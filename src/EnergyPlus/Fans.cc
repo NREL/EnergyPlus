@@ -1155,8 +1155,8 @@ namespace EnergyPlus::Fans {
         Real64 XmotorMax;                  // Factor for motor max eff curve [ln hp]
         Real64 MotorOutPwrRatio;           // Ratio of motor output power to max motor output power [-]
         Real64 MotorPLEff;                 // Motor normalized (part-load) efficiency [-]
-        static Real64 VFDSpdRatio(0.0);    // Ratio of motor speed to motor max speed [-]
-        static Real64 VFDOutPwrRatio(0.0); // Ratio of VFD output power to max VFD output power [-]
+        Real64 VFDSpdRatio(0.0);    // Ratio of motor speed to motor max speed [-]
+        Real64 VFDOutPwrRatio(0.0); // Ratio of VFD output power to max VFD output power [-]
         std::string CompName;              // component name
         std::string CompType;              // component type
         std::string SizingString;          // input field sizing description (e.g., Nominal Capacity)
@@ -1590,8 +1590,8 @@ namespace EnergyPlus::Fans {
         Real64 MassFlow; // [kg/sec]
         Real64 PartLoadFrac;
         Real64 MinFlowFrac;                  // Variable Volume Fan Min Flow Fraction [-]
-        static Real64 FlowFracForPower(0.0); // Variable Volume Fan Flow Fraction for power calcs[-]
-        static Real64 FlowFracActual(0.0);   // actual VAV fan flow fraction
+        Real64 FlowFracForPower(0.0); // Variable Volume Fan Flow Fraction for power calcs[-]
+        Real64 FlowFracActual(0.0);   // actual VAV fan flow fraction
         Real64 FanShaftPower;                // power delivered to fan shaft
         int NVPerfNum;
 
@@ -1791,7 +1791,6 @@ namespace EnergyPlus::Fans {
         Real64 FanShaftPower;        // power delivered to fan shaft
         Real64 SpeedRaisedToPower;   // Result of the speed ratio raised to the power of n (Curve object)
         Real64 EffRatioAtSpeedRatio; // Efficiency ratio at current speed ratio (Curve object)
-        static int ErrCount(0);
 
         auto & Fan(state.dataFans->Fan);
 
@@ -1846,7 +1845,7 @@ namespace EnergyPlus::Fans {
             PartLoadRatio = min(1.0, FlowFrac);
             // Fan is operating
             if (state.dataHVACGlobal->OnOffFanPartLoadFraction <= 0.0) {
-                ShowRecurringWarningErrorAtEnd(state, "Fan:OnOff, OnOffFanPartLoadFraction <= 0.0, Reset to 1.0", ErrCount);
+                ShowRecurringWarningErrorAtEnd(state, "Fan:OnOff, OnOffFanPartLoadFraction <= 0.0, Reset to 1.0", state.dataFans->ErrCount);
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0; // avoid divide by zero or negative PLF
             }
 
@@ -2098,8 +2097,8 @@ namespace EnergyPlus::Fans {
         Real64 BeltPLEff;                  // Belt normalized (part-load) efficiency [-]
         Real64 MotorOutPwrRatio;           // Ratio of motor output power to max motor output power [-]
         Real64 MotorPLEff;                 // Motor normalized (part-load) efficiency [-]
-        static Real64 VFDSpdRatio(0.0);    // Ratio of motor speed to motor max speed [-]
-        static Real64 VFDOutPwrRatio(0.0); // Ratio of VFD output power to max VFD output power [-]
+        Real64 VFDSpdRatio(0.0);    // Ratio of motor speed to motor max speed [-]
+        Real64 VFDOutPwrRatio(0.0); // Ratio of VFD output power to max VFD output power [-]
         Real64 FanEnthalpyChange;          // Air enthalpy change due to fan, belt, and motor losses [kJ/kg]
 
         auto & NightVentPerf(state.dataFans->NightVentPerf);

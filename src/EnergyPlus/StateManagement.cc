@@ -56,26 +56,16 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
-#include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
-#include <EnergyPlus/HVACDuct.hh>
-#include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/HVACSingleDuctInduc.hh>
-#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
-#include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
-#include <EnergyPlus/Photovoltaics.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
@@ -89,21 +79,8 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
     DataOutputs::clear_state();
-    DataStringGlobals::clear_state();
-    DataViewFactorInformation::clear_state();
-    DesiccantDehumidifiers::clear_state();
-    EvaporativeFluidCoolers::clear_state();
     FluidProperties::clear_state();
-    HeatBalanceIntRadExchange::clear_state();
     HeatBalanceManager::clear_state();
-    HVACDuct::clear_state();
-    HVACDXSystem::clear_state();
     HVACFan::clearHVACFanObjects();
-    HVACSingleDuctInduc::clear_state();
-    HybridModel::clear_state();
-    HysteresisPhaseChange::clear_state();
-    Photovoltaics::clear_state();
     Psychrometrics::clear_state();
-    RoomAirModelAirflowNetwork::clear_state();
-    RoomAirModelUserTempPattern::clear_state();
 }

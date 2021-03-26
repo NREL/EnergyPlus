@@ -59,20 +59,6 @@ namespace DataViewFactorInformation {
     //       AUTHOR         Rob Hitchcock
     //       DATE WRITTEN   September 2007; Moved from HeatBalanceIntRadExchange
 
-    int NumOfRadiantEnclosures(0); // Number of radiant enclosures
-    int NumOfSolarEnclosures(0);   // Number of solar enclosures
-
-    Array1D<ZoneViewFactorInformation> ZoneRadiantInfo;
-    Array1D<ZoneViewFactorInformation> ZoneSolarInfo;
-
-    void clear_state()
-    {
-        NumOfRadiantEnclosures = 0;
-        NumOfSolarEnclosures = 0;
-        ZoneRadiantInfo.deallocate();
-        ZoneSolarInfo.deallocate();
-    }
-
 } // namespace DataViewFactorInformation
 
 } // namespace EnergyPlus

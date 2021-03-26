@@ -76,7 +76,8 @@ namespace EnergyPlus::TARCOGOutput {
     using namespace TARCOGGassesParams;
     using namespace TARCOGParams;
 
-    void WriteInputArguments(EnergyPlusData &state, InputOutputFile &InArgumentsFile,
+    void WriteInputArguments(EnergyPlusData &state,
+                             InputOutputFile &InArgumentsFile,
                              const std::string &DBGD,
                              Real64 const tout,
                              Real64 const tind,

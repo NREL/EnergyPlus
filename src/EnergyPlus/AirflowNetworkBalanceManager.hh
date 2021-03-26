@@ -308,6 +308,15 @@ namespace AirflowNetworkBalanceManager {
         Array1D<AirflowNetwork::AirflowNetworkNodeReportData> nodeReport;
         Array1D<AirflowNetwork::AirflowNetworkLinkReportData> linkReport1;
 
+        // used to be statics
+        Array1D<bool> onceZoneFlag;
+        Array1D<bool> onceSurfFlag;
+        bool onetime = false;
+        int HybridGlobalErrIndex = 0;
+        int HybridGlobalErrCount = 0;
+        int AFNNumOfExtOpenings = 0; // Total number of external openings in the model
+        int OpenNuminZone = 0;       // Counts which opening this is in the zone, 1 or 2
+
         void clear_state() override
         {
             this->OccupantVentilationControl.deallocate();
@@ -374,7 +383,19 @@ namespace AirflowNetworkBalanceManager {
             this->linkReport.deallocate();
             this->nodeReport.deallocate();
             this->linkReport1.deallocate();
-
+            this->ErrCountVar = 0;
+            this->ErrCountHighPre = 0;
+            this->ErrCountLowPre = 0;
+            this->ErrIndexHighPre = 0;
+            this->ErrIndexVar = 0;
+            this->ErrIndexLowPre = 0;
+            this->onceZoneFlag.clear();
+            this->onceSurfFlag.clear();
+            this->onetime = false;
+            this->HybridGlobalErrIndex = 0;
+            this->HybridGlobalErrCount = 0;
+            this->AFNNumOfExtOpenings = 0;
+            this->OpenNuminZone = 0;
             solver.clear();
         }
     };

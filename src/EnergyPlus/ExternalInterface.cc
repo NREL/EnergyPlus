@@ -399,8 +399,6 @@ namespace EnergyPlus::ExternalInterface {
         std::string xmlStrOut;    // xml values in string, separated by ';'
         std::string xmlStrOutTyp; // xml values in string, separated by ';'
         std::string xmlStrIn;     // xml values in string, separated by ';'
-        static int nOutVal;       // Number of output values (E+ -> ExternalInterface)
-        static int nInpVar;       // Number of input values (ExternalInterface -> E+)
         int retVal;               // Return value of function call, used for error handling
         int mainVersion;          // The version number
 
@@ -460,22 +458,22 @@ namespace EnergyPlus::ExternalInterface {
                     retVal = getepvariables(simCfgFilNam.c_str(),
                                             &xmlStrOutTypArr[0],
                                             &xmlStrOutArr[0],
-                                            &nOutVal,
+                                            &state.dataExternalInterface->nOutVal,
                                             xmlStrInKey.c_str(),
                                             &state.dataExternalInterface->nInKeys,
                                             &xmlStrInArr[0],
-                                            &nInpVar,
+                                            &state.dataExternalInterface->nInpVar,
                                             state.dataExternalInterface->inpVarTypes.data(),
                                             &lenXmlStr);
                 } else if (state.dataExternalInterface->haveExternalInterfaceFMUExport) {
                     retVal = getepvariablesFMU(simCfgFilNam.c_str(),
                                                &xmlStrOutTypArr[0],
                                                &xmlStrOutArr[0],
-                                               &nOutVal,
+                                               &state.dataExternalInterface->nOutVal,
                                                xmlStrInKey.c_str(),
                                                &state.dataExternalInterface->nInKeys,
                                                &xmlStrInArr[0],
-                                               &nInpVar,
+                                               &state.dataExternalInterface->nInpVar,
                                                state.dataExternalInterface->inpVarTypes.data(),
                                                &lenXmlStr);
                 } else {
@@ -508,44 +506,44 @@ namespace EnergyPlus::ExternalInterface {
             }
             StopExternalInterfaceIfError(state);
 
-            if (nOutVal + nInpVar > maxVar) {
+            if (state.dataExternalInterface->nOutVal + state.dataExternalInterface->nInpVar > maxVar) {
                 ShowSevereError(state, "ExternalInterface: Too many variables to be exchanged.");
-                ShowContinueError(state, format("Attempted to exchange {} outputs", nOutVal));
-                ShowContinueError(state, format("plus {} inputs.", nOutVal));
+                ShowContinueError(state, format("Attempted to exchange {} outputs", state.dataExternalInterface->nOutVal));
+                ShowContinueError(state, format("plus {} inputs.", state.dataExternalInterface->nOutVal));
                 ShowContinueError(state, format("Maximum allowed is sum is {}.", maxVar));
                 ShowContinueError(state, "To fix, increase maxVar in ExternalInterface.cc");
                 state.dataExternalInterface->ErrorsFound = true;
             }
             StopExternalInterfaceIfError(state);
 
-            if (nOutVal < 0) {
+            if (state.dataExternalInterface->nOutVal < 0) {
                 ShowSevereError(state, "ExternalInterface: Error when getting number of xml values for outputs.");
                 state.dataExternalInterface->ErrorsFound = true;
             } else {
-                ParseString(xmlStrOut, state.dataExternalInterface->varNames, nOutVal);
-                ParseString(xmlStrOutTyp, state.dataExternalInterface->varKeys, nOutVal);
+                ParseString(xmlStrOut, state.dataExternalInterface->varNames, state.dataExternalInterface->nOutVal);
+                ParseString(xmlStrOutTyp, state.dataExternalInterface->varKeys, state.dataExternalInterface->nOutVal);
             }
             StopExternalInterfaceIfError(state);
 
-            if (nInpVar < 0) {
+            if (state.dataExternalInterface->nInpVar < 0) {
                 ShowSevereError(state, "ExternalInterface: Error when getting number of xml values for inputs.");
                 state.dataExternalInterface->ErrorsFound = true;
             } else {
-                ParseString(xmlStrIn, state.dataExternalInterface->inpVarNames, nInpVar);
+                ParseString(xmlStrIn, state.dataExternalInterface->inpVarNames, state.dataExternalInterface->nInpVar);
             }
             StopExternalInterfaceIfError(state);
 
-            DisplayString(state, format("Number of outputs in ExternalInterface = {}", nOutVal));
-            DisplayString(state, format("Number of inputs  in ExternalInterface = {}", nInpVar));
+            DisplayString(state, format("Number of outputs in ExternalInterface = {}", state.dataExternalInterface->nOutVal));
+            DisplayString(state, format("Number of inputs  in ExternalInterface = {}", state.dataExternalInterface->nInpVar));
 
             state.dataExternalInterface->InitExternalInterfacefirstCall = false;
 
         } else if (!state.dataExternalInterface->configuredControlPoints) {
-            state.dataExternalInterface->keyVarIndexes.allocate(nOutVal);
-            state.dataExternalInterface->varTypes.allocate(nOutVal);
-            GetReportVariableKey(state, state.dataExternalInterface->varKeys, nOutVal, state.dataExternalInterface->varNames, state.dataExternalInterface->keyVarIndexes, state.dataExternalInterface->varTypes);
-            state.dataExternalInterface->varInd.allocate(nInpVar);
-            for (i = 1; i <= nInpVar; ++i) {
+            state.dataExternalInterface->keyVarIndexes.allocate(state.dataExternalInterface->nOutVal);
+            state.dataExternalInterface->varTypes.allocate(state.dataExternalInterface->nOutVal);
+            GetReportVariableKey(state, state.dataExternalInterface->varKeys, state.dataExternalInterface->nOutVal, state.dataExternalInterface->varNames, state.dataExternalInterface->keyVarIndexes, state.dataExternalInterface->varTypes);
+            state.dataExternalInterface->varInd.allocate(state.dataExternalInterface->nInpVar);
+            for (i = 1; i <= state.dataExternalInterface->nInpVar; ++i) {
                 if (state.dataExternalInterface->inpVarTypes(i) == indexSchedule) {
                     state.dataExternalInterface->varInd(i) = GetDayScheduleIndex(state, state.dataExternalInterface->inpVarNames(i));
                 } else if (state.dataExternalInterface->inpVarTypes(i) == indexVariable) {
@@ -561,7 +559,7 @@ namespace EnergyPlus::ExternalInterface {
             }
             StopExternalInterfaceIfError(state);
             // Configure Erl variables
-            for (i = 1; i <= nInpVar; ++i) {
+            for (i = 1; i <= state.dataExternalInterface->nInpVar; ++i) {
                 if (state.dataExternalInterface->inpVarTypes(i) == indexVariable) { // ems-globalvariable
                     state.dataExternalInterface->useEMS = true;
                     if (!isExternalInterfaceErlVariable(state, state.dataExternalInterface->varInd(i))) {
@@ -944,7 +942,6 @@ namespace EnergyPlus::ExternalInterface {
 
         // Using/Aliasing
         using DataStringGlobals::altpathChar;
-        using DataStringGlobals::CurrentWorkingFolder;
         using DataStringGlobals::pathChar;
         using DataSystemVariables::CheckForActualFileName;
 

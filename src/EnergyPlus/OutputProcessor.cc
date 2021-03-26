@@ -196,7 +196,7 @@ namespace OutputProcessor {
         op->ReportList.allocate(500);
         op->NumReportList = 500;
         op->ReportList = 0;
-        op->NumExtraVars = 0; 
+        op->NumExtraVars = 0;
 
         // Initialize end use category names - the indices must match up with endUseNames in OutputReportTabular
         op->EndUseCategory.allocate(state.dataGlobalConst->iEndUse.size());
@@ -2850,10 +2850,6 @@ namespace OutputProcessor {
         int Loop; // Loop Control
         bool PrintTimeStamp;
         int CurDayType;
-        static Real64 rDummy1(0.0);
-        static Real64 rDummy2(0.0);
-        static int iDummy1(0);
-        static int iDummy2(0);
         auto &op(state.dataOutputProcessor);
 
         if (!state.dataResultsFramework->resultsFramework->TSMeters.rDataFrameEnabled()) {
@@ -2918,10 +2914,10 @@ namespace OutputProcessor {
                                      op->EnergyMeters(Loop).TSRptNumChr,
                                      op->EnergyMeters(Loop).TSValue,
                                      ReportingFrequency::TimeStep,
-                                     rDummy1,
-                                     iDummy1,
-                                     rDummy2,
-                                     iDummy2,
+                                     state.dataOutputProcessor->rDummy1TS,
+                                     state.dataOutputProcessor->iDummy1TS,
+                                     state.dataOutputProcessor->rDummy2TS,
+                                     state.dataOutputProcessor->iDummy2TS,
                                      op->EnergyMeters(Loop).RptTSFO);
                 state.dataResultsFramework->resultsFramework->TSMeters.pushVariableValue(op->EnergyMeters(Loop).TSRptNum, op->EnergyMeters(Loop).TSValue);
             }
@@ -2979,10 +2975,6 @@ namespace OutputProcessor {
         int Loop; // Loop Control
         bool PrintTimeStamp;
         int CurDayType;
-        static Real64 rDummy1(0.0);
-        static Real64 rDummy2(0.0);
-        static int iDummy1(0);
-        static int iDummy2(0);
         auto &op(state.dataOutputProcessor);
 
         if (!state.dataResultsFramework->resultsFramework->HRMeters.rDataFrameEnabled()) {
@@ -3024,10 +3016,10 @@ namespace OutputProcessor {
                                      op->EnergyMeters(Loop).HRRptNumChr,
                                      op->EnergyMeters(Loop).HRValue,
                                      ReportingFrequency::Hourly,
-                                     rDummy1,
-                                     iDummy1,
-                                     rDummy2,
-                                     iDummy2,
+                                     state.dataOutputProcessor->rDummy1,
+                                     state.dataOutputProcessor->iDummy1,
+                                     state.dataOutputProcessor->rDummy2,
+                                     state.dataOutputProcessor->iDummy2,
                                      op->EnergyMeters(Loop).RptHRFO); // EnergyMeters(Loop)%HRMinVal, EnergyMeters(Loop)%HRMinValDate, & |
                                                                   // EnergyMeters(Loop)%HRMaxVal, EnergyMeters(Loop)%HRMaxValDate, &
                 state.dataResultsFramework->resultsFramework->HRMeters.pushVariableValue(op->EnergyMeters(Loop).HRRptNum, op->EnergyMeters(Loop).HRValue);
@@ -3808,17 +3800,16 @@ namespace OutputProcessor {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static int const N(100);
-        static char stamp[N];
+
         assert(reportIDString.length() + DayOfSimChr.length() + (DayType.present() ? DayType().length() : 0u) + 26 <
-               N); // Check will fit in stamp size
+               N_WriteTimeStampFormatData); // Check will fit in stamp size
 
         if (!outputFile.good()) return;
 
         switch (reportingInterval) {
         case ReportingFrequency::EachCall:
         case ReportingFrequency::TimeStep:
-            std::sprintf(stamp,
+            std::sprintf(state.dataOutputProcessor->stamp,
                          "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s",
                          reportIDString.c_str(),
                          DayOfSimChr.c_str(),
@@ -3829,7 +3820,7 @@ namespace OutputProcessor {
                          StartMinute(),
                          EndMinute(),
                          DayType().c_str());
-            print(outputFile, "{}\n", stamp);
+            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
@@ -3847,7 +3838,7 @@ namespace OutputProcessor {
             }
             break;
         case ReportingFrequency::Hourly:
-            std::sprintf(stamp,
+            std::sprintf(state.dataOutputProcessor->stamp,
                          "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s",
                          reportIDString.c_str(),
                          DayOfSimChr.c_str(),
@@ -3858,7 +3849,7 @@ namespace OutputProcessor {
                          0.0,
                          60.0,
                          DayType().c_str());
-            print(outputFile, "{}\n", stamp);
+            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
@@ -3876,8 +3867,8 @@ namespace OutputProcessor {
             }
             break;
         case ReportingFrequency::Daily:
-            std::sprintf(stamp, "%s,%s,%2d,%2d,%2d,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), DayType().c_str());
-            print(outputFile, "{}\n", stamp);
+            std::sprintf(state.dataOutputProcessor->stamp, "%s,%s,%2d,%2d,%2d,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), DayType().c_str());
+            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
@@ -3895,16 +3886,16 @@ namespace OutputProcessor {
             }
             break;
         case ReportingFrequency::Monthly:
-            std::sprintf(stamp, "%s,%s,%2d", reportIDString.c_str(), DayOfSimChr.c_str(), Month());
-            print(outputFile, "{}\n", stamp);
+            std::sprintf(state.dataOutputProcessor->stamp, "%s,%s,%2d", reportIDString.c_str(), DayOfSimChr.c_str(), Month());
+            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(
                     static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, state.dataEnvrn->CurEnvirNum, state.dataGlobal->CalendarYear, Month);
             }
             break;
         case ReportingFrequency::Simulation:
-            std::sprintf(stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str());
-            print(outputFile, "{}\n", stamp);
+            std::sprintf(state.dataOutputProcessor->stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str());
+            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(
                     static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, state.dataEnvrn->CurEnvirNum, state.dataGlobal->CalendarYear);
@@ -4245,8 +4236,6 @@ namespace OutputProcessor {
         // of the UpdateDataandReport subroutine. The code was moved to facilitate
         // easier maintenance and writing of data to the SQL database.
 
-        static char s[129];
-
         std::string NumberOut;   // Character for producing "number out"
         Real64 repVal(repValue); // The variable's value
 
@@ -4256,8 +4245,8 @@ namespace OutputProcessor {
         if (repVal == 0.0) {
             NumberOut = "0.0";
         } else {
-            dtoa(repVal, s);
-            NumberOut = std::string(s);
+            dtoa(repVal, state.dataOutputProcessor->s_WriteReportRealData);
+            NumberOut = std::string(state.dataOutputProcessor->s_WriteReportRealData);
         }
 
         if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
@@ -4299,15 +4288,15 @@ namespace OutputProcessor {
             if (MaxValue == 0.0) {
                 MaxOut = "0.0";
             } else {
-                dtoa(MaxValue, s);
-                MaxOut = std::string(s);
+                dtoa(MaxValue, state.dataOutputProcessor->s_WriteReportRealData);
+                MaxOut = std::string(state.dataOutputProcessor->s_WriteReportRealData);
             }
 
             if (minValue == 0.0) {
                 MinOut = "0.0";
             } else {
-                dtoa(minValue, s);
-                MinOut = std::string(s);
+                dtoa(minValue, state.dataOutputProcessor->s_WriteReportRealData);
+                MinOut = std::string(state.dataOutputProcessor->s_WriteReportRealData);
             }
 
             // Append the min and max strings with date information
@@ -4338,14 +4327,13 @@ namespace OutputProcessor {
         // This subroutine writes the cumulative meter data to the output files and
         // SQL database.
 
-        static char s[129];
         std::string NumberOut; // Character for producing "number out"
 
         if (repValue == 0.0) {
             NumberOut = "0.0";
         } else {
-            dtoa(repValue, s);
-            NumberOut = std::string(s);
+            dtoa(repValue, state.dataOutputProcessor->s_WriteCumulativeReportMeterData);
+            NumberOut = std::string(state.dataOutputProcessor->s_WriteCumulativeReportMeterData);
         }
 
         if (sqlite) {
@@ -4384,14 +4372,13 @@ namespace OutputProcessor {
         // This subroutine writes for the non-cumulative meter data to the output files and
         // SQL database.
 
-        static char s[129];
         std::string NumberOut; // Character for producing "number out"
 
         if (repValue == 0.0) {
             NumberOut = "0.0";
         } else {
-            dtoa(repValue, s);
-            NumberOut = std::string(s);
+            dtoa(repValue, state.dataOutputProcessor->s_WriteReportMeterData);
+            NumberOut = std::string(state.dataOutputProcessor->s_WriteReportMeterData);
         }
 
         if (sqlite) {
@@ -4417,15 +4404,15 @@ namespace OutputProcessor {
             if (MaxValue == 0.0) {
                 MaxOut = "0.0";
             } else {
-                dtoa(MaxValue, s);
-                MaxOut = std::string(s);
+                dtoa(MaxValue, state.dataOutputProcessor->s_WriteReportMeterData);
+                MaxOut = std::string(state.dataOutputProcessor->s_WriteReportMeterData);
             }
 
             if (minValue == 0.0) {
                 MinOut = "0.0";
             } else {
-                dtoa(minValue, s);
-                MinOut = std::string(s);
+                dtoa(minValue, state.dataOutputProcessor->s_WriteReportMeterData);
+                MinOut = std::string(state.dataOutputProcessor->s_WriteReportMeterData);
             }
 
             // Append the min and max strings with date information
@@ -4465,18 +4452,16 @@ namespace OutputProcessor {
         // of the UpdateDataandReport subroutine. The code was moved to facilitate
         // easier maintenance and writing of data to the SQL database.
 
-        static char s[129];
-
         if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface && !state.dataSysVars->ReportDuringWarmup) return;
 
-        dtoa(repValue, s);
+        dtoa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
         if (sqlite) {
             sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.eso.good()) {
-            print(state.files.eso, "{},{}\n", creportID, s);
+            print(state.files.eso, "{},{}\n", creportID, state.dataOutputProcessor->s_WriteNumericData);
         }
     }
 
@@ -4501,16 +4486,14 @@ namespace OutputProcessor {
         // of the UpdateDataandReport subroutine. The code was moved to facilitate
         // easier maintenance and writing of data to the SQL database.
 
-        static char s[129];
-
-        i32toa(repValue, s);
+        i32toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
         if (sqlite) {
             sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.eso.good()) {
-            print(state.files.eso, "{},{}\n", creportID, s);
+            print(state.files.eso, "{},{}\n", creportID, state.dataOutputProcessor->s_WriteNumericData);
         }
     }
 
@@ -4535,16 +4518,14 @@ namespace OutputProcessor {
         // of the UpdateDataandReport subroutine. The code was moved to facilitate
         // easier maintenance and writing of data to the SQL database.
 
-        static char s[129];
-
-        i64toa(repValue, s);
+        i64toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
         if (sqlite) {
             sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.eso.good()) {
-            print(state.files.eso, "{},{}\n", creportID, s);
+            print(state.files.eso, "{},{}\n", creportID, state.dataOutputProcessor->s_WriteNumericData);
         }
     }
 
@@ -4727,7 +4708,7 @@ namespace OutputProcessor {
         }
     }
 
-    int DetermineIndexGroupKeyFromMeterName(std::string const &meterName) // the meter name
+    int DetermineIndexGroupKeyFromMeterName(EnergyPlusData &state, std::string const &meterName) // the meter name
     {
 
         // FUNCTION INFORMATION:
@@ -4757,44 +4738,43 @@ namespace OutputProcessor {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static int indexGroupKey(-1);
 
         // Facility indices are in the 100s
         if (has(meterName, "Electricity:Facility")) {
-            indexGroupKey = 100;
+            state.dataOutputProcessor->indexGroupKey = 100;
         } else if (has(meterName, "NaturalGas:Facility")) {
-            indexGroupKey = 101;
+            state.dataOutputProcessor->indexGroupKey = 101;
         } else if (has(meterName, "DistricHeating:Facility")) {
-            indexGroupKey = 102;
+            state.dataOutputProcessor->indexGroupKey = 102;
         } else if (has(meterName, "DistricCooling:Facility")) {
-            indexGroupKey = 103;
+            state.dataOutputProcessor->indexGroupKey = 103;
         } else if (has(meterName, "ElectricityNet:Facility")) {
-            indexGroupKey = 104;
+            state.dataOutputProcessor->indexGroupKey = 104;
 
             // Building indices are in the 200s
         } else if (has(meterName, "Electricity:Building")) {
-            indexGroupKey = 201;
+            state.dataOutputProcessor->indexGroupKey = 201;
         } else if (has(meterName, "NaturalGas:Building")) {
-            indexGroupKey = 202;
+            state.dataOutputProcessor->indexGroupKey = 202;
 
             // HVAC indices are in the 300s
         } else if (has(meterName, "Electricity:HVAC")) {
-            indexGroupKey = 301;
+            state.dataOutputProcessor->indexGroupKey = 301;
 
             // InteriorLights:Electricity:Zone indices are in the 500s
         } else if (has(meterName, "InteriorLights:Electricity:Zone")) {
-            indexGroupKey = 501;
+            state.dataOutputProcessor->indexGroupKey = 501;
 
             // InteriorLights:Electricity indices are in the 400s
         } else if (has(meterName, "InteriorLights:Electricity")) {
-            indexGroupKey = 401;
+            state.dataOutputProcessor->indexGroupKey = 401;
 
             // Unknown items have negative indices
         } else {
-            indexGroupKey = -11;
+            state.dataOutputProcessor->indexGroupKey = -11;
         }
 
-        DetermineIndexGroupKeyFromMeterName = indexGroupKey;
+        DetermineIndexGroupKeyFromMeterName = state.dataOutputProcessor->indexGroupKey;
 
         return DetermineIndexGroupKeyFromMeterName;
     }
@@ -5722,11 +5702,6 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     Real64 MinuteNow;     // What minute it is now
     bool ReportNow;       // True if this variable should be reported now
     int CurDayType;       // What kind of day it is (weekday (sunday, etc) or holiday)
-    //////////// hoisted into namespace ////////////////////////////////////////////////
-    // static int LHourP( -1 ); // Helps set hours for timestamp output
-    // static Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
-    // static Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
-    ////////////////////////////////////////////////////////////////////////////////////
     bool EndTimeStepFlag(false); // True when it's the end of the Zone Time Step
     Real64 rxTime;                      // (MinuteNow-StartMinute)/REAL(MinutesPerTimeStep,r64) - for execution time
     auto &op(state.dataOutputProcessor);
@@ -6421,9 +6396,6 @@ void AssignReportNumber(EnergyPlusData &state, int &ReportNumber)
     // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    //////////// hoisted into namespace ////////////
-    // static int ReportNumberCounter( 0 );
-    ////////////////////////////////////////////////
 
     ++state.dataOutputProcessor->ReportNumberCounter;
     ReportNumber = state.dataOutputProcessor->ReportNumberCounter;
@@ -6472,25 +6444,23 @@ void GenOutputVariablesAuditReport(EnergyPlusData &state)
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static bool Rept(false);
     int Loop;
-    static bool OpaqSurfWarned(false);
     auto &op(state.dataOutputProcessor);
 
     for (Loop = 1; Loop <= op->NumOfReqVariables; ++Loop) {
         if (op->ReqRepVars(Loop).Used) continue;
         if (op->ReqRepVars(Loop).Key.empty()) op->ReqRepVars(Loop).Key = "*";
-        if (has(op->ReqRepVars(Loop).VarName, "OPAQUE SURFACE INSIDE FACE CONDUCTION") && !state.dataGlobal->DisplayAdvancedReportVariables && !OpaqSurfWarned) {
+        if (has(op->ReqRepVars(Loop).VarName, "OPAQUE SURFACE INSIDE FACE CONDUCTION") && !state.dataGlobal->DisplayAdvancedReportVariables && !state.dataOutputProcessor->OpaqSurfWarned) {
             ShowWarningError(state, "Variables containing \"Opaque Surface Inside Face Conduction\" are now \"advanced\" variables.");
             ShowContinueError(state, "You must enter the \"Output:Diagnostics,DisplayAdvancedReportVariables;\" statement to view.");
             ShowContinueError(state, "First, though, read cautionary statements in the \"InputOutputReference\" document.");
-            OpaqSurfWarned = true;
+            state.dataOutputProcessor->OpaqSurfWarned = true;
         }
-        if (!Rept) {
+        if (!state.dataOutputProcessor->Rept) {
             ShowWarningError(state, "The following Report Variables were requested but not generated -- check.rdd file");
             ShowContinueError(state, "Either the IDF did not contain these elements, the variable name is misspelled,");
             ShowContinueError(state, "or the requested variable is an advanced output which requires Output : Diagnostics, DisplayAdvancedReportVariables;");
-            Rept = true;
+            state.dataOutputProcessor->Rept = true;
         }
         ShowMessage(state, "Key=" + op->ReqRepVars(Loop).Key + ", VarName=" + op->ReqRepVars(Loop).VarName +
                     ", Frequency=" + reportFrequency[op->ReqRepVars(Loop).frequency]);
@@ -6566,7 +6536,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
     int NumReqMeterFOs;
     ReportingFrequency ReportFreq;
 
-    static bool ErrorsFound(false); // If errors detected in input
+    bool ErrorsFound(false); // If errors detected in input
     auto &op(state.dataOutputProcessor);
 
     GetCustomMeterInput(state, ErrorsFound);
@@ -6791,7 +6761,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
             if (!op->EnergyMeters(WhichMeter).RptTS) {
                 op->EnergyMeters(WhichMeter).RptTS = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptTSFO = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -6816,7 +6786,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
             if (!op->EnergyMeters(WhichMeter).RptAccTS) {
                 op->EnergyMeters(WhichMeter).RptAccTS = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptAccTSFO = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -6844,7 +6814,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptHR = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptHRFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingHourlyVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -6870,7 +6840,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptAccHR = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptAccHRFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingHourlyVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -6898,7 +6868,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptDY = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptDYFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingDailyVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -6924,7 +6894,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptAccDY = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptAccDYFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingDailyVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -6952,7 +6922,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptMN = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptMNFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingMonthlyVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -6978,7 +6948,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptAccMN = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptAccMNFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingMonthlyVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -7006,7 +6976,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptYR = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptYRFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingYearlyVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -7032,7 +7002,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptAccYR = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptAccYRFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingYearlyVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -7060,7 +7030,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptSM = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptSMFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingRunPeriodVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -7086,7 +7056,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptAccSM = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptAccSMFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingRunPeriodVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -7128,28 +7098,25 @@ int GetMeterIndex(EnergyPlusData &state, std::string const &MeterName)
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     // Valid Meter names because matching case insensitive
-    static Array1D_string ValidMeterNames;
-    static Array1D_int iValidMeterNames;
-    static int NumValidMeters(0);
     //////////// hoisted into namespace changed to GetMeterIndexFirstCall////////////
     // static bool FirstCall( true );
     ////////////////////////////////////////////////
     int Found;
     auto &op(state.dataOutputProcessor);
 
-    if (op->GetMeterIndexFirstCall || (NumValidMeters != op->NumEnergyMeters)) {
-        NumValidMeters = op->NumEnergyMeters;
-        ValidMeterNames.allocate(NumValidMeters);
-        for (Found = 1; Found <= NumValidMeters; ++Found) {
-            ValidMeterNames(Found) = UtilityRoutines::MakeUPPERCase(op->EnergyMeters(Found).Name);
+    if (op->GetMeterIndexFirstCall || (state.dataOutputProcessor->NumValidMeters != op->NumEnergyMeters)) {
+        state.dataOutputProcessor->NumValidMeters = op->NumEnergyMeters;
+        state.dataOutputProcessor->ValidMeterNames.allocate(state.dataOutputProcessor->NumValidMeters);
+        for (Found = 1; Found <= state.dataOutputProcessor->NumValidMeters; ++Found) {
+            state.dataOutputProcessor->ValidMeterNames(Found) = UtilityRoutines::MakeUPPERCase(op->EnergyMeters(Found).Name);
         }
-        iValidMeterNames.allocate(NumValidMeters);
-        SetupAndSort(ValidMeterNames, iValidMeterNames);
+        state.dataOutputProcessor->iValidMeterNames.allocate(state.dataOutputProcessor->NumValidMeters);
+        SetupAndSort(state.dataOutputProcessor->ValidMeterNames, state.dataOutputProcessor->iValidMeterNames);
         op->GetMeterIndexFirstCall = false;
     }
 
-    MeterIndex = UtilityRoutines::FindItemInSortedList(MeterName, ValidMeterNames, NumValidMeters);
-    if (MeterIndex != 0) MeterIndex = iValidMeterNames(MeterIndex);
+    MeterIndex = UtilityRoutines::FindItemInSortedList(MeterName, state.dataOutputProcessor->ValidMeterNames, state.dataOutputProcessor->NumValidMeters);
+    if (MeterIndex != 0) MeterIndex = state.dataOutputProcessor->iValidMeterNames(MeterIndex);
 
     return MeterIndex;
 }
@@ -7852,9 +7819,6 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
     using SortAndStringUtilities::SetupAndSort;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    //////////// hoisted into namespace ///////////////////////////////////////////////
-    // static bool InitFlag( true ); // for initting the keyVarIndexes array
-    ////////////////////////////////////////////////////////////////////////////////////
     int Loop; // Loop counters
     int Loop2;
     std::string::size_type Position; // Starting point of search string
@@ -8276,7 +8240,7 @@ void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &Repor
         Meter = UtilityRoutines::FindItem(PollutionMeters(Loop), op->EnergyMeters);
         if (Meter > 0) { // All the active meters for this run are set, but all are still searched for.
 
-            indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(Meter).Name);
+            indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(Meter).Name);
             indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(Meter));
             // All of the specified meters are checked and the headers printed to the meter file if this
             //  has not been done previously
@@ -8411,7 +8375,6 @@ void ProduceRDDMDD(EnergyPlusData &state)
     // provide a single call for writing out the Report Data Dictionary and Meter Data Dictionary.
 
     // Using/Aliasing
-    using DataStringGlobals::IDDVerString;
     using DataStringGlobals::VerString;
     using namespace OutputProcessor;
     using General::ScanForReports;
@@ -8462,16 +8425,16 @@ void ProduceRDDMDD(EnergyPlusData &state)
     state.files.rdd.ensure_open(state, "ProduceRDDMDD", state.files.outputControl.rdd);
     state.files.mdd.ensure_open(state, "ProduceRDDMDD", state.files.outputControl.mdd);
     if (op->ProduceReportVDD == iReportVDD::Yes) {
-        print(state.files.rdd, "Program Version,{},{}{}", VerString, IDDVerString, '\n');
+        print(state.files.rdd, "Program Version,{},{}{}", VerString, state.dataStrGlobals->IDDVerString, '\n');
         print(state.files.rdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", '\n');
 
-        print(state.files.mdd, "Program Version,{},{}{}", VerString, IDDVerString, '\n');
+        print(state.files.mdd, "Program Version,{},{}{}", VerString, state.dataStrGlobals->IDDVerString, '\n');
         print(state.files.mdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", '\n');
     } else if (op->ProduceReportVDD == iReportVDD::IDF) {
-        print(state.files.rdd, "! Program Version,{},{}{}", VerString, IDDVerString, '\n');
+        print(state.files.rdd, "! Program Version,{},{}{}", VerString, state.dataStrGlobals->IDDVerString, '\n');
         print(state.files.rdd, "! Output:Variable Objects (applicable to this run){}", '\n');
 
-        print(state.files.mdd, "! Program Version,{},{}{}", VerString, IDDVerString, '\n');
+        print(state.files.mdd, "! Program Version,{},{}{}", VerString, state.dataStrGlobals->IDDVerString, '\n');
         print(state.files.mdd, "! Output:Meter Objects (applicable to this run){}", '\n');
     }
 

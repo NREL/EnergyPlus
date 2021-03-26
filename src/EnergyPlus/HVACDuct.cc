@@ -98,23 +98,12 @@ namespace HVACDuct {
     // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
-    int NumDucts(0);
-    Array1D_bool CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE HVACDuct:
 
     // <name Public routines, optionally name Private routines within this module>
 
     // Object Data
-    Array1D<DuctData> Duct;
-    bool GetInputFlag(true); // First time, input is "gotten"
-
-    void clear_state() {
-        NumDucts = 0;
-        CheckEquipName.clear();
-        Duct.clear();
-        GetInputFlag = true; // First time, input is "gotten"
-    }
 
     // Functions
 
@@ -139,34 +128,34 @@ namespace HVACDuct {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DuctNum;                    // index of duct being simulated
 
-        if (GetInputFlag) {
+        if (state.dataHVACDuct->GetInputFlag) {
             GetDuctInput(state);
-            GetInputFlag = false;
+            state.dataHVACDuct->GetInputFlag = false;
         }
 
         // Get the duct component index
         if (CompIndex == 0) {
-            DuctNum = UtilityRoutines::FindItemInList(CompName, Duct);
+            DuctNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACDuct->Duct);
             if (DuctNum == 0) {
                 ShowFatalError(state, "SimDuct: Component not found=" + CompName);
             }
             CompIndex = DuctNum;
         } else {
             DuctNum = CompIndex;
-            if (DuctNum > NumDucts || DuctNum < 1) {
+            if (DuctNum > state.dataHVACDuct->NumDucts || DuctNum < 1) {
                 ShowFatalError(
                     state,
-                    format("SimDuct:  Invalid CompIndex passed={}, Number of Components={}, Entered Component name={}", DuctNum, NumDucts, CompName));
+                    format("SimDuct:  Invalid CompIndex passed={}, Number of Components={}, Entered Component name={}", DuctNum, state.dataHVACDuct->NumDucts, CompName));
             }
-            if (CheckEquipName(DuctNum)) {
-                if (CompName != Duct(DuctNum).Name) {
+            if (state.dataHVACDuct->CheckEquipName(DuctNum)) {
+                if (CompName != state.dataHVACDuct->Duct(DuctNum).Name) {
                     ShowFatalError(state,
                                    format("SimDuct: Invalid CompIndex passed={}, Component name={}, stored Component Name for that index={}",
                                           DuctNum,
                                           CompName,
-                                          Duct(DuctNum).Name));
+                                          state.dataHVACDuct->Duct(DuctNum).Name));
                 }
-                CheckEquipName(DuctNum) = false;
+                state.dataHVACDuct->CheckEquipName(DuctNum) = false;
             }
         }
 
@@ -204,14 +193,14 @@ namespace HVACDuct {
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        auto& cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Duct";
-        NumDucts = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        Duct.allocate(NumDucts);
-        CheckEquipName.dimension(NumDucts, true);
+        state.dataHVACDuct->NumDucts = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHVACDuct->Duct.allocate(state.dataHVACDuct->NumDucts);
+        state.dataHVACDuct->CheckEquipName.dimension(state.dataHVACDuct->NumDucts, true);
 
-        for (DuctNum = 1; DuctNum <= NumDucts; ++DuctNum) {
+        for (DuctNum = 1; DuctNum <= state.dataHVACDuct->NumDucts; ++DuctNum) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           DuctNum,
@@ -226,11 +215,11 @@ namespace HVACDuct {
                                           state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            Duct(DuctNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-            Duct(DuctNum).InletNodeNum = GetOnlySingleNode(state,
-                state.dataIPShortCut->cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
-            Duct(DuctNum).OutletNodeNum = GetOnlySingleNode(state,
-                state.dataIPShortCut->cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
+            state.dataHVACDuct->Duct(DuctNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataHVACDuct->Duct(DuctNum).InletNodeNum = GetOnlySingleNode(state,
+                                                                               state.dataIPShortCut->cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
+            state.dataHVACDuct->Duct(DuctNum).OutletNodeNum = GetOnlySingleNode(state,
+                                                                                state.dataIPShortCut->cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             TestCompSet(state, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(3), "Air Nodes");
         }
 
@@ -275,13 +264,13 @@ namespace HVACDuct {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
-        static Array1D_bool MyEnvrnFlag;
+        bool MyOneTimeFlag(true);
+        Array1D_bool MyEnvrnFlag;
 
         // do one time initializations
         if (MyOneTimeFlag) {
             // initialize the environment and sizing flags
-            MyEnvrnFlag.dimension(NumDucts, true);
+            MyEnvrnFlag.dimension(state.dataHVACDuct->NumDucts, true);
 
             MyOneTimeFlag = false;
         }
@@ -350,8 +339,8 @@ namespace HVACDuct {
         int InNode;  // inlet node number
         int OutNode; // outlet node number
 
-        InNode = Duct(DuctNum).InletNodeNum;
-        OutNode = Duct(DuctNum).OutletNodeNum;
+        InNode = state.dataHVACDuct->Duct(DuctNum).InletNodeNum;
+        OutNode = state.dataHVACDuct->Duct(DuctNum).OutletNodeNum;
         // Set the outlet air node conditions of the duct
         state.dataLoopNodes->Node(OutNode).MassFlowRate = state.dataLoopNodes->Node(InNode).MassFlowRate;
         state.dataLoopNodes->Node(OutNode).Temp = state.dataLoopNodes->Node(InNode).Temp;

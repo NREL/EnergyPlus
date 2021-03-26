@@ -864,72 +864,6 @@ namespace EnergyPlus::General {
         XX_1 = X1;
     }
 
-    Real64 InterpSw(Real64 const SwitchFac, // Switching factor: 0.0 if glazing is unswitched, = 1.0 if fully switched
-                    Real64 const A,         // Glazing property in unswitched state
-                    Real64 const B          // Glazing property in fully switched state
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Fred Winkelmann
-        //       DATE WRITTEN   February 1999
-
-        // PURPOSE OF THIS FUNCTION:
-        // For switchable glazing, calculates a weighted average of properties
-        // A and B
-
-        // Return value
-        Real64 InterpSw;
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 locSwitchFac;
-
-        locSwitchFac = min(SwitchFac, 1.0);
-        locSwitchFac = max(locSwitchFac, 0.0);
-
-        InterpSw = (1.0 - locSwitchFac) * A + locSwitchFac * B;
-        return InterpSw;
-    }
-
-    Real64 InterpBlind(Real64 const ProfAng,           // Profile angle (rad)
-                       Array1A<Real64> const PropArray // Array of blind properties
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Fred Winkelmann
-        //       DATE WRITTEN   May 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Does profile-angle interpolation of window blind solar-thermal properties
-
-        // METHODOLOGY EMPLOYED:
-        // Linear interpolation.
-
-        // Return value
-        Real64 InterpBlind;
-
-        // Argument array dimensioning
-        PropArray.dim(37);
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaAngRad(DataGlobalConstants::Pi / 36.0); // Profile angle increment (rad)
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 InterpFac; // Interpolation factor
-        int IAlpha;       // Profile angle index
-
-        if (ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
-            InterpBlind = 0.0;
-        } else {
-            IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2) / DeltaAngRad);
-            InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
-            InterpBlind = (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
-        }
-        return InterpBlind;
-    }
-
     Real64 InterpProfAng(Real64 const ProfAng,           // Profile angle (rad)
                          Array1S<Real64> const PropArray // Array of blind properties
     )
@@ -1011,7 +945,8 @@ namespace EnergyPlus::General {
         if (VarSlats) { // Variable-angle slats
             IBeta = 1 + int(SlatAng1 * DeltaAng_inv);
             InterpFac = (SlatAng1 - DeltaAng * (IBeta - 1)) * DeltaAng_inv;
-            InterpSlatAng = PropArray(IBeta) + InterpFac * (PropArray(min(MaxSlatAngs, IBeta + 1)) - PropArray(IBeta));
+            InterpSlatAng = PropArray(IBeta) +
+                    InterpFac * (PropArray(min(MaxSlatAngs, IBeta + 1)) - PropArray(IBeta));
         } else { // Fixed-angle slats or shade
             InterpSlatAng = PropArray(1);
         }
@@ -1622,7 +1557,7 @@ namespace EnergyPlus::General {
         int JulianDay;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_int EndDayofMonth(12, {31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365});
+        static Array1D_int const EndDayofMonth(12, {31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365});
         // End day numbers of each month (without Leap Year)
 
         if (Month == 1) {
@@ -2163,7 +2098,7 @@ namespace EnergyPlus::General {
         // string but in this case the output string is a fixed size so this is more
         // clear for formatting and faster. If formatted string changes, make sure to
         // add more to buffer.
-        static char buffer[11];
+        char buffer[11];
         int cx = snprintf(buffer, 11, "%02d:%02d:%04.1f", Hours, Minutes, Seconds);
 
         // Make sure output string is only between 0 and 10 characters so string is
@@ -2267,16 +2202,16 @@ namespace EnergyPlus::General {
         int NumNames;
         int NumNumbers;
         int IOStat;
-        static std::string DXFOption1;
-        static std::string DXFOption2;
-        static std::string DXFWFOption1;
-        static std::string DXFWFOption2;
-        static std::string VRMLOption1;
-        static std::string VRMLOption2;
-        static std::string ViewRptOption1;
-        static std::string LineRptOption1;
-        static std::string VarDictOption1;
-        static std::string VarDictOption2;
+        auto & DXFOption1 = state.dataGeneral->DXFOption1;
+        auto & DXFOption2 = state.dataGeneral->DXFOption2;
+        auto & DXFWFOption1 = state.dataGeneral->DXFWFOption1;
+        auto & DXFWFOption2 = state.dataGeneral->DXFWFOption2;
+        auto & VRMLOption1 = state.dataGeneral->VRMLOption1;
+        auto & VRMLOption2 = state.dataGeneral->VRMLOption2;
+        auto & ViewRptOption1 = state.dataGeneral->ViewRptOption1;
+        auto & LineRptOption1 = state.dataGeneral->LineRptOption1;
+        auto & VarDictOption1 = state.dataGeneral->VarDictOption1;
+        auto & VarDictOption2 = state.dataGeneral->VarDictOption2;
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         if (state.dataGeneral->GetReportInput) {

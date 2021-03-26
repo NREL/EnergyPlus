@@ -331,6 +331,13 @@ namespace ScheduleManager {
 
 struct ScheduleManagerData : BaseGlobalStruct
 {
+    bool CheckScheduleValueMinMaxRunOnceOnly = true;
+    bool DoScheduleReportingSetup = true;
+    std::unordered_map<std::string, std::string> UniqueDayScheduleNames;
+    std::unordered_map<std::string, std::string> UniqueWeekScheduleNames;
+    std::unordered_map<std::string, std::string> UniqueScheduleNames;
+
+
     // Integer Variables for the Module
     int NumScheduleTypes = 0;
     int NumDaySchedules = 0;
@@ -342,13 +349,6 @@ struct ScheduleManagerData : BaseGlobalStruct
     bool ScheduleDSTSFileWarningIssued = false;
     bool ScheduleFileShadingProcessed = false; // This is false unless there is a Schedule:File:Shading object.
 
-    // These were within the namespace
-    bool CheckScheduleValueMinMaxRunOnceOnly = true;
-    bool DoScheduleReportingSetup = true;
-    // Object data
-    std::unordered_map<std::string, std::string> UniqueDayScheduleNames;
-    std::unordered_map<std::string, std::string> UniqueWeekScheduleNames;
-    std::unordered_map<std::string, std::string> UniqueScheduleNames;
 
     // Object Data
     Array1D<ScheduleManager::ScheduleTypeData> ScheduleType; // Allowed Schedule Types
@@ -358,16 +358,16 @@ struct ScheduleManagerData : BaseGlobalStruct
 
     void clear_state() override
     {
-        NumScheduleTypes = 0;
-        NumDaySchedules = 0;
-        NumWeekSchedules = 0;
-        NumSchedules = 0;
-
         CheckScheduleValueMinMaxRunOnceOnly = true;
         UniqueDayScheduleNames.clear();
         UniqueWeekScheduleNames.clear();
         UniqueScheduleNames.clear();
         DoScheduleReportingSetup = true;
+
+        NumScheduleTypes = 0;
+        NumDaySchedules = 0;
+        NumWeekSchedules = 0;
+        NumSchedules = 0;
 
         ScheduleInputProcessed = false;
         ScheduleDSTSFileWarningIssued = false;

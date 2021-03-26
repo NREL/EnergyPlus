@@ -198,13 +198,16 @@ struct TranspiredCollectorData : BaseGlobalStruct {
     bool MyOneTimeFlag = true;
     bool MySetPointCheckFlag = true;
 
+    Array1D_bool MyEnvrnFlag;
+
     void clear_state() override
     {
-        NumUTSC = 0;
-        GetInputFlag = true;
-        UTSC.deallocate();
-        MyOneTimeFlag = true;
-        MySetPointCheckFlag = true;
+        this->NumUTSC = 0;
+        this->GetInputFlag = true;
+        this->UTSC.deallocate();
+        this->MyOneTimeFlag = true;
+        this->MySetPointCheckFlag = true;
+        this->MyEnvrnFlag.deallocate();
     }
 
     // Default Constructor

@@ -98,22 +98,17 @@ namespace EvaporativeFluidCoolers {
     std::string const cEvapFluidCooler_SingleSpeed("EvaporativeFluidCooler:SingleSpeed");
     std::string const cEvapFluidCooler_TwoSpeed("EvaporativeFluidCooler:TwoSpeed");
 
-    bool GetEvapFluidCoolerInputFlag(true);
-    int NumSimpleEvapFluidCoolers(0); // Number of similar evaporative fluid coolers
-
-    Array1D<EvapFluidCoolerSpecs> SimpleEvapFluidCooler; // dimension to number of machines
-    std::unordered_map<std::string, std::string> UniqueSimpleEvapFluidCoolerNames;
 
     PlantComponent *EvapFluidCoolerSpecs::factory(EnergyPlusData &state, int objectType, std::string const &objectName)
     {
         // Process the input data if it hasn't been done already
-        if (GetEvapFluidCoolerInputFlag) {
+        if (state.dataEvapFluidCoolers->GetEvapFluidCoolerInputFlag) {
             GetEvapFluidCoolerInput(state);
-            GetEvapFluidCoolerInputFlag = false;
+            state.dataEvapFluidCoolers->GetEvapFluidCoolerInputFlag = false;
         }
 
         // Now look for this particular object
-        for (auto &thisEFC : SimpleEvapFluidCooler) {
+        for (auto &thisEFC : state.dataEvapFluidCoolers->SimpleEvapFluidCooler) {
             if ((thisEFC.TypeOf_Num == objectType) && (thisEFC.Name == objectName)) {
                 return &thisEFC;
             }
@@ -154,16 +149,16 @@ namespace EvaporativeFluidCoolers {
         // Get number of all evaporative fluid coolers specified in the input data file (idf)
         int NumSingleSpeedEvapFluidCoolers = inputProcessor->getNumObjectsFound(state, cEvapFluidCooler_SingleSpeed);
         int NumTwoSpeedEvapFluidCoolers = inputProcessor->getNumObjectsFound(state, cEvapFluidCooler_TwoSpeed);
-        NumSimpleEvapFluidCoolers = NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers;
+        state.dataEvapFluidCoolers->NumSimpleEvapFluidCoolers = NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers;
 
-        if (NumSimpleEvapFluidCoolers <= 0)
+        if (state.dataEvapFluidCoolers->NumSimpleEvapFluidCoolers <= 0)
             ShowFatalError(state, "No evaporative fluid cooler objects found in input, however, a branch object has specified an evaporative fluid cooler. "
                            "Search the input for evaporative fluid cooler to determine the cause for this error.");
 
         // Allocate data structures to hold evaporative fluid cooler input data,
         // report data and evaporative fluid cooler inlet conditions
-        SimpleEvapFluidCooler.allocate(NumSimpleEvapFluidCoolers);
-        UniqueSimpleEvapFluidCoolerNames.reserve(static_cast<unsigned>(NumSimpleEvapFluidCoolers));
+        state.dataEvapFluidCoolers->SimpleEvapFluidCooler.allocate(state.dataEvapFluidCoolers->NumSimpleEvapFluidCoolers);
+        state.dataEvapFluidCoolers->UniqueSimpleEvapFluidCoolerNames.reserve(static_cast<unsigned>(state.dataEvapFluidCoolers->NumSimpleEvapFluidCoolers));
 
         // Load data structures with evaporative fluid cooler input data
         state.dataIPShortCut->cCurrentModuleObject = cEvapFluidCooler_SingleSpeed;
@@ -182,13 +177,13 @@ namespace EvaporativeFluidCoolers {
                                           state.dataIPShortCut->lAlphaFieldBlanks,
                                           state.dataIPShortCut->cAlphaFieldNames,
                                           state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueSimpleEvapFluidCoolerNames,
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataEvapFluidCoolers->UniqueSimpleEvapFluidCoolerNames,
                                                      AlphArray(1),
                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
 
-            auto &thisEFC = SimpleEvapFluidCooler(EvapFluidCoolerNum);
+            auto &thisEFC = state.dataEvapFluidCoolers->SimpleEvapFluidCooler(EvapFluidCoolerNum);
 
             thisEFC.Name = AlphArray(1);
             thisEFC.EvapFluidCoolerType = state.dataIPShortCut->cCurrentModuleObject;
@@ -464,13 +459,13 @@ namespace EvaporativeFluidCoolers {
                                           state.dataIPShortCut->cAlphaFieldNames,
                                           state.dataIPShortCut->cNumericFieldNames);
 
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueSimpleEvapFluidCoolerNames,
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataEvapFluidCoolers->UniqueSimpleEvapFluidCoolerNames,
                                                      AlphArray(1),
                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
 
-            auto &thisEFC = SimpleEvapFluidCooler(EvapFluidCoolerNum);
+            auto &thisEFC = state.dataEvapFluidCoolers->SimpleEvapFluidCooler(EvapFluidCoolerNum);
 
             thisEFC.Name = AlphArray(1);
             thisEFC.EvapFluidCoolerType = state.dataIPShortCut->cCurrentModuleObject;
@@ -2567,14 +2562,6 @@ namespace EvaporativeFluidCoolers {
             this->FanEnergy = this->FanPower * ReportingConstant;
             this->WaterAmountUsed = this->WaterUsage * ReportingConstant;
         }
-    }
-
-    void clear_state()
-    {
-        GetEvapFluidCoolerInputFlag = true;
-        NumSimpleEvapFluidCoolers = 0;
-        SimpleEvapFluidCooler.deallocate();
-        UniqueSimpleEvapFluidCoolerNames.clear();
     }
 
 } // namespace EvaporativeFluidCoolers

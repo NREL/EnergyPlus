@@ -4599,7 +4599,7 @@ namespace HeatBalanceManager {
 
             std::string window5DataFileName;
             if (ConstructAlphas(1) == "") {
-                window5DataFileName = CurrentWorkingFolder + "Window5DataFile.dat";
+                window5DataFileName = state.dataStrGlobals->CurrentWorkingFolder + "Window5DataFile.dat";
             } else {
                 window5DataFileName = ConstructAlphas(1);
             }
@@ -4729,8 +4729,8 @@ namespace HeatBalanceManager {
         state.dataGlobal->NumOfZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         state.dataHeatBal->Zone.allocate(state.dataGlobal->NumOfZones);
-        DataViewFactorInformation::ZoneRadiantInfo.allocate(state.dataGlobal->NumOfZones);
-        DataViewFactorInformation::ZoneSolarInfo.allocate(state.dataGlobal->NumOfZones);
+        state.dataViewFactor->ZoneRadiantInfo.allocate(state.dataGlobal->NumOfZones);
+        state.dataViewFactor->ZoneSolarInfo.allocate(state.dataGlobal->NumOfZones);
         state.dataDaylightingData->ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
 
         ZoneLoop = 0;

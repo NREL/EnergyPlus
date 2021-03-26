@@ -129,7 +129,7 @@ namespace MatrixDataManager {
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int NumRows;
         int NumCols;
         int NumElements;
@@ -215,11 +215,11 @@ namespace MatrixDataManager {
         int MatrixIndexPtr; // Function result
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static bool GetInputFlag(true); // First time, input is "gotten"
+        auto & GetMatrixInputFlag = state.dataUtilityRoutines->GetMatrixInputFlag;
 
-        if (GetInputFlag) {
+        if (GetMatrixInputFlag) {
             GetMatrixInput(state);
-            GetInputFlag = false;
+            GetMatrixInputFlag = false;
         }
 
         if (NumMats > 0) {

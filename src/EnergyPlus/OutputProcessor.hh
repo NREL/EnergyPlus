@@ -73,12 +73,6 @@ struct EnergyPlusData;
 
 namespace OutputProcessor {
 
-    // Using/Aliasing
-
-    // Data
-    // in this file should obey a USE OutputProcessor, ONLY: rule.
-
-    // MODULE PARAMETER DEFINITIONS:
     enum class iReportVDD
     {
         No,               // Don't report the variable dictionaries in any form
@@ -101,6 +95,8 @@ namespace OutputProcessor {
     constexpr int MeterType_Custom(1);     // Type value for custom meters
     constexpr int MeterType_CustomDec(2);  // Type value for custom meters that decrement another meter
     constexpr int MeterType_CustomDiff(3); // Type value for custom meters that difference another meter
+
+    constexpr int N_WriteTimeStampFormatData(100);
 
     constexpr const char *DayTypes(int &d)
     {
@@ -851,7 +847,7 @@ namespace OutputProcessor {
                                 int const maxValueDate                      // The date the maximum value occurred
     );
 
-    int DetermineIndexGroupKeyFromMeterName(std::string const &meterName); // the meter name
+    int DetermineIndexGroupKeyFromMeterName(EnergyPlusData &state, std::string const &meterName); // the meter name
 
     std::string DetermineIndexGroupFromMeterGroup(MeterType const &meter); // the meter
 
@@ -1109,6 +1105,28 @@ struct OutputProcessorData : BaseGlobalStruct {
     Array1D<OutputProcessor::MeterType> EnergyMeters;
     Array1D<OutputProcessor::EndUseCategoryType> EndUseCategory;
     std::unordered_map<std::string, std::string> UniqueMeterNames;
+    char stamp[OutputProcessor::N_WriteTimeStampFormatData];
+    char s_WriteReportRealData[129];
+    char s_WriteCumulativeReportMeterData[129];
+    char s_WriteReportMeterData[129];
+    char s_WriteNumericData[129];
+    bool Rept = false;
+    bool OpaqSurfWarned = false;
+    Array1D_string ValidMeterNames;
+    Array1D_int iValidMeterNames;
+    int NumValidMeters = 0;
+
+    // statics
+
+    Real64 rDummy1TS = 0.0;
+    Real64 rDummy2TS = 0.0;
+    int iDummy1TS = 0;
+    int iDummy2TS = 0;
+    Real64 rDummy1 = 0.0;
+    Real64 rDummy2 = 0.0;
+    int iDummy1 = 0;
+    int iDummy2 = 0;
+    int indexGroupKey = -1;
 
     void clear_state() override
     {
@@ -1183,6 +1201,21 @@ struct OutputProcessorData : BaseGlobalStruct {
         this->EnergyMeters.deallocate();
         this->EndUseCategory.deallocate();
         this->UniqueMeterNames.clear();
+
+        this->rDummy1TS = 0.0;
+        this->rDummy2TS = 0.0;
+        this->iDummy1TS = 0;
+        this->iDummy2TS = 0;
+        this->rDummy1 = 0.0;
+        this->rDummy2 = 0.0;
+        this->iDummy1 = 0;
+        this->iDummy2 = 0;
+        this->indexGroupKey = -1;
+        this->Rept = false;
+        this->OpaqSurfWarned = false;
+        this->ValidMeterNames.clear();
+        this->iValidMeterNames.clear();
+        this->NumValidMeters = 0;
     }
 };
 

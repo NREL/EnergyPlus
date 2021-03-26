@@ -141,20 +141,20 @@ namespace EnergyPlus::SizingManager {
         static std::string const RoutineName("ManageSizing: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool Available(false); // an environment is available to process
-        static bool ErrorsFound(false);
-        static bool SimAir(false);
-        static bool SimZoneEquip(false);
-        static int TimeStepInDay(0); // time step number
-        static int LastMonth(0);
-        static int LastDayOfMonth(0);
-        static int CtrlZoneNum(0);       // controlled zone index
-        static int ZoneNum(0);           // index into the Zone data array for the controlled zone
-        static Real64 TempAtPeak(0.0);   // Outside temperature at peak cooling/heating for reporting
-        static Real64 HumRatAtPeak(0.0); // Outside humidity ratio at peak cooling/heating for reporting
-        static int TimeStepAtPeak(0);    // time step number at heat or cool peak
-        static int DDNum(0);             // Design Day index
-        static int AirLoopNum(0);        // air loop index
+        bool Available(false); // an environment is available to process
+        bool ErrorsFound(false);
+        bool SimAir(false);
+        bool SimZoneEquip(false);
+        int TimeStepInDay(0); // time step number
+        int LastMonth(0);
+        int LastDayOfMonth(0);
+        int CtrlZoneNum(0);       // controlled zone index
+        int ZoneNum(0);           // index into the Zone data array for the controlled zone
+        Real64 TempAtPeak(0.0);   // Outside temperature at peak cooling/heating for reporting
+        Real64 HumRatAtPeak(0.0); // Outside humidity ratio at peak cooling/heating for reporting
+        int TimeStepAtPeak(0);    // time step number at heat or cool peak
+        int DDNum(0);             // Design Day index
+        int AirLoopNum(0);        // air loop index
         //  EXTERNAL            ReportZoneSizing
         //  EXTERNAL            ReportSysSizing
         std::string curName;
@@ -1076,31 +1076,33 @@ namespace EnergyPlus::SizingManager {
                     }
                 }
 
+                auto & IndUnit = state.dataHVACSingleDuctInduc->IndUnit;
+                auto & NumIndUnits = state.dataHVACSingleDuctInduc->NumIndUnits;
+
                 // sum up heating and max flows for any four pipe induction units
                 // dual path for std 62.1
-                if (allocated(HVACSingleDuctInduc::IndUnit) && (HVACSingleDuctInduc::NumIndUnits > 0)) {
-                    for (int indUnitNum = 1; indUnitNum <= HVACSingleDuctInduc::NumIndUnits; ++indUnitNum) {
-                        if (AirLoopNum == HVACSingleDuctInduc::IndUnit(indUnitNum).AirLoopNum) {
-                            int termUnitSizingIndex = AirDistUnit(HVACSingleDuctInduc::IndUnit(indUnitNum).ADUNum).TermUnitSizingNum;
-
+                if (allocated(IndUnit) && (NumIndUnits > 0)) {
+                    for (int indUnitNum = 1; indUnitNum <= NumIndUnits; ++indUnitNum) {
+                        if (AirLoopNum == IndUnit(indUnitNum).AirLoopNum) {
+                            int termUnitSizingIndex = AirDistUnit(IndUnit(indUnitNum).ADUNum).TermUnitSizingNum;
                             airLoopHeatingMaximumFlowRateSum +=
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
+                                IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             airLoopHeatingMinimumFlowRateSum +=
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
-                            airLoopMaxFlowRateSum += HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
+                                IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
+                            airLoopMaxFlowRateSum += IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             // store Std 62.1 values, CV system
                             state.dataSize->VpzClgByZone(termUnitSizingIndex) =
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
+                                IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             state.dataSize->VpzMinClgByZone(termUnitSizingIndex) =
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
-                            state.dataSize->VdzClgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
-                            state.dataSize->VdzMinClgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
+                                IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
+                            state.dataSize->VdzClgByZone(termUnitSizingIndex) = IndUnit(indUnitNum).MaxTotAirVolFlow;
+                            state.dataSize->VdzMinClgByZone(termUnitSizingIndex) = IndUnit(indUnitNum).MaxTotAirVolFlow;
                             state.dataSize->VpzHtgByZone(termUnitSizingIndex) =
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
+                                IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             state.dataSize->VpzMinHtgByZone(termUnitSizingIndex) =
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
-                            state.dataSize->VdzHtgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
-                            state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
+                                IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
+                            state.dataSize->VdzHtgByZone(termUnitSizingIndex) = IndUnit(indUnitNum).MaxTotAirVolFlow;
+                            state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) = IndUnit(indUnitNum).MaxTotAirVolFlow;
                         }
                     }
                 }
@@ -2057,7 +2059,7 @@ namespace EnergyPlus::SizingManager {
         int TotalArgs;  // Total number of alpha and numeric arguments (max) for a
         int IOStatus;   // Used in GetObjectItem
         int OAIndex;
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
         //  REAL(r64) :: CalcAmt
 
         std::string CurrentModuleObject; // for ease in getting objects
@@ -2324,7 +2326,7 @@ namespace EnergyPlus::SizingManager {
         int TotalArgs;  // Total number of alpha and numeric arguments (max) for a
         int IOStatus;   // Used in GetObjectItem
         int ZADIndex;
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
 
         std::string CurrentModuleObject; // for ease in getting objects
         Array1D_string Alphas;           // Alpha input items for object
@@ -2566,7 +2568,7 @@ namespace EnergyPlus::SizingManager {
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int NumDesDays;                 // Number of design days in input
         int NumSizingZoneStatements;
         int Item;
@@ -3290,7 +3292,7 @@ namespace EnergyPlus::SizingManager {
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int NumDesDays;                 // Number of design days in input
 
         auto &SysSizInput(state.dataSize->SysSizInput);
@@ -3789,7 +3791,7 @@ namespace EnergyPlus::SizingManager {
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int NumDesDays;                 // Number of design days in input
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Sizing:Plant";
@@ -4190,7 +4192,7 @@ namespace EnergyPlus::SizingManager {
         int TotalArgs;                  // Total number of alpha and numeric arguments (max) for a
         int IOStatus;                   // Used in GetObjectItem
         int zSIndex;                    // index of "DesignSpecification:ZoneHVAC:Sizing" objects
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
         //  REAL(r64) :: CalcAmt
 
         std::string CurrentModuleObject; // for ease in getting objects

@@ -96,13 +96,6 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
     using namespace DataRoomAirModel;
 
     // Functions
-    bool MyOneTimeFlag(true); // one time setup flag
-    bool MyOneTimeFlag2(true);
-
-    void clear_state() {
-        MyOneTimeFlag = true;
-        MyOneTimeFlag2 = true;
-    }
 
     void ManageUserDefinedPatterns(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
@@ -142,38 +135,14 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
         int SurfNum;                     // do loop counter
 
-        if (MyOneTimeFlag) {
-            MyEnvrnFlag.dimension(state.dataGlobal->NumOfZones, true);
-            MyOneTimeFlag = false;
+        if (state.dataRoomAirModelTempPattern->MyOneTimeFlag) {
+            state.dataRoomAirModelTempPattern->MyEnvrnFlag.dimension(state.dataGlobal->NumOfZones, true);
+            state.dataRoomAirModelTempPattern->MyOneTimeFlag = false;
         }
 
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ZoneNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataRoomAirModelTempPattern->MyEnvrnFlag(ZoneNum)) {
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean = 23.0;
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = 23.0;
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = 23.0;
@@ -182,10 +151,10 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
             for (SurfNum = 1; SurfNum <= state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs; ++SurfNum) {
                 state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(SurfNum).TadjacentAir = 23.0;
             }
-            MyEnvrnFlag(ZoneNum) = false;
+            state.dataRoomAirModelTempPattern->MyEnvrnFlag(ZoneNum) = false;
         }
 
-        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag(ZoneNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) state.dataRoomAirModelTempPattern->MyEnvrnFlag(ZoneNum) = true;
 
         // init report variable
         state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Gradient = 0.0;
@@ -438,14 +407,13 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
         Real64 thisZeta;                     // non-dimensional height
         Real64 DeltaHeight;                  // height difference in m
         Real64 tempDeltaTai;                 // temporary temperature difference
-        static Array1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
 
-        if (MyOneTimeFlag2) {
-            SetupOutputFlag.dimension(state.dataGlobal->NumOfZones, true); // init
-            MyOneTimeFlag2 = false;
+        if (state.dataRoomAirModelTempPattern->MyOneTimeFlag2) {
+            state.dataRoomAirModelTempPattern->SetupOutputFlag.dimension(state.dataGlobal->NumOfZones, true); // init
+            state.dataRoomAirModelTempPattern->MyOneTimeFlag2 = false;
         }
 
-        if (SetupOutputFlag(ZoneNum)) {
+        if (state.dataRoomAirModelTempPattern->SetupOutputFlag(ZoneNum)) {
             SetupOutputVariable(state, "Room Air Zone Vertical Temperature Gradient",
                                 OutputProcessor::Unit::K_m,
                                 state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Gradient,
@@ -453,7 +421,7 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
                                 "State",
                                 state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneName);
 
-            SetupOutputFlag(ZoneNum) = false;
+            state.dataRoomAirModelTempPattern->SetupOutputFlag(ZoneNum) = false;
         }
 
         Tmean = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;

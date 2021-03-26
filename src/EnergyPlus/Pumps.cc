@@ -265,7 +265,7 @@ namespace EnergyPlus::Pumps {
         int NumConstPumpBankSimple;
         Real64 SteamDensity;
         Real64 TempWaterDensity;
-        static int DummyWaterIndex(1);
+        int DummyWaterIndex(1);
 
         ErrorsFound = false;
 
@@ -1208,7 +1208,7 @@ namespace EnergyPlus::Pumps {
         int OutletNode; // pump outlet node number
         Real64 TotalEffic;
         Real64 SteamDensity; // Density of working fluid
-        static int DummyWaterIndex(1);
+        int DummyWaterIndex(1);
         Real64 TempWaterDensity;
         bool errFlag;
         Real64 mdotMax; // local fluid mass flow rate maximum
@@ -1912,7 +1912,7 @@ namespace EnergyPlus::Pumps {
         Real64 PumpSizFac; // pump sizing factor
         Real64 SteamDensity;
         Real64 TempWaterDensity;
-        static int DummyWaterIndex(1);
+        int DummyWaterIndex(1);
         Real64 DesVolFlowRatePerBranch; // local temporary for split of branch pumps
 
         // Calculate density at InitConvTemp once here, to remove RhoH2O calls littered throughout
@@ -2187,12 +2187,12 @@ namespace EnergyPlus::Pumps {
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        static Real64 PumpMassFlowRateMaxPress(0.0); // Maximum mass flow rate associated with maximum pressure limit
-        static Real64 PumpMassFlowRateMinPress(0.0); // Minimum mass flow rate associated with minimum pressure limit
-        static Real64 RotSpeed_Max(0.0);             // Maximum rotational speed in rps
-        static Real64 RotSpeed_Min(0.0);             // Minimum rotational speed in rps
-        static Real64 MinPress(0.0);                 // Minimum pressure
-        static Real64 MaxPress(0.0);                 // Maximum pressure
+        Real64 PumpMassFlowRateMaxPress(0.0); // Maximum mass flow rate associated with maximum pressure limit
+        Real64 PumpMassFlowRateMinPress(0.0); // Minimum mass flow rate associated with minimum pressure limit
+        Real64 RotSpeed_Max(0.0);             // Maximum rotational speed in rps
+        Real64 RotSpeed_Min(0.0);             // Minimum rotational speed in rps
+        Real64 MinPress(0.0);                 // Minimum pressure
+        Real64 MaxPress(0.0);                 // Maximum pressure
 
         RotSpeed_Min = GetCurrentScheduleValue(state, state.dataPumps->PumpEquip(PumpNum).VFD.MinRPMSchedIndex);
         RotSpeed_Max = GetCurrentScheduleValue(state, state.dataPumps->PumpEquip(PumpNum).VFD.MaxRPMSchedIndex);
@@ -2207,14 +2207,14 @@ namespace EnergyPlus::Pumps {
                 state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMaxRPM = ResolveLoopFlowVsPressure(state, state.dataPumps->PumpEquip(PumpNum).LoopNum,
                                                                                       InletNodeMassFlowRate,
                                                                                       state.dataPumps->PumpEquip(PumpNum).PressureCurve_Index,
-                                                                                      RotSpeed_Max,
+                                              RotSpeed_Max,
                                                                                       state.dataPumps->PumpEquip(PumpNum).ImpellerDiameter,
                                                                                       state.dataPumps->PumpEquip(PumpNum).MinPhiValue,
                                                                                       state.dataPumps->PumpEquip(PumpNum).MaxPhiValue);
                 state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMinRPM = ResolveLoopFlowVsPressure(state, state.dataPumps->PumpEquip(PumpNum).LoopNum,
                                                                                       InletNodeMassFlowRate,
                                                                                       state.dataPumps->PumpEquip(PumpNum).PressureCurve_Index,
-                                                                                      RotSpeed_Min,
+                                              RotSpeed_Min,
                                                                                       state.dataPumps->PumpEquip(PumpNum).ImpellerDiameter,
                                                                                       state.dataPumps->PumpEquip(PumpNum).MinPhiValue,
                                                                                       state.dataPumps->PumpEquip(PumpNum).MaxPhiValue);

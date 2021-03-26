@@ -6196,7 +6196,7 @@ namespace EnergyPlus::RefrigeratedCase {
         auto &CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
         auto &CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
 
-        static std::string Walkin_and_zone_name; // concat name for walk-in/zone credit reporting
+        std::string Walkin_and_zone_name; // concat name for walk-in/zone credit reporting
 
         if (state.dataRefrigCase->NumSimulationCases > 0) {
             // Setup Report Variables for simulated Refrigerated Case (do not report unused cases)

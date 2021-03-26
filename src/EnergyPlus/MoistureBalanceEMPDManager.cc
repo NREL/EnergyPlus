@@ -159,7 +159,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
         int MaterialNumAlpha;             // Number of material alpha names being passed
         int MaterialNumProp;              // Number of material properties being passed
         Array1D<Real64> MaterialProps(9); // Temporary array to transfer material properties
-        static bool ErrorsFound(false);   // If errors detected in input
+        bool ErrorsFound(false);   // If errors detected in input
 
         int EMPDMat; // EMPD Moisture Material additional properties for each base material
         int Loop;
@@ -168,7 +168,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
         int MatNum;            // Material number at interior layer
         int ConstrNum;         // Construction number
         Array1D_bool EMPDzone; // EMPD property check for each zone
-        static int ErrCount(0);
+        auto & ErrCount = state.dataMoistureBalEMPD->ErrCount;
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         // Load the additional EMPD Material properties
@@ -436,7 +436,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
         Real64 RVaver; // Average zone vapor density
         Real64 dU_dRH;
         int Flag; // Convergence flag (0 - converged)
-        static bool OneTimeFlag(true);
+        auto & OneTimeFlag = state.dataMoistureBalEMPD->OneTimeFlag;
         Real64 PVsurf;        // Surface vapor pressure
         Real64 PV_surf_layer; // Vapor pressure of surface layer
         Real64 PV_deep_layer;

@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataHVACControllers.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -104,9 +105,10 @@ namespace SimAirServingZones {
     constexpr int UnitarySystemModel(29);
     constexpr int ZoneVRFasAirLoopEquip(30);
 
-    void ManageAirLoops(EnergyPlusData &state, bool FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
-                        bool &SimAir,                  // TRUE means air loops must be (re)simulated
-                        bool &SimZoneEquipment         // TRUE means zone equipment must be (re) simulated
+    void ManageAirLoops(EnergyPlusData &state,
+                        bool FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
+                        bool &SimAir,            // TRUE means air loops must be (re)simulated
+                        bool &SimZoneEquipment   // TRUE means zone equipment must be (re) simulated
     );
 
     void GetAirPathData(EnergyPlusData &state);
@@ -118,12 +120,18 @@ namespace SimAirServingZones {
     void SimAirLoops(EnergyPlusData &state, bool FirstHVACIteration, bool &SimZoneEquipment);
 
     void SimAirLoop(EnergyPlusData &state,
-        bool FirstHVACIteration, int AirLoopNum, int AirLoopPass, int &AirLoopIterMax, int &AirLoopIterTot, int &AirLoopNumCalls);
+                    bool FirstHVACIteration,
+                    int AirLoopNum,
+                    int AirLoopPass,
+                    int &AirLoopIterMax,
+                    int &AirLoopIterTot,
+                    int &AirLoopNumCalls);
 
-    void SolveAirLoopControllers(EnergyPlusData &state,
-        bool FirstHVACIteration, int AirLoopNum, bool &AirLoopConvergedFlag, int &IterMax, int &IterTot, int &NumCalls);
+    void SolveAirLoopControllers(
+        EnergyPlusData &state, bool FirstHVACIteration, int AirLoopNum, bool &AirLoopConvergedFlag, int &IterMax, int &IterTot, int &NumCalls);
 
-    void SolveWaterCoilController(EnergyPlusData &state, bool FirstHVACIteration,
+    void SolveWaterCoilController(EnergyPlusData &state,
+                                  bool FirstHVACIteration,
                                   int AirLoopNum,
                                   std::string const &CompName,
                                   int &CompIndex,
@@ -131,18 +139,20 @@ namespace SimAirServingZones {
                                   int ControllerIndex,
                                   bool HXAssistedWaterCoil);
 
-    void ReSolveAirLoopControllers(EnergyPlusData &state,
-        bool FirstHVACIteration, int AirLoopNum, bool &AirLoopConvergedFlag, int &IterMax, int &IterTot, int &NumCalls);
+    void ReSolveAirLoopControllers(
+        EnergyPlusData &state, bool FirstHVACIteration, int AirLoopNum, bool &AirLoopConvergedFlag, int &IterMax, int &IterTot, int &NumCalls);
 
-    void SimAirLoopComponents(EnergyPlusData &state, int AirLoopNum,         // Index of the air loop being currently simulated
+    void SimAirLoopComponents(EnergyPlusData &state,
+                              int AirLoopNum,         // Index of the air loop being currently simulated
                               bool FirstHVACIteration // TRUE if first full HVAC iteration in an HVAC timestep
     );
 
-    void SimAirLoopComponent(EnergyPlusData &state, std::string const &CompName,   // the component Name
-                             int CompType_Num,        // numeric equivalent for component type
-                             bool FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
-                             int AirLoopNum,          // Primary air loop number
-                             int &CompIndex,                // numeric pointer for CompType/CompName -- passed back from other routines
+    void SimAirLoopComponent(EnergyPlusData &state,
+                             std::string const &CompName, // the component Name
+                             int CompType_Num,            // numeric equivalent for component type
+                             bool FirstHVACIteration,     // TRUE if first full HVAC iteration in an HVAC timestep
+                             int AirLoopNum,              // Primary air loop number
+                             int &CompIndex,              // numeric pointer for CompType/CompName -- passed back from other routines
                              HVACSystemData *CompPointer);
 
     void UpdateBranchConnections(EnergyPlusData &state,
@@ -152,8 +162,8 @@ namespace SimAirServingZones {
     );
 
     void ResolveSysFlow(EnergyPlusData &state,
-                        int SysNum, // the primary air system number
-                        bool &SysReSim    // Set to TRUE if mass balance fails and re-simulation is needed
+                        int SysNum,    // the primary air system number
+                        bool &SysReSim // Set to TRUE if mass balance fails and re-simulation is needed
     );
 
     void SizeAirLoops(EnergyPlusData &state);
@@ -179,7 +189,8 @@ namespace SimAirServingZones {
                           Real64 &SystemCoolingEv // system ventilation efficiency
     );
 
-    void CheckWaterCoilIsOnAirLoop(EnergyPlusData &state, int CoilTypeNum, std::string const &CompType, std::string const &CompName, bool &WaterCoilOnAirLoop);
+    void CheckWaterCoilIsOnAirLoop(
+        EnergyPlusData &state, int CoilTypeNum, std::string const &CompType, std::string const &CompName, bool &WaterCoilOnAirLoop);
 
     bool CheckWaterCoilOnPrimaryAirLoopBranch(EnergyPlusData &state, int CoilTypeNum, std::string const &CompName);
 
@@ -189,10 +200,11 @@ namespace SimAirServingZones {
 
 } // namespace SimAirServingZones
 
-struct SimAirServingZonesData : BaseGlobalStruct {
+struct SimAirServingZonesData : BaseGlobalStruct
+{
 
-    bool GetAirLoopInputFlag = true;        // Flag set to make sure you get input once
-    int NumOfTimeStepInDay = 0;             // number of zone time steps in a day
+    bool GetAirLoopInputFlag = true; // Flag set to make sure you get input once
+    int NumOfTimeStepInDay = 0;      // number of zone time steps in a day
     bool InitAirLoopsOneTimeFlag = true;
     int TestUniqueNodesNum = 0;
     bool SizeAirLoopsOneTimeFlag = true;
@@ -225,6 +237,48 @@ struct SimAirServingZonesData : BaseGlobalStruct {
     Array1D_int TermUnitSizingNumsHeat;
     Array1D_int SupNode;
     Array1D_int SupNodeType;
+
+    int TUInNode = 0;            // inlet node number of a terminal unit
+    Real64 SumZoneDesFlow = 0.0; // sum of the zone design air mass flow rates for zones served by a system
+    Real64 OAReliefDiff = 0.0;   // local for massflow change across OA system, kg/s
+    Real64 MassFlowSetToler;
+    int salIterMax = 0;   // Maximum of iteration counters across all air loops
+    int salIterTot = 0;   // Aggregated number of iterations across all air loops
+    int NumCallsTot = 0;  // Aggregated number fo times SimAirLoopComponents() has been invoked across all air loops
+    int IterMaxSAL2 = 0;  // Maximum number of iterations performed by each controller on this air loop
+    int IterTotSAL2 = 0;  // Aggregated number of iterations performed by each controller on this air loop
+    int NumCallsSAL2 = 0; // Number of times SimAirLoopComponents() has been invoked per air loop for either Solve or ReSolve operations
+    // TRUE when primary air system & controllers simulation has converged;
+    bool AirLoopConvergedFlagSAL = false;
+    // TRUE when speculative warm restart is allowed; FALSE otherwise.
+    bool DoWarmRestartFlagSAL = false;
+    // If Status<0, no speculative warm restart attempted.
+    // If Status==0, warm restart failed.
+    // If Status>0, warm restart succeeded.
+    int WarmRestartStatusSAL = DataHVACControllers::iControllerWarmRestartNone;
+    int IterSALC = 0;        // Iteration counter
+    int ErrCountSALC = 0;    // Number of times that the maximum iterations was exceeded
+    int MaxErrCountSALC = 0; // Number of times that the maximum iterations was exceeded
+    // A character string equivalent of ErrCount
+    bool BypassOAControllerSALC; // logical to tell ManageControllers to sim or not sim controller in OA System (don't sim here)
+    // Iteration counter
+    int IterSWCC = 0;
+    // Number of times that the maximum iterations was exceeded
+    int ErrCountSWCC = 0;
+    // Number of times that the maximum iterations was exceeded
+    int MaxErrCountSWCC = 0;
+    int AirLoopPassSWCC;
+    bool BypassOAControllerSWCC;
+    bool BypassOAControllerRSALC; // logical to bypass HVAC controller calcs
+    Real64 EpSSOA = 1.0;          // zone primary air fraction
+
+    // Last saved HVAC time stamp at beginning of step in seconds.
+    // Used to control when to reset the statistic counters for each new HVAC step.
+    Real64 SavedPreviousHVACTime = 0.0;
+
+    // Placeholder for environment name used in error reporting
+    std::string ErrEnvironmentName;
+    std::string ErrEnvironmentNameSolveWaterCoilController;
 
     void clear_state() override
     {
@@ -262,6 +316,29 @@ struct SimAirServingZonesData : BaseGlobalStruct {
         this->TermUnitSizingNumsHeat.clear();
         this->SupNode.clear();
         this->SupNodeType.clear();
+
+        this->TUInNode = 0;         // inlet node number of a terminal unit
+        this->SumZoneDesFlow = 0.0; // sum of the zone design air mass flow rates for zones served by a system
+        this->OAReliefDiff = 0.0;   // local for massflow change across OA system, kg/s
+        this->salIterMax = 0;       // Maximum of iteration counters across all air loops
+        this->salIterTot = 0;       // Aggregated number of iterations across all air loops
+        this->NumCallsTot = 0;      // Aggregated number fo times SimAirLoopComponents() has been invoked across all air loops
+        this->IterMaxSAL2 = 0;      // Maximum number of iterations performed by each controller on this air loop
+        this->IterTotSAL2 = 0;      // Aggregated number of iterations performed by each controller on this air loop
+        this->NumCallsSAL2 = 0;     // Number of times SimAirLoopComponents() has been invoked per air loop for either Solve or ReSolve operations
+        this->AirLoopConvergedFlagSAL = false;
+        this->DoWarmRestartFlagSAL = false;
+        this->WarmRestartStatusSAL = DataHVACControllers::iControllerWarmRestartNone;
+        this->IterSALC = 0;        // Iteration counter
+        this->ErrCountSALC = 0;    // Number of times that the maximum iterations was exceeded
+        this->MaxErrCountSALC = 0; // Number of times that the maximum iterations was exceeded
+        this->IterSWCC = 0;
+        this->ErrCountSWCC = 0;
+        this->MaxErrCountSWCC = 0;
+        this->EpSSOA = 1.0; // zone primary air fraction
+        this->SavedPreviousHVACTime = 0.0;
+        this->ErrEnvironmentName.clear();
+        this->ErrEnvironmentNameSolveWaterCoilController.clear();
     }
 };
 

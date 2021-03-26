@@ -195,12 +195,12 @@ namespace EnergyPlus::SetPointManager {
     {
         // wrapper for GetInput to allow unit testing when fatal inputs are detected
         bool ErrorsFound(false);
-        static std::string const RoutineName("GetSetPointManagerInputs: "); // include trailing blank space
+        const char *  RoutineName("GetSetPointManagerInputs: "); // include trailing blank space
 
         GetSetPointManagerInputData(state, ErrorsFound);
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(state, format("{}Errors found in input.  Program terminates.",RoutineName));
         }
     }
 
@@ -251,7 +251,7 @@ namespace EnergyPlus::SetPointManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSetPointManagerInputs: "); // include trailing blank space
+        const char *  RoutineName("GetSetPointManagerInputs: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string cAlphaFieldNames;
@@ -261,7 +261,6 @@ namespace EnergyPlus::SetPointManager {
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
-
 
         int NumNums;   // Number of real numbers returned by GetObjectItem
         int NumAlphas; // Number of alphanumerics returned by GetObjectItem
@@ -287,176 +286,177 @@ namespace EnergyPlus::SetPointManager {
         cCurrentModuleObject = "SetpointManager:Scheduled";
         state.dataSetPointManager->NumSchSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:Scheduled'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = NumNums;
-        state.dataSetPointManager->MaxNumAlphasGSPID = NumAlphas;
+
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = NumNums;
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = NumAlphas;
 
         cCurrentModuleObject = "SetpointManager:Scheduled:DualSetpoint";
         state.dataSetPointManager->NumDualSchSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:Scheduled:DualSetpoint'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:OutdoorAirReset";
         state.dataSetPointManager->NumOutAirSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:OutdoorAirReset'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:SingleZone:Reheat";
         state.dataSetPointManager->NumSZRhSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Reheat'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:SingleZone:Heating";
         state.dataSetPointManager->NumSZHtSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Heating'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:SingleZone:Cooling";
         state.dataSetPointManager->NumSZClSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Cooling'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Minimum";
         state.dataSetPointManager->NumSZMinHumSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Humidity:Minimum'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Maximum";
         state.dataSetPointManager->NumSZMaxHumSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Humidity:Maximum'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:MixedAir";
         state.dataSetPointManager->NumMixedAirSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MixedAir'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:OutdoorAirPretreat";
         state.dataSetPointManager->NumOAPretreatSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:OutdoorAirPretreat'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:Warmest";
         state.dataSetPointManager->NumWarmestSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:Warmest'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:Coldest";
         state.dataSetPointManager->NumColdestSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:Coldest'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:WarmestTemperatureFlow";
         state.dataSetPointManager->NumWarmestSetPtMgrsTempFlow = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:WarmestTemperatureFlow'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:ReturnAirBypassFlow";
         state.dataSetPointManager->NumRABFlowSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:ReturnAirBypassFlow'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:MultiZone:Cooling:Average";
         state.dataSetPointManager->NumMZClgAverageSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:Cooling:Average'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:MultiZone:Heating:Average";
         state.dataSetPointManager->NumMZHtgAverageSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:Heating:Average'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:MultiZone:MinimumHumidity:Average";
         state.dataSetPointManager->NumMZAverageMinHumSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:MinimumHumidity:Average'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:MultiZone:MaximumHumidity:Average";
         state.dataSetPointManager->NumMZAverageMaxHumSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:MaximumHumidity:Average'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Minimum";
         state.dataSetPointManager->NumMZMinHumSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:Humidity:Minimum'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Maximum";
         state.dataSetPointManager->NumMZMaxHumSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:Humidity:Maximum'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:FollowOutdoorAirTemperature";
         state.dataSetPointManager->NumFollowOATempSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:FollowOutdoorAirTemperature'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:FollowSystemNodeTemperature";
         state.dataSetPointManager->NumFollowSysNodeTempSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:FollowSystemNodeTemperature'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:FollowGroundTemperature";
         state.dataSetPointManager->NumGroundTempSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:FollowGroundTemperature'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:CondenserEnteringReset";
         state.dataSetPointManager->NumCondEntSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:CondenserEnteringReset'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
         state.dataSetPointManager->NumIdealCondEntSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:CondenserEnteringReset:Ideal'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:SingleZone:OneStageCooling";
         state.dataSetPointManager->NumSZOneStageCoolingSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:SingleZone:OneStageHeating";
         state.dataSetPointManager->NumSZOneStageHeatingSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:ReturnTemperature:ChilledWater";
         state.dataSetPointManager->NumReturnWaterResetChWSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:ReturnTemperature:HotWater";
         state.dataSetPointManager->NumReturnWaterResetHWSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
-        state.dataSetPointManager->MaxNumNumbersGSPID = max(state.dataSetPointManager->MaxNumNumbersGSPID, NumNums);
-        state.dataSetPointManager->MaxNumAlphasGSPID = max(state.dataSetPointManager->MaxNumAlphasGSPID, NumAlphas);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
+        state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
         state.dataSetPointManager->NumAllSetPtMgrs = state.dataSetPointManager->NumSchSetPtMgrs + state.dataSetPointManager->NumDualSchSetPtMgrs + state.dataSetPointManager->NumOutAirSetPtMgrs + state.dataSetPointManager->NumSZRhSetPtMgrs + state.dataSetPointManager->NumSZHtSetPtMgrs + state.dataSetPointManager->NumSZClSetPtMgrs +
                 state.dataSetPointManager->NumSZMinHumSetPtMgrs + state.dataSetPointManager->NumSZMaxHumSetPtMgrs + state.dataSetPointManager->NumMixedAirSetPtMgrs + state.dataSetPointManager->NumOAPretreatSetPtMgrs + state.dataSetPointManager->NumWarmestSetPtMgrs +
@@ -466,12 +466,12 @@ namespace EnergyPlus::SetPointManager {
                 state.dataSetPointManager->NumCondEntSetPtMgrs + state.dataSetPointManager->NumIdealCondEntSetPtMgrs + state.dataSetPointManager->NumSZOneStageCoolingSetPtMgrs + state.dataSetPointManager->NumSZOneStageHeatingSetPtMgrs +
                 state.dataSetPointManager->NumReturnWaterResetChWSetPtMgrs + state.dataSetPointManager->NumReturnWaterResetHWSetPtMgrs;
 
-        cAlphaFieldNames.allocate(state.dataSetPointManager->MaxNumAlphasGSPID);
-        cAlphaArgs.allocate(state.dataSetPointManager->MaxNumAlphasGSPID);
-        lAlphaFieldBlanks.dimension(state.dataSetPointManager->MaxNumAlphasGSPID, false);
-        cNumericFieldNames.allocate(state.dataSetPointManager->MaxNumNumbersGSPID);
-        rNumericArgs.dimension(state.dataSetPointManager->MaxNumNumbersGSPID, 0.0);
-        lNumericFieldBlanks.dimension(state.dataSetPointManager->MaxNumNumbersGSPID, false);
+        cAlphaFieldNames.allocate(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas);
+        cAlphaArgs.allocate(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas);
+        lAlphaFieldBlanks.dimension(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, false);
+        cNumericFieldNames.allocate(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers);
+        rNumericArgs.dimension(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, 0.0);
+        lNumericFieldBlanks.dimension(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, false);
 
         inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
         NodeNums.dimension(NumParams, 0);
@@ -4190,8 +4190,8 @@ namespace EnergyPlus::SetPointManager {
                                     for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).TotalComponents;
                                          ++CompNum) {
                                         // Check if cooling tower is single speed and generate and error
-                                        state.dataSetPointManager->TypeOf_NumISPM = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
-                                        if (state.dataSetPointManager->TypeOf_NumISPM == TypeOf_CoolingTower_SingleSpd) {
+                                        state.dataSetPointManager->InitSetPointManagerTypeOf_Num = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
+                                        if (state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_CoolingTower_SingleSpd) {
                                             ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).Name +
                                                             "\", invalid tower found");
                                             ShowContinueError(state, "Found SingleSpeed Cooling Tower, Cooling Tower=" +
@@ -4205,14 +4205,18 @@ namespace EnergyPlus::SetPointManager {
                                 for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TotalBranches; ++BranchNum) {
                                     for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).TotalComponents;
                                          ++CompNum) {
-                                        state.dataSetPointManager->TypeOf_NumISPM = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
-                                        if (state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_Absorption || state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_Indirect_Absorption ||
-                                            state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_CombTurbine || state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_ConstCOP ||
-                                            state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_Electric || state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_ElectricEIR ||
-                                            state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_DFAbsorption || state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_ElectricReformEIR ||
-                                            state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_EngineDriven) {
+                                        state.dataSetPointManager->InitSetPointManagerTypeOf_Num = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
+                                        if (state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_Absorption ||
+                                            state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_Indirect_Absorption ||
+                                            state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_CombTurbine ||
+                                            state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_ConstCOP ||
+                                            state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_Electric ||
+                                            state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_ElectricEIR ||
+                                            state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_DFAbsorption ||
+                                            state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_ElectricReformEIR ||
+                                            state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_EngineDriven) {
                                             // Scan the supply side to find the chiller index and branch index on plantloop
-                                            state.dataSetPointManager->TypeNumISPM = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
+                                            state.dataSetPointManager->InitSetPointManagerTypeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
                                             for (LoopNum2 = 1; LoopNum2 <= state.dataHVACGlobal->NumCondLoops + state.dataHVACGlobal->NumPlantLoops; ++LoopNum2) {
                                                 for (BranchNumPlantSide = 1;
                                                      BranchNumPlantSide <= state.dataPlnt->PlantLoop(LoopNum2).LoopSide(SupplySide).TotalBranches;
@@ -4225,7 +4229,7 @@ namespace EnergyPlus::SetPointManager {
                                                                 .LoopSide(SupplySide)
                                                                 .Branch(BranchNumPlantSide)
                                                                 .Comp(CompNumPlantSide)
-                                                                .TypeOf_Num == state.dataSetPointManager->TypeNumISPM) {
+                                                                .TypeOf_Num == state.dataSetPointManager->InitSetPointManagerTypeNum) {
                                                             state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).LoopIndexPlantSide = LoopNum2;
                                                             state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).ChillerIndexPlantSide = CompNumPlantSide;
                                                             state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).BranchIndexPlantSide = BranchNumPlantSide;
@@ -4233,7 +4237,7 @@ namespace EnergyPlus::SetPointManager {
                                                     }
                                                 }
                                             }
-                                            state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).TypeNum = state.dataSetPointManager->TypeNumISPM;
+                                            state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).TypeNum = state.dataSetPointManager->InitSetPointManagerTypeNum;
                                             state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).LoopIndexDemandSide = LoopNum;
                                             state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).ChillerIndexDemandSide = CompNum;
                                             state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).BranchIndexDemandSide = BranchNum;
@@ -4247,7 +4251,7 @@ namespace EnergyPlus::SetPointManager {
 
                 // Ideal condenser entering water temperature reset setpoint manager
                 cSetPointManagerType = managerTypeName(SetPointManagerType::IdealCondEntReset);
-                state.dataSetPointManager->NumChillerISPM = 0;
+                state.dataSetPointManager->InitSetPointManagerNumChiller = 0;
                 for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumIdealCondEntSetPtMgrs; ++SetPtMgrNum) {
                     // Scan loops and find the loop index that includes the condenser cooling tower node used as setpoint
                     for (LoopNum = 1; LoopNum <= state.dataHVACGlobal->NumCondLoops + state.dataHVACGlobal->NumPlantLoops;
@@ -4258,21 +4262,23 @@ namespace EnergyPlus::SetPointManager {
                                     for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).TotalComponents;
                                          ++CompNum) {
                                         // Check if cooling tower is single speed and generate and error
-                                        state.dataSetPointManager->TypeOf_NumISPM = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
-                                        if (state.dataSetPointManager->TypeOf_NumISPM == TypeOf_CoolingTower_SingleSpd) {
+                                        state.dataSetPointManager->InitSetPointManagerTypeOf_Num = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
+                                        if (state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_CoolingTower_SingleSpd) {
                                             ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).Name +
                                                             "\", invalid cooling tower found");
                                             ShowContinueError(state, "Found Single Speed Cooling Tower, Cooling Tower=" +
                                                               state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).Name);
                                             ShowContinueError(state, "SingleSpeed cooling towers cannot be used with this setpoint manager on each loop");
                                             ErrorsFound = true;
-                                        } else if (state.dataSetPointManager->TypeOf_NumISPM == TypeOf_CoolingTower_TwoSpd || state.dataSetPointManager->TypeOf_NumISPM == TypeOf_CoolingTower_VarSpd) {
+                                        } else if (state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_CoolingTower_TwoSpd ||
+                                                   state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_CoolingTower_VarSpd) {
                                             state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).CondTowerBranchNum.push_back(BranchNum);
                                             state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).TowerNum.push_back(CompNum);
                                             state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).numTowers++;
                                         }
                                         // Scan the pump on the condenser water loop
-                                        if (state.dataSetPointManager->TypeOf_NumISPM == TypeOf_PumpVariableSpeed || state.dataSetPointManager->TypeOf_NumISPM == TypeOf_PumpConstantSpeed) {
+                                        if (state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_PumpVariableSpeed ||
+                                            state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_PumpConstantSpeed) {
                                             state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).CondPumpNum = CompNum;
                                             state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).CondPumpBranchNum = BranchNum;
                                         }
@@ -4282,14 +4288,18 @@ namespace EnergyPlus::SetPointManager {
                                 for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TotalBranches; ++BranchNum) {
                                     for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).TotalComponents;
                                          ++CompNum) {
-                                        state.dataSetPointManager->TypeOf_NumISPM = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
-                                        if (state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_Absorption || state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_Indirect_Absorption ||
-                                            state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_CombTurbine || state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_ConstCOP ||
-                                            state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_Electric || state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_ElectricEIR ||
-                                            state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_DFAbsorption || state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_ElectricReformEIR ||
-                                            state.dataSetPointManager->TypeOf_NumISPM == TypeOf_Chiller_EngineDriven) {
+                                        state.dataSetPointManager->InitSetPointManagerTypeOf_Num = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
+                                        if (state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_Absorption ||
+                                            state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_Indirect_Absorption ||
+                                            state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_CombTurbine ||
+                                            state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_ConstCOP ||
+                                            state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_Electric ||
+                                            state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_ElectricEIR ||
+                                            state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_DFAbsorption ||
+                                            state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_ElectricReformEIR ||
+                                            state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_Chiller_EngineDriven) {
                                             // Scan the supply side to find the chiller index and branch index on plantloop
-                                            state.dataSetPointManager->TypeNumISPM = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
+                                            state.dataSetPointManager->InitSetPointManagerTypeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
                                             for (LoopNum2 = 1; LoopNum2 <= state.dataHVACGlobal->NumCondLoops + state.dataHVACGlobal->NumPlantLoops; ++LoopNum2) {
                                                 for (BranchNumPlantSide = 1;
                                                      BranchNumPlantSide <= state.dataPlnt->PlantLoop(LoopNum2).LoopSide(SupplySide).TotalBranches;
@@ -4298,13 +4308,13 @@ namespace EnergyPlus::SetPointManager {
                                                          CompNumPlantSide <=
                                                          state.dataPlnt->PlantLoop(LoopNum2).LoopSide(SupplySide).Branch(BranchNumPlantSide).TotalComponents;
                                                          ++CompNumPlantSide) {
-                                                        state.dataSetPointManager->TypeOf_NumISPM = state.dataPlnt->PlantLoop(LoopNum2)
+                                                        state.dataSetPointManager->InitSetPointManagerTypeOf_Num = state.dataPlnt->PlantLoop(LoopNum2)
                                                                          .LoopSide(SupplySide)
                                                                          .Branch(BranchNumPlantSide)
                                                                          .Comp(CompNumPlantSide)
                                                                          .TypeOf_Num;
-                                                        if (state.dataSetPointManager->TypeOf_NumISPM == state.dataSetPointManager->TypeNumISPM) {
-                                                            ++state.dataSetPointManager->NumChillerISPM;
+                                                        if (state.dataSetPointManager->InitSetPointManagerTypeOf_Num == state.dataSetPointManager->InitSetPointManagerTypeNum) {
+                                                            ++state.dataSetPointManager->InitSetPointManagerNumChiller;
                                                             state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).LoopIndexPlantSide = LoopNum2;
                                                             state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).ChillerIndexPlantSide = CompNumPlantSide;
                                                             state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).BranchIndexPlantSide = BranchNumPlantSide;
@@ -4315,13 +4325,13 @@ namespace EnergyPlus::SetPointManager {
                                                                      CompNum2 <=
                                                                      state.dataPlnt->PlantLoop(LoopNum2).LoopSide(SupplySide).Branch(BranchNum2).TotalComponents;
                                                                      ++CompNum2) {
-                                                                    state.dataSetPointManager->TypeOf_NumISPM = state.dataPlnt->PlantLoop(LoopNum2)
+                                                                    state.dataSetPointManager->InitSetPointManagerTypeOf_Num = state.dataPlnt->PlantLoop(LoopNum2)
                                                                                      .LoopSide(SupplySide)
                                                                                      .Branch(BranchNum2)
                                                                                      .Comp(CompNum2)
                                                                                      .TypeOf_Num;
-                                                                    if (state.dataSetPointManager->TypeOf_NumISPM == TypeOf_PumpVariableSpeed ||
-                                                                        state.dataSetPointManager->TypeOf_NumISPM == TypeOf_PumpConstantSpeed) {
+                                                                    if (state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_PumpVariableSpeed ||
+                                                                        state.dataSetPointManager->InitSetPointManagerTypeOf_Num == TypeOf_PumpConstantSpeed) {
                                                                         state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).ChilledPumpNum = CompNum2;
                                                                         state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).ChilledPumpBranchNum = BranchNum2;
                                                                     }
@@ -4331,7 +4341,7 @@ namespace EnergyPlus::SetPointManager {
                                                     }
                                                 }
                                             }
-                                            if (state.dataSetPointManager->NumChillerISPM > 1) {
+                                            if (state.dataSetPointManager->InitSetPointManagerNumChiller > 1) {
                                                 ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).Name +
                                                                 "\", too many chillers found");
                                                 ShowContinueError(state, "only one chiller can be used with this setpoint manager on each loop");
@@ -4339,12 +4349,12 @@ namespace EnergyPlus::SetPointManager {
                                                                   state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).Name);
                                                 ErrorsFound = true;
                                             }
-                                            state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).TypeNum = state.dataSetPointManager->TypeNumISPM;
+                                            state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).TypeNum = state.dataSetPointManager->InitSetPointManagerTypeNum;
                                             state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).CondLoopNum = LoopNum;
                                         }
                                     }
                                 }
-                                state.dataSetPointManager->NumChillerISPM = 0;
+                                state.dataSetPointManager->InitSetPointManagerNumChiller = 0;
                             }
                         }
                     }
@@ -5202,14 +5212,12 @@ namespace EnergyPlus::SetPointManager {
         int RetNode;
         int OAMixOAInNode;
         Real64 FanDeltaT;
-        static Real64 TSupNoHC(0.0); // supply temperature with no heating or cooling
         Real64 TMixAtMinOA;
         Real64 EnthMixAtMinOA;
         Real64 HumRatMixAtMinOA;
         int AirLoopNum;
         Real64 OAFrac;
         int LoopInNode;
-        static Real64 ExtrRateNoHC(0.0); // the heating (>0) or cooling (<0) that can be done by supply air at TSupNoHC [W]
 
         ZoneInletNode = this->ZoneInletNodeNum;
         ZoneNum = this->ControlZoneNum;
@@ -5239,41 +5247,41 @@ namespace EnergyPlus::SetPointManager {
         } else {
             FanDeltaT = 0.0;
         }
-        TSupNoHC = TMixAtMinOA + FanDeltaT;
+        state.dataSetPointManager->TSupNoHC = TMixAtMinOA + FanDeltaT;
         CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneInletNode).HumRat);
-        ExtrRateNoHC = CpAir * ZoneMassFlow * (TSupNoHC - ZoneTemp);
+        state.dataSetPointManager->ExtrRateNoHC = CpAir * ZoneMassFlow * (state.dataSetPointManager->TSupNoHC - ZoneTemp);
         if (ZoneMassFlow <= SmallMassFlow) {
-            TSetPt = TSupNoHC;
+            TSetPt = state.dataSetPointManager->TSupNoHC;
         } else if (DeadBand || std::abs(ZoneLoad) < SmallLoad) {
             // if air with no active heating or cooling provides cooling
-            if (ExtrRateNoHC < 0.0) {
+            if (state.dataSetPointManager->ExtrRateNoHC < 0.0) {
                 // if still in deadband, do no active heating or cooling;
                 // if below heating setpoint, set a supply temp that will cool to the heating setpoint
-                if (ExtrRateNoHC >= ZoneLoadToHeatSetPt) {
-                    TSetPt = TSupNoHC;
+                if (state.dataSetPointManager->ExtrRateNoHC >= ZoneLoadToHeatSetPt) {
+                    TSetPt = state.dataSetPointManager->TSupNoHC;
                 } else {
                     TSetPt = ZoneTemp + ZoneLoadToHeatSetPt / (CpAir * ZoneMassFlow);
                 }
                 // if air with no active heating or cooling provides heating
-            } else if (ExtrRateNoHC > 0.0) {
+            } else if (state.dataSetPointManager->ExtrRateNoHC > 0.0) {
                 // if still in deadband, do no active heating or cooling;
                 // if above cooling setpoint, set a supply temp that will heat to the cooling setpoint
-                if (ExtrRateNoHC <= ZoneLoadToCoolSetPt) {
-                    TSetPt = TSupNoHC;
+                if (state.dataSetPointManager->ExtrRateNoHC <= ZoneLoadToCoolSetPt) {
+                    TSetPt = state.dataSetPointManager->TSupNoHC;
                 } else {
                     TSetPt = ZoneTemp + ZoneLoadToCoolSetPt / (CpAir * ZoneMassFlow);
                 }
             } else {
-                TSetPt = TSupNoHC;
+                TSetPt = state.dataSetPointManager->TSupNoHC;
             }
         } else if (ZoneLoad < (-1.0 * SmallLoad)) {
             TSetPt1 = ZoneTemp + ZoneLoad / (CpAir * ZoneMassFlow);
             TSetPt2 = ZoneTemp + ZoneLoadToHeatSetPt / (CpAir * ZoneMassFlow);
-            if (TSetPt1 > TSupNoHC) {
-                if (TSetPt2 > TSupNoHC) {
+            if (TSetPt1 > state.dataSetPointManager->TSupNoHC) {
+                if (TSetPt2 > state.dataSetPointManager->TSupNoHC) {
                     TSetPt = TSetPt2;
                 } else {
-                    TSetPt = TSupNoHC;
+                    TSetPt = state.dataSetPointManager->TSupNoHC;
                 }
             } else {
                 TSetPt = TSetPt1;
@@ -5281,17 +5289,17 @@ namespace EnergyPlus::SetPointManager {
         } else if (ZoneLoad > SmallLoad) {
             TSetPt1 = ZoneTemp + ZoneLoad / (CpAir * ZoneMassFlow);
             TSetPt2 = ZoneTemp + ZoneLoadToCoolSetPt / (CpAir * ZoneMassFlow);
-            if (TSetPt1 < TSupNoHC) {
-                if (TSetPt2 < TSupNoHC) {
+            if (TSetPt1 < state.dataSetPointManager->TSupNoHC) {
+                if (TSetPt2 < state.dataSetPointManager->TSupNoHC) {
                     TSetPt = TSetPt2;
                 } else {
-                    TSetPt = TSupNoHC;
+                    TSetPt = state.dataSetPointManager->TSupNoHC;
                 }
             } else {
                 TSetPt = TSetPt1;
             }
         } else {
-            TSetPt = TSupNoHC;
+            TSetPt = state.dataSetPointManager->TSupNoHC;
         }
 
         TSetPt = max(min(TSetPt, this->MaxSetTemp), this->MinSetTemp);
@@ -6913,12 +6921,12 @@ namespace EnergyPlus::SetPointManager {
         using namespace DataPlant;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 CondWaterSetPoint(0.0); // Condenser entering water temperature setpoint this timestep, C
-        static Real64 EvapOutletTemp(0.0);    // Evaporator water outlet temperature (C)
-        static Real64 CondTempLimit(0.0);     // Condenser entering water temperature setpoint lower limit
-        static Real64 CurLoad(0.0);           // Current cooling load, W
-        static Real64 TotEnergy(0.0);         // Total energy consumptions at this time step
-        static Real64 TotEnergyPre(0.0);      // Total energy consumptions at the previous time step
+        auto & CondWaterSetPoint = state.dataSetPointManager->CondWaterSetPoint;
+        auto & EvapOutletTemp = state.dataSetPointManager->EvapOutletTemp;
+        auto & CondTempLimit = state.dataSetPointManager->CondTempLimit;
+        auto & CurLoad = state.dataSetPointManager->CurLoad;
+        auto & TotEnergy = state.dataSetPointManager->TotEnergy;
+        auto & TotEnergyPre = state.dataSetPointManager->TotEnergyPre;
 
         if (state.dataGlobal->MetersHaveBeenInitialized) {
             // Setup meter vars
@@ -8143,7 +8151,7 @@ namespace EnergyPlus::SetPointManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ResetHumidityRatioCtrlVarType: ");
+        const char *  RoutineName("ResetHumidityRatioCtrlVarType: ");
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
@@ -8182,7 +8190,7 @@ namespace EnergyPlus::SetPointManager {
     SPMLoop_exit:;
 
         if (ResetCntrlVarType) {
-            ShowWarningError(state, RoutineName + managerTypeName(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNumPtr).SPMType) + "=\"" + state.dataSetPointManager->AllSetPtMgr(SetPtMgrNumPtr).Name + "\". ");
+            ShowWarningError(state, format("{}{}=\"{}\". ",RoutineName,managerTypeName(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNumPtr).SPMType), state.dataSetPointManager->AllSetPtMgr(SetPtMgrNumPtr).Name));
             ShowContinueError(state, format(" ..Humidity ratio control variable type specified is = {}", controlTypeName(iCtrlVarType::HumRat)));
             ShowContinueError(state, format(" ..Humidity ratio control variable type allowed with water coils is = {}", controlTypeName(iCtrlVarType::MaxHumRat)));
             ShowContinueError(state, format(" ..Setpointmanager control variable type is reset to = {}", controlTypeName(iCtrlVarType::MaxHumRat)));

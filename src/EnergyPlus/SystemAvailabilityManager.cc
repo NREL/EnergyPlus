@@ -145,7 +145,7 @@ namespace SystemAvailabilityManager {
         int ZoneEquipType;           // Type of ZoneHVAC:* component
         int CompNum;                 // Index of ZoneHVAC:* component
         int ZoneCompAvailMgrNum;     // Index of availability manager associated with the ZoneHVAC:* component
-        static int DummyArgument(1); // This variable is used when SimSysAvailManager is called for a ZoneHVAC:* component
+        int const DummyArgument(1); // This variable is used when SimSysAvailManager is called for a ZoneHVAC:* component
 
         if (state.dataSystemAvailabilityManager->GetAvailMgrInputFlag) {
             GetSysAvailManagerInputs(state);
@@ -323,7 +323,7 @@ namespace SystemAvailabilityManager {
         int maxNumbers;                 // maximum number of numbers for this set of objects
         int numArgs;                    // maximum number of arguments for this set of objects
         int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int SysAvailNum;                // DO loop index for all System Availability Managers
         int CyclingTimeSteps;
         int ZoneEquipType;
@@ -1945,7 +1945,7 @@ namespace SystemAvailabilityManager {
         int CtrldZoneNum;
         int ZoneNum;
         Real64 TempTol;
-        static Array1D_bool ZoneCompNCControlType;
+        auto & ZoneCompNCControlType = state.dataSystemAvailabilityManager->ZoneCompNCControlType;
         int CyclingRunTimeControlType;
 
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
@@ -3721,7 +3721,7 @@ namespace SystemAvailabilityManager {
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int SysAvailNum;                // DO loop index for all System Availability Managers
         Real64 SchedMin;                // Minimum value specified in a schedule
         Real64 SchedMax;                // Maximum value specified in a schedule
@@ -4238,11 +4238,11 @@ namespace SystemAvailabilityManager {
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true); // One time flag
-        static bool MyEnvrnFlag(true);
+        auto & MyOneTimeFlag = state.dataSystemAvailabilityManager->MyOneTimeFlag;
+        auto & MyEnvrnFlag = state.dataSystemAvailabilityManager->MyEnvrnFlag;
         int SysAvailNum;                // DO loop index for Sys Avail Manager objects
         int ControlledZoneNum;          // Index into the ZoneEquipConfig array
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int AirLoopNum;                 // Air loop number
         int ControlMode;                // Hybrid control mode
         int AirLoopCount;               // Air loop name count

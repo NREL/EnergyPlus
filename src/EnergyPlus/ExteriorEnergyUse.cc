@@ -116,18 +116,17 @@ namespace ExteriorEnergyUse {
         auto constexpr RoutineName("GetExteriorEnergyUseInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Item;                       // Item to be "gotten"
-        int NumAlphas;                  // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                 // Number of Numbers for each GetObjectItem call
-        int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        int NumFuelEq;                  // Temporary -- number of ExteriorFuelEquipment statements
-        int NumWtrEq;                   // Temporary -- number of ExteriorWaterEquipment statements
-        std::string TypeString;         // Fuel Type string (returned from Validation)
+        int Item;                // Item to be "gotten"
+        int NumAlphas;           // Number of Alphas for each GetObjectItem call
+        int NumNumbers;          // Number of Numbers for each GetObjectItem call
+        int IOStatus;            // Used in GetObjectItem
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        int NumFuelEq;           // Temporary -- number of ExteriorFuelEquipment statements
+        int NumWtrEq;            // Temporary -- number of ExteriorWaterEquipment statements
+        std::string TypeString;  // Fuel Type string (returned from Validation)
         std::string EndUseSubcategoryName;
-        Real64 SchMax;                     // Max value of schedule for item
-        Real64 SchMin;                     // Min value of schedule for item
-        static Real64 sumDesignLevel(0.0); // for predefined report of design level total
+        Real64 SchMax; // Max value of schedule for item
+        Real64 SchMin; // Min value of schedule for item
 
         state.dataExteriorEnergyUse->NumExteriorLights = inputProcessor->getNumObjectsFound(state, "Exterior:Lights");
         state.dataExteriorEnergyUse->ExteriorLights.allocate(state.dataExteriorEnergyUse->NumExteriorLights);
@@ -230,7 +229,7 @@ namespace ExteriorEnergyUse {
 
             // entries for predefined tables
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtPower, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, state.dataExteriorEnergyUse->ExteriorLights(Item).DesignLevel);
-            sumDesignLevel += state.dataExteriorEnergyUse->ExteriorLights(Item).DesignLevel;
+            state.dataExteriorEnergyUse->sumDesignLevel += state.dataExteriorEnergyUse->ExteriorLights(Item).DesignLevel;
             if (state.dataExteriorEnergyUse->ExteriorLights(Item).ControlMode == ExteriorEnergyUse::LightControlType::AstroClockOverride) { // photocell/schedule
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtClock, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, "AstronomicalClock");
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtSchd, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, "-");
@@ -239,7 +238,7 @@ namespace ExteriorEnergyUse {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtSchd, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, GetScheduleName(state, state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr));
             }
         }
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtPower, "Exterior Lighting Total", sumDesignLevel);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtPower, "Exterior Lighting Total", state.dataExteriorEnergyUse->sumDesignLevel);
 
         // =================================  Get Exterior Fuel Equipment
 

@@ -932,17 +932,17 @@ namespace EnergyPlus::NodeInputManager {
         int iNode; // node loop index
         int iReq;  // requested report variables loop index
 
-        static Real64 RhoAirStdInit;
-        static Real64 RhoWaterStdInit;
-        static Array1D_int NodeWetBulbSchedPtr;
-        static Array1D_bool NodeRelHumidityRepReq;
-        static Array1D_int NodeRelHumiditySchedPtr;
-        static Array1D_bool NodeDewPointRepReq;
-        static Array1D_int NodeDewPointSchedPtr;
-        static Array1D_bool NodeSpecificHeatRepReq;
-        static Array1D_int NodeSpecificHeatSchedPtr;
-        static std::vector<std::string> nodeReportingStrings;
-        static std::vector<std::string> nodeFluidNames;
+        auto & RhoAirStdInit = state.dataNodeInputMgr->RhoAirStdInit;
+        auto & RhoWaterStdInit = state.dataNodeInputMgr->RhoWaterStdInit;
+        auto & NodeWetBulbSchedPtr = state.dataNodeInputMgr->NodeWetBulbSchedPtr;
+        auto & NodeRelHumidityRepReq = state.dataNodeInputMgr->NodeRelHumidityRepReq;
+        auto & NodeRelHumiditySchedPtr = state.dataNodeInputMgr->NodeRelHumiditySchedPtr;
+        auto & NodeDewPointRepReq = state.dataNodeInputMgr->NodeDewPointRepReq;
+        auto & NodeDewPointSchedPtr = state.dataNodeInputMgr->NodeDewPointSchedPtr;
+        auto & NodeSpecificHeatRepReq = state.dataNodeInputMgr->NodeSpecificHeatRepReq;
+        auto & NodeSpecificHeatSchedPtr = state.dataNodeInputMgr->NodeSpecificHeatSchedPtr;
+        auto & nodeReportingStrings = state.dataNodeInputMgr->nodeReportingStrings;
+        auto & nodeFluidNames = state.dataNodeInputMgr->nodeFluidNames;
         bool ReportWetBulb;
         bool ReportRelHumidity;
         bool ReportDewPoint;
