@@ -167,7 +167,7 @@ namespace EnergyPlus::SolarShading {
         // allow segmentation separating it from the hourly loads calculation.
 
 #ifdef EP_Count_Calls
-        ++NumInitSolar_Calls;
+        ++state.dataTimingsData->NumInitSolar_Calls;
 #endif
         if (state.dataGlobal->BeginSimFlag) {
             if (state.files.outputControl.shd) {
@@ -2270,7 +2270,7 @@ namespace EnergyPlus::SolarShading {
 
 
 #ifdef EP_Count_Calls
-        ++NumAnisoSky_Calls;
+        ++state.dataTimingsData->NumAnisoSky_Calls;
 #endif
 
         CosZenithAng = state.dataEnvrn->SOLCOS(3);
@@ -3926,7 +3926,7 @@ namespace EnergyPlus::SolarShading {
         Real64 HFunct;
 
 #ifdef EP_Count_Calls
-        ++NumClipPoly_Calls;
+        ++state.dataTimingsData->NumClipPoly_Calls;
 #endif
         // Tuned Linear indexing
 
@@ -4333,7 +4333,7 @@ namespace EnergyPlus::SolarShading {
 
         // Check for exceeding array limits.
 #ifdef EP_Count_Calls
-        ++NumDetPolyOverlap_Calls;
+        ++state.dataTimingsData->NumDetPolyOverlap_Calls;
 #endif
 
         if (NS3 > state.dataSolarShading->MaxHCS) {
@@ -4497,7 +4497,7 @@ namespace EnergyPlus::SolarShading {
         if (state.dataGlobal->KickOffSizing || state.dataGlobal->KickOffSimulation) return; // Skip solar calcs for these Initialization steps.
 
 #ifdef EP_Count_Calls
-        ++NumCalcPerSolBeam_Calls;
+        ++state.dataTimingsData->NumCalcPerSolBeam_Calls;
 #endif
 
         // Initialize some values for the appropriate period
@@ -4803,7 +4803,7 @@ namespace EnergyPlus::SolarShading {
         static int MaxDim(0);
 
 #ifdef EP_Count_Calls
-        ++NumDetShadowCombs_Calls;
+        ++state.dataTimingsData->NumDetShadowCombs_Calls;
 #endif
 
         state.dataShadowComb->ShadowComb.dimension(state.dataSurface->TotSurfaces, ShadowingCombinations{}); // Set all elements to default constructed state
@@ -5240,9 +5240,9 @@ namespace EnergyPlus::SolarShading {
 
 #ifdef EP_Count_Calls
         if (iHour == 0) {
-            ++NumShadow_Calls;
+            ++state.dataTimingsData->NumShadow_Calls;
         } else {
-            ++NumShadowAtTS_Calls;
+            ++state.dataTimingsData->NumShadowAtTS_Calls;
         }
 #endif
 
@@ -5959,7 +5959,7 @@ namespace EnergyPlus::SolarShading {
         }
 
 #ifdef EP_Count_Calls
-        ++NumIntSolarDist_Calls;
+        ++state.dataTimingsData->NumIntSolarDist_Calls;
 #endif
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             state.dataSurface->EnclSolDB(zoneNum) = 0.0;

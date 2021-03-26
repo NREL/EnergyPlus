@@ -173,18 +173,18 @@ namespace HeatBalanceIntRadExchange {
 
 #ifdef EP_Count_Calls
         if (!PartialResimulate) {
-            ++NumIntRadExchange_Calls;
+            ++state.dataTimingsData->NumIntRadExchange_Calls;
         } else {
-            ++NumIntRadExchangeZ_Calls;
+            ++state.dataTimingsData->NumIntRadExchangeZ_Calls;
         }
         if (CalledFrom.empty()) {
             // do nothing
         } else if (CalledFrom == "Main") {
-            ++NumIntRadExchangeMain_Calls;
+            ++state.dataTimingsData->NumIntRadExchangeMain_Calls;
         } else if (CalledFrom == "Outside") {
-            ++NumIntRadExchangeOSurf_Calls;
+            ++state.dataTimingsData->NumIntRadExchangeOSurf_Calls;
         } else if (CalledFrom == "Inside") {
-            ++NumIntRadExchangeISurf_Calls;
+            ++state.dataTimingsData->NumIntRadExchangeISurf_Calls;
         }
 #endif
 
@@ -1744,7 +1744,7 @@ namespace HeatBalanceIntRadExchange {
 
 
 #ifdef EP_Count_Calls
-        ++NumCalcScriptF_Calls;
+        ++state.dataTimingsData->NumCalcScriptF_Calls;
 #endif
 
         // Load Cmatrix with AF (AREA * DIRECT VIEW FACTOR) matrix
