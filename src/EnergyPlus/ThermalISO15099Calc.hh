@@ -649,7 +649,7 @@ namespace ThermalISO15099Calc {
 
             this->iFP = 0;
             this->kFP = 0;
-            this.dynFormat = "";
+            this->dynFormat = "";
 
         }
     };
