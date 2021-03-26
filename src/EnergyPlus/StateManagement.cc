@@ -47,24 +47,23 @@
 
 #include <EnergyPlus/StateManagement.hh>
 
-#include <AirflowNetwork/Elements.hpp>
+//#include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
-#include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataViewFactorInformation.hh>
-#include <EnergyPlus/EvaporativeFluidCoolers.hh>
+//#include <EnergyPlus/Construction.hh>
+//#include <EnergyPlus/CurveManager.hh>
+//#include <EnergyPlus/Data/EnergyPlusData.hh>
+//#include <EnergyPlus/DataBranchNodeConnections.hh>
+//#include <EnergyPlus/DataViewFactorInformation.hh>
+//#include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
+//#include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/IntegratedHeatPump.hh>
-#include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutsideEnergySources.hh>
+//#include <EnergyPlus/IntegratedHeatPump.hh>
+//#include <EnergyPlus/OutAirNodeManager.hh>
+//#include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
-#include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/RoomAirModelUserTempPattern.hh>
+//#include <EnergyPlus/Psychrometrics.hh>
+//#include <EnergyPlus/RoomAirModelUserTempPattern.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -75,7 +74,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     // A to Z order
     AirflowNetwork::clear_state();
     FluidProperties::clear_state();
-    HeatBalanceManager::clear_state();
     HVACFan::clearHVACFanObjects();
     PhotovoltaicThermalCollectors::clear_state();
     Psychrometrics::clear_state();

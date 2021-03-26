@@ -154,32 +154,6 @@ namespace HeatBalanceManager {
 
     Array1D_string const PassFail(2, {"Fail", "Pass"});
 
-
-    // Subroutine Specifications for the Heat Balance Module
-    // Driver Routines
-
-    // Input reader routines for the module
-
-    // Initialization routines for module
-
-    // Record Keeping/Utility Routines for Module
-
-    // Reporting routines for module
-
-    // Object Data
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
-    // Functions
-
-    // Clears the global data in HeatBalanceManager.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        surfaceOctree = SurfaceOctreeCube();  // somewhere_else
-    }
-
     void ManageHeatBalance(EnergyPlusData &state)
     {
 
@@ -234,7 +208,7 @@ namespace HeatBalanceManager {
             //   if in the future surfaces are altered after this point
             if (state.dataSurface->TotSurfaces >= DaylightingManager::octreeCrossover) {                        // Octree can be active
                 if (inputProcessor->getNumObjectsFound(state, "Daylighting:Controls") > 0) { // Daylighting is active
-                    surfaceOctree.init(state.dataSurface->Surface);                               // Set up surface octree
+                    state.dataHeatBalMgr->surfaceOctree.init(state.dataSurface->Surface);                               // Set up surface octree
                 }
             }
 

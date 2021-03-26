@@ -631,9 +631,6 @@ private:                          // Data
 
 }; // SurfaceOctreeCube
 
-// Globals
-extern SurfaceOctreeCube surfaceOctree;
-
 } // namespace EnergyPlus
 
 #endif

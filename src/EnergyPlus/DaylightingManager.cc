@@ -81,6 +81,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -2998,7 +2999,7 @@ namespace EnergyPlus::DaylightingManager {
 
                     // Check octree surface candidates until a hit is found, if any
                     Vector3<Real64> const URay_inv(SurfaceOctreeCube::safe_inverse(URay));
-                    surfaceOctree.hasSurfaceRayIntersectsCube(GroundHitPt, URay, URay_inv, surfaceHit);
+                    state.dataHeatBalMgr->surfaceOctree.hasSurfaceRayIntersectsCube(GroundHitPt, URay, URay_inv, surfaceHit);
                 }
 
                 if (hitObs) continue; // Obstruction hit
@@ -5625,7 +5626,7 @@ namespace EnergyPlus::DaylightingManager {
 
             // Check octree surface candidates for hits: short circuits if zero transmittance reached
             Vector3<Real64> const RN_inv(SurfaceOctreeCube::safe_inverse(RN));
-            surfaceOctree.processSomeSurfaceRayIntersectsCube(state, R1, RN, RN_inv, solarTransmittance);
+            state.dataHeatBalMgr->surfaceOctree.processSomeSurfaceRayIntersectsCube(state, R1, RN, RN_inv, solarTransmittance);
         }
     }
 
@@ -5702,7 +5703,7 @@ namespace EnergyPlus::DaylightingManager {
             };
 
             // Check octree surface candidates until a hit is found, if any
-            surfaceOctree.hasSurfaceSegmentIntersectsCube(R1, R2, surfaceHit);
+            state.dataHeatBalMgr->surfaceOctree.hasSurfaceSegmentIntersectsCube(R1, R2, surfaceHit);
         }
     }
 
@@ -5796,7 +5797,7 @@ namespace EnergyPlus::DaylightingManager {
             };
 
             // Check octree surface candidates until a hit is found, if any
-            surfaceOctree.hasSurfaceSegmentIntersectsCube(R1, R2, surfaceHit);
+            state.dataHeatBalMgr->surfaceOctree.hasSurfaceSegmentIntersectsCube(R1, R2, surfaceHit);
         }
     }
 
@@ -8697,7 +8698,7 @@ namespace EnergyPlus::DaylightingManager {
 
             // Process octree surface candidates
             Vector3<Real64> const RayVec_inv(SurfaceOctreeCube::safe_inverse(RayVec));
-            surfaceOctree.processSurfaceRayIntersectsCube(RecPt, RayVec, RayVec_inv, surfaceHit);
+            state.dataHeatBalMgr->surfaceOctree.processSurfaceRayIntersectsCube(RecPt, RayVec, RayVec_inv, surfaceHit);
             if (nearestHitSurface != nullptr) { // Find surface number: This is inefficient: Improve when surfaces know their own number
                 for (int i = 1; i <= state.dataSurface->TotSurfaces; ++i) {
                     if (&state.dataSurface->Surface(i) == nearestHitSurface) {
