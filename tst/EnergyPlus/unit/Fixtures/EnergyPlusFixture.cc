@@ -93,10 +93,10 @@ void EnergyPlusFixture::openOutputFiles(EnergyPlusData &state)
 void EnergyPlusFixture::SetUp()
 {
     this->state = new EnergyPlusData;
+    if (!state->dataInputProcessing->inputProcessor) state->dataInputProcessing->inputProcessor = InputProcessor::factory();
     EnergyPlus::clearAllStates(*state);
 
-    if (!state->dataInputProcessing->inputProcessor) state->dataInputProcessing->inputProcessor = InputProcessor::factory();
-    state->dataInputProcessing->inputProcessor->clear_state();
+    //state->dataInputProcessing->inputProcessor->clear_state();
 
     show_message();
 
