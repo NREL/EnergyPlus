@@ -6419,33 +6419,18 @@ void GenOutputVariablesAuditReport(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Use flagged data structure in OutputProcessor.
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
     using namespace OutputProcessor;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::map<ReportingFrequency, std::string> reportFrequency({{ReportingFrequency::EachCall, "Detailed"},
-                                                                      {ReportingFrequency::TimeStep, "TimeStep"},
-                                                                      {ReportingFrequency::Hourly, "Hourly"},
-                                                                      {ReportingFrequency::Daily, "Daily"},
-                                                                      {ReportingFrequency::Monthly, "Monthly"},
-                                                                      {ReportingFrequency::Yearly, "Annual"}});
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Loop;
     auto &op(state.dataOutputProcessor);
+    std::map<ReportingFrequency, std::string> reportFrequency({{ReportingFrequency::EachCall, "Detailed"},
+                                                               {ReportingFrequency::TimeStep, "TimeStep"},
+                                                               {ReportingFrequency::Hourly, "Hourly"},
+                                                               {ReportingFrequency::Daily, "Daily"},
+                                                               {ReportingFrequency::Monthly, "Monthly"},
+                                                               {ReportingFrequency::Yearly, "Annual"}});
 
     for (Loop = 1; Loop <= op->NumOfReqVariables; ++Loop) {
         if (op->ReqRepVars(Loop).Used) continue;
