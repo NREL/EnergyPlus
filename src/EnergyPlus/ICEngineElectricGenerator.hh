@@ -65,12 +65,9 @@ struct EnergyPlusData;
 
 namespace ICEngineElectricGenerator {
 
-    extern Real64 const ReferenceTemp; // Reference temperature by which lower heating
+    Real64 constexpr ReferenceTemp(25.0); // Reference temperature by which lower heating
     // value is reported.  This should be subtracted
     // off of when calculated exhaust energies.
-
-    extern int NumICEngineGenerators; // number of IC ENGINE Generators specified in input
-    extern bool getICEInput;          // When TRUE, calls subroutine to read input file.
 
     struct ICEngineGeneratorSpecs : PlantComponent
     {
@@ -170,17 +167,21 @@ namespace ICEngineElectricGenerator {
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    extern Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
-
     void GetICEngineGeneratorInput(EnergyPlusData &state);
 
 } // namespace ICEngineElectricGenerator
 
 struct ICEngineElectricGeneratorData : BaseGlobalStruct {
 
+    int NumICEngineGenerators = 0; // number of IC ENGINE Generators specified in input
+    bool getICEInput = true;          // When TRUE, calls subroutine to read input file.
+    Array1D<ICEngineElectricGenerator::ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
+
     void clear_state() override
     {
-
+        this->getICEInput = true;
+        this->NumICEngineGenerators = 0;
+        this->ICEngineGenerator.deallocate();
     }
 };
 
