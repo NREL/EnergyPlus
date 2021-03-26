@@ -69,9 +69,6 @@ namespace ICEngineElectricGenerator {
     // value is reported.  This should be subtracted
     // off of when calculated exhaust energies.
 
-    extern int NumICEngineGenerators; // number of IC ENGINE Generators specified in input
-    extern bool getICEInput;          // When TRUE, calls subroutine to read input file.
-
     struct ICEngineGeneratorSpecs : PlantComponent
     {
         // Members
@@ -170,17 +167,21 @@ namespace ICEngineElectricGenerator {
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    extern Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
-
     void GetICEngineGeneratorInput(EnergyPlusData &state);
 
 } // namespace ICEngineElectricGenerator
 
 struct ICEngineElectricGeneratorData : BaseGlobalStruct {
 
+    bool getICEInput = true;       // When TRUE, calls subroutine to read input file.
+    int NumICEngineGenerators = 0; // number of IC ENGINE Generators specified in input
+    Array1D<ICEngineElectricGenerator::ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
+
     void clear_state() override
     {
-
+        getICEInput = true;
+        NumICEngineGenerators = 0;
+        ICEngineGenerator.deallocate();
     }
 };
 
