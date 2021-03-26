@@ -200,8 +200,6 @@ void HVACSizingSimulationManager::UpdateSizingLogsSystemStep(EnergyPlusData &sta
     sizingLogger.UpdateSizingLogValuesSystemStep(state);
 }
 
-std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
-
 void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 {
     using EMSManager::ManageEMS;
@@ -209,6 +207,8 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
     using PlantPipingSystemsManager::SimulateGroundDomains;
     using namespace WeatherManager;
     using namespace HeatBalanceManager;
+
+    auto & hvacSizingSimulationManager = state.dataHVACSizingSimMgr->hvacSizingSimulationManager;
 
     hvacSizingSimulationManager = std::unique_ptr<HVACSizingSimulationManager>(new HVACSizingSimulationManager());
 

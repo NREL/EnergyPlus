@@ -6995,7 +6995,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             }
 
 #ifdef EP_Count_Calls
-            NumMaxInsideSurfIterations = max(NumMaxInsideSurfIterations, state.dataHeatBal->InsideSurfIterations);
+            state.dataTimingsData->NumMaxInsideSurfIterations = max(state.dataTimingsData->NumMaxInsideSurfIterations, state.dataHeatBal->InsideSurfIterations);
 #endif
 
             if (state.dataHeatBal->InsideSurfIterations < state.dataHeatBalSurf->MinIterations) Converged = false;
@@ -7720,7 +7720,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             if (MaxDelTemp <= state.dataHeatBal->MaxAllowedDelTemp) Converged = true;
 
 #ifdef EP_Count_Calls
-            NumMaxInsideSurfIterations = max(NumMaxInsideSurfIterations, state.dataHeatBal->InsideSurfIterations);
+            state.dataTimingsData->NumMaxInsideSurfIterations = max(state.dataTimingsData->NumMaxInsideSurfIterations, state.dataHeatBal->InsideSurfIterations);
 #endif
 
             if (state.dataHeatBal->InsideSurfIterations < state.dataHeatBalSurf->MinIterations) Converged = false;

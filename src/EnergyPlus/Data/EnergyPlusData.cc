@@ -58,6 +58,7 @@ namespace EnergyPlus {
         this->dataAirSystemsData = std::make_unique<AirSystemsData>();
         this->dataAirflowNetwork = std::make_unique<AirflowNetworkData>();
         this->dataAirflowNetworkBalanceManager = std::make_unique<AirflowNetworkBalanceManagerData>();
+        this->dataAFNProps = std::make_unique<DataAFNProps>();
         this->dataBSDFWindow = std::make_unique<BSDFWindowData>();
         this->dataBaseSizerFanHeatInputs = std::make_unique<BaseSizerWithFanHeatInputsData>();
         this->dataBaseSizerScalableInputs = std::make_unique<BaseSizerWithScalableInputsData>();
@@ -176,12 +177,14 @@ namespace EnergyPlus {
         this->dataLoopNodes = std::make_unique<LoopNodeData>();
         this->dataLowTempRadSys = std::make_unique<LowTempRadiantSystemData>();
         this->dataMaterial = std::make_unique<MaterialData>();
+        this->dataMatrixDataManager = std::make_unique<MatrixDataManagerData>();
         this->dataMircoturbElectGen = std::make_unique<MicroturbineElectricGeneratorData>();
         this->dataMixedAir = std::make_unique<MixedAirData>();
         this->dataMixerComponent = std::make_unique<MixerComponentData>();
         this->dataMoistureBalEMPD = std::make_unique<MoistureBalanceEMPDManagerData>();
         this->dataMstBal = std::make_unique<MoistureBalanceData>();
         this->dataMstBalEMPD = std::make_unique<MoistureBalanceEMPDData>();
+        this->dataMundtSimMgr = std::make_unique<MundtSimMgrData>();
         this->dataNodeInputMgr = std::make_unique<NodeInputManagerData>();
         this->dataOutAirNodeMgr = std::make_unique<OutAirNodeManagerData>();
         this->dataOutRptPredefined = std::make_unique<OutputReportPredefinedData>();
@@ -308,6 +311,7 @@ namespace EnergyPlus {
         this->dataAirSystemsData->clear_state();
         this->dataAirflowNetwork->clear_state();
         this->dataAirflowNetworkBalanceManager->clear_state();
+        this->dataAFNProps->clear_state();
         this->dataBSDFWindow->clear_state();
         this->dataBaseSizerFanHeatInputs->clear_state();
         this->dataBaseSizerScalableInputs->clear_state();
@@ -426,12 +430,14 @@ namespace EnergyPlus {
         this->dataLoopNodes->clear_state();
         this->dataLowTempRadSys->clear_state();
         this->dataMaterial->clear_state();
+        this->dataMatrixDataManager->clear_state();
         this->dataMircoturbElectGen->clear_state();
         this->dataMixedAir->clear_state();
         this->dataMixerComponent->clear_state();
         this->dataMoistureBalEMPD->clear_state();
         this->dataMstBal->clear_state();
         this->dataMstBalEMPD->clear_state();
+        this->dataMundtSimMgr->clear_state();
         this->dataNodeInputMgr->clear_state();
         this->dataOutAirNodeMgr->clear_state();
         this->dataOutRptPredefined->clear_state();

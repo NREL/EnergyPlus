@@ -380,7 +380,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(CoilNum).Name;
     state->dataSize->DataWaterLoopNum = 1;
-    FluidProperties::NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     createCoilSelectionReportObj(*state);
     WaterCoils::SizeWaterCoil(*state, CoilNum);
@@ -11488,20 +11488,20 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     ASSERT_TRUE(process_idf(idf_objects));
 
     std::string fanName = "TEST FAN 1";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
+    state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
 
     fanName = "TEST FAN 2";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
+    state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
 
     fanName = "TEST FAN 3";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
+    state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurOASysNum = 0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    HVACFan::fanObjs[2]->simulate(*state, _, _, _, _);                 // triggers sizing call
-    Real64 locFanSizeVdot = HVACFan::fanObjs[2]->designAirVolFlowRate; // get function
-    Real64 locDesignHeatGain3 = HVACFan::fanObjs[2]->getFanDesignHeatGain(*state, locFanSizeVdot);
+    state->dataHVACFan->fanObjs[2]->simulate(*state, _, _, _, _);                 // triggers sizing call
+    Real64 locFanSizeVdot = state->dataHVACFan->fanObjs[2]->designAirVolFlowRate; // get function
+    Real64 locDesignHeatGain3 = state->dataHVACFan->fanObjs[2]->getFanDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain3, 402.0, 0.1);
 
     Fans::GetFanInput(*state);

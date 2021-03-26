@@ -3671,16 +3671,6 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    void clear_state()
-    {
-        //AirflowNetworkExchangeData.deallocate();
-        //AirflowNetworkMultiExchangeData.deallocate();
-        //AirflowNetworkLinkReport.deallocate();
-        //AirflowNetworkNodeReport.deallocate();
-        //AirflowNetworkLinkReport1.deallocate();
-        lowerLimitErrIdx = 0;
-        upperLimitErrIdx = 0;
-    }
 
 } // namespace AirflowNetwork
 

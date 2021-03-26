@@ -401,10 +401,10 @@ namespace OutdoorAirUnit {
             errFlag = false;
             if (HVACFan::checkIfFanNameIsAFanSystem(state, OutAirUnit(OAUnitNum).SFanName)) { // no object type in input, so check if Fan:SystemModel
                 OutAirUnit(OAUnitNum).SFanType = DataHVACGlobals::FanType_SystemModelObject;
-                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, OutAirUnit(OAUnitNum).SFanName)); // call constructor
+                state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, OutAirUnit(OAUnitNum).SFanName)); // call constructor
                 OutAirUnit(OAUnitNum).SFan_Index = HVACFan::getFanObjectVectorIndex(state, OutAirUnit(OAUnitNum).SFanName);
-                OutAirUnit(OAUnitNum).SFanMaxAirVolFlow = HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->designAirVolFlowRate;
-                OutAirUnit(OAUnitNum).SFanAvailSchedPtr = HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->availSchedIndex;
+                OutAirUnit(OAUnitNum).SFanMaxAirVolFlow = state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->designAirVolFlowRate;
+                OutAirUnit(OAUnitNum).SFanAvailSchedPtr = state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->availSchedIndex;
             } else {
                 GetFanType(
                     state, OutAirUnit(OAUnitNum).SFanName, OutAirUnit(OAUnitNum).SFanType, errFlag, CurrentModuleObject, OutAirUnit(OAUnitNum).Name);
@@ -444,10 +444,10 @@ namespace OutdoorAirUnit {
                 errFlag = false;
                 if (HVACFan::checkIfFanNameIsAFanSystem(state, OutAirUnit(OAUnitNum).ExtFanName)) { // no object type in input, so check if Fan:SystemModel
                     OutAirUnit(OAUnitNum).ExtFanType = DataHVACGlobals::FanType_SystemModelObject;
-                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, OutAirUnit(OAUnitNum).ExtFanName)); // call constructor
+                    state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, OutAirUnit(OAUnitNum).ExtFanName)); // call constructor
                     OutAirUnit(OAUnitNum).ExtFan_Index = HVACFan::getFanObjectVectorIndex(state, OutAirUnit(OAUnitNum).ExtFanName);
-                    OutAirUnit(OAUnitNum).EFanMaxAirVolFlow = HVACFan::fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->designAirVolFlowRate;
-                    OutAirUnit(OAUnitNum).ExtFanAvailSchedPtr = HVACFan::fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->availSchedIndex;
+                    OutAirUnit(OAUnitNum).EFanMaxAirVolFlow = state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->designAirVolFlowRate;
+                    OutAirUnit(OAUnitNum).ExtFanAvailSchedPtr = state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->availSchedIndex;
                 } else {
                     GetFanType(state,
                                OutAirUnit(OAUnitNum).ExtFanName,
@@ -1523,8 +1523,8 @@ namespace OutdoorAirUnit {
                     GetFanDesignVolumeFlowRate(state, cFanTypes(OutAirUnit(OAUnitNum).SFanType), OutAirUnit(OAUnitNum).SFanName, ErrorsFound);
 
             } else {
-                HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, _, _, _);
-                OutAirUnit(OAUnitNum).SFanMaxAirVolFlow = HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->designAirVolFlowRate;
+                state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, _, _, _);
+                OutAirUnit(OAUnitNum).SFanMaxAirVolFlow = state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->designAirVolFlowRate;
             }
         }
         if (OutAirUnit(OAUnitNum).ExtFan) {
@@ -1535,8 +1535,8 @@ namespace OutdoorAirUnit {
                     OutAirUnit(OAUnitNum).EFanMaxAirVolFlow =
                         GetFanDesignVolumeFlowRate(state, cFanTypes(OutAirUnit(OAUnitNum).ExtFanType), OutAirUnit(OAUnitNum).ExtFanName, ErrorsFound);
                 } else {
-                    HVACFan::fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->simulate(state, _, _, _, _);
-                    OutAirUnit(OAUnitNum).EFanMaxAirVolFlow = HVACFan::fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->designAirVolFlowRate;
+                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->simulate(state, _, _, _, _);
+                    OutAirUnit(OAUnitNum).EFanMaxAirVolFlow = state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->designAirVolFlowRate;
                 }
             }
         }
@@ -1719,7 +1719,7 @@ namespace OutdoorAirUnit {
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
 
                 SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
@@ -1733,7 +1733,7 @@ namespace OutdoorAirUnit {
                                                     ZoneCompTurnFansOn,
                                                     ZoneCompTurnFansOff); // why not turn on/off flags here?
                     } else {
-                        HVACFan::fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                        state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                     }
                 }
 
@@ -1748,7 +1748,7 @@ namespace OutdoorAirUnit {
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
                 if (OutAirUnit(OAUnitNum).ExtFan) {
                     if (OutAirUnit(OAUnitNum).ExtFanType != DataHVACGlobals::FanType_SystemModelObject) {
@@ -1760,7 +1760,7 @@ namespace OutdoorAirUnit {
                                                     ZoneCompTurnFansOn,
                                                     ZoneCompTurnFansOff);
                     } else {
-                        HVACFan::fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                        state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                     }
                 }
             }
@@ -1804,7 +1804,7 @@ namespace OutdoorAirUnit {
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
                 DesOATemp = state.dataLoopNodes->Node(SFanOutletNode).Temp;
             } else if (OutAirUnit(OAUnitNum).FanPlace == DrawThru) {
@@ -1872,7 +1872,7 @@ namespace OutdoorAirUnit {
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
 
                 OutAirUnit(OAUnitNum).FanEffect = true; // RE-Simulation to take over the supply fan effect
@@ -1887,7 +1887,7 @@ namespace OutdoorAirUnit {
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
                 OutAirUnit(OAUnitNum).FanEffect = false;
             }
@@ -1901,7 +1901,7 @@ namespace OutdoorAirUnit {
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    HVACFan::fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
             }
         } // ...end of system ON/OFF IF-THEN block
@@ -1955,13 +1955,13 @@ namespace OutdoorAirUnit {
         if (OutAirUnit(OAUnitNum).SFanType != DataHVACGlobals::FanType_SystemModelObject) {
             OutAirUnit(OAUnitNum).ElecFanRate += Fans::GetFanPower(state, OutAirUnit(OAUnitNum).SFan_Index);
         } else {
-            OutAirUnit(OAUnitNum).ElecFanRate += HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->fanPower();
+            OutAirUnit(OAUnitNum).ElecFanRate += state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->fanPower();
         }
         if (OutAirUnit(OAUnitNum).ExtFan) {
             if (OutAirUnit(OAUnitNum).ExtFanType != DataHVACGlobals::FanType_SystemModelObject) {
                 OutAirUnit(OAUnitNum).ElecFanRate += Fans::GetFanPower(state, OutAirUnit(OAUnitNum).ExtFan_Index);
             } else {
-                OutAirUnit(OAUnitNum).ElecFanRate += HVACFan::fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->fanPower();
+                OutAirUnit(OAUnitNum).ElecFanRate += state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->fanPower();
             }
         }
 

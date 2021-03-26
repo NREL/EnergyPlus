@@ -104,7 +104,7 @@ struct DaylightingDevicesData : BaseGlobalStruct {
 
     Array1D<Real64> COSAngle = Array1D<Real64>(DataDaylightingDevices::NumOfAngles); // List of cosines of incident angle
     bool ShelfReported = false;
-    bool GetTDDInputErrorsFound = false; // Set to true if errors in input, fatal at end of routine
+    bool GetTDDInputErrorsFound = false;   // Set to true if errors in input, fatal at end of routine
     bool GetShelfInputErrorsFound = false; // Set to true if errors in input, fatal at end of routine
     bool MyEnvrnFlag = true;
 

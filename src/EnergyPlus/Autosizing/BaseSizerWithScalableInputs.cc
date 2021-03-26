@@ -114,7 +114,7 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                              this->compName,
                                                              this->compType,
-                                                             HVACFan::fanObjs[this->primaryAirSystem(this->curSysNum).supFanVecIndex]->name,
+                                                             state.dataHVACFan->fanObjs[this->primaryAirSystem(this->curSysNum).supFanVecIndex]->name,
                                                              DataAirSystems::objectVectorOOFanSystemModel,
                                                              this->primaryAirSystem(this->curSysNum).supFanVecIndex);
             }

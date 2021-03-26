@@ -404,7 +404,7 @@ void ManageHVAC(EnergyPlusData &state)
                 UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
                 if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                     state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
-                    if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
+                    if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager) state.dataHVACSizingSimMgr->hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
                 }
                 UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
             }
@@ -451,7 +451,7 @@ void ManageHVAC(EnergyPlusData &state)
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                 state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
-                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
+                if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager) state.dataHVACSizingSimMgr->hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
             }
         } else if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface) { // added for FMI
             if (state.dataGlobal->BeginDayFlag && !state.dataEnvrn->PrintEnvrnStampWarmupPrinted) {

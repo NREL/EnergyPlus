@@ -232,7 +232,7 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
     state->dataSize->DataWaterLoopNum = 1;
-    NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     createCoilSelectionReportObj(*state);
     SizeWaterCoil(*state, CoilNum);
@@ -467,7 +467,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 0;
     state->dataSize->DataWaterLoopNum = 1;
-    NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
@@ -618,7 +618,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 0;
     state->dataSize->DataWaterLoopNum = 1;
-    NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
@@ -774,7 +774,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
     state->dataSize->CurOASysNum = 0;
 
     state->dataSize->DataWaterLoopNum = 1;
-    NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
@@ -892,7 +892,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
 
     state->dataSize->DataWaterLoopNum = 1;
-    NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     // run water coil sizing
     createCoilSelectionReportObj(*state);
@@ -1007,7 +1007,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
     state->dataSize->PlantSizData(1).ExitTemp = 5.7;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataSize->DataWaterLoopNum = 1;
-    NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     // run water coil sizing
     createCoilSelectionReportObj(*state);
@@ -1129,7 +1129,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     state->dataSize->PlantSizData(1).ExitTemp = 5.7;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataSize->DataWaterLoopNum = 1;
-    NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     OutputReportPredefined::SetPredefinedTables(*state);
 
@@ -1284,7 +1284,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
     state->dataSize->PlantSizData(1).DeltaT = 10.0;
 
     state->dataSize->DataWaterLoopNum = 1;
-    NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     // run water coil sizing
     createCoilSelectionReportObj(*state);
@@ -1379,7 +1379,7 @@ TEST_F(WaterCoilsTest, HotWaterHeatingCoilAutoSizeTempTest)
     state->dataSize->CurOASysNum = 0;
 
     state->dataSize->DataWaterLoopNum = 1;
-    NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;

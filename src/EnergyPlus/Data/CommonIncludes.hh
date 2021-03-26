@@ -56,6 +56,7 @@
 // these are needed so that we don't have incomplete types when we manage the EnergyPlusData instance
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <AirflowNetwork/Properties.hpp>
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>

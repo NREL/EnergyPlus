@@ -409,6 +409,15 @@ struct SingleDuctData : BaseGlobalStruct {
     Real64 MixedAirHumRatCATM = 0.0;
     Real64 MixedAirTempCATM = 0.0;
 
+     Real64 ZoneTempSDAT = 0.0;                      // zone air temperature [C]
+     Real64 MaxHeatTempSDAT = 0.0;                   // maximum supply air temperature [C]
+     Real64 MaxDeviceAirMassFlowReheatSDAT = 0.0;    // air mass flow rate required to meet the coil heating load [W]
+     Real64 MassFlowReqToLimitLeavingTempSDAT = 0.0; // air mass flow rate actually used [W]
+     Real64 QZoneMaxRHTempLimitSDAT = 0.0;           // maximum zone heat addition rate given constraints of MaxHeatTemp and max
+    // available air mass flow rate [W]
+     Real64 MinMassAirFlowSDAT = 0.0; // the air flow rate during heating for normal acting damper
+     Real64 QZoneMax2SDAT = 0.0;      // temporary variable
+
 
     void clear_state() override {
         this->SysATMixer.deallocate();
@@ -475,6 +484,14 @@ struct SingleDuctData : BaseGlobalStruct {
         this->MixedAirEnthalpyCATM = 0.0;
         this->MixedAirHumRatCATM = 0.0;
         this->MixedAirTempCATM = 0.0;
+
+        this->ZoneTempSDAT = 0.0;                      // zone air temperature [C]
+        this->MaxHeatTempSDAT = 0.0;                   // maximum supply air temperature [C]
+        this->MaxDeviceAirMassFlowReheatSDAT = 0.0;    // air mass flow rate required to meet the coil heating load [W]
+        this->MassFlowReqToLimitLeavingTempSDAT = 0.0; // air mass flow rate actually used [W]
+        this->QZoneMaxRHTempLimitSDAT = 0.0;           // maximum zone heat addition rate given constraints of MaxHeatTemp and max
+        this->MinMassAirFlowSDAT = 0.0; // the air flow rate during heating for normal acting damper
+        this->QZoneMax2SDAT = 0.0;      // temporary variable
     }
 };
 

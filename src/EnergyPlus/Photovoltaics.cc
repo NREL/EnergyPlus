@@ -222,7 +222,7 @@ namespace Photovoltaics {
         // PVT may add thermal
         if (state.dataPhotovoltaic->PVarray(GeneratorIndex).CellIntegrationMode == CellIntegration::PVTSolarCollector) {
             // get result for thermal power generation
-            GetPVTThermalPowerProduction(GeneratorIndex, ThermalPower, ThermalEnergy);
+            GetPVTThermalPowerProduction(state, GeneratorIndex, ThermalPower, ThermalEnergy);
         } else {
             ThermalPower = 0.0;
             ThermalEnergy = 0.0;

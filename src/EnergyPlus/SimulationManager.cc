@@ -1847,22 +1847,22 @@ namespace SimulationManager {
         print(state.files.audit, variable_fmt, "NumOfNodeConnections", state.dataBranchNodeConnections->NumOfNodeConnections);
         print(state.files.audit, variable_fmt, "MaxNumOfNodeConnections", state.dataBranchNodeConnections->MaxNumOfNodeConnections);
 #ifdef EP_Count_Calls
-        print(state.files.audit, variable_fmt, "NumShadow_Calls", NumShadow_Calls);
-        print(state.files.audit, variable_fmt, "NumShadowAtTS_Calls", NumShadowAtTS_Calls);
-        print(state.files.audit, variable_fmt, "NumClipPoly_Calls", NumClipPoly_Calls);
-        print(state.files.audit, variable_fmt, "NumInitSolar_Calls", NumInitSolar_Calls);
-        print(state.files.audit, variable_fmt, "NumAnisoSky_Calls", NumAnisoSky_Calls);
-        print(state.files.audit, variable_fmt, "NumDetPolyOverlap_Calls", NumDetPolyOverlap_Calls);
-        print(state.files.audit, variable_fmt, "NumCalcPerSolBeam_Calls", NumCalcPerSolBeam_Calls);
-        print(state.files.audit, variable_fmt, "NumDetShadowCombs_Calls", NumDetShadowCombs_Calls);
-        print(state.files.audit, variable_fmt, "NumIntSolarDist_Calls", NumIntSolarDist_Calls);
-        print(state.files.audit, variable_fmt, "NumIntRadExchange_Calls", NumIntRadExchange_Calls);
-        print(state.files.audit, variable_fmt, "NumIntRadExchangeZ_Calls", NumIntRadExchangeZ_Calls);
-        print(state.files.audit, variable_fmt, "NumIntRadExchangeMain_Calls", NumIntRadExchangeMain_Calls);
-        print(state.files.audit, variable_fmt, "NumIntRadExchangeOSurf_Calls", NumIntRadExchangeOSurf_Calls);
-        print(state.files.audit, variable_fmt, "NumIntRadExchangeISurf_Calls", NumIntRadExchangeISurf_Calls);
-        print(state.files.audit, variable_fmt, "NumMaxInsideSurfIterations", NumMaxInsideSurfIterations);
-        print(state.files.audit, variable_fmt, "NumCalcScriptF_Calls", NumCalcScriptF_Calls);
+        print(state.files.audit, variable_fmt, "NumShadow_Calls", state.dataTimingsData->NumShadow_Calls);
+        print(state.files.audit, variable_fmt, "NumShadowAtTS_Calls", state.dataTimingsData->NumShadowAtTS_Calls);
+        print(state.files.audit, variable_fmt, "NumClipPoly_Calls", state.dataTimingsData->NumClipPoly_Calls);
+        print(state.files.audit, variable_fmt, "NumInitSolar_Calls", state.dataTimingsData->NumInitSolar_Calls);
+        print(state.files.audit, variable_fmt, "NumAnisoSky_Calls", state.dataTimingsData->NumAnisoSky_Calls);
+        print(state.files.audit, variable_fmt, "NumDetPolyOverlap_Calls", state.dataTimingsData->NumDetPolyOverlap_Calls);
+        print(state.files.audit, variable_fmt, "NumCalcPerSolBeam_Calls", state.dataTimingsData->NumCalcPerSolBeam_Calls);
+        print(state.files.audit, variable_fmt, "NumDetShadowCombs_Calls", state.dataTimingsData->NumDetShadowCombs_Calls);
+        print(state.files.audit, variable_fmt, "NumIntSolarDist_Calls", state.dataTimingsData->NumIntSolarDist_Calls);
+        print(state.files.audit, variable_fmt, "NumIntRadExchange_Calls", state.dataTimingsData->NumIntRadExchange_Calls);
+        print(state.files.audit, variable_fmt, "NumIntRadExchangeZ_Calls", state.dataTimingsData->NumIntRadExchangeZ_Calls);
+        print(state.files.audit, variable_fmt, "NumIntRadExchangeMain_Calls", state.dataTimingsData->NumIntRadExchangeMain_Calls);
+        print(state.files.audit, variable_fmt, "NumIntRadExchangeOSurf_Calls", state.dataTimingsData->NumIntRadExchangeOSurf_Calls);
+        print(state.files.audit, variable_fmt, "NumIntRadExchangeISurf_Calls", state.dataTimingsData->NumIntRadExchangeISurf_Calls);
+        print(state.files.audit, variable_fmt, "NumMaxInsideSurfIterations", state.dataTimingsData->NumMaxInsideSurfIterations);
+        print(state.files.audit, variable_fmt, "NumCalcScriptF_Calls", state.dataTimingsData->NumCalcScriptF_Calls);
 #endif
 
         print(state.files.eso, "{}\n", EndOfDataString);
@@ -2917,9 +2917,6 @@ namespace SimulationManager {
         // Using/Aliasing
         // using SQLiteProcedures::CreateSQLiteDatabase;
         using FluidProperties::FindGlycol;
-        using FluidProperties::FluidIndex_EthyleneGlycol;
-        using FluidProperties::FluidIndex_PropoleneGlycol;
-        using FluidProperties::FluidIndex_Water;
 
         state.dataGlobal->DoingInputProcessing = false;
 
@@ -2930,9 +2927,9 @@ namespace SimulationManager {
         }
 
         // Set up more globals - process fluid input.
-        FluidIndex_Water = FindGlycol(state, "Water");
-        FluidIndex_EthyleneGlycol = FindGlycol(state, "EthyleneGlycol");
-        FluidIndex_PropoleneGlycol = FindGlycol(state, "PropoleneGlycol");
+        state.dataFluidProps->FluidIndex_Water = FindGlycol(state, "Water");
+        state.dataFluidProps->FluidIndex_EthyleneGlycol = FindGlycol(state, "EthyleneGlycol");
+        state.dataFluidProps->FluidIndex_PropoleneGlycol = FindGlycol(state, "PropoleneGlycol");
 
         inputProcessor->preScanReportingVariables(state);
     }

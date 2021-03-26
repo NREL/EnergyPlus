@@ -1156,13 +1156,13 @@ namespace EnergyPlus::SimAirServingZones {
                             PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Fan_System_Object;
                             // Construct fan object
                             if (HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, false) < 0) {
-                                HVACFan::fanObjs.emplace_back(
+                                state.dataHVACFan->fanObjs.emplace_back(
                                     new HVACFan::FanSystem(state, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name));
                             }
                             PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompIndex =
                                 HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name) +
                                 1; // + 1 for shift from zero-based vector to 1-based compIndex
-                            HVACFan::fanObjs[HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name)]
+                            state.dataHVACFan->fanObjs[HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name)]
                                 ->AirPathFlag = true;
                         } else if (componentType == "FAN:COMPONENTMODEL") {
                             PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Fan_ComponentModel;
@@ -3415,7 +3415,7 @@ namespace EnergyPlus::SimAirServingZones {
                 // if the fan is here, it can't (yet) really be cycling fan operation, set this ugly global in the event that there are dx coils
                 // involved but the fan should really run like constant volume and not cycle with compressor
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-                HVACFan::fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
+                state.dataHVACFan->fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
 
             } else if (SELECT_CASE_var == Fan_ComponentModel) { // 'Fan:ComponentModel'
                 Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
