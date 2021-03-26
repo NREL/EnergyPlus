@@ -9796,8 +9796,8 @@ namespace AirflowNetworkBalanceManager {
                         // Replace the convenience function with in-place code
                         std::string mycoil = state.dataAirflowNetwork->DisSysCompCoilData(i).name;
                         auto it = std::find_if(
-                            coilCoolingDXs.begin(), coilCoolingDXs.end(), [&mycoil](const CoilCoolingDX &coil) { return coil.name == mycoil; });
-                        if (it != coilCoolingDXs.end()) {
+                                state.dataCoilCooingDX->coilCoolingDXs.begin(), state.dataCoilCooingDX->coilCoolingDXs.end(), [&mycoil](const CoilCoolingDX &coil) { return coil.name == mycoil; });
+                        if (it != state.dataCoilCooingDX->coilCoolingDXs.end()) {
                             // Set the airloop number on the CoilCoolingDX object, which is used to collect the runtime fraction
                             it->airLoopNum = state.dataAirflowNetwork->DisSysCompCoilData(i).AirLoopNum;
                         } else {

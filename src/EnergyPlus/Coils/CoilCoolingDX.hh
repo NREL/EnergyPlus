@@ -151,15 +151,14 @@ struct CoilCoolingDX
     Real64 recoveredHeatEnergyRate = 0.0;
 };
 
-extern std::vector<CoilCoolingDX> coilCoolingDXs;
-extern bool coilCoolingDXGetInputFlag;
-extern std::string const coilCoolingDXObjectName;
-
 struct CoilCoolingDXData : BaseGlobalStruct {
-
+    std::vector<CoilCoolingDX> coilCoolingDXs;
+    bool coilCoolingDXGetInputFlag = true;
+    std::string const coilCoolingDXObjectName = "Coil:Cooling:DX";
     void clear_state() override
     {
-
+        coilCoolingDXs.clear();
+        coilCoolingDXGetInputFlag = true;
     }
 };
 

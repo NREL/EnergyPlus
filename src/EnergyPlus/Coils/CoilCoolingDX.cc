@@ -72,20 +72,13 @@
 
 using namespace EnergyPlus;
 
-namespace EnergyPlus {
-
-    std::vector<CoilCoolingDX> coilCoolingDXs;
-    bool coilCoolingDXGetInputFlag = true;
-    std::string const coilCoolingDXObjectName = "Coil:Cooling:DX";
-}
-
 int CoilCoolingDX::factory(EnergyPlus::EnergyPlusData &state, std::string const & coilName) {
-    if (coilCoolingDXGetInputFlag) {
+    if (state.dataCoilCooingDX->coilCoolingDXGetInputFlag) {
         CoilCoolingDX::getInput(state);
-        coilCoolingDXGetInputFlag = false;
+        state.dataCoilCooingDX->coilCoolingDXGetInputFlag = false;
     }
     int handle = -1;
-    for (auto const & thisCoil : coilCoolingDXs) {
+    for (auto const & thisCoil : state.dataCoilCooingDX->coilCoolingDXs) {
         handle++;
         if (EnergyPlus::UtilityRoutines::MakeUPPERCase(coilName) == EnergyPlus::UtilityRoutines::MakeUPPERCase(thisCoil.name)) {
             return handle;
@@ -95,13 +88,8 @@ int CoilCoolingDX::factory(EnergyPlus::EnergyPlusData &state, std::string const 
     return -1;
 }
 
-void CoilCoolingDX::clear_state() {
-    coilCoolingDXs.clear();
-    coilCoolingDXGetInputFlag = true;
-}
-
 void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state) {
-    int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(state, coilCoolingDXObjectName);
+    int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(state, state.dataCoilCooingDX->coilCoolingDXObjectName);
     if (numCoolingCoilDXs <= 0) {
         ShowFatalError(state, R"(No "Coil:Cooling:DX" objects in input file)");
     }
@@ -109,7 +97,7 @@ void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state) {
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        inputProcessor->getObjectItem(state, coilCoolingDXObjectName, coilNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
+        inputProcessor->getObjectItem(state, state.dataCoilCooingDX->coilCoolingDXObjectName, coilNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
         CoilCoolingDXInputSpecification input_specs;
         input_specs.name = state.dataIPShortCut->cAlphaArgs(1);
         input_specs.evaporator_inlet_node_name = state.dataIPShortCut->cAlphaArgs(2);
@@ -123,7 +111,7 @@ void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state) {
         input_specs.evaporative_condenser_supply_water_storage_tank_name = state.dataIPShortCut->cAlphaArgs(10);
         CoilCoolingDX thisCoil;
         thisCoil.instantiateFromInputSpec(state, input_specs);
-        coilCoolingDXs.push_back(thisCoil);
+        state.dataCoilCooingDX->coilCoolingDXs.push_back(thisCoil);
     }
 }
 
@@ -144,7 +132,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
     // other construction below
     this->evapInletNodeIndex = NodeInputManager::GetOnlySingleNode(state, input_data.evaporator_inlet_node_name,
                                                                    errorsFound,
-                                                                   coilCoolingDXObjectName,
+                                                                   state.dataCoilCooingDX->coilCoolingDXObjectName,
                                                                    input_data.name,
                                                                    DataLoopNode::NodeFluidType::Air,
                                                                    DataLoopNode::NodeConnectionType::Inlet,
@@ -152,7 +140,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                    DataLoopNode::ObjectIsNotParent);
     this->evapOutletNodeIndex = NodeInputManager::GetOnlySingleNode(state, input_data.evaporator_outlet_node_name,
                                                                     errorsFound,
-                                                                    coilCoolingDXObjectName,
+                                                                    state.dataCoilCooingDX->coilCoolingDXObjectName,
                                                                     input_data.name,
                                                                     DataLoopNode::NodeFluidType::Air,
                                                                     DataLoopNode::NodeConnectionType::Outlet,
@@ -161,7 +149,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
 
     this->condInletNodeIndex = NodeInputManager::GetOnlySingleNode(state, input_data.condenser_inlet_node_name,
                                                                    errorsFound,
-                                                                   coilCoolingDXObjectName,
+                                                                   state.dataCoilCooingDX->coilCoolingDXObjectName,
                                                                    input_data.name,
                                                                    DataLoopNode::NodeFluidType::Air,
                                                                    DataLoopNode::NodeConnectionType::Inlet,
@@ -170,7 +158,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
 
     // Ultimately, this restriction should go away - condenser inlet node could be from anywhere
     if (!OutAirNodeManager::CheckOutAirNodeNumber(state, this->condInletNodeIndex)) {
-        ShowWarningError(state, routineName + coilCoolingDXObjectName + "=\"" + this->name + "\", may be invalid");
+        ShowWarningError(state, routineName + state.dataCoilCooingDX->coilCoolingDXObjectName + "=\"" + this->name + "\", may be invalid");
         ShowContinueError(state, "Condenser Inlet Node Name=\"" + input_data.condenser_inlet_node_name +
                           "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
         ShowContinueError(state, "This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
@@ -178,7 +166,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
 
     this->condOutletNodeIndex = NodeInputManager::GetOnlySingleNode(state, input_data.condenser_outlet_node_name,
                                                                         errorsFound,
-                                                                        coilCoolingDXObjectName,
+                                                                    state.dataCoilCooingDX->coilCoolingDXObjectName,
                                                                         input_data.name,
                                                                         DataLoopNode::NodeFluidType::Air,
                                                                         DataLoopNode::NodeConnectionType::Outlet,
@@ -187,7 +175,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
 
     if (!input_data.condensate_collection_water_storage_tank_name.empty()) {
         WaterManager::SetupTankSupplyComponent(state, this->name,
-                                               coilCoolingDXObjectName,
+                                               state.dataCoilCooingDX->coilCoolingDXObjectName,
                                  input_data.condensate_collection_water_storage_tank_name,
                                  errorsFound,
                                  this->condensateTankIndex,
@@ -196,7 +184,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
 
     if (!input_data.evaporative_condenser_supply_water_storage_tank_name.empty()) {
         WaterManager::SetupTankDemandComponent(state, this->name,
-                                               coilCoolingDXObjectName,
+                                               state.dataCoilCooingDX->coilCoolingDXObjectName,
                                  input_data.evaporative_condenser_supply_water_storage_tank_name,
                                  errorsFound,
                                  this->evaporativeCondSupplyTankIndex,
@@ -209,16 +197,16 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
         this->availScheduleIndex = ScheduleManager::GetScheduleIndex(state, input_data.availability_schedule_name);
     }
     if (this->availScheduleIndex == 0) {
-        ShowSevereError(state, routineName + coilCoolingDXObjectName + "=\"" + this->name + "\", invalid");
+        ShowSevereError(state, routineName + state.dataCoilCooingDX->coilCoolingDXObjectName + "=\"" + this->name + "\", invalid");
         ShowContinueError(state, "...Availability Schedule Name=\"" + input_data.availability_schedule_name + "\".");
         errorsFound = true;
     }
 
     BranchNodeConnections::TestCompSet(state,
-            coilCoolingDXObjectName, this->name, input_data.evaporator_inlet_node_name, input_data.evaporator_outlet_node_name, "Air Nodes");
+                                       state.dataCoilCooingDX->coilCoolingDXObjectName, this->name, input_data.evaporator_inlet_node_name, input_data.evaporator_outlet_node_name, "Air Nodes");
 
     if (errorsFound) {
-        ShowFatalError(state, routineName + "Errors found in getting " + coilCoolingDXObjectName + " input. Preceding condition(s) causes termination.");
+        ShowFatalError(state, routineName + "Errors found in getting " + state.dataCoilCooingDX->coilCoolingDXObjectName + " input. Preceding condition(s) causes termination.");
     }
 }
 
