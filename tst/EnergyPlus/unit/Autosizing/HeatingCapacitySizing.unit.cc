@@ -82,10 +82,10 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataEnvrn->StdRhoAir = 1.2;
     // call simulate to trigger sizing call
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(*state, "MyFan"));
+    state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "MyFan"));
     state->dataLoopNodes->Node(1).Press = 101325.0;
     state->dataLoopNodes->Node(1).Temp = 24.0;
-    HVACFan::fanObjs[0]->simulate(*state, _, _, _, _);
+    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _, _, _);
 
     // this global state is what would be set up by E+ currently
     static std::string const routineName("HeatingCapacitySizingGauntlet");

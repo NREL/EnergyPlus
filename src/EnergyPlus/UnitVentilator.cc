@@ -507,10 +507,10 @@ namespace UnitVentilator {
                     }
                 } else if (UtilityRoutines::SameString(state.dataUnitVentilators->UnitVent(UnitVentNum).FanType, "Fan:SystemModel")) {
                     state.dataUnitVentilators->UnitVent(UnitVentNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataUnitVentilators->UnitVent(UnitVentNum).FanName));       // call constructor
+                    state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataUnitVentilators->UnitVent(UnitVentNum).FanName));       // call constructor
                     state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index = HVACFan::getFanObjectVectorIndex(state, state.dataUnitVentilators->UnitVent(UnitVentNum).FanName); // zero-based
-                    state.dataUnitVentilators->UnitVent(UnitVentNum).FanOutletNode = HVACFan::fanObjs[state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index]->outletNodeNum;
-                    FanVolFlow = HVACFan::fanObjs[state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index]->designAirVolFlowRate;
+                    state.dataUnitVentilators->UnitVent(UnitVentNum).FanOutletNode = state.dataHVACFan->fanObjs[state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index]->outletNodeNum;
+                    FanVolFlow = state.dataHVACFan->fanObjs[state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index]->designAirVolFlowRate;
                     if (FanVolFlow != AutoSize && state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow != AutoSize &&
                         FanVolFlow < state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
@@ -532,7 +532,7 @@ namespace UnitVentilator {
                         ShowContinueError(state, "...the unit ventilator flow rate is autosized while the fan flow rate is not.");
                         ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
                     }
-                    state.dataUnitVentilators->UnitVent(UnitVentNum).FanAvailSchedPtr = HVACFan::fanObjs[state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index]->availSchedIndex;
+                    state.dataUnitVentilators->UnitVent(UnitVentNum).FanAvailSchedPtr = state.dataHVACFan->fanObjs[state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index]->availSchedIndex;
                 }
             }
             // For node connections, this object is both a parent and a non-parent, because the
@@ -3230,7 +3230,7 @@ namespace UnitVentilator {
         if (state.dataUnitVentilators->UnitVent(UnitVentNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
             state.dataUnitVentilators->UnitVent(UnitVentNum).ElecPower = Fans::GetFanPower(state, state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
         } else {
-            state.dataUnitVentilators->UnitVent(UnitVentNum).ElecPower = HVACFan::fanObjs[state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index]->fanPower();
+            state.dataUnitVentilators->UnitVent(UnitVentNum).ElecPower = state.dataHVACFan->fanObjs[state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index]->fanPower();
         }
 
         PowerMet = QUnitOut;
@@ -3327,7 +3327,7 @@ namespace UnitVentilator {
                                             ZoneCompTurnFansOff);
             } else {
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0; // used for cycling fan, set to 1.0 to be sure
-                HVACFan::fanObjs[state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
 
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent) {
@@ -3413,7 +3413,7 @@ namespace UnitVentilator {
                                             ZoneCompTurnFansOn,
                                             ZoneCompTurnFansOff);
             } else {
-                HVACFan::fanObjs[state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
 
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent) {

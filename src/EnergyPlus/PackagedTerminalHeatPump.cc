@@ -400,7 +400,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
             locFanElecPower = Fans::GetFanPower(state, state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
         } else {
-            locFanElecPower = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->fanPower();
+            locFanElecPower = state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->fanPower();
         }
         state.dataPTHP->PTUnit(PTUnitNum).ElecPower = locFanElecPower + state.dataHVACGlobal->DXElecCoolingPower + state.dataHVACGlobal->DXElecHeatingPower + state.dataHVACGlobal->ElecHeatingCoilPower + state.dataHVACGlobal->SuppHeatingCoilPower;
     }
@@ -716,13 +716,13 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
             if (UtilityRoutines::SameString(state.dataPTHP->PTUnit(PTUnitNum).FanType, "Fan:SystemModel")) {
                 state.dataPTHP->PTUnit(PTUnitNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataPTHP->PTUnit(PTUnitNum).FanName)); // call constructor
+                state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataPTHP->PTUnit(PTUnitNum).FanName)); // call constructor
                 state.dataPTHP->PTUnit(PTUnitNum).FanIndex = HVACFan::getFanObjectVectorIndex(state, state.dataPTHP->PTUnit(PTUnitNum).FanName);
-                FanInletNodeNum = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->inletNodeNum;
-                FanOutletNodeNum = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->outletNodeNum;
-                FanVolFlow = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
+                FanInletNodeNum = state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->inletNodeNum;
+                FanOutletNodeNum = state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->outletNodeNum;
+                FanVolFlow = state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
                 state.dataPTHP->PTUnit(PTUnitNum).ActualFanVolFlowRate = FanVolFlow;
-                state.dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->availSchedIndex;
+                state.dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr = state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->availSchedIndex;
             } else {
                 errFlag = false;
                 GetFanType(state, state.dataPTHP->PTUnit(PTUnitNum).FanName, state.dataPTHP->PTUnit(PTUnitNum).FanType_Num, errFlag, CurrentModuleObject, state.dataPTHP->PTUnit(PTUnitNum).Name);
@@ -1617,13 +1617,13 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
             if (UtilityRoutines::SameString(state.dataPTHP->PTUnit(PTUnitNum).FanType, "Fan:SystemModel")) {
                 state.dataPTHP->PTUnit(PTUnitNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataPTHP->PTUnit(PTUnitNum).FanName)); // call constructor
+                state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataPTHP->PTUnit(PTUnitNum).FanName)); // call constructor
                 state.dataPTHP->PTUnit(PTUnitNum).FanIndex = HVACFan::getFanObjectVectorIndex(state, state.dataPTHP->PTUnit(PTUnitNum).FanName);
-                FanInletNodeNum = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->inletNodeNum;
-                FanOutletNodeNum = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->outletNodeNum;
-                FanVolFlow = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
+                FanInletNodeNum = state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->inletNodeNum;
+                FanOutletNodeNum = state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->outletNodeNum;
+                FanVolFlow = state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
                 state.dataPTHP->PTUnit(PTUnitNum).ActualFanVolFlowRate = FanVolFlow;
-                state.dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->availSchedIndex;
+                state.dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr = state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->availSchedIndex;
             } else {
 
                 // Get the fan's availability schedule
@@ -2366,13 +2366,13 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
                 if (UtilityRoutines::SameString(state.dataPTHP->PTUnit(PTUnitNum).FanType, "Fan:SystemModel")) {
                     state.dataPTHP->PTUnit(PTUnitNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataPTHP->PTUnit(PTUnitNum).FanName)); // call constructor
+                    state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataPTHP->PTUnit(PTUnitNum).FanName)); // call constructor
                     state.dataPTHP->PTUnit(PTUnitNum).FanIndex = HVACFan::getFanObjectVectorIndex(state, state.dataPTHP->PTUnit(PTUnitNum).FanName);
-                    FanInletNodeNum = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->inletNodeNum;
-                    FanOutletNodeNum = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->outletNodeNum;
-                    FanVolFlow = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
+                    FanInletNodeNum = state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->inletNodeNum;
+                    FanOutletNodeNum = state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->outletNodeNum;
+                    FanVolFlow = state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
                     state.dataPTHP->PTUnit(PTUnitNum).ActualFanVolFlowRate = FanVolFlow;
-                    state.dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->availSchedIndex;
+                    state.dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr = state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->availSchedIndex;
                 } else {
                     errFlag = false;
                     GetFanType(state, state.dataPTHP->PTUnit(PTUnitNum).FanName, state.dataPTHP->PTUnit(PTUnitNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
@@ -2999,7 +2999,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
             // Set the Design Fan Volume Flow Rate
             if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataPTHP->PTUnit(PTUnitNum).ActualFanVolFlowRate = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
+                state.dataPTHP->PTUnit(PTUnitNum).ActualFanVolFlowRate = state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
             } else {
                 errFlag = false;
                 GetFanVolFlow(state, state.dataPTHP->PTUnit(PTUnitNum).FanIndex, FanVolFlow);
@@ -3989,7 +3989,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 MyFanFlag(PTUnitNum) = false;
             } else {
                 if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataPTHP->PTUnit(PTUnitNum).ActualFanVolFlowRate = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
+                    state.dataPTHP->PTUnit(PTUnitNum).ActualFanVolFlowRate = state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
                 } else {
                     GetFanVolFlow(state, state.dataPTHP->PTUnit(PTUnitNum).FanIndex, state.dataPTHP->PTUnit(PTUnitNum).ActualFanVolFlowRate);
                 }
@@ -4042,7 +4042,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (state.dataPTHP->PTUnit(PTUnitNum).CheckFanFlow) {
                 CurrentModuleObject = "ZoneHVAC:PackagedTerminalHeatPump";
                 if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataPTHP->PTUnit(PTUnitNum).FanVolFlow = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
+                    state.dataPTHP->PTUnit(PTUnitNum).FanVolFlow = state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
                 } else {
                     GetFanVolFlow(state, state.dataPTHP->PTUnit(PTUnitNum).FanIndex, state.dataPTHP->PTUnit(PTUnitNum).FanVolFlow);
                 }
@@ -5797,7 +5797,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // if blow through, simulate fan then coils
         if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == BlowThru) {
             if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
             } else {
                 Fans::SimulateFanComponents(state,
                                             state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -6059,7 +6059,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // if draw through, simulate coils then fan
         if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == DrawThru) {
             if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
             } else {
                 Fans::SimulateFanComponents(state,
                                             state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -7997,7 +7997,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // if blow through, simulate fan then coils
         if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == BlowThru) {
             if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
             } else {
                 Fans::SimulateFanComponents(state,
                                             state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -8179,7 +8179,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // if draw through, simulate coils then fan
         if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == DrawThru) {
             if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
             } else {
                 Fans::SimulateFanComponents(state,
                                             state.dataPTHP->PTUnit(PTUnitNum).FanName,

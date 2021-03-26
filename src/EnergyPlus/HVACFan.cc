@@ -75,10 +75,6 @@ namespace EnergyPlus {
 
 namespace HVACFan {
 
-    void clearHVACFanObjects(EnergyPlusData &state)
-    {
-        state.dataHVACFan->fanObjs.clear();
-    }
 
     int getFanObjectVectorIndex(       // lookup vector index for fan object name in object array EnergyPlus::HVACFan::fanObjs
         EnergyPlusData &state,

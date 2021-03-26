@@ -255,8 +255,6 @@ namespace HVACFan {
 
     }; // class FanSystem
 
-    void clearHVACFanObjects(EnergyPlusData &state);
-
 } // namespace HVACFan
 
 struct HVACFanData : BaseGlobalStruct {

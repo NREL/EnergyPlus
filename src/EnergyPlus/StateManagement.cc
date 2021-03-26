@@ -60,7 +60,6 @@
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
@@ -79,6 +78,5 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     AirflowNetwork::clear_state();
     DataOutputs::clear_state();
     HeatBalanceManager::clear_state();
-    HVACFan::clearHVACFanObjects();
     Psychrometrics::clear_state();
 }
