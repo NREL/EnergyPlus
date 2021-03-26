@@ -54,7 +54,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -77,7 +76,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     // A to Z order
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
-    DataOutputs::clear_state();
     FluidProperties::clear_state();
     HeatBalanceManager::clear_state();
     HVACFan::clearHVACFanObjects();

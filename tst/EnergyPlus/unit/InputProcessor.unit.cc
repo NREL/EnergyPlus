@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/InputProcessorFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -4136,15 +4137,13 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_basic)
     // 34 fields with defaults, 6 Autosizable, 3 Autocalculatable
     // 11 fields defaulted    , 4 Autosized  , 2 Autocalculated
 
-    EXPECT_EQ(4,  DataOutputs::iNumberOfRecords);             // Number of IDF Records (=Objects)
-
-    EXPECT_EQ(34, DataOutputs::iTotalFieldsWithDefaults);     // Total number of fields that could be defaulted
-    EXPECT_EQ(6,  DataOutputs::iTotalAutoSizableFields);      // Total number of autosizeable fields
-    EXPECT_EQ(3,  DataOutputs::iTotalAutoCalculatableFields); // Total number of autocalculatable fields
-
-    EXPECT_EQ(11, DataOutputs::iNumberOfDefaultedFields);     // Number of defaulted fields in IDF
-    EXPECT_EQ(4,  DataOutputs::iNumberOfAutoSizedFields);     // Number of autosized fields in IDF
-    EXPECT_EQ(2,  DataOutputs::iNumberOfAutoCalcedFields);    // Number of autocalculated fields
+    EXPECT_EQ(4,  state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
+    EXPECT_EQ(34, state->dataOutput->iTotalFieldsWithDefaults);     // Total number of fields that could be defaulted
+    EXPECT_EQ(6,  state->dataOutput->iTotalAutoSizableFields);      // Total number of autosizeable fields
+    EXPECT_EQ(3,  state->dataOutput->iTotalAutoCalculatableFields); // Total number of autocalculatable fields
+    EXPECT_EQ(11, state->dataOutput->iNumberOfDefaultedFields);     // Number of defaulted fields in IDF
+    EXPECT_EQ(4,  state->dataOutput->iNumberOfAutoSizedFields);     // Number of autosized fields in IDF
+    EXPECT_EQ(2,  state->dataOutput->iNumberOfAutoCalcedFields);    // Number of autocalculated fields
 }
 
 TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
@@ -4211,15 +4210,13 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
     // 15 fields with defaults, 0 Autosizable, 0 Autocalculatable
     // 2  fields defaulted    , 0 Autosized  , 0 Autocalculated
 
-    EXPECT_EQ(4,  DataOutputs::iNumberOfRecords);             // Number of IDF Records (=Objects)
-
-    EXPECT_EQ(15, DataOutputs::iTotalFieldsWithDefaults);     // Total number of fields that could be defaulted
-    EXPECT_EQ(0,  DataOutputs::iTotalAutoSizableFields);      // Total number of autosizeable fields
-    EXPECT_EQ(0,  DataOutputs::iTotalAutoCalculatableFields); // Total number of autocalculatable fields
-
-    EXPECT_EQ(2,  DataOutputs::iNumberOfDefaultedFields);     // Number of defaulted fields in IDF
-    EXPECT_EQ(0,  DataOutputs::iNumberOfAutoSizedFields);     // Number of autosized fields in IDF
-    EXPECT_EQ(0,  DataOutputs::iNumberOfAutoCalcedFields);    // Number of autocalculated fields
+    EXPECT_EQ(4,  state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
+    EXPECT_EQ(15, state->dataOutput->iTotalFieldsWithDefaults);     // Total number of fields that could be defaulted
+    EXPECT_EQ(0,  state->dataOutput->iTotalAutoSizableFields);      // Total number of autosizeable fields
+    EXPECT_EQ(0,  state->dataOutput->iTotalAutoCalculatableFields); // Total number of autocalculatable fields
+    EXPECT_EQ(2,  state->dataOutput->iNumberOfDefaultedFields);     // Number of defaulted fields in IDF
+    EXPECT_EQ(0,  state->dataOutput->iNumberOfAutoSizedFields);     // Number of autosized fields in IDF
+    EXPECT_EQ(0,  state->dataOutput->iNumberOfAutoCalcedFields);    // Number of autocalculated fields
 
 }
 

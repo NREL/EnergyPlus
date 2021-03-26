@@ -5798,13 +5798,13 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Using/Aliasing
         auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
-        using DataOutputs::iNumberOfAutoCalcedFields;
-        using DataOutputs::iNumberOfAutoSizedFields;
-        using DataOutputs::iNumberOfDefaultedFields;
-        using DataOutputs::iNumberOfRecords;
-        using DataOutputs::iTotalAutoCalculatableFields;
-        using DataOutputs::iTotalAutoSizableFields;
-        using DataOutputs::iTotalFieldsWithDefaults;
+        auto & iNumberOfAutoCalcedFields = state.dataOutput->iNumberOfAutoCalcedFields;
+        auto & iNumberOfAutoSizedFields = state.dataOutput->iNumberOfAutoSizedFields;
+        auto & iNumberOfDefaultedFields = state.dataOutput->iNumberOfDefaultedFields;
+        auto & iNumberOfRecords = state.dataOutput->iNumberOfRecords;
+        auto & iTotalAutoCalculatableFields = state.dataOutput->iTotalAutoCalculatableFields;
+        auto & iTotalAutoSizableFields = state.dataOutput->iTotalAutoSizableFields;
+        auto & iTotalFieldsWithDefaults = state.dataOutput->iTotalFieldsWithDefaults;
 
         using ScheduleManager::GetScheduleName;
         using ScheduleManager::ScheduleAverageHoursPerWeek;

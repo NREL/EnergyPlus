@@ -1857,8 +1857,8 @@ namespace SimulationManager {
             print(state.files.audit, "{}\n", "ClippingAlgorithm=ConvexWeilerAtherton");
         }
         print(state.files.audit, variable_fmt, "MonthlyFieldSetInputCount", state.dataOutRptTab->MonthlyFieldSetInputCount);
-        print(state.files.audit, variable_fmt, "NumConsideredOutputVariables", NumConsideredOutputVariables);
-        print(state.files.audit, variable_fmt, "MaxConsideredOutputVariables", MaxConsideredOutputVariables);
+        print(state.files.audit, variable_fmt, "NumConsideredOutputVariables", state.dataOutput->NumConsideredOutputVariables);
+        print(state.files.audit, variable_fmt, "MaxConsideredOutputVariables", state.dataOutput->MaxConsideredOutputVariables);
 
         print(state.files.audit, variable_fmt, "numActuatorsUsed", state.dataRuntimeLang->numActuatorsUsed);
         print(state.files.audit, variable_fmt, "numEMSActuatorsAvailable", state.dataRuntimeLang->numEMSActuatorsAvailable);
