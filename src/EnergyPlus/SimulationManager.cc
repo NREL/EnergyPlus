@@ -245,7 +245,7 @@ namespace SimulationManager {
 
         if (sqlite) {
             sqlite->sqliteBegin();
-            sqlite->createSQLiteSimulationsRecord(1, DataStringGlobals::VerString, state.dataStrGlobals->CurrentDateTime);
+            sqlite->createSQLiteSimulationsRecord(1, state.dataStrGlobals->VerStringVar, state.dataStrGlobals->CurrentDateTime);
             sqlite->sqliteCommit();
         }
 
@@ -1434,7 +1434,7 @@ namespace SimulationManager {
     // J.Glazer February 2020
     {
         UtilityRoutines::appendPerfLog(state, "Program, Version, TimeStamp",
-                                       DataStringGlobals::VerString); // this string already includes three portions and has commas
+                                       state.dataStrGlobals->VerStringVar); // this string already includes three portions and has commas
         UtilityRoutines::appendPerfLog(state, "Use Coil Direct Solution", bool_to_string(state.dataGlobal->DoCoilDirectSolutions));
         if (state.dataHeatBalIntRadExchg->CarrollMethod) {
             UtilityRoutines::appendPerfLog(state, "Zone Radiant Exchange Algorithm", "CarrollMRT");
@@ -1752,44 +1752,21 @@ namespace SimulationManager {
         // This subroutine opens all of the input and output files needed for
         // an EnergyPlus run.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataStringGlobals::VerString;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-
         state.dataGlobal->StdOutputRecordCount = 0;
         state.files.eso.ensure_open(state, "OpenOutputFiles", state.files.outputControl.eso);
-        print(state.files.eso, "Program Version,{}\n", VerString);
+        print(state.files.eso, "Program Version,{}\n", state.dataStrGlobals->VerStringVar);
 
         // Open the Initialization Output File
         state.files.eio.ensure_open(state, "OpenOutputFiles", state.files.outputControl.eio);
-        print(state.files.eio, "Program Version,{}\n", VerString);
+        print(state.files.eio, "Program Version,{}\n", state.dataStrGlobals->VerStringVar);
 
         // Open the Meters Output File
         state.files.mtr.ensure_open(state, "OpenOutputFiles", state.files.outputControl.mtr);
-        print(state.files.mtr, "Program Version,{}\n", VerString);
+        print(state.files.mtr, "Program Version,{}\n", state.dataStrGlobals->VerStringVar);
 
         // Open the Branch-Node Details Output File
         state.files.bnd.ensure_open(state, "OpenOutputFiles", state.files.outputControl.bnd);
-        print(state.files.bnd, "Program Version,{}\n", VerString);
+        print(state.files.bnd, "Program Version,{}\n", state.dataStrGlobals->VerStringVar);
     }
 
     void CloseOutputFiles(EnergyPlusData &state)

@@ -4009,11 +4009,6 @@ namespace EnergyPlus::SizingManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine writes one item of zone sizing data to the "eio" file..
 
-        // Using/Aliasing
-        using DataStringGlobals::VerString;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         if (state.dataSizingManager->ReportZoneSizingMyOneTimeFlag) {
             static constexpr auto Format_990(
                 "! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, Calc Des Air Flow "

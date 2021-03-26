@@ -259,10 +259,10 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
 
     state.dataStrGlobals->CurrentDateTime = CreateCurrentDateTimeString();
 
-    state.dataResultsFramework->resultsFramework->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setProgramVersion(state.dataStrGlobals->VerStringVar);
     state.dataResultsFramework->resultsFramework->SimulationInformation.setStartDateTimeStamp(state.dataStrGlobals->CurrentDateTime.substr(5));
 
-    DataStringGlobals::VerString += "," + state.dataStrGlobals->CurrentDateTime;
+    state.dataStrGlobals->VerStringVar = DataStringGlobals::VerString + "," + state.dataStrGlobals->CurrentDateTime;
 
     DataSystemVariables::processEnvironmentVariables(state);
 
@@ -279,7 +279,7 @@ int commonRun(EnergyPlus::EnergyPlusData &state) {
     state.dataSysVars->TestAllPaths = true;
 
     DisplayString(state, "EnergyPlus Starting");
-    DisplayString(state, DataStringGlobals::VerString);
+    DisplayString(state, state.dataStrGlobals->VerStringVar);
 
     try {
         EnergyPlus::inputProcessor = InputProcessor::factory();

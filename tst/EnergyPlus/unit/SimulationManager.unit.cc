@@ -136,8 +136,6 @@ TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
     // make sure the static variables are cleared
     UtilityRoutines::appendPerfLog(*state, "RESET", "RESET");
 
-    DataStringGlobals::VerString = "EnergyPlus, Version 0.0.0-xxxx, August 14 1945";
-
     // call the function to test
     SimulationManager::writeIntialPerfLogValues(*state, "MODE193");
 
@@ -154,7 +152,7 @@ TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
 
     std::string expectedContents = "Program, Version, TimeStamp,Use Coil Direct Solution,Zone Radiant Exchange Algorithm,"
         "Override Mode,Number of Timesteps per Hour,Minimum Number of Warmup Days,SuppressAllBeginEnvironmentResets,Minimum System Timestep,MaxZoneTempDiff,MaxAllowedDelTemp,lastHeader,\n"
-        "EnergyPlus, Version 0.0.0-xxxx, August 14 1945,False,ScriptF,MODE193,0,1,False,1.0,0.30,2.0000E-003,lastValue,\n";
+        + state->dataStrGlobals->VerStringVar + ",False,ScriptF,MODE193,0,1,False,1.0,0.30,2.0000E-003,lastValue,\n";
 
     EXPECT_EQ(perfLogContents, expectedContents);
 
