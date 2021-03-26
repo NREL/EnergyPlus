@@ -75,11 +75,9 @@ namespace EnergyPlus {
 
 namespace HVACFan {
 
-    std::vector<std::unique_ptr<FanSystem>> fanObjs;
-
-    void clearHVACFanObjects()
+    void clearHVACFanObjects(EnergyPlusData &state)
     {
-        fanObjs.clear();
+        state.dataHVACFan->fanObjs.clear();
     }
 
     int getFanObjectVectorIndex(       // lookup vector index for fan object name in object array EnergyPlus::HVACFan::fanObjs
@@ -89,8 +87,8 @@ namespace HVACFan {
     {
         int index = -1;
         bool found = false;
-        for (std::size_t loop = 0; loop < fanObjs.size(); ++loop) {
-            if (objectName == fanObjs[loop]->name) {
+        for (std::size_t loop = 0; loop < state.dataHVACFan->fanObjs.size(); ++loop) {
+            if (objectName == state.dataHVACFan->fanObjs[loop]->name) {
                 if (!found) {
                     index = loop;
                     found = true;
