@@ -87,33 +87,16 @@ namespace ICEngineElectricGenerator {
     // is available to meet an electric load demand, it calls SimICEngineGenerator
     // which in turn calls the ICEngine Generator model.
 
-    Real64 const ReferenceTemp(25.0); // Reference temperature by which lower heating
-    // value is reported.  This should be subtracted
-    // off of when calculated exhaust energies.
-
-    bool getICEInput(true);       // When TRUE, calls subroutine to read input file.
-    int NumICEngineGenerators(0); // number of IC ENGINE Generators specified in input
-
-    // Object Data
-    Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
-
-    void clear_state()
-    {
-        getICEInput = true;
-        NumICEngineGenerators = 0;
-        ICEngineGenerator.deallocate();
-    }
-
     PlantComponent *ICEngineGeneratorSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for ICEGen if it hasn't been done already
-        if (getICEInput) {
+        if (state.dataICEngElectGen->getICEInput) {
             GetICEngineGeneratorInput(state);
-            getICEInput = false;
+            state.dataICEngElectGen->getICEInput = false;
         }
 
         // Now look for this particular generator in the list
-        for (auto &thisICE : ICEngineGenerator) {
+        for (auto &thisICE : state.dataICEngElectGen->ICEngineGenerator) {
             if (thisICE.Name == objectName) {
                 return &thisICE;
             }
@@ -143,20 +126,21 @@ namespace ICEngineElectricGenerator {
         Array1D<Real64> NumArray(11);   // numeric data
         bool ErrorsFound(false); // error flag
 
+        auto &ICEngineGenerator(state.dataICEngElectGen->ICEngineGenerator);
 
         state.dataIPShortCut->cCurrentModuleObject = "Generator:InternalCombustionEngine";
-        NumICEngineGenerators = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataICEngElectGen->NumICEngineGenerators = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
-        if (NumICEngineGenerators <= 0) {
+        if (state.dataICEngElectGen->NumICEngineGenerators <= 0) {
             ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
         // ALLOCATE ARRAYS
-        ICEngineGenerator.allocate(NumICEngineGenerators);
+        ICEngineGenerator.allocate(state.dataICEngElectGen->NumICEngineGenerators);
 
         // LOAD ARRAYS WITH IC ENGINE Generator CURVE FIT  DATA
-        for (genNum = 1; genNum <= NumICEngineGenerators; ++genNum) {
+        for (genNum = 1; genNum <= state.dataICEngElectGen->NumICEngineGenerators; ++genNum) {
             inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           genNum,
