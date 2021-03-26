@@ -87,12 +87,6 @@ namespace ICEngineElectricGenerator {
     // is available to meet an electric load demand, it calls SimICEngineGenerator
     // which in turn calls the ICEngine Generator model.
 
-    Real64 const ReferenceTemp(25.0); // Reference temperature by which lower heating
-    // value is reported.  This should be subtracted
-    // off of when calculated exhaust energies.
-
-    // Object Data
-
     PlantComponent *ICEngineGeneratorSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for ICEGen if it hasn't been done already
@@ -132,6 +126,7 @@ namespace ICEngineElectricGenerator {
         Array1D<Real64> NumArray(11);   // numeric data
         bool ErrorsFound(false); // error flag
 
+        auto &ICEngineGenerator(state.dataICEngElectGen->ICEngineGenerator);
 
         state.dataIPShortCut->cCurrentModuleObject = "Generator:InternalCombustionEngine";
         state.dataICEngElectGen->NumICEngineGenerators = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
@@ -142,7 +137,7 @@ namespace ICEngineElectricGenerator {
         }
 
         // ALLOCATE ARRAYS
-        state.dataICEngElectGen->ICEngineGenerator.allocate(state.dataICEngElectGen->NumICEngineGenerators);
+        ICEngineGenerator.allocate(state.dataICEngElectGen->NumICEngineGenerators);
 
         // LOAD ARRAYS WITH IC ENGINE Generator CURVE FIT  DATA
         for (genNum = 1; genNum <= state.dataICEngElectGen->NumICEngineGenerators; ++genNum) {
