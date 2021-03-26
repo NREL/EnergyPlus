@@ -255,17 +255,15 @@ namespace HVACFan {
 
     }; // class FanSystem
 
-    extern std::vector<std::unique_ptr<FanSystem>> fanObjs;
-
-    void clearHVACFanObjects();
-
 } // namespace HVACFan
 
 struct HVACFanData : BaseGlobalStruct {
 
+    std::vector<std::unique_ptr<HVACFan::FanSystem>> fanObjs;
+
     void clear_state() override
     {
-
+        fanObjs.clear();
     }
 };
 

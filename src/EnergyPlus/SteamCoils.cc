@@ -819,7 +819,7 @@ namespace SteamCoils {
                             state,
                             state.dataSteamCoils->SteamCoil(CoilNum).Name,
                             "Coil:Heating:Steam",
-                            HVACFan::fanObjs[state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex]->name,
+                            state.dataHVACFan->fanObjs[state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex]->name,
                             DataAirSystems::objectVectorOOFanSystemModel,
                             state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex);
                     }

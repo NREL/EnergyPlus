@@ -1688,12 +1688,12 @@ namespace EnergyPlus::SingleDuct {
                 ErrorsFound = true;
             }
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(
+                state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(
                     state, state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanName)); // call constructor, safe here because get input is not using DataIPShortCuts.
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index = HVACFan::getFanObjectVectorIndex(state, state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanName);
-                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum = HVACFan::fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->outletNodeNum;
-                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum = HVACFan::fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->inletNodeNum;
-                HVACFan::fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->fanIsSecondaryDriver = true;
+                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum = state.dataHVACFan->fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->outletNodeNum;
+                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum = state.dataHVACFan->fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->inletNodeNum;
+                state.dataHVACFan->fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->fanIsSecondaryDriver = true;
             } else if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Num == DataHVACGlobals::FanType_SimpleVAV) {
                 IsNotOK = false;
 
@@ -3211,15 +3211,6 @@ namespace EnergyPlus::SingleDuct {
         Real64 AirLoopOAFrac;                    // fraction of outside air entering air loop
         Real64 DummyMdot;                        // temporary mass flow rate argument
 
-        static Real64 ZoneTemp(0.0);                      // zone air temperature [C]
-        static Real64 MaxHeatTemp(0.0);                   // maximum supply air temperature [C]
-        static Real64 MaxDeviceAirMassFlowReheat(0.0);    // air mass flow rate required to meet the coil heating load [W]
-        static Real64 MassFlowReqToLimitLeavingTemp(0.0); // air mass flow rate actually used [W]
-        static Real64 QZoneMaxRHTempLimit(0.0);           // maximum zone heat addition rate given constraints of MaxHeatTemp and max
-        // available air mass flow rate [W]
-        static Real64 MinMassAirFlow(0.0); // the air flow rate during heating for normal acting damper
-        static Real64 QZoneMax2(0.0);      // temporary variable
-
         // Note to the perplexed
         // The SINGLE DUCT:VAV:REHEAT terminal unit originally contained 2 components: a damper
         // and a reheat coil. The damper has become a virtual component - it consists only of
@@ -3237,8 +3228,8 @@ namespace EnergyPlus::SingleDuct {
         CpAirAvg = PsyCpAirFnW(0.5 * (state.dataLoopNodes->Node(ZoneNodeNum).HumRat + this->sd_airterminalInlet.AirHumRat));
         MinFlowFrac = this->ZoneMinAirFrac;
         MassFlowBasedOnOA = 0.0;
-        ZoneTemp = state.dataLoopNodes->Node(ZoneNodeNum).Temp;
-        MinMassAirFlow = MinFlowFrac * state.dataEnvrn->StdRhoAir * this->MaxAirVolFlowRate;
+        state.dataSingleDuct->ZoneTempSDAT = state.dataLoopNodes->Node(ZoneNodeNum).Temp;
+        state.dataSingleDuct->MinMassAirFlowSDAT = MinFlowFrac * state.dataEnvrn->StdRhoAir * this->MaxAirVolFlowRate;
 
         // Then depending on if the Load is for heating or cooling it is handled differently.  First
         // the massflow rate for cooling is determined to meet the entire load.  Then
@@ -3248,7 +3239,7 @@ namespace EnergyPlus::SingleDuct {
             (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
             // Calculate the flow required for cooling
 
-            DeltaTemp = CpAirAvg * (this->sd_airterminalInlet.AirTemp - ZoneTemp);
+            DeltaTemp = CpAirAvg * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSDAT);
 
             // Need to check DeltaTemp and ensure that it is not zero
             if (DeltaTemp != 0.0) {
@@ -3267,9 +3258,9 @@ namespace EnergyPlus::SingleDuct {
             MassFlow = max(MassFlow, MassFlowBasedOnOA);
 
             // used for normal acting damper
-            MinMassAirFlow = max(MinMassAirFlow, MassFlowBasedOnOA);
-            MinMassAirFlow = max(MinMassAirFlow, this->sd_airterminalInlet.AirMassFlowRateMinAvail);
-            MinMassAirFlow = min(MinMassAirFlow, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
+            state.dataSingleDuct->MinMassAirFlowSDAT = max(state.dataSingleDuct->MinMassAirFlowSDAT, MassFlowBasedOnOA);
+            state.dataSingleDuct->MinMassAirFlowSDAT = max(state.dataSingleDuct->MinMassAirFlowSDAT, this->sd_airterminalInlet.AirMassFlowRateMinAvail);
+            state.dataSingleDuct->MinMassAirFlowSDAT = min(state.dataSingleDuct->MinMassAirFlowSDAT, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
 
             // limit the OA based supply air flow rate based on optional user input
             // Check to see if the flow is < the Min or > the Max air Fraction to the zone; then set to min or max
@@ -3368,7 +3359,7 @@ namespace EnergyPlus::SingleDuct {
         this->UpdateSys(state);
 
         // At the current air mass flow rate, calculate heating coil load
-        QActualHeating = QToHeatSetPt - MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - ZoneTemp); // reheat needed
+        QActualHeating = QToHeatSetPt - MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSDAT); // reheat needed
 
         // do the reheat calculation if there's some air nass flow (or the damper action is "reverse action"), the flow is <= minimum ,
         // there's a heating requirement, and there's a thermostat with a heating setpoint
@@ -3383,34 +3374,34 @@ namespace EnergyPlus::SingleDuct {
             // and solving for the air mass flow rate that will meet the load. If the flow rate is between the min and
             // max we are in condition 2.
 
-            QZoneMax2 = QToHeatSetPt;
+            state.dataSingleDuct->QZoneMax2SDAT = QToHeatSetPt;
 
             // fill dual-max reheat flow limit, if any
             if (this->DamperHeatingAction == Action::ReverseAction) {
-                MaxDeviceAirMassFlowReheat = this->AirMassFlowRateMax;
+                state.dataSingleDuct->MaxDeviceAirMassFlowReheatSDAT = this->AirMassFlowRateMax;
             } else if (this->DamperHeatingAction == Action::ReverseActionWithLimits) {
-                MaxDeviceAirMassFlowReheat = this->AirMassFlowDuringReheatMax;
+                state.dataSingleDuct->MaxDeviceAirMassFlowReheatSDAT = this->AirMassFlowDuringReheatMax;
             } else if (this->DamperHeatingAction == Action::Normal) {
-                MaxDeviceAirMassFlowReheat = this->ZoneMinAirFrac * this->AirMassFlowRateMax;
+                state.dataSingleDuct->MaxDeviceAirMassFlowReheatSDAT = this->ZoneMinAirFrac * this->AirMassFlowRateMax;
             } else {
                 // used for AIRTERMINAL_SINGLEDUCT_VAV_NOREHEAT or SingleDuctVAVNoReheat
-                MaxDeviceAirMassFlowReheat = this->AirMassFlowRateMax;
+                state.dataSingleDuct->MaxDeviceAirMassFlowReheatSDAT = this->AirMassFlowRateMax;
             }
 
             // determine flow based on leaving reheat temperature limit
             if (this->MaxReheatTempSetByUser) {
 
-                MaxHeatTemp = this->MaxReheatTemp;
+                state.dataSingleDuct->MaxHeatTempSDAT = this->MaxReheatTemp;
                 if (QToHeatSetPt > SmallLoad) { // zone has a positive load to heating setpoint
-                    MassFlowReqToLimitLeavingTemp = QToHeatSetPt / (CpAirAvg * (MaxHeatTemp - ZoneTemp));
+                    state.dataSingleDuct->MassFlowReqToLimitLeavingTempSDAT = QToHeatSetPt / (CpAirAvg * (state.dataSingleDuct->MaxHeatTempSDAT - state.dataSingleDuct->ZoneTempSDAT));
                 } else {
-                    MassFlowReqToLimitLeavingTemp = 0.0;
+                    state.dataSingleDuct->MassFlowReqToLimitLeavingTempSDAT = 0.0;
                 }
             }
 
             // (re)apply limits to find air mass flow
-            MassFlow = max(MassFlow, MassFlowReqToLimitLeavingTemp);
-            MassFlow = min(MassFlow, MaxDeviceAirMassFlowReheat);
+            MassFlow = max(MassFlow, state.dataSingleDuct->MassFlowReqToLimitLeavingTempSDAT);
+            MassFlow = min(MassFlow, state.dataSingleDuct->MaxDeviceAirMassFlowReheatSDAT);
             MassFlow = max(MassFlow, MassFlowBasedOnOA);
             MassFlow = min(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
             MassFlow = max(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMinAvail);
@@ -3425,8 +3416,8 @@ namespace EnergyPlus::SingleDuct {
 
             // now make any corrections to heating coil loads
             if (this->MaxReheatTempSetByUser) {
-                QZoneMaxRHTempLimit = MassFlow * CpAirAvg * (MaxHeatTemp - ZoneTemp);
-                QZoneMax2 = min(QZoneMaxRHTempLimit, QToHeatSetPt);
+                state.dataSingleDuct->QZoneMaxRHTempLimitSDAT = MassFlow * CpAirAvg * (state.dataSingleDuct->MaxHeatTempSDAT - state.dataSingleDuct->ZoneTempSDAT);
+                state.dataSingleDuct->QZoneMax2SDAT = min(state.dataSingleDuct->QZoneMaxRHTempLimitSDAT, QToHeatSetPt);
             }
 
             this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
@@ -3442,7 +3433,7 @@ namespace EnergyPlus::SingleDuct {
                     // Determine the load required to pass to the Component controller
                     // Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
                     // and is working as-is, temperature setpoints are maintained as expected.
-                    QZnReq = QZoneMax2 + MassFlow * CpAirAvg * ZoneTemp;
+                    QZnReq = state.dataSingleDuct->QZoneMax2SDAT + MassFlow * CpAirAvg * state.dataSingleDuct->ZoneTempSDAT;
 
                     // Initialize hot water flow rate to zero.
                     DummyMdot = 0.0;
@@ -3493,7 +3484,7 @@ namespace EnergyPlus::SingleDuct {
                             state.dataSingleDuct->MinAirMassFlowRevActSVAV = max(state.dataSingleDuct->MinAirMassFlowRevActSVAV, this->sd_airterminalInlet.AirMassFlowRateMinAvail);
 
                             state.dataSingleDuct->MaxAirMassFlowRevActSVAV = this->AirMassFlowRateMax;
-                            state.dataSingleDuct->MaxAirMassFlowRevActSVAV = min(state.dataSingleDuct->MaxAirMassFlowRevActSVAV, MaxDeviceAirMassFlowReheat);
+                            state.dataSingleDuct->MaxAirMassFlowRevActSVAV = min(state.dataSingleDuct->MaxAirMassFlowRevActSVAV, state.dataSingleDuct->MaxDeviceAirMassFlowReheatSDAT);
                             state.dataSingleDuct->MaxAirMassFlowRevActSVAV = max(state.dataSingleDuct->MaxAirMassFlowRevActSVAV, state.dataSingleDuct->MinAirMassFlowRevActSVAV);
                             state.dataSingleDuct->MaxAirMassFlowRevActSVAV = min(state.dataSingleDuct->MaxAirMassFlowRevActSVAV, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
 
@@ -3504,7 +3495,7 @@ namespace EnergyPlus::SingleDuct {
                                               this->ReheatComp,
                                               this->ReheatComp_Index,
                                               FirstHVACIteration,
-                                              QZoneMax2,
+                                              state.dataSingleDuct->QZoneMax2SDAT,
                                               this->OutletNodeNum,
                                               state.dataSingleDuct->MaxAirMassFlowRevActSVAV,
                                               state.dataSingleDuct->MinAirMassFlowRevActSVAV,
@@ -3529,7 +3520,7 @@ namespace EnergyPlus::SingleDuct {
 
                                 // Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
                                 // and is working as-is, temperature setpoints are maintained as expected.
-                                QZnReq = QZoneMax2 + MassFlow * CpAirAvg * ZoneTemp;
+                                QZnReq = state.dataSingleDuct->QZoneMax2SDAT + MassFlow * CpAirAvg * state.dataSingleDuct->ZoneTempSDAT;
                                 ControlCompOutput(state,
                                                   this->ReheatName,
                                                   this->ReheatComp,
@@ -3572,21 +3563,21 @@ namespace EnergyPlus::SingleDuct {
 
                 } else if (SELECT_CASE_var == HeatingCoilType::SteamAirHeating) { // ! COIL:STEAM:AIRHEATING
                     // Determine the load required to pass to the Component controller
-                    QZnReq = QZoneMax2 - MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - ZoneTemp);
+                    QZnReq = state.dataSingleDuct->QZoneMax2SDAT - MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSDAT);
 
                     // Simulate reheat coil for the VAV system
                     SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, QZnReq);
 
                 } else if (SELECT_CASE_var == HeatingCoilType::Electric) { // COIL:ELECTRIC:HEATING
                     // Determine the load required to pass to the Component controller
-                    QZnReq = QZoneMax2 - MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - ZoneTemp);
+                    QZnReq = state.dataSingleDuct->QZoneMax2SDAT - MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSDAT);
 
                     // Simulate reheat coil for the VAV system
                     SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index);
 
                 } else if (SELECT_CASE_var == HeatingCoilType::Gas) { // COIL:GAS:HEATING
                     // Determine the load required to pass to the Component controller
-                    QZnReq = QZoneMax2 - MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - ZoneTemp);
+                    QZnReq = state.dataSingleDuct->QZoneMax2SDAT - MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSDAT);
 
                     // Simulate reheat coil for the VAV system
                     SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index, QHeatingDelivered);
@@ -4761,14 +4752,14 @@ namespace EnergyPlus::SingleDuct {
         if (FanType == DataHVACGlobals::FanType_SimpleVAV && FanOn == 1) {
             Fans::SimulateFanComponents(state, this->FanName, FirstHVACIteration, this->Fan_Index);
         } else if (FanType == DataHVACGlobals::FanType_SystemModelObject && FanOn == 1) {
-            HVACFan::fanObjs[this->Fan_Index]->simulate(state, _, _, _, _);
+            state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, _, _, _, _);
 
         } else { // pass through conditions
             state.dataHVACGlobal->TurnFansOff = true;
             if (FanType == DataHVACGlobals::FanType_SimpleVAV) {
                 Fans::SimulateFanComponents(state, this->FanName, FirstHVACIteration, this->Fan_Index);
             } else if (FanType == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[this->Fan_Index]->simulate(state, _, _, state.dataHVACGlobal->TurnFansOff, _);
+                state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, _, _, state.dataHVACGlobal->TurnFansOff, _);
             }
             state.dataHVACGlobal->TurnFansOff = TurnFansOffSav;
             state.dataLoopNodes->Node(FanOutNode).MassFlowRate = state.dataLoopNodes->Node(FanInNode).MassFlowRate;

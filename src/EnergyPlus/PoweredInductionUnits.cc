@@ -380,9 +380,9 @@ namespace EnergyPlus::PoweredInductionUnits {
             // test if Fan:SystemModel fan of this name exists
             if (HVACFan::checkIfFanNameIsAFanSystem(state, state.dataPowerInductionUnits->PIU(PIUNum).FanName)) {
                 state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
-                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataPowerInductionUnits->PIU(PIUNum).FanName)); // call constructor
+                state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataPowerInductionUnits->PIU(PIUNum).FanName)); // call constructor
                 state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index = HVACFan::getFanObjectVectorIndex(state, state.dataPowerInductionUnits->PIU(PIUNum).FanName);
-                state.dataPowerInductionUnits->PIU(PIUNum).FanAvailSchedPtr = HVACFan::fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->availSchedIndex;
+                state.dataPowerInductionUnits->PIU(PIUNum).FanAvailSchedPtr = state.dataHVACFan->fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->availSchedIndex;
             } else {
                 bool isNotOkay(false);
                 ValidateComponent(state, "FAN:CONSTANTVOLUME", state.dataPowerInductionUnits->PIU(PIUNum).FanName, isNotOkay, "GetPIUs");
@@ -589,9 +589,9 @@ namespace EnergyPlus::PoweredInductionUnits {
             // test if Fan:SystemModel fan of this name exists
             if (HVACFan::checkIfFanNameIsAFanSystem(state, state.dataPowerInductionUnits->PIU(PIUNum).FanName)) {
                 state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
-                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataPowerInductionUnits->PIU(PIUNum).FanName)); // call constructor
+                state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataPowerInductionUnits->PIU(PIUNum).FanName)); // call constructor
                 state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index = HVACFan::getFanObjectVectorIndex(state, state.dataPowerInductionUnits->PIU(PIUNum).FanName);
-                state.dataPowerInductionUnits->PIU(PIUNum).FanAvailSchedPtr = HVACFan::fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->availSchedIndex;
+                state.dataPowerInductionUnits->PIU(PIUNum).FanAvailSchedPtr = state.dataHVACFan->fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->availSchedIndex;
             } else {
                 bool isNotOkay(false);
                 ValidateComponent(state, "FAN:CONSTANTVOLUME", state.dataPowerInductionUnits->PIU(PIUNum).FanName, isNotOkay, "GetPIUs");
@@ -1582,7 +1582,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                 state.dataLoopNodes->Node(SecNode).MassFlowRate = state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow;
                 SimAirMixer(state, state.dataPowerInductionUnits->PIU(PIUNum).MixerName, state.dataPowerInductionUnits->PIU(PIUNum).Mixer_Num); // fire the mixer
                 if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    HVACFan::fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
                 } else if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                     Fans::SimulateFanComponents(state,
                                                 state.dataPowerInductionUnits->PIU(PIUNum).FanName,
@@ -1628,7 +1628,7 @@ namespace EnergyPlus::PoweredInductionUnits {
         SimAirMixer(state, state.dataPowerInductionUnits->PIU(PIUNum).MixerName, state.dataPowerInductionUnits->PIU(PIUNum).Mixer_Num);
         // fire the fan
         if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            HVACFan::fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
+            state.dataHVACFan->fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
         } else if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
             Fans::SimulateFanComponents(state,
                                         state.dataPowerInductionUnits->PIU(PIUNum).FanName,
@@ -1872,7 +1872,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                 state.dataLoopNodes->Node(PriNode).MassFlowRate = 0.0;
 
                 if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    HVACFan::fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
                 } else if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                     Fans::SimulateFanComponents(state,
                                                 state.dataPowerInductionUnits->PIU(PIUNum).FanName,
@@ -1920,7 +1920,7 @@ namespace EnergyPlus::PoweredInductionUnits {
         // fire the fan
 
         if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            HVACFan::fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
+            state.dataHVACFan->fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
         } else if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
             Fans::SimulateFanComponents(state,
                                         state.dataPowerInductionUnits->PIU(PIUNum).FanName,
