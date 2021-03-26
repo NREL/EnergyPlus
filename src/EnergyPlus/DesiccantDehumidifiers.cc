@@ -2594,7 +2594,6 @@ namespace DesiccantDehumidifiers {
         int RegenCoilIndex;              // index to regeneration heating coil, 0 when not used
         int CompanionCoilIndexNum;       // index for companion DX cooling coil, 0 when DX coil is not used
         std::string MinVol;              // character string used for error messages
-        static Real64 RhoAirStdInit;     // standard air density (kg/m3)
         bool UnitOn;                     // unit on flag
         //  LOGICAL       :: SimFlag                    ! used to turn off additional simulation if DX Coil is off
         Real64 QRegen_OASysFanAdjust; // temporary variable used to adjust regen heater load during iteration
@@ -2623,7 +2622,7 @@ namespace DesiccantDehumidifiers {
         }
 
         if (state.dataDesiccantDehumidifiers->CalcGenericDesiccantDehumidifierMyOneTimeFlag) {
-            RhoAirStdInit = state.dataEnvrn->StdRhoAir;
+            state.dataDesiccantDehumidifiers->RhoAirStdInitCGDD = state.dataEnvrn->StdRhoAir;
             state.dataDesiccantDehumidifiers->CalcGenericDesiccantDehumidifierMyOneTimeFlag = false;
         }
 
@@ -3023,7 +3022,7 @@ namespace DesiccantDehumidifiers {
         // check condenser minimum flow per rated total capacity
         if (DDPartLoadRatio > 0.0 && DesicDehum(DesicDehumNum).ExhaustFanMaxVolFlowRate > 0.0) {
             VolFlowPerRatedTotQ = (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate + ExhaustFanMassFlowRate) /
-                                  max(0.00001, (DesicDehum(DesicDehumNum).CompanionCoilCapacity * DDPartLoadRatio * RhoAirStdInit));
+                                  max(0.00001, (DesicDehum(DesicDehumNum).CompanionCoilCapacity * DDPartLoadRatio * state.dataDesiccantDehumidifiers->RhoAirStdInitCGDD));
             if (!state.dataGlobal->WarmupFlag && (VolFlowPerRatedTotQ < MinVolFlowPerRatedTotQ)) {
                 ++DesicDehum(DesicDehumNum).ErrCount;
                 if (DesicDehum(DesicDehumNum).ErrCount < 2) {
