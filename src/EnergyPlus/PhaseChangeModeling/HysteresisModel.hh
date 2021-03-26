@@ -134,8 +134,6 @@ namespace HysteresisPhaseChange {
         }
     };
 
-    extern std::vector<HysteresisPhaseChange> hysteresisPhaseChangeModels;
-
     void readAllHysteresisModels(EnergyPlusData &state);
 
 } // namespace HysteresisPhaseChange
