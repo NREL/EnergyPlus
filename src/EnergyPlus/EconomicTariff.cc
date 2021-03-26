@@ -4147,8 +4147,8 @@ namespace EnergyPlus::EconomicTariff {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                                 tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost");
                         }
                     }
@@ -4208,8 +4208,8 @@ namespace EnergyPlus::EconomicTariff {
                 columnWidth = 14; // array assignment - same for all columns
                 WriteSubtitle(state, "Tariff Summary");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
+                if (state.dataSQLiteProcedures->sqlite) {
+                    state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary");
                 }
                 if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
@@ -4289,8 +4289,8 @@ namespace EnergyPlus::EconomicTariff {
                     columnWidth = 14; // array assignment - same for all columns
                     WriteSubtitle(state, "General");
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "Tariff Report", tariff(iTariff).tariffName, "General");
                     }
                     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
@@ -4680,8 +4680,8 @@ namespace EnergyPlus::EconomicTariff {
         columnWidth = 14; // array assignment - same for all columns
         WriteSubtitle(state, titleString);
         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-        if (sqlite) {
-            sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Tariff Report", forString, titleString);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Tariff Report", forString, titleString);
         }
         if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
             state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Tariff Report", forString,

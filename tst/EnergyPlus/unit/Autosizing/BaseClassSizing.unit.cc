@@ -620,7 +620,7 @@ TEST_F(SQLiteFixture, BaseSizer_SQLiteRecordReportSizerOutputTest)
     // get the sqlite output
     // query the sqLite
     auto result = queryResult("SELECT * FROM ComponentSizes;", "ComponentSizes");
-    EnergyPlus::sqlite->sqliteCommit();
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
     // check that there are two sizing result records
     ASSERT_EQ(2ul, result.size());
     std::vector<std::string> testResult0{"1", "BOILER:HOTWATER", "RESIDENTIAL BOILER ELECTRIC", "Design Size Nominal Capacity", "105977.98934", "W"};

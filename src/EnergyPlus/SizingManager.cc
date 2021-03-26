@@ -4039,8 +4039,8 @@ namespace EnergyPlus::SizingManager {
               DOASHeatAddRate);
 
         // BSLLC Start
-        if (sqlite) {
-            sqlite->addSQLiteZoneSizingRecord(ZoneName,
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->addSQLiteZoneSizingRecord(ZoneName,
                                               LoadType,
                                               CalcDesLoad,
                                               UserDesLoad,
@@ -4090,8 +4090,8 @@ namespace EnergyPlus::SizingManager {
               dateHrMin);
 
         // BSLLC Start
-        if (sqlite)
-            sqlite->addSQLiteSystemSizingRecord(SysName, LoadType, PeakLoadKind, UserDesCap, CalcDesVolFlow, UserDesVolFlow, DesDayName, dateHrMin);
+        if (state.dataSQLiteProcedures->sqlite)
+            state.dataSQLiteProcedures->sqlite->addSQLiteSystemSizingRecord(SysName, LoadType, PeakLoadKind, UserDesCap, CalcDesVolFlow, UserDesVolFlow, DesDayName, dateHrMin);
         // BSLLC Finish
     }
 

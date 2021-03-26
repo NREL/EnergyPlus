@@ -942,8 +942,8 @@ namespace EnergyPlus::OutputReportTabularAnnual {
             OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose annual XML tables.
         }
         if (produceSQLite_para) {
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, m_name, "Entire Facility", "Custom Annual Report");
+            if (state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, m_name, "Entire Facility", "Custom Annual Report");
             }
         }
         // for the new binning aggregation types create a second table of the bin ranges
@@ -993,8 +993,8 @@ namespace EnergyPlus::OutputReportTabularAnnual {
                             state, tableBodyRange, rowHeadRange, colHeadRange, colWidthRange, true); // transpose annual XML tables.
                     }
                     if (produceSQLite_para) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                                 tableBodyRange, rowHeadRange, colHeadRange, m_name, "Entire Facility", "Bin Sizes");
                         }
                     }

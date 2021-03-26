@@ -6878,8 +6878,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose monthly XML tables.
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                    rowHead,
                                                                    columnHead,
                                                                    ort->MonthlyInput(iInput).name,
@@ -7107,8 +7107,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose XML tables
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                    rowHead,
                                                                    columnHead,
                                                                    repNameWithUnitsandscheduleName,
@@ -7170,8 +7170,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBodyStat, rowHeadStat, columnHeadStat, columnWidthStat, true); // transpose XML table
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                                 tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Statistics");
                         }
                     }
@@ -7723,8 +7723,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                    rowHead,
                                                                    columnHead,
                                                                    "AnnualBuildingUtilityPerformanceSummary",
@@ -7886,8 +7886,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                    rowHead,
                                                                    columnHead,
                                                                    "AnnualBuildingUtilityPerformanceSummary",
@@ -7954,8 +7954,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                                 tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area");
                         }
                     }
@@ -8323,8 +8323,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                                 tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
                         }
                     }
@@ -8494,8 +8494,8 @@ namespace EnergyPlus::OutputReportTabular {
                     Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
                     Array1D_string columnHeadTemp(columnHead({2, _, _}));
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
                                                                    rowHeadTemp,
                                                                    columnHeadTemp,
                                                                    "AnnualBuildingUtilityPerformanceSummary",
@@ -8691,8 +8691,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                    rowHead,
                                                                    columnHead,
                                                                    "AnnualBuildingUtilityPerformanceSummary",
@@ -8727,8 +8727,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                    rowHead,
                                                                    columnHead,
                                                                    "AnnualBuildingUtilityPerformanceSummary",
@@ -8830,8 +8830,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                    rowHead,
                                                                    columnHead,
                                                                    "AnnualBuildingUtilityPerformanceSummary",
@@ -8935,8 +8935,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                    rowHead,
                                                                    columnHead,
                                                                    "AnnualBuildingUtilityPerformanceSummary",
@@ -9044,8 +9044,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                                 tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary");
                         }
                     }
@@ -9096,8 +9096,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                    rowHead,
                                                                    columnHead,
                                                                    "AnnualBuildingUtilityPerformanceSummary",
@@ -9158,8 +9158,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                    rowHead,
                                                                    columnHead,
                                                                    "AnnualBuildingUtilityPerformanceSummary",
@@ -9412,8 +9412,8 @@ namespace EnergyPlus::OutputReportTabular {
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
                 if (produceSQLite) {
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(tableBody,
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                rowHead,
                                                                columnHead,
                                                                "SourceEnergyEndUseComponentsSummary",
@@ -9502,8 +9502,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                    rowHead,
                                                                    columnHead,
                                                                    "SourceEnergyEndUseComponentsSummary",
@@ -9544,8 +9544,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                    rowHead,
                                                                    columnHead,
                                                                    "SourceEnergyEndUseComponentsSummary",
@@ -9878,8 +9878,8 @@ namespace EnergyPlus::OutputReportTabular {
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, state.dataOutRptTab->footnote);
                 }
                 if (produceSQLite) {
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses");
                     }
                 }
@@ -10007,8 +10007,8 @@ namespace EnergyPlus::OutputReportTabular {
                 Array1D_string columnHeadTemp(columnHead({2, _, _}));
 
                 if (produceSQLite) {
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
                                                                rowHeadTemp,
                                                                columnHeadTemp,
                                                                "DemandEndUseComponentsSummary",
@@ -10287,8 +10287,8 @@ namespace EnergyPlus::OutputReportTabular {
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             }
             if (produceSQLite) {
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody,
+                if (state.dataSQLiteProcedures->sqlite) {
+                    state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                            rowHead,
                                                            columnHead,
                                                            "Construction Cost Estimate Summary",
@@ -10358,8 +10358,8 @@ namespace EnergyPlus::OutputReportTabular {
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             }
             if (produceSQLite) {
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
+                if (state.dataSQLiteProcedures->sqlite) {
+                    state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
                 }
             }
@@ -10597,8 +10597,8 @@ namespace EnergyPlus::OutputReportTabular {
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
                 if (produceSQLite) {
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General");
                     }
                 }
@@ -10860,8 +10860,8 @@ namespace EnergyPlus::OutputReportTabular {
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
                 if (produceSQLite) {
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio");
                     }
                 }
@@ -10934,8 +10934,8 @@ namespace EnergyPlus::OutputReportTabular {
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
                 if (produceSQLite) {
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio");
                     }
                 }
@@ -10980,8 +10980,8 @@ namespace EnergyPlus::OutputReportTabular {
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
                 if (produceSQLite) {
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio");
                     }
                 }
@@ -11022,8 +11022,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                    rowHead,
                                                                    columnHead,
                                                                    "InputVerificationandResultsSummary",
@@ -11261,8 +11261,8 @@ namespace EnergyPlus::OutputReportTabular {
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
                 if (produceSQLite) {
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary");
                     }
                 }
@@ -11339,8 +11339,8 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary");
+            if (state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary");
             }
             if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                 state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
@@ -11603,8 +11603,8 @@ namespace EnergyPlus::OutputReportTabular {
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
                 if (produceSQLite) {
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "AnnualHeatEmissionsReport", "Entire Facility", "Annual Heat Emissions Summary");
                     }
                 }
@@ -11846,8 +11846,8 @@ namespace EnergyPlus::OutputReportTabular {
                                            state.dataOutRptPredefined->subTable(jSubTable).footnote);
                             }
                             if (produceSQLite) {
-                                if (sqlite) {
-                                    sqlite->createSQLiteTabularDataRecords(tableBody,
+                                if (state.dataSQLiteProcedures->sqlite) {
+                                    state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                            rowHead,
                                                                            columnHead,
                                                                            state.dataOutRptPredefined->reportName(iReportName).name,
@@ -12098,8 +12098,8 @@ namespace EnergyPlus::OutputReportTabular {
                     }
 
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                    rowHead,
                                                                    columnHead,
                                                                    "ComponentSizingSummary",
@@ -12230,8 +12230,8 @@ namespace EnergyPlus::OutputReportTabular {
                 // write the table
                 if (iKindRec == recKindSurface) {
                     WriteSubtitle(state, "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces");
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(tableBody,
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                rowHead,
                                                                columnHead,
                                                                "SurfaceShadowingSummary",
@@ -12249,8 +12249,8 @@ namespace EnergyPlus::OutputReportTabular {
                     }
                 } else if (iKindRec == recKindSubsurface) {
                     WriteSubtitle(state, "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces");
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(tableBody,
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                rowHead,
                                                                columnHead,
                                                                "SurfaceShadowingSummary",
@@ -12390,8 +12390,8 @@ namespace EnergyPlus::OutputReportTabular {
                             WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
                         }
                         if (produceSQLite) {
-                            if (sqlite) {
-                                sqlite->createSQLiteTabularDataRecords(
+                            if (state.dataSQLiteProcedures->sqlite) {
+                                state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                                     tableBody, rowHead, columnHead, "Initialization Summary", "Entire Facility", tableName);
                             }
                         }
@@ -14450,8 +14450,8 @@ namespace EnergyPlus::OutputReportTabular {
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
                 if (produceSQLite_para) {
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
                     }
                 }
                 if (produceTabular_para) {
@@ -14538,8 +14538,8 @@ namespace EnergyPlus::OutputReportTabular {
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
                 if (produceSQLite_para) {
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
                     }
                 }
                 if (produceTabular_para) {
@@ -14592,8 +14592,8 @@ namespace EnergyPlus::OutputReportTabular {
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
                 if (produceSQLite_para) {
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName);
                     }
                 }
@@ -14633,8 +14633,8 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
                     if (produceSQLite_para) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                                 tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
                         }
                     }

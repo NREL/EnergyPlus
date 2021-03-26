@@ -241,12 +241,12 @@ namespace SimulationManager {
         state.files.debug.ensure_open(state, "OpenOutputFiles", state.files.outputControl.dbg);
 
         // CreateSQLiteDatabase();
-        sqlite = EnergyPlus::CreateSQLiteDatabase(state);
+        state.dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(state);
 
-        if (sqlite) {
-            sqlite->sqliteBegin();
-            sqlite->createSQLiteSimulationsRecord(1, state.dataStrGlobals->VerStringVar, state.dataStrGlobals->CurrentDateTime);
-            sqlite->sqliteCommit();
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->sqliteBegin();
+            state.dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, state.dataStrGlobals->VerStringVar, state.dataStrGlobals->CurrentDateTime);
+            state.dataSQLiteProcedures->sqlite->sqliteCommit();
         }
 
         PostIPProcessing(state);
@@ -394,10 +394,10 @@ namespace SimulationManager {
         // up until this point, output vars, meters, actuators, etc., may not have been registered; they are now
         state.dataPluginManager->fullyReady = true;
 
-        if (sqlite) {
-            sqlite->sqliteBegin();
-            sqlite->updateSQLiteSimulationRecord(1, state.dataGlobal->NumOfTimeStepInHour);
-            sqlite->sqliteCommit();
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->sqliteBegin();
+            state.dataSQLiteProcedures->sqlite->updateSQLiteSimulationRecord(1, state.dataGlobal->NumOfTimeStepInHour);
+            state.dataSQLiteProcedures->sqlite->sqliteCommit();
         }
 
         GetInputForLifeCycleCost(state); // must be prior to WriteTabularReports -- do here before big simulation stuff.
@@ -433,10 +433,10 @@ namespace SimulationManager {
 
             ++EnvCount;
 
-            if (sqlite) {
-                sqlite->sqliteBegin();
-                sqlite->createSQLiteEnvironmentPeriodRecord(state.dataEnvrn->CurEnvirNum, state.dataEnvrn->EnvironmentName, state.dataGlobal->KindOfSim);
-                sqlite->sqliteCommit();
+            if (state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->sqliteBegin();
+                state.dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(state.dataEnvrn->CurEnvirNum, state.dataEnvrn->EnvironmentName, state.dataGlobal->KindOfSim);
+                state.dataSQLiteProcedures->sqlite->sqliteCommit();
             }
 
             state.dataErrTracking->ExitDuringSimulations = true;
@@ -476,7 +476,7 @@ namespace SimulationManager {
             while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (state.dataGlobal->WarmupFlag)) { // Begin day loop ...
                 if (state.dataGlobal->stopSimulation) break;
 
-                if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
+                if (state.dataSQLiteProcedures->sqlite) state.dataSQLiteProcedures->sqlite->sqliteBegin(); // setup for one transaction per day
 
                 ++state.dataGlobal->DayOfSim;
                 state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
@@ -580,7 +580,7 @@ namespace SimulationManager {
 
                 } // ... End hour loop.
 
-                if (sqlite) sqlite->sqliteCommit(); // one transaction per day
+                if (state.dataSQLiteProcedures->sqlite) state.dataSQLiteProcedures->sqlite->sqliteCommit(); // one transaction per day
 
             } // ... End day loop.
 
@@ -604,7 +604,7 @@ namespace SimulationManager {
 
         PlantManager::CheckOngoingPlantWarnings(state);
 
-        if (sqlite) sqlite->sqliteBegin(); // for final data to write
+        if (state.dataSQLiteProcedures->sqlite) state.dataSQLiteProcedures->sqlite->sqliteBegin(); // for final data to write
 
 #ifdef EP_Detailed_Timings
         epStartTime("Closeout Reporting=");
@@ -635,13 +635,13 @@ namespace SimulationManager {
 #endif
         CloseOutputFiles(state);
 
-        // sqlite->createZoneExtendedOutput();
+        // state.dataSQLiteProcedures->sqlite->createZoneExtendedOutput();
         CreateSQLiteZoneExtendedOutput(state);
 
-        if (sqlite) {
+        if (state.dataSQLiteProcedures->sqlite) {
             DisplayString(state, "Writing final SQL reports");
-            sqlite->sqliteCommit();      // final transactions
-            sqlite->initializeIndexes(); // do not create indexes (SQL) until all is done.
+            state.dataSQLiteProcedures->sqlite->sqliteCommit();      // final transactions
+            state.dataSQLiteProcedures->sqlite->initializeIndexes(); // do not create indexes (SQL) until all is done.
         }
 
         if (ErrorsFound) {

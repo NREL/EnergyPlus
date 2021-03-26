@@ -250,11 +250,11 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
             if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).HVACSizingIterationNum != HVACSizingIterCount) continue;
 
             if (state.dataSysVars->ReportDuringHVACSizingSimulation) {
-                if (sqlite) {
-                    sqlite->sqliteBegin();
-                    sqlite->createSQLiteEnvironmentPeriodRecord(
+                if (state.dataSQLiteProcedures->sqlite) {
+                    state.dataSQLiteProcedures->sqlite->sqliteBegin();
+                    state.dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
                         state.dataEnvrn->CurEnvirNum, state.dataEnvrn->EnvironmentName, state.dataGlobal->KindOfSim);
-                    sqlite->sqliteCommit();
+                    state.dataSQLiteProcedures->sqlite->sqliteCommit();
                 }
             }
             state.dataErrTracking->ExitDuringSimulations = true;
@@ -284,7 +284,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 
                 // Let's always do a transaction, except we'll roll it back if need be
                 // if (ReportDuringHVACSizingSimulation) {
-                    if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
+                    if (state.dataSQLiteProcedures->sqlite) state.dataSQLiteProcedures->sqlite->sqliteBegin(); // setup for one transaction per day
                 // }
                 ++state.dataGlobal->DayOfSim;
                 state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
@@ -356,11 +356,11 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                     state.dataGlobal->PreviousHour = state.dataGlobal->HourOfDay;
 
                 } // ... End hour loop.
-                if (sqlite) {
+                if (state.dataSQLiteProcedures->sqlite) {
                     if (state.dataSysVars->ReportDuringHVACSizingSimulation) {
-                        sqlite->sqliteCommit(); // one transaction per day
+                        state.dataSQLiteProcedures->sqlite->sqliteCommit(); // one transaction per day
                     } else {
-                        sqlite->sqliteRollback(); // Cancel transaction
+                        state.dataSQLiteProcedures->sqlite->sqliteRollback(); // Cancel transaction
                     }
                 }
             } // ... End day loop.

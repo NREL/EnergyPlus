@@ -6046,8 +6046,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitSubstring_Test)
 
 TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
 {
-    sqlite->sqliteBegin();
-    sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularVeriSum = true;
     state->dataEnvrn->Latitude = 12.3;
@@ -6122,7 +6122,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
     auto strings = queryResult("SELECT * FROM Strings;", "Strings");
     auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
-    sqlite->sqliteCommit();
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     EXPECT_EQ(123ul, tabularData.size());
     // tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId,
@@ -6156,8 +6156,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
 // Test for #6350 and #6469
 TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
 {
-    sqlite->sqliteBegin();
-    sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularVeriSum = true;
     state->dataEnvrn->Latitude = 12.3;
@@ -6309,7 +6309,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
 
         std::string flag = queryResult(query, "TabularDataWithStrings")[0][0];
         // Not needed, we're just querying, not inside a transaction
-        // EnergyPlus::sqlite->sqliteCommit();
+        // state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
         // Add informative message if failed
         EXPECT_EQ(std::get<2>(v), flag) << "Failed for RowName=" << rowName << "; ColumnName=" << columnName;
@@ -6376,7 +6376,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
                           rowName + "'" + "  AND ColumnName = '" + columnName + "'");
 
         Real64 return_val = execAndReturnFirstDouble(query);
-        // EnergyPlus::sqlite->sqliteCommit();
+        // state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
         // Add informative message if failed
         EXPECT_NEAR(std::get<2>(v), return_val, 0.01) << "Failed for RowName=" << rowName << "; ColumnName=" << columnName;
@@ -6882,8 +6882,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
 
 TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoop_ZeroDesignDay)
 {
-    sqlite->sqliteBegin();
-    sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataSize->SysSizPeakDDNum.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
@@ -6904,7 +6904,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
     auto strings = queryResult("SELECT * FROM Strings;", "Strings");
     auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
-    sqlite->sqliteCommit();
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     EXPECT_EQ(460ul, tabularData.size());
     EXPECT_EQ(77ul, strings.size());
@@ -6916,8 +6916,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 // We ensure that if the Airloop peak matches the zone peak, we don't do the IP conversion twice
 TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoop_IPConversion)
 {
-    sqlite->sqliteBegin();
-    sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     OutputReportTabular::SetupUnitConversions(*state);
     state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
@@ -7079,7 +7079,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
         std::string oa_db = queryResult(query, "TabularDataWithStrings")[0][0];
         // Not needed, we're just querying, not inside a transaction
-        // EnergyPlus::sqlite->sqliteCommit();
+        // state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
         // Add informative message if failed
         EXPECT_EQ(std::get<2>(v), oa_db) << "Failed for TableName=" << tableName << "; ReportName=" << reportName;
@@ -7236,8 +7236,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
 // https://github.com/NREL/EnergyPlus/issues/6442
 TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
 {
-    sqlite->sqliteBegin();
-    sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->WriteTabularFiles = true;
 
@@ -7265,8 +7265,8 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
     state->dataOutRptPredefined->reportName(5).show = true;
 
     WritePredefinedTables(*state);
-    sqlite->sqliteCommit();
-    sqlite->initializeIndexes();
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
+    state->dataSQLiteProcedures->sqlite->initializeIndexes();
 
     auto units = queryResult("Select Units From TabularDataWithStrings "
                              "WHERE ReportName = \"EquipmentSummary\" "
@@ -7276,7 +7276,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
                               "WHERE ReportName = \"EquipmentSummary\" "
                               "  AND ColumnName = \"Rated Net Cooling Capacity Test A\"",
                               "TabularDataWithStrings");
-    sqlite->sqliteCommit();
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     EXPECT_EQ(1u, units.size());
     // Because the table has 8 cols
@@ -7295,8 +7295,8 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
 // https://github.com/NREL/EnergyPlus/issues/7565
 TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
 {
-    sqlite->sqliteBegin();
-    sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->WriteTabularFiles = true;
 
@@ -7319,8 +7319,8 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
     state->dataOutRptPredefined->reportName(7).show = true;
 
     WritePredefinedTables(*state);
-    sqlite->sqliteCommit();
-    sqlite->initializeIndexes();
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
+    state->dataSQLiteProcedures->sqlite->initializeIndexes();
 
     for (const std::string reportName: {"HVACSizingSummary", "CoilSizingDetails"}) {
 
@@ -7330,7 +7330,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
                                  "  AND ColumnName = \"Coil Leaving Air Humidity Ratio at Ideal Loads Peak\"",
                                  "TabularDataWithStrings");
 
-        sqlite->sqliteCommit();
+        state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
         EXPECT_EQ(1u, result.size());
         // Because the table has 8 cols
@@ -7620,8 +7620,8 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
 
 TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
 
-    sqlite->sqliteBegin();
-    sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displaySourceEnergyEndUseSummary = true;
 
@@ -7797,13 +7797,13 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
         }
     }
 
-    sqlite->sqliteCommit();
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }
 
 TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 {
-    sqlite->sqliteBegin();
-    sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularBEPS = true;
     state->dataOutRptTab->displayDemandEndUse = true;
@@ -7936,7 +7936,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     OutputReportTabular::WriteBEPSTable(*state);
     OutputReportTabular::WriteDemandEndUseSummary(*state);
 
-    sqlite->sqliteCommit();
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     // We test for Heating and Total, since they should be the same
     std::vector<std::string> testReportNames = {"AnnualBuildingUtilityPerformanceSummary", "DemandEndUseComponentsSummary"};
@@ -8440,12 +8440,12 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
     state->dataStrGlobals->outputSqlFileName = "eplussqlite1.err";
     state->dataStrGlobals->outputSqliteErrFileName = "eplusout1.sql";
 
-    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
+    state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
-    EXPECT_NE(sqlite, nullptr);
-    EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
-    EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
+    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
+    EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
     state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
     state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
@@ -8464,12 +8464,12 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
 
     state->dataStrGlobals->outputSqlFileName = "eplussqlite2.err";
     state->dataStrGlobals->outputSqliteErrFileName = "eplusout2.sql";
-    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
+    state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::InchPound);
-    EXPECT_NE(sqlite, nullptr);
-    EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
-    EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
+    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
+    EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
     state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
     state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
@@ -8488,12 +8488,12 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
 
     state->dataStrGlobals->outputSqlFileName = "eplussqlite3.err";
     state->dataStrGlobals->outputSqliteErrFileName = "eplusout3.sql";
-    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
+    state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::None);
-    EXPECT_NE(sqlite, nullptr);
-    EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
-    EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
+    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
+    EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
     state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
     state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
@@ -8514,12 +8514,12 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
     state->dataStrGlobals->outputSqlFileName = "eplussqlite4.err";
     state->dataStrGlobals->outputSqliteErrFileName = "eplusout4.sql";
 
-    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
+    state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
-    EXPECT_NE(sqlite, nullptr);
-    EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
-    EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
+    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
+    EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
     state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
     state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
@@ -8541,12 +8541,12 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
     state->dataStrGlobals->outputSqlFileName = "eplussqlite5.err";
     state->dataStrGlobals->outputSqliteErrFileName = "eplusout5.sql";
 
-    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
+    state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
-    EXPECT_NE(sqlite, nullptr);
-    EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
-    EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
+    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
+    EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
     state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
     state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
@@ -8554,8 +8554,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
 
 TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
 {
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayHeatEmissionsSummary = true;
 
@@ -8730,13 +8730,13 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
         }
     }
 
-    EnergyPlus::sqlite->sqliteCommit();
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }
 
 TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
 {
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displaySourceEnergyEndUseSummary = true;
 
@@ -8922,7 +8922,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
         }
     }
 
-    EnergyPlus::sqlite->sqliteCommit();
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }
 
 TEST_F(EnergyPlusFixture, ORT_LoadSummaryUnitConversion_OverLoad_DualUnits)
@@ -8966,8 +8966,8 @@ TEST_F(EnergyPlusFixture, ORT_LoadSummaryUnitConversion_OverLoad_DualUnits)
 
 TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest_DualUnits)
 {
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularVeriSum = true;
     state->dataEnvrn->Latitude = 12.3;
@@ -9049,7 +9049,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest_DualUnits)
     auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
     auto strings = queryResult("SELECT * FROM Strings;", "Strings");
     auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
-    EnergyPlus::sqlite->sqliteCommit();
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     EXPECT_EQ(123ul, tabularData.size());
     // tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId,
@@ -9083,8 +9083,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest_DualUnits)
 // Dual Unit test: Borrowed from Test for #6350 and #6469
 TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
 {
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularVeriSum = true;
     state->dataEnvrn->Latitude = 12.3;
@@ -9250,7 +9250,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
 
         std::string flag = queryResult(query, "TabularDataWithStrings")[0][0];
         // Not needed, we're just querying, not inside a transaction
-        // EnergyPlus::sqlite->sqliteCommit();
+        // state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
         // Add informative message if failed
         EXPECT_EQ(std::get<2>(v), flag) << "Failed for RowName=" << rowName << "; ColumnName=" << columnName;
@@ -9317,7 +9317,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
                           rowName + "'" + "  AND ColumnName = '" + columnName + "'");
 
         Real64 return_val = execAndReturnFirstDouble(query);
-        // EnergyPlus::sqlite->sqliteCommit();
+        // state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
         // Add informative message if failed
         EXPECT_NEAR(std::get<2>(v), return_val, 0.01) << "Failed for RowName=" << rowName << "; ColumnName=" << columnName;
@@ -9326,8 +9326,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
 
 TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
 {
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularBEPS = true;
     state->dataOutRptTab->displayDemandEndUse = true;
@@ -9456,7 +9456,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
     OutputReportTabular::WriteBEPSTable(*state);
     OutputReportTabular::WriteDemandEndUseSummary(*state);
 
-    EnergyPlus::sqlite->sqliteCommit();
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     // We test for Heating and Total, since they should be the same
     std::vector<std::string> testReportNames = {"AnnualBuildingUtilityPerformanceSummary", "DemandEndUseComponentsSummary"};
@@ -9610,8 +9610,8 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
 TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
 {
     // Test for #8542 - Ensures strings are escaped before going to HTML
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     auto &ort(state->dataOutRptTab);
     ort->numStyles = 1;
@@ -9680,7 +9680,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
                                  "  AND ColumnName = \"Coil Leaving Air Humidity Ratio at Ideal Loads Peak\"",
                                  "TabularDataWithStrings");
 
-        EnergyPlus::sqlite->sqliteCommit();
+        state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
         EXPECT_EQ(1u, result.size());
         // Because the table has 8 cols

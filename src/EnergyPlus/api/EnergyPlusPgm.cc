@@ -344,8 +344,8 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         EnergyPlus::inputProcessor->reportOrphanRecordObjects(state);
         FluidProperties::ReportOrphanFluids(state);
         ScheduleManager::ReportOrphanSchedules(state);
-        if (EnergyPlus::sqlite) {
-            EnergyPlus::sqlite.reset();
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite.reset();
         }
         if (EnergyPlus::inputProcessor) {
             EnergyPlus::inputProcessor.reset();

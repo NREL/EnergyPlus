@@ -3821,8 +3821,8 @@ namespace OutputProcessor {
                          EndMinute(),
                          DayType().c_str());
             print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
-            if (writeToSQL && sqlite) {
-                sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
+            if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
                                                     state.dataGlobal->DayOfSim,
                                                     state.dataEnvrn->CurEnvirNum,
@@ -3850,8 +3850,8 @@ namespace OutputProcessor {
                          60.0,
                          DayType().c_str());
             print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
-            if (writeToSQL && sqlite) {
-                sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
+            if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
                                                     state.dataGlobal->DayOfSim,
                                                     state.dataEnvrn->CurEnvirNum,
@@ -3869,8 +3869,8 @@ namespace OutputProcessor {
         case ReportingFrequency::Daily:
             std::sprintf(state.dataOutputProcessor->stamp, "%s,%s,%2d,%2d,%2d,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), DayType().c_str());
             print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
-            if (writeToSQL && sqlite) {
-                sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
+            if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
                                                     state.dataGlobal->DayOfSim,
                                                     state.dataEnvrn->CurEnvirNum,
@@ -3888,23 +3888,23 @@ namespace OutputProcessor {
         case ReportingFrequency::Monthly:
             std::sprintf(state.dataOutputProcessor->stamp, "%s,%s,%2d", reportIDString.c_str(), DayOfSimChr.c_str(), Month());
             print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
-            if (writeToSQL && sqlite) {
-                sqlite->createSQLiteTimeIndexRecord(
+            if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(
                     static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, state.dataEnvrn->CurEnvirNum, state.dataGlobal->CalendarYear, Month);
             }
             break;
         case ReportingFrequency::Simulation:
             std::sprintf(state.dataOutputProcessor->stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str());
             print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
-            if (writeToSQL && sqlite) {
-                sqlite->createSQLiteTimeIndexRecord(
+            if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(
                     static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, state.dataEnvrn->CurEnvirNum, state.dataGlobal->CalendarYear);
             }
             break;
         default:
-            if (sqlite) {
+            if (state.dataSQLiteProcedures->sqlite) {
                 std::string str(format("Illegal reportingInterval passed to WriteTimeStampFormatData: {}", static_cast<int>(reportingInterval)));
-                sqlite->sqliteWriteMessage(str);
+                state.dataSQLiteProcedures->sqlite->sqliteWriteMessage(str);
             }
             break;
         }
@@ -3917,8 +3917,8 @@ namespace OutputProcessor {
                               bool writeToSQL)
     {
         print(outputFile, "{},{}\n", reportIDString, yearOfSimChr);
-        if (writeToSQL && sqlite) {
-            sqlite->createYearlyTimeIndexRecord(state.dataGlobal->CalendarYear, state.dataEnvrn->CurEnvirNum);
+        if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createYearlyTimeIndexRecord(state.dataGlobal->CalendarYear, state.dataEnvrn->CurEnvirNum);
         }
     }
 
@@ -4016,8 +4016,8 @@ namespace OutputProcessor {
             // No default available?
         }
 
-        if (sqlite) {
-            sqlite->createSQLiteReportDictionaryRecord(reportID,
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(reportID,
                                                        static_cast<int>(storeType),
                                                        indexGroup,
                                                        keyedValue,
@@ -4129,8 +4129,8 @@ namespace OutputProcessor {
         static std::string const keyedValueStringNon;
         std::string const &keyedValueString(cumulativeMeterFlag ? keyedValueStringCum : keyedValueStringNon);
 
-        if (sqlite) {
-            sqlite->createSQLiteReportDictionaryRecord(reportID,
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(reportID,
                                                        static_cast<int>(storeType),
                                                        indexGroup,
                                                        keyedValueString,
@@ -4269,8 +4269,8 @@ namespace OutputProcessor {
             }
         }
 
-        if (sqlite) {
-            sqlite->createSQLiteReportDataRecord(
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(
                 reportID, repVal, static_cast<int>(reportingInterval), minValue, minValueDate, MaxValue, maxValueDate);
         }
 
@@ -4336,8 +4336,8 @@ namespace OutputProcessor {
             NumberOut = std::string(state.dataOutputProcessor->s_WriteCumulativeReportMeterData);
         }
 
-        if (sqlite) {
-            sqlite->createSQLiteReportDataRecord(reportID, repValue);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.mtr.good()) print(state.files.mtr, "{},{}\n", creportID, NumberOut);
@@ -4381,8 +4381,8 @@ namespace OutputProcessor {
             NumberOut = std::string(state.dataOutputProcessor->s_WriteReportMeterData);
         }
 
-        if (sqlite) {
-            sqlite->createSQLiteReportDataRecord(
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(
                 reportID, repValue, static_cast<int>(reportingInterval), minValue, minValueDate, MaxValue, maxValueDate, state.dataGlobal->MinutesPerTimeStep);
         }
 
@@ -4456,8 +4456,8 @@ namespace OutputProcessor {
 
         dtoa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
-        if (sqlite) {
-            sqlite->createSQLiteReportDataRecord(reportID, repValue);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.eso.good()) {
@@ -4488,8 +4488,8 @@ namespace OutputProcessor {
 
         i32toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
-        if (sqlite) {
-            sqlite->createSQLiteReportDataRecord(reportID, repValue);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.eso.good()) {
@@ -4520,8 +4520,8 @@ namespace OutputProcessor {
 
         i64toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
-        if (sqlite) {
-            sqlite->createSQLiteReportDataRecord(reportID, repValue);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.eso.good()) {
@@ -4690,8 +4690,8 @@ namespace OutputProcessor {
 
         rminValue = minValue;
         rmaxValue = MaxValue;
-        if (sqlite) {
-            sqlite->createSQLiteReportDataRecord(
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(
                 reportID, repVal, static_cast<int>(reportingInterval), rminValue, minValueDate, rmaxValue, maxValueDate);
         }
 

@@ -9358,7 +9358,7 @@ namespace EnergyPlus::DaylightingManager {
                     RefPt += state.dataDaylightingData->IllumMap(MapNum).Xnum;
                 } // X
 
-                if (sqlite) {
+                if (state.dataSQLiteProcedures->sqlite) {
                     if (state.dataDaylightingManager->SQFirstTime) {
                         int const nX(maxval(state.dataDaylightingData->IllumMap, &DataDaylighting::IllumMapData::Xnum));
                         int const nY(maxval(state.dataDaylightingData->IllumMap, &DataDaylighting::IllumMapData::Ynum));
@@ -9386,7 +9386,7 @@ namespace EnergyPlus::DaylightingManager {
                         } // X Loop
                     }     // Y Loop
 
-                    sqlite->createSQLiteDaylightMap(
+                    state.dataSQLiteProcedures->sqlite->createSQLiteDaylightMap(
                         MapNum, SQYear, SQMonth, SQDayOfMonth, state.dataGlobal->HourOfDay, state.dataDaylightingData->IllumMap(MapNum).Xnum, XValue, state.dataDaylightingData->IllumMap(MapNum).Ynum, YValue, IllumValue);
 
                 } // WriteOutputToSQLite
@@ -10155,8 +10155,8 @@ namespace EnergyPlus::DaylightingManager {
               fmt::arg("RefPt1", refPt1),
               fmt::arg("RefPt2", refPt2));
 
-        if (sqlite) {
-            sqlite->createSQLiteDaylightMapTitle(mapNum, fullmapName, environmentName, ZoneNum, refPt1, refPt2, zcoord);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteDaylightMapTitle(mapNum, fullmapName, environmentName, ZoneNum, refPt1, refPt2, zcoord);
         }
     }
 
