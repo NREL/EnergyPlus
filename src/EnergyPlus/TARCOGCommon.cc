@@ -50,6 +50,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGParams.hh>
@@ -275,7 +276,7 @@ namespace TARCOGCommon {
         }
     }
 
-    void EquationsSolver(Array2<Real64> &a, Array1D<Real64> &b, int const n, int &nperr, std::string &ErrorMessage)
+    void EquationsSolver(EnergyPlusData &state, Array2<Real64> &a, Array1D<Real64> &b, int const n, int &nperr, std::string &ErrorMessage)
     {
         //***********************************************************************
         // Purpose: solves the main system of energy balance equations
@@ -295,7 +296,7 @@ namespace TARCOGCommon {
         Array1D_int indx(n);
         Real64 d;
 
-        ludcmp(a, n, indx, d, nperr, ErrorMessage);
+        ludcmp(state, a, n, indx, d, nperr, ErrorMessage);
 
         // Exit on error
         if ((nperr > 0) && (nperr <= 1000)) return;
@@ -303,14 +304,11 @@ namespace TARCOGCommon {
         lubksb(a, n, indx, b);
     }
 
-    void ludcmp(Array2<Real64> &a, int const n, Array1D_int &indx, Real64 &d, int &nperr, std::string &ErrorMessage)
+    void ludcmp(EnergyPlusData &state, Array2<Real64> &a, int const n, Array1D_int &indx, Real64 &d, int &nperr, std::string &ErrorMessage)
     {
 
         // Locals
-        int constexpr NMAX(500);
-        static Array1D<Real64> vv(NMAX);  // TODO: Make this a state variable
-
-        Real64 const TINY(1.0e-20);
+        Real64 constexpr TINY(1.0e-20);
 
         int i;
         int imax;
@@ -331,7 +329,7 @@ namespace TARCOGCommon {
                 ErrorMessage = "Singular matrix in ludcmp.";
                 return;
             }
-            vv(i) = 1.0 / aamax;
+            state.dataTARCOGCommon->vv(i) = 1.0 / aamax;
         } // i
 
         for (j = 1; j <= n; ++j) {
@@ -349,7 +347,7 @@ namespace TARCOGCommon {
                     sum -= a(k, i) * a(j, k);
                 } // k
                 a(j, i) = sum;
-                dum = vv(i) * std::abs(sum);
+                dum = state.dataTARCOGCommon->vv(i) * std::abs(sum);
                 if (dum >= aamax) {
                     imax = i;
                     aamax = dum;
@@ -362,7 +360,7 @@ namespace TARCOGCommon {
                     a(k, j) = dum;
                 } // k
                 d = -d;
-                vv(imax) = vv(j);
+                state.dataTARCOGCommon->vv(imax) = state.dataTARCOGCommon->vv(j);
             }
             indx(j) = imax;
             if (a(j, j) == 0.0) a(j, j) = TINY;

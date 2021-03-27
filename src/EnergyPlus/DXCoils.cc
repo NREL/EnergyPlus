@@ -8253,7 +8253,7 @@ namespace EnergyPlus::DXCoils {
 
         Real64 locFanElecPower = 0.0;
         if (Coil.SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-            locFanElecPower = HVACFan::fanObjs[Coil.SupplyFanIndex]->fanPower();
+            locFanElecPower = state.dataHVACFan->fanObjs[Coil.SupplyFanIndex]->fanPower();
         } else {
             locFanElecPower = Fans::GetFanPower(state, Coil.SupplyFanIndex);
         }
@@ -13628,8 +13628,8 @@ namespace EnergyPlus::DXCoils {
                 }
                 FanStaticPressureRise = ExternalStatic + state.dataDXCoils->DXCoil(DXCoilNum).InternalStaticPressureDrop;
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-                    FanInletNode = HVACFan::fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->inletNodeNum;
-                    FanOutletNode = HVACFan::fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->outletNodeNum;
+                    FanInletNode = state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->inletNodeNum;
+                    FanOutletNode = state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->outletNodeNum;
                 } else {
                     FanInletNode = Fans::GetFanInletNode(state, "FAN:VARIABLEVOLUME", state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName, ErrorsFound);
                     FanOutletNode = Fans::GetFanOutletNode(state, "FAN:VARIABLEVOLUME", state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName, ErrorsFound);
@@ -13644,8 +13644,8 @@ namespace EnergyPlus::DXCoils {
                 state.dataLoopNodes->Node(FanInletNode).Enthalpy =
                     PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, state.dataLoopNodes->Node(FanInletNode).HumRat);
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-                    HVACFan::fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
-                    FanPowerCorrection = HVACFan::fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->fanPower();
+                    state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
+                    FanPowerCorrection = state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->fanPower();
                 } else {
                     Fans::SimulateFanComponents(
                         state, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName, true, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);
@@ -13786,8 +13786,8 @@ namespace EnergyPlus::DXCoils {
                     state.dataLoopNodes->Node(FanInletNode).Enthalpy = PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat);
 
                     if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
-                        FanPowerCorrection = HVACFan::fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->fanPower();
+                        state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
+                        FanPowerCorrection = state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->fanPower();
                     } else {
                         Fans::SimulateFanComponents(
                             state, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName, true, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);
@@ -14145,7 +14145,7 @@ namespace EnergyPlus::DXCoils {
             state.dataLoopNodes->Node(FanInletNodeNum).Enthalpy =
                 PsyHFnTdbW(IndoorUnitInletDryBulb, state.dataLoopNodes->Node(FanInletNodeNum).HumRat);
             if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
+                state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
             } else {
                 Fans::SimulateFanComponents(
                     state, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName, true, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);
@@ -15173,7 +15173,7 @@ namespace EnergyPlus::DXCoils {
                     state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
-                                                                 HVACFan::fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->name,
+                                                                 state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->name,
                                                                  DataAirSystems::objectVectorOOFanSystemModel,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
                 } else {

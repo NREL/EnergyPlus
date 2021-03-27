@@ -4599,7 +4599,7 @@ namespace HeatBalanceManager {
 
             std::string window5DataFileName;
             if (ConstructAlphas(1) == "") {
-                window5DataFileName = CurrentWorkingFolder + "Window5DataFile.dat";
+                window5DataFileName = state.dataStrGlobals->CurrentWorkingFolder + "Window5DataFile.dat";
             } else {
                 window5DataFileName = ConstructAlphas(1);
             }
@@ -4729,8 +4729,8 @@ namespace HeatBalanceManager {
         state.dataGlobal->NumOfZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         state.dataHeatBal->Zone.allocate(state.dataGlobal->NumOfZones);
-        DataViewFactorInformation::ZoneRadiantInfo.allocate(state.dataGlobal->NumOfZones);
-        DataViewFactorInformation::ZoneSolarInfo.allocate(state.dataGlobal->NumOfZones);
+        state.dataViewFactor->ZoneRadiantInfo.allocate(state.dataGlobal->NumOfZones);
+        state.dataViewFactor->ZoneSolarInfo.allocate(state.dataGlobal->NumOfZones);
         state.dataDaylightingData->ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
 
         ZoneLoop = 0;
@@ -8847,7 +8847,7 @@ namespace HeatBalanceManager {
             // Basis matrix
             // ***************************************************************************************
             state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMatIndex = MatrixIndex(state, locAlphaArgs(5));
-            Get2DMatrixDimensions(state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMatIndex, NumRows, NumCols);
+            Get2DMatrixDimensions(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMatIndex, NumRows, NumCols);
             state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMatNrows = NumRows;
             state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMatNcols = NumCols;
 
@@ -8861,7 +8861,7 @@ namespace HeatBalanceManager {
                                       "\" invalid matrix dimensions.  Basis matrix dimension can only be 2 x 1.");
             }
             state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMat.allocate(NumCols, NumRows);
-            Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMatIndex,
+            Get2DMatrix(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMatIndex,
                         state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMat);
             if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType == DataBSDFWindow::BasisType_WINDOW)
                 CalculateBasisLength(state,
@@ -8895,7 +8895,7 @@ namespace HeatBalanceManager {
                 // Solar front transmittance
                 // *******************************************************************************
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransIndex = MatrixIndex(state, locAlphaArgs(6));
-                Get2DMatrixDimensions(state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransIndex, NumRows, NumCols);
+                Get2DMatrixDimensions(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransIndex, NumRows, NumCols);
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransNrows = NumRows;
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransNcols = NumCols;
 
@@ -8932,7 +8932,7 @@ namespace HeatBalanceManager {
                     ShowContinueError(state,
                                       "Solar front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(6) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransIndex,
+                    Get2DMatrix(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransIndex,
                                 state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTrans);
                 }
 
@@ -8940,7 +8940,7 @@ namespace HeatBalanceManager {
                 // Solar back reflectance
                 // *******************************************************************************
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflIndex = MatrixIndex(state, locAlphaArgs(7));
-                Get2DMatrixDimensions(state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflIndex, NumRows, NumCols);
+                Get2DMatrixDimensions(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflIndex, NumRows, NumCols);
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflNrows = NumRows;
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflNcols = NumCols;
 
@@ -8972,7 +8972,7 @@ namespace HeatBalanceManager {
                     ShowContinueError(state,
                                       "Solar back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(7) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflIndex,
+                    Get2DMatrix(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflIndex,
                                 state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkRefl);
                 }
 
@@ -8980,7 +8980,7 @@ namespace HeatBalanceManager {
                 // Visible front transmittance
                 // *******************************************************************************
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransIndex = MatrixIndex(state, locAlphaArgs(8));
-                Get2DMatrixDimensions(state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransIndex, NumRows, NumCols);
+                Get2DMatrixDimensions(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransIndex, NumRows, NumCols);
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransNrows = NumRows;
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransNcols = NumCols;
 
@@ -9012,7 +9012,7 @@ namespace HeatBalanceManager {
                     ShowContinueError(
                         state, "Visible front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(8) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransIndex,
+                    Get2DMatrix(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransIndex,
                                 state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTrans);
                 }
 
@@ -9020,7 +9020,7 @@ namespace HeatBalanceManager {
                 // Visible back reflectance
                 // *******************************************************************************
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflIndex = MatrixIndex(state, locAlphaArgs(9));
-                Get2DMatrixDimensions(state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflIndex, NumRows, NumCols);
+                Get2DMatrixDimensions(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflIndex, NumRows, NumCols);
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflNrows = NumRows;
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflNcols = NumCols;
 
@@ -9051,7 +9051,7 @@ namespace HeatBalanceManager {
                     ShowContinueError(state,
                                       "Visble back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(9) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflIndex,
+                    Get2DMatrix(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflIndex,
                                 state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkRefl);
                 }
 
@@ -9074,7 +9074,7 @@ namespace HeatBalanceManager {
                         // *******************************************************************************
                         state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex =
                             MatrixIndex(state, locAlphaArgs(AlphaIndex));
-                        Get2DMatrixDimensions(
+                        Get2DMatrixDimensions(state, 
                             state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex, NumRows, NumCols);
 
                         if (NumRows != 1) {
@@ -9113,7 +9113,7 @@ namespace HeatBalanceManager {
                                                      locAlphaArgs(AlphaIndex),
                                                      currentOpticalLayer));
                         } else {
-                            Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex,
+                            Get2DMatrix(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex,
                                         state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbs);
                         }
 
@@ -9123,7 +9123,7 @@ namespace HeatBalanceManager {
                         // *******************************************************************************
                         state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex =
                             MatrixIndex(state, locAlphaArgs(AlphaIndex));
-                        Get2DMatrixDimensions(
+                        Get2DMatrixDimensions(state, 
                             state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex, NumRows, NumCols);
 
                         if (NumRows != 1) {
@@ -9161,7 +9161,7 @@ namespace HeatBalanceManager {
                                                      locAlphaArgs(AlphaIndex),
                                                      currentOpticalLayer));
                         } else {
-                            Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex,
+                            Get2DMatrix(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex,
                                         state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbs);
                         }
                     } // if (Mod(Layer, 2) <> 0) then
@@ -9175,7 +9175,7 @@ namespace HeatBalanceManager {
                 // Solar front transmittance
                 // *******************************************************************************
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransIndex = MatrixIndex(state, locAlphaArgs(6));
-                Get2DMatrixDimensions(state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransIndex, NumRows, NumCols);
+                Get2DMatrixDimensions(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransIndex, NumRows, NumCols);
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransNrows = NBasis;
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransNcols = NBasis;
 
@@ -9207,7 +9207,7 @@ namespace HeatBalanceManager {
                     ShowContinueError(state,
                                       "Solar front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(6) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransIndex, state.dataBSDFWindow->BSDFTempMtrx);
+                    Get2DMatrix(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransIndex, state.dataBSDFWindow->BSDFTempMtrx);
 
                     state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTrans = 0.0;
                     for (I = 1; I <= NBasis; ++I) {
@@ -9219,7 +9219,7 @@ namespace HeatBalanceManager {
                 // Solar back reflectance
                 // *******************************************************************************
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflIndex = MatrixIndex(state, locAlphaArgs(7));
-                Get2DMatrixDimensions(state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflIndex, NumRows, NumCols);
+                Get2DMatrixDimensions(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflIndex, NumRows, NumCols);
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflNrows = NBasis;
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflNcols = NBasis;
 
@@ -9251,7 +9251,7 @@ namespace HeatBalanceManager {
                     ShowContinueError(state,
                                       "Solar back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(7) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflIndex, state.dataBSDFWindow->BSDFTempMtrx);
+                    Get2DMatrix(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflIndex, state.dataBSDFWindow->BSDFTempMtrx);
                     state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkRefl = 0.0;
                     for (I = 1; I <= NBasis; ++I) {
                         state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkRefl(I, I) = state.dataBSDFWindow->BSDFTempMtrx(I, 1);
@@ -9262,7 +9262,7 @@ namespace HeatBalanceManager {
                 // Visible front transmittance
                 // *******************************************************************************
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransIndex = MatrixIndex(state, locAlphaArgs(8));
-                Get2DMatrixDimensions(state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransIndex, NumRows, NumCols);
+                Get2DMatrixDimensions(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransIndex, NumRows, NumCols);
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransNrows = NBasis;
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransNcols = NBasis;
 
@@ -9294,7 +9294,7 @@ namespace HeatBalanceManager {
                     ShowContinueError(
                         state, "Visible front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(8) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransIndex, state.dataBSDFWindow->BSDFTempMtrx);
+                    Get2DMatrix(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransIndex, state.dataBSDFWindow->BSDFTempMtrx);
                     state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTrans = 0.0;
                     for (I = 1; I <= NBasis; ++I) {
                         state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTrans(I, I) = state.dataBSDFWindow->BSDFTempMtrx(I, 1);
@@ -9305,7 +9305,7 @@ namespace HeatBalanceManager {
                 // Visible back reflectance
                 // *******************************************************************************
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflIndex = MatrixIndex(state, locAlphaArgs(9));
-                Get2DMatrixDimensions(state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflIndex, NumRows, NumCols);
+                Get2DMatrixDimensions(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflIndex, NumRows, NumCols);
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflNrows = NBasis;
                 state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflNcols = NBasis;
 
@@ -9337,7 +9337,7 @@ namespace HeatBalanceManager {
                     ShowContinueError(state,
                                       "Visible back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(9) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflIndex, state.dataBSDFWindow->BSDFTempMtrx);
+                    Get2DMatrix(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflIndex, state.dataBSDFWindow->BSDFTempMtrx);
                     state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkRefl = 0.0;
                     for (I = 1; I <= NBasis; ++I) {
                         state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkRefl(I, I) = state.dataBSDFWindow->BSDFTempMtrx(I, 1);
@@ -9372,7 +9372,7 @@ namespace HeatBalanceManager {
                         ++AlphaIndex;
                         state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex =
                             MatrixIndex(state, locAlphaArgs(AlphaIndex));
-                        Get2DMatrixDimensions(
+                        Get2DMatrixDimensions(state, 
                             state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex, NumRows, NumCols);
 
                         if (NumRows != 1) {
@@ -9412,7 +9412,7 @@ namespace HeatBalanceManager {
                                                      locAlphaArgs(AlphaIndex),
                                                      currentOpticalLayer));
                         } else {
-                            Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex,
+                            Get2DMatrix(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex,
                                         state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbs);
                         }
 
@@ -9422,7 +9422,7 @@ namespace HeatBalanceManager {
                         ++AlphaIndex;
                         state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex =
                             MatrixIndex(state, locAlphaArgs(AlphaIndex));
-                        Get2DMatrixDimensions(
+                        Get2DMatrixDimensions(state, 
                             state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex, NumRows, NumCols);
 
                         if (NumRows != 1) {
@@ -9461,7 +9461,7 @@ namespace HeatBalanceManager {
                                                      locAlphaArgs(AlphaIndex),
                                                      currentOpticalLayer));
                         } else {
-                            Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex,
+                            Get2DMatrix(state, state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex,
                                         state.dataConstruction->Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbs);
                         }
                     } // if (Mod(Layer, 2) <> 0) then

@@ -86,9 +86,6 @@ namespace MatrixDataManager {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    int const TwoDimensional(2);
-
-    int NumMats; // number of matracies in input file
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
@@ -101,7 +98,6 @@ namespace MatrixDataManager {
     // PUBLIC GetMatrixName
 
     // Object Data
-    Array1D<MatrixDataStruct> MatData;
 
 // MSVC was complaining that it detected a divide by zero in the Row = (El - 1) / NumCols + 1 line, indicating it thought NumCols was zero
 // the compiler should never have been able to identify that, as NumCols is based directly on rNumericArgs, which is based on input values
@@ -138,9 +134,9 @@ namespace MatrixDataManager {
         cCurrentModuleObject = "Matrix:TwoDimension";
         NumTwoDimMatrix = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        NumMats = NumTwoDimMatrix;
+        state.dataMatrixDataManager->NumMats = NumTwoDimMatrix;
 
-        MatData.allocate(NumMats);
+        state.dataMatrixDataManager->MatData.allocate(state.dataMatrixDataManager->NumMats);
 
         MatNum = 0;
         for (MatIndex = 1; MatIndex <= NumTwoDimMatrix; ++MatIndex) {
@@ -159,7 +155,7 @@ namespace MatrixDataManager {
             ++MatNum;
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            MatData(MatNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataMatrixDataManager->MatData(MatNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             NumRows = std::floor(state.dataIPShortCut->rNumericArgs(1));
             NumCols = std::floor(state.dataIPShortCut->rNumericArgs(2));
             NumElements = NumRows * NumCols;
@@ -177,9 +173,9 @@ namespace MatrixDataManager {
                                   state.dataIPShortCut->cNumericFieldNames(2));
                 ErrorsFound = true;
             }
-            MatData(MatNum).MatrixType = TwoDimensional;
+            state.dataMatrixDataManager->MatData(MatNum).MatrixType = TwoDimensional;
             // Note With change to row-major arrays the "row" and "col" usage here is transposed
-            auto &matrix(MatData(MatNum).Mat2D);
+            auto &matrix(state.dataMatrixDataManager->MatData(MatNum).Mat2D);
             matrix.allocate(NumCols, NumRows); // This is standard order for a NumRows X NumCols matrix
             Array2<Real64>::size_type l(0);
             for (int ElementNum = 1; ElementNum <= NumElements; ++ElementNum, l += matrix.size()) {
@@ -222,8 +218,8 @@ namespace MatrixDataManager {
             GetMatrixInputFlag = false;
         }
 
-        if (NumMats > 0) {
-            MatrixIndexPtr = UtilityRoutines::FindItemInList(MatrixName, MatData);
+        if (state.dataMatrixDataManager->NumMats > 0) {
+            MatrixIndexPtr = UtilityRoutines::FindItemInList(MatrixName, state.dataMatrixDataManager->MatData);
         } else {
             MatrixIndexPtr = 0;
         }
@@ -231,7 +227,8 @@ namespace MatrixDataManager {
         return MatrixIndexPtr;
     }
 
-    void Get2DMatrix(int const Idx, // pointer index to location in MatData
+    void Get2DMatrix(EnergyPlusData &state,
+                     int const Idx, // pointer index to location in MatData
                      Array2S<Real64> Mat2D)
     {
 
@@ -245,13 +242,14 @@ namespace MatrixDataManager {
         // pass matrix to calling routine
 
         if (Idx > 0) { // protect hard crash
-            Mat2D = MatData(Idx).Mat2D;
+            Mat2D = state.dataMatrixDataManager->MatData(Idx).Mat2D;
         } else {
             // do nothing (?) throw dev error
         }
     }
 
-    void Get2DMatrixDimensions(int const Idx, // pointer index to location in MatData
+    void Get2DMatrixDimensions(EnergyPlusData &state,
+                               int const Idx, // pointer index to location in MatData
                                int &NumRows,
                                int &NumCols)
     {
@@ -266,8 +264,8 @@ namespace MatrixDataManager {
         // <description>
 
         if (Idx > 0) {
-            NumRows = MatData(Idx).Mat2D.isize(2);
-            NumCols = MatData(Idx).Mat2D.isize(1);
+            NumRows = state.dataMatrixDataManager->MatData(Idx).Mat2D.isize(2);
+            NumCols = state.dataMatrixDataManager->MatData(Idx).Mat2D.isize(1);
         } else {
             // do nothing (?) throw dev error?
         }

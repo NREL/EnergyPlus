@@ -84,8 +84,6 @@ namespace EnergyPlus {
 
 namespace FourPipeBeam {
 
-    Array1D<std::shared_ptr<HVACFourPipeBeam>> FourPipeBeams; // dimension to number of machines
-
     //    HVACFourPipeBeam::HVACFourPipeBeam(){}
     ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
     std::shared_ptr<AirTerminalUnit> HVACFourPipeBeam::fourPipeBeamFactory(EnergyPlusData &state, std::string objectName)
@@ -462,7 +460,7 @@ namespace FourPipeBeam {
         }
 
         if (found && !ErrorsFound) {
-            FourPipeBeams.push_back(thisBeam);
+            state.dataFourPipeBeam->FourPipeBeams.push_back(thisBeam);
             return thisBeam;
         } else {
             ShowFatalError(state, routineName + "Errors found in getting input. Preceding conditions cause termination.");

@@ -136,10 +136,10 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
             }
         }
         std::shared_ptr<std::ofstream> errorStream =
-            std::make_shared<std::ofstream>(DataStringGlobals::outputSqliteErrFileName, std::ofstream::out | std::ofstream::trunc);
+            std::make_shared<std::ofstream>(state.dataStrGlobals->outputSqliteErrFileName, std::ofstream::out | std::ofstream::trunc);
         return std::unique_ptr<SQLite>(new SQLite(errorStream,
-                                                  DataStringGlobals::outputSqlFileName,
-                                                  DataStringGlobals::outputSqliteErrFileName,
+                                                  state.dataStrGlobals->outputSqlFileName,
+                                                  state.dataStrGlobals->outputSqliteErrFileName,
                                                   writeOutputToSQLite,
                                                   writeTabularDataToSQLite));
     } catch (const std::runtime_error &error) {

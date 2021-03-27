@@ -107,8 +107,9 @@ namespace Psychrometrics {
     constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychrometric routines that
 
     std::string const blank_string;
+
 #ifdef EP_psych_stats
-    extern Array1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 -
+extern Array1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 -
                                                  // max iter | 18 - PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw (raw calc)
 
     extern Array1D_bool const PsyReportIt; // PsyTdpFnTdbTwbPb     1 | PsyRhFnTdbWPb        2 | PsyTwbFnTdbWPb       3 | PsyVFnTdbWPb         4 |
@@ -145,13 +146,6 @@ namespace Psychrometrics {
     // na
 
     // MODULE VARIABLE DEFINITIONS:
-    extern std::string String;
-    extern bool ReportErrors;
-    extern Array1D_int iPsyErrIndex; // Number of times error occurred
-#ifdef EP_psych_stats
-    extern Array1D<Int64> NumTimesCalled;
-    extern Array1D_int NumIterations;
-#endif
 
     // DERIVED TYPE DEFINITIONS
 
@@ -1396,9 +1390,36 @@ namespace Psychrometrics {
 
 struct PsychrometricsData : BaseGlobalStruct
 {
+    Real64 iconvTol = 0.0001;
+    Real64 last_Patm = -99999.0;  // barometric pressure {Pascals}  (last)
+    Real64 last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
+    Real64 Press_Save = -99999.0;
+    Real64 tSat_Save = -99999.0;
+
+#ifdef EP_psych_stats
+    Array1D<Int64> NumTimesCalled = Array1D<Int64>(NumPsychMonitors, 0);
+    Array1D_int NumIterations = Array1D_int(NumPsychMonitors, 0);
+#endif
+
+    Array1D_int iPsyErrIndex = Array1D_int(Psychrometrics::NumPsychMonitors, 0); // Number of times error occurred
+    std::string String;
+    bool ReportErrors = true;
 
     void clear_state() override
     {
+        iPsyErrIndex = Array1D_int(Psychrometrics::NumPsychMonitors, 0);
+        iconvTol = 0.0001;
+        last_Patm = -99999.0;  // barometric pressure {Pascals}  (last)
+        last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
+        Press_Save = -99999.0;
+        tSat_Save = -99999.0;
+        String = "";
+        ReportErrors = true;
+
+#ifdef EP_psych_stats
+        NumTimesCalled = Array1D<Int64>(NumPsychMonitors, 0);
+        NumIterations = Array1D_int(NumPsychMonitors, 0);
+#endif
     }
 };
 

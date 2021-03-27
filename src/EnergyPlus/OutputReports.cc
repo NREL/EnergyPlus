@@ -218,29 +218,19 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
 
     static std::string const vertexstring("X,Y,Z ==> Vertex");
 
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static bool optiondone(false);
-    static std::string lastoption;
-
     if (state.dataSurface->TotSurfaces > 0 && !allocated(state.dataSurface->Surface)) {
         // no error needed, probably in end processing, just return
         return;
     }
 
-    if (optiondone) {
-        ShowWarningError(state, "Report of Surfaces/Lines Option has already been completed with option=" + lastoption);
+    if (state.dataOutputReports->optiondone) {
+        ShowWarningError(state, "Report of Surfaces/Lines Option has already been completed with option=" + state.dataOutputReports->lastoption);
         ShowContinueError(state, "..option=\"" + option + "\" will not be done this time.");
         return;
     }
 
-    lastoption = option;
-    optiondone = true;
+    state.dataOutputReports->lastoption = option;
+    state.dataOutputReports->optiondone = true;
 
     auto slnfile = state.files.sln.open(state, "LinesOut", state.files.outputControl.sln);
 

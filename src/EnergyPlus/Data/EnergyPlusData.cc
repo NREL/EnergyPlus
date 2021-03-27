@@ -53,14 +53,11 @@
 namespace EnergyPlus {
 
     EnergyPlusData::EnergyPlusData() {
-        // todo, try to eliminate the need for the singleton
-        IOFiles::setSingleton(&files);
-
         this->dataAirLoop = std::make_unique<DataAirLoopData>();
         this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
         this->dataAirSystemsData = std::make_unique<AirSystemsData>();
-        this->dataAirflowNetworkBalanceManager = std::make_unique<AirflowNetworkBalanceManagerData>();
         this->dataAirflowNetwork = std::make_unique<AirflowNetworkData>();
+        this->dataAirflowNetworkBalanceManager = std::make_unique<AirflowNetworkBalanceManagerData>();
         this->dataAutoSizingBase = std::make_unique<AutoSizingBaseData>();
         this->dataBSDFWindow = std::make_unique<BSDFWindowData>();
         this->dataBaseSizerFanHeatInputs = std::make_unique<BaseSizerWithFanHeatInputsData>();
@@ -180,6 +177,7 @@ namespace EnergyPlus {
         this->dataLoopNodes = std::make_unique<LoopNodeData>();
         this->dataLowTempRadSys = std::make_unique<LowTempRadiantSystemData>();
         this->dataMaterial = std::make_unique<MaterialData>();
+        this->dataMatrixDataManager = std::make_unique<MatrixDataManagerData>();
         this->dataMircoturbElectGen = std::make_unique<MicroturbineElectricGeneratorData>();
         this->dataMixedAir = std::make_unique<MixedAirData>();
         this->dataMixerComponent = std::make_unique<MixerComponentData>();
@@ -190,11 +188,12 @@ namespace EnergyPlus {
         this->dataNodeInputMgr = std::make_unique<NodeInputManagerData>();
         this->dataOutAirNodeMgr = std::make_unique<OutAirNodeManagerData>();
         this->dataOutRptPredefined = std::make_unique<OutputReportPredefinedData>();
+        this->dataOutRptTab = std::make_unique<OutputReportTabularData>();
         this->dataOutdoorAirUnit = std::make_unique<OutdoorAirUnitData>();
         this->dataOutput = std::make_unique<OutputsData>();
         this->dataOutputProcessor = std::make_unique<OutputProcessorData>();
-        this->dataOutRptTab = std::make_unique<OutputReportTabularData>();
         this->dataOutputReportTabularAnnual = std::make_unique<OutputReportTabularAnnualData>();
+        this->dataOutputReports = std::make_unique<OutputReportsData>();
         this->dataOutsideEnergySrcs = std::make_unique<OutsideEnergySourcesData>();
         this->dataPTHP = std::make_unique<PackagedTerminalHeatPumpData>();
         this->dataPVWatts = std::make_unique<PVWattsData>();
@@ -260,9 +259,14 @@ namespace EnergyPlus {
         this->dataSysRpts = std::make_unique<SystemReportsData>();
         this->dataSysVars = std::make_unique<SystemVarsData>();
         this->dataSystemAvailabilityManager = std::make_unique<SystemAvailabilityManagerData>();
+        this->dataTARCOGCommon = std::make_unique<TARCOGCommonData>();
         this->dataTARCOGOutputs = std::make_unique<TARCOGOutputData>();
         this->dataThermalChimneys = std::make_unique<ThermalChimneysData>();
         this->dataThermalComforts = std::make_unique<ThermalComfortsData>();
+        this->dataThermalISO15099Calc = std::make_unique<ThermalISO15099CalcData>();
+        this->dataTARCOGGasses90 = std::make_unique<TARCOGGasses90Data>();
+        this->dataTARCOGMain = std::make_unique<TARCOGMainData>();
+        this->dataTarcogShading = std::make_unique<TarcogShadingData>();
         this->dataTimingsData = std::make_unique<DataTimingsData>();
         this->dataTranspiredCollector = std::make_unique<TranspiredCollectorData>();
         this->dataUCSDShared = std::make_unique<UCSDSharedData>();
@@ -305,8 +309,8 @@ namespace EnergyPlus {
         this->dataAirLoop->clear_state();
         this->dataAirLoopHVACDOAS->clear_state();
         this->dataAirSystemsData->clear_state();
-        this->dataAirflowNetworkBalanceManager->clear_state();
         this->dataAirflowNetwork->clear_state();
+        this->dataAirflowNetworkBalanceManager->clear_state();
         this->dataAutoSizingBase->clear_state();
         this->dataBSDFWindow->clear_state();
         this->dataBaseSizerFanHeatInputs->clear_state();
@@ -426,6 +430,7 @@ namespace EnergyPlus {
         this->dataLoopNodes->clear_state();
         this->dataLowTempRadSys->clear_state();
         this->dataMaterial->clear_state();
+        this->dataMatrixDataManager->clear_state();
         this->dataMircoturbElectGen->clear_state();
         this->dataMixedAir->clear_state();
         this->dataMixerComponent->clear_state();
@@ -436,11 +441,12 @@ namespace EnergyPlus {
         this->dataNodeInputMgr->clear_state();
         this->dataOutAirNodeMgr->clear_state();
         this->dataOutRptPredefined->clear_state();
+        this->dataOutRptTab->clear_state();
         this->dataOutdoorAirUnit->clear_state();
         this->dataOutput->clear_state();
         this->dataOutputProcessor->clear_state();
-        this->dataOutRptTab->clear_state();
         this->dataOutputReportTabularAnnual->clear_state();
+        this->dataOutputReports->clear_state();
         this->dataOutsideEnergySrcs->clear_state();
         this->dataPTHP->clear_state();
         this->dataPVWatts->clear_state();
@@ -506,9 +512,14 @@ namespace EnergyPlus {
         this->dataSysRpts->clear_state();
         this->dataSysVars->clear_state();
         this->dataSystemAvailabilityManager->clear_state();
+        this->dataTARCOGCommon->clear_state();
         this->dataTARCOGOutputs->clear_state();
         this->dataThermalChimneys->clear_state();
         this->dataThermalComforts->clear_state();
+        this->dataThermalISO15099Calc->clear_state();
+        this->dataTARCOGGasses90->clear_state();
+        this->dataTARCOGMain->clear_state();
+        this->dataTarcogShading->clear_state();
         this->dataTimingsData->clear_state();
         this->dataTranspiredCollector->clear_state();
         this->dataUCSDShared->clear_state();

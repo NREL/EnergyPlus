@@ -2628,5 +2628,5 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ShadingFlagTest)
     EXPECT_TRUE(ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadingFlag));
 
     ShadingFlag = WinShadingType::GlassConditionallyLightened;
-    IS_SHADED_NO_GLARE_CTRL(ANY_BETWEENGLASS_SHADE_BLIND(ShadingFlag));
+    EXPECT_FALSE(IS_SHADED_NO_GLARE_CTRL(ShadingFlag));
 }

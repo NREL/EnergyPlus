@@ -1514,7 +1514,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                 SumAllInternalCO2Gains(state, Loop, state.dataContaminantBalance->ZoneCO2Gain(Loop));
-                if (HybridModel::FlagHybridModel_PC) {
+                if (state.dataHybridModel->FlagHybridModel_PC) {
                     SumAllInternalCO2GainsExceptPeople(state, Loop, state.dataContaminantBalance->ZoneCO2GainExceptPeople(Loop));
                 }
                 SumInternalCO2GainsByTypes(state, Loop, Array1D_int(1, IntGainTypeOf_People), state.dataContaminantBalance->ZoneCO2GainFromPeople(Loop));
@@ -2133,20 +2133,19 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
         Real64 SysTimeStepInSeconds(0.0);
         SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
 
-        state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredCO2Concentration = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneMeasuredCO2ConcentrationSchedulePtr);
+        state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredCO2Concentration = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneMeasuredCO2ConcentrationSchedulePtr);
 
-        if (state.dataEnvrn->DayOfYear >= HybridModelZone(ZoneNum).HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= HybridModelZone(ZoneNum).HybridEndDayOfYear) {
+        if (state.dataEnvrn->DayOfYear >= state.dataHybridModel->HybridModelZone(ZoneNum).HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= state.dataHybridModel->HybridModelZone(ZoneNum).HybridEndDayOfYear) {
             state.dataContaminantBalance->ZoneAirCO2(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredCO2Concentration;
 
-            if (HybridModelZone(ZoneNum).InfiltrationCalc_C && state.dataHVACGlobal->UseZoneTimeStepHistory) {
+            if (state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_C && state.dataHVACGlobal->UseZoneTimeStepHistory) {
                 static std::string const RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
-
                 // Conditionally calculate the CO2-dependent and CO2-independent terms.
-                if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
+                if (state.dataHybridModel->HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
                     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
+                        GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
                     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirCO2ConcentrationSchedulePtr);
+                        GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneSupplyAirCO2ConcentrationSchedulePtr);
 
                     SumSysM_HM = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate;
                     SumSysMxCO2_HM = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration;
@@ -2184,11 +2183,10 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
             }
 
             // Hybrid Model calculate people count
-            if (HybridModelZone(ZoneNum).PeopleCountCalc_C && state.dataHVACGlobal->UseZoneTimeStepHistory) {
-                state.dataHeatBal->Zone(ZoneNum).ZonePeopleActivityLevel = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
-                ActivityLevel = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
-                CO2GenRate = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZonePeopleCO2GenRateSchedulePtr);
-
+            if (state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_C && state.dataHVACGlobal->UseZoneTimeStepHistory) {
+                state.dataHeatBal->Zone(ZoneNum).ZonePeopleActivityLevel = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
+                ActivityLevel = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
+                CO2GenRate = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZonePeopleCO2GenRateSchedulePtr);
                 if (ActivityLevel <= 0.0) {
                     ActivityLevel = 130.0; // 130.0 is the default people activity level [W]
                 }
@@ -2198,11 +2196,11 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                 }
 
                 // Conditionally calculate the CO2-dependent and CO2-independent terms.
-                if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
+                if (state.dataHybridModel->HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
                     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
+                        GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
                     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirCO2ConcentrationSchedulePtr);
+                        GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneSupplyAirCO2ConcentrationSchedulePtr);
 
                     SumSysM_HM = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate;
                     SumSysMxCO2_HM = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration;
@@ -2543,7 +2541,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
 
                 state.dataContaminantBalance->ZoneAirCO2(ZoneNum) = state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum);
 
-                if ((HybridModelZone(ZoneNum).InfiltrationCalc_C || HybridModelZone(ZoneNum).PeopleCountCalc_C) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
+                if ((state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_C || state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_C) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
                     InverseModelCO2(state, ZoneNum, CO2Gain, CO2GainExceptPeople, ZoneMassFlowRate, CO2MassFlowRate, RhoAir);
                 }
                 // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone

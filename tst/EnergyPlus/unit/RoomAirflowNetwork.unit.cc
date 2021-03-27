@@ -122,7 +122,7 @@ protected:
         state->dataAirflowNetwork->AirflowNetworkLinkageData.allocate(5);
         state->dataAirflowNetwork->AirflowNetworkNodeSimu.allocate(6);
         state->dataAirflowNetwork->AirflowNetworkLinkSimu.allocate(5);
-        RAFN.allocate(state->dataGlobal->NumOfZones);
+        state->dataRoomAirflowNetModel->RAFN.allocate(state->dataGlobal->NumOfZones);
     }
 
     virtual void TearDown()
@@ -289,7 +289,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
                                      PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
 
     RoomAirNode = 1;
-    auto &thisRAFN(RAFN(ZoneNum));
+    auto &thisRAFN(state->dataRoomAirflowNetModel->RAFN(ZoneNum));
     thisRAFN.ZoneNum = ZoneNum;
 
     thisRAFN.InitRoomAirModelAirflowNetwork(*state, RoomAirNode);

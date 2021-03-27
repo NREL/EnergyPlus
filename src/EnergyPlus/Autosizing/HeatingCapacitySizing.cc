@@ -286,7 +286,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanTypeNum ==
                             SimAirServingZones::Fan_System_Object) {
                         int FanIndex = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanIndex;
-                        Real64 DeltaT = HVACFan::fanObjs[FanIndex]->getFanDesignTemperatureRise(state);
+                        Real64 DeltaT = state.dataHVACFan->fanObjs[FanIndex]->getFanDesignTemperatureRise(state);
                         CoilInTemp += DeltaT;
                     }
                 } else {

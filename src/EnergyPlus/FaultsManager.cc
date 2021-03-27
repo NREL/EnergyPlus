@@ -906,8 +906,7 @@ namespace FaultsManager {
                     }
 
                     // Check the coil name and coil type
-                    int CoilSysNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName,
-                                                                     state.dataHVACDXSys->DXCoolingSystem);
+                    int CoilSysNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName, state.dataHVACDXSys->DXCoolingSystem);
                     if (CoilSysNum <= 0) {
                         ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                         cAlphaArgs(5) + "\" not found.");

@@ -767,7 +767,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         int InstructionNum;
         int InstructionNum2;
         int ExpressionNum;
-        int VariableNum;
+        int ESVariableNum;
         int WhileLoopExitCounter;      // to avoid infinite loop in While loop
         bool seriousErrorFound(false); // once it gets set true (inside EvaluateExpresssion) it will trigger a fatal (in WriteTrace)
 
@@ -793,12 +793,12 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                 } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordSet) {
 
                     ReturnValue = EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
-                    VariableNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-                    if ((!state.dataRuntimeLang->ErlVariable(VariableNum).ReadOnly) && (!state.dataRuntimeLang->ErlVariable(VariableNum).Value.TrendVariable)) {
-                        state.dataRuntimeLang->ErlVariable(VariableNum).Value = ReturnValue;
-                    } else if (state.dataRuntimeLang->ErlVariable(VariableNum).Value.TrendVariable) {
-                        state.dataRuntimeLang->ErlVariable(VariableNum).Value.Number = ReturnValue.Number;
-                        state.dataRuntimeLang->ErlVariable(VariableNum).Value.Error = ReturnValue.Error;
+                    ESVariableNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+                    if ((!state.dataRuntimeLang->ErlVariable(ESVariableNum).ReadOnly) && (!state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.TrendVariable)) {
+                        state.dataRuntimeLang->ErlVariable(ESVariableNum).Value = ReturnValue;
+                    } else if (state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.TrendVariable) {
+                        state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.Number = ReturnValue.Number;
+                        state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.Error = ReturnValue.Error;
                     }
 
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
@@ -1020,9 +1020,6 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         int CountDoLooping;
         bool LastED; // last character in a numeric was an E or D
 
-        // Object Data
-        auto & Token = state.dataRuntimeLangProcessor->Token;
-
         CountDoLooping = 0;
         NumErrors = 0;
         //  Error = 'No errors.'
@@ -1063,7 +1060,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
             }
 
             // Extend the token array
-            Token.redimension(++NumTokens);
+            state.dataRuntimeLangProcessor->PEToken.redimension(++NumTokens);
 
             // Get the next token
             StringToken = "";
@@ -1136,13 +1133,13 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
                 // Save the number token
                 if (!ErrorFlag) {
-                    Token(NumTokens).Type = TokenNumber;
-                    Token(NumTokens).String = StringToken;
+                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = TokenNumber;
+                    state.dataRuntimeLangProcessor->PEToken(NumTokens).String = StringToken;
                     if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "Number=\"{}\"\n", StringToken);
-                    Token(NumTokens).Number = UtilityRoutines::ProcessNumber(StringToken, ErrorFlag);
+                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Number = UtilityRoutines::ProcessNumber(StringToken, ErrorFlag);
                     if (state.dataSysVars->DeveloperFlag && ErrorFlag) print(state.files.debug, "{}\n", "Numeric error flagged");
                     if (MinusFound) {
-                        Token(NumTokens).Number = -Token(NumTokens).Number;
+                        state.dataRuntimeLangProcessor->PEToken(NumTokens).Number = -state.dataRuntimeLangProcessor->PEToken(NumTokens).Number;
                         MinusFound = false;
                     }
                     if (ErrorFlag) {
@@ -1177,10 +1174,10 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                 }
 
                 // Save the variable token
-                Token(NumTokens).Type = TokenVariable;
-                Token(NumTokens).String = StringToken;
+                state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = TokenVariable;
+                state.dataRuntimeLangProcessor->PEToken(NumTokens).String = StringToken;
                 if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "Variable=\"{}\"\n", StringToken);
-                Token(NumTokens).Variable = NewEMSVariable(state, StringToken, StackNum);
+                state.dataRuntimeLangProcessor->PEToken(NumTokens).Variable = NewEMSVariable(state, StringToken, StackNum);
 
             } else if (is_any_of(NextChar, "+-*/^=<>@|&")) {
                 // Parse an operator token
@@ -1211,11 +1208,11 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         DivFound = false;
                     } else {
                         StringToken = NextChar;
-                        Token(NumTokens).Type = TokenOperator;
+                        state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = TokenOperator;
                     }
                 } else { // any other character process as operator
                     StringToken = NextChar;
-                    Token(NumTokens).Type = TokenOperator;
+                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = TokenOperator;
                 }
 
                 // parse an operator if found,
@@ -1227,8 +1224,8 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     if ((case_insensitive && UtilityRoutines::SameString(potential_match, string)) ||
                         (!case_insensitive && potential_match == string)) {
                         if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "OPERATOR \"{}\"\n", potential_match);
-                        Token(NumTokens).Operator = op;
-                        Token(NumTokens).String = potential_match;
+                        state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = op;
+                        state.dataRuntimeLangProcessor->PEToken(NumTokens).String = potential_match;
                         Pos += (len - 1);
                         return true;
                     } else {
@@ -1291,7 +1288,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     }
                 } else {
                     // Check for remaining single character operators
-                    Token(NumTokens).String = StringToken;
+                    state.dataRuntimeLangProcessor->PEToken(NumTokens).String = StringToken;
                     MultFound = false;
                     DivFound = false;
 
@@ -1299,7 +1296,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
                     if (StringToken == "+") {
                         if (!OperatorProcessing) {
-                            Token(NumTokens).Operator = OperatorAdd;
+                            state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = OperatorAdd;
                             OperatorProcessing = true;
                         } else {
                             PlusFound = true;
@@ -1307,33 +1304,33 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         }
                     } else if (StringToken == "-") {
                         if (!OperatorProcessing) {
-                            Token(NumTokens).Operator = OperatorSubtract;
+                            state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = OperatorSubtract;
                             OperatorProcessing = true;
                         } else {
                             MinusFound = true;
                             OperatorProcessing = false;
                         }
                     } else if (StringToken == "*") {
-                        Token(NumTokens).Operator = OperatorMultiply;
+                        state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = OperatorMultiply;
                         MultFound = true;
                         OperatorProcessing = true;
                     } else if (StringToken == "/") {
-                        Token(NumTokens).Operator = OperatorDivide;
+                        state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = OperatorDivide;
                         DivFound = true;
                         OperatorProcessing = true;
                     } else if (StringToken == "<") {
-                        Token(NumTokens).Operator = OperatorLessThan;
+                        state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = OperatorLessThan;
                         OperatorProcessing = true;
                     } else if (StringToken == ">") {
-                        Token(NumTokens).Operator = OperatorGreaterThan;
+                        state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = OperatorGreaterThan;
                         OperatorProcessing = true;
                     } else if (StringToken == "^") {
-                        Token(NumTokens).Operator = OperatorRaiseToPower;
+                        state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = OperatorRaiseToPower;
                         OperatorProcessing = true;
                     } else if (StringToken == "0" && (NextChar == '-')) {
                         // process string insert = "0"
-                        Token(NumTokens).Type = TokenNumber;
-                        Token(NumTokens).String = StringToken;
+                        state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = TokenNumber;
+                        state.dataRuntimeLangProcessor->PEToken(NumTokens).String = StringToken;
                     } else {
                         // Uh OH, this should never happen! throw error
                         if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "ERROR \"{}\"\n", StringToken);
@@ -1348,13 +1345,13 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                 ++Pos;
                 StringToken = NextChar;
                 if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "PAREN \"{}\"\n", StringToken);
-                Token(NumTokens).Type = TokenParenthesis;
-                Token(NumTokens).String = StringToken;
+                state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = TokenParenthesis;
+                state.dataRuntimeLangProcessor->PEToken(NumTokens).String = StringToken;
                 if (NextChar == '(') {
-                    Token(NumTokens).Parenthesis = ParenthesisLeft;
+                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Parenthesis = ParenthesisLeft;
                     OperatorProcessing = true;
                 }
-                if (NextChar == ')') Token(NumTokens).Parenthesis = ParenthesisRight;
+                if (NextChar == ')') state.dataRuntimeLangProcessor->PEToken(NumTokens).Parenthesis = ParenthesisRight;
 
             } else if (is_any_of(NextChar, "\"")) {
                 // Parse a string literal token
@@ -1371,7 +1368,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
             ShowFatalError(state, "EMS, previous errors cause termination.");
         }
 
-        ExpressionNum = ProcessTokens(state, Token, NumTokens, StackNum, String);
+        ExpressionNum = ProcessTokens(state, state.dataRuntimeLangProcessor->PEToken, NumTokens, StackNum, String);
     }
 
     int ProcessTokens(EnergyPlusData &state, const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString)

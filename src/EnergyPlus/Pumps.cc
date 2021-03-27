@@ -2207,14 +2207,14 @@ namespace EnergyPlus::Pumps {
                 state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMaxRPM = ResolveLoopFlowVsPressure(state, state.dataPumps->PumpEquip(PumpNum).LoopNum,
                                                                                       InletNodeMassFlowRate,
                                                                                       state.dataPumps->PumpEquip(PumpNum).PressureCurve_Index,
-                                                                                      RotSpeed_Max,
+                                              RotSpeed_Max,
                                                                                       state.dataPumps->PumpEquip(PumpNum).ImpellerDiameter,
                                                                                       state.dataPumps->PumpEquip(PumpNum).MinPhiValue,
                                                                                       state.dataPumps->PumpEquip(PumpNum).MaxPhiValue);
                 state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMinRPM = ResolveLoopFlowVsPressure(state, state.dataPumps->PumpEquip(PumpNum).LoopNum,
                                                                                       InletNodeMassFlowRate,
                                                                                       state.dataPumps->PumpEquip(PumpNum).PressureCurve_Index,
-                                                                                      RotSpeed_Min,
+                                              RotSpeed_Min,
                                                                                       state.dataPumps->PumpEquip(PumpNum).ImpellerDiameter,
                                                                                       state.dataPumps->PumpEquip(PumpNum).MinPhiValue,
                                                                                       state.dataPumps->PumpEquip(PumpNum).MaxPhiValue);

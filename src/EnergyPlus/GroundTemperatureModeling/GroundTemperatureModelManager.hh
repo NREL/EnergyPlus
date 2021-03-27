@@ -67,13 +67,13 @@ struct EnergyPlusData;
 
 namespace GroundTemperatureManager {
 
-    int constexpr objectType_KusudaGroundTemp(1);
-    int constexpr objectType_FiniteDiffGroundTemp(2);
-    int constexpr objectType_SiteBuildingSurfaceGroundTemp(3);
-    int constexpr objectType_SiteShallowGroundTemp(4);
-    int constexpr objectType_SiteDeepGroundTemp(5);
-    int constexpr objectType_SiteFCFactorMethodGroundTemp(6);
-    int constexpr objectType_XingGroundTemp(7);
+    int constexpr objectType_KusudaGroundTemp = 1;
+    int constexpr objectType_FiniteDiffGroundTemp = 2;
+    int constexpr objectType_SiteBuildingSurfaceGroundTemp = 3;
+    int constexpr objectType_SiteShallowGroundTemp = 4;
+    int constexpr objectType_SiteDeepGroundTemp = 5;
+    int constexpr objectType_SiteFCFactorMethodGroundTemp = 6;
+    int constexpr objectType_XingGroundTemp = 7;
 
     std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &type, std::string const &name);
 
