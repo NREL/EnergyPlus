@@ -111,10 +111,6 @@ namespace SystemAvailabilityManager {
     using namespace DataHVACGlobals;
     using namespace ScheduleManager;
 
-    Real64 CurrentEndTime(0.0);     // Current end time
-    Real64 CurrentEndTimeLast(0.0); // last end time
-    Real64 TimeStepSysLast(0.0);    // last system time step
-
     void ManageSystemAvailability(EnergyPlusData &state)
     {
 
@@ -4426,8 +4422,8 @@ namespace SystemAvailabilityManager {
             MyEnvrnFlag = true;
         }
         // check minimum operation time
-        CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
-        if (CurrentEndTime > CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= TimeStepSysLast) {
+        state.dataSystemAvailabilityManager->CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
+        if (state.dataSystemAvailabilityManager->CurrentEndTime > state.dataSystemAvailabilityManager->CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= state.dataSystemAvailabilityManager->TimeStepSysLast) {
             for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl == state.dataSystemAvailabilityManager->HybridVentCtrl_NoAction) {
                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).TimeOperDuration = 0.0;
@@ -4435,20 +4431,20 @@ namespace SystemAvailabilityManager {
                 }
                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MinVentTime > 0.0) {
                     if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl == state.dataSystemAvailabilityManager->HybridVentCtrl_Open) {
-                        state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).TimeVentDuration += (CurrentEndTime - CurrentEndTimeLast) * 60.0;
+                        state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).TimeVentDuration += (state.dataSystemAvailabilityManager->CurrentEndTime - state.dataSystemAvailabilityManager->CurrentEndTimeLast) * 60.0;
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).TimeOperDuration = 0.0;
                     }
                 }
                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MinOperTime > 0.0) {
                     if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl == state.dataSystemAvailabilityManager->HybridVentCtrl_Close) {
-                        state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).TimeOperDuration += (CurrentEndTime - CurrentEndTimeLast) * 60.0;
+                        state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).TimeOperDuration += (state.dataSystemAvailabilityManager->CurrentEndTime - state.dataSystemAvailabilityManager->CurrentEndTimeLast) * 60.0;
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).TimeVentDuration = 0.0;
                     }
                 }
             }
         }
-        TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
-        CurrentEndTimeLast = CurrentEndTime;
+        state.dataSystemAvailabilityManager->TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
+        state.dataSystemAvailabilityManager->CurrentEndTimeLast = state.dataSystemAvailabilityManager->CurrentEndTime;
     }
 
     void CalcHybridVentSysAvailMgr(EnergyPlusData &state,

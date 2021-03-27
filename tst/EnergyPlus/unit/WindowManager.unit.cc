@@ -194,7 +194,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
@@ -472,7 +472,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
@@ -2698,7 +2698,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;

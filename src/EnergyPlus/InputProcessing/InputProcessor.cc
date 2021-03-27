@@ -102,8 +102,6 @@ static std::string const BlankString;
 
 using json = nlohmann::json;
 
-std::unique_ptr<InputProcessor> inputProcessor = nullptr;
-
 InputProcessor::InputProcessor() : idf_parser(std::unique_ptr<IdfParser>(new IdfParser())), data(std::unique_ptr<DataStorage>(new DataStorage()))
 {
     auto const embeddedEpJSONSchema = EmbeddedEpJSONSchema::embeddedEpJSONSchema();

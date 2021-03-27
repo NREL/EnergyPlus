@@ -63,7 +63,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/StateManagement.hh>
 #include <algorithm>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -94,7 +93,7 @@ void EnergyPlusFixture::SetUp()
 {
     this->state = new EnergyPlusData;
     if (!state->dataInputProcessing->inputProcessor) state->dataInputProcessing->inputProcessor = InputProcessor::factory();
-    EnergyPlus::clearAllStates(*state);
+    state->clear_state();
 
     //state->dataInputProcessing->inputProcessor->clear_state();
 
@@ -116,7 +115,7 @@ void EnergyPlusFixture::SetUp()
 
     state->dataUtilityRoutines->outputErrorHeader = false;
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
     FluidProperties::InitializeGlycRoutines();
     createCoilSelectionReportObj(*state);
 }
@@ -133,7 +132,7 @@ void EnergyPlusFixture::TearDown()
     state->files.mtr.del();
     state->files.bnd.del();
     state->files.shade.del();
-    clearAllStates(*this->state);
+    state->clear_state();
     delete this->state;
 }
 

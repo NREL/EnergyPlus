@@ -59,6 +59,7 @@ namespace EnergyPlus {
         this->dataAirflowNetwork = std::make_unique<AirflowNetworkData>();
         this->dataAirflowNetworkBalanceManager = std::make_unique<AirflowNetworkBalanceManagerData>();
         this->dataAFNProps = std::make_unique<DataAFNProps>();
+        this->dataAFNSolver = std::make_unique<AirflowNetworkSolverData>();
         this->dataBSDFWindow = std::make_unique<BSDFWindowData>();
         this->dataBaseSizerFanHeatInputs = std::make_unique<BaseSizerWithFanHeatInputsData>();
         this->dataBaseSizerScalableInputs = std::make_unique<BaseSizerWithScalableInputsData>();
@@ -221,6 +222,7 @@ namespace EnergyPlus {
         this->dataPondGHE = std::make_unique<PondGroundHeatExchangerData>();
         this->dataPowerInductionUnits = std::make_unique<PoweredInductionUnitsData>();
         this->dataPsychrometrics = std::make_unique<PsychrometricsData>();
+        this->dataPsychCache = std::make_unique<PsychrometricCacheData>();
         this->dataPumps = std::make_unique<PumpsData>();
         this->dataPurchasedAirMgr = std::make_unique<PurchasedAirManagerData>();
         this->dataRefrigCase = std::make_unique<RefrigeratedCaseData>();
@@ -312,6 +314,7 @@ namespace EnergyPlus {
         this->dataAirSystemsData->clear_state();
         this->dataAirflowNetwork->clear_state();
         this->dataAirflowNetworkBalanceManager->clear_state();
+        this->dataAFNSolver->clear_state();
         this->dataAFNProps->clear_state();
         this->dataBSDFWindow->clear_state();
         this->dataBaseSizerFanHeatInputs->clear_state();
@@ -475,6 +478,7 @@ namespace EnergyPlus {
         this->dataPondGHE->clear_state();
         this->dataPowerInductionUnits->clear_state();
         this->dataPsychrometrics->clear_state();
+        this->dataPsychCache->clear_state();
         this->dataPumps->clear_state();
         this->dataPurchasedAirMgr->clear_state();
         this->dataRefrigCase->clear_state();

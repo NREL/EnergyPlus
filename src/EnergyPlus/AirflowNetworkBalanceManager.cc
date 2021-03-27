@@ -192,6 +192,9 @@ namespace AirflowNetworkBalanceManager {
 
         state.dataAirflowNetworkBalanceManager->initialize(state);
 
+        auto & NetworkNumOfNodes = state.dataAFNSolver->NetworkNumOfNodes;
+        auto & NetworkNumOfLinks = state.dataAFNSolver->NetworkNumOfLinks;
+
         NetworkNumOfNodes = state.dataAirflowNetwork->NumOfNodesMultiZone;
         NetworkNumOfLinks = state.dataAirflowNetwork->NumOfLinksMultiZone;
 
@@ -369,6 +372,8 @@ namespace AirflowNetworkBalanceManager {
         if (!success) {
             return false;
         }
+
+        auto & solver = state.dataAFNSolver->solver;
 
         // *** Read AirflowNetwork simulation surface crack component
         CurrentModuleObject = "AirflowNetwork:MultiZone:Surface:Crack";
@@ -2817,6 +2822,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Read AirflowNetwork simulation horizontal openings
         // Moved into getAirflowElementInput
+        auto & solver = state.dataAFNSolver->solver;
 
         // Check status of control level for each surface with an opening
         j = 0;
@@ -5056,7 +5062,7 @@ namespace AirflowNetworkBalanceManager {
         state.dataAirflowNetwork->ANZW.allocate(state.dataGlobal->NumOfZones);                                          // Local zone humidity ratio for rollback use
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataAirflowNetwork->ANCO.allocate(state.dataGlobal->NumOfZones);           // Local zone CO2 for rollback use
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) state.dataAirflowNetwork->ANGC.allocate(state.dataGlobal->NumOfZones); // Local zone generic contaminant for rollback use
-
+        auto & solver = state.dataAFNSolver->solver;
         solver.allocate(state);
 
         bool OnOffFanFlag = false;
@@ -5726,7 +5732,7 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
-        for (n = 1; n <= NetworkNumOfNodes; ++n) {
+        for (n = 1; n <= state.dataAFNSolver->NetworkNumOfNodes; ++n) {
             if (state.dataAirflowNetwork->AirflowNetworkNodeData(n).NodeTypeNum == 0) {
                 state.dataAirflowNetwork->AirflowNetworkNodeSimu(n).PZ = 0.0;
             } else {
@@ -5889,7 +5895,7 @@ namespace AirflowNetworkBalanceManager {
                 PressureSet = GetCurrentScheduleValue(state, state.dataAirflowNetwork->PressureControllerData(1).PresSetpointSchedPtr);
             }
         }
-
+        auto & solver = state.dataAFNSolver->solver;
         solver.initialize(state);
 
         if (!(state.dataAirflowNetwork->PressureSetFlag > 0 && state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
@@ -6086,7 +6092,7 @@ namespace AirflowNetworkBalanceManager {
         if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrlRelief) {
             state.dataAirflowNetwork->ReliefMassFlowRate = ControllerMassFlowRate;
         }
-
+        auto & solver = state.dataAFNSolver->solver;
         solver.initialize(state);
         solver.airmov(state);
 
@@ -10631,7 +10637,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Object Data
         Array1D<AFNExtSurfacesProp> AFNExtSurfaces; // Surface numbers of all exterior openings
-
+        auto & solver = state.dataAFNSolver->solver;
         // Count the total number of exterior simple and detailed openings and the number in each zone
         // Verify that each zone with "ADVANCED" single sided wind pressure coefficients has exactly two openings.
         // If it doesn't have two openings, change "ADVANCED" to "STANDARD"

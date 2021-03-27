@@ -279,7 +279,7 @@ public:
         state->dataHVACGlobal->NumPrimaryAirSys = 1;
         state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
         state->dataAirLoop->AirLoopControlInfo.allocate(1);
-        Psychrometrics::InitializePsychRoutines();
+        Psychrometrics::InitializePsychRoutines(*state);
         state->dataLoopNodes->Node.allocate(30);
     }
 
@@ -287,8 +287,8 @@ public:
     {
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
 
-        Psychrometrics::cached_Twb.clear();
-        Psychrometrics::cached_Psat.clear();
+        state->dataPsychCache->cached_Twb.clear();
+        state->dataPsychCache->cached_Psat.clear();
     }
 };
 
@@ -4282,7 +4282,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
 
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = 1.20;
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     thisSys.m_MultiOrVarSpeedHeatCoil = true;
     thisSys.m_MultiOrVarSpeedCoolCoil = true;
@@ -11532,7 +11532,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     state->dataSize->NumSysSizInput = 1;
 
     state->dataEnvrn->StdBaroPress = 101325.0;
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     // Need this to prevent crash in Sizers
     state->dataSize->UnitarySysEqSizing.allocate(1);

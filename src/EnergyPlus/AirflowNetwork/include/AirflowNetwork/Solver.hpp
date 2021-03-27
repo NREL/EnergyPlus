@@ -56,6 +56,8 @@
 
 #include "AirflowNetwork/Properties.hpp"
 
+#include <EnergyPlus/Data/BaseData.hh>
+
 namespace EnergyPlus {
 
 // Forward declarations
@@ -65,6 +67,8 @@ struct EnergyPlusData;
 #define SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
 
 namespace AirflowNetwork {
+
+    int constexpr NrInt = 20; // Number of intervals for a large opening
 
     struct AirProperties
     {
@@ -167,18 +171,6 @@ namespace AirflowNetwork {
         Array1D<Real64> SUMF;
     };
 
-    // Data
-    extern int NetworkNumOfLinks;
-    extern int NetworkNumOfNodes;
-
-    extern int const NrInt; // Number of intervals for a large opening
-
-    // Large opening variables
-    extern Array1D<Real64> DpProf;   // Differential pressure profile for Large Openings [Pa]
-    extern Array1D<Real64> RhoProfF; // Density profile in FROM zone [kg/m3]
-    extern Array1D<Real64> RhoProfT; // Density profile in TO zone [kg/m3]
-    extern Array2D<Real64> DpL;      // Array of stack pressures in link
-
     // Functions
 
     int GenericCrack(EnergyPlusData &state, Real64 &coef,               // Flow coefficient
@@ -209,7 +201,7 @@ namespace AirflowNetwork {
                 int const NSYM         // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     );
 
-    void SLVSKY(const Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
+    void SLVSKY(EnergyPlusData &state, const Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
                 const Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
                 const Array1D<Real64> &AL, // the lower triangle of [A] before and after factoring
                 Array1D<Real64> &B,        // "B" vector (input); "X" vector (output).
@@ -218,7 +210,7 @@ namespace AirflowNetwork {
                 int const NSYM             // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     );
 
-    void FILSKY(const Array1D<Real64> &X,    // element array (row-wise sequence)
+    void FILSKY(EnergyPlusData &state, const Array1D<Real64> &X,    // element array (row-wise sequence)
                 std::array<int, 2> const LM, // location matrix
                 const Array1D_int &IK,       // pointer to the top of column/row "K"
                 Array1D<Real64> &AU,         // the upper triangle of [A] before and after factoring
@@ -280,7 +272,73 @@ namespace AirflowNetwork {
 
 } // namespace AirflowNetwork
 
-extern AirflowNetwork::Solver solver;
+struct AirflowNetworkSolverData : BaseGlobalStruct {
+    AirflowNetwork::Solver solver;
+
+    // Data
+    int NetworkNumOfLinks = 0;
+    int NetworkNumOfNodes = 0;
+
+    // Common block AFEDAT
+    Array1D<Real64> AFECTL;
+    Array1D<Real64> AFLOW2;
+    Array1D<Real64> AFLOW;
+    Array1D<Real64> PS;
+    Array1D<Real64> PW;
+
+    // Common block CONTRL
+    Real64 PB = 0.0;
+    int LIST = 0;
+
+    // Common block ZONL
+    // Array1D<Real64> RHOZ;
+    // Array1D<Real64> SQRTDZ;
+    // Array1D<Real64> VISCZ;
+    Array1D<Real64> SUMAF;
+    // Array1D<Real64> TZ; // Temperature [C]
+    // Array1D<Real64> WZ; // Humidity ratio [kg/kg]
+    Array1D<Real64> PZ; // Pressure [Pa]
+
+    // Other array variables
+    Array1D_int ID;
+    Array1D_int IK;
+    Array1D<Real64> AD;
+    Array1D<Real64> AU;
+
+#ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
+    Array1D_int newIK;     // noel
+    Array1D<Real64> newAU; // noel
+#endif
+
+    // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
+    Array1D<Real64> SUMF;
+
+    // Large opening variables
+    Array1D<Real64> DpProf;   // Differential pressure profile for Large Openings [Pa]
+    Array1D<Real64> RhoProfF; // Density profile in FROM zone [kg/m3]
+    Array1D<Real64> RhoProfT; // Density profile in TO zone [kg/m3]
+    Array2D<Real64> DpL;      // Array of stack pressures in link
+
+    void clear_state() override {
+        NetworkNumOfLinks = 0;
+        NetworkNumOfNodes = 0;
+        AFECTL.clear();
+        AFLOW2.clear();
+        AFLOW.clear();
+        PS.clear();
+        PW.clear();
+        PB = 0.0;
+        LIST = 0;
+        SUMAF.clear();
+        PZ.clear();
+        ID.clear();
+        IK.clear();
+        AD.clear();
+        AU.clear();
+        solver.clear();
+    }
+
+    };
 
 } // namespace EnergyPlus
 

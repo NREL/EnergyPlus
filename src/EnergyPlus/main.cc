@@ -49,13 +49,14 @@
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
 #include <EnergyPlus/Data/CommonIncludes.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-
-using EnergyPlus::CommandLineInterface::ProcessArgs;
+#include <EnergyPlus/DataStringGlobals.hh>
 
 int main(int argc, const char *argv[])
 {
     EnergyPlus::EnergyPlusData state;
-
-    ProcessArgs(state, argc, argv);
+    // these need to be set early to be used in help and version output messaging
+    state.dataStrGlobals->CurrentDateTime = CreateCurrentDateTimeString();
+    state.dataStrGlobals->VerStringVar = EnergyPlus::DataStringGlobals::VerString + "," + state.dataStrGlobals->CurrentDateTime;
+    EnergyPlus::CommandLineInterface::ProcessArgs(state, argc, argv);
     return EnergyPlusPgm(state);
 }

@@ -45,20 +45,105 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus Headers
-#include <EnergyPlus/DataViewFactorInformation.hh>
+#ifndef PsychCacheData_hh_INCLUDED
+#define PsychCacheData_hh_INCLUDED
+
+#include <EnergyPlus/Data/BaseData.hh>
 
 namespace EnergyPlus {
 
-namespace DataViewFactorInformation {
+#ifdef EP_nocache_Psychrometrics
+    #undef EP_cache_PsyTwbFnTdbWPb
+    #undef EP_cache_PsyPsatFnTemp
+    #undef EP_cache_PsyTsatFnPb
+    #undef EP_cache_PsyTsatFnHPb
+#else
+    #define EP_cache_PsyTwbFnTdbWPb
+    #define EP_cache_PsyPsatFnTemp
+    #define EP_cache_PsyTsatFnPb
+    #define EP_cache_PsyTsatFnHPb
+#endif
 
-    // Module containing the data dealing with view factor information for ScriptF
-    // and Diffuse Solar distribution calculations
+#ifdef EP_cache_PsyTwbFnTdbWPb
+    struct cached_twb_t
+    {
+        // Members
+        Int64 iTdb;
+        Int64 iW;
+        Int64 iPb;
+        Real64 Twb;
 
-    // MODULE INFORMATION:
-    //       AUTHOR         Rob Hitchcock
-    //       DATE WRITTEN   September 2007; Moved from HeatBalanceIntRadExchange
+        // Default Constructor
+        cached_twb_t() : iTdb(0), iW(0), iPb(0), Twb(0.0)
+        {
+        }
+    };
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+    struct cached_tsat_h_pb
+    {
+        // Members
+        Int64 iH;
+        Int64 iPb;
+        Real64 Tsat;
 
-} // namespace DataViewFactorInformation
+        // Default Constructor
+        cached_tsat_h_pb() : iH(0), iPb(0), Tsat(0.0)
+        {
+        }
+    };
+#endif
+#ifdef EP_cache_PsyPsatFnTemp
+    struct cached_psat_t
+    {
+        // Members
+        Int64 iTdb;
+        Real64 Psat;
 
-} // namespace EnergyPlus
+        // Default Constructor
+        cached_psat_t() : iTdb(-1000), Psat(0.0)
+        {
+        }
+    };
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+    struct cached_tsat_pb
+    {
+        // Members
+        Int64 iPb;
+        Real64 Tsat;
+
+        // Default Constructor
+        cached_tsat_pb() : iPb(-1000), Tsat(0.0)
+        {
+        }
+    };
+#endif
+
+    struct PsychrometricCacheData : BaseGlobalStruct {
+
+#ifdef EP_cache_PsyTwbFnTdbWPb
+        Array1D<cached_twb_t> cached_Twb; // DIMENSION(0:twbcache_size)
+#endif
+#ifdef EP_cache_PsyPsatFnTemp
+        Array1D<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+        Array1D<cached_tsat_pb> cached_Tsat; // DIMENSION(0:tsatcache_size)
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+        Array1D<cached_tsat_h_pb> cached_Tsat_HPb; // DIMENSION(0:tsat_hbp_cache_size)
+#endif
+
+        void clear_state() override {
+            cached_Twb.clear();
+            cached_Psat.clear();
+            cached_Tsat.clear();
+            cached_Tsat_HPb.clear();
+        }
+
+    };
+
+}
+
+#endif // PsychCacheData_hh_INCLUDED

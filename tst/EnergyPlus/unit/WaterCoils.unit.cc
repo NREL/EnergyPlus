@@ -156,15 +156,15 @@ public:
         state->dataSize->FinalZoneSizing.allocate(1);
         state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
         state->dataAirLoop->AirLoopControlInfo.allocate(1);
-        InitializePsychRoutines();
+        InitializePsychRoutines(*state);
     }
 
     virtual void TearDown()
     {
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
 
-        cached_Twb.clear();
-        cached_Psat.clear();
+        state->dataPsychCache->cached_Twb.clear();
+        state->dataPsychCache->cached_Psat.clear();
     }
 };
 
@@ -824,7 +824,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
 
 TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
 {
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ShowMessage(*state, "Begin Test: state->dataWaterCoils->WaterCoilsTest, CoilCoolingWaterSimpleSizing");
@@ -924,7 +924,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
 
 TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
 {
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ShowMessage(*state, "Begin Test: state->dataWaterCoils->WaterCoilsTest, CoilCoolingWaterDetailedSizing");
@@ -1037,7 +1037,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
 
 TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
 {
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
@@ -1218,7 +1218,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
 
 TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
 {
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ShowMessage(*state, "Begin Test: state->dataWaterCoils->WaterCoilsTest, CoilHeatingWaterSimpleSizing");
@@ -1447,7 +1447,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     std::string const idf_objects = delimited_string({
          "	Zone,",

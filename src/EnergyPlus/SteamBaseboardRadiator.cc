@@ -109,7 +109,6 @@ namespace SteamBaseboardRadiator {
     using DataZoneEquipment::CheckZoneEquipmentList;
 
     static std::string const fluidNameSteam("STEAM");
-    Array1D_string SteamBaseboardDesignNames;           // Array that contains the names of Design objects
 
     void SimSteamBaseboard(EnergyPlusData &state,
                            std::string const &EquipName,
@@ -321,7 +320,7 @@ namespace SteamBaseboardRadiator {
         state.dataSteamBaseboardRadiator->SteamBaseboardDesign.allocate(state.dataSteamBaseboardRadiator->NumSteamBaseboardsDesign);
         state.dataSteamBaseboardRadiator->CheckDesignObjectName.dimension(state.dataSteamBaseboardRadiator->NumSteamBaseboardsDesign, true);
         state.dataSteamBaseboardRadiator->SteamBaseboardDesignNumericFields.allocate(state.dataSteamBaseboardRadiator->NumSteamBaseboardsDesign);
-        SteamBaseboardDesignNames.allocate(state.dataSteamBaseboardRadiator->NumSteamBaseboardsDesign);
+        state.dataSteamBaseboardRadiator->SteamBaseboardDesignNames.allocate(state.dataSteamBaseboardRadiator->NumSteamBaseboardsDesign);
 
         // Get the data from the user input related to baseboard heater designobjects
         for (BaseboardDesignNum = 1; BaseboardDesignNum <= state.dataSteamBaseboardRadiator->NumSteamBaseboardsDesign; ++BaseboardDesignNum) {
@@ -347,7 +346,7 @@ namespace SteamBaseboardRadiator {
             VerifyUniqueBaseboardName(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + " Name");
 
             state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName = state.dataIPShortCut->cAlphaArgs(1);      // Name of the design object of baseboard
-            SteamBaseboardDesignNames(BaseboardDesignNum) = state.dataIPShortCut->cAlphaArgs(1);                                              // Add to  array of design object names
+            state.dataSteamBaseboardRadiator->SteamBaseboardDesignNames(BaseboardDesignNum) = state.dataIPShortCut->cAlphaArgs(1);                                              // Add to  array of design object names
 
             // Determine steam baseboard radiator system heating design capacity sizing method
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
@@ -466,7 +465,7 @@ namespace SteamBaseboardRadiator {
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType = TypeOf_Baseboard_Rad_Conv_Steam;         //'ZoneHVAC:Baseboard:RadiantConvective:Steam'
 
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).designObjectName = state.dataIPShortCut->cAlphaArgs(2);                     // Name of the design object for this baseboard
-            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).DesignObjectPtr = UtilityRoutines::FindItemInList(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).designObjectName, SteamBaseboardDesignNames);
+            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).DesignObjectPtr = UtilityRoutines::FindItemInList(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).designObjectName, state.dataSteamBaseboardRadiator->SteamBaseboardDesignNames);
             SteamBaseboardDesignData SteamBaseboardDesignDataObject{state.dataSteamBaseboardRadiator->
                                                                     SteamBaseboardDesign(state.dataSteamBaseboardRadiator->
                                                                                          SteamBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the design data for steam baseboard object

@@ -69,12 +69,6 @@
 
 namespace EnergyPlus {
 
-int simDay = 0;
-int numIterYears = 0;
-int const maxYearsToIterate = 10;
-Real64 finalTempConvergenceCriteria = 0.05;
-Real64 iterationTempConvergenceCriteria = 0.00001;
-
 //******************************************************************************
 
 // Finite difference model factory
@@ -475,7 +469,7 @@ void FiniteDiffGroundTempsModel::performSimulation(EnergyPlusData &state)
     do {
 
         // loop over all days
-        for (simDay = 1; simDay <= state.dataWeatherManager->NumDaysInYear; ++simDay) {
+        for (state.dataGlobal->FDsimDay = 1; state.dataGlobal->FDsimDay <= state.dataWeatherManager->NumDaysInYear; ++state.dataGlobal->FDsimDay) {
 
             bool iterationConverged = false;
 
@@ -488,7 +482,7 @@ void FiniteDiffGroundTempsModel::performSimulation(EnergyPlusData &state)
                 for (int cell = 1; cell <= totalNumCells; ++cell) {
 
                     if (cell == 1) {
-                        updateSurfaceCellTemperature();
+                        updateSurfaceCellTemperature(state);
                     } else if (cell > 1 && cell < totalNumCells) {
                         updateGeneralDomainCellTemperature(cell);
                     } else if (cell == totalNumCells) {
@@ -507,18 +501,18 @@ void FiniteDiffGroundTempsModel::performSimulation(EnergyPlusData &state)
             } while (!iterationConverged);
 
             // Shift temperatures for next timestep
-            updateTimeStepTemperatures();
+            updateTimeStepTemperatures(state);
         }
 
         // Check final temperature convergence
-        convergedFinal = checkFinalTemperatureConvergence();
+        convergedFinal = checkFinalTemperatureConvergence(state);
 
     } while (!convergedFinal);
 }
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::updateSurfaceCellTemperature()
+void FiniteDiffGroundTempsModel::updateSurfaceCellTemperature(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -563,7 +557,7 @@ void FiniteDiffGroundTempsModel::updateSurfaceCellTemperature()
 
     auto &thisCell = cellArray(1);
     auto &cellBelow_thisCell = cellArray(2);
-    auto &cwd = weatherDataArray(simDay); // "Current Weather Day"
+    auto &cwd = weatherDataArray(state.dataGlobal->FDsimDay); // "Current Weather Day"
 
     // Add effect from previous time step
     numerator += thisCell.temperature_prevTimeStep;
@@ -753,7 +747,7 @@ void FiniteDiffGroundTempsModel::updateBottomCellTemperature()
 
 //******************************************************************************
 
-bool FiniteDiffGroundTempsModel::checkFinalTemperatureConvergence()
+bool FiniteDiffGroundTempsModel::checkFinalTemperatureConvergence(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -766,8 +760,9 @@ bool FiniteDiffGroundTempsModel::checkFinalTemperatureConvergence()
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool converged = true;
+    Real64 const finalTempConvergenceCriteria = 0.05;
 
-    if (numIterYears == maxYearsToIterate) return converged;
+    if (state.dataGlobal->FDnumIterYears == maxYearsToIterate) return converged;
 
     for (int cell = 1; cell <= totalNumCells; ++cell) {
 
@@ -780,7 +775,7 @@ bool FiniteDiffGroundTempsModel::checkFinalTemperatureConvergence()
         thisCell.temperature_finalConvergence = thisCell.temperature;
     }
 
-    ++numIterYears;
+    ++state.dataGlobal->FDnumIterYears;
 
     return converged;
 }
@@ -800,6 +795,7 @@ bool FiniteDiffGroundTempsModel::checkIterationTemperatureConvergence()
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool converged = true;
+    Real64 const iterationTempConvergenceCriteria = 0.00001;
 
     for (int cell = 1; cell <= totalNumCells; ++cell) {
 
@@ -889,7 +885,7 @@ void FiniteDiffGroundTempsModel::updateIterationTemperatures()
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::updateTimeStepTemperatures()
+void FiniteDiffGroundTempsModel::updateTimeStepTemperatures(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -907,7 +903,7 @@ void FiniteDiffGroundTempsModel::updateTimeStepTemperatures()
         thisCell.temperature_prevTimeStep = thisCell.temperature;
 
         // Log temps for later use
-        groundTemps(simDay, cell) = thisCell.temperature;
+        groundTemps(state.dataGlobal->FDsimDay, cell) = thisCell.temperature;
     }
 }
 

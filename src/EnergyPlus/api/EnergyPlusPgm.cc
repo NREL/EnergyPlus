@@ -227,8 +227,8 @@ int EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath
 void commonInitialize(EnergyPlus::EnergyPlusData &state) {
     using namespace EnergyPlus;
     // Disable C++ i/o synching with C methods for speed
-    std::ios_base::sync_with_stdio(false);
-    std::cin.tie(nullptr); // Untie cin and cout: Could cause odd behavior for interactive prompts
+    //std::ios_base::sync_with_stdio(false);
+    //std::cin.tie(nullptr); // Untie cin and cout: Could cause odd behavior for interactive prompts
 
 // Enable floating point exceptions
 #ifndef NDEBUG

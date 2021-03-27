@@ -6446,7 +6446,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test)
 {
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
     createCoilSelectionReportObj(*state);
 
     CompLoadTablesType compLoad;
@@ -6931,7 +6931,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataGlobal->CompLoadReportIsReq = true;
 
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
     createCoilSelectionReportObj(*state);
 
     // Two design days

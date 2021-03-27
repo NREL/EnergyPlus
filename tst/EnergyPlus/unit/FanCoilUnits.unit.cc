@@ -125,7 +125,7 @@ namespace EnergyPlus {
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
 
-        InitializePsychRoutines();
+        InitializePsychRoutines(*state);
 
         std::string const idf_objects = delimited_string({
             "	Zone,",
@@ -435,7 +435,7 @@ namespace EnergyPlus {
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
 
-        InitializePsychRoutines();
+        InitializePsychRoutines(*state);
 
         std::string const idf_objects = delimited_string({
             "	Zone,",
@@ -747,7 +747,7 @@ namespace EnergyPlus {
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
 
-        InitializePsychRoutines();
+        InitializePsychRoutines(*state);
 
         std::string const idf_objects = delimited_string({
             "	Zone,",
@@ -1135,7 +1135,7 @@ namespace EnergyPlus {
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
 
-        InitializePsychRoutines();
+        InitializePsychRoutines(*state);
 
         std::string const idf_objects = delimited_string({
             "	Zone,",
@@ -1443,7 +1443,7 @@ namespace EnergyPlus {
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
 
-        InitializePsychRoutines();
+        InitializePsychRoutines(*state);
 
         std::string const idf_objects = delimited_string({
             "	Zone,",
@@ -1797,7 +1797,7 @@ namespace EnergyPlus {
         state->dataGlobal->MinutesPerTimeStep = 60;
         state->dataSize->CurZoneEqNum = 1;
 
-        InitializePsychRoutines();
+        InitializePsychRoutines(*state);
 
         std::string const idf_objects = delimited_string({
             "	Zone,",
@@ -2213,7 +2213,7 @@ namespace EnergyPlus {
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
 
-        InitializePsychRoutines();
+        InitializePsychRoutines(*state);
 
         std::string const idf_objects = delimited_string({
             " Zone, EAST ZONE, 0, 0, 0, 0, 1, 1, autocalculate, autocalculate;",
@@ -2499,7 +2499,7 @@ namespace EnergyPlus {
         state->dataGlobal->MinutesPerTimeStep = 60;
         state->dataSize->CurZoneEqNum = 1;
 
-        InitializePsychRoutines();
+        InitializePsychRoutines(*state);
 
         std::string const idf_objects = delimited_string({
             "	Zone,",
@@ -2904,7 +2904,7 @@ namespace EnergyPlus {
         state->dataGlobal->MinutesPerTimeStep = 60;
         state->dataSize->CurZoneEqNum = 1;
 
-        InitializePsychRoutines();
+        InitializePsychRoutines(*state);
 
         std::string const idf_objects = delimited_string({
             "	Zone,",
@@ -3308,7 +3308,7 @@ namespace EnergyPlus {
         state->dataGlobal->MinutesPerTimeStep = 60;
         state->dataSize->CurZoneEqNum = 1;
 
-        InitializePsychRoutines();
+        InitializePsychRoutines(*state);
 
         std::string const idf_objects = delimited_string({
             " Zone,",
@@ -3675,7 +3675,7 @@ namespace EnergyPlus {
         state->dataGlobal->MinutesPerTimeStep = 60;
         state->dataSize->CurZoneEqNum = 1;
 
-        InitializePsychRoutines();
+        InitializePsychRoutines(*state);
 
         std::string const idf_objects = delimited_string({
             " Zone,",
@@ -4042,7 +4042,7 @@ namespace EnergyPlus {
         state->dataGlobal->MinutesPerTimeStep = 60;
         state->dataSize->CurZoneEqNum = 1;
 
-        InitializePsychRoutines();
+        InitializePsychRoutines(*state);
 
         std::string const idf_objects = delimited_string({
             " Zone,",
@@ -4510,7 +4510,7 @@ namespace EnergyPlus {
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
         state->dataSize->CurZoneEqNum = 1;
-        InitializePsychRoutines();
+        InitializePsychRoutines(*state);
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);

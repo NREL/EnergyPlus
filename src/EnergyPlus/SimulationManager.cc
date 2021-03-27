@@ -251,7 +251,7 @@ namespace SimulationManager {
 
         PostIPProcessing(state);
 
-        InitializePsychRoutines();
+        InitializePsychRoutines(state);
 
         state.dataGlobal->BeginSimFlag = true;
         state.dataGlobal->BeginFullSimFlag = false;

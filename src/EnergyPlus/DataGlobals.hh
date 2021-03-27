@@ -160,6 +160,8 @@ struct EnergyPlusData;
         bool eplusRunningViaAPI = false;
         int NumOfWaterHeater;
         bool CountNonZoneEquip = true;
+        int FDsimDay = 0;
+        int FDnumIterYears = 0;
 
         void clear_state() override {
             this->BeginDayFlag = false;
@@ -257,6 +259,8 @@ struct EnergyPlusData;
             this->eplusRunningViaAPI = false;
             this->NumOfWaterHeater = 0;
             this->CountNonZoneEquip = true;
+            this->FDsimDay = 0;
+            this->FDnumIterYears = 0;
         }
     };
 

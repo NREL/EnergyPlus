@@ -439,7 +439,7 @@ namespace AirflowNetwork {
 
 
         // Crack standard condition from given inputs
-        if (i > NetworkNumOfLinks - state.dataAirflowNetwork->NumOfLinksIntraZone) {
+        if (i > state.dataAFNSolver->NetworkNumOfLinks - state.dataAirflowNetwork->NumOfLinksIntraZone) {
             Corr = 1.0;
         } else {
             Corr = state.dataAirflowNetwork->MultizoneSurfaceData(i).Factor;
@@ -876,7 +876,7 @@ namespace AirflowNetwork {
             // Check VAV termals with a damper
             SumTermFlow = 0.0;
             SumFracSuppLeak = 0.0;
-            for (k = 1; k <= NetworkNumOfLinks; ++k) {
+            for (k = 1; k <= state.dataAFNSolver->NetworkNumOfLinks; ++k) {
                 if (state.dataAirflowNetwork->AirflowNetworkLinkageData(k).VAVTermDamper && state.dataAirflowNetwork->AirflowNetworkLinkageData(k).AirLoopNum == AirLoopNum) {
                     k1 = state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(k).NodeNums[0]).EPlusNodeNum;
                     if (state.dataLoopNodes->Node(k1).MassFlowRate > 0.0) {
@@ -956,7 +956,7 @@ namespace AirflowNetwork {
 
 
         int NumCur = n;
-
+        auto & solver = state.dataAFNSolver->solver;
         if (solver.AFECTL(i) <= 0.0) {
             // Speed = 0; treat fan as resistance.
             return GenericCrack(state, FlowCoef, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
@@ -1201,7 +1201,7 @@ namespace AirflowNetwork {
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
 
-
+        auto & solver = state.dataAFNSolver->solver;
         C = solver.AFECTL(i);
         if (C < FlowMin) C = FlowMin;
         if (C > FlowMax) C = FlowMax;
@@ -1631,7 +1631,7 @@ namespace AirflowNetwork {
 
         // calculate DpProfNew
         for (i = 1; i <= NrInt + 2; ++i) {
-            DpProfNew(i) = PDROP + DpProf(Loc + i) - DpL(IL, 1);
+            DpProfNew(i) = PDROP + state.dataAFNSolver->DpProf(Loc + i) - state.dataAFNSolver->DpL(IL, 1);
         }
 
         // Get opening data based on the opening factor
@@ -1787,20 +1787,20 @@ namespace AirflowNetwork {
             for (i = 2; i <= NrInt + 1; ++i) {
                 if (DpProfNew(i) > 0) {
                     if (std::abs(DpProfNew(i)) <= DpZeroOffset) {
-                        dfmasum = std::sqrt(RhoProfF(Loc + i) * DpZeroOffset) / DpZeroOffset;
+                        dfmasum = std::sqrt(state.dataAFNSolver->RhoProfF(Loc + i) * DpZeroOffset) / DpZeroOffset;
                         fmasum = DpProfNew(i) * dfmasum;
                     } else {
-                        fmasum = std::sqrt(RhoProfF(Loc + i) * DpProfNew(i));
+                        fmasum = std::sqrt(state.dataAFNSolver->RhoProfF(Loc + i) * DpProfNew(i));
                         dfmasum = 0.5 * fmasum / DpProfNew(i);
                     }
                     fma12 += fmasum;
                     dp1fma12 += dfmasum;
                 } else {
                     if (std::abs(DpProfNew(i)) <= DpZeroOffset) {
-                        dfmasum = -std::sqrt(RhoProfT(Loc + i) * DpZeroOffset) / DpZeroOffset;
+                        dfmasum = -std::sqrt(state.dataAFNSolver->RhoProfT(Loc + i) * DpZeroOffset) / DpZeroOffset;
                         fmasum = DpProfNew(i) * dfmasum;
                     } else {
-                        fmasum = std::sqrt(-RhoProfT(Loc + i) * DpProfNew(i));
+                        fmasum = std::sqrt(-state.dataAFNSolver->RhoProfT(Loc + i) * DpProfNew(i));
                         dfmasum = 0.5 * fmasum / DpProfNew(i);
                     }
                     fma21 += fmasum;
@@ -1840,9 +1840,9 @@ namespace AirflowNetwork {
             // Calculation of massflow and its derivative
             for (i = 2; i <= NrInt + 1; ++i) {
                 if (DpProfNew(i) > 0) {
-                    rholink = RhoProfF(Loc + i);
+                    rholink = state.dataAFNSolver->RhoProfF(Loc + i);
                 } else {
-                    rholink = RhoProfT(Loc + i);
+                    rholink = state.dataAFNSolver->RhoProfT(Loc + i);
                 }
 
                 if ((EvalHghts(i) <= h2) || (EvalHghts(i) >= h4)) {
@@ -1897,9 +1897,9 @@ namespace AirflowNetwork {
                 for (i = 2; i <= NrInt + 1; ++i) {
                     rholink = 0.0;
                     if (DpProfNew(i) > 0) {
-                        rholink = RhoProfF(Loc + i);
+                        rholink = state.dataAFNSolver->RhoProfF(Loc + i);
                     } else {
-                        rholink = RhoProfT(Loc + i);
+                        rholink = state.dataAFNSolver->RhoProfT(Loc + i);
                     }
                     rholink /= NrInt;
                     rholink = 1.2;
@@ -2102,7 +2102,7 @@ namespace AirflowNetwork {
 
         int n = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[0];
         int m = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[1];
-
+        auto & solver = state.dataAFNSolver->solver;
 
         // Get component properties
         // A  = Cross section area [m2]
@@ -2112,7 +2112,7 @@ namespace AirflowNetwork {
             F[0] = std::sqrt(2.0 * propN.density) * A * std::sqrt(DP);
             DF[0] = 0.5 * F[0] / DP;
         } else {
-            for (k = 1; k <= NetworkNumOfLinks; ++k) {
+            for (k = 1; k <= state.dataAFNSolver->NetworkNumOfLinks; ++k) {
                 if (state.dataAirflowNetwork->AirflowNetworkLinkageData(k).NodeNums[1] == n) {
                     F[0] = solver.AFLOW(k);
                     break;

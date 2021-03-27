@@ -2510,7 +2510,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Coil)
 
     // Pre-process
     state->dataEnvrn->OutBaroPress = OutBaroPress;
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Run and Check: VRFOU_Cap
     { //   Test the method VRFOU_Cap, which determines the VRF OU heat transfer rate, given refrigerant side temperature,
@@ -2877,7 +2877,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUAirFlow)
     FanSpdRatio = 0;
     Wout = 1;
     state->dataEnvrn->OutBaroPress = 101570;
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     state->dataDXCoils->DXCoil(CoolCoilIndex).C1Te = 0;
     state->dataDXCoils->DXCoil(CoolCoilIndex).C2Te = 0.804;

@@ -104,7 +104,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SecondaryAirOutletCondition)
     AirMassFlowSec = 2.0;
     QHXTotal = 10206.410750000941;
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // make the call for dry operating mode
     CalcSecondaryAirOutletCondition(*state, EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
@@ -355,7 +355,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcSecondaryAirOutletCondition)
     AirMassFlowSec = 2.0;
     QHXTotal = 10206.410750000941;
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // make the call for dry operating mode
     EvaporativeCoolers::CalcSecondaryAirOutletCondition(*state,

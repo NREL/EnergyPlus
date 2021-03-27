@@ -80,8 +80,6 @@ const int SQLite::RowNameId = 4;
 const int SQLite::ColumnNameId = 5;
 const int SQLite::UnitsId = 6;
 
-std::unique_ptr<SQLite> sqlite;
-
 std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
 {
     if (!state.files.outputControl.sqlite) {
@@ -150,7 +148,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
 
 void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
 {
-    if (sqlite && state.dataSQLiteProcedures->sqlite->writeOutputToSQLite()) {
+    if (state.dataSQLiteProcedures->sqlite && state.dataSQLiteProcedures->sqlite->writeOutputToSQLite()) {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             state.dataSQLiteProcedures->sqlite->addZoneData(zoneNum, state.dataHeatBal->Zone(zoneNum));
         }

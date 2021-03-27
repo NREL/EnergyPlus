@@ -59,7 +59,7 @@
 void initializeFunctionalAPI(EnergyPlusState state) {
     auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     thisState->dataInputProcessing->inputProcessor = EnergyPlus::InputProcessor::factory();
-    EnergyPlus::Psychrometrics::InitializePsychRoutines();
+    EnergyPlus::Psychrometrics::InitializePsychRoutines(*thisState);
     EnergyPlus::FluidProperties::InitializeGlycRoutines();
 }
 

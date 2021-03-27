@@ -57,6 +57,7 @@
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <AirflowNetwork/Properties.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
@@ -158,6 +159,7 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <EnergyPlus/GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
@@ -242,6 +244,7 @@
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/PondGroundHeatExchanger.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
+#include <EnergyPlus/PsychCacheData.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>

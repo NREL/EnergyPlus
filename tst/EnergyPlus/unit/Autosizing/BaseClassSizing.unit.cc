@@ -286,7 +286,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     state->dataSize->NumSysSizInput = 1;
 
     state->dataEnvrn->StdBaroPress = 101325.0;
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     state->dataSize->DataFlowUsedForSizing = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesCoolVolFlow;
     // Need this to prevent crash in Sizers
@@ -463,7 +463,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     state->dataSize->NumSysSizInput = 1;
 
     state->dataEnvrn->StdBaroPress = 101325.0;
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     state->dataSize->DataFlowUsedForSizing = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesCoolVolFlow;
     // Need this to prevent crash in Sizers
@@ -558,7 +558,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
 
     state->dataSize->ZoneSizingRunDone = true;
     state->dataEnvrn->StdBaroPress = 101325.0;
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Need this to prevent crash in Sizers
     state->dataSize->ZoneEqSizing.allocate(1);

@@ -247,7 +247,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     state->dataEnvrn->OutDryBulbTemp = 5.0;
     OutputReportPredefined::SetPredefinedTables(*state);
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
     createCoilSelectionReportObj(*state);
 
     int UnitNum = 1;
@@ -558,7 +558,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataSize->CurZoneEqNum = 1;
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
     GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);
     GetZoneEquipmentData(*state);

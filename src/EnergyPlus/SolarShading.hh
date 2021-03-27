@@ -472,6 +472,11 @@ struct SolarShadingData : BaseGlobalStruct {
     Array1D<Real64> XVertex; // X,Y,Z coordinates of vertices of
     Array1D<Real64> YVertex; // back surfaces projected into system
     Array1D<Real64> ZVertex; // relative to receiving surface
+    std::vector<Real64> sin_Phi;
+    std::vector<Real64> cos_Phi;
+    std::vector<Real64> sin_Theta;
+    std::vector<Real64> cos_Theta;
+    std::unique_ptr<std::iostream> shd_stream; // Shading file stream
 
     void clear_state() override
     {
@@ -583,6 +588,11 @@ struct SolarShadingData : BaseGlobalStruct {
         this->XVertex.deallocate();
         this->YVertex.deallocate();
         this->ZVertex.deallocate();
+        this->sin_Phi.clear();
+        this->cos_Phi.clear();
+        this->sin_Theta.clear();
+        this->cos_Theta.clear();
+        this->shd_stream.reset();
     }
 
     // Default Constructor

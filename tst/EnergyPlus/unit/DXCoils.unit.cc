@@ -2200,7 +2200,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     state->dataSize->NumSysSizInput = 1;
 
     state->dataEnvrn->StdBaroPress = 101325.0;
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     // Need this to prevent crash in Sizers
     state->dataSize->UnitarySysEqSizing.allocate(1);
@@ -2426,7 +2426,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     state->dataSize->NumSysSizInput = 1;
 
     state->dataEnvrn->StdBaroPress = 101325.0;
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     // Need this to prevent crash in Sizers
     state->dataSize->UnitarySysEqSizing.allocate(1);
@@ -3511,7 +3511,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
 
     state->dataEnvrn->StdBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     // set system sizing parameters
     state->dataSize->CurZoneEqNum = 0;
@@ -3763,7 +3763,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
 
     state->dataEnvrn->StdBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     // set system sizing parameters
     state->dataSize->CurZoneEqNum = 0;
