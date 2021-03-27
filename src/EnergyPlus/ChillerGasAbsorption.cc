@@ -1803,7 +1803,12 @@ namespace EnergyPlus::ChillerGasAbsorption {
             }
 
             // Calculate operating part load ratio for cooling
-            lHeatPartLoadRatio = lHeatingLoad / lAvailableHeatingCapacity;
+            if (lAvailableHeatingCapacity <= 0.0) {
+                lAvailableHeatingCapacity = 0.0;
+                lHeatPartLoadRatio = 0.0;
+            } else {
+                lHeatPartLoadRatio = lHeatingLoad / lAvailableHeatingCapacity;
+            }
 
             // Calculate fuel consumption for cooling
             // fuel used for cooling availCap * HIR * HIR-FT * HIR-FPLR
