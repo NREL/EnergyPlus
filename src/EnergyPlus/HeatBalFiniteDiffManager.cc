@@ -218,46 +218,48 @@ namespace HeatBalFiniteDiffManager {
         // user settings for numerical parameters
         cCurrentModuleObject = "HeatBalanceSettings:ConductionFiniteDifference";
 
-        if (inputProcessor->getNumObjectsFound(state, cCurrentModuleObject) > 0) {
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
-                                          1,
-                                          cAlphaArgs,
-                                          NumAlphas,
-                                          rNumericArgs,
-                                          NumNumbers,
-                                          IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-
-            if (!lAlphaFieldBlanks(1)) {
-
-                {
-                    auto const SELECT_CASE_var(cAlphaArgs(1));
-
-                    if (SELECT_CASE_var == "CRANKNICHOLSONSECONDORDER") {
-                        CondFDSchemeType = CrankNicholsonSecondOrder;
-                    } else if (SELECT_CASE_var == "FULLYIMPLICITFIRSTORDER") {
-                        CondFDSchemeType = FullyImplicitFirstOrder;
-                    } else {
-                        ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + " entered=" + cAlphaArgs(1) +
+        auto instances = inputProcessor->epJSON.find(cCurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            auto instance = instances.value().begin();
+            auto const &fields = instance.value();
+ 
+            if (fields.find("difference_scheme") != fields.end()) { // not required field, has default value
+                std::string scheme = fields.at("difference_scheme");
+                if (scheme == "CRANKNICHOLSONSECONDORDER") {
+                    CondFDSchemeType = CrankNicholsonSecondOrder;
+                } else if (scheme == "FULLYIMPLICITFIRSTORDER") {
+                    CondFDSchemeType = FullyImplicitFirstOrder;
+                } else {
+                    ShowSevereError(state,
+                                    cCurrentModuleObject + ": invalid Difference Scheme entered=" + scheme +
                                         ", must match CrankNicholsonSecondOrder or FullyImplicitFirstOrder.");
-                        ErrorsFound = true;
-                    }
+                    ErrorsFound = true;
                 }
             }
 
-            if (!lNumericFieldBlanks(1)) {
-                SpaceDescritConstant = rNumericArgs(1);
+            if (fields.find("space_discretization_constant")  != fields.end()) {
+                SpaceDescritConstant = fields.at("space_discretization_constant");
             }
-            if (!lNumericFieldBlanks(2)) {
-                state.dataHeatBal->CondFDRelaxFactorInput = rNumericArgs(2);
+            if (fields.find("relaxation_factor") != fields.end()) {
+                state.dataHeatBal->CondFDRelaxFactorInput = fields.at("relaxation_factor");
                 state.dataHeatBal->CondFDRelaxFactor = state.dataHeatBal->CondFDRelaxFactorInput;
             }
-            if (!lNumericFieldBlanks(3)) {
-                state.dataHeatBal->MaxAllowedDelTempCondFD = rNumericArgs(3);
+            if (fields.find("inside_face_surface_temperature_convergence_criteria") != fields.end()) {
+                state.dataHeatBal->MaxAllowedDelTempCondFD = fields.at("inside_face_surface_temperature_convergence_criteria");
+            }
+
+            if (fields.find("solution_scheme") != fields.end()) { // not required field, has default value
+                std::string scheme = fields.at("solution_scheme");
+                if (scheme == "GAUSSSEIDEL") {
+                    // This is the default, nothing to do
+                } else if (scheme == "TDMA") {
+                    state.dataHeatBal->CondFD_TDMA = true;
+                } else {
+                    ShowSevereError(state,
+                                    cCurrentModuleObject + ": invalid Solution Scheme entered=" + scheme +
+                                        ", must match GaussSeidel or TDMA.");
+                    ErrorsFound = true;
+                }
             }
 
         } // settings object
@@ -272,6 +274,7 @@ namespace HeatBalFiniteDiffManager {
 
         if (pcMat != 0) { //  Get Phase Change info
             //    CondFDVariableProperties = .TRUE.
+            state.dataHeatBal->CondFD_TDMA = false;
             for (Loop = 1; Loop <= pcMat; ++Loop) {
 
                 // Call Input Get routine to retrieve material data
@@ -364,6 +367,7 @@ namespace HeatBalFiniteDiffManager {
         cCurrentModuleObject = "MaterialProperty:VariableThermalConductivity"; // Variable Thermal Conductivity Info next
         if (vcMat != 0) {                                                      //  variable k info
             //    CondFDVariableProperties = .TRUE.
+            state.dataHeatBal->CondFD_TDMA = false;
             for (Loop = 1; Loop <= vcMat; ++Loop) {
 
                 // Call Input Get routine to retrieve material data
