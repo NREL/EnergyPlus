@@ -158,7 +158,7 @@ Array1D_string const PsyRoutineNames(NumPsychMonitors,
                                             // PsyTwbFnTdbWPb_raw (raw calc) | PsyPsatFnTemp_cache  19 - PsyPsatFnTemp_raw (raw calc)
 #endif
 
-    void InitializePsychRoutines(EnergyPlusData &state)
+    void InitializePsychRoutines([[maybe_unused]] EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

@@ -136,10 +136,18 @@ namespace EnergyPlus {
 #endif
 
         void clear_state() override {
+#ifdef EP_cache_PsyTwbFnTdbWPb
             cached_Twb.clear();
+#endif
+#ifdef EP_cache_PsyPsatFnTemp
             cached_Psat.clear();
+#endif
+#ifdef EP_cache_PsyTsatFnPb
             cached_Tsat.clear();
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
             cached_Tsat_HPb.clear();
+#endif
         }
 
     };
