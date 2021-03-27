@@ -302,6 +302,12 @@ namespace WaterToAirHeatPumpSimple {
         Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
         Array1D_bool MyPlantScanFlag;
 
+        Real64 LoadSideInletDBTemp_Init= 0; // rated conditions
+        Real64 LoadSideInletWBTemp_Init= 0; // rated conditions
+        Real64 LoadSideInletHumRat_Init= 0; // rated conditions
+        Real64 LoadSideInletEnth_Init = 0;   // rated conditions
+        Real64 CpAir_Init = 0;               // rated conditions
+
         void clear_state() override
         {
             this->NumWatertoAirHPs = 0;
@@ -313,6 +319,11 @@ namespace WaterToAirHeatPumpSimple {
             this->firstTime = true;
             this->MyEnvrnFlag.deallocate();
             this->MyPlantScanFlag.deallocate();
+            this->LoadSideInletDBTemp_Init= 0;
+            this->LoadSideInletWBTemp_Init= 0;
+            this->LoadSideInletHumRat_Init= 0;
+            this->LoadSideInletEnth_Init = 0;
+            this->CpAir_Init = 0;
         }
 
         // Default Constructor
