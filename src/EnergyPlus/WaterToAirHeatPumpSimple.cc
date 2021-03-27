@@ -2090,11 +2090,6 @@ namespace WaterToAirHeatPumpSimple {
 
         bool LatDegradModelSimFlag;      // Latent degradation model simulation flag
         int NumIteration;                // Iteration Counter
-        Real64 LoadSideInletDBTemp_Init(0); // rated conditions
-        Real64 LoadSideInletWBTemp_Init(0); // rated conditions
-        Real64 LoadSideInletHumRat_Init(0); // rated conditions
-        Real64 LoadSideInletEnth_Init;   // rated conditions
-        Real64 CpAir_Init;               // rated conditions
         Real64 LoadSideInletDBTemp_Unit; // calc conditions for unit
         Real64 LoadSideInletWBTemp_Unit; // calc conditions for unit
         Real64 LoadSideInletHumRat_Unit; // calc conditions for unit
@@ -2103,13 +2098,13 @@ namespace WaterToAirHeatPumpSimple {
 
         if (state.dataWaterToAirHeatPumpSimple->firstTime) {
             // Set indoor air conditions to the rated condition
-            LoadSideInletDBTemp_Init = 26.7;
-            LoadSideInletHumRat_Init = 0.0111;
-            LoadSideInletEnth_Init = PsyHFnTdbW(LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init);
-            CpAir_Init = PsyCpAirFnW(LoadSideInletHumRat_Init);
+            state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp_Init = 26.7;
+            state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat_Init = 0.0111;
+            state.dataWaterToAirHeatPumpSimple->LoadSideInletEnth_Init = PsyHFnTdbW(state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp_Init, state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat_Init);
+            state.dataWaterToAirHeatPumpSimple->CpAir_Init = PsyCpAirFnW(state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat_Init);
             state.dataWaterToAirHeatPumpSimple->firstTime = false;
         }
-        LoadSideInletWBTemp_Init = PsyTwbFnTdbWPb(state, LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init, state.dataEnvrn->OutBaroPress, RoutineName);
+        state.dataWaterToAirHeatPumpSimple->LoadSideInletWBTemp_Init = PsyTwbFnTdbWPb(state, state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp_Init, state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat_Init, state.dataEnvrn->OutBaroPress, RoutineName);
 
         //  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
 
@@ -2168,11 +2163,11 @@ namespace WaterToAirHeatPumpSimple {
             ++NumIteration;
             if (NumIteration == 1) {
                 // Set indoor air conditions to the rated conditions
-                state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp = LoadSideInletDBTemp_Init;
-                state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat = LoadSideInletHumRat_Init;
-                state.dataWaterToAirHeatPumpSimple->LoadSideInletWBTemp = LoadSideInletWBTemp_Init;
-                state.dataWaterToAirHeatPumpSimple->LoadSideInletEnth = LoadSideInletEnth_Init;
-                CpAir = CpAir_Init;
+                state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp = state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp_Init;
+                state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat = state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat_Init;
+                state.dataWaterToAirHeatPumpSimple->LoadSideInletWBTemp = state.dataWaterToAirHeatPumpSimple->LoadSideInletWBTemp_Init;
+                state.dataWaterToAirHeatPumpSimple->LoadSideInletEnth = state.dataWaterToAirHeatPumpSimple->LoadSideInletEnth_Init;
+                CpAir = state.dataWaterToAirHeatPumpSimple->CpAir_Init;
             } else {
                 // Set indoor air conditions to the actual condition
                 state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp = LoadSideInletDBTemp_Unit;
