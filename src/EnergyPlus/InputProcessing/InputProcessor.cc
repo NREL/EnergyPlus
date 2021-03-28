@@ -112,7 +112,11 @@ InputProcessor::InputProcessor() : idf_parser(std::unique_ptr<IdfParser>(new Idf
     for (auto it = loc.begin(); it != loc.end(); ++it) {
         caseInsensitiveObjectMap.emplace(convertToUpper(it.key()), it.key());
     }
-
+    idf_parser = std::unique_ptr<IdfParser>(new IdfParser());
+    data = std::unique_ptr<DataStorage>(new DataStorage());
+    epJSON = json::object();
+//    objectCacheMap.clear();
+//    unusedInputs.clear();
     validation = std::unique_ptr<Validation>(new Validation(&schema));
 }
 
@@ -176,14 +180,14 @@ json const &InputProcessor::getPatternProperties(EnergyPlusData &state, json con
 
 // Functions
 
-void InputProcessor::clear_state() {
-    idf_parser = std::unique_ptr<IdfParser>(new IdfParser());
-    data = std::unique_ptr<DataStorage>(new DataStorage());
-    epJSON = json::object();
-    objectCacheMap.clear();
-    unusedInputs.clear();
-    validation = std::unique_ptr<Validation>(new Validation(&schema));
-}
+//void InputProcessor::clear_state() {
+//    idf_parser = std::unique_ptr<IdfParser>(new IdfParser());
+//    data = std::unique_ptr<DataStorage>(new DataStorage());
+//    epJSON = json::object();
+//    objectCacheMap.clear();
+//    unusedInputs.clear();
+//    validation = std::unique_ptr<Validation>(new Validation(&schema));
+//}
 
 std::vector<std::string> const &InputProcessor::validationErrors()
 {

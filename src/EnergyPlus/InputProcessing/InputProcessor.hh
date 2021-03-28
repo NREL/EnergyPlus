@@ -67,6 +67,8 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/InputProcessing/DataStorage.hh>
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/InputValidation.hh>
 
 class IdfParser;
 class Validation;
@@ -187,7 +189,7 @@ public:
 
     const json &getObjectInstances(std::string const &ObjType);
 
-    void clear_state();
+//    void clear_state();
 private:
     friend class EnergyPlusFixture;
     friend class InputProcessorFixture;
@@ -310,9 +312,10 @@ private:
 }; // InputProcessor
 
 struct DataInputProcessing : BaseGlobalStruct {
-    std::unique_ptr<InputProcessor> inputProcessor;
+    std::unique_ptr<InputProcessor> inputProcessor = InputProcessor::factory();
     void clear_state() override {
-        inputProcessor->clear_state();
+        inputProcessor.reset();
+        inputProcessor = EnergyPlus::InputProcessor::factory();
     }
 };
 

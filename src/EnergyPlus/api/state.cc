@@ -61,8 +61,6 @@ EnergyPlusState stateNew() {
 void stateReset(EnergyPlusState state) {
     auto *this_state = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     this_state->clear_state();
-    // also clear out the input processor since the clear_state does not do that.
-    this_state->dataInputProcessing->inputProcessor = EnergyPlus::InputProcessor::factory();
 }
 
 void stateDelete(EnergyPlusState state) {

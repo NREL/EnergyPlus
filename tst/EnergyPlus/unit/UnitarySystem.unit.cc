@@ -286,9 +286,6 @@ public:
     virtual void TearDown()
     {
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
-
-        state->dataPsychCache->cached_Twb.clear();
-        state->dataPsychCache->cached_Psat.clear();
     }
 };
 

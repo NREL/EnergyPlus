@@ -92,7 +92,7 @@ namespace HeatBalanceKivaManager {
         Kiva::InputBlock footing;
         std::string name;
         std::vector<int> surfaces;
-        int wallConstructionIndex;
+        int wallConstructionIndex = 0;
         Real64 assumedIndoorTemperature;
     };
 

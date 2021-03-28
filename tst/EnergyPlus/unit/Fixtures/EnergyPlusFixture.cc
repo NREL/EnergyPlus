@@ -91,11 +91,11 @@ void EnergyPlusFixture::openOutputFiles(EnergyPlusData &state)
 
 void EnergyPlusFixture::SetUp()
 {
+//    if (this->state) {
+//        this->state->clear_state();
+//    } else {
     this->state = new EnergyPlusData;
-    if (!state->dataInputProcessing->inputProcessor) state->dataInputProcessing->inputProcessor = InputProcessor::factory();
-    state->clear_state();
-
-    //state->dataInputProcessing->inputProcessor->clear_state();
+//    }
 
     show_message();
 
@@ -132,7 +132,7 @@ void EnergyPlusFixture::TearDown()
     state->files.mtr.del();
     state->files.bnd.del();
     state->files.shade.del();
-    state->clear_state();
+//    state->clear_state();
     delete this->state;
 }
 
