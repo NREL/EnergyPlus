@@ -136,7 +136,7 @@ namespace EnergyPlus::TARCOGArgs {
                  const Array1D<Real64> &SlatCurve,
                  const Array1D<Real64> &vvent,
                  const Array1D<Real64> &tvent,
-                 const Array1D_int &LayerType,
+                 const TARCOGParams::TARCOGLayerType &LayerType,
                  const Array1D_int &nslice,
                  const Array1D<Real64> &LaminateA,
                  const Array1D<Real64> &LaminateB,
@@ -379,14 +379,14 @@ namespace EnergyPlus::TARCOGArgs {
                 ErrorMessage = format("Layer width is less than (or equal to) zero. Layer #{:3}", i);
                 return ArgCheck;
             }
-            if ((i < nlayer) && IsShadingLayer(LayerType(i)) && IsShadingLayer(LayerType(i + 1))) {
+            if ((i < nlayer) && IsShadingLayer(static_cast<int>(LayerType(i))) && IsShadingLayer(static_cast<int>(LayerType(i + 1)))) {
                 ArgCheck = 37;
                 ErrorMessage = "Cannot handle two consecutive shading layers.";
                 return ArgCheck;
             }
             // Deflection cannot be calculated with IGU containing shading layer. This error check is to be
             // removed once that extension is programmed
-            if ((CalcDeflection > 0.0) && (LayerType(i) != SPECULAR)) {
+            if ((CalcDeflection > 0.0) && (LayerType(i) != TARCOGParams::TARCOGLayerType::SPECULAR)) {
                 ArgCheck = 42;
                 ErrorMessage = "Cannot calculate deflection with IGU containing shading devices.";
                 return ArgCheck;
@@ -445,7 +445,7 @@ namespace EnergyPlus::TARCOGArgs {
                 return ArgCheck;
             }
 
-            if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) { // Venetian blind specific:
+            if (LayerType(i) == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ || LayerType(i) == TARCOGParams::TARCOGLayerType::VENETBLIND_VERT) { // Venetian blind specific:
                 if (SlatThick(i) <= 0) {
                     ArgCheck = 31;
                     ErrorMessage = format("Invalid slat thickness (must be >0). Layer #{:3}", i);
@@ -599,7 +599,7 @@ namespace EnergyPlus::TARCOGArgs {
 
         // Adjust shading layer properties
         for (int i = 1; i <= nlayer; ++i) {
-            if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) {
+            if (LayerType(i) == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ || LayerType(i) == TARCOGParams::TARCOGLayerType::VENETBLIND_VERT) {
                 scon(i) = SlatCond(i);
                 if (ThermalMod == THERM_MOD_SCW) {
                     // bi...the idea here is to have glass-to-glass width the same as before scaling
@@ -613,10 +613,10 @@ namespace EnergyPlus::TARCOGArgs {
                     thick(i) = SlatThick(i);
                     const Real64 slatAngRad = SlatAngle(i) * 2.0 * DataGlobalConstants::Pi / 360.0;
                     Real64 C4_VENET(0);
-                    if (LayerType(i) == VENETBLIND_HORIZ) {
+                    if (LayerType(i) == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ) {
                         C4_VENET = C4_VENET_HORIZONTAL;
                     }
-                    if (LayerType(i) == VENETBLIND_VERT) {
+                    if (LayerType(i) == TARCOGParams::TARCOGLayerType::VENETBLIND_VERT) {
                         C4_VENET = C4_VENET_VERTICAL;
                     }
                     thick(i) = C4_VENET * (SlatWidth(i) * cos(slatAngRad) + thick(i) * sin(slatAngRad));

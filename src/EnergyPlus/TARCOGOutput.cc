@@ -105,7 +105,7 @@ namespace EnergyPlus::TARCOGOutput {
                              Real64 const tilt,
                              Real64 const totsol,
                              int const nlayer,
-                             const Array1D_int &LayerType,
+                             const TARCOGLayerType &LayerType,
                              const Array1D<Real64> &thick,
                              const Array1D<Real64> &scon,
                              const Array1D<Real64> &asol,

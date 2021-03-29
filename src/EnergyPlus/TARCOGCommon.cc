@@ -50,6 +50,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include "TARCOGParams.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
@@ -70,7 +71,7 @@ namespace TARCOGCommon {
     // PURPOSE OF THIS MODULE:
     // A module which contains common TARCOG functions and subroutines
 
-    bool IsShadingLayer(int const layertype)
+    bool IsShadingLayer(TARCOGLayerType const layertype)
     {
 
         // Using/Aliasing

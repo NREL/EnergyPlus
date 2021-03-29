@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 
 namespace EnergyPlus {
 
@@ -106,7 +107,7 @@ namespace TARCOGOutput {
                              Real64 tilt,
                              Real64 totsol,
                              int nlayer,
-                             const Array1D_int &LayerType,
+                             const TARCOGParams::TARCOGLayerType &LayerType,
                              const Array1D<Real64> &thick,
                              const Array1D<Real64> &scon,
                              const Array1D<Real64> &asol,
@@ -149,7 +150,7 @@ namespace TARCOGOutput {
                                 Real64 Gout,
                                 Real64 Gin,
                                 int nlayer,
-                                const Array1D_int &LayerType,
+                                const TARCOGParams::TARCOGLayerType &LayerType,
                                 const Array1D_int &nmix,
                                 Array2A<Real64> frct,
                                 const Array1D<Real64> &thick,
@@ -185,7 +186,7 @@ namespace TARCOGOutput {
                               Real64 hrout,
                               const Array1D<Real64> &Ra,
                               const Array1D<Real64> &Nu,
-                              const Array1D_int &LayerType,
+                              const TARCOGParams::TARCOGLayerType &LayerType,
                               const Array1D<Real64> &Ebf,
                               const Array1D<Real64> &Ebb,
                               const Array1D<Real64> &Rf,
@@ -250,7 +251,7 @@ namespace TARCOGOutput {
                               Real64 tilt,
                               Real64 totsol,
                               int nlayer,
-                              const Array1D_int &LayerType,
+                              const TARCOGParams::TARCOGLayerType &LayerType,
                               const Array1D<Real64> &thick,
                               const Array1D<Real64> &scon,
                               const Array1D<Real64> &YoungsMod,

@@ -64,14 +64,16 @@ namespace EnergyPlus::TARCOGParams {
     int constexpr maxlay2(maxlay * 2);  // maximum number of glass surfaces (maxlay*2)
     int constexpr maxlay3(maxlay2 + 1); // maximum number of ? (maxlay2+1)
 
-    //  Layer types:
-    extern int const SPECULAR;
-    extern int const VENETBLIND_VERT;
-    extern int const WOVSHADE;
-    extern int const PERFORATED;
-    extern int const DIFFSHADE;
-    extern int const BSDF;
-    extern int const VENETBLIND_HORIZ;
+//  Layer types:
+    enum class TARCOGLayerType : int {
+        SPECULAR = 0,
+        VENETBLIND_HORIZ = 1,
+        WOVSHADE = 2,
+        PERFORATED = 3,
+        DIFFSHADE = 4,
+        BSDF = 5,
+        VENETBLIND_VERT = 6
+    };
 
     extern int const MinLayType;
     extern int const MaxLayType;
