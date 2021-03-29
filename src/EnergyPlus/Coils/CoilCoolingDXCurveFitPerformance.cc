@@ -532,7 +532,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
                         " has zero rated total cooling capacity. Standard ratings cannot be calculated.");
     }
 }
-void CoilCoolingDXCurveFitPerformance::setOperMode(EnergyPlusData &state, CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode)
+void CoilCoolingDXCurveFitPerformance::setOperMode(EnergyPlus::EnergyPlusData &state, CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode)
 {
     // set parent mode for each speed
     int numSpeeds;
