@@ -63,14 +63,6 @@ namespace EnergyPlus::TARCOGParams {
     // PURPOSE OF THIS MODULE:
     // Module which contains common TARCOG parameters and constants
 
-    int const MinLayType(0);
-    int const MaxLayType(6);
-
-    //  Thermal models:
-    int const THERM_MOD_ISO15099(0);
-    int const THERM_MOD_SCW(1);
-    int const THERM_MOD_CSM(2);
-
     int const YES_SupportPillar(1);
 
     // Deflection parameters

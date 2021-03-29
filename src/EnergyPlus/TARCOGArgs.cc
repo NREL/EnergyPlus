@@ -425,7 +425,9 @@ namespace EnergyPlus::TARCOGArgs {
                 return ArgCheck;
             }
 
-            if ((static_cast<int>(LayerType(i)) < MinLayType) || (static_cast<int>(LayerType(i)) > MaxLayType)) {
+            if (((LayerType(i)) != TARCOGLayerType::SPECULAR) || ((LayerType(i)) != TARCOGLayerType::WOVSHADE) ||
+                ((LayerType(i)) != TARCOGLayerType::PERFORATED) || ((LayerType(i)) != TARCOGLayerType::DIFFSHADE) ||
+                ((LayerType(i)) != TARCOGLayerType::BSDF) || ((LayerType(i)) != TARCOGLayerType::VENETBLIND_VERT)) {
                 ArgCheck = 22;
                 ErrorMessage = format("Incorrect layer type for layer #{:3}"
                                ".  Layer type can either be 0 (glazing layer), 1 (Venetian blind), 2 (woven shade), 3 (perforated), 4 (diffuse "

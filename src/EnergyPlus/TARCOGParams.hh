@@ -76,13 +76,10 @@ namespace EnergyPlus::TARCOGParams {
         VENETBLIND_VERT = 6
     };
 
-    extern int const MinLayType;
-    extern int const MaxLayType;
-
     //  Thermal models:
-    extern int const THERM_MOD_ISO15099;
-    extern int const THERM_MOD_SCW;
-    extern int const THERM_MOD_CSM;
+    int const THERM_MOD_ISO15099(0);
+    int const THERM_MOD_SCW(1);
+    int const THERM_MOD_CSM(2);
 
     extern int const YES_SupportPillar;
 
