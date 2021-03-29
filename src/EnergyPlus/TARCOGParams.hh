@@ -66,6 +66,7 @@ namespace EnergyPlus::TARCOGParams {
 
 //  Layer types:
     enum class TARCOGLayerType : int {
+        UNASSSIGNED = -1,
         SPECULAR = 0,
         VENETBLIND_HORIZ = 1,
         WOVSHADE = 2,

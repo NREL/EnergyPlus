@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 
 namespace EnergyPlus {
 
@@ -61,13 +62,6 @@ namespace DataComplexFenestration {
     // Using/Aliasing
 
     // Data
-    // Parameters for complex shade
-    constexpr int csVenetianHorizontal(1);
-    constexpr int csWoven(2);
-    constexpr int csPerforated(3);
-    constexpr int csOtherShadingType(4);
-    constexpr int csBSDF(5);
-    constexpr int csVenetianVertical(6);
 
     // Parameters for gas definitions
     constexpr int GasCoeffsCustom(0);
@@ -123,7 +117,7 @@ namespace DataComplexFenestration {
     {
         // Members
         std::string Name;               // Name for complex shade
-        int LayerType;                  // Layer type (OtherShadingType, Venetian, Woven, Perforated)
+        TARCOGParams::TARCOGLayerType LayerType;                  // Layer type (OtherShadingType, Venetian, Woven, Perforated)
         Real64 Thickness;               // Layer thickness (m)
         Real64 Conductivity;            // Layer conductivity (W/m2K)
         Real64 IRTransmittance;         // IR Transmittance
@@ -143,7 +137,7 @@ namespace DataComplexFenestration {
 
         // Default Constructor
         WindowComplexShade()
-            : LayerType(-1), Thickness(0.0), Conductivity(0.0), IRTransmittance(0.0), FrontEmissivity(0.0), BackEmissivity(0.0),
+            : LayerType(TARCOGParams::TARCOGLayerType::UNASSSIGNED), Thickness(0.0), Conductivity(0.0), IRTransmittance(0.0), FrontEmissivity(0.0), BackEmissivity(0.0),
               TopOpeningMultiplier(0.0), BottomOpeningMultiplier(0.0), LeftOpeningMultiplier(0.0), RightOpeningMultiplier(0.0),
               FrontOpeningMultiplier(0.0), SlatWidth(0.0), SlatSpacing(0.0), SlatThickness(0.0), SlatAngle(0.0), SlatConductivity(0.0), SlatCurve(0.0)
         {

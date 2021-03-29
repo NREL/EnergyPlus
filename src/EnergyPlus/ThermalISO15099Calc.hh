@@ -147,7 +147,7 @@ namespace ThermalISO15099Calc {
                        const Array1D<Real64> &SlatCurve,
                        const Array1D<Real64> &vvent,
                        const Array1D<Real64> &tvent,
-                       const Array1D_int &LayerType,
+                       const Array1D<TARCOGLayerType> &LayerType,
                        const Array1D_int &nslice,
                        const Array1D<Real64> &LaminateA,
                        const Array1D<Real64> &LaminateB,
@@ -235,7 +235,7 @@ namespace ThermalISO15099Calc {
                  const Array1D<Real64> &EffectiveOpenness,
                  const Array1D<Real64> &vvent,
                  const Array1D<Real64> &tvent,
-                 const Array1D_int &LayerType,
+                 const Array1D<TARCOGLayerType> &LayerType,
                  Array1D<Real64> &Ra,
                  Array1D<Real64> &Nu,
                  Array1D<Real64> &vfreevent,
@@ -279,7 +279,7 @@ namespace ThermalISO15099Calc {
                 Array1D<Real64> &Theta,
                 Array1D<Real64> &qlayer,
                 const Array1D<Real64> &qv,
-                const Array1D_int &LayerType,
+                const Array1D<TARCOGLayerType> &LayerType,
                 const Array1D<Real64> &thick,
                 const Array1D<Real64> &scon,
                 Real64 &ufactor,
@@ -340,7 +340,7 @@ namespace ThermalISO15099Calc {
 
     void effectiveLayerCond(EnergyPlusData &state,
                             int nlayer,
-                            const Array1D_int &LayerType,             // Layer type
+                            const Array1D<TARCOGLayerType> &LayerType,             // Layer type
                             const Array1D<Real64> &scon,              // Layer thermal conductivity
                             const Array1D<Real64> &thick,             // Layer thickness
                             Array2A_int iprop,                        // Gas type in gaps
@@ -471,7 +471,7 @@ namespace ThermalISO15099Calc {
         Array1D<Real64> tvent_NOSD = Array1D<Real64>(maxlay1);
         Array1D<Real64> qv_NOSD = Array1D<Real64>(maxlay1);
         Array1D<Real64> q_NOSD = Array1D<Real64>(maxlay3);
-        Array1D_int LayerType_NOSD = Array1D_int(maxlay);
+        Array1D<TARCOGParams::TARCOGLayerType> LayerType_NOSD = Array1D<TARCOGParams::TARCOGLayerType>(maxlay);
         Array1D<Real64> gap_NOSD = Array1D<Real64>(maxlay);
         Array1D<Real64> thick_NOSD = Array1D<Real64>(maxlay);
         Array1D<Real64> scon_NOSD = Array1D<Real64>(maxlay);
@@ -576,7 +576,7 @@ namespace ThermalISO15099Calc {
             this->tvent_NOSD = Array1D<Real64>(maxlay1);
             this->qv_NOSD = Array1D<Real64>(maxlay1);
             this->q_NOSD = Array1D<Real64>(maxlay3);
-            this->LayerType_NOSD = Array1D_int(maxlay);
+            this->LayerType_NOSD = Array1D<TARCOGLayerType>(maxlay);
             this->gap_NOSD = Array1D<Real64>(maxlay);
             this->thick_NOSD = Array1D<Real64>(maxlay);
             this->scon_NOSD = Array1D<Real64>(maxlay);

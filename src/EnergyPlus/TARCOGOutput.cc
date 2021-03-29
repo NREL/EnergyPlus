@@ -105,7 +105,7 @@ namespace EnergyPlus::TARCOGOutput {
                              Real64 const tilt,
                              Real64 const totsol,
                              int const nlayer,
-                             const TARCOGLayerType &LayerType,
+                             const Array1D<TARCOGParams::TARCOGLayerType> &LayerType,
                              const Array1D<Real64> &thick,
                              const Array1D<Real64> &scon,
                              const Array1D<Real64> &asol,
@@ -350,15 +350,15 @@ namespace EnergyPlus::TARCOGOutput {
         for (i = 1; i <= nlayer; ++i) {
             {
                 auto const SELECT_CASE_var(LayerType(i));
-                if (SELECT_CASE_var == DIFFSHADE) { // Diffuse Shade
+                if (SELECT_CASE_var == TARCOGLayerType::DIFFSHADE) { // Diffuse Shade
                     print(InArgumentsFile, Format_10806, i, LayerType(i));
-                } else if (SELECT_CASE_var == WOVSHADE) { // Woven Shade
+                } else if (SELECT_CASE_var == TARCOGLayerType::WOVSHADE) { // Woven Shade
                     print(InArgumentsFile, Format_10805, i, LayerType(i));
-                } else if (SELECT_CASE_var == VENETBLIND_HORIZ) { // Horizontal venetian blind
+                } else if (SELECT_CASE_var == TARCOGLayerType::VENETBLIND_HORIZ) { // Horizontal venetian blind
                     print(InArgumentsFile, Format_10804, i, LayerType(i));
-                } else if (SELECT_CASE_var == VENETBLIND_VERT) { // Vertical venetian blind
+                } else if (SELECT_CASE_var == TARCOGLayerType::VENETBLIND_VERT) { // Vertical venetian blind
                     print(InArgumentsFile, Format_10810, i, LayerType(i));
-                } else if (SELECT_CASE_var == SPECULAR) { // Specular layer
+                } else if (SELECT_CASE_var == TARCOGLayerType::SPECULAR) { // Specular layer
                     if (nslice(i) <= 1) {
                         print(InArgumentsFile, Format_10802, i, LayerType(i)); // Monolithic glass
                     } else {
@@ -376,7 +376,7 @@ namespace EnergyPlus::TARCOGOutput {
             print(InArgumentsFile, Format_1094, emis(2 * i - 1));
             print(InArgumentsFile, Format_1095, emis(2 * i));
 
-            if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) { // SD layer
+            if (LayerType(i) == TARCOGLayerType::VENETBLIND_HORIZ || LayerType(i) == TARCOGLayerType::VENETBLIND_VERT) { // SD layer
                 print(InArgumentsFile, Format_1100, Atop(i));
                 print(InArgumentsFile, Format_1101, Abot(i));
                 print(InArgumentsFile, Format_1102, Al(i));
@@ -447,7 +447,7 @@ namespace EnergyPlus::TARCOGOutput {
                                 Real64 const Gout,
                                 Real64 const Gin,
                                 int const nlayer,
-                                const Array1D_int &LayerType,
+                                const Array1D<TARCOGParams::TARCOGLayerType> &LayerType,
                                 const Array1D_int &nmix,
                                 Array2A<Real64> const frct,
                                 const Array1D<Real64> &thick,
@@ -513,7 +513,8 @@ namespace EnergyPlus::TARCOGOutput {
         print(InArgumentsFile, "\n");
 
         for (i = 1; i <= nlayer; ++i) {
-            if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) { // SD layer
+            if ((TARCOGLayerType)LayerType(i) == TARCOGLayerType::VENETBLIND_HORIZ ||
+                (TARCOGLayerType)LayerType(i) == TARCOGLayerType::VENETBLIND_VERT) { // SD layer
                 print(InArgumentsFile, Format_1084, i, LayerType(i));
                 print(InArgumentsFile, Format_1090, thick(i));
                 print(InArgumentsFile, Format_1091, scon(i));
@@ -565,7 +566,7 @@ namespace EnergyPlus::TARCOGOutput {
                               Real64 const hrout,
                               const Array1D<Real64> &Ra,
                               const Array1D<Real64> &Nu,
-                              const Array1D_int &LayerType,
+                              const Array1D<TARCOGParams::TARCOGLayerType> &LayerType,
                               const Array1D<Real64> &Ebf,
                               const Array1D<Real64> &Ebb,
                               const Array1D<Real64> &Rf,
@@ -681,20 +682,20 @@ namespace EnergyPlus::TARCOGOutput {
         // bi  Write out layer properties:
         for (i = 1; i <= nlayer; ++i) {
             {
-                auto const SELECT_CASE_var(LayerType(i));
-                if (SELECT_CASE_var == SPECULAR) { // Specular layer
+                TARCOGLayerType const SELECT_CASE_var((LayerType(i)));
+                if ((SELECT_CASE_var) == TARCOGLayerType::SPECULAR) { // Specular layer
                     print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
                     print(OutArgumentsFile, Format_2190, i, q(2 * i));
                     print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
-                } else if (SELECT_CASE_var == VENETBLIND_HORIZ || SELECT_CASE_var == VENETBLIND_VERT) { // Venetian blind
+                } else if (SELECT_CASE_var == TARCOGLayerType::VENETBLIND_HORIZ || SELECT_CASE_var == TARCOGLayerType::VENETBLIND_VERT) { // Venetian blind
                     print(OutArgumentsFile, Format_2111, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
                     print(OutArgumentsFile, Format_2195, i, q(2 * i), i, ShadeGapKeffConv(i));
                     print(OutArgumentsFile, Format_2111, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
-                } else if (SELECT_CASE_var == WOVSHADE) { // Venetian blind
+                } else if (SELECT_CASE_var == TARCOGLayerType::WOVSHADE) { // Venetian blind
                     print(OutArgumentsFile, Format_2112, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
                     print(OutArgumentsFile, Format_2195, i, q(2 * i), i, ShadeGapKeffConv(i));
                     print(OutArgumentsFile, Format_2112, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
-                } else if (SELECT_CASE_var == DIFFSHADE) { // Venetian blind
+                } else if (SELECT_CASE_var == TARCOGLayerType::DIFFSHADE) { // Venetian blind
                     print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
                     print(OutArgumentsFile, Format_2190, i, q(2 * i));
                     print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
@@ -736,25 +737,25 @@ namespace EnergyPlus::TARCOGOutput {
         for (i = 1; i <= nlayer; ++i) {
             {
                 auto const SELECT_CASE_var(LayerType(i));
-                if (SELECT_CASE_var == SPECULAR) { // Specular layer
+                if (SELECT_CASE_var == TARCOGLayerType::SPECULAR) { // Specular layer
                     print(OutArgumentsFile, Format_4110, i, Ebf(i), i, Rf(i));
                     print(OutArgumentsFile, Format_4111);
                     print(OutArgumentsFile, Format_4190);
                     print(OutArgumentsFile, Format_4121);
                     print(OutArgumentsFile, Format_4120, i, Ebb(i), i, Rb(i));
-                } else if (SELECT_CASE_var == VENETBLIND_HORIZ || SELECT_CASE_var == VENETBLIND_VERT) { // Venetian blind
+                } else if (SELECT_CASE_var == TARCOGLayerType::VENETBLIND_HORIZ || SELECT_CASE_var == TARCOGLayerType::VENETBLIND_VERT) { // Venetian blind
                     print(OutArgumentsFile, Format_4112, i, Ebf(i), i, Rf(i));
                     print(OutArgumentsFile, Format_4113);
                     print(OutArgumentsFile, Format_4190);
                     print(OutArgumentsFile, Format_4123);
                     print(OutArgumentsFile, Format_4122, i, Ebb(i), i, Rb(i));
-                } else if (SELECT_CASE_var == WOVSHADE) { // Venetian blind
+                } else if (SELECT_CASE_var == TARCOGLayerType::WOVSHADE) { // Venetian blind
                     print(OutArgumentsFile, Format_4114, i, Ebf(i), i, Rf(i));
                     print(OutArgumentsFile, Format_4115);
                     print(OutArgumentsFile, Format_4190);
                     print(OutArgumentsFile, Format_4125);
                     print(OutArgumentsFile, Format_4124, i, Ebb(i), i, Rb(i));
-                } else if (SELECT_CASE_var == DIFFSHADE) {
+                } else if (SELECT_CASE_var == TARCOGLayerType::DIFFSHADE) {
                     print(OutArgumentsFile, Format_4116, i, Ebf(i), i, Rf(i));
                     print(OutArgumentsFile, Format_4117);
                     print(OutArgumentsFile, Format_4190);
@@ -896,7 +897,7 @@ namespace EnergyPlus::TARCOGOutput {
                               Real64 const tilt,
                               Real64 const totsol,
                               int const nlayer,
-                              const Array1D_int &LayerType,
+                              const Array1D<TARCOGParams::TARCOGLayerType> &LayerType,
                               const Array1D<Real64> &thick,
                               const Array1D<Real64> &scon,
                               const Array1D<Real64> &YoungsMod,
@@ -1124,13 +1125,13 @@ namespace EnergyPlus::TARCOGOutput {
 
         for (i = 1; i <= nlayer; ++i) {
             print(files.WINCogFile, Format_113);
-            if (LayerType(i) == SPECULAR) {
+            if (LayerType(i) == TARCOGLayerType::SPECULAR) {
                 print(files.WINCogFile, Format_1060, i);
-            } else if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) {
+            } else if (LayerType(i) == TARCOGLayerType::VENETBLIND_HORIZ || LayerType(i) == TARCOGLayerType::VENETBLIND_VERT) {
                 print(files.WINCogFile, Format_1061, i);
-            } else if (LayerType(i) == WOVSHADE) {
+            } else if (LayerType(i) == TARCOGLayerType::WOVSHADE) {
                 print(files.WINCogFile, Format_1062, i);
-            } else if (LayerType(i) == DIFFSHADE) {
+            } else if (LayerType(i) == TARCOGLayerType::DIFFSHADE) {
                 print(files.WINCogFile, Format_1063, i);
             } else {
                 print(files.WINCogFile, Format_1064, i);
@@ -1156,7 +1157,7 @@ namespace EnergyPlus::TARCOGOutput {
                 print(files.WINCogFile, Format_1053, Atop(i), Abot(i), Al(i), Ar(i), Ah(i));
             }
 
-            if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) {
+            if (LayerType(i) == TARCOGLayerType::VENETBLIND_HORIZ || LayerType(i) == TARCOGLayerType::VENETBLIND_VERT) {
                 print(files.WINCogFile, Format_1054);
                 print(files.WINCogFile, Format_1055, SlatThick(i), SlatWidth(i), SlatAngle(i), SlatCond(i), SlatSpacing(i), SlatCurve(i));
             }

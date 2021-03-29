@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 
 namespace EnergyPlus {
 
@@ -64,7 +65,7 @@ namespace TARCOGCommon {
 
     int constexpr NMAX(500);
 
-    bool IsShadingLayer(int layertype);
+    bool IsShadingLayer(const EnergyPlus::TARCOGParams::TARCOGLayerType layertype);
 
     Real64 LDSumMax(Real64 Width, Real64 Height);
 

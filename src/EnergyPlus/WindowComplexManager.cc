@@ -2896,7 +2896,7 @@ namespace WindowComplexManager {
 
             if ((state.dataMaterial->Material(LayPtr).Group == WindowGlass) || (state.dataMaterial->Material(LayPtr).Group == WindowSimpleGlazing)) {
                 ++IGlass;
-                LayerType(IGlass) = 0; // this marks specular layer type
+                LayerType(IGlass) = TARCOGParams::TARCOGLayerType::SPECULAR; // this marks specular layer type
                 thick(IGlass) = state.dataMaterial->Material(LayPtr).Thickness;
                 scon(IGlass) = state.dataMaterial->Material(LayPtr).Conductivity;
                 emis(2 * IGlass - 1) = state.dataMaterial->Material(LayPtr).AbsorpThermalFront;
@@ -2988,7 +2988,7 @@ namespace WindowComplexManager {
         if (CalcCondition == DataBSDFWindow::noCondition) {
             // now calculate correct areas for multipliers
             for (Lay = 1; Lay <= nlayer; ++Lay) {
-                if (LayerType(Lay) != 0) { // Layer is shading
+                if (LayerType(Lay) != TARCOGParams::TARCOGLayerType::SPECULAR) { // Layer is shading
                     // before changing multipliers, need to determine which one is dominant gap width
                     if (Lay == 1) { // Exterior shading device
                         dominantGapWidth = gap(Lay);

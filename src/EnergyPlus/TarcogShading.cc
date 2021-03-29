@@ -119,7 +119,7 @@ namespace TarcogShading {
                  Array1D<Real64> const &Ah,
                  Array1D<Real64> const &vvent,
                  Array1D<Real64> const &tvent,
-                 Array1D_int const &LayerType,
+                 Array1D<TARCOGLayerType> LayerType,
                  Array1D<Real64> &Tgaps,
                  Array1D<Real64> &qv,
                  Array1D<Real64> &hcv, // Heat transfer coeefficient in gaps including airlow
@@ -1077,23 +1077,23 @@ namespace TarcogShading {
                                     Array1D<Real64> &Al_eff,         // Output - Effective left side openning area [m2]
                                     Array1D<Real64> &Ar_eff,         // Output - Effective right side openning area [m2]
                                     Array1D<Real64> &Ah_eff,         // Output - Effective front side openning area [m2]
-                                    const Array1D_int &LayerType,    // Layer type
+                                    const Array1D<TARCOGLayerType> &LayerType,    // Layer type
                                     const Array1D<Real64> &SlatAngle // Venetian layer slat angle [deg]
     )
     {
         for (int i = 1; i <= nlayer; ++i) {
-            if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) {
+            if (LayerType(i) == TARCOGLayerType::VENETBLIND_HORIZ || LayerType(i) == TARCOGLayerType::VENETBLIND_VERT) {
                 const Real64 slatAngRad = SlatAngle(i) * 2 * DataGlobalConstants::Pi / 360;
                 Real64 C1_VENET(0);
                 Real64 C2_VENET(0);
                 Real64 C3_VENET(0);
 
-                if (LayerType(i) == VENETBLIND_HORIZ) {
+                if (LayerType(i) == TARCOGLayerType::VENETBLIND_HORIZ) {
                     C1_VENET = C1_VENET_HORIZONTAL;
                     C2_VENET = C2_VENET_HORIZONTAL;
                     C3_VENET = C3_VENET_HORIZONTAL;
                 }
-                if (LayerType(i) == VENETBLIND_VERT) {
+                if (LayerType(i) == TARCOGLayerType::VENETBLIND_VERT) {
                     C1_VENET = C1_VENET_VERTICAL;
                     C2_VENET = C2_VENET_VERTICAL;
                     C3_VENET = C3_VENET_VERTICAL;
@@ -1103,7 +1103,7 @@ namespace TarcogShading {
                 Ar_eff(i) = 0.0;
                 Atop_eff(i) = Atop(i);
                 Abot_eff(i) = Abot(i);
-            } else if ((LayerType(i) == PERFORATED) || (LayerType(i) == DIFFSHADE) || (LayerType(i) == BSDF) || (LayerType(i) == WOVSHADE)) {
+            } else if ((LayerType(i) == TARCOGLayerType::PERFORATED) || (LayerType(i) == TARCOGLayerType::DIFFSHADE) || (LayerType(i) == TARCOGLayerType::BSDF) || (LayerType(i) == TARCOGLayerType::WOVSHADE)) {
                 Ah_eff(i) = width * height * C1_SHADE * pow((Ah(i) / (width * height)), C2_SHADE);
                 Al_eff(i) = Al(i) * C3_SHADE;
                 Ar_eff(i) = Ar(i) * C3_SHADE;

@@ -330,7 +330,7 @@ namespace WindowComplexManager {
         //               outdoor and indoor environment [m/s] {maxlay+1} ***
         Array1D<Real64> tvent = Array1D<Real64>(TARCOGParams::maxlay + 1, 0.0); // Vector of temperatures of ventilation gas for forced ventilation, for each
         //  gap, and for outdoor and indoor environment [K] {maxlay+1}
-        Array1D_int LayerType = Array1D_int(TARCOGParams::maxlay, 0); // Glazing layer type flag {maxlay}:
+        Array1D<TARCOGParams::TARCOGLayerType> LayerType = Array1D<TARCOGParams::TARCOGLayerType>(TARCOGParams::maxlay, 0); // Glazing layer type flag {maxlay}:
         //                 0 - Specular layer,
         //                 1 - Venetian blind (SD)
         //                 2 - Woven shade (SD) (not implemented)
