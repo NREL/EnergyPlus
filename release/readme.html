@@ -94,7 +94,7 @@
             <a class="btn btn-primary margin-bottom-6" data-toggle="collapse" href="#cDifferent" role="button"
                aria-expanded="false"
                aria-controls="cDifferent">
-                Is 9.5 different from 9.4? (What's up with this library stuff?)
+                Is 9.5 different from 9.4? (Anything new on the library front?)
             </a>
             <div class="collapse" id="cDifferent">
                 <div class="card card-body">
@@ -110,6 +110,10 @@
                         "plugins" in lieu of writing user-defined Erl code.  In the library mode, a
                         client can make function calls to setup and execute a simulation, as well as interact with
                         simulation results <b>during</b> a simulation. &#128077; &#128077; &#128077;<br>
+                        A key effort completed with 9.5 was making EnergyPlus "thread-safe" by removing all global and
+                        static data from the program.  Now each running thread of EnergyPlus has a complete simulation
+                        state, and no data is shared, so multiple runs can happen within a single process, opening the
+                        door for interesting new workflows and applications.<br>
                         See the full
                         <a href="https://github.com/NREL/EnergyPlus/releases/latest" class="card-link">ChangeLog</a>
                         for a complete list of new features added in this and previous versions.
