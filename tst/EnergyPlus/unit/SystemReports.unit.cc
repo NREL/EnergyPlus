@@ -55,12 +55,17 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/SystemReports.hh>
+#include <EnergyPlus/WindowAC.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus::SystemReports;
 using namespace EnergyPlus::DataGlobalConstants;
@@ -211,5 +216,86 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     // Calculate SysTotPropane ("Air System Propane Energy")
     ReportSystemEnergyUse(*state);
     EXPECT_EQ(state->dataSysRpts->SysTotPropane(1), 200);
+}
+TEST_F(EnergyPlusFixture, ReportMaxVentilationLoads_ZoneEquip)
+{
+    state->dataHVACGlobal->NumPrimaryAirSys = 0;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->ZonePreDefRep.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    SystemReports::AllocateAndSetUpVentReports(*state);
+    ZoneTempPredictorCorrector::InitZoneAirSetPoints(*state);
+    //state->dataSize->NumOARequirements = 2;
+    //state->dataSize->OARequirements.allocate(state->dataSize->NumOARequirements);
+
+
+    state->dataLoopNodes->Node.allocate(20);
+
+
+    // Set up 2 controlled zones with just enough info for the ventilation report test
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneDesignSpecOAIndex = 0;
+    state->dataHeatBal->Zone(1).Volume = 10.0;
+    state->dataZoneEquip->ZoneEquipConfig(1).EquipListIndex = 1;
+    int NumEquip1 = 1;
+    state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes = 1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipType_Num.allocate(NumEquip1);
+    state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(1) = DataZoneEquipment::WindowAC_Num;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(NumEquip1);
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
+    state->dataWindowAC->GetWindowACInputFlag = false;
+    state->dataWindowAC->WindAC.allocate(1);
+    state->dataWindowAC->WindAC(1).OutsideAirNode = 1;
+    state->dataLoopNodes->Node(1).MassFlowRate = 1.0;
+
+    state->dataSysRpts->VentReportStructureCreated = true;
+    state->dataSysRpts->VentLoadsReportEnabled = true;
+    SystemReports::ReportMaxVentilationLoads(*state);
+
+    EXPECT_NEAR(state->dataSysRpts->ZoneTargetVentilationFlowVoz(1), 0.0, 0.001);
+    EXPECT_NEAR(state->dataSysRpts->ZoneOAMassFlow(1), 1.0, 0.001);
+
+    //bool CompLoadFlag(false);
+    //int AirLoopNum(1);
+    //std::string CompType1;
+    //std::string CompType2;
+    //Real64 CompLoad(150.0);
+    //Real64 CompEnergyUse(100.0);
+
+    //state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 2;
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNumOut = 1;
+
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(2);
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "Main Gas Humidifier";
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "HUMIDIFIER:STEAM:GAS";
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).NodeNumIn = 1;
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).NodeNumOut = 1;
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).NumMeteredVars = 1;
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar.allocate(1);
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).EndUse_CompMode = SystemReports::iEndUseType::CoolingOnly;
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).CurMeterReading = 100.0;
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType = AssignResourceTypeNum("NaturalGas");
+
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).Name = "Main Gas Heating Coil";
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).TypeOf = "COIL:HEATING:DESUPERHEATER";
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).NodeNumIn = 2;
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).NodeNumOut = 2;
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).NumMeteredVars = 1;
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar.allocate(1);
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).EndUse_CompMode = SystemReports::iEndUseType::CoolingOnly;
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).CurMeterReading = 100.0;
+    //state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType = AssignResourceTypeNum("NaturalGas");
+
+    //state->dataLoopNodes->Node(1).MassFlowRate = 1.0;
+    //state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
+
 }
 } // namespace EnergyPlus
