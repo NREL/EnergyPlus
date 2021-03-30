@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include "Fixtures/InputProcessorFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -4220,6 +4221,103 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
 
 }
 
+TEST_F(InputProcessorFixture, epJSONgetObjectItem_minfields)
+{
+
+    json root;
+    std::string obj_name1 = "Building";
+    std::string name1 = "Building 1";
+    json bldg1 = {{"loads_convergence_tolerance_value", 0.1}, {"terrain", "Ocean"}};
+    EXPECT_TRUE(bldg1.is_object());
+    root[obj_name1][name1] = bldg1;
+
+    std::string obj_name2 = "Material:NoMass";
+    std::string name2 = "Standard insulation_01";
+    json mat1 = {{"name", name1}, {"roughness", "MediumRough"}, {"thermal_resistance", 2.0}, {"solar_absorptance", 0.5}};
+    EXPECT_TRUE(mat1.is_object());
+    root[obj_name2][name2] = mat1;
+
+    state->dataInputProcessing->inputProcessor->epJSON = root;
+    // getEpJSON();
+
+    int numAlphas = 0;
+    int numNumbers = 0;
+    int ioStat = 0;
+    state->dataGlobal->isEpJSON = true;
+    state->dataInputProcessing->inputProcessor->initializeMaps();
+
+    int maxAlphas = 20;
+    int maxNumbers = 20;
+    state->dataIPShortCut->lNumericFieldBlanks.allocate(maxNumbers);
+    state->dataIPShortCut->lAlphaFieldBlanks.allocate(maxAlphas);
+    state->dataIPShortCut->cAlphaFieldNames.allocate(maxAlphas);
+    state->dataIPShortCut->cNumericFieldNames.allocate(maxNumbers);
+    state->dataIPShortCut->cAlphaArgs.allocate(maxAlphas);
+    state->dataIPShortCut->rNumericArgs.allocate(maxNumbers);
+    state->dataIPShortCut->lNumericFieldBlanks = false;
+    state->dataIPShortCut->lAlphaFieldBlanks = false;
+    state->dataIPShortCut->cAlphaFieldNames = " ";
+    state->dataIPShortCut->cNumericFieldNames = " ";
+    state->dataIPShortCut->cAlphaArgs = " ";
+    state->dataIPShortCut->rNumericArgs = 0.0;
+
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                  obj_name1,
+                                  1,
+                                  state->dataIPShortCut->cAlphaArgs,
+                                  numAlphas,
+                                  state->dataIPShortCut->rNumericArgs,
+                                  numNumbers,
+                                  ioStat,
+                                  state->dataIPShortCut->lNumericFieldBlanks,
+                                  state->dataIPShortCut->lAlphaFieldBlanks,
+                                  state->dataIPShortCut->cAlphaFieldNames,
+                                  state->dataIPShortCut->cNumericFieldNames);
+
+    // For Building, min-fields is 8, which is the entire object, regardless of the number of input object fields
+    EXPECT_EQ(numAlphas, 3);
+    EXPECT_EQ(numNumbers, 5);
+
+    // User inputs from above
+    // Note even though choice keys are case-sensitive during epJSON processing, getObjectItem pushes Alphas to UPPERcase
+    EXPECT_EQ(state->dataIPShortCut->cAlphaArgs(1), name1); // Building Name field is tagged with /retaincase
+    EXPECT_EQ(state->dataIPShortCut->cAlphaArgs(2), "OCEAN");
+    EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(2), 0.1, 0.0001);
+    // Defaults from schema
+    EXPECT_EQ(state->dataIPShortCut->cAlphaArgs(3), "FULLEXTERIOR");
+    EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(1), 0.0, 0.0001);
+    EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(3), 0.4, 0.0001);
+    EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(4), 25.0, 0.0001);
+    EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(5), 1.0, 0.0001);
+
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                  obj_name2,
+                                  1,
+                                  state->dataIPShortCut->cAlphaArgs,
+                                  numAlphas,
+                                  state->dataIPShortCut->rNumericArgs,
+                                  numNumbers,
+                                  ioStat,
+                                  state->dataIPShortCut->lNumericFieldBlanks,
+                                  state->dataIPShortCut->lAlphaFieldBlanks,
+                                  state->dataIPShortCut->cAlphaFieldNames,
+                                  state->dataIPShortCut->cNumericFieldNames);
+
+    // For Material:NoMass, min-fields is 3, but the input object above takes it to A2 and N3
+    EXPECT_EQ(numAlphas, 2);
+    EXPECT_EQ(numNumbers, 3);
+
+    // User inputs from above
+    // Note even though choice keys are case-sensitive during epJSON processing, getObjectItem pushes Alphas to UPPERcase
+    EXPECT_EQ(state->dataIPShortCut->cAlphaArgs(1), UtilityRoutines::MakeUPPERCase(name2)); // Material Name field is NOT tagged with /retaincase
+    EXPECT_EQ(state->dataIPShortCut->cAlphaArgs(2), "MEDIUMROUGH");
+    EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(1), 2.0, 0.0001);
+    EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(3), 0.5, 0.0001);
+    // Defaults from schema
+    EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(2), 0.9, 0.0001);
+    // Fields beyond min-fields come back as blank or zero, even if they have a default
+    EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(4), 0.0, 0.0001);
+}
 
 /*
    TEST_F( InputProcessorFixture, processIDF_json )
