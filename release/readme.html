@@ -37,8 +37,8 @@
             <div class="col-md-8 text-center">
                 <h1><img src="favicon.png" alt="EnergyPlus Logo" width="98" height="98"> EnergyPlus</h1>
                 <p>
-                    Version 9.4.0<br>
-                    30 September 2020<br>
+                    Version 9.5.0<br>
+                    31 March 2021<br>
                     <em>EnergyPlus is a trademark of the US Department of Energy.</em>
                 </p>
             </div>
@@ -88,13 +88,13 @@
         set – see below).
     </p>
 
-    <h2><a id="Whats_going_on"></a>What’s going on in V9.4?</h2>
+    <h2><a id="Whats_going_on"></a>What’s going on in V9.5?</h2>
     <div class="row">
         <div class="col-md-12">
             <a class="btn btn-primary margin-bottom-6" data-toggle="collapse" href="#cDifferent" role="button"
                aria-expanded="false"
                aria-controls="cDifferent">
-                Is 9.4 different from 9.3? (What's up with this library stuff?)
+                Is 9.5 different from 9.4? (What's up with this library stuff?)
             </a>
             <div class="collapse" id="cDifferent">
                 <div class="card card-body">
@@ -110,9 +110,7 @@
                         "plugins" in lieu of writing user-defined Erl code.  In the library mode, a
                         client can make function calls to setup and execute a simulation, as well as interact with
                         simulation results <b>during</b> a simulation. &#128077; &#128077; &#128077;<br>
-                        With version 9.4 the library APIs heavily changed, so scripts will need to be updated. (Don't
-                        worry we won't make a habit of that!).  Details of these major changes along with other
-                        significant features for this version are listed below in this readme.  Also, see the full
+                        See the full
                         <a href="https://github.com/NREL/EnergyPlus/releases/latest" class="card-link">ChangeLog</a>
                         for a complete list of new features added in this and previous versions.
                     </p>
@@ -126,13 +124,13 @@
             <a class="btn btn-primary margin-bottom-6" data-toggle="collapse" href="#collapseIDDIDF" role="button"
                aria-expanded="false"
                aria-controls="collapseIDDIDF">
-                Are 9.4 and 9.3 IDD and IDF files the same?
+                Are 9.5 and 9.4 IDD and IDF files the same?
             </a>
             <div class="collapse" id="collapseIDDIDF">
                 <div class="card card-body">
                     <h5 class="card-title">No, they are different</h5>
-                    <p class="card-text">There are a few key changes in the V9.4 IDD. For best results, use the transition program to
-                    transfer from the earlier V9.3 files. Use the IDFVersionUpdater program for best results.</p>
+                    <p class="card-text">There are a few key changes in the V9.5 IDD. For best results, use the transition program to
+                    transfer from the earlier V9.4 files. Use the IDFVersionUpdater program for best results.</p>
                 </div>
             </div>
         </div>
@@ -143,7 +141,7 @@
             <a class="btn btn-primary margin-bottom-6" data-toggle="collapse" href="#collapseCompatible" role="button"
                aria-expanded="false"
                aria-controls="collapseCompatible">
-                Is version 9.4 backward compatible? Can I run v9.3 file in v9.4?
+                Is version 9.5 backward compatible? Can I run v9.4 file in v9.5?
             </a>
             <div class="collapse" id="collapseCompatible">
                 <div class="card card-body">
@@ -151,17 +149,19 @@
                     There have been changes in the following objects which require conversion. Either read and follow
                     the Rules document or use the IDFVersionUpdater utility. The “Rules” document contains information on
                     exact object changes that you can do by hand. The updater program is described more fully in the Auxiliary
-                    Programs document. For the v9.4 release, the following objects require conversion (from V9.3):
+                    Programs document. For the v9.5 release, the following objects require conversion (from V9.4):
                     <ul class="list-group">
+                        <li class="list-group-item transition-object-name">Construction:AirBoundary</li>
+                        <li class="list-group-item transition-object-name">Coil:Cooling:WaterToAirHeatPump:EquationFit</li>
+                        <li class="list-group-item transition-object-name">Coil:Heating:WaterToAirHeatPump:EquationFit</li>
                         <li class="list-group-item transition-object-name">Construction:InternalSource</li>
-                        <li class="list-group-item transition-object-name">ZoneHVAC:HybridUnitaryHVAC</li>
-                        <li class="list-group-item transition-object-name">Output:DebuggingData</li>
-                        <li class="list-group-item transition-object-name">Output:Diagnostics</li>
+                        <li class="list-group-item transition-object-name">HeatPump:WaterToWater:EquationFit:Cooling</li>
+                        <li class="list-group-item transition-object-name">HeatPump:WaterToWater:EquationFit:Heating</li>
+                        <li class="list-group-item transition-object-name">ZoneAirMassFlowConservation</li>
                         <li class="list-group-item transition-object-name">ZoneHVAC:LowTemperatureRadiant:VariableFlow</li>
-                        <li class="list-group-item transition-object-name">ZoneHVAC:LowTemperatureRadiant:VariableFlow</li>
-                        <li class="list-group-item transition-object-name">ZoneHVAC:LowTemperatureRadiant:Electric</li>
                         <li class="list-group-item transition-object-name">ZoneHVAC:LowTemperatureRadiant:ConstantFlow</li>
-                        <li class="list-group-item transition-object-name">Multiple Objects Affected with Fuel type Synonym Unification</li>
+                        <li class="list-group-item transition-object-name">ZoneHVAC:Baseboard:RadiantConvective:Water</li>
+                        <li class="list-group-item transition-object-name">ZoneHVAC:Baseboard:RadiantConvective:Steam</li>
                     </ul>
                 </div>
             </div>
@@ -228,18 +228,7 @@
         about the included (or other) files. Weather data for more than 2100 locations in more than 100 countries can be
         downloaded on the <a href="https://energyplus.net/weather">EnergyPlus Weather Page</a>.</p>
 
-    <h2>An Important Note About the API</h2>
-    <p>
-        Under normal circumstances, we intend on providing a very stable API for clients to access EnergyPlus.
-        However, as somewhat expected (see 9.3 README), the first release of the API was always likely to expose
-        some cases that would require a change in the API.  Indeed it did.  The change is pretty widespread through the
-        API, but quite an easy change to make.  In summary - a new argument is needed in most functions, including
-        Python Plugin method overrides and user-defined runtime API callback functions.  The client merely needs to
-        accept this argument in functions and pass it back in to the API methods.  More information can be found in the
-        input-output reference document.
-    </p>
-
-    <h2>Highlights of this release (V9.4.0)</h2>
+    <h2>Highlights of this release (V9.5.0)</h2>
     <h3><a id="Highlights_of_this_release"></a>New Features</h3>
     <table class="table table-striped table-bordered">
         <tr>
@@ -332,13 +321,13 @@
 
     <h2><a id="Platforms_90"></a>Platforms</h2>
     <p>
-        Packages changed slightly with 9.4.  We are now building our packages on a new system which adds better support
-        for some platforms.  During the change, we are stepping away from some older OS versions.  For example, we are
+        Packages changed slightly with the previous release (9.4).
+        We began building our packages on a new system which adds better support
+        for newer platforms.  During the change, we stepped away from some older OS versions.  For example, we are
         not testing on Windows 7 or 8, only 10.  However, both our 32-bit and 64-bit packages now include the new
         Python plugin system, rather than just the 64-bit as previously.  We have also added packaging and testing
         with Ubuntu 20.04 <i>in addition to</i> Ubuntu 18.04.  On Mac, we are officially releasing an installer for
-        OSX 10.15, although we will make an effort to offer a package for an older version.  (Though 10.15 has been
-        out for a while now...)
+        OSX 10.15.
     </p>
     <ul class="list-group">
         <li class="list-group-item">Windows 10</li>
@@ -422,7 +411,7 @@
     <hr>
 
     <footer>
-        <p>Copyright © 1996-2020 The Board of Trustees of the University of Illinois, The Regents of the University of
+        <p>Copyright © 1996-2021 The Board of Trustees of the University of Illinois, The Regents of the University of
             California through Ernest Orlando Lawrence Berkeley National Laboratory, Oak Ridge National Laboratory,
             managed
             by
