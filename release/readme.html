@@ -236,28 +236,52 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8100">8100</a></td>
-            <td>Resilience Metrics Reporting</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8327">8327</a></td>
+            <td>Expand access for ancillary power inputs and total electricity rate/energy to all coil types in UnitarySystem</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8113">8113</a></td>
-            <td>Implementation of On-Off Control Capabilities for the Variable Flow and Electric Low Temperature Radiant Systems</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8405">8405</a></td>
+            <td>Improve PMV Calculations to consider cooling credit for elevated air velocity</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8170">8170</a></td>
-            <td>Enhancement of Low Temperature Radiant Models to Allow Multi-Zone Systems</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8413">8413</a></td>
+            <td>Additional fuel types for Generator:*Turbine objects</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8183">8183</a></td>
-            <td>Implement Changeover Delay for Hydronic Low Temperature Radiant Systems</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8417">8417</a></td>
+            <td>CondFD Surface Actuators</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8269">8269</a></td>
-            <td>Allow Multiple Scheduled Shades to Reference a Single Window</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8460">8460</a></td>
+            <td>NFP-Zone Air Mass Flow Balance Improvement</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7821">7821</a></td>
-            <td>Add Report of SEER calculated using the user specified PLF curve and default AHRI curve and C_D</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8464">8464</a></td>
+            <td>Change EquationFit coils to reference curves</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8474">8474</a></td>
+            <td>Dual units option for tabular output report</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8477">8477</a></td>
+            <td>Add EMS Actuator for View Factor to Ground</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8499">8499</a></td>
+            <td>ElectricLoadCenter:Storage:LiIonNMCBattery</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8518">8518</a></td>
+            <td>ASTM C1340 Convection Coefficient Algorithm for Radiant Barriers</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8529">8529</a></td>
+            <td>New Outdoor Air Details report</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8549">8549</a></td>
+            <td>Allow HPWH and Zonal ERVs to be modeled with AFNs</td>
         </tr>
     </table>
     <h3><a id="PerformanceFeatures"></a>Runtime Performance Enhancing Developments</h3>
@@ -267,20 +291,24 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7904">7904</a></td>
-            <td>Native E+ CSV output and conditional output file selection</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8257">8257</a></td>
+            <td>Surface Window data struct & heat balance routines refactoring</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7963">7963</a></td>
-            <td>Skip interzone diffuse solar exchange factors calculations when no interzone window exists</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8347">8347</a></td>
+            <td>Heat balance surface data structure refactoring</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8141">8141</a></td>
-            <td>SurfaceWindow struct refactoring</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8370">8370</a></td>
+            <td>Construction:AirBoundary - remove solar and radiant method fields</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8182">8182</a></td>
-            <td>Bypass interior solar distribution calculation at night</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8540">8540</a></td>
+            <td>TDD surface reordering and bug fixing</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8591">8591</a></td>
+            <td>Refactoring of interpolation functions for blinds Prof and Slat Angle</td>
         </tr>
     </table>
     <h3><a id="RefactoringEfforts"></a>Targeted Refactoring Efforts</h3>
@@ -290,20 +318,8 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8157">8157</a></td>
-            <td>WeatherManager clean up</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8173">8173</a></td>
-            <td>Fix State confusion around API</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8211">8211</a></td>
-            <td>Global Pointer-to-Implementation Redesign</td>
-        </tr>
-        <tr>
             <td>(MANY)</td>
-            <td>Many refactoring efforts to clean up global variable usage in EnergyPlus</td>
+            <td>Completed removing global and static variables from EnergyPlus</td>
         </tr>
     </table>
 
