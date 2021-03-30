@@ -242,7 +242,8 @@ private:
         std::size_t max_extensible_fields = 0;
     };
 
-    MaxFields findMaxFields(EnergyPlusData &state, json const &ep_object, std::string const &extension_key, json const &legacy_idd);
+    MaxFields findMaxFields(
+        EnergyPlusData &state, json const &ep_object, std::string const &extension_key, json const &legacy_idd, std::size_t const min_fields);
 
     void setObjectItemValue(EnergyPlusData &state,
                             json const &ep_object,

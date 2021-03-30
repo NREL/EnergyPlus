@@ -563,7 +563,8 @@ const json &InputProcessor::getObjectInstances(std::string const &ObjType)
     return epJSON.find(ObjType).value();
 }
 
-InputProcessor::MaxFields InputProcessor::findMaxFields(EnergyPlusData &state, json const &ep_object, std::string const &extension_key, json const &legacy_idd)
+InputProcessor::MaxFields InputProcessor::findMaxFields(
+    EnergyPlusData &state, json const &ep_object, std::string const &extension_key, json const &legacy_idd, std::size_t const min_fields)
 {
     InputProcessor::MaxFields maxFields;
     if (!state.dataGlobal->isEpJSON) {
@@ -577,6 +578,8 @@ InputProcessor::MaxFields InputProcessor::findMaxFields(EnergyPlusData &state, j
         }
     } else {
         auto const &legacy_idd_fields = legacy_idd["fields"];
+        // start with at least min_fields as the number of fields
+        maxFields.max_fields = min_fields;
         for (auto const &field : ep_object.items()) {
             auto const &field_key = field.key();
             if (field_key == extension_key) continue;
@@ -691,13 +694,13 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
         }
     }
     if (field_type == "a") {
-        if (within_max_fields) NumAlphas++;
+        if (within_max_fields) NumAlphas = alpha_index;
         if (is_AlphaFieldNames) {
             AlphaFieldNames()(alpha_index) = (state.dataGlobal->isEpJSON) ? field : legacy_field_info.at("field_name").get<std::string>();
         }
         alpha_index++;
     } else if (field_type == "n") {
-        if (within_max_fields) NumNumbers++;
+        if (within_max_fields) NumNumbers = numeric_index;
         if (is_NumericFieldNames) {
             NumericFieldNames()(numeric_index) = (state.dataGlobal->isEpJSON) ? field : legacy_field_info.at("field_name").get<std::string>();
         }
@@ -764,6 +767,11 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
     auto const &legacy_idd_fields = legacy_idd["fields"];
     auto const &schema_name_field = epJSON_schema_it_val.find("name");
     auto const has_idd_name_field = schema_name_field != epJSON_schema_it_val.end();
+    auto const &found_min_fields = epJSON_schema_it_val.find("min_fields");
+    size_t min_fields = 0;
+    if (found_min_fields != epJSON_schema_it_val.end()) {
+        min_fields = found_min_fields.value();
+    }
 
     auto key = legacy_idd.find("extension");
     std::string extension_key;
@@ -777,7 +785,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
 
     int alpha_index = 1;
     int numeric_index = 1;
-    auto maxFields = findMaxFields(state, obj_val, extension_key, legacy_idd);
+    auto maxFields = findMaxFields(state, obj_val, extension_key, legacy_idd, min_fields);
 
     Alphas = "";
     Numbers = 0;
