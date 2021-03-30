@@ -1158,10 +1158,10 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             }
         }
         // for fins and overhangs just add them explicitly since not otherwise classified
-        int totOverhangs = inputProcessor->getNumObjectsFound(state, "Shading:Overhang") + inputProcessor->getNumObjectsFound(state, "Shading:Overhang:Projection");
+        int totOverhangs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Shading:Overhang") + state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Shading:Overhang:Projection");
         numSurfaces(int(SurfaceClass::Overhang)) = totOverhangs;
         numExtSurfaces(int(SurfaceClass::Overhang)) = totOverhangs;
-        int totFins = inputProcessor->getNumObjectsFound(state, "Shading:Fin") + inputProcessor->getNumObjectsFound(state, "Shading:Fin:Projection");
+        int totFins = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Shading:Fin") + state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Shading:Fin:Projection");
         numSurfaces(int(SurfaceClass::Fin)) = totFins;
         numExtSurfaces(int(SurfaceClass::Fin)) = totFins;
         // go through all the surfaces again and this time insert the net area results

@@ -227,7 +227,7 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
         bool ErrorsFound(false);
 
         state.dataIPShortCut->cCurrentModuleObject = "Chiller:Absorption:Indirect";
-        state.dataChillerIndirectAbsorption->NumIndirectAbsorbers = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataChillerIndirectAbsorption->NumIndirectAbsorbers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataChillerIndirectAbsorption->NumIndirectAbsorbers <= 0) {
             ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
@@ -241,7 +241,7 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
 
         // LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
         for (AbsorberNum = 1; AbsorberNum <= state.dataChillerIndirectAbsorption->NumIndirectAbsorbers; ++AbsorberNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           AbsorberNum,
                                           state.dataIPShortCut->cAlphaArgs,

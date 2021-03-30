@@ -5841,7 +5841,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         // BSLLC Start
         // if ( sqlite ) {
-        //     sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin,
+        //     state.dataSQLiteProcedures->sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin,
         //         PeakTemp, PeakHumRat, MinOAVolFlow, DOASHeatAddRate );
         // }
         // BSLLC Finish

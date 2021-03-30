@@ -2380,9 +2380,9 @@ namespace EnergyPlus::General {
 
             cCurrentModuleObject = "Output:Surfaces:List";
 
-            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               RepNum,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -2438,9 +2438,9 @@ namespace EnergyPlus::General {
 
             cCurrentModuleObject = "Output:Surfaces:Drawing";
 
-            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               RepNum,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -2482,7 +2482,7 @@ namespace EnergyPlus::General {
                 }
             }
 
-            RepNum = inputProcessor->getNumSectionsFound("Report Variable Dictionary");
+            RepNum = state.dataInputProcessing->inputProcessor->getNumSectionsFound("Report Variable Dictionary");
             if (RepNum > 0) {
                 state.dataGeneral->VarDict = true;
                 VarDictOption1 = "REGULAR";
@@ -2491,9 +2491,9 @@ namespace EnergyPlus::General {
 
             cCurrentModuleObject = "Output:VariableDictionary";
 
-            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               RepNum,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -2511,9 +2511,9 @@ namespace EnergyPlus::General {
             }
 
             cCurrentModuleObject = "Output:Constructions";
-            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               RepNum,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -2540,9 +2540,9 @@ namespace EnergyPlus::General {
             }
 
             cCurrentModuleObject = "Output:EnergyManagementSystem";
-            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               RepNum,
                                               state.dataIPShortCut->cAlphaArgs,

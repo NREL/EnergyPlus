@@ -124,7 +124,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
 
     bool ErrorsFound(false);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -304,7 +304,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
 
     bool ErrorsFound(false);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -484,7 +484,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
 
     bool ErrorsFound(false);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -665,7 +665,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
 
     bool ErrorsFound(false);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -814,7 +814,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
 
     bool ErrorsFound(false);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     std::string const idf_objects = delimited_string({
         "	Zone,",

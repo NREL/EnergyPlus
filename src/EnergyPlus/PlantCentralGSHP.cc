@@ -539,7 +539,7 @@ namespace EnergyPlus::PlantCentralGSHP {
         int IOStat;              // IO Status when calling get input subroutine
 
         state.dataIPShortCut->cCurrentModuleObject = "CentralHeatPumpSystem";
-        state.dataPlantCentralGSHP->numWrappers = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataPlantCentralGSHP->numWrappers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataPlantCentralGSHP->numWrappers <= 0) {
             ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
@@ -549,7 +549,7 @@ namespace EnergyPlus::PlantCentralGSHP {
 
         // Load arrays with electric EIR chiller data
         for (int WrapperNum = 1; WrapperNum <= state.dataPlantCentralGSHP->numWrappers; ++WrapperNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           WrapperNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -1068,7 +1068,7 @@ namespace EnergyPlus::PlantCentralGSHP {
         Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
 
         state.dataIPShortCut->cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
-        state.dataPlantCentralGSHP->numChillerHeaters = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataPlantCentralGSHP->numChillerHeaters = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataPlantCentralGSHP->numChillerHeaters <= 0) {
             ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
@@ -1081,7 +1081,7 @@ namespace EnergyPlus::PlantCentralGSHP {
 
         // Load arrays with electric EIR chiller data
         for (int ChillerHeaterNum = 1; ChillerHeaterNum <= state.dataPlantCentralGSHP->numChillerHeaters; ++ChillerHeaterNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           ChillerHeaterNum,
                                           state.dataIPShortCut->cAlphaArgs,

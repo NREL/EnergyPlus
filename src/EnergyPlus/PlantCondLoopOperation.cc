@@ -344,16 +344,16 @@ namespace EnergyPlus::PlantCondLoopOperation {
 
         // get number of operation schemes
         CurrentModuleObject = "PlantEquipmentOperationSchemes";
-        NumPlantOpSchemes = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumPlantOpSchemes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         for (OpNum = 1; OpNum <= NumPlantOpSchemes; ++OpNum) {
-            inputProcessor->getObjectItem(state, CurrentModuleObject, OpNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, OpNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
             if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
         }
 
         CurrentModuleObject = "CondenserEquipmentOperationSchemes";
-        NumCondOpSchemes = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumCondOpSchemes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         for (OpNum = 1; OpNum <= NumCondOpSchemes; ++OpNum) {
-            inputProcessor->getObjectItem(state, CurrentModuleObject, OpNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, OpNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
             if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
         }
 
@@ -367,10 +367,10 @@ namespace EnergyPlus::PlantCondLoopOperation {
                 CurrentModuleObject = "CondenserEquipmentOperationSchemes";
                 PlantLoopObject = "CondenserLoop";
             }
-            OpNum = inputProcessor->getObjectItemNum(state,
+            OpNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state,
 CurrentModuleObject, PlantOpSchemeName);
             if (OpNum > 0) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               OpNum,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -511,20 +511,20 @@ CurrentModuleObject, PlantOpSchemeName);
         ErrorsFound = false;
 
         //**********VERIFY THE 'PLANTEQUIPMENTOPERATION:...' KEYWORDS**********
-        CLRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:CoolingLoad");
-        HLRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:HeatingLoad");
-        DBRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDryBulb");
-        WBRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorWetBulb");
-        DPRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDewpoint");
-        RHRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorRelativeHumidity");
-        CSPBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:ComponentSetpoint"); //* Temp Based Control
-        NumUserDefOpSchemes = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:UserDefined");
-        DBTDBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDryBulbDifference");
-        WBTDBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorWetBulbDifference");
-        DPTDBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDewpointDifference");
-        TESSPBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:ThermalEnergyStorage");
+        CLRBO = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:CoolingLoad");
+        HLRBO = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:HeatingLoad");
+        DBRBO = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDryBulb");
+        WBRBO = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorWetBulb");
+        DPRBO = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDewpoint");
+        RHRBO = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorRelativeHumidity");
+        CSPBO = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:ComponentSetpoint"); //* Temp Based Control
+        NumUserDefOpSchemes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:UserDefined");
+        DBTDBO = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDryBulbDifference");
+        WBTDBO = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorWetBulbDifference");
+        DPTDBO = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDewpointDifference");
+        TESSPBO = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:ThermalEnergyStorage");
         NumSchemes = CLRBO + HLRBO + DBRBO + WBRBO + DPRBO + RHRBO + CSPBO + DBTDBO + WBTDBO + DPTDBO + NumUserDefOpSchemes + TESSPBO;
-        NumUncontrolledSchemes = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:Uncontrolled");
+        NumUncontrolledSchemes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:Uncontrolled");
         if ((NumSchemes + NumUncontrolledSchemes) <= 0) {
             ShowFatalError(state, "No PlantEquipmentOperation:* objects specified. Stop simulation.");
         }
@@ -582,15 +582,15 @@ CurrentModuleObject, PlantOpSchemeName);
                 ShowFatalError(state, "Error in control scheme identification");
             }
 
-            inputProcessor->getObjectItem(state, CurrentModuleObject, Count, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, Count, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
             if (GlobalNames::VerifyUniqueInterObjectName(state, UniqueNames, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
                 continue;
             }
         }
 
         //**********VERIFY THE 'PlantEquipmentList' AND 'CondenserEquipmentList' KEYWORDS*********
-        PELists = inputProcessor->getNumObjectsFound(state, "PlantEquipmentList");
-        CELists = inputProcessor->getNumObjectsFound(state, "CondenserEquipmentList");
+        PELists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentList");
+        CELists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CondenserEquipmentList");
         NumSchemeLists = PELists + CELists;
         UniqueNames.clear();
         UniqueNames.reserve(NumSchemeLists);
@@ -603,7 +603,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 CurrentModuleObject = "CondenserEquipmentList";
                 Count = Num - PELists;
             }
-            inputProcessor->getObjectItem(state, CurrentModuleObject, Count, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, Count, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
             if (GlobalNames::VerifyUniqueInterObjectName(state, UniqueNames, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
                 continue;
             }
@@ -749,7 +749,7 @@ CurrentModuleObject, PlantOpSchemeName);
         SchemeNameFound = true;
 
         // Determine max number of alpha and numeric arguments for all objects being read, in order to allocate local arrays
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         AlphArray.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
@@ -766,7 +766,7 @@ CurrentModuleObject, PlantOpSchemeName);
 
         if (NumSchemes > 0) {
             for (Num = 1; Num <= NumSchemes; ++Num) {
-                inputProcessor->getObjectItem(state, CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
+                state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
                 if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, AlphArray(1))) break;
                 if (Num == NumSchemes) {
                     ShowSevereError(state, LoopOpSchemeObj + " = \"" + state.dataPlnt->PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject +
@@ -941,7 +941,7 @@ CurrentModuleObject, PlantOpSchemeName);
         SchemeNameFound = true;
 
         // Determine max number of alpha and numeric arguments for all objects being read, in order to allocate local arrays
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         AlphArray.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
@@ -958,7 +958,7 @@ CurrentModuleObject, PlantOpSchemeName);
 
         if (NumSchemes > 0) {
             for (Num = 1; Num <= NumSchemes; ++Num) {
-                inputProcessor->getObjectItem(state, CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
+                state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
                 if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, AlphArray(1))) break;
                 if (Num == NumSchemes) {
                     ShowSevereError(state, LoopOpSchemeObj + " = \"" + state.dataPlnt->PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject +
@@ -1055,8 +1055,8 @@ CurrentModuleObject, PlantOpSchemeName);
 
         if (state.dataPlantCondLoopOp->LoadEquipListOneTimeFlag) {
             // assemble mapping between list names and indices one time
-            PELists = inputProcessor->getNumObjectsFound(state, "PlantEquipmentList");
-            CELists = inputProcessor->getNumObjectsFound(state, "CondenserEquipmentList");
+            PELists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentList");
+            CELists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CondenserEquipmentList");
             state.dataPlantCondLoopOp->TotNumLists = PELists + CELists;
             if (state.dataPlantCondLoopOp->TotNumLists > 0) {
                 state.dataPlantCondLoopOp->EquipListsNameList.allocate(state.dataPlantCondLoopOp->TotNumLists);
@@ -1068,7 +1068,7 @@ CurrentModuleObject, PlantOpSchemeName);
                     CurrentModuleObject = "PlantEquipmentList";
                     for (Num = 1; Num <= PELists; ++Num) {
                         iIndex = Num;
-                        inputProcessor->getObjectItem(state,
+                        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                       CurrentModuleObject,
                                                       Num,
                                                       state.dataIPShortCut->cAlphaArgs,
@@ -1115,7 +1115,7 @@ CurrentModuleObject, PlantOpSchemeName);
                     CurrentModuleObject = "CondenserEquipmentList";
                     for (Num = 1; Num <= CELists; ++Num) {
                         iIndex = Num + PELists;
-                        inputProcessor->getObjectItem(state,
+                        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                       CurrentModuleObject,
                                                       Num,
                                                       state.dataIPShortCut->cAlphaArgs,
@@ -1179,7 +1179,7 @@ CurrentModuleObject, PlantOpSchemeName);
                         CurrentModuleObject = "CondenserEquipmentList";
                     }
                 }
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               state.dataPlantCondLoopOp->EquipListsIndexList(Num),
                                               state.dataIPShortCut->cAlphaArgs,
@@ -1273,7 +1273,7 @@ CurrentModuleObject, PlantOpSchemeName);
 
         if (NumSchemes > 0) {
             for (int Num = 1; Num <= NumSchemes; ++Num) {
-                inputProcessor->getObjectItem(state, CurrentModuleObject, Num, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
+                state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, Num, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
                 if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, state.dataIPShortCut->cAlphaArgs(1))) break;
                 if (Num == NumSchemes) {
                     ShowSevereError(state, LoopOpSchemeObj + " = \"" + state.dataPlnt->PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject +
@@ -1639,7 +1639,7 @@ CurrentModuleObject, PlantOpSchemeName);
         if (NumSchemes > 0) {
 
             for (Num = 1; Num <= NumSchemes; ++Num) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               Num,
                                               state.dataIPShortCut->cAlphaArgs,

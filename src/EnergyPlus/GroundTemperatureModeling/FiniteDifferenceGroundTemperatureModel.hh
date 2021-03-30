@@ -57,7 +57,6 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
@@ -69,6 +68,9 @@ struct EnergyPlusData;
 // Derived class for Finite-Difference Model
 class FiniteDiffGroundTempsModel : public BaseGroundTempsModel
 {
+
+    static int constexpr maxYearsToIterate = 10;
+
     Real64 rhoCp_soil_liq_1;
     Real64 rhoCP_soil_liq;
     Real64 rhoCP_soil_transient;
@@ -145,7 +147,7 @@ public:
 
     void performSimulation(EnergyPlusData& state);
 
-    void updateSurfaceCellTemperature();
+    void updateSurfaceCellTemperature(EnergyPlusData &state);
 
     void updateGeneralDomainCellTemperature(int const cell);
 
@@ -153,13 +155,13 @@ public:
 
     void initDomain(EnergyPlusData& state);
 
-    bool checkFinalTemperatureConvergence();
+    bool checkFinalTemperatureConvergence(EnergyPlusData &state);
 
     bool checkIterationTemperatureConvergence();
 
     void updateIterationTemperatures();
 
-    void updateTimeStepTemperatures();
+    void updateTimeStepTemperatures(EnergyPlusData &state);
 
     void doStartOfTimeStepInits();
 

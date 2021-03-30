@@ -122,7 +122,7 @@ namespace EnergyPlus {
             //       DATE WRITTEN   May 2014
             //       MODIFIED       na
             //       RE-ENGINEERED  na
-            int numSlabsCheck(inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Slab));
+            int numSlabsCheck(state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Slab));
             state.dataGlobal->AnySlabsInModel = (numSlabsCheck > 0);
         }
 
@@ -132,7 +132,7 @@ namespace EnergyPlus {
             //       DATE WRITTEN   May 2014
             //       MODIFIED       na
             //       RE-ENGINEERED  na
-            int const numBasementsCheck(inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Basement));
+            int const numBasementsCheck(state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Basement));
             state.dataGlobal->AnyBasementsInModel = (numBasementsCheck > 0);
         }
 
@@ -404,15 +404,15 @@ namespace EnergyPlus {
             bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
             // Read number of objects and allocate main data structures - first domains
-            int NumGeneralizedDomains = inputProcessor->getNumObjectsFound(state, ObjName_ug_GeneralDomain);
-            int NumHorizontalTrenches = inputProcessor->getNumObjectsFound(state, ObjName_HorizTrench);
-            int NumZoneCoupledDomains = inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Slab);
-            int NumBasements = inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Basement);
+            int NumGeneralizedDomains = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_ug_GeneralDomain);
+            int NumHorizontalTrenches = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_HorizTrench);
+            int NumZoneCoupledDomains = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Slab);
+            int NumBasements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Basement);
             int TotalNumDomains = NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + NumBasements;
             state.dataPlantPipingSysMgr->domains.resize(TotalNumDomains);
 
             // then circuits
-            int NumPipeCircuits = inputProcessor->getNumObjectsFound(state, ObjName_Circuit);
+            int NumPipeCircuits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_Circuit);
 
             // Read in raw inputs, don't try to interpret dependencies yet
             ReadGeneralDomainInputs(state, 1, NumGeneralizedDomains, ErrorsFound);
@@ -506,7 +506,7 @@ namespace EnergyPlus {
             for (int DomainNum = IndexStart; DomainNum <= NumGeneralizedDomains; ++DomainNum) {
 
                 // Set up all the inputs for this domain object
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               ObjName_ug_GeneralDomain,
                                               DomainNum,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -832,7 +832,7 @@ namespace EnergyPlus {
                 ++DomainCtr;
 
                 // Read all the inputs for this domain object
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               ObjName_ZoneCoupled_Slab,
                                               ZoneCoupledDomainCtr,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -1148,7 +1148,7 @@ namespace EnergyPlus {
                 ++DomainNum;
 
                 // Read all the inputs for this domain object
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               ObjName_ZoneCoupled_Basement,
                                               BasementCtr,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -1502,11 +1502,11 @@ namespace EnergyPlus {
 
             // get all of the actual generalized pipe circuit objects
 
-            int NumPipeCircuits = inputProcessor->getNumObjectsFound(state, ObjName_Circuit);
+            int NumPipeCircuits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_Circuit);
             for (int PipeCircuitCounter = 1; PipeCircuitCounter <= NumPipeCircuits; ++PipeCircuitCounter) {
 
                 // Read all the inputs for this pipe circuit
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               ObjName_Circuit,
                                               PipeCircuitCounter,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -1617,13 +1617,13 @@ namespace EnergyPlus {
 
             // now get all the pipe circuits related to horizontal trenches
 
-            int NumHorizontalTrenches = inputProcessor->getNumObjectsFound(state, ObjName_HorizTrench);
+            int NumHorizontalTrenches = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_HorizTrench);
 
             // Read in all pipe segments
             for (int HorizontalGHXCtr = 1; HorizontalGHXCtr <= NumHorizontalTrenches; ++HorizontalGHXCtr) {
 
                 // Read all inputs for this pipe segment
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               ObjName_HorizTrench,
                                               HorizontalGHXCtr,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -1764,11 +1764,11 @@ namespace EnergyPlus {
             int CurIndex;
 
             // Read in all pipe segments
-            int NumPipeSegmentsInInput = inputProcessor->getNumObjectsFound(state, ObjName_Segment);
+            int NumPipeSegmentsInInput = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_Segment);
             for (int SegmentCtr = 1; SegmentCtr <= NumPipeSegmentsInInput; ++SegmentCtr) {
 
                 // Read all inputs for this pipe segment
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               ObjName_Segment,
                                               SegmentCtr,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -1842,7 +1842,7 @@ namespace EnergyPlus {
             //  then resolve each one, creating definitions for a pipe domain, pipe circuit, and series of pipe segments
             // This way, the outer get input routines can handle it as though they were generalized routines
 
-            int NumHorizontalTrenches = inputProcessor->getNumObjectsFound(state, ObjName_HorizTrench);
+            int NumHorizontalTrenches = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_HorizTrench);
 
             // Read in all pipe segments
             for (int HorizontalGHXCtr = 1; HorizontalGHXCtr <= NumHorizontalTrenches; ++HorizontalGHXCtr) {
@@ -1852,7 +1852,7 @@ namespace EnergyPlus {
                 ++CircuitCtr;
 
                 // Read all inputs for this pipe segment
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               ObjName_HorizTrench,
                                               HorizontalGHXCtr,
                                               state.dataIPShortCut->cAlphaArgs,

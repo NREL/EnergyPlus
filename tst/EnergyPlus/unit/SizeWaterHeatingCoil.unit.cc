@@ -102,7 +102,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
 
     bool ErrorsFound(false);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
     state->dataEnvrn->StdRhoAir = 1.20;
 
     std::string const idf_objects = delimited_string({
@@ -340,7 +340,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
 
     bool ErrorsFound(false);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
     state->dataEnvrn->StdRhoAir = 1.20;
 
     std::string const idf_objects = delimited_string({
@@ -577,7 +577,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     // with all inputs set by user except rated capacity is autosized
     bool ErrorsFound(false);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
     state->dataEnvrn->StdRhoAir = 1.20;
 
     std::string const idf_objects = delimited_string({
@@ -814,7 +814,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
 
     bool ErrorsFound(false);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
     state->dataEnvrn->StdRhoAir = 1.20;
 
     std::string const idf_objects = delimited_string({
@@ -1050,7 +1050,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
 
     bool ErrorsFound(false);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
     state->dataEnvrn->StdRhoAir = 1.20;
 
     std::string const idf_objects = delimited_string({
@@ -1220,7 +1220,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
 
     bool ErrorsFound(false);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
     state->dataEnvrn->StdRhoAir = 1.20;
 
     std::string const idf_objects = delimited_string({

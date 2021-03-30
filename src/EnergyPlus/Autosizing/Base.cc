@@ -58,13 +58,6 @@
 
 namespace EnergyPlus {
 
-bool oneTimeCompRptHeaderFlag = true;
-
-void autosizing_clear_state()
-{
-    oneTimeCompRptHeaderFlag = true;
-}
-
 void BaseSizer::initializeWithinEP(EnergyPlusData &state,
                                    const std::string &_compType,
                                    const std::string &_compName,
@@ -325,9 +318,9 @@ void BaseSizer::reportSizerOutput(EnergyPlusData &state,
 
     // to do, make this a parameter. Unfortunately this function is used in MANY
     // places so it involves touching most of E+
-    if (oneTimeCompRptHeaderFlag) {
+    if (state.dataEnvrn->oneTimeCompRptHeaderFlag) {
         print(state.files.eio, Format_990);
-        oneTimeCompRptHeaderFlag = false;
+        state.dataEnvrn->oneTimeCompRptHeaderFlag = false;
     }
 
     print(state.files.eio, Format_991, CompType, CompName, VarDesc, VarValue);
@@ -342,9 +335,9 @@ void BaseSizer::reportSizerOutput(EnergyPlusData &state,
     }
 
     // add to SQL output
-    if (sqlite) sqlite->addSQLiteComponentSizingRecord(CompType, CompName, VarDesc, VarValue);
+    if (state.dataSQLiteProcedures->sqlite) state.dataSQLiteProcedures->sqlite->addSQLiteComponentSizingRecord(CompType, CompName, VarDesc, VarValue);
     if (present(UsrDesc) && present(UsrValue)) {
-        if (sqlite) sqlite->addSQLiteComponentSizingRecord(CompType, CompName, UsrDesc, UsrValue);
+        if (state.dataSQLiteProcedures->sqlite) state.dataSQLiteProcedures->sqlite->addSQLiteComponentSizingRecord(CompType, CompName, UsrDesc, UsrValue);
     }
 }
 

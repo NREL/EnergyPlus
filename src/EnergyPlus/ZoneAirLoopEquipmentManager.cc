@@ -199,7 +199,7 @@ namespace ZoneAirLoopEquipmentManager {
             state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
         }
 
-        state.dataDefineEquipment->NumAirDistUnits = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataDefineEquipment->NumAirDistUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         state.dataDefineEquipment->AirDistUnit.allocate(state.dataDefineEquipment->NumAirDistUnits);
         state.dataZoneAirLoopEquipmentManager->EachOnceFlag.allocate(state.dataDefineEquipment->NumAirDistUnits);
@@ -208,7 +208,7 @@ namespace ZoneAirLoopEquipmentManager {
         if (state.dataDefineEquipment->NumAirDistUnits > 0) {
 
             for (AirDistUnitNum = 1; AirDistUnitNum <= state.dataDefineEquipment->NumAirDistUnits; ++AirDistUnitNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               AirDistUnitNum,
                                               AlphArray,

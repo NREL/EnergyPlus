@@ -71,6 +71,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 
 namespace EnergyPlus {
 
@@ -78,9 +79,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace AirflowNetwork {
-
-    extern int lowerLimitErrIdx;
-    extern int upperLimitErrIdx;
 
     Real64 airThermConductivity(EnergyPlusData &state, Real64 T // Temperature in Celsius
     );
@@ -104,6 +102,15 @@ namespace AirflowNetwork {
     );
 
 } // namespace AirflowNetwork
+
+struct DataAFNProps : BaseGlobalStruct {
+    int lowerLimitErrIdx = 0;
+    int upperLimitErrIdx = 0;
+    void clear_state() override {
+        lowerLimitErrIdx = 0;
+        upperLimitErrIdx = 0;
+    }
+};
 
 } // namespace EnergyPlus
 

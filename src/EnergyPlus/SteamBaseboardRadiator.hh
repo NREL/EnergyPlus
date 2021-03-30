@@ -236,6 +236,7 @@ struct SteamBaseboardRadiatorData : BaseGlobalStruct {
     Array1D<SteamBaseboardRadiator::SteamBaseboardDesignData> SteamBaseboardDesign;
     Array1D<SteamBaseboardRadiator::SteamBaseboardNumericFieldData> SteamBaseboardNumericFields;
     Array1D<SteamBaseboardRadiator::SteamBaseboardDesignNumericFieldData> SteamBaseboardDesignNumericFields;
+    Array1D_string SteamBaseboardDesignNames;           // Array that contains the names of Design objects
 
     void clear_state() override
     {
@@ -256,6 +257,7 @@ struct SteamBaseboardRadiatorData : BaseGlobalStruct {
         ZoneEquipmentListChecked = false;
         SteamBaseboard.clear();
         SteamBaseboardNumericFields.clear();
+        SteamBaseboardDesignNames.clear();
     }
 
     // Default Constructor

@@ -59,9 +59,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/PsychCacheData.hh>
 
 namespace EnergyPlus {
 
@@ -142,90 +144,7 @@ extern Array1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 
     constexpr int tsat_hbp_precision_bits = 28;
 #endif
 
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // MODULE VARIABLE DEFINITIONS:
-
-    // DERIVED TYPE DEFINITIONS
-
-    // Types
-
-#ifdef EP_cache_PsyTwbFnTdbWPb
-    struct cached_twb_t
-    {
-        // Members
-        Int64 iTdb;
-        Int64 iW;
-        Int64 iPb;
-        Real64 Twb;
-
-        // Default Constructor
-        cached_twb_t() : iTdb(0), iW(0), iPb(0), Twb(0.0)
-        {
-        }
-    };
-#endif
-#ifdef EP_cache_PsyTsatFnHPb
-    struct cached_tsat_h_pb
-    {
-        // Members
-        Int64 iH;
-        Int64 iPb;
-        Real64 Tsat;
-
-        // Default Constructor
-        cached_tsat_h_pb() : iH(0), iPb(0), Tsat(0.0)
-        {
-        }
-    };
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-    struct cached_psat_t
-    {
-        // Members
-        Int64 iTdb;
-        Real64 Psat;
-
-        // Default Constructor
-        cached_psat_t() : iTdb(-1000), Psat(0.0)
-        {
-        }
-    };
-#endif
-#ifdef EP_cache_PsyTsatFnPb
-    struct cached_tsat_pb
-    {
-        // Members
-        Int64 iPb;
-        Real64 Tsat;
-
-        // Default Constructor
-        cached_tsat_pb() : iPb(-1000), Tsat(0.0)
-        {
-        }
-    };
-#endif
-    // Object Data
-#ifdef EP_cache_PsyTwbFnTdbWPb
-    inline Array1D<cached_twb_t> cached_Twb; // DIMENSION(0:twbcache_size)
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-    inline Array1D<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
-#endif
-#ifdef EP_cache_PsyTsatFnPb
-    inline Array1D<cached_tsat_pb> cached_Tsat; // DIMENSION(0:tsatcache_size)
-#endif
-#ifdef EP_cache_PsyTsatFnHPb
-    inline Array1D<cached_tsat_h_pb> cached_Tsat_HPb; // DIMENSION(0:tsat_hbp_cache_size)
-#endif
-    // Subroutine Specifications for the Module
-
-    // Functions
-
-    void clear_state();
-
-    void InitializePsychRoutines();
+    void InitializePsychRoutines(EnergyPlusData &state);
 
     void ShowPsychrometricSummary(InputOutputFile &auditFile);
 
@@ -733,14 +652,10 @@ extern Array1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 
         ++NumTimesCalled(iPsyPsatFnTemp_cache);
 #endif
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-
-
         Int64 const Tdb_tag(bit_shift(bit_transfer(T, Grid_Shift), -Grid_Shift)); // Note that 2nd arg to TRANSFER is not used: Only type matters
         //        Int64 const hash( bit::bit_and( Tdb_tag, psatcache_mask ) ); //Tuned Replaced by below
         Int64 const hash(Tdb_tag & psatcache_mask);
-        auto &cPsat(cached_Psat(hash));
+        auto &cPsat(state.dataPsychCache->cached_Psat(hash));
 
         if (cPsat.iTdb != Tdb_tag) {
             cPsat.iTdb = Tdb_tag;
@@ -798,6 +713,7 @@ extern Array1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 
         Pb_tag = bit_transfer(Pb, Pb_tag);
         Pb_tag = bit_shift(Pb_tag, -Grid_Shift);
         hash = bit_and(bit_xor(H_tag, Pb_tag), Int64(tsat_hbp_cache_size - 1));
+        auto & cached_Tsat_HPb = state.dataPsychCache->cached_Tsat_HPb;
         if (cached_Tsat_HPb(hash).iH != H_tag || cached_Tsat_HPb(hash).iPb != Pb_tag) {
             cached_Tsat_HPb(hash).iH = H_tag;
             cached_Tsat_HPb(hash).iPb = Pb_tag;
@@ -1195,7 +1111,7 @@ extern Array1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 
         Int64 const Pb_tag(bit_shift(bit_transfer(Press, Grid_Shift), -Grid_Shift));
 
         Int64 const hash(Pb_tag & tsatcache_mask);
-        auto &cTsat(cached_Tsat(hash));
+        auto &cTsat(state.dataPsychCache->cached_Tsat(hash));
         if (cTsat.iPb != Pb_tag) {
             cTsat.iPb = Pb_tag;
             cTsat.Tsat = PsyTsatFnPb_raw(state, Press, CalledFrom);

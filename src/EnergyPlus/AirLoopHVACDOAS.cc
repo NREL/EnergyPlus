@@ -143,8 +143,8 @@ namespace AirLoopHVACDOAS {
         std::string cCurrentModuleObject = "AirLoopHVAC:Mixer";
         std::string cFieldName;
 
-        auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
-        if (instances == inputProcessor->epJSON.end()) {
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+        if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
             errorsFound = true;
         } else {
             int AirLoopMixerNum = 0;
@@ -153,7 +153,7 @@ namespace AirLoopHVACDOAS {
 
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
-                inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
                 ++AirLoopMixerNum;
                 AirLoopMixer thisMixer;
 
@@ -298,8 +298,8 @@ namespace AirLoopHVACDOAS {
         std::string cCurrentModuleObject = "AirLoopHVAC:Splitter";
         std::string cFieldName;
 
-        auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
-        if (instances == inputProcessor->epJSON.end()) {
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+        if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
             errorsFound = true;
         } else {
             int AirLoopSplitterNum = 0;
@@ -308,7 +308,7 @@ namespace AirLoopHVACDOAS {
 
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
-                inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
 
                 ++AirLoopSplitterNum;
                 AirLoopSplitter thisSplitter;
@@ -356,8 +356,8 @@ namespace AirLoopHVACDOAS {
         std::string cCurrentModuleObject = "AirLoopHVAC:DedicatedOutdoorAirSystem";
         std::string cFieldName;
 
-        auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
-        if (instances == inputProcessor->epJSON.end()) {
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+        if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
             errorsFound = true;
         } else {
             int AirLoopDOASNum = 0;
@@ -366,7 +366,7 @@ namespace AirLoopHVACDOAS {
 
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
-                inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
                 ++AirLoopDOASNum;
                 AirLoopDOAS thisDOAS;
 

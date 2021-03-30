@@ -1613,10 +1613,6 @@ namespace AirflowNetwork {
         }
     };
 
-    // Object Data
-
-    void clear_state();
-
 } // namespace AirflowNetwork
 
 struct AirflowNetworkData : BaseGlobalStruct {

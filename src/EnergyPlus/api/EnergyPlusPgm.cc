@@ -227,8 +227,8 @@ int EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath
 void commonInitialize(EnergyPlus::EnergyPlusData &state) {
     using namespace EnergyPlus;
     // Disable C++ i/o synching with C methods for speed
-    std::ios_base::sync_with_stdio(false);
-    std::cin.tie(nullptr); // Untie cin and cout: Could cause odd behavior for interactive prompts
+    //std::ios_base::sync_with_stdio(false);
+    //std::cin.tie(nullptr); // Untie cin and cout: Could cause odd behavior for interactive prompts
 
 // Enable floating point exceptions
 #ifndef NDEBUG
@@ -259,10 +259,10 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
 
     state.dataStrGlobals->CurrentDateTime = CreateCurrentDateTimeString();
 
-    state.dataResultsFramework->resultsFramework->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setProgramVersion(state.dataStrGlobals->VerStringVar);
     state.dataResultsFramework->resultsFramework->SimulationInformation.setStartDateTimeStamp(state.dataStrGlobals->CurrentDateTime.substr(5));
 
-    DataStringGlobals::VerString += "," + state.dataStrGlobals->CurrentDateTime;
+    state.dataStrGlobals->VerStringVar = DataStringGlobals::VerString + "," + state.dataStrGlobals->CurrentDateTime;
 
     DataSystemVariables::processEnvironmentVariables(state);
 
@@ -279,11 +279,11 @@ int commonRun(EnergyPlus::EnergyPlusData &state) {
     state.dataSysVars->TestAllPaths = true;
 
     DisplayString(state, "EnergyPlus Starting");
-    DisplayString(state, DataStringGlobals::VerString);
+    DisplayString(state, state.dataStrGlobals->VerStringVar);
 
     try {
-        EnergyPlus::inputProcessor = InputProcessor::factory();
-        EnergyPlus::inputProcessor->processInput(state);
+        state.dataInputProcessing->inputProcessor = InputProcessor::factory();
+        state.dataInputProcessing->inputProcessor->processInput(state);
         if (state.dataGlobal->outputEpJSONConversionOnly) {
             DisplayString(state, "Converted input file format. Exiting.");
             return EndEnergyPlus(state);
@@ -341,14 +341,14 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
 
         Psychrometrics::ShowPsychrometricSummary(state.files.audit);
 
-        EnergyPlus::inputProcessor->reportOrphanRecordObjects(state);
+        state.dataInputProcessing->inputProcessor->reportOrphanRecordObjects(state);
         FluidProperties::ReportOrphanFluids(state);
         ScheduleManager::ReportOrphanSchedules(state);
-        if (EnergyPlus::sqlite) {
-            EnergyPlus::sqlite.reset();
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite.reset();
         }
-        if (EnergyPlus::inputProcessor) {
-            EnergyPlus::inputProcessor.reset();
+        if (state.dataInputProcessing->inputProcessor) {
+            state.dataInputProcessing->inputProcessor.reset();
         }
 
         if (state.dataGlobal->runReadVars) {

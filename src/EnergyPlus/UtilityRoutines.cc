@@ -635,8 +635,8 @@ namespace UtilityRoutines {
         bool ErrFound;
         bool TerminalError;
 
-        if (sqlite) {
-            sqlite->updateSQLiteSimulationRecord(true, false);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->updateSQLiteSimulationRecord(true, false);
         }
 
         state.dataErrTracking->AbortProcessing = true;
@@ -812,8 +812,8 @@ namespace UtilityRoutines {
         int Minutes;    // Elapsed Time Minute Reporting
         Real64 Seconds; // Elapsed Time Second Reporting
 
-        if (sqlite) {
-            sqlite->updateSQLiteSimulationRecord(true, true);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->updateSQLiteSimulationRecord(true, true);
         }
 
         ReportSurfaceErrors(state);
@@ -1046,9 +1046,9 @@ namespace UtilityRoutines {
         ShowErrorMessage(state, " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2);
         ShowErrorMessage(state, format(" ..... Reference severe error count={}", state.dataErrTracking->TotalSevereErrors), OutUnit1, OutUnit2);
         ShowErrorMessage(state, " ..... Last severe error=" + state.dataErrTracking->LastSevereError, OutUnit1, OutUnit2);
-        if (sqlite) {
-            sqlite->createSQLiteErrorRecord(1, 2, ErrorMessage, 1);
-            if (sqlite->sqliteWithinTransaction()) sqlite->sqliteCommit();
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, 2, ErrorMessage, 1);
+            if (state.dataSQLiteProcedures->sqlite->sqliteWithinTransaction()) state.dataSQLiteProcedures->sqlite->sqliteCommit();
         }
         if (state.dataGlobal->errorCallback) {
             state.dataGlobal->errorCallback(Error::Fatal, ErrorMessage);
@@ -1088,8 +1088,8 @@ namespace UtilityRoutines {
 
         //  Could set a variable here that gets checked at some point?
 
-        if (sqlite) {
-            sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 1);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 1);
         }
         if (state.dataGlobal->errorCallback) {
             state.dataGlobal->errorCallback(Error::Severe, ErrorMessage);
@@ -1128,8 +1128,8 @@ namespace UtilityRoutines {
 
         //  Could set a variable here that gets checked at some point?
 
-        if (sqlite) {
-            sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 0);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 0);
         }
         if (state.dataGlobal->errorCallback) {
             state.dataGlobal->errorCallback(Error::Severe, ErrorMessage);
@@ -1152,8 +1152,8 @@ namespace UtilityRoutines {
         // Calls ShowErrorMessage utility routine.
 
         ShowErrorMessage(state, " **   ~~~   ** " + Message, OutUnit1, OutUnit2);
-        if (sqlite) {
-            sqlite->updateSQLiteErrorRecord(Message);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->updateSQLiteErrorRecord(Message);
         }
         if (state.dataGlobal->errorCallback) {
             state.dataGlobal->errorCallback(Error::Continue, Message);
@@ -1200,8 +1200,8 @@ namespace UtilityRoutines {
             ShowErrorMessage(state, " **   ~~~   ** " + m,
                              OutUnit1,
                              OutUnit2);
-            if (sqlite) {
-                sqlite->updateSQLiteErrorRecord(m);
+            if (state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->updateSQLiteErrorRecord(m);
             }
             if (state.dataGlobal->errorCallback) {
                 state.dataGlobal->errorCallback(Error::Continue, m);
@@ -1214,8 +1214,8 @@ namespace UtilityRoutines {
             ShowErrorMessage(state, postfix,
                              OutUnit1,
                              OutUnit2);
-            if (sqlite) {
-                sqlite->updateSQLiteErrorRecord(m);
+            if (state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->updateSQLiteErrorRecord(m);
             }
             if (state.dataGlobal->errorCallback) {
                 state.dataGlobal->errorCallback(Error::Continue, m);
@@ -1243,8 +1243,8 @@ namespace UtilityRoutines {
             ShowErrorMessage(state, " *************", OutUnit1, OutUnit2);
         } else {
             ShowErrorMessage(state, " ************* " + Message, OutUnit1, OutUnit2);
-            if (sqlite) {
-                sqlite->createSQLiteErrorRecord(1, -1, Message, 0);
+            if (state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, -1, Message, 0);
             }
             if (state.dataGlobal->errorCallback) {
                 state.dataGlobal->errorCallback(Error::Info, Message);
@@ -1281,8 +1281,8 @@ namespace UtilityRoutines {
         if (state.dataGlobal->DoingSizing) ++state.dataErrTracking->TotalWarningErrorsDuringSizing;
         ShowErrorMessage(state, " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
 
-        if (sqlite) {
-            sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 1);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 1);
         }
         if (state.dataGlobal->errorCallback) {
             state.dataGlobal->errorCallback(Error::Warning, ErrorMessage);
@@ -1314,8 +1314,8 @@ namespace UtilityRoutines {
         }
 
         ShowErrorMessage(state, " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
-        if (sqlite) {
-            sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 0);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 0);
         }
         if (state.dataGlobal->errorCallback) {
             state.dataGlobal->errorCallback(Error::Warning, ErrorMessage);
@@ -1585,22 +1585,10 @@ namespace UtilityRoutines {
         // If arguments OutUnit1 and/or OutUnit2 are present the
         // error message is written to these as well and the standard one.
 
-        using DataStringGlobals::VerString;
-
-//        auto *err_stream = []() -> std::ostream *{
-//            // NOTE: this is called in too many places to justify changing the interface right now,
-//            // so we are using the Singleton (not ideal)
-//            if (IOFiles::hasSingleton()) {
-//                return IOFiles::getSingleton().err_stream.get();
-//            } else {
-//                return nullptr;
-//            }
-//        }();
-
         auto *err_stream = state.files.err_stream.get();
 
         if (state.dataUtilityRoutines->outputErrorHeader && err_stream) {
-            *err_stream << "Program Version," << VerString << ',' << state.dataStrGlobals->IDDVerString << '\n';
+            *err_stream << "Program Version," << state.dataStrGlobals->VerStringVar << ',' << state.dataStrGlobals->IDDVerString << '\n';
             state.dataUtilityRoutines->outputErrorHeader = false;
         }
 
@@ -1700,8 +1688,8 @@ namespace UtilityRoutines {
                 // Suppress reporting the count if it is a continue error
                 if (has_prefix(error.Message, " **   ~~~   ** ")) {
                     ShowMessage(state, error.Message);
-                    if (sqlite) {
-                        sqlite->updateSQLiteErrorRecord(error.Message);
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->updateSQLiteErrorRecord(error.Message);
                     }
                     if (state.dataGlobal->errorCallback) {
                         state.dataGlobal->errorCallback(Error::Continue, error.Message);
@@ -1715,11 +1703,11 @@ namespace UtilityRoutines {
                     ShowMessage(state, format("{}  This error occurred {} total times;", StatMessageStart, error.Count));
                     ShowMessage(state, format("{}  during Warmup {} times;", StatMessageStart, error.WarmupCount));
                     ShowMessage(state, format("{}  during Sizing {} times.", StatMessageStart, error.SizingCount));
-                    if (sqlite) {
+                    if (state.dataSQLiteProcedures->sqlite) {
                         if (warning) {
-                            sqlite->createSQLiteErrorRecord(1, 0, error.Message.substr(15), error.Count);
+                            state.dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, 0, error.Message.substr(15), error.Count);
                         } else if (severe) {
-                            sqlite->createSQLiteErrorRecord(1, 1, error.Message.substr(15), error.Count);
+                            state.dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, 1, error.Message.substr(15), error.Count);
                         }
                     }
                     if (state.dataGlobal->errorCallback) {

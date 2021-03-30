@@ -447,8 +447,8 @@ namespace EnergyPlus::HybridUnitaryAirConditioners {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetInputZoneHybridUnitaryAirConditioners: ");
         cCurrentModuleObject = "ZoneHVAC:HybridUnitaryHVAC";
-        state.dataHybridUnitaryAC->NumZoneHybridEvap = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        state.dataHybridUnitaryAC->NumZoneHybridEvap = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         int MaxNumbers = max(0, NumNumbers); // Maximum number of numeric fields in all objects
         int MaxAlphas = max(0, NumAlphas);   // Maximum number of alpha fields in all objects
         Alphas.allocate(MaxAlphas);
@@ -465,7 +465,7 @@ namespace EnergyPlus::HybridUnitaryAirConditioners {
             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner.allocate(state.dataHybridUnitaryAC->NumZoneHybridEvap);
 
             for (UnitLoop = 1; UnitLoop <= state.dataHybridUnitaryAC->NumZoneHybridEvap; ++UnitLoop) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               UnitLoop,
                                               Alphas,

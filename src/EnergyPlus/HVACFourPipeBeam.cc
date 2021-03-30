@@ -124,9 +124,9 @@ namespace FourPipeBeam {
         NumNumbers = 11;
 
         // find beam index from name
-        beamIndex = inputProcessor->getObjectItemNum(state, cCurrentModuleObject, objectName);
+        beamIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, cCurrentModuleObject, objectName);
         if (beamIndex > 0) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           beamIndex,
                                           state.dataIPShortCut->cAlphaArgs,

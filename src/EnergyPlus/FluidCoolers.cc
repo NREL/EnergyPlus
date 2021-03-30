@@ -175,8 +175,8 @@ namespace EnergyPlus::FluidCoolers {
         Array1D_string AlphArray(5);  // Character string input data array
 
         // Get number of all Fluid Coolers specified in the input data file (idf)
-        int const NumSingleSpeedFluidCoolers = inputProcessor->getNumObjectsFound(state, "FluidCooler:SingleSpeed");
-        int const NumTwoSpeedFluidCoolers = inputProcessor->getNumObjectsFound(state, "FluidCooler:TwoSpeed");
+        int const NumSingleSpeedFluidCoolers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidCooler:SingleSpeed");
+        int const NumTwoSpeedFluidCoolers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidCooler:TwoSpeed");
         state.dataFluidCoolers->NumSimpleFluidCoolers = NumSingleSpeedFluidCoolers + NumTwoSpeedFluidCoolers;
 
         if (state.dataFluidCoolers->NumSimpleFluidCoolers <= 0)
@@ -198,7 +198,7 @@ namespace EnergyPlus::FluidCoolers {
         cCurrentModuleObject = cFluidCooler_SingleSpeed;
         for (int SingleSpeedFluidCoolerNumber = 1; SingleSpeedFluidCoolerNumber <= NumSingleSpeedFluidCoolers; ++SingleSpeedFluidCoolerNumber) {
             FluidCoolerNum = SingleSpeedFluidCoolerNumber;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SingleSpeedFluidCoolerNumber,
                                           AlphArray,
@@ -285,7 +285,7 @@ namespace EnergyPlus::FluidCoolers {
         cCurrentModuleObject = cFluidCooler_TwoSpeed;
         for (int TwoSpeedFluidCoolerNumber = 1; TwoSpeedFluidCoolerNumber <= NumTwoSpeedFluidCoolers; ++TwoSpeedFluidCoolerNumber) {
             FluidCoolerNum = NumSingleSpeedFluidCoolers + TwoSpeedFluidCoolerNumber;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           TwoSpeedFluidCoolerNumber,
                                           AlphArray,

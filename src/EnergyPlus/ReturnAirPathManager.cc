@@ -133,7 +133,7 @@ namespace ReturnAirPathManager {
         }
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "AirLoopHVAC:ReturnPath";
-        state.dataZoneEquip->NumReturnAirPaths = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneEquip->NumReturnAirPaths = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneEquip->NumReturnAirPaths > 0) {
 
@@ -141,7 +141,7 @@ namespace ReturnAirPathManager {
 
             for (PathNum = 1; PathNum <= state.dataZoneEquip->NumReturnAirPaths; ++PathNum) {
 
-                inputProcessor->getObjectItem(state, cCurrentModuleObject, PathNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
+                state.dataInputProcessing->inputProcessor->getObjectItem(state, cCurrentModuleObject, PathNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
                 UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataZoneEquip->ReturnAirPath(PathNum).Name = state.dataIPShortCut->cAlphaArgs(1);

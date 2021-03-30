@@ -225,11 +225,11 @@ namespace EnergyPlus::PipeHeatTransfer {
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         // Initializations and allocations
         cCurrentModuleObject = "Pipe:Indoor";
-        NumOfPipeHTInt = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumOfPipeHTInt = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         cCurrentModuleObject = "Pipe:Outdoor";
-        NumOfPipeHTExt = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumOfPipeHTExt = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         cCurrentModuleObject = "Pipe:Underground";
-        NumOfPipeHTUG = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumOfPipeHTUG = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         state.dataPipeHT->nsvNumOfPipeHT = NumOfPipeHTInt + NumOfPipeHTExt + NumOfPipeHTUG;
         // allocate data structures
@@ -243,7 +243,7 @@ namespace EnergyPlus::PipeHeatTransfer {
         for (PipeItem = 1; PipeItem <= NumOfPipeHTInt; ++PipeItem) {
             ++Item;
             // get the object name
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           PipeItem,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -362,7 +362,7 @@ namespace EnergyPlus::PipeHeatTransfer {
         for (PipeItem = 1; PipeItem <= NumOfPipeHTExt; ++PipeItem) {
             ++Item;
             // get the object name
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           PipeItem,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -467,7 +467,7 @@ namespace EnergyPlus::PipeHeatTransfer {
 
             ++Item;
             // get the object name
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           PipeItem,
                                           state.dataIPShortCut->cAlphaArgs,

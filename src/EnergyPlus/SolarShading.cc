@@ -135,20 +135,13 @@ namespace EnergyPlus::SolarShading {
     using namespace FenestrationCommon;
     using namespace SingleLayerOptics;
 
-    std::unique_ptr<std::iostream> shd_stream; // Shading file stream
-
-    int const NPhi = 6;                      // Number of altitude angle steps for sky integration
-    int const NTheta = 24;                   // Number of azimuth angle steps for sky integration
-    Real64 const Eps = 1.e-10;               // Small number
-    Real64 const DPhi = DataGlobalConstants::PiOvr2 / NPhi;       // Altitude step size
-    Real64 const DTheta = 2.0 * DataGlobalConstants::Pi / NTheta; // Azimuth step size
-    Real64 const DThetaDPhi = DTheta * DPhi; // Product of DTheta and DPhi
-    Real64 const PhiMin = 0.5 * DPhi;        // Minimum altitude
-
-    std::vector<Real64> sin_Phi;
-    std::vector<Real64> cos_Phi;
-    std::vector<Real64> sin_Theta;
-    std::vector<Real64> cos_Theta;
+    int constexpr NPhi = 6;                      // Number of altitude angle steps for sky integration
+    int constexpr NTheta = 24;                   // Number of azimuth angle steps for sky integration
+    Real64 constexpr Eps = 1.e-10;               // Small number
+    Real64 constexpr DPhi = DataGlobalConstants::PiOvr2 / NPhi;       // Altitude step size
+    Real64 constexpr DTheta = 2.0 * DataGlobalConstants::Pi / NTheta; // Azimuth step size
+    Real64 constexpr DThetaDPhi = DTheta * DPhi; // Product of DTheta and DPhi
+    Real64 constexpr PhiMin = 0.5 * DPhi;        // Minimum altitude
 
     void InitSolarCalculations(EnergyPlusData &state)
     {
@@ -171,12 +164,12 @@ namespace EnergyPlus::SolarShading {
 #endif
         if (state.dataGlobal->BeginSimFlag) {
             if (state.files.outputControl.shd) {
-                shd_stream = std::unique_ptr<std::iostream>(new std::fstream(state.dataStrGlobals->outputShdFileName.c_str(), std::ios_base::out | std::ios_base::trunc));
-                if (!shd_stream) {
+                state.dataSolarShading->shd_stream = std::unique_ptr<std::iostream>(new std::fstream(state.dataStrGlobals->outputShdFileName.c_str(), std::ios_base::out | std::ios_base::trunc));
+                if (!state.dataSolarShading->shd_stream) {
                     ShowFatalError(state, "InitSolarCalculations: Could not open file \"" + state.dataStrGlobals->outputShdFileName + "\" for output (write).");
                 }
             } else {
-                shd_stream = std::make_unique<std::iostream>(nullptr);
+                state.dataSolarShading->shd_stream = std::make_unique<std::iostream>(nullptr);
             }
 
             if (state.dataSolarShading->GetInputFlag) {
@@ -196,7 +189,7 @@ namespace EnergyPlus::SolarShading {
 
             if (state.dataSolarShading->firstTime) DisplayString(state, "Determining Shadowing Combinations");
             DetermineShadowingCombinations(state);
-            shd_stream.reset(); // Done writing to shd file
+            state.dataSolarShading->shd_stream.reset(); // Done writing to shd file
 
             if (state.dataSolarShading->firstTime) DisplayString(state, "Computing Window Shade Absorption Factors");
             ComputeWinShadeAbsorpFactors(state);
@@ -333,14 +326,14 @@ namespace EnergyPlus::SolarShading {
         // Initialize these once
         for (int IPhi = 1; IPhi <= NPhi; ++IPhi) {   // Loop over patch altitude values
             Real64 Phi = PhiMin + (IPhi - 1) * DPhi; // 7.5,22.5,37.5,52.5,67.5,82.5 for NPhi = 6
-            sin_Phi.push_back(std::sin(Phi));
-            cos_Phi.push_back(std::cos(Phi));
+            state.dataSolarShading->sin_Phi.push_back(std::sin(Phi));
+            state.dataSolarShading->cos_Phi.push_back(std::cos(Phi));
         }
 
         for (int ITheta = 1; ITheta <= NTheta; ++ITheta) { // Loop over patch azimuth values
             Real64 Theta = (ITheta - 1) * DTheta;          // 0,15,30,....,330,345 for NTheta = 24
-            sin_Theta.push_back(std::sin(Theta));
-            cos_Theta.push_back(std::cos(Theta));
+            state.dataSolarShading->sin_Theta.push_back(std::sin(Theta));
+            state.dataSolarShading->cos_Theta.push_back(std::cos(Theta));
         }
 
         state.dataSolarShading->firstTime = false;
@@ -373,7 +366,7 @@ namespace EnergyPlus::SolarShading {
         state.dataIPShortCut->cAlphaArgs(1) = "";
         state.dataIPShortCut->cAlphaArgs(2) = "";
         cCurrentModuleObject = "ShadowCalculation";
-        NumItems = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumItems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         NumAlphas = 0;
         NumNumbers = 0;
         if (NumItems > 1) {
@@ -381,7 +374,7 @@ namespace EnergyPlus::SolarShading {
         }
 
         if (NumItems != 0) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           1,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -2734,24 +2727,24 @@ namespace EnergyPlus::SolarShading {
                 //    CALL ShowRecurringContinueErrorAtEnd(state, 'Surface "'//TRIM(Surface(GRSNR)%Name)//'" '//TRIM(MSG(OverlapStatus))//  &
                 //                       ' SubSurface "'//TRIM(Surface(SBSNR)%Name)//'"',  &
                 //                      TrackBaseSubSurround(SBSNR)%ErrIndex2)
-                if (shd_stream) {
-                    *shd_stream << "==== Base does not Surround subsurface details ====\n";
-                    *shd_stream << "Surface=" << state.dataSurface->Surface(GRSNR).Name << ' ' << state.dataSolarShading->cOverLapStatus(state.dataSolarShading->OverlapStatus) << '\n';
-                    *shd_stream << "Surface#=" << std::setw(5) << GRSNR << " NSides=" << std::setw(5) << state.dataSurface->Surface(GRSNR).Sides << '\n';
-                    *shd_stream << std::fixed << std::setprecision(2);
+                if (state.dataSolarShading->shd_stream) {
+                    *state.dataSolarShading->shd_stream << "==== Base does not Surround subsurface details ====\n";
+                    *state.dataSolarShading->shd_stream << "Surface=" << state.dataSurface->Surface(GRSNR).Name << ' ' << state.dataSolarShading->cOverLapStatus(state.dataSolarShading->OverlapStatus) << '\n';
+                    *state.dataSolarShading->shd_stream << "Surface#=" << std::setw(5) << GRSNR << " NSides=" << std::setw(5) << state.dataSurface->Surface(GRSNR).Sides << '\n';
+                    *state.dataSolarShading->shd_stream << std::fixed << std::setprecision(2);
                     for (N = 1; N <= state.dataSurface->Surface(GRSNR).Sides; ++N) {
                         Vector const &v(state.dataSurface->Surface(GRSNR).Vertex(N));
-                        *shd_stream << "Vertex " << std::setw(5) << N << "=(" << std::setw(15) << v.x << ',' << std::setw(15) << v.y << ','
+                        *state.dataSolarShading->shd_stream << "Vertex " << std::setw(5) << N << "=(" << std::setw(15) << v.x << ',' << std::setw(15) << v.y << ','
                                     << std::setw(15) << v.z << ")\n";
                     }
-                    *shd_stream << "SubSurface=" << state.dataSurface->Surface(SBSNR).Name << '\n';
-                    *shd_stream << "Surface#=" << std::setw(5) << SBSNR << " NSides=" << std::setw(5) << state.dataSurface->Surface(SBSNR).Sides << '\n';
+                    *state.dataSolarShading->shd_stream << "SubSurface=" << state.dataSurface->Surface(SBSNR).Name << '\n';
+                    *state.dataSolarShading->shd_stream << "Surface#=" << std::setw(5) << SBSNR << " NSides=" << std::setw(5) << state.dataSurface->Surface(SBSNR).Sides << '\n';
                     for (N = 1; N <= state.dataSurface->Surface(SBSNR).Sides; ++N) {
                         Vector const &v(state.dataSurface->Surface(SBSNR).Vertex(N));
-                        *shd_stream << "Vertex " << std::setw(5) << N << "=(" << std::setw(15) << v.x << ',' << std::setw(15) << v.y << ','
+                        *state.dataSolarShading->shd_stream << "Vertex " << std::setw(5) << N << "=(" << std::setw(15) << v.x << ',' << std::setw(15) << v.y << ','
                                     << std::setw(15) << v.z << ")\n";
                     }
-                    *shd_stream << "================================\n";
+                    *state.dataSolarShading->shd_stream << "================================\n";
                 }
             }
         }
@@ -4649,11 +4642,11 @@ namespace EnergyPlus::SolarShading {
             state.dataHeatBal->WoShdgHoriz = 0.;
 
             for (int IPhi = 0; IPhi < NPhi; ++IPhi) { // Loop over patch altitude values
-                state.dataSolarShading->SUNCOS(3) = sin_Phi[IPhi];
+                state.dataSolarShading->SUNCOS(3) = state.dataSolarShading->sin_Phi[IPhi];
 
                 for (int ITheta = 0; ITheta < NTheta; ++ITheta) { // Loop over patch azimuth values
-                    state.dataSolarShading->SUNCOS(1) = cos_Phi[IPhi] * cos_Theta[ITheta];
-                    state.dataSolarShading->SUNCOS(2) = cos_Phi[IPhi] * sin_Theta[ITheta];
+                    state.dataSolarShading->SUNCOS(1) = state.dataSolarShading->cos_Phi[IPhi] * state.dataSolarShading->cos_Theta[ITheta];
+                    state.dataSolarShading->SUNCOS(2) = state.dataSolarShading->cos_Phi[IPhi] * state.dataSolarShading->sin_Theta[ITheta];
 
                     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                         if (!state.dataSurface->Surface(SurfNum).ShadowingSurf && !state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
@@ -4670,7 +4663,7 @@ namespace EnergyPlus::SolarShading {
 
                         if (state.dataSolarShading->CTHETA(SurfNum) < 0.0) continue;
 
-                        Fac1WoShdg = cos_Phi[IPhi] * DThetaDPhi * state.dataSolarShading->CTHETA(SurfNum);
+                        Fac1WoShdg = state.dataSolarShading->cos_Phi[IPhi] * DThetaDPhi * state.dataSolarShading->CTHETA(SurfNum);
                         SurfArea = state.dataSurface->Surface(SurfNum).NetAreaShadowCalc;
                         if (SurfArea > Eps) {
                             FracIlluminated = state.dataSolarShading->SAREA(SurfNum) / SurfArea;
@@ -5071,35 +5064,35 @@ namespace EnergyPlus::SolarShading {
         BKS.deallocate();
 
         if (!state.dataSolarShading->penumbra) {
-            if (shd_stream) {
-                *shd_stream << "Shadowing Combinations\n";
+            if (state.dataSolarShading->shd_stream) {
+                *state.dataSolarShading->shd_stream << "Shadowing Combinations\n";
                 if (state.dataHeatBal->SolarDistribution == MinimalShadowing) {
-                    *shd_stream << "..Solar Distribution=Minimal Shadowing, Detached Shading will not be used in shadowing calculations\n";
+                    *state.dataSolarShading->shd_stream << "..Solar Distribution=Minimal Shadowing, Detached Shading will not be used in shadowing calculations\n";
                 } else if (state.dataHeatBal->SolarDistribution == FullExterior) {
                     if (state.dataSurface->CalcSolRefl) {
-                        *shd_stream << "..Solar Distribution=FullExteriorWithReflectionsFromExteriorSurfaces\n";
+                        *state.dataSolarShading->shd_stream << "..Solar Distribution=FullExteriorWithReflectionsFromExteriorSurfaces\n";
                     } else {
-                        *shd_stream << "..Solar Distribution=FullExterior\n";
+                        *state.dataSolarShading->shd_stream << "..Solar Distribution=FullExterior\n";
                     }
                 } else if (state.dataHeatBal->SolarDistribution == FullInteriorExterior) {
                     if (state.dataSurface->CalcSolRefl) {
-                        *shd_stream << "..Solar Distribution=FullInteriorAndExteriorWithReflectionsFromExteriorSurfaces\n";
+                        *state.dataSolarShading->shd_stream << "..Solar Distribution=FullInteriorAndExteriorWithReflectionsFromExteriorSurfaces\n";
                     } else {
-                        *shd_stream << "..Solar Distribution=FullInteriorAndExterior\n";
+                        *state.dataSolarShading->shd_stream << "..Solar Distribution=FullInteriorAndExterior\n";
                     }
                 } else {
                 }
 
-                *shd_stream << "..In the following, only the first 10 reference surfaces will be shown.\n";
-                *shd_stream << "..But all surfaces are used in the calculations.\n";
+                *state.dataSolarShading->shd_stream << "..In the following, only the first 10 reference surfaces will be shown.\n";
+                *state.dataSolarShading->shd_stream << "..But all surfaces are used in the calculations.\n";
 
                 for (int HTSnum : state.dataSurface->AllSurfaceListReportOrder) {
-                    *shd_stream << "==================================\n";
+                    *state.dataSolarShading->shd_stream << "==================================\n";
                     if (state.dataShadowComb->ShadowComb(HTSnum).UseThisSurf) {
                         if (state.dataSurface->Surface(HTSnum).IsConvex) {
-                            *shd_stream << "Surface=" << state.dataSurface->Surface(HTSnum).Name << " is used as Receiving Surface in calculations and is convex.\n";
+                            *state.dataSolarShading->shd_stream << "Surface=" << state.dataSurface->Surface(HTSnum).Name << " is used as Receiving Surface in calculations and is convex.\n";
                         } else {
-                            *shd_stream << "Surface=" << state.dataSurface->Surface(HTSnum).Name << " is used as Receiving Surface in calculations and is non-convex.\n";
+                            *state.dataSolarShading->shd_stream << "Surface=" << state.dataSurface->Surface(HTSnum).Name << " is used as Receiving Surface in calculations and is non-convex.\n";
                             if (state.dataShadowComb->ShadowComb(HTSnum).NumGenSurf > 0) {
                                 if (state.dataGlobal->DisplayExtraWarnings) {
                                     ShowWarningError(state, "DetermineShadowingCombinations: Surface=\"" + state.dataSurface->Surface(HTSnum).Name +
@@ -5111,20 +5104,20 @@ namespace EnergyPlus::SolarShading {
                             }
                         }
                     } else {
-                        *shd_stream << "Surface=" << state.dataSurface->Surface(HTSnum).Name << " is not used as Receiving Surface in calculations.\n";
+                        *state.dataSolarShading->shd_stream << "Surface=" << state.dataSurface->Surface(HTSnum).Name << " is not used as Receiving Surface in calculations.\n";
                     }
-                    *shd_stream << "Number of general casting surfaces=" << state.dataShadowComb->ShadowComb(HTSnum).NumGenSurf << '\n';
+                    *state.dataSolarShading->shd_stream << "Number of general casting surfaces=" << state.dataShadowComb->ShadowComb(HTSnum).NumGenSurf << '\n';
                     for (NGSS = 1; NGSS <= state.dataShadowComb->ShadowComb(HTSnum).NumGenSurf; ++NGSS) {
-                        if (NGSS <= 10) *shd_stream << "..Surface=" << state.dataSurface->Surface(state.dataShadowComb->ShadowComb(HTSnum).GenSurf(NGSS)).Name << '\n';
+                        if (NGSS <= 10) *state.dataSolarShading->shd_stream << "..Surface=" << state.dataSurface->Surface(state.dataShadowComb->ShadowComb(HTSnum).GenSurf(NGSS)).Name << '\n';
                         CastingSurface(state.dataShadowComb->ShadowComb(HTSnum).GenSurf(NGSS)) = true;
                     }
-                    *shd_stream << "Number of back surfaces=" << state.dataShadowComb->ShadowComb(HTSnum).NumBackSurf << '\n';
+                    *state.dataSolarShading->shd_stream << "Number of back surfaces=" << state.dataShadowComb->ShadowComb(HTSnum).NumBackSurf << '\n';
                     for (NGSS = 1; NGSS <= min(10, state.dataShadowComb->ShadowComb(HTSnum).NumBackSurf); ++NGSS) {
-                        *shd_stream << "...Surface=" << state.dataSurface->Surface(state.dataShadowComb->ShadowComb(HTSnum).BackSurf(NGSS)).Name << '\n';
+                        *state.dataSolarShading->shd_stream << "...Surface=" << state.dataSurface->Surface(state.dataShadowComb->ShadowComb(HTSnum).BackSurf(NGSS)).Name << '\n';
                     }
-                    *shd_stream << "Number of receiving sub surfaces=" << state.dataShadowComb->ShadowComb(HTSnum).NumSubSurf << '\n';
+                    *state.dataSolarShading->shd_stream << "Number of receiving sub surfaces=" << state.dataShadowComb->ShadowComb(HTSnum).NumSubSurf << '\n';
                     for (NGSS = 1; NGSS <= min(10, state.dataShadowComb->ShadowComb(HTSnum).NumSubSurf); ++NGSS) {
-                        *shd_stream << "....Surface=" << state.dataSurface->Surface(state.dataShadowComb->ShadowComb(HTSnum).SubSurf(NGSS)).Name << '\n';
+                        *state.dataSolarShading->shd_stream << "....Surface=" << state.dataSurface->Surface(state.dataShadowComb->ShadowComb(HTSnum).SubSurf(NGSS)).Name << '\n';
                     }
                 }
             }
@@ -9605,11 +9598,11 @@ namespace EnergyPlus::SolarShading {
         }
 
         for (int IPhi = 0; IPhi < NPhi; ++IPhi) { // Loop over patch altitude values
-            state.dataSolarShading->SUNCOS(3) = sin_Phi[IPhi];
+            state.dataSolarShading->SUNCOS(3) = state.dataSolarShading->sin_Phi[IPhi];
 
             for (int ITheta = 0; ITheta < NTheta; ++ITheta) { // Loop over patch azimuth values
-                state.dataSolarShading->SUNCOS(1) = cos_Phi[IPhi] * cos_Theta[ITheta];
-                state.dataSolarShading->SUNCOS(2) = cos_Phi[IPhi] * sin_Theta[ITheta];
+                state.dataSolarShading->SUNCOS(1) = state.dataSolarShading->cos_Phi[IPhi] * state.dataSolarShading->cos_Theta[ITheta];
+                state.dataSolarShading->SUNCOS(2) = state.dataSolarShading->cos_Phi[IPhi] * state.dataSolarShading->sin_Theta[ITheta];
 
                 for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) { // Cosine of angle of incidence on surface of solar
                     // radiation from patch
@@ -9631,7 +9624,7 @@ namespace EnergyPlus::SolarShading {
 
                     if (state.dataSolarShading->CTHETA(SurfNum) < 0.0) continue;
 
-                    Fac1WoShdg = cos_Phi[IPhi] * DThetaDPhi * state.dataSolarShading->CTHETA(SurfNum);
+                    Fac1WoShdg = state.dataSolarShading->cos_Phi[IPhi] * DThetaDPhi * state.dataSolarShading->CTHETA(SurfNum);
                     SurfArea = state.dataSurface->Surface(SurfNum).NetAreaShadowCalc;
                     if (SurfArea > Eps) {
                         FracIlluminated = state.dataSolarShading->SAREA(SurfNum) / SurfArea;

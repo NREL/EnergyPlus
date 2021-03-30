@@ -173,7 +173,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
 
         // Load the additional EMPD Material properties
         cCurrentModuleObject = "MaterialProperty:MoisturePenetrationDepth:Settings";
-        EMPDMat = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        EMPDMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (EMPDMat == 0) {
             ShowSevereError(state, "EMPD Solution requested, but no \"" + cCurrentModuleObject + "\" objects were found.");
@@ -183,7 +183,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
         for (Loop = 1; Loop <= EMPDMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
                                           MaterialNames,

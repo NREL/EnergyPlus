@@ -1429,39 +1429,39 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         MaxAlphas = 0;
         MaxNumbers = 0;
 
-        NumVRFCTU = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow");
+        NumVRFCTU = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow");
         if (NumVRFCTU > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
 
-        state.dataHVACVarRefFlow->NumVRFCond_SysCurve = inputProcessor->getNumObjectsFound(state, "AirConditioner:VariableRefrigerantFlow");
+        state.dataHVACVarRefFlow->NumVRFCond_SysCurve = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirConditioner:VariableRefrigerantFlow");
         if (state.dataHVACVarRefFlow->NumVRFCond_SysCurve > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, "AirConditioner:VariableRefrigerantFlow", NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirConditioner:VariableRefrigerantFlow", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
 
-        state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HP = inputProcessor->getNumObjectsFound(state, "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl");
+        state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HP = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl");
         if (state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HP > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl", NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
 
-        state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HR = inputProcessor->getNumObjectsFound(state, "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR");
+        state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HR = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR");
         if (state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HR > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR", NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
 
         state.dataHVACVarRefFlow->NumVRFCond = state.dataHVACVarRefFlow->NumVRFCond_SysCurve + state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HP + state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HR;
 
-        state.dataHVACVarRefFlow->NumVRFTULists = inputProcessor->getNumObjectsFound(state, "ZoneTerminalUnitList");
+        state.dataHVACVarRefFlow->NumVRFTULists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneTerminalUnitList");
         if (state.dataHVACVarRefFlow->NumVRFTULists > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, "ZoneTerminalUnitList", NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "ZoneTerminalUnitList", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
@@ -1500,7 +1500,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // read all terminal unit list objects
         cCurrentModuleObject = "ZoneTerminalUnitList";
         for (VRFNum = 1; VRFNum <= state.dataHVACVarRefFlow->NumVRFTULists; ++VRFNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           VRFNum,
                                           cAlphaArgs,
@@ -1552,7 +1552,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // read all VRF condenser objects: Algorithm Type 1_system curve based model
         cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow";
         for (VRFNum = 1; VRFNum <= state.dataHVACVarRefFlow->NumVRFCond_SysCurve; ++VRFNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           VRFNum,
                                           cAlphaArgs,
@@ -2403,7 +2403,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // Read all VRF condenser objects: Algorithm Type 2_physics based model (VRF-FluidTCtrl-HP)
         cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl";
         for (VRFNum = state.dataHVACVarRefFlow->NumVRFCond_SysCurve + 1; VRFNum <= state.dataHVACVarRefFlow->NumVRFCond_SysCurve + state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HP; ++VRFNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           VRFNum,
                                           cAlphaArgs,
@@ -2780,7 +2780,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         for (VRFNum = state.dataHVACVarRefFlow->NumVRFCond_SysCurve + state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HP + 1;
              VRFNum <= state.dataHVACVarRefFlow->NumVRFCond_SysCurve + state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HP + state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HR;
              ++VRFNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           VRFNum,
                                           cAlphaArgs,
@@ -3203,7 +3203,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             HCoilOutletNodeNum = 0;
             OANodeNums = 0;
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           VRFTUNum,
                                           cAlphaArgs,

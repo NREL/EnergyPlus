@@ -272,11 +272,11 @@ namespace Photovoltaics {
         Array1D<SNLModuleParamsStuct> tmpSNLModuleParams;          // temporary, for processing input data
 
         // count how many photovoltaic arrays of different types are in the .idf
-        state.dataPhotovoltaic->NumPVs = inputProcessor->getNumObjectsFound(state, state.dataPhotovoltaic->cPVGeneratorObjectName);
-        state.dataPhotovoltaic->NumSimplePVModuleTypes = inputProcessor->getNumObjectsFound(state, state.dataPhotovoltaic->cPVSimplePerfObjectName);
+        state.dataPhotovoltaic->NumPVs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataPhotovoltaic->cPVGeneratorObjectName);
+        state.dataPhotovoltaic->NumSimplePVModuleTypes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataPhotovoltaic->cPVSimplePerfObjectName);
         state.dataPhotovoltaic->Num1DiodePVModuleTypes =
-            inputProcessor->getNumObjectsFound(state, state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName);
-        state.dataPhotovoltaic->NumSNLPVModuleTypes = inputProcessor->getNumObjectsFound(state, state.dataPhotovoltaic->cPVSandiaPerfObjectName);
+                state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName);
+        state.dataPhotovoltaic->NumSNLPVModuleTypes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataPhotovoltaic->cPVSandiaPerfObjectName);
 
         if (state.dataPhotovoltaic->NumPVs <= 0) {
             ShowSevereError(state, "Did not find any " + state.dataPhotovoltaic->cPVGeneratorObjectName);
@@ -288,7 +288,7 @@ namespace Photovoltaics {
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = state.dataPhotovoltaic->cPVGeneratorObjectName;
         for (PVnum = 1; PVnum <= state.dataPhotovoltaic->NumPVs; ++PVnum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           PVnum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -435,7 +435,7 @@ namespace Photovoltaics {
             tmpSimpleModuleParams.allocate(state.dataPhotovoltaic->NumSimplePVModuleTypes);
             cCurrentModuleObject = state.dataPhotovoltaic->cPVSimplePerfObjectName;
             for (ModNum = 1; ModNum <= state.dataPhotovoltaic->NumSimplePVModuleTypes; ++ModNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               ModNum,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -486,7 +486,7 @@ namespace Photovoltaics {
             tmpTNRSYSModuleParams.allocate(state.dataPhotovoltaic->Num1DiodePVModuleTypes);
             cCurrentModuleObject = state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName;
             for (ModNum = 1; ModNum <= state.dataPhotovoltaic->Num1DiodePVModuleTypes; ++ModNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               ModNum,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -546,7 +546,7 @@ namespace Photovoltaics {
             cCurrentModuleObject = state.dataPhotovoltaic->cPVSandiaPerfObjectName;
             for (ModNum = 1; ModNum <= state.dataPhotovoltaic->NumSNLPVModuleTypes; ++ModNum) {
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               ModNum,
                                               state.dataIPShortCut->cAlphaArgs,

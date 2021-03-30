@@ -167,8 +167,8 @@ namespace HeatBalFiniteDiffManager {
         // user settings for numerical parameters
         cCurrentModuleObject = "HeatBalanceSettings:ConductionFiniteDifference";
 
-        if (inputProcessor->getNumObjectsFound(state, cCurrentModuleObject) > 0) {
-            inputProcessor->getObjectItem(state,
+        if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject) > 0) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           1,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -211,8 +211,8 @@ namespace HeatBalFiniteDiffManager {
 
         } // settings object
 
-        pcMat = inputProcessor->getNumObjectsFound(state, "MaterialProperty:PhaseChange");
-        vcMat = inputProcessor->getNumObjectsFound(state, "MaterialProperty:VariableThermalConductivity");
+        pcMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:PhaseChange");
+        vcMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:VariableThermalConductivity");
 
         auto & MaterialFD = state.dataHeatBalFiniteDiffMgr->MaterialFD;
 
@@ -226,7 +226,7 @@ namespace HeatBalFiniteDiffManager {
             for (Loop = 1; Loop <= pcMat; ++Loop) {
 
                 // Call Input Get routine to retrieve material data
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Loop,
                                               MaterialNames,
@@ -318,7 +318,7 @@ namespace HeatBalFiniteDiffManager {
             for (Loop = 1; Loop <= vcMat; ++Loop) {
 
                 // Call Input Get routine to retrieve material data
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Loop,
                                               MaterialNames,

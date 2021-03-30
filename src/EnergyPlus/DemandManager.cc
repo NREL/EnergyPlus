@@ -325,12 +325,12 @@ namespace EnergyPlus::DemandManager {
 
 
         CurrentModuleObject = "DemandManagerAssignmentList";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, ListNum, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, ListNum, NumAlphas, NumNums);
 
         auto & DemandManagerList(state.dataDemandManager->DemandManagerList);
         auto & DemandMgr(state.dataDemandManager->DemandMgr);
 
-        state.dataDemandManager->NumDemandManagerList = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataDemandManager->NumDemandManagerList = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         if (state.dataDemandManager->NumDemandManagerList > 0) {
             AlphArray.dimension(NumAlphas, std::string());
@@ -340,7 +340,7 @@ namespace EnergyPlus::DemandManager {
 
             for (ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               ListNum,
                                               AlphArray,
@@ -591,37 +591,37 @@ namespace EnergyPlus::DemandManager {
         MaxAlphas = 0;
         MaxNums = 0;
         CurrentModuleObject = "DemandManager:ExteriorLights";
-        NumDemandMgrExtLights = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumDemandMgrExtLights = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumDemandMgrExtLights > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNums = max(MaxNums, NumNums);
         }
         CurrentModuleObject = "DemandManager:Lights";
-        NumDemandMgrLights = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumDemandMgrLights = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumDemandMgrLights > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNums = max(MaxNums, NumNums);
         }
         CurrentModuleObject = "DemandManager:ElectricEquipment";
-        NumDemandMgrElecEquip = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumDemandMgrElecEquip = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumDemandMgrElecEquip > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNums = max(MaxNums, NumNums);
         }
         CurrentModuleObject = "DemandManager:Thermostats";
-        NumDemandMgrThermostats = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumDemandMgrThermostats = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumDemandMgrThermostats > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNums = max(MaxNums, NumNums);
         }
         CurrentModuleObject = "DemandManager:Ventilation";
-        NumDemandMgrVentilation = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumDemandMgrVentilation = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumDemandMgrVentilation > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNums = max(MaxNums, NumNums);
         }
@@ -645,7 +645,7 @@ namespace EnergyPlus::DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               MgrNum - StartIndex + 1,
                                               AlphArray,
@@ -759,7 +759,7 @@ namespace EnergyPlus::DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               MgrNum - StartIndex + 1,
                                               AlphArray,
@@ -894,7 +894,7 @@ namespace EnergyPlus::DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               MgrNum - StartIndex + 1,
                                               AlphArray,
@@ -1029,7 +1029,7 @@ namespace EnergyPlus::DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               MgrNum - StartIndex + 1,
                                               AlphArray,
@@ -1172,7 +1172,7 @@ namespace EnergyPlus::DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               MgrNum - StartIndex + 1,
                                               AlphArray,

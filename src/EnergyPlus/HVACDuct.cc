@@ -196,12 +196,12 @@ namespace HVACDuct {
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         auto& cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Duct";
-        state.dataHVACDuct->NumDucts = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHVACDuct->NumDucts = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataHVACDuct->Duct.allocate(state.dataHVACDuct->NumDucts);
         state.dataHVACDuct->CheckEquipName.dimension(state.dataHVACDuct->NumDucts, true);
 
         for (DuctNum = 1; DuctNum <= state.dataHVACDuct->NumDucts; ++DuctNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           DuctNum,
                                           state.dataIPShortCut->cAlphaArgs,

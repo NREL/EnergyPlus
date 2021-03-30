@@ -49,12 +49,11 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace DataOutputs {
+namespace EnergyPlus::DataOutputs {
 
     // Module containing the data and routines dealing with prescanning for
     // requested output variables to limit the number being processed in OutputProcessor
@@ -70,20 +69,7 @@ namespace DataOutputs {
     // PURPOSE OF THIS MODULE:
     // The module contains structure for output variables that are used in a small number of modules.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-
-    // Data
     // MODULE PARAMETER DEFINITIONS:
-    int const NumMonthlyReports(63);
     Array1D_string const MonthlyNamedReports(NumMonthlyReports,
                                              {"ZONECOOLINGSUMMARYMONTHLY",
                                               "ZONEHEATINGSUMMARYMONTHLY",
@@ -149,27 +135,6 @@ namespace DataOutputs {
                                               "MECHANICALVENTILATIONLOADSMONTHLY",
                                               "HEATEMISSIONSREPORTMONTHLY"});
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    int MaxConsideredOutputVariables(0); // Max Array size for OutputVariable pre-scanned
-    int NumConsideredOutputVariables(0); // Number of variables - pre-scanned, allowed for output
-    int iNumberOfRecords;                // Number of records in input
-    int iNumberOfDefaultedFields;        // number of defaulted fields
-    int iTotalFieldsWithDefaults;        // number of fields that can be defaulted
-    int iNumberOfAutoSizedFields;        // number of autosized fields
-    int iTotalAutoSizableFields;         // number of fields that can be autosized
-    int iNumberOfAutoCalcedFields;       // number of autocalculated fields
-    int iTotalAutoCalculatableFields;    // number of fields that can be autocalculated
-
-    // Object Data
-    std::unordered_map<std::string, std::unordered_map<std::string, OutputReportingVariables,
-                                                      UtilityRoutines::case_insensitive_hasher,
-                                                      UtilityRoutines::case_insensitive_comparator>,
-                       UtilityRoutines::case_insensitive_hasher,
-                       UtilityRoutines::case_insensitive_comparator> OutputVariablesForSimulation;
-    // Functions
-
     OutputReportingVariables::OutputReportingVariables(EnergyPlusData &state, std::string const &KeyValue, std::string const &VariableName)
         : key(KeyValue), variableName(VariableName)
     {
@@ -180,8 +145,8 @@ namespace DataOutputs {
             break;
         }
         if (is_simple_string) return;
-        pattern = std::unique_ptr<RE2>(new RE2(KeyValue));
-        case_insensitive_pattern = std::unique_ptr<RE2>(new RE2("(?i)" + KeyValue));
+        pattern = new RE2(KeyValue);
+        case_insensitive_pattern = new RE2("(?i)" + KeyValue);
         if (!pattern->ok()) {
             ShowSevereError(state, "Regular expression \"" + KeyValue + "\" for variable name \"" + VariableName + "\" in input file is incorrect");
             ShowContinueError(state, pattern->error());
@@ -189,23 +154,7 @@ namespace DataOutputs {
         }
     }
 
-    // Clears the global data in DataOutputs.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        MaxConsideredOutputVariables = 0;
-        NumConsideredOutputVariables = 0;
-        iNumberOfRecords = int();
-        iNumberOfDefaultedFields = int();
-        iTotalFieldsWithDefaults = int();
-        iNumberOfAutoSizedFields = int();
-        iTotalAutoSizableFields = int();
-        iNumberOfAutoCalcedFields = int();
-        iTotalAutoCalculatableFields = int();
-        OutputVariablesForSimulation.clear();
-    }
-
-    bool FindItemInVariableList(std::string const &KeyedValue, std::string const &VariableName)
+    bool FindItemInVariableList(EnergyPlusData &state, std::string const &KeyedValue, std::string const &VariableName)
     {
 
         // FUNCTION INFORMATION:
@@ -218,8 +167,8 @@ namespace DataOutputs {
         // This function looks up a key and variable name value and determines if they are
         // in the list of required variables for a simulation.
 
-        auto const found_variable = OutputVariablesForSimulation.find(VariableName);
-        if (found_variable == OutputVariablesForSimulation.end()) return false;
+        auto const found_variable = state.dataOutput->OutputVariablesForSimulation.find(VariableName);
+        if (found_variable == state.dataOutput->OutputVariablesForSimulation.end()) return false;
 
         auto found_key = found_variable->second.find(KeyedValue);
         if (found_key != found_variable->second.end()) return true;
@@ -239,7 +188,5 @@ namespace DataOutputs {
         }
         return false;
     }
-
-} // namespace DataOutputs
 
 } // namespace EnergyPlus

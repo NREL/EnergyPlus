@@ -553,7 +553,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataGlobal->DoingSizing = true;
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     bool ErrorsFound(false);
     GetZoneData(*state, ErrorsFound);
@@ -859,7 +859,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataGlobal->DoingSizing = true;
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     bool ErrorsFound(false);
     GetZoneData(*state, ErrorsFound);

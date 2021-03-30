@@ -446,39 +446,39 @@ namespace EnergyPlus::HeatBalanceAirManager {
             "Site Total Zone Exhaust Air Heat Loss", OutputProcessor::Unit::J, state.dataHeatBal->ZoneTotalExhaustHeatLoss, "System", "Sum", "Environment");
 
         cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
-        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = NumAlpha;
         maxNumber = NumNumber;
         cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = max(NumAlpha, maxAlpha);
         maxNumber = max(NumNumber, maxNumber);
         cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = max(NumAlpha, maxAlpha);
         maxNumber = max(NumNumber, maxNumber);
         cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = max(NumAlpha, maxAlpha);
         maxNumber = max(NumNumber, maxNumber);
         cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = max(NumAlpha, maxAlpha);
         maxNumber = max(NumNumber, maxNumber);
         cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
-        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = max(NumAlpha, maxAlpha);
         maxNumber = max(NumNumber, maxNumber);
         cCurrentModuleObject = "ZoneMixing";
-        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = max(NumAlpha, maxAlpha);
         maxNumber = max(NumNumber, maxNumber);
         cCurrentModuleObject = "ZoneCrossMixing";
-        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = max(NumAlpha, maxAlpha);
         maxNumber = max(NumNumber, maxNumber);
         cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
-        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = max(NumAlpha, maxAlpha);
         maxNumber = max(NumNumber, maxNumber);
 
@@ -490,12 +490,12 @@ namespace EnergyPlus::HeatBalanceAirManager {
         lNumericFieldBlanks.dimension(maxNumber, true);
 
         cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
-        state.dataHeatBal->TotZoneAirBalance = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->TotZoneAirBalance = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         state.dataHeatBal->ZoneAirBalance.allocate(state.dataHeatBal->TotZoneAirBalance);
 
         for (Loop = 1; Loop <= state.dataHeatBal->TotZoneAirBalance; ++Loop) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
@@ -672,20 +672,20 @@ namespace EnergyPlus::HeatBalanceAirManager {
         }
 
         cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-        state.dataHeatBal->TotShermGrimsInfiltration = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->TotShermGrimsInfiltration = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-        state.dataHeatBal->TotAIM2Infiltration = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->TotAIM2Infiltration = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-        state.dataHeatBal->NumInfiltrationStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->NumInfiltrationStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         state.dataHeatBal->InfiltrationObjects.allocate(state.dataHeatBal->NumInfiltrationStatements);
 
         state.dataHeatBal->TotDesignFlowInfiltration = 0;
         errFlag = false;
         for (Item = 1; Item <= state.dataHeatBal->NumInfiltrationStatements; ++Item) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Item,
                                           cAlphaArgs,
@@ -739,7 +739,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
             cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
             for (Item = 1; Item <= state.dataHeatBal->NumInfiltrationStatements; ++Item) {
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Item,
                                               cAlphaArgs,
@@ -950,7 +950,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
         cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
         InfiltCount = state.dataHeatBal->TotDesignFlowInfiltration;
         for (Loop = 1; Loop <= state.dataHeatBal->TotShermGrimsInfiltration; ++Loop) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
@@ -1013,7 +1013,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
 
         cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
         for (Loop = 1; Loop <= state.dataHeatBal->TotAIM2Infiltration; ++Loop) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
@@ -1176,10 +1176,10 @@ namespace EnergyPlus::HeatBalanceAirManager {
         RepVarSet = true;
 
         cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-        state.dataHeatBal->NumVentilationStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->NumVentilationStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
-        state.dataHeatBal->TotWindAndStackVentilation = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->TotWindAndStackVentilation = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         state.dataHeatBal->VentilationObjects.allocate(state.dataHeatBal->NumVentilationStatements);
 
@@ -1187,7 +1187,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
         errFlag = false;
         cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
         for (Item = 1; Item <= state.dataHeatBal->NumVentilationStatements; ++Item) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Item,
                                           cAlphaArgs,
@@ -1241,7 +1241,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
             cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
             for (Item = 1; Item <= state.dataHeatBal->NumVentilationStatements; ++Item) {
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Item,
                                               cAlphaArgs,
@@ -1862,7 +1862,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
         VentiCount = state.dataHeatBal->TotDesignFlowVentilation;
         for (Loop = 1; Loop <= state.dataHeatBal->TotWindAndStackVentilation; ++Loop) {
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
@@ -2292,12 +2292,12 @@ namespace EnergyPlus::HeatBalanceAirManager {
         RepVarSet = true;
 
         cCurrentModuleObject = "ZoneMixing";
-        state.dataHeatBal->TotMixing = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->TotMixing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataHeatBal->Mixing.allocate(state.dataHeatBal->TotMixing);
 
         for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
@@ -2745,7 +2745,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
             }
         }
         cCurrentModuleObject = "ZoneCrossMixing";
-        int inputCrossMixing = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        int inputCrossMixing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataHeatBal->TotCrossMixing = inputCrossMixing + state.dataHeatBal->NumAirBoundaryMixing;
         state.dataHeatBal->CrossMixing.allocate(state.dataHeatBal->TotCrossMixing);
 
@@ -2763,7 +2763,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                 state.dataHeatBal->CrossMixing(Loop).FromZone = zone2;
             }
             else {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Loop,
                                               cAlphaArgs,
@@ -3203,7 +3203,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
         }
 
         cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
-        state.dataHeatBal->TotRefDoorMixing = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->TotRefDoorMixing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataHeatBal->TotRefDoorMixing > 0) {
             state.dataHeatBal->RefDoorMixing.allocate(state.dataGlobal->NumOfZones);
             for (auto &e : state.dataHeatBal->RefDoorMixing)
@@ -3211,7 +3211,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
 
             for (Loop = 1; Loop <= state.dataHeatBal->TotRefDoorMixing; ++Loop) {
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Loop,
                                               cAlphaArgs,
@@ -3867,14 +3867,14 @@ namespace EnergyPlus::HeatBalanceAirManager {
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "RoomAirModelType";
-        NumOfAirModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumOfAirModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumOfAirModels > state.dataGlobal->NumOfZones) {
             ShowSevereError(state, "Too many " + cCurrentModuleObject + ".  Cannot exceed the number of Zones.");
             ErrorsFound = true;
         }
 
         for (AirModelNum = 1; AirModelNum <= NumOfAirModels; ++AirModelNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           AirModelNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -3964,7 +3964,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                     } else if (SELECT_CASE_var == "AIRFLOWNETWORK") {
                         state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::AirflowNetwork;
                         state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
-                        if (inputProcessor->getNumObjectsFound(state, "AirflowNetwork:SimulationControl") == 0) {
+                        if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirflowNetwork:SimulationControl") == 0) {
                             ShowSevereError(state, "In " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ": " + state.dataIPShortCut->cAlphaFieldNames(3) + " = AIRFLOWNETWORK.");
                             ShowContinueError(state, "This model requires AirflowNetwork:* objects to form a complete network, including "
                                               "AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage.");

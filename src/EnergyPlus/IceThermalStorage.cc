@@ -697,8 +697,8 @@ namespace IceThermalStorage {
         ErrorsFound = false; // Always need to reset this since there are multiple types of ice storage systems
 
         // LOAD ARRAYS WITH SimpleIceStorage DATA
-        state.dataIceThermalStorage->NumSimpleIceStorage = inputProcessor->getNumObjectsFound(state, cIceStorageSimple); // by ZG
-        state.dataIceThermalStorage->NumDetailedIceStorage = inputProcessor->getNumObjectsFound(state, cIceStorageDetailed);
+        state.dataIceThermalStorage->NumSimpleIceStorage = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cIceStorageSimple); // by ZG
+        state.dataIceThermalStorage->NumDetailedIceStorage = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cIceStorageDetailed);
 
         // Allocate SimpleIceStorage based on NumOfIceStorage
         state.dataIceThermalStorage->SimpleIceStorage.allocate(state.dataIceThermalStorage->NumSimpleIceStorage);
@@ -709,7 +709,7 @@ namespace IceThermalStorage {
             int NumAlphas;
             int NumNums;
             int IOStat;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           iceNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -806,7 +806,7 @@ namespace IceThermalStorage {
             int NumAlphas;
             int NumNums;
             int IOStat;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           iceNum,
                                           state.dataIPShortCut->cAlphaArgs,
