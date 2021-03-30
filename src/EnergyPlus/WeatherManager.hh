@@ -82,6 +82,7 @@ namespace WeatherManager {
     // Water mains temperatures calculation methods
     enum class WaterMainsTempCalcMethod
     {
+        FixedDefault = 0,
         Schedule = 1,
         Correlation = 2,
         CorrelationFromWeatherFile = 3
@@ -1009,6 +1010,7 @@ namespace WeatherManager {
 
             this->SnowGndRefModifier = 1.0;              // Modifier to ground reflectance during snow
             this->SnowGndRefModifierForDayltg = 1.0;     // Modifier to ground reflectance during snow for daylighting
+            this->WaterMainsTempsMethod = WeatherManager::WaterMainsTempCalcMethod::FixedDefault;
             this->WaterMainsTempsSchedule = 0;           // Water mains temperature schedule
             this->WaterMainsTempsAnnualAvgAirTemp = 0.0; // Annual average outdoor air temperature (C)
             this->WaterMainsTempsMaxDiffAirTemp = 0.0;   // Maximum difference in monthly average outdoor air temperatures (deltaC)
@@ -1193,7 +1195,7 @@ namespace WeatherManager {
               LocationGathered(false), WeatherFileLatitude(0.0), WeatherFileLongitude(0.0),
               WeatherFileTimeZone(0.0), WeatherFileElevation(0.0),
               GroundTempsFCFromEPWHeader(12, 0.0), GroundReflectances(12, 0.2), SnowGndRefModifier(1.0),
-              SnowGndRefModifierForDayltg(1.0), WaterMainsTempsSchedule(0),
+              SnowGndRefModifierForDayltg(1.0), WaterMainsTempsMethod{WeatherManager::WaterMainsTempCalcMethod::FixedDefault}, WaterMainsTempsSchedule(0),
               WaterMainsTempsAnnualAvgAirTemp(0.0), WaterMainsTempsMaxDiffAirTemp(0.0), WaterMainsTempsScheduleName(""),
               wthFCGroundTemps(false), TotRunPers(0), TotRunDesPers(0),
               NumSpecialDays(0), SpecialDayTypes(366, 0), WeekDayTypes(366, 0), DSTIndex(366, 0),
