@@ -107,23 +107,23 @@ namespace GeneratorFuelSupply {
         //                      reuse with both Annex 42 models,
 
         // Using/Aliasing
-                using CurveManager::GetCurveIndex;
+        using CurveManager::GetCurveIndex;
         using DataLoopNode::ObjectIsNotParent;
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //  INTEGER                     :: GeneratorNum !Generator counter
-        int NumAlphas;                  // Number of elements in the alpha array
-        int NumNums;                    // Number of elements in the numeric array
-        int IOStat;                     // IO Status when calling get input subroutine
-        Array1D_string AlphArray(25);   // character string data
-        Array1D<Real64> NumArray(200);  // numeric data TODO deal with allocatable for extensible
-        bool ErrorsFound(false); // error flag
+        int NumAlphas;                 // Number of elements in the alpha array
+        int NumNums;                   // Number of elements in the numeric array
+        int IOStat;                    // IO Status when calling get input subroutine
+        Array1D_string AlphArray(25);  // character string data
+        Array1D<Real64> NumArray(200); // numeric data TODO deal with allocatable for extensible
+        bool ErrorsFound(false);       // error flag
         int FuelSupNum;
         std::string ObjMSGName;
         int ConstitNum;
-        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         if (state.dataGeneratorFuelSupply->MyOneTimeFlag) {
             cCurrentModuleObject = "Generator:FuelSupply";
@@ -137,8 +137,18 @@ namespace GeneratorFuelSupply {
             state.dataGenerator->FuelSupply.allocate(state.dataGenerator->NumGeneratorFuelSups);
 
             for (FuelSupNum = 1; FuelSupNum <= state.dataGenerator->NumGeneratorFuelSups; ++FuelSupNum) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(
-                    state, cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, state.dataIPShortCut->cAlphaFieldNames, state.dataIPShortCut->cNumericFieldNames);
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         cCurrentModuleObject,
+                                                                         FuelSupNum,
+                                                                         AlphArray,
+                                                                         NumAlphas,
+                                                                         NumArray,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         _,
+                                                                         _,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataGenerator->FuelSupply(FuelSupNum).Name = AlphArray(1);
@@ -155,10 +165,18 @@ namespace GeneratorFuelSupply {
 
                 state.dataGenerator->FuelSupply(FuelSupNum).NodeName = AlphArray(3);
                 state.dataGenerator->FuelSupply(FuelSupNum).NodeNum = GetOnlySingleNode(state,
-                    AlphArray(3), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
+                                                                                        AlphArray(3),
+                                                                                        ErrorsFound,
+                                                                                        cCurrentModuleObject,
+                                                                                        AlphArray(1),
+                                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                                        DataLoopNode::NodeConnectionType::Sensor,
+                                                                                        1,
+                                                                                        ObjectIsNotParent);
 
                 state.dataGenerator->FuelSupply(FuelSupNum).SchedNum = GetScheduleIndex(state, AlphArray(4));
-                if ((state.dataGenerator->FuelSupply(FuelSupNum).SchedNum == 0) && (state.dataGenerator->FuelSupply(FuelSupNum).FuelTempMode == DataGenerators::FuelTemperatureMode::FuelInTempSchedule)) {
+                if ((state.dataGenerator->FuelSupply(FuelSupNum).SchedNum == 0) &&
+                    (state.dataGenerator->FuelSupply(FuelSupNum).FuelTempMode == DataGenerators::FuelTemperatureMode::FuelInTempSchedule)) {
                     ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError(state, "Schedule named was not found");
@@ -269,7 +287,6 @@ namespace GeneratorFuelSupply {
         // unused  REAL(r64) :: DelfHfuel
         // unused  REAL(r64) :: h_i
         // unused  REAL(r64) :: LHV
-
 
         NumHardCodedConstituents = 14;
 
@@ -594,7 +611,8 @@ namespace GeneratorFuelSupply {
             for (i = 1; i <= state.dataGenerator->FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
 
                 thisName = state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitName(i);
-                thisGasID = UtilityRoutines::FindItem(thisName, state.dataGenerator->GasPhaseThermoChemistryData, &GasPropertyDataStruct::ConstituentName);
+                thisGasID =
+                    UtilityRoutines::FindItem(thisName, state.dataGenerator->GasPhaseThermoChemistryData, &GasPropertyDataStruct::ConstituentName);
                 state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i) = thisGasID;
 
                 if (thisGasID == 0) {
@@ -604,13 +622,16 @@ namespace GeneratorFuelSupply {
 
                 // for this fuel mixture, figure stoichiometric oxygen requirement
                 O2Stoic += state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitMolalFract(i) *
-                           (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumCarbons + state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 4.0 -
+                           (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumCarbons +
+                            state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 4.0 -
                             state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumOxygens / 2.0);
                 // for this fuel mixture, figure stoichiometric Carbon Dioxide in Product Gases
 
-                CO2ProdStoic += state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitMolalFract(i) * state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumCarbons;
+                CO2ProdStoic += state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitMolalFract(i) *
+                                state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumCarbons;
 
-                H2OProdStoic += state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitMolalFract(i) * state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0;
+                H2OProdStoic += state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitMolalFract(i) *
+                                state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0;
             }
 
             state.dataGenerator->FuelSupply(FuelSupplyNum).StoicOxygenRate = O2Stoic;
@@ -624,10 +645,11 @@ namespace GeneratorFuelSupply {
                 if (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens == 0.0) {
                     LHVi = 0.0;
                 } else {
-                    LHVi =
-                        state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).StdRefMolarEnthOfForm -
-                        state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumCarbons * state.dataGenerator->GasPhaseThermoChemistryData(CO2dataID).StdRefMolarEnthOfForm -
-                        (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0) * state.dataGenerator->GasPhaseThermoChemistryData(WaterDataID).StdRefMolarEnthOfForm;
+                    LHVi = state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).StdRefMolarEnthOfForm -
+                           state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumCarbons *
+                               state.dataGenerator->GasPhaseThermoChemistryData(CO2dataID).StdRefMolarEnthOfForm -
+                           (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0) *
+                               state.dataGenerator->GasPhaseThermoChemistryData(WaterDataID).StdRefMolarEnthOfForm;
                 }
                 LHVfuel += LHVi * state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitMolalFract(i);
             }
@@ -640,12 +662,13 @@ namespace GeneratorFuelSupply {
                 if (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens == 0.0) {
                     HHVi = 0.0;
                 } else {
-                    HHVi =
-                        state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).StdRefMolarEnthOfForm -
-                        state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumCarbons * state.dataGenerator->GasPhaseThermoChemistryData(CO2dataID).StdRefMolarEnthOfForm -
-                        (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0) * state.dataGenerator->GasPhaseThermoChemistryData(WaterDataID).StdRefMolarEnthOfForm +
-                        (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0) *
-                            (state.dataGenerator->GasPhaseThermoChemistryData(WaterDataID).StdRefMolarEnthOfForm + 285.8304);
+                    HHVi = state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).StdRefMolarEnthOfForm -
+                           state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumCarbons *
+                               state.dataGenerator->GasPhaseThermoChemistryData(CO2dataID).StdRefMolarEnthOfForm -
+                           (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0) *
+                               state.dataGenerator->GasPhaseThermoChemistryData(WaterDataID).StdRefMolarEnthOfForm +
+                           (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0) *
+                               (state.dataGenerator->GasPhaseThermoChemistryData(WaterDataID).StdRefMolarEnthOfForm + 285.8304);
                 }
                 HHVfuel += HHVi * state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitMolalFract(i);
             }
@@ -654,23 +677,27 @@ namespace GeneratorFuelSupply {
             MWfuel = 0.0;
             for (i = 1; i <= state.dataGenerator->FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
                 thisGasID = state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i);
-                MWfuel += state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitMolalFract(i) * state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).MolecularWeight;
+                MWfuel += state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitMolalFract(i) *
+                          state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).MolecularWeight;
             }
             state.dataGenerator->FuelSupply(FuelSupplyNum).MW = MWfuel;
             state.dataGenerator->FuelSupply(FuelSupplyNum).KmolPerSecToKgPerSec = MWfuel;      // TODO check this, guessing on conversion...
             state.dataGenerator->FuelSupply(FuelSupplyNum).HHV = 1000000.0 * HHVfuel / MWfuel; // (1000/k) (1000/k) (kJ/mol)/(g/mol) = J/kg
-            state.dataGenerator->FuelSupply(FuelSupplyNum).LHVJperkg = state.dataGenerator->FuelSupply(FuelSupplyNum).LHV * 1000000.0 / state.dataGenerator->FuelSupply(FuelSupplyNum).MW;
+            state.dataGenerator->FuelSupply(FuelSupplyNum).LHVJperkg =
+                state.dataGenerator->FuelSupply(FuelSupplyNum).LHV * 1000000.0 / state.dataGenerator->FuelSupply(FuelSupplyNum).MW;
 
         } else if (state.dataGenerator->FuelSupply(FuelSupplyNum).FuelTypeMode == DataGenerators::FuelMode::fuelModeGenericLiquid) {
-            state.dataGenerator->FuelSupply(FuelSupplyNum).LHV =
-                    state.dataGenerator->FuelSupply(FuelSupplyNum).LHVliquid * state.dataGenerator->FuelSupply(FuelSupplyNum).MW / 1000000.0; // J/kg * g/mol (k/1000) (k/10000)
+            state.dataGenerator->FuelSupply(FuelSupplyNum).LHV = state.dataGenerator->FuelSupply(FuelSupplyNum).LHVliquid *
+                                                                 state.dataGenerator->FuelSupply(FuelSupplyNum).MW /
+                                                                 1000000.0; // J/kg * g/mol (k/1000) (k/10000)
 
         } else {
         }
 
         // report Heating Values in EIO.
-        print(state.files.eio, "! <Fuel Supply>, Fuel Supply Name, Lower Heating Value [J/kmol], Lower Heating Value [kJ/kg], Higher "
-                                             "Heating Value [KJ/kg],  Molecular Weight [g/mol] \n");
+        print(state.files.eio,
+              "! <Fuel Supply>, Fuel Supply Name, Lower Heating Value [J/kmol], Lower Heating Value [kJ/kg], Higher "
+              "Heating Value [KJ/kg],  Molecular Weight [g/mol] \n");
         static constexpr auto Format_501(" Fuel Supply, {},{:13.6N},{:13.6N},{:13.6N},{:13.6N}\n");
         print(state.files.eio,
               Format_501,

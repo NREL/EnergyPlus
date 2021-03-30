@@ -383,7 +383,7 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_getDesignCapacities_Test)
 
     // Heater
     thisChillerHeater.getDesignCapacities(*state, loc_2, maxload, minload, optload);
-    
+
     EXPECT_NEAR(minload, 9000.0, 0.001);
     EXPECT_NEAR(maxload, 81000.0, 0.001);
     EXPECT_NEAR(optload, 72000.0, 0.001);
@@ -641,7 +641,7 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_calcHeater_Fix_Test)
 
     Real64 loadinput = 5000.0;
     bool runflaginput = true;
-    
+
     thisChillerHeater.CoolingLoad = 100000.0;
     thisChillerHeater.CoolPartLoadRatio = 1.0;
     state->dataPlnt->TotNumLoops = 1;
@@ -660,7 +660,7 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_calcHeater_Fix_Test)
     state->dataLoopNodes->Node(7).Temp = 350.0;
     state->dataLoopNodes->Node(7).MassFlowRate = 0.5;
 
-    thisChillerHeater.calcHeater(*state,  loadinput, runflaginput);
+    thisChillerHeater.calcHeater(*state, loadinput, runflaginput);
 
     EXPECT_NEAR(thisChillerHeater.HeatingLoad, 21085.0, 1e-6);
     EXPECT_NEAR(thisChillerHeater.HeatElectricPower, 400.0, 1e-6);

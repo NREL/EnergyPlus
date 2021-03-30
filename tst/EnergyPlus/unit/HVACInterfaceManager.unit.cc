@@ -60,9 +60,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/HVACInterfaceManager.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
@@ -97,7 +95,7 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
     UpdateHalfLoopInletTemp(*state, 1, 1, TankOutletTemp);
     // Excess storage calcs moved here
     PlantManager::UpdateNodeThermalHistory(*state);
-    EXPECT_NEAR((2928.82-500), state->dataPlnt->PlantLoop(1).LoopSide(2).LoopSideInlet_MdotCpDeltaT, 0.001);
+    EXPECT_NEAR((2928.82 - 500), state->dataPlnt->PlantLoop(1).LoopSide(2).LoopSideInlet_MdotCpDeltaT, 0.001);
     EXPECT_NEAR(2928.82, state->dataPlnt->PlantLoop(1).LoopSide(2).LoopSideInlet_McpDTdt, 0.001);
     EXPECT_EQ(1, state->dataPlnt->PlantLoop(1).LoopSide(2).LoopSideInlet_CapExcessStorageTime);
     EXPECT_EQ(1, state->dataPlnt->PlantLoop(1).LoopSide(2).LoopSideInlet_TotalTime);
@@ -109,7 +107,7 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
     UpdateHalfLoopInletTemp(*state, 1, 1, TankOutletTemp);
     // Excess storage calcs moved here
     PlantManager::UpdateNodeThermalHistory(*state);
-    EXPECT_NEAR((-588.264 -500), state->dataPlnt->PlantLoop(1).LoopSide(2).LoopSideInlet_MdotCpDeltaT, 0.001);
+    EXPECT_NEAR((-588.264 - 500), state->dataPlnt->PlantLoop(1).LoopSide(2).LoopSideInlet_MdotCpDeltaT, 0.001);
     EXPECT_NEAR(-588.264, state->dataPlnt->PlantLoop(1).LoopSide(2).LoopSideInlet_McpDTdt, .001);
     EXPECT_EQ(1, state->dataPlnt->PlantLoop(1).LoopSide(2).LoopSideInlet_CapExcessStorageTime);
     EXPECT_EQ(2, state->dataPlnt->PlantLoop(1).LoopSide(2).LoopSideInlet_TotalTime);

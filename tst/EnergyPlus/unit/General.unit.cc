@@ -259,7 +259,7 @@ Real64 Residual(Real64 const Frac)
 Real64 ResidualTest(Real64 const Frac, Array1<Real64> const &Par)
 {
     Real64 ResidualTest;
-    Real64 Request = 1.0+1.0e-12;
+    Real64 Request = 1.0 + 1.0e-12;
     Real64 Actual;
 
     Actual = 1.0 + 2.0 * Frac + 10.0 * Frac * Frac;
@@ -314,7 +314,6 @@ TEST_F(EnergyPlusFixture, General_SolveRootTest)
     EXPECT_EQ(-1, SolFla);
 
     Par.deallocate();
-
 }
 
 TEST_F(EnergyPlusFixture, nthDayOfWeekOfMonth_test)
@@ -369,33 +368,33 @@ TEST_F(EnergyPlusFixture, nthDayOfWeekOfMonth_test)
 
 TEST_F(EnergyPlusFixture, General_EpexpTest)
 {
-    //Global exp function test
+    // Global exp function test
     Real64 x;
     Real64 d(1.0);
     Real64 y;
 
     // Underflow and near zero tests
     x = -69.0;
-    y = epexp(x,d);
+    y = epexp(x, d);
     EXPECT_NEAR(0.0, y, 1.0E-20);
 
     x = -700.0;
-    y = epexp(x,d);
+    y = epexp(x, d);
     EXPECT_NEAR(0.0, y, 1.0E-20);
 
     x = -1000.0; // Will cause underflow
-    y = epexp(x,d);
+    y = epexp(x, d);
     EXPECT_EQ(0.0, y);
 
     // Divide by zero tests
     d = 0.0;
     x = -1000.0;
-    y = epexp(x,d);
+    y = epexp(x, d);
     EXPECT_EQ(0.0, y);
 
     d = 0.0;
     x = 1000.0;
-    y = epexp(x,d);
+    y = epexp(x, d);
     EXPECT_EQ(0.0, y);
 
     /*// Overflow and near-overflow tests (Not currently used in code)

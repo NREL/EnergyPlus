@@ -45,8 +45,10 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <gtest/gtest.h>
 #include "../Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <gtest/gtest.h>
 
-class AutoSizingFixture : public EnergyPlus::EnergyPlusFixture {};
+class AutoSizingFixture : public EnergyPlus::EnergyPlusFixture
+{
+};

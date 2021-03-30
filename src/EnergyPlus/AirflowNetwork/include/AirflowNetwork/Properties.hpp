@@ -70,8 +70,8 @@
 #endif
 
 // EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -86,27 +86,32 @@ namespace AirflowNetwork {
     Real64 airDynamicVisc(Real64 T // Temperature in Celsius
     );
 
-    Real64 airKinematicVisc(EnergyPlusData &state, Real64 T, // Temperature in Celsius
+    Real64 airKinematicVisc(EnergyPlusData &state,
+                            Real64 T, // Temperature in Celsius
                             Real64 W, // Humidity ratio
                             Real64 P  // Barometric pressure
     );
 
-    Real64 airThermalDiffusivity(EnergyPlusData &state, Real64 T, // Temperature in Celsius
+    Real64 airThermalDiffusivity(EnergyPlusData &state,
+                                 Real64 T, // Temperature in Celsius
                                  Real64 W, // Humidity ratio
                                  Real64 P  // Barometric pressure
     );
 
-    Real64 airPrandtl(EnergyPlusData &state, Real64 T, // Temperature in Celsius
+    Real64 airPrandtl(EnergyPlusData &state,
+                      Real64 T, // Temperature in Celsius
                       Real64 W, // Humidity ratio
                       Real64 P  // Barometric pressure
     );
 
 } // namespace AirflowNetwork
 
-struct DataAFNProps : BaseGlobalStruct {
+struct DataAFNProps : BaseGlobalStruct
+{
     int lowerLimitErrIdx = 0;
     int upperLimitErrIdx = 0;
-    void clear_state() override {
+    void clear_state() override
+    {
         lowerLimitErrIdx = 0;
         upperLimitErrIdx = 0;
     }

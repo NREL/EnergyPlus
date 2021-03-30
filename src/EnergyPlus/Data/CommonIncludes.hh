@@ -54,10 +54,10 @@
 // here in this one file.  Basically, when a header inclusion is removed from EnergyPlusData.hh, put it here.
 
 // these are needed so that we don't have incomplete types when we manage the EnergyPlusData instance
-#include <EnergyPlus/AirLoopHVACDOAS.hh>
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <AirflowNetwork/Properties.hpp>
 #include <AirflowNetwork/Solver.hpp>
+#include <EnergyPlus/AirLoopHVACDOAS.hh>
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
@@ -158,8 +158,8 @@
 #include <EnergyPlus/GeneratorFuelSupply.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
-#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>

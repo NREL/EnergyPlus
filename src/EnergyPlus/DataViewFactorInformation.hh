@@ -92,7 +92,8 @@ namespace DataViewFactorInformation {
 
 } // namespace DataViewFactorInformation
 
-struct ViewFactorInfoData : BaseGlobalStruct {
+struct ViewFactorInfoData : BaseGlobalStruct
+{
 
     int NumOfRadiantEnclosures = 0; // Number of radiant enclosures
     int NumOfSolarEnclosures = 0;   // Number of solar enclosures

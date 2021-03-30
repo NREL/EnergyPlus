@@ -680,7 +680,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(NodeNum)).MassFlowRate = 0.0;
     }
     CalcZoneMassBalance(*state, false);
-    EXPECT_EQ(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate,0.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate, 0.0);
 
     // Set return node basis node flows to non-zero values, return flow should be the sum
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(1)).MassFlowRate = 0.05;
@@ -740,7 +740,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
         "  Space Return Node 2, !- Node 2 Name",
         "  Space Return Node 3; !- Node 3 Name",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
@@ -1838,7 +1838,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
         "  Zone Equip Exhaust 2,      !- Node 1 Name",
         "  Zone Equip Exhaust 4;      !- Node 2 Name",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
@@ -1941,128 +1941,127 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     EXPECT_EQ(energy.RemainingOutputRequired, expectedHeatLoad);
     EXPECT_EQ(energy.RemainingOutputReqToHeatSP, expectedHeatLoad);
     EXPECT_EQ(energy.RemainingOutputReqToCoolSP, expectedCoolLoad);
-
 }
 
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEquip_WithFractions)
 {
 
     std::string const idf_objects = delimited_string({
-         "Zone,",
-         "  Space;                   !- Name",
+        "Zone,",
+        "  Space;                   !- Name",
 
-         "ZoneHVAC:EquipmentConnections,",
-         " Space,                    !- Zone Name",
-         " Space Equipment,          !- Zone Conditioning Equipment List Name",
-         " Space Inlet Nodes,        !- Zone Air Inlet Node or NodeList Name",
-         " Space Exhaust Nodes,      !- Zone Air Exhaust Node or NodeList Name",
-         " Space Node,               !- Zone Air Node Name",
-         " Space Ret Node;           !- Zone Return Air Node Name",
+        "ZoneHVAC:EquipmentConnections,",
+        " Space,                    !- Zone Name",
+        " Space Equipment,          !- Zone Conditioning Equipment List Name",
+        " Space Inlet Nodes,        !- Zone Air Inlet Node or NodeList Name",
+        " Space Exhaust Nodes,      !- Zone Air Exhaust Node or NodeList Name",
+        " Space Node,               !- Zone Air Node Name",
+        " Space Ret Node;           !- Zone Return Air Node Name",
 
-         "ScheduleTypeLimits,",
-         "Fraction,       !- Name",
-         "0.0,            !- Lower limit value",
-         "1.0,            !- Upper limit value",
-         "Continuous,     !- Numeric Type",
-         "Dimensionless;  !- Unit Type",
+        "ScheduleTypeLimits,",
+        "Fraction,       !- Name",
+        "0.0,            !- Lower limit value",
+        "1.0,            !- Upper limit value",
+        "Continuous,     !- Numeric Type",
+        "Dimensionless;  !- Unit Type",
 
-         "Schedule:Constant,",
-         "Air Terminal 1 ADU Cooling Fraction,",
-         "Fraction,",
-         "0.3;",
+        "Schedule:Constant,",
+        "Air Terminal 1 ADU Cooling Fraction,",
+        "Fraction,",
+        "0.3;",
 
-         "Schedule:Constant,",
-         "Air Terminal 1 ADU Heating Fraction,",
-         "Fraction,",
-         "0.4;",
+        "Schedule:Constant,",
+        "Air Terminal 1 ADU Heating Fraction,",
+        "Fraction,",
+        "0.4;",
 
-         "Schedule:Constant,",
-         "Ideal System A Cooling Fraction,",
-         "Fraction,",
-         "0.5;",
+        "Schedule:Constant,",
+        "Ideal System A Cooling Fraction,",
+        "Fraction,",
+        "0.5;",
 
-         "Schedule:Constant,",
-         "Ideal System A Heating Fraction,",
-         "Fraction,",
-         "0.6;",
+        "Schedule:Constant,",
+        "Ideal System A Heating Fraction,",
+        "Fraction,",
+        "0.6;",
 
-         "ZoneHVAC:EquipmentList,",
-         " Space Equipment,          !- Name",
-         " SequentialLoad,           !- Load Distribution Scheme",
-         " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
-         " Air Terminal 1 ADU,       !- Zone Equipment 1 Name",
-         " 1,                        !- Zone Equipment 1 Cooling Sequence",
-         " 1,                        !- Zone Equipment 1 Heating or No-Load Sequence",
-         " Air Terminal 1 ADU Cooling Fraction,        !- Zone Equipment 1 Sequential Cooling Fraction",
-         " Air Terminal 1 ADU Heating Fraction,        !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
-         " ZoneHVAC:IdealLoadsAirSystem,",
-         " Ideal System A,           !- Name",
-         " 2,                        !- Zone Equipment 2 Cooling Sequence",
-         " 2,                        !- Zone Equipment 2 Heating or No-Load Sequence",
-         " Ideal System A Cooling Fraction,                         !- Zone Equipment 2 Sequential Cooling Fraction",
-         " Ideal System A Heating Fraction,                         !- Zone Equipment 2 Sequential Heating or No-Load Fraction",
-         " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
-         " Air Terminal 3 ADU,       !- Zone Equipment 3 Name",
-         " 3,                        !- Zone Equipment 3 Cooling Sequence",
-         " 3,                        !- Zone Equipment 3 Heating or No-Load Sequence",
-         " ,                         !- Zone Equipment 3 Sequential Cooling Fraction",
-         " ,                         !- Zone Equipment 3 Sequential Heating or No-Load Fraction",
-         " ZoneHVAC:IdealLoadsAirSystem,",
-         " Ideal System B,           !- Name",
-         " 4,                        !- Zone Equipment 4 Cooling Sequence",
-         " 4,                        !- Zone Equipment 4 Heating or No-Load Sequence",
-         " ,                         !- Zone Equipment 4 Sequential Cooling Fraction",
-         " ;                         !- Zone Equipment 4 Sequential Heating or No-Load Fraction",
+        "ZoneHVAC:EquipmentList,",
+        " Space Equipment,          !- Name",
+        " SequentialLoad,           !- Load Distribution Scheme",
+        " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        " Air Terminal 1 ADU,       !- Zone Equipment 1 Name",
+        " 1,                        !- Zone Equipment 1 Cooling Sequence",
+        " 1,                        !- Zone Equipment 1 Heating or No-Load Sequence",
+        " Air Terminal 1 ADU Cooling Fraction,        !- Zone Equipment 1 Sequential Cooling Fraction",
+        " Air Terminal 1 ADU Heating Fraction,        !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
+        " ZoneHVAC:IdealLoadsAirSystem,",
+        " Ideal System A,           !- Name",
+        " 2,                        !- Zone Equipment 2 Cooling Sequence",
+        " 2,                        !- Zone Equipment 2 Heating or No-Load Sequence",
+        " Ideal System A Cooling Fraction,                         !- Zone Equipment 2 Sequential Cooling Fraction",
+        " Ideal System A Heating Fraction,                         !- Zone Equipment 2 Sequential Heating or No-Load Fraction",
+        " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
+        " Air Terminal 3 ADU,       !- Zone Equipment 3 Name",
+        " 3,                        !- Zone Equipment 3 Cooling Sequence",
+        " 3,                        !- Zone Equipment 3 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 3 Sequential Cooling Fraction",
+        " ,                         !- Zone Equipment 3 Sequential Heating or No-Load Fraction",
+        " ZoneHVAC:IdealLoadsAirSystem,",
+        " Ideal System B,           !- Name",
+        " 4,                        !- Zone Equipment 4 Cooling Sequence",
+        " 4,                        !- Zone Equipment 4 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 4 Sequential Cooling Fraction",
+        " ;                         !- Zone Equipment 4 Sequential Heating or No-Load Fraction",
 
-         "ZoneHVAC:AirDistributionUnit,",
-         " Air Terminal 1 ADU,       !- Name",
-         " Zone Equip Inlet 1,       !- Air Distribution Unit Outlet Node Name",
-         " AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
-         " Air Terminal 1;           !- Air Terminal Name",
+        "ZoneHVAC:AirDistributionUnit,",
+        " Air Terminal 1 ADU,       !- Name",
+        " Zone Equip Inlet 1,       !- Air Distribution Unit Outlet Node Name",
+        " AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        " Air Terminal 1;           !- Air Terminal Name",
 
-         "ZoneHVAC:IdealLoadsAirSystem,",
-         " Ideal System A,           !- Name",
-         " ,                         !- Availability Schedule Name",
-         " Zone Equip Inlet 2,       !- Zone Supply Air Node Name",
-         " Zone Equip Exhaust 2;     !- Zone Exhaust Air Node Name",
+        "ZoneHVAC:IdealLoadsAirSystem,",
+        " Ideal System A,           !- Name",
+        " ,                         !- Availability Schedule Name",
+        " Zone Equip Inlet 2,       !- Zone Supply Air Node Name",
+        " Zone Equip Exhaust 2;     !- Zone Exhaust Air Node Name",
 
-         "ZoneHVAC:AirDistributionUnit,",
-         " Air Terminal 3 ADU,       !- Name",
-         " Zone Equip Inlet 3,       !- Air Distribution Unit Outlet Node Name",
-         " AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
-         " Air Terminal 3;           !- Air Terminal Name",
+        "ZoneHVAC:AirDistributionUnit,",
+        " Air Terminal 3 ADU,       !- Name",
+        " Zone Equip Inlet 3,       !- Air Distribution Unit Outlet Node Name",
+        " AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        " Air Terminal 3;           !- Air Terminal Name",
 
-         "ZoneHVAC:IdealLoadsAirSystem,",
-         " Ideal System B,           !- Name",
-         " ,                         !- Availability Schedule Name",
-         " Zone Equip Inlet 4,       !- Zone Supply Air Node Name",
-         " Zone Equip Exhaust 4;     !- Zone Exhaust Air Node Name",
+        "ZoneHVAC:IdealLoadsAirSystem,",
+        " Ideal System B,           !- Name",
+        " ,                         !- Availability Schedule Name",
+        " Zone Equip Inlet 4,       !- Zone Supply Air Node Name",
+        " Zone Equip Exhaust 4;     !- Zone Exhaust Air Node Name",
 
-         "AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
-         " Air Terminal 1,          !- Name",
-         " ,    !- Availability Schedule Name",
-         " Zone Equip Inlet 1 2AT,  !- Air Inlet Node Name",
-         " Zone Equip Inlet 1,      !- Air Outlet Node Name",
-         " 0.2;                     !- Maximum Air Flow Rate {m3/s}",
+        "AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+        " Air Terminal 1,          !- Name",
+        " ,    !- Availability Schedule Name",
+        " Zone Equip Inlet 1 2AT,  !- Air Inlet Node Name",
+        " Zone Equip Inlet 1,      !- Air Outlet Node Name",
+        " 0.2;                     !- Maximum Air Flow Rate {m3/s}",
 
-         "AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
-         " Air Terminal 3,          !- Name",
-         " ,                        !- Availability Schedule Name",
-         " Zone Equip Inlet 3 2AT,  !- Air Inlet Node Name",
-         " Zone Equip Inlet 3,      !- Air Outlet Node Name",
-         " 0.2;                     !- Maximum Air Flow Rate {m3/s}",
+        "AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+        " Air Terminal 3,          !- Name",
+        " ,                        !- Availability Schedule Name",
+        " Zone Equip Inlet 3 2AT,  !- Air Inlet Node Name",
+        " Zone Equip Inlet 3,      !- Air Outlet Node Name",
+        " 0.2;                     !- Maximum Air Flow Rate {m3/s}",
 
-         "NodeList,",
-         "  Space Inlet Nodes,       !- Name",
-         "  Zone Equip Inlet 1,      !- Node 1 Name",
-         "  Zone Equip Inlet 2,      !- Node 2 Name",
-         "  Zone Equip Inlet 3,      !- Node 3 Name",
-         "  Zone Equip Inlet 4;      !- Node 4 Name",
+        "NodeList,",
+        "  Space Inlet Nodes,       !- Name",
+        "  Zone Equip Inlet 1,      !- Node 1 Name",
+        "  Zone Equip Inlet 2,      !- Node 2 Name",
+        "  Zone Equip Inlet 3,      !- Node 3 Name",
+        "  Zone Equip Inlet 4;      !- Node 4 Name",
 
-         "NodeList,",
-         "  Space Exhaust Nodes,       !- Name",
-         "  Zone Equip Exhaust 2,      !- Node 1 Name",
-         "  Zone Equip Exhaust 4;      !- Node 2 Name",
+        "NodeList,",
+        "  Space Exhaust Nodes,       !- Name",
+        "  Zone Equip Exhaust 2,      !- Node 1 Name",
+        "  Zone Equip Exhaust 4;      !- Node 2 Name",
 
     });
 
@@ -2163,10 +2162,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     EXPECT_DOUBLE_EQ(energy.RemainingOutputRequired, expectedHeatLoad);
     EXPECT_DOUBLE_EQ(energy.RemainingOutputReqToHeatSP, expectedHeatLoad);
     EXPECT_DOUBLE_EQ(energy.RemainingOutputReqToCoolSP, expectedCoolLoad);
-
 }
 
-TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
+TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
+{
 
     state->dataEnvrn->TotDesDays = 12;
     state->dataEnvrn->TotRunDesPersDays = 3;
@@ -2543,7 +2542,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
             thisSizingType2.HeatOutHumRatSeq.allocate(state->dataZoneEquipmentManager->NumOfTimeStepInDay);
             thisSizingType2.CoolOutHumRatSeq.allocate(state->dataZoneEquipmentManager->NumOfTimeStepInDay);
 
-            for ( int TimeStepIndex = 1; TimeStepIndex <= state->dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex ) {
+            for (int TimeStepIndex = 1; TimeStepIndex <= state->dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
                 thisSizingType2.DOASHeatLoadSeq(TimeStepIndex) = 1.0;
                 thisSizingType2.DOASCoolLoadSeq(TimeStepIndex) = 1.0;
                 thisSizingType2.DOASHeatAddSeq(TimeStepIndex) = 1.0;
@@ -2578,79 +2577,79 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
 
     ZoneEquipmentManager::RezeroZoneSizingArrays(*state);
 
-    for ( int CtrlZoneNum = 1; CtrlZoneNum <= state->dataGlobal->NumOfZones; ++CtrlZoneNum ) {
-        for ( int DesDayNum = 1; DesDayNum <= state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays; ++DesDayNum ) {
+    for (int CtrlZoneNum = 1; CtrlZoneNum <= state->dataGlobal->NumOfZones; ++CtrlZoneNum) {
+        for (int DesDayNum = 1; DesDayNum <= state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
             auto &thisSizingType(state->dataSize->ZoneSizing(DesDayNum, CtrlZoneNum));
-            //EXPECT_EQ(thisSizingType.ZoneName, "");
-            //EXPECT_EQ(thisSizingType.ADUName, "");
+            // EXPECT_EQ(thisSizingType.ZoneName, "");
+            // EXPECT_EQ(thisSizingType.ADUName, "");
             EXPECT_EQ(thisSizingType.CoolDesDay, "");
             EXPECT_EQ(thisSizingType.HeatDesDay, "");
             EXPECT_EQ(thisSizingType.cHeatDDDate, "");
             EXPECT_EQ(thisSizingType.cCoolDDDate, "");
-            //EXPECT_FALSE(thisSizingType.AccountForDOAS);
-            //EXPECT_FALSE(thisSizingType.EMSOverrideDesHeatMassOn);
-            //EXPECT_FALSE(thisSizingType.EMSOverrideDesCoolMassOn);
-            //EXPECT_FALSE(thisSizingType.EMSOverrideDesHeatLoadOn);
-            //EXPECT_FALSE(thisSizingType.EMSOverrideDesCoolLoadOn);
-            //EXPECT_FALSE(thisSizingType.EMSOverrideDesHeatVolOn);
-            //EXPECT_FALSE(thisSizingType.EMSOverrideDesCoolVolOn);
-            //EXPECT_EQ(thisSizingType.ZnCoolDgnSAMethod, 0);
-            //EXPECT_EQ(thisSizingType.ZnHeatDgnSAMethod, 0);
-            //EXPECT_EQ(thisSizingType.ZoneDesignSpecOAIndex, 0);
-            //EXPECT_EQ(thisSizingType.OADesMethod, 0);
-            //EXPECT_EQ(thisSizingType.CoolAirDesMethod, 0);
-            //EXPECT_EQ(thisSizingType.HeatAirDesMethod, 0);
-            //EXPECT_EQ(thisSizingType.DOASControlStrategy, 0);
-            //EXPECT_EQ(thisSizingType.ActualZoneNum, 0);
+            // EXPECT_FALSE(thisSizingType.AccountForDOAS);
+            // EXPECT_FALSE(thisSizingType.EMSOverrideDesHeatMassOn);
+            // EXPECT_FALSE(thisSizingType.EMSOverrideDesCoolMassOn);
+            // EXPECT_FALSE(thisSizingType.EMSOverrideDesHeatLoadOn);
+            // EXPECT_FALSE(thisSizingType.EMSOverrideDesCoolLoadOn);
+            // EXPECT_FALSE(thisSizingType.EMSOverrideDesHeatVolOn);
+            // EXPECT_FALSE(thisSizingType.EMSOverrideDesCoolVolOn);
+            // EXPECT_EQ(thisSizingType.ZnCoolDgnSAMethod, 0);
+            // EXPECT_EQ(thisSizingType.ZnHeatDgnSAMethod, 0);
+            // EXPECT_EQ(thisSizingType.ZoneDesignSpecOAIndex, 0);
+            // EXPECT_EQ(thisSizingType.OADesMethod, 0);
+            // EXPECT_EQ(thisSizingType.CoolAirDesMethod, 0);
+            // EXPECT_EQ(thisSizingType.HeatAirDesMethod, 0);
+            // EXPECT_EQ(thisSizingType.DOASControlStrategy, 0);
+            // EXPECT_EQ(thisSizingType.ActualZoneNum, 0);
             EXPECT_EQ(thisSizingType.TimeStepNumAtHeatMax, 0);
             EXPECT_EQ(thisSizingType.TimeStepNumAtCoolMax, 0);
             EXPECT_EQ(thisSizingType.HeatDDNum, 0);
             EXPECT_EQ(thisSizingType.CoolDDNum, 0);
-            //EXPECT_EQ(thisSizingType.CoolDesTemp, 0.0);
-            //EXPECT_EQ(thisSizingType.HeatDesTemp, 0.0);
-            //EXPECT_EQ(thisSizingType.CoolDesTempDiff, 0.0);
-            //EXPECT_EQ(thisSizingType.HeatDesTempDiff, 0.0);
-            //EXPECT_EQ(thisSizingType.CoolDesHumRat, 0.0);
-            //EXPECT_EQ(thisSizingType.HeatDesHumRat, 0.0);
-            //EXPECT_EQ(thisSizingType.DesOAFlowPPer, 0.0);
-            //EXPECT_EQ(thisSizingType.DesOAFlowPerArea, 0.0);
-            //EXPECT_EQ(thisSizingType.DesOAFlow, 0.0);
-            //EXPECT_EQ(thisSizingType.InpDesCoolAirFlow, 0.0);
-            //EXPECT_EQ(thisSizingType.DesCoolMinAirFlowPerArea, 0.0);
-            //EXPECT_EQ(thisSizingType.DesCoolMinAirFlow, 0.0);
-            //EXPECT_EQ(thisSizingType.DesCoolMinAirFlowFrac, 0.0);
-            //EXPECT_EQ(thisSizingType.InpDesHeatAirFlow, 0.0);
-            //EXPECT_EQ(thisSizingType.DesHeatMaxAirFlowPerArea, 0.0);
-            //EXPECT_EQ(thisSizingType.DesHeatMaxAirFlow, 0.0);
-            //EXPECT_EQ(thisSizingType.DesHeatMaxAirFlowFrac, 0.0);
-            //EXPECT_EQ(thisSizingType.HeatSizingFactor, 0.0);
-            //EXPECT_EQ(thisSizingType.CoolSizingFactor, 0.0);
-            //EXPECT_EQ(thisSizingType.DOASLowSetpoint, 0.0);
-            //EXPECT_EQ(thisSizingType.DOASHighSetpoint, 0.0);
+            // EXPECT_EQ(thisSizingType.CoolDesTemp, 0.0);
+            // EXPECT_EQ(thisSizingType.HeatDesTemp, 0.0);
+            // EXPECT_EQ(thisSizingType.CoolDesTempDiff, 0.0);
+            // EXPECT_EQ(thisSizingType.HeatDesTempDiff, 0.0);
+            // EXPECT_EQ(thisSizingType.CoolDesHumRat, 0.0);
+            // EXPECT_EQ(thisSizingType.HeatDesHumRat, 0.0);
+            // EXPECT_EQ(thisSizingType.DesOAFlowPPer, 0.0);
+            // EXPECT_EQ(thisSizingType.DesOAFlowPerArea, 0.0);
+            // EXPECT_EQ(thisSizingType.DesOAFlow, 0.0);
+            // EXPECT_EQ(thisSizingType.InpDesCoolAirFlow, 0.0);
+            // EXPECT_EQ(thisSizingType.DesCoolMinAirFlowPerArea, 0.0);
+            // EXPECT_EQ(thisSizingType.DesCoolMinAirFlow, 0.0);
+            // EXPECT_EQ(thisSizingType.DesCoolMinAirFlowFrac, 0.0);
+            // EXPECT_EQ(thisSizingType.InpDesHeatAirFlow, 0.0);
+            // EXPECT_EQ(thisSizingType.DesHeatMaxAirFlowPerArea, 0.0);
+            // EXPECT_EQ(thisSizingType.DesHeatMaxAirFlow, 0.0);
+            // EXPECT_EQ(thisSizingType.DesHeatMaxAirFlowFrac, 0.0);
+            // EXPECT_EQ(thisSizingType.HeatSizingFactor, 0.0);
+            // EXPECT_EQ(thisSizingType.CoolSizingFactor, 0.0);
+            // EXPECT_EQ(thisSizingType.DOASLowSetpoint, 0.0);
+            // EXPECT_EQ(thisSizingType.DOASHighSetpoint, 0.0);
             EXPECT_EQ(thisSizingType.DesHeatMassFlow, 0.0);
-            //EXPECT_EQ(thisSizingType.DesHeatMassFlowNoOA, 0.0);
-            //EXPECT_EQ(thisSizingType.DesHeatOAFlowFrac, 0.0);
-            //EXPECT_EQ(thisSizingType.EMSValueDesHeatMassFlow, 0.0);
+            // EXPECT_EQ(thisSizingType.DesHeatMassFlowNoOA, 0.0);
+            // EXPECT_EQ(thisSizingType.DesHeatOAFlowFrac, 0.0);
+            // EXPECT_EQ(thisSizingType.EMSValueDesHeatMassFlow, 0.0);
             EXPECT_EQ(thisSizingType.DesCoolMassFlow, 0.0);
-            //EXPECT_EQ(thisSizingType.DesCoolMassFlowNoOA, 0.0);
-            //EXPECT_EQ(thisSizingType.DesCoolOAFlowFrac, 0.0);
-            //EXPECT_EQ(thisSizingType.EMSValueDesCoolMassFlow, 0.0);
+            // EXPECT_EQ(thisSizingType.DesCoolMassFlowNoOA, 0.0);
+            // EXPECT_EQ(thisSizingType.DesCoolOAFlowFrac, 0.0);
+            // EXPECT_EQ(thisSizingType.EMSValueDesCoolMassFlow, 0.0);
             EXPECT_EQ(thisSizingType.DesHeatLoad, 0.0);
-            //EXPECT_EQ(thisSizingType.NonAirSysDesHeatLoad, 0.0);
-            //EXPECT_EQ(thisSizingType.EMSValueDesHeatLoad, 0.0);
+            // EXPECT_EQ(thisSizingType.NonAirSysDesHeatLoad, 0.0);
+            // EXPECT_EQ(thisSizingType.EMSValueDesHeatLoad, 0.0);
             EXPECT_EQ(thisSizingType.DesCoolLoad, 0.0);
-            //EXPECT_EQ(thisSizingType.NonAirSysDesCoolLoad, 0.0);
-            //EXPECT_EQ(thisSizingType.EMSValueDesCoolLoad, 0.0);
+            // EXPECT_EQ(thisSizingType.NonAirSysDesCoolLoad, 0.0);
+            // EXPECT_EQ(thisSizingType.EMSValueDesCoolLoad, 0.0);
             EXPECT_EQ(thisSizingType.DesHeatDens, 0.0);
             EXPECT_EQ(thisSizingType.DesCoolDens, 0.0);
             EXPECT_EQ(thisSizingType.DesHeatVolFlow, 0.0);
-            //EXPECT_EQ(thisSizingType.DesHeatVolFlowNoOA, 0.0);
-            //EXPECT_EQ(thisSizingType.NonAirSysDesHeatVolFlow, 0.0);
-            //EXPECT_EQ(thisSizingType.EMSValueDesHeatVolFlow, 0.0);
+            // EXPECT_EQ(thisSizingType.DesHeatVolFlowNoOA, 0.0);
+            // EXPECT_EQ(thisSizingType.NonAirSysDesHeatVolFlow, 0.0);
+            // EXPECT_EQ(thisSizingType.EMSValueDesHeatVolFlow, 0.0);
             EXPECT_EQ(thisSizingType.DesCoolVolFlow, 0.0);
-            //EXPECT_EQ(thisSizingType.DesCoolVolFlowNoOA, 0.0);
-            //EXPECT_EQ(thisSizingType.NonAirSysDesCoolVolFlow, 0.0);
-            //EXPECT_EQ(thisSizingType.EMSValueDesCoolVolFlow, 0.0);
+            // EXPECT_EQ(thisSizingType.DesCoolVolFlowNoOA, 0.0);
+            // EXPECT_EQ(thisSizingType.NonAirSysDesCoolVolFlow, 0.0);
+            // EXPECT_EQ(thisSizingType.EMSValueDesCoolVolFlow, 0.0);
             EXPECT_EQ(thisSizingType.DesHeatVolFlowMax, 0.0);
             EXPECT_EQ(thisSizingType.DesCoolVolFlowMin, 0.0);
             EXPECT_EQ(thisSizingType.DesHeatCoilInTemp, 0.0);
@@ -2687,37 +2686,37 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
             EXPECT_EQ(thisSizingType.ZoneHumRatAtCoolPeak, 0.0);
             EXPECT_EQ(thisSizingType.OutHumRatAtHeatPeak, 0.0);
             EXPECT_EQ(thisSizingType.OutHumRatAtCoolPeak, 0.0);
-            //EXPECT_EQ(thisSizingType.MinOA, 0.0);
-            //EXPECT_EQ(thisSizingType.DesCoolMinAirFlow2, 0.0);
-            //EXPECT_EQ(thisSizingType.DesHeatMaxAirFlow2, 0.0);
-            //EXPECT_EQ(thisSizingType.ZoneADEffCooling, 0.0);
-            //EXPECT_EQ(thisSizingType.ZoneADEffHeating, 0.0);
-            //EXPECT_EQ(thisSizingType.ZoneSecondaryRecirculation, 0.0);
-            //EXPECT_EQ(thisSizingType.ZoneVentilationEff, 0.0);
-            //EXPECT_EQ(thisSizingType.ZonePrimaryAirFraction, 0.0);
-            //EXPECT_EQ(thisSizingType.ZonePrimaryAirFractionHtg, 0.0);
-            //EXPECT_EQ(thisSizingType.ZoneOAFracCooling, 0.0);
-            //EXPECT_EQ(thisSizingType.ZoneOAFracHeating, 0.0);
-            //EXPECT_EQ(thisSizingType.TotalOAFromPeople, 0.0);
-            //EXPECT_EQ(thisSizingType.TotalOAFromArea, 0.0);
-            //EXPECT_EQ(thisSizingType.TotPeopleInZone, 0.0);
-            //EXPECT_EQ(thisSizingType.TotalZoneFloorArea, 0.0);
-            //EXPECT_EQ(thisSizingType.ZonePeakOccupancy, 0.0);
-            //EXPECT_EQ(thisSizingType.SupplyAirAdjustFactor, 0.0);
-            //EXPECT_EQ(thisSizingType.ZpzClgByZone, 0.0);
-            //EXPECT_EQ(thisSizingType.ZpzHtgByZone, 0.0);
-            //EXPECT_EQ(thisSizingType.VozClgByZone, 0.0);
-            //EXPECT_EQ(thisSizingType.VozHtgByZone, 0.0);
+            // EXPECT_EQ(thisSizingType.MinOA, 0.0);
+            // EXPECT_EQ(thisSizingType.DesCoolMinAirFlow2, 0.0);
+            // EXPECT_EQ(thisSizingType.DesHeatMaxAirFlow2, 0.0);
+            // EXPECT_EQ(thisSizingType.ZoneADEffCooling, 0.0);
+            // EXPECT_EQ(thisSizingType.ZoneADEffHeating, 0.0);
+            // EXPECT_EQ(thisSizingType.ZoneSecondaryRecirculation, 0.0);
+            // EXPECT_EQ(thisSizingType.ZoneVentilationEff, 0.0);
+            // EXPECT_EQ(thisSizingType.ZonePrimaryAirFraction, 0.0);
+            // EXPECT_EQ(thisSizingType.ZonePrimaryAirFractionHtg, 0.0);
+            // EXPECT_EQ(thisSizingType.ZoneOAFracCooling, 0.0);
+            // EXPECT_EQ(thisSizingType.ZoneOAFracHeating, 0.0);
+            // EXPECT_EQ(thisSizingType.TotalOAFromPeople, 0.0);
+            // EXPECT_EQ(thisSizingType.TotalOAFromArea, 0.0);
+            // EXPECT_EQ(thisSizingType.TotPeopleInZone, 0.0);
+            // EXPECT_EQ(thisSizingType.TotalZoneFloorArea, 0.0);
+            // EXPECT_EQ(thisSizingType.ZonePeakOccupancy, 0.0);
+            // EXPECT_EQ(thisSizingType.SupplyAirAdjustFactor, 0.0);
+            // EXPECT_EQ(thisSizingType.ZpzClgByZone, 0.0);
+            // EXPECT_EQ(thisSizingType.ZpzHtgByZone, 0.0);
+            // EXPECT_EQ(thisSizingType.VozClgByZone, 0.0);
+            // EXPECT_EQ(thisSizingType.VozHtgByZone, 0.0);
             EXPECT_EQ(thisSizingType.DOASHeatLoad, 0.0);
             EXPECT_EQ(thisSizingType.DOASCoolLoad, 0.0);
-            //EXPECT_EQ(thisSizingType.DOASHeatAdd, 0.0);
-            //EXPECT_EQ(thisSizingType.DOASLatAdd, 0.0);
+            // EXPECT_EQ(thisSizingType.DOASHeatAdd, 0.0);
+            // EXPECT_EQ(thisSizingType.DOASLatAdd, 0.0);
             EXPECT_EQ(thisSizingType.DOASSupMassFlow, 0.0);
             EXPECT_EQ(thisSizingType.DOASSupTemp, 0.0);
             EXPECT_EQ(thisSizingType.DOASSupHumRat, 0.0);
             EXPECT_EQ(thisSizingType.DOASTotCoolLoad, 0.0);
 
-            for ( int TimeStepIndex = 1; TimeStepIndex <= state->dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex ) {
+            for (int TimeStepIndex = 1; TimeStepIndex <= state->dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
                 EXPECT_EQ(thisSizingType.DOASHeatLoadSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType.DOASCoolLoadSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType.DOASHeatAddSeq(TimeStepIndex), 0.0);
@@ -2749,76 +2748,76 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
             }
 
             auto &thisSizingType2(state->dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum));
-            //EXPECT_EQ(thisSizingType2.ZoneName, "");
-            //EXPECT_EQ(thisSizingType2.ADUName, "");
+            // EXPECT_EQ(thisSizingType2.ZoneName, "");
+            // EXPECT_EQ(thisSizingType2.ADUName, "");
             EXPECT_EQ(thisSizingType2.CoolDesDay, "");
             EXPECT_EQ(thisSizingType2.HeatDesDay, "");
             EXPECT_EQ(thisSizingType2.cHeatDDDate, "");
             EXPECT_EQ(thisSizingType2.cCoolDDDate, "");
-            //EXPECT_FALSE(thisSizingType2.AccountForDOAS);
-            //EXPECT_FALSE(thisSizingType2.EMSOverrideDesHeatMassOn);
-            //EXPECT_FALSE(thisSizingType2.EMSOverrideDesCoolMassOn);
-            //EXPECT_FALSE(thisSizingType2.EMSOverrideDesHeatLoadOn);
-            //EXPECT_FALSE(thisSizingType2.EMSOverrideDesCoolLoadOn);
-            //EXPECT_FALSE(thisSizingType2.EMSOverrideDesHeatVolOn);
-            //EXPECT_FALSE(thisSizingType2.EMSOverrideDesCoolVolOn);
-            //EXPECT_EQ(thisSizingType2.ZnCoolDgnSAMethod, 0);
-            //EXPECT_EQ(thisSizingType2.ZnHeatDgnSAMethod, 0);
-            //EXPECT_EQ(thisSizingType2.ZoneDesignSpecOAIndex, 0);
-            //EXPECT_EQ(thisSizingType2.OADesMethod, 0);
-            //EXPECT_EQ(thisSizingType2.CoolAirDesMethod, 0);
-            //EXPECT_EQ(thisSizingType2.HeatAirDesMethod, 0);
-            //EXPECT_EQ(thisSizingType2.DOASControlStrategy, 0);
-            //EXPECT_EQ(thisSizingType2.ActualZoneNum, 0);
+            // EXPECT_FALSE(thisSizingType2.AccountForDOAS);
+            // EXPECT_FALSE(thisSizingType2.EMSOverrideDesHeatMassOn);
+            // EXPECT_FALSE(thisSizingType2.EMSOverrideDesCoolMassOn);
+            // EXPECT_FALSE(thisSizingType2.EMSOverrideDesHeatLoadOn);
+            // EXPECT_FALSE(thisSizingType2.EMSOverrideDesCoolLoadOn);
+            // EXPECT_FALSE(thisSizingType2.EMSOverrideDesHeatVolOn);
+            // EXPECT_FALSE(thisSizingType2.EMSOverrideDesCoolVolOn);
+            // EXPECT_EQ(thisSizingType2.ZnCoolDgnSAMethod, 0);
+            // EXPECT_EQ(thisSizingType2.ZnHeatDgnSAMethod, 0);
+            // EXPECT_EQ(thisSizingType2.ZoneDesignSpecOAIndex, 0);
+            // EXPECT_EQ(thisSizingType2.OADesMethod, 0);
+            // EXPECT_EQ(thisSizingType2.CoolAirDesMethod, 0);
+            // EXPECT_EQ(thisSizingType2.HeatAirDesMethod, 0);
+            // EXPECT_EQ(thisSizingType2.DOASControlStrategy, 0);
+            // EXPECT_EQ(thisSizingType2.ActualZoneNum, 0);
             EXPECT_EQ(thisSizingType2.TimeStepNumAtHeatMax, 0);
             EXPECT_EQ(thisSizingType2.TimeStepNumAtCoolMax, 0);
             EXPECT_EQ(thisSizingType2.HeatDDNum, 0);
             EXPECT_EQ(thisSizingType2.CoolDDNum, 0);
-            //EXPECT_EQ(thisSizingType2.CoolDesTemp, 0.0);
-            //EXPECT_EQ(thisSizingType2.HeatDesTemp, 0.0);
-            //EXPECT_EQ(thisSizingType2.CoolDesTempDiff, 0.0);
-            //EXPECT_EQ(thisSizingType2.HeatDesTempDiff, 0.0);
-            //EXPECT_EQ(thisSizingType2.CoolDesHumRat, 0.0);
-            //EXPECT_EQ(thisSizingType2.HeatDesHumRat, 0.0);
-            //EXPECT_EQ(thisSizingType2.DesOAFlowPPer, 0.0);
-            //EXPECT_EQ(thisSizingType2.DesOAFlowPerArea, 0.0);
-            //EXPECT_EQ(thisSizingType2.DesOAFlow, 0.0);
-            //EXPECT_EQ(thisSizingType2.InpDesCoolAirFlow, 0.0);
-            //EXPECT_EQ(thisSizingType2.DesCoolMinAirFlowPerArea, 0.0);
-            //EXPECT_EQ(thisSizingType2.DesCoolMinAirFlow, 0.0);
-            //EXPECT_EQ(thisSizingType2.DesCoolMinAirFlowFrac, 0.0);
-            //EXPECT_EQ(thisSizingType2.InpDesHeatAirFlow, 0.0);
-            //EXPECT_EQ(thisSizingType2.DesHeatMaxAirFlowPerArea, 0.0);
-            //EXPECT_EQ(thisSizingType2.DesHeatMaxAirFlow, 0.0);
-            //EXPECT_EQ(thisSizingType2.DesHeatMaxAirFlowFrac, 0.0);
-            //EXPECT_EQ(thisSizingType2.HeatSizingFactor, 0.0);
-            //EXPECT_EQ(thisSizingType2.CoolSizingFactor, 0.0);
-            //EXPECT_EQ(thisSizingType2.DOASLowSetpoint, 0.0);
-            //EXPECT_EQ(thisSizingType2.DOASHighSetpoint, 0.0);
+            // EXPECT_EQ(thisSizingType2.CoolDesTemp, 0.0);
+            // EXPECT_EQ(thisSizingType2.HeatDesTemp, 0.0);
+            // EXPECT_EQ(thisSizingType2.CoolDesTempDiff, 0.0);
+            // EXPECT_EQ(thisSizingType2.HeatDesTempDiff, 0.0);
+            // EXPECT_EQ(thisSizingType2.CoolDesHumRat, 0.0);
+            // EXPECT_EQ(thisSizingType2.HeatDesHumRat, 0.0);
+            // EXPECT_EQ(thisSizingType2.DesOAFlowPPer, 0.0);
+            // EXPECT_EQ(thisSizingType2.DesOAFlowPerArea, 0.0);
+            // EXPECT_EQ(thisSizingType2.DesOAFlow, 0.0);
+            // EXPECT_EQ(thisSizingType2.InpDesCoolAirFlow, 0.0);
+            // EXPECT_EQ(thisSizingType2.DesCoolMinAirFlowPerArea, 0.0);
+            // EXPECT_EQ(thisSizingType2.DesCoolMinAirFlow, 0.0);
+            // EXPECT_EQ(thisSizingType2.DesCoolMinAirFlowFrac, 0.0);
+            // EXPECT_EQ(thisSizingType2.InpDesHeatAirFlow, 0.0);
+            // EXPECT_EQ(thisSizingType2.DesHeatMaxAirFlowPerArea, 0.0);
+            // EXPECT_EQ(thisSizingType2.DesHeatMaxAirFlow, 0.0);
+            // EXPECT_EQ(thisSizingType2.DesHeatMaxAirFlowFrac, 0.0);
+            // EXPECT_EQ(thisSizingType2.HeatSizingFactor, 0.0);
+            // EXPECT_EQ(thisSizingType2.CoolSizingFactor, 0.0);
+            // EXPECT_EQ(thisSizingType2.DOASLowSetpoint, 0.0);
+            // EXPECT_EQ(thisSizingType2.DOASHighSetpoint, 0.0);
             EXPECT_EQ(thisSizingType2.DesHeatMassFlow, 0.0);
-            //EXPECT_EQ(thisSizingType2.DesHeatMassFlowNoOA, 0.0);
-            //EXPECT_EQ(thisSizingType2.DesHeatOAFlowFrac, 0.0);
-            //EXPECT_EQ(thisSizingType2.EMSValueDesHeatMassFlow, 0.0);
+            // EXPECT_EQ(thisSizingType2.DesHeatMassFlowNoOA, 0.0);
+            // EXPECT_EQ(thisSizingType2.DesHeatOAFlowFrac, 0.0);
+            // EXPECT_EQ(thisSizingType2.EMSValueDesHeatMassFlow, 0.0);
             EXPECT_EQ(thisSizingType2.DesCoolMassFlow, 0.0);
-            //EXPECT_EQ(thisSizingType2.DesCoolMassFlowNoOA, 0.0);
-            //EXPECT_EQ(thisSizingType2.DesCoolOAFlowFrac, 0.0);
-            //EXPECT_EQ(thisSizingType2.EMSValueDesCoolMassFlow, 0.0);
+            // EXPECT_EQ(thisSizingType2.DesCoolMassFlowNoOA, 0.0);
+            // EXPECT_EQ(thisSizingType2.DesCoolOAFlowFrac, 0.0);
+            // EXPECT_EQ(thisSizingType2.EMSValueDesCoolMassFlow, 0.0);
             EXPECT_EQ(thisSizingType2.DesHeatLoad, 0.0);
-            //EXPECT_EQ(thisSizingType2.NonAirSysDesHeatLoad, 0.0);
-            //EXPECT_EQ(thisSizingType2.EMSValueDesHeatLoad, 0.0);
+            // EXPECT_EQ(thisSizingType2.NonAirSysDesHeatLoad, 0.0);
+            // EXPECT_EQ(thisSizingType2.EMSValueDesHeatLoad, 0.0);
             EXPECT_EQ(thisSizingType2.DesCoolLoad, 0.0);
-            //EXPECT_EQ(thisSizingType2.NonAirSysDesCoolLoad, 0.0);
-            //EXPECT_EQ(thisSizingType2.EMSValueDesCoolLoad, 0.0);
+            // EXPECT_EQ(thisSizingType2.NonAirSysDesCoolLoad, 0.0);
+            // EXPECT_EQ(thisSizingType2.EMSValueDesCoolLoad, 0.0);
             EXPECT_EQ(thisSizingType2.DesHeatDens, 0.0);
             EXPECT_EQ(thisSizingType2.DesCoolDens, 0.0);
             EXPECT_EQ(thisSizingType2.DesHeatVolFlow, 0.0);
-            //EXPECT_EQ(thisSizingType2.DesHeatVolFlowNoOA, 0.0);
-            //EXPECT_EQ(thisSizingType2.NonAirSysDesHeatVolFlow, 0.0);
-            //EXPECT_EQ(thisSizingType2.EMSValueDesHeatVolFlow, 0.0);
+            // EXPECT_EQ(thisSizingType2.DesHeatVolFlowNoOA, 0.0);
+            // EXPECT_EQ(thisSizingType2.NonAirSysDesHeatVolFlow, 0.0);
+            // EXPECT_EQ(thisSizingType2.EMSValueDesHeatVolFlow, 0.0);
             EXPECT_EQ(thisSizingType2.DesCoolVolFlow, 0.0);
-            //EXPECT_EQ(thisSizingType2.DesCoolVolFlowNoOA, 0.0);
-            //EXPECT_EQ(thisSizingType2.NonAirSysDesCoolVolFlow, 0.0);
-            //EXPECT_EQ(thisSizingType2.EMSValueDesCoolVolFlow, 0.0);
+            // EXPECT_EQ(thisSizingType2.DesCoolVolFlowNoOA, 0.0);
+            // EXPECT_EQ(thisSizingType2.NonAirSysDesCoolVolFlow, 0.0);
+            // EXPECT_EQ(thisSizingType2.EMSValueDesCoolVolFlow, 0.0);
             EXPECT_EQ(thisSizingType2.DesHeatVolFlowMax, 0.0);
             EXPECT_EQ(thisSizingType2.DesCoolVolFlowMin, 0.0);
             EXPECT_EQ(thisSizingType2.DesHeatCoilInTemp, 0.0);
@@ -2855,37 +2854,37 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
             EXPECT_EQ(thisSizingType2.ZoneHumRatAtCoolPeak, 0.0);
             EXPECT_EQ(thisSizingType2.OutHumRatAtHeatPeak, 0.0);
             EXPECT_EQ(thisSizingType2.OutHumRatAtCoolPeak, 0.0);
-            //EXPECT_EQ(thisSizingType2.MinOA, 0.0);
-            //EXPECT_EQ(thisSizingType2.DesCoolMinAirFlow2, 0.0);
-            //EXPECT_EQ(thisSizingType2.DesHeatMaxAirFlow2, 0.0);
-            //EXPECT_EQ(thisSizingType2.ZoneADEffCooling, 0.0);
-            //EXPECT_EQ(thisSizingType2.ZoneADEffHeating, 0.0);
-            //EXPECT_EQ(thisSizingType2.ZoneSecondaryRecirculation, 0.0);
-            //EXPECT_EQ(thisSizingType2.ZoneVentilationEff, 0.0);
-            //EXPECT_EQ(thisSizingType2.ZonePrimaryAirFraction, 0.0);
-            //EXPECT_EQ(thisSizingType2.ZonePrimaryAirFractionHtg, 0.0);
-            //EXPECT_EQ(thisSizingType2.ZoneOAFracCooling, 0.0);
-            //EXPECT_EQ(thisSizingType2.ZoneOAFracHeating, 0.0);
-            //EXPECT_EQ(thisSizingType2.TotalOAFromPeople, 0.0);
-            //EXPECT_EQ(thisSizingType2.TotalOAFromArea, 0.0);
-            //EXPECT_EQ(thisSizingType2.TotPeopleInZone, 0.0);
-            //EXPECT_EQ(thisSizingType2.TotalZoneFloorArea, 0.0);
-            //EXPECT_EQ(thisSizingType2.ZonePeakOccupancy, 0.0);
-            //EXPECT_EQ(thisSizingType2.SupplyAirAdjustFactor, 0.0);
-            //EXPECT_EQ(thisSizingType2.ZpzClgByZone, 0.0);
-            //EXPECT_EQ(thisSizingType2.ZpzHtgByZone, 0.0);
-            //EXPECT_EQ(thisSizingType2.VozClgByZone, 0.0);
-            //EXPECT_EQ(thisSizingType2.VozHtgByZone, 0.0);
+            // EXPECT_EQ(thisSizingType2.MinOA, 0.0);
+            // EXPECT_EQ(thisSizingType2.DesCoolMinAirFlow2, 0.0);
+            // EXPECT_EQ(thisSizingType2.DesHeatMaxAirFlow2, 0.0);
+            // EXPECT_EQ(thisSizingType2.ZoneADEffCooling, 0.0);
+            // EXPECT_EQ(thisSizingType2.ZoneADEffHeating, 0.0);
+            // EXPECT_EQ(thisSizingType2.ZoneSecondaryRecirculation, 0.0);
+            // EXPECT_EQ(thisSizingType2.ZoneVentilationEff, 0.0);
+            // EXPECT_EQ(thisSizingType2.ZonePrimaryAirFraction, 0.0);
+            // EXPECT_EQ(thisSizingType2.ZonePrimaryAirFractionHtg, 0.0);
+            // EXPECT_EQ(thisSizingType2.ZoneOAFracCooling, 0.0);
+            // EXPECT_EQ(thisSizingType2.ZoneOAFracHeating, 0.0);
+            // EXPECT_EQ(thisSizingType2.TotalOAFromPeople, 0.0);
+            // EXPECT_EQ(thisSizingType2.TotalOAFromArea, 0.0);
+            // EXPECT_EQ(thisSizingType2.TotPeopleInZone, 0.0);
+            // EXPECT_EQ(thisSizingType2.TotalZoneFloorArea, 0.0);
+            // EXPECT_EQ(thisSizingType2.ZonePeakOccupancy, 0.0);
+            // EXPECT_EQ(thisSizingType2.SupplyAirAdjustFactor, 0.0);
+            // EXPECT_EQ(thisSizingType2.ZpzClgByZone, 0.0);
+            // EXPECT_EQ(thisSizingType2.ZpzHtgByZone, 0.0);
+            // EXPECT_EQ(thisSizingType2.VozClgByZone, 0.0);
+            // EXPECT_EQ(thisSizingType2.VozHtgByZone, 0.0);
             EXPECT_EQ(thisSizingType2.DOASHeatLoad, 0.0);
             EXPECT_EQ(thisSizingType2.DOASCoolLoad, 0.0);
-            //EXPECT_EQ(thisSizingType2.DOASHeatAdd, 0.0);
-            //EXPECT_EQ(thisSizingType2.DOASLatAdd, 0.0);
+            // EXPECT_EQ(thisSizingType2.DOASHeatAdd, 0.0);
+            // EXPECT_EQ(thisSizingType2.DOASLatAdd, 0.0);
             EXPECT_EQ(thisSizingType2.DOASSupMassFlow, 0.0);
             EXPECT_EQ(thisSizingType2.DOASSupTemp, 0.0);
             EXPECT_EQ(thisSizingType2.DOASSupHumRat, 0.0);
             EXPECT_EQ(thisSizingType2.DOASTotCoolLoad, 0.0);
 
-            for ( int TimeStepIndex = 1; TimeStepIndex <= state->dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex ) {
+            for (int TimeStepIndex = 1; TimeStepIndex <= state->dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
                 EXPECT_EQ(thisSizingType2.DOASHeatLoadSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType2.DOASCoolLoadSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType2.DOASHeatAddSeq(TimeStepIndex), 0.0);
@@ -3046,7 +3045,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
         "Fraction,",
         "1.0;",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
@@ -3291,7 +3290,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
         "Fraction,",
         "1.0;",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -3556,7 +3555,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
         "Fraction,",
         "1.0;",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -3823,7 +3822,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
         "Fraction,",
         "1.0;",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -3932,7 +3931,6 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     // zone mixing object flow is modified
     EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 1.0, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
-
 
     // Test 3: set receiving zone exhaust fan flow 3 times supply flow rate
     // set source zone exhaust fan flow to zero and receiving zone exhaust fan flow to 3.0
@@ -4139,7 +4137,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wSourceAndReceivingZone)
         "Fraction,",
         "1.0;",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -4381,7 +4379,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_ZoneMixingInfiltrationFlowsFlag
         "Fraction,",
         "1.0;",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 

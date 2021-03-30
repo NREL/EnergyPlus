@@ -76,7 +76,6 @@ namespace WindowManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-
         // PURPOSE OF THIS SUBROUTINE:
         // Reads input and creates instance of WindowModel object
         int NumNums;
@@ -86,7 +85,8 @@ namespace WindowManager {
         std::unique_ptr<CWindowModel> aModel = std::unique_ptr<CWindowModel>(new CWindowModel());
         int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, objectName);
         if (numCurrModels > 0) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state, objectName, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
+            state.dataInputProcessing->inputProcessor->getObjectItem(
+                state, objectName, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
             EnumParser<WindowsModel> aParser;
             aModel->m_Model = aParser.StringToEnum(state, state.dataIPShortCut->cAlphaArgs(1));
         }

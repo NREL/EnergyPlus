@@ -2181,7 +2181,7 @@ TEST_F(EnergyPlusFixture, EMS_ViewFactorToGround)
         "    Set south_window_view_factor_ground_act = 0.5 * 0.85,  !- A7",
         "    ENDIF;                   !- A8",
 
-            "EnergyManagementSystem:Program,",
+        "EnergyManagementSystem:Program,",
         "    surface_view_factor_ground_adj,  !- Name",
         "    IF (DayOfYear >= 1) && (DayOfYear <= 120),  !- Program Line 1",
         "    Set surface_south_window_view_factor_ground_act = 0.5 * 0.85,  !- Program Line 2",

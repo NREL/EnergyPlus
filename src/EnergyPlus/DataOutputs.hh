@@ -78,8 +78,8 @@ namespace DataOutputs {
         std::string const key;
         std::string const variableName;
         bool is_simple_string = true;
-        RE2 * pattern;
-        RE2 * case_insensitive_pattern;
+        RE2 *pattern;
+        RE2 *case_insensitive_pattern;
     };
 
     // Check if a KeyValue/VariableName is inside the map OutputVariablesForSimulation
@@ -87,22 +87,26 @@ namespace DataOutputs {
 
 } // namespace DataOutputs
 
-struct OutputsData : BaseGlobalStruct {
+struct OutputsData : BaseGlobalStruct
+{
 
     int MaxConsideredOutputVariables = 0; // Max Array size for OutputVariable pre-scanned
     int NumConsideredOutputVariables = 0; // Number of variables - pre-scanned, allowed for output
-    int iNumberOfRecords;                // Number of records in input
-    int iNumberOfDefaultedFields;        // number of defaulted fields
-    int iTotalFieldsWithDefaults;        // number of fields that can be defaulted
-    int iNumberOfAutoSizedFields;        // number of autosized fields
-    int iTotalAutoSizableFields;         // number of fields that can be autosized
-    int iNumberOfAutoCalcedFields;       // number of autocalculated fields
-    int iTotalAutoCalculatableFields;    // number of fields that can be autocalculated
-    std::unordered_map<std::string, std::unordered_map<std::string, DataOutputs::OutputReportingVariables,
-            UtilityRoutines::case_insensitive_hasher,
-            UtilityRoutines::case_insensitive_comparator>,
-            UtilityRoutines::case_insensitive_hasher,
-            UtilityRoutines::case_insensitive_comparator> OutputVariablesForSimulation;
+    int iNumberOfRecords;                 // Number of records in input
+    int iNumberOfDefaultedFields;         // number of defaulted fields
+    int iTotalFieldsWithDefaults;         // number of fields that can be defaulted
+    int iNumberOfAutoSizedFields;         // number of autosized fields
+    int iTotalAutoSizableFields;          // number of fields that can be autosized
+    int iNumberOfAutoCalcedFields;        // number of autocalculated fields
+    int iTotalAutoCalculatableFields;     // number of fields that can be autocalculated
+    std::unordered_map<std::string,
+                       std::unordered_map<std::string,
+                                          DataOutputs::OutputReportingVariables,
+                                          UtilityRoutines::case_insensitive_hasher,
+                                          UtilityRoutines::case_insensitive_comparator>,
+                       UtilityRoutines::case_insensitive_hasher,
+                       UtilityRoutines::case_insensitive_comparator>
+        OutputVariablesForSimulation;
 
     void clear_state() override
     {

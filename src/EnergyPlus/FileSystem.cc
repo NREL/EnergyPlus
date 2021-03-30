@@ -47,8 +47,8 @@
 
 // Standard C++ library
 #include <errno.h>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -100,7 +100,7 @@ namespace FileSystem {
         tempPath = tempPath.substr(0, pathCharPosition + 1);
 
         // If empty, then current dir, but with trailing separator too: eg `./`
-        if (tempPath == "") tempPath = {'.',DataStringGlobals:: pathChar};
+        if (tempPath == "") tempPath = {'.', DataStringGlobals::pathChar};
 
         return tempPath;
     }
@@ -262,7 +262,7 @@ namespace FileSystem {
             return;
         }
 #ifdef _WIN32
-        //Note: on Windows, rename function doesn't always replace the existing file so MoveFileExA is used
+        // Note: on Windows, rename function doesn't always replace the existing file so MoveFileExA is used
         MoveFileExA(filePath.c_str(), destination.c_str(), MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING);
 #else
         // Start by removing the destination file. rename fails silently, so you don't want to silently use a potentially outdated file...

@@ -112,7 +112,8 @@ enum GeneralRoutinesEquipNums
     VentilatedSlabNum = 11
 };
 
-void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,           // the component Name
+void ControlCompOutput(EnergyPlusData &state,
+                       std::string const &CompName,           // the component Name
                        std::string const &CompType,           // Type of component
                        int &CompNum,                          // Index of component in component array
                        bool const FirstHVACIteration,         // flag for 1st HVAV iteration in the time step
@@ -189,21 +190,21 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
     // Interval Half Type used for Controller
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Iter(0); // Iteration limit for the interval halving process
-    Real64 CpAir;       // specific heat of air (J/kg-C)
+    int Iter(0);  // Iteration limit for the interval halving process
+    Real64 CpAir; // specific heat of air (J/kg-C)
     bool Converged;
     Real64 Denom;   // the denominator of the control signal
     Real64 LoadMet; // Actual output of unit (watts)
     // INTEGER, SAVE    :: ErrCount=0  ! Number of times that the maximum iterations was exceeded
     // INTEGER, SAVE    :: ErrCount1=0 ! for recurring error
-    bool WaterCoilAirFlowControl;   // True if controlling air flow through water coil, water flow fixed
-    int SimCompNum;                 // internal number for case statement
-    Real64 HalvingPrec(0.0); // precision of halving algorithm
-    bool BBConvergeCheckFlag;       // additional check on convergence specifically for radiant/convective baseboard units
+    bool WaterCoilAirFlowControl; // True if controlling air flow through water coil, water flow fixed
+    int SimCompNum;               // internal number for case statement
+    Real64 HalvingPrec(0.0);      // precision of halving algorithm
+    bool BBConvergeCheckFlag;     // additional check on convergence specifically for radiant/convective baseboard units
 
     // Object Data
-    auto & ZoneInterHalf = state.dataGeneralRoutines->ZoneInterHalf;
-    auto & ZoneController = state.dataGeneralRoutines->ZoneController;
+    auto &ZoneInterHalf = state.dataGeneralRoutines->ZoneInterHalf;
+    auto &ZoneController = state.dataGeneralRoutines->ZoneController;
 
     if (ControlCompTypeNum != 0) {
         SimCompNum = ControlCompTypeNum;
@@ -250,8 +251,10 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
             ZoneController.MaxSetPoint = state.dataLoopNodes->Node(ActuatedNode).MassFlowRateMaxAvail;
             ZoneController.MinSetPoint = state.dataLoopNodes->Node(ActuatedNode).MassFlowRateMinAvail;
         } else {
-            ZoneController.MaxSetPoint = min(state.dataLoopNodes->Node(ActuatedNode).MassFlowRateMaxAvail, state.dataLoopNodes->Node(ActuatedNode).MassFlowRateMax);
-            ZoneController.MinSetPoint = max(state.dataLoopNodes->Node(ActuatedNode).MassFlowRateMinAvail, state.dataLoopNodes->Node(ActuatedNode).MassFlowRateMin);
+            ZoneController.MaxSetPoint =
+                min(state.dataLoopNodes->Node(ActuatedNode).MassFlowRateMaxAvail, state.dataLoopNodes->Node(ActuatedNode).MassFlowRateMax);
+            ZoneController.MinSetPoint =
+                max(state.dataLoopNodes->Node(ActuatedNode).MassFlowRateMinAvail, state.dataLoopNodes->Node(ActuatedNode).MassFlowRateMin);
         }
         // The first time through run at maximum flow rate and find results
         if (ZoneInterHalf.MaxFlowCalc) {
@@ -295,7 +298,8 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
                 }
                 // Set the Actuated node MassFlowRate with zero value
                 if (present(LoopNum)) { // this is a plant component
-                    SetActuatedBranchFlowRate(state, ZoneController.CalculatedSetPoint,
+                    SetActuatedBranchFlowRate(state,
+                                              ZoneController.CalculatedSetPoint,
                                               ActuatedNode,
                                               LoopNum,
                                               LoopSide,
@@ -404,7 +408,8 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
 
         // Set the Actuated node MassFlowRate with the new value
         if (present(LoopNum)) { // this is a plant component
-            SetActuatedBranchFlowRate(state, ZoneController.CalculatedSetPoint,
+            SetActuatedBranchFlowRate(state,
+                                      ZoneController.CalculatedSetPoint,
                                       ActuatedNode,
                                       LoopNum,
                                       LoopSide,
@@ -431,9 +436,11 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
             // simulate series piu reheat coil
             SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
-            CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
+            CpAir =
+                PsyCpAirFnW(state.dataLoopNodes->Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             LoadMet = CpAir * state.dataLoopNodes->Node(TempOutNode).MassFlowRate *
-                      (state.dataLoopNodes->Node(TempOutNode).Temp - state.dataLoopNodes->Node(TempInNode).Temp); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
+                      (state.dataLoopNodes->Node(TempOutNode).Temp -
+                       state.dataLoopNodes->Node(TempInNode).Temp); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
 
@@ -441,9 +448,11 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
             // simulate series piu reheat coil
             SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
-            CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
+            CpAir =
+                PsyCpAirFnW(state.dataLoopNodes->Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             LoadMet = CpAir * state.dataLoopNodes->Node(TempOutNode).MassFlowRate *
-                      (state.dataLoopNodes->Node(TempOutNode).Temp - state.dataLoopNodes->Node(TempInNode).Temp); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
+                      (state.dataLoopNodes->Node(TempOutNode).Temp -
+                       state.dataLoopNodes->Node(TempInNode).Temp); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
 
@@ -458,7 +467,8 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
             } else {
                 WaterCoilAirFlowControl = true;
                 LoadMet = state.dataLoopNodes->Node(TempOutNode).MassFlowRate * CpAir *
-                          (state.dataLoopNodes->Node(TempOutNode).Temp - state.dataLoopNodes->Node(TempInNode).Temp); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
+                          (state.dataLoopNodes->Node(TempOutNode).Temp -
+                           state.dataLoopNodes->Node(TempInNode).Temp); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
                 ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             }
             break;
@@ -493,7 +503,8 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
 
         case OutdoorAirUnitNum: //'ZONEHVAC:OUTDOORAIRUNIT'
             // Simulate outdoor air unit components
-            OutdoorAirUnit::CalcOAUnitCoilComps(state, CompNum, FirstHVACIteration, EquipIndex, LoadMet); // Autodesk:OPTIONAL EquipIndex used without PRESENT check
+            OutdoorAirUnit::CalcOAUnitCoilComps(
+                state, CompNum, FirstHVACIteration, EquipIndex, LoadMet); // Autodesk:OPTIONAL EquipIndex used without PRESENT check
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
@@ -562,7 +573,8 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
             ShowContinueError(state, "... Error          = (Load met - Load requested) / MAXIMUM(Load requested, 100)");
             ShowContinueError(state, format("... Actuated Node Mass Flow Rate ={:.9R} kg/s", state.dataLoopNodes->Node(ActuatedNode).MassFlowRate));
             ShowContinueErrorTimeStamp(state, "");
-            ShowRecurringWarningErrorAtEnd(state, "ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
+            ShowRecurringWarningErrorAtEnd(state,
+                                           "ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
                                            CompErrIndex,
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
@@ -570,7 +582,8 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
                                            "%",
                                            "%");
             //}
-            ShowRecurringWarningErrorAtEnd(state, "ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
+            ShowRecurringWarningErrorAtEnd(state,
+                                           "ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
                                            CompErrIndex,
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
@@ -874,10 +887,10 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     using Psychrometrics::PsyWFnTdbTwbPb;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const g(9.807);           // gravitational constant (m/s**2)
-    Real64 const nu(15.66e-6);       // kinematic viscosity (m**2/s) for air at 300 K (Mills 1999 Heat Transfer)
-    Real64 const k(0.0267);          // thermal conductivity (W/m K) for air at 300 K (Mills 1999 Heat Transfer)
-    Real64 const Sigma(5.6697e-08);  // Stefan-Boltzmann constant
+    Real64 const g(9.807);          // gravitational constant (m/s**2)
+    Real64 const nu(15.66e-6);      // kinematic viscosity (m**2/s) for air at 300 K (Mills 1999 Heat Transfer)
+    Real64 const k(0.0267);         // thermal conductivity (W/m K) for air at 300 K (Mills 1999 Heat Transfer)
+    Real64 const Sigma(5.6697e-08); // Stefan-Boltzmann constant
     static std::string const RoutineName("CalcPassiveExteriorBaffleGap");
     // INTERFACE BLOCK SPECIFICATIONS:
 
@@ -894,42 +907,42 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     Array1D<Real64> LocalWindArr;
 
     // local working variables
-    Real64 RhoAir;                       // density of air
-    Real64 CpAir;                        // specific heat of air
-    Real64 Tamb;                         // outdoor drybulb
-    Real64 A;                            // projected area of baffle from sum of underlying surfaces
-    Real64 HcPlen;                       // surface convection heat transfer coefficient for plenum surfaces
-    int ThisSurf;                        // do loop counter
-    int NumSurfs;                        // number of underlying HT surfaces associated with UTSC
-    Real64 TmpTsBaf;                     // baffle temperature
-    int SurfPtr;                         // index of surface in main surface structure
-    Real64 HMovInsul;                    // dummy for call to InitExteriorConvectionCoeff
-    Real64 HExt;                         // dummy for call to InitExteriorConvectionCoeff
-    int ConstrNum;                       // index of construction in main construction structure
-    Real64 AbsThermSurf;                 // thermal emmittance of underlying wall.
-    Real64 TsoK;                         // underlying surface temperature in Kelvin
-    Real64 TsBaffK;                      // baffle temperature in Kelvin  (lagged)
-    Real64 Vwind;                        // localized, and area-weighted average for wind speed
-    Real64 HrSky;                        // radiation coeff for sky, area-weighted average
-    Real64 HrGround;                     // radiation coeff for ground, area-weighted average
-    Real64 HrAtm;                        // radiation coeff for air (bulk atmosphere), area-weighted average
-    Real64 Isc;                          // Incoming combined solar radiation, area-weighted average
-    Real64 HrPlen;                       // radiation coeff for plenum surfaces, area-weighted average
-    Real64 Tso;                          // temperature of underlying surface, area-weighted average
-    Real64 TmeanK;                       // average of surface temps , for Beta in Grashoff no.
-    Real64 Gr;                           // Grasshof number for natural convection calc
-    Real64 VdotWind;                     // volume flow rate of nat. vent due to wind
-    Real64 VdotThermal;                  // Volume flow rate of nat. vent due to bouyancy
-    Real64 VdotVent;                     // total volume flow rate of nat vent
-    Real64 MdotVent;                     // total mass flow rate of nat vent
-    Real64 NuPlen;                       // Nusselt No. for plenum Gap
-    Real64 LocalOutDryBulbTemp;          // OutDryBulbTemp for here
-    Real64 LocalWetBulbTemp;             // OutWetBulbTemp for here
-    Real64 LocalOutHumRat;               // OutHumRat for here
+    Real64 RhoAir;                // density of air
+    Real64 CpAir;                 // specific heat of air
+    Real64 Tamb;                  // outdoor drybulb
+    Real64 A;                     // projected area of baffle from sum of underlying surfaces
+    Real64 HcPlen;                // surface convection heat transfer coefficient for plenum surfaces
+    int ThisSurf;                 // do loop counter
+    int NumSurfs;                 // number of underlying HT surfaces associated with UTSC
+    Real64 TmpTsBaf;              // baffle temperature
+    int SurfPtr;                  // index of surface in main surface structure
+    Real64 HMovInsul;             // dummy for call to InitExteriorConvectionCoeff
+    Real64 HExt;                  // dummy for call to InitExteriorConvectionCoeff
+    int ConstrNum;                // index of construction in main construction structure
+    Real64 AbsThermSurf;          // thermal emmittance of underlying wall.
+    Real64 TsoK;                  // underlying surface temperature in Kelvin
+    Real64 TsBaffK;               // baffle temperature in Kelvin  (lagged)
+    Real64 Vwind;                 // localized, and area-weighted average for wind speed
+    Real64 HrSky;                 // radiation coeff for sky, area-weighted average
+    Real64 HrGround;              // radiation coeff for ground, area-weighted average
+    Real64 HrAtm;                 // radiation coeff for air (bulk atmosphere), area-weighted average
+    Real64 Isc;                   // Incoming combined solar radiation, area-weighted average
+    Real64 HrPlen;                // radiation coeff for plenum surfaces, area-weighted average
+    Real64 Tso;                   // temperature of underlying surface, area-weighted average
+    Real64 TmeanK;                // average of surface temps , for Beta in Grashoff no.
+    Real64 Gr;                    // Grasshof number for natural convection calc
+    Real64 VdotWind;              // volume flow rate of nat. vent due to wind
+    Real64 VdotThermal;           // Volume flow rate of nat. vent due to bouyancy
+    Real64 VdotVent;              // total volume flow rate of nat vent
+    Real64 MdotVent;              // total mass flow rate of nat vent
+    Real64 NuPlen;                // Nusselt No. for plenum Gap
+    Real64 LocalOutDryBulbTemp;   // OutDryBulbTemp for here
+    Real64 LocalWetBulbTemp;      // OutWetBulbTemp for here
+    Real64 LocalOutHumRat;        // OutHumRat for here
     bool ICSCollectorIsOn(false); // ICS collector has OSCM on
-    int CollectorNum;                    // current solar collector index
-    Real64 ICSWaterTemp;                 // ICS solar collector water temp
-    Real64 ICSULossbottom;               // ICS solar collector bottom loss Conductance
+    int CollectorNum;             // current solar collector index
+    Real64 ICSWaterTemp;          // ICS solar collector water temp
+    Real64 ICSULossbottom;        // ICS solar collector bottom loss Conductance
 
     Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, SurfPtrARR));
 
@@ -970,7 +983,8 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         // Initializations for this surface
         HMovInsul = 0.0;
         LocalWindArr(ThisSurf) = state.dataSurface->Surface(SurfPtr).WindSpeed;
-        InitExteriorConvectionCoeff(state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
+        InitExteriorConvectionCoeff(
+            state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
         AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
         TsoK = state.dataHeatBalSurf->TH(1, 1, SurfPtr) + DataGlobalConstants::KelvinConv;
@@ -1036,7 +1050,8 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     Tso = sum_product_sub(state.dataHeatBalSurf->TH(1, 1, _), state.dataSurface->Surface, &SurfaceData::Area, SurfPtrARR) /
           A; // Autodesk:F2C++ Functions handle array subscript usage
     //    Isc = sum( QRadSWOutIncident( SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-    Isc = sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident, state.dataSurface->Surface, &SurfaceData::Area, SurfPtrARR) / A; // Autodesk:F2C++ Functions handle array subscript usage
+    Isc = sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident, state.dataSurface->Surface, &SurfaceData::Area, SurfPtrARR) /
+          A; // Autodesk:F2C++ Functions handle array subscript usage
 
     TmeanK = 0.5 * (TmpTsBaf + Tso) + DataGlobalConstants::KelvinConv;
 
@@ -1066,7 +1081,8 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
 
     // now calculate baffle temperature
     if (!ICSCollectorIsOn) {
-        TsBaffle = (Isc * SolAbs + HExt * Tamb + HrAtm * Tamb + HrSky * state.dataEnvrn->SkyTemp + HrGround * Tamb + HrPlen * Tso + HcPlen * TaGap + QdotSource) /
+        TsBaffle = (Isc * SolAbs + HExt * Tamb + HrAtm * Tamb + HrSky * state.dataEnvrn->SkyTemp + HrGround * Tamb + HrPlen * Tso + HcPlen * TaGap +
+                    QdotSource) /
                    (HExt + HrAtm + HrSky + HrGround + HrPlen + HcPlen);
     } else {
 
@@ -1246,7 +1262,7 @@ void CalcBasinHeaterPower(EnergyPlusData &state,
     }
 }
 
-void TestAirPathIntegrity(EnergyPlusData &state,  bool &ErrFound)
+void TestAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1266,7 +1282,7 @@ void TestAirPathIntegrity(EnergyPlusData &state,  bool &ErrFound)
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1357,7 +1373,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     using namespace DataLoopNode;
     auto &GetZoneSplitterInput(SplitterComponent::GetSplitterInput);
     using namespace DataZoneEquipment;
-    auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Count;
@@ -1400,7 +1416,9 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
             PrimaryAirLoopName = state.dataAirLoop->AirToZoneNodeInfo(Count1).AirLoopName;
             Found = 0;
             for (Count2 = 1; Count2 <= state.dataAirLoop->AirToZoneNodeInfo(Count1).NumSupplyNodes; ++Count2) {
-                if (state.dataZoneEquip->SupplyAirPath(BCount).InletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count1).ZoneEquipSupplyNodeNum(Count2)) Found = Count2;
+                if (state.dataZoneEquip->SupplyAirPath(BCount).InletNodeNum ==
+                    state.dataAirLoop->AirToZoneNodeInfo(Count1).ZoneEquipSupplyNodeNum(Count2))
+                    Found = Count2;
             }
             if (Found != 0) break;
         }
@@ -1425,7 +1443,9 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
 
                 if (SELECT_CASE_var == "AIRLOOPHVAC:SUPPLYPLENUM") {
                     for (Count2 = 1; Count2 <= state.dataZonePlenum->NumZoneSupplyPlenums; ++Count2) {
-                        if (state.dataZonePlenum->ZoneSupPlenCond(Count2).ZonePlenumName != state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count)) continue;
+                        if (state.dataZonePlenum->ZoneSupPlenCond(Count2).ZonePlenumName !=
+                            state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count))
+                            continue;
                         if (Count == 1 && AirPathNodeName != state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneSupPlenCond(Count2).InletNode)) {
                             ShowSevereError(state, "Error in AirLoopHVAC:SupplyPath=" + state.dataZoneEquip->SupplyAirPath(BCount).Name);
                             ShowContinueError(state, "For AirLoopHVAC:SupplyPlenum=" + state.dataZonePlenum->ZoneSupPlenCond(Count2).ZonePlenumName);
@@ -1436,7 +1456,9 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
                             ErrFound = true;
                             ++NumErr;
                         }
-                        print(state.files.bnd, "     #Outlet Nodes on Supply Air Path Component,{}\n", state.dataZonePlenum->ZoneSupPlenCond(Count2).NumOutletNodes);
+                        print(state.files.bnd,
+                              "     #Outlet Nodes on Supply Air Path Component,{}\n",
+                              state.dataZonePlenum->ZoneSupPlenCond(Count2).NumOutletNodes);
                         for (Count1 = 1; Count1 <= state.dataZonePlenum->ZoneSupPlenCond(Count2).NumOutletNodes; ++Count1) {
                             print(state.files.bnd,
                                   "     Supply Air Path Component Nodes,{},{},{},{},{},{}\n",
@@ -1451,17 +1473,24 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
 
                 } else if (SELECT_CASE_var == "AIRLOOPHVAC:ZONESPLITTER") {
                     for (Count2 = 1; Count2 <= state.dataSplitterComponent->NumSplitters; ++Count2) {
-                        if (state.dataSplitterComponent->SplitterCond(Count2).SplitterName != state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count)) continue;
+                        if (state.dataSplitterComponent->SplitterCond(Count2).SplitterName !=
+                            state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count))
+                            continue;
                         if (Count == 1 &&
                             AirPathNodeName != state.dataLoopNodes->NodeID(state.dataSplitterComponent->SplitterCond(Count2).InletNode)) {
                             ShowSevereError(state, "Error in AirLoopHVAC:SupplyPath=" + state.dataZoneEquip->SupplyAirPath(BCount).Name);
-                            ShowContinueError(state, "For AirLoopHVAC:ZoneSplitter=" + state.dataSplitterComponent->SplitterCond(Count2).SplitterName);
+                            ShowContinueError(state,
+                                              "For AirLoopHVAC:ZoneSplitter=" + state.dataSplitterComponent->SplitterCond(Count2).SplitterName);
                             ShowContinueError(state, "Expected inlet node (supply air path)=" + AirPathNodeName);
-                            ShowContinueError(state, "Encountered node name (zone splitter)=" + state.dataLoopNodes->NodeID(state.dataSplitterComponent->SplitterCond(Count2).InletNode));
+                            ShowContinueError(state,
+                                              "Encountered node name (zone splitter)=" +
+                                                  state.dataLoopNodes->NodeID(state.dataSplitterComponent->SplitterCond(Count2).InletNode));
                             ErrFound = true;
                             ++NumErr;
                         }
-                        print(state.files.bnd, "     #Outlet Nodes on Supply Air Path Component,{}\n", state.dataSplitterComponent->SplitterCond(Count2).NumOutletNodes);
+                        print(state.files.bnd,
+                              "     #Outlet Nodes on Supply Air Path Component,{}\n",
+                              state.dataSplitterComponent->SplitterCond(Count2).NumOutletNodes);
                         for (Count1 = 1; Count1 <= state.dataSplitterComponent->SplitterCond(Count2).NumOutletNodes; ++Count1) {
                             print(state.files.bnd,
                                   "     Supply Air Path Component Nodes,{},{},{},{},{},{}\n",
@@ -1475,7 +1504,8 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
                     }
 
                 } else {
-                    ShowSevereError(state, "Invalid Component Type in Supply Air Path=" + state.dataZoneEquip->SupplyAirPath(BCount).ComponentType(Count));
+                    ShowSevereError(state,
+                                    "Invalid Component Type in Supply Air Path=" + state.dataZoneEquip->SupplyAirPath(BCount).ComponentType(Count));
                     ErrFound = true;
                     ++NumErr;
                 }
@@ -1534,7 +1564,8 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
                     state.dataZoneEquip->SupplyAirPath(BCount).ComponentType(Count) != "AIRLOOPHVAC:SUPPLYPLENUM")
                     continue;
                 if (FoundSupplyPlenum(Count1)) {
-                    ShowSevereError(state, "AirLoopHVAC:SupplyPlenum=\"" + state.dataZonePlenum->ZoneSupPlenCond(Count1).ZonePlenumName + "\", duplicate entry.");
+                    ShowSevereError(
+                        state, "AirLoopHVAC:SupplyPlenum=\"" + state.dataZonePlenum->ZoneSupPlenCond(Count1).ZonePlenumName + "\", duplicate entry.");
                     ShowContinueError(state, "already exists on AirLoopHVAC:SupplyPath=\"" + FoundNames(Count1) + "\".");
                     ErrFound = true;
                 } else {
@@ -1550,11 +1581,14 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     for (Count1 = 1; Count1 <= state.dataSplitterComponent->NumSplitters; ++Count1) {
         for (BCount = 1; BCount <= state.dataZoneEquip->NumSupplyAirPaths; ++BCount) {
             for (Count = 1; Count <= state.dataZoneEquip->SupplyAirPath(BCount).NumOfComponents; ++Count) {
-                if (state.dataSplitterComponent->SplitterCond(Count1).SplitterName != state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count) ||
+                if (state.dataSplitterComponent->SplitterCond(Count1).SplitterName !=
+                        state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count) ||
                     state.dataZoneEquip->SupplyAirPath(BCount).ComponentType(Count) != "AIRLOOPHVAC:ZONESPLITTER")
                     continue;
                 if (FoundZoneSplitter(Count1)) {
-                    ShowSevereError(state, "AirLoopHVAC:ZoneSplitter=\"" + state.dataSplitterComponent->SplitterCond(Count1).SplitterName + "\", duplicate entry.");
+                    ShowSevereError(state,
+                                    "AirLoopHVAC:ZoneSplitter=\"" + state.dataSplitterComponent->SplitterCond(Count1).SplitterName +
+                                        "\", duplicate entry.");
                     ShowContinueError(state, "already exists on AirLoopHVAC:SupplyPath=\"" + FoundNames(Count1) + "\".");
                     ErrFound = true;
                 } else {
@@ -1570,7 +1604,9 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     if (!all(FoundSupplyPlenum)) {
         for (Count1 = 1; Count1 <= state.dataZonePlenum->NumZoneSupplyPlenums; ++Count1) {
             if (FoundSupplyPlenum(Count1)) continue;
-            ShowSevereError(state, "AirLoopHVAC:SupplyPlenum=\"" + state.dataZonePlenum->ZoneSupPlenCond(Count1).ZonePlenumName + "\", not found on any AirLoopHVAC:SupplyPath.");
+            ShowSevereError(state,
+                            "AirLoopHVAC:SupplyPlenum=\"" + state.dataZonePlenum->ZoneSupPlenCond(Count1).ZonePlenumName +
+                                "\", not found on any AirLoopHVAC:SupplyPath.");
             //      ErrFound=.TRUE.
         }
     }
@@ -1578,7 +1614,9 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     if (!all(FoundZoneSplitter)) {
         for (Count1 = 1; Count1 <= state.dataSplitterComponent->NumSplitters; ++Count1) {
             if (FoundZoneSplitter(Count1)) continue;
-            ShowSevereError(state, "AirLoopHVAC:ZoneSplitter=\"" + state.dataSplitterComponent->SplitterCond(Count1).SplitterName + "\", not found on any AirLoopHVAC:SupplyPath.");
+            ShowSevereError(state,
+                            "AirLoopHVAC:ZoneSplitter=\"" + state.dataSplitterComponent->SplitterCond(Count1).SplitterName +
+                                "\", not found on any AirLoopHVAC:SupplyPath.");
             //      ErrFound=.TRUE.
         }
     }
@@ -1631,7 +1669,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     using namespace DataLoopNode;
     using namespace DataZoneEquipment;
     using namespace ZonePlenum;
-    auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
     auto &GetZoneMixerInput(MixerComponent::GetMixerInput);
     using HVACSingleDuctInduc::FourPipeInductionUnitHasMixer;
     using PoweredInductionUnits::PIUnitHasMixer;
@@ -1688,7 +1726,9 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
             PrimaryAirLoopName = state.dataAirLoop->AirToZoneNodeInfo(Count1).AirLoopName;
             Found = 0;
             for (Count2 = 1; Count2 <= state.dataAirLoop->AirToZoneNodeInfo(Count1).NumReturnNodes; ++Count2) {
-                if (state.dataZoneEquip->ReturnAirPath(BCount).OutletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count1).ZoneEquipReturnNodeNum(Count2)) Found = Count2;
+                if (state.dataZoneEquip->ReturnAirPath(BCount).OutletNodeNum ==
+                    state.dataAirLoop->AirToZoneNodeInfo(Count1).ZoneEquipReturnNodeNum(Count2))
+                    Found = Count2;
             }
             if (Found != 0) break;
         }
@@ -1732,13 +1772,17 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
 
                 if (SELECT_CASE_var == "AIRLOOPHVAC:ZONEMIXER") {
                     for (Count2 = 1; Count2 <= state.dataMixerComponent->NumMixers; ++Count2) {
-                        if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp) != state.dataMixerComponent->MixerCond(Count2).MixerName) continue;
+                        if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp) !=
+                            state.dataMixerComponent->MixerCond(Count2).MixerName)
+                            continue;
                         // Found correct Mixer (by name), check outlet node vs. return air path outlet node
                         if (AirPathNodeName != state.dataLoopNodes->NodeID(state.dataMixerComponent->MixerCond(Count2).OutletNode)) {
                             ShowSevereError(state, "Error in Return Air Path=" + state.dataZoneEquip->ReturnAirPath(BCount).Name);
                             ShowContinueError(state, "For Connector:Mixer=" + state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp));
                             ShowContinueError(state, "Expected outlet node (return air path)=" + AirPathNodeName);
-                            ShowContinueError(state, "Encountered node name (mixer)=" + state.dataLoopNodes->NodeID(state.dataMixerComponent->MixerCond(Count2).OutletNode));
+                            ShowContinueError(state,
+                                              "Encountered node name (mixer)=" +
+                                                  state.dataLoopNodes->NodeID(state.dataMixerComponent->MixerCond(Count2).OutletNode));
                             ErrFound = true;
                             ++NumErr;
                         } else {
@@ -1749,7 +1793,9 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                                 AllNodes(CountNodes) = state.dataMixerComponent->MixerCond(Count2).InletNode(Loop);
                             }
                         }
-                        print(state.files.bnd, "     #Inlet Nodes on Return Air Path Component,{}\n", state.dataMixerComponent->MixerCond(Count2).NumInletNodes);
+                        print(state.files.bnd,
+                              "     #Inlet Nodes on Return Air Path Component,{}\n",
+                              state.dataMixerComponent->MixerCond(Count2).NumInletNodes);
                         for (Count1 = 1; Count1 <= state.dataMixerComponent->MixerCond(Count2).NumInletNodes; ++Count1) {
                             print(state.files.bnd,
                                   "     Return Air Path Component Nodes,{},{},{},{},{},{}\n",
@@ -1764,12 +1810,17 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
 
                 } else if (SELECT_CASE_var == "AIRLOOPHVAC:RETURNPLENUM") {
                     for (Count2 = 1; Count2 <= state.dataZonePlenum->NumZoneReturnPlenums; ++Count2) {
-                        if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp) != state.dataZonePlenum->ZoneRetPlenCond(Count2).ZonePlenumName) continue;
+                        if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp) !=
+                            state.dataZonePlenum->ZoneRetPlenCond(Count2).ZonePlenumName)
+                            continue;
                         if (AirPathNodeName != state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneRetPlenCond(Count2).OutletNode)) {
                             ShowSevereError(state, "Error in Return Air Path=" + state.dataZoneEquip->ReturnAirPath(BCount).Name);
-                            ShowContinueError(state, "For AirLoopHVAC:ReturnPlenum=" + state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp));
+                            ShowContinueError(state,
+                                              "For AirLoopHVAC:ReturnPlenum=" + state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp));
                             ShowContinueError(state, "Expected outlet node (return air path)=" + AirPathNodeName);
-                            ShowContinueError(state, "Encountered node name (zone return plenum)=" + state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneRetPlenCond(Count2).OutletNode));
+                            ShowContinueError(state,
+                                              "Encountered node name (zone return plenum)=" +
+                                                  state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneRetPlenCond(Count2).OutletNode));
                             ErrFound = true;
                             ++NumErr;
                         } else {
@@ -1780,7 +1831,9 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                                 AllNodes(CountNodes) = state.dataZonePlenum->ZoneRetPlenCond(Count2).InletNode(Loop);
                             }
                         }
-                        print(state.files.bnd, "     #Inlet Nodes on Return Air Path Component,{}\n", state.dataZonePlenum->ZoneRetPlenCond(Count2).NumInletNodes);
+                        print(state.files.bnd,
+                              "     #Inlet Nodes on Return Air Path Component,{}\n",
+                              state.dataZonePlenum->ZoneRetPlenCond(Count2).NumInletNodes);
                         for (Count1 = 1; Count1 <= state.dataZonePlenum->ZoneRetPlenCond(Count2).NumInletNodes; ++Count1) {
                             print(state.files.bnd,
                                   "     Return Air Path Component Nodes,{},{},{},{},{},{}\n",
@@ -1806,7 +1859,9 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
 
                     if (SELECT_CASE_var == "AIRLOOPHVAC:ZONEMIXER") {
                         for (Count2 = 1; Count2 <= state.dataMixerComponent->NumMixers; ++Count2) {
-                            if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(Count3) != state.dataMixerComponent->MixerCond(Count2).MixerName) continue;
+                            if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(Count3) !=
+                                state.dataMixerComponent->MixerCond(Count2).MixerName)
+                                continue;
                             for (Loop = 1; Loop <= state.dataMixerComponent->MixerCond(Count2).NumInletNodes; ++Loop) {
                                 ++CountNodes;
                                 AllNodes(CountNodes) = state.dataMixerComponent->MixerCond(Count2).InletNode(Loop);
@@ -1815,7 +1870,9 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
 
                     } else if (SELECT_CASE_var == "AIRLOOPHVAC:RETURNPLENUM") {
                         for (Count2 = 1; Count2 <= state.dataZonePlenum->NumZoneReturnPlenums; ++Count2) {
-                            if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(Count3) != state.dataZonePlenum->ZoneRetPlenCond(Count2).ZonePlenumName) continue;
+                            if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(Count3) !=
+                                state.dataZonePlenum->ZoneRetPlenCond(Count2).ZonePlenumName)
+                                continue;
                             for (Loop = 1; Loop <= state.dataZonePlenum->ZoneRetPlenCond(Count2).NumInletNodes; ++Loop) {
                                 ++CountNodes;
                                 AllNodes(CountNodes) = state.dataZonePlenum->ZoneRetPlenCond(Count2).InletNode(Loop);
@@ -1836,9 +1893,17 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
             print(state.files.bnd, "   #Nodes on Return Air Path,{}\n", CountNodes);
             for (Count2 = 1; Count2 <= CountNodes; ++Count2) {
                 if (Count2 == 1) {
-                    print(state.files.bnd, "   Return Air Path Node,Outlet Node,{},{},{}\n", Count2, state.dataLoopNodes->NodeID(AllNodes(Count2)), PrimaryAirLoopName);
+                    print(state.files.bnd,
+                          "   Return Air Path Node,Outlet Node,{},{},{}\n",
+                          Count2,
+                          state.dataLoopNodes->NodeID(AllNodes(Count2)),
+                          PrimaryAirLoopName);
                 } else {
-                    print(state.files.bnd, "   Return Air Path Node,Inlet Node,{},{},{}\n", Count2, state.dataLoopNodes->NodeID(AllNodes(Count2)), PrimaryAirLoopName);
+                    print(state.files.bnd,
+                          "   Return Air Path Node,Inlet Node,{},{},{}\n",
+                          Count2,
+                          state.dataLoopNodes->NodeID(AllNodes(Count2)),
+                          PrimaryAirLoopName);
                 }
             }
         }
@@ -1852,7 +1917,9 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                     break;
                 }
             } else {
-                ShowWarningError(state, "TestReturnAirPathIntegrity: Air Loop has no Zone Equipment Return Node=" + state.dataAirLoop->AirToZoneNodeInfo(Count2).AirLoopName);
+                ShowWarningError(state,
+                                 "TestReturnAirPathIntegrity: Air Loop has no Zone Equipment Return Node=" +
+                                     state.dataAirLoop->AirToZoneNodeInfo(Count2).AirLoopName);
             }
         }
     }
@@ -1881,7 +1948,8 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                     state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(Count) != "AIRLOOPHVAC:RETURNPLENUM")
                     continue;
                 if (FoundReturnPlenum(Count1)) {
-                    ShowSevereError(state, "AirLoopHVAC:ReturnPlenum=\"" + state.dataZonePlenum->ZoneRetPlenCond(Count1).ZonePlenumName + "\", duplicate entry.");
+                    ShowSevereError(
+                        state, "AirLoopHVAC:ReturnPlenum=\"" + state.dataZonePlenum->ZoneRetPlenCond(Count1).ZonePlenumName + "\", duplicate entry.");
                     ShowContinueError(state, "already exists on AirLoopHVAC:ReturnPath=\"" + FoundNames(Count1) + "\".");
                     ErrFound = true;
                 } else {
@@ -1902,7 +1970,8 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                     state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(Count) != "AIRLOOPHVAC:ZONEMIXER")
                     continue;
                 if (FoundZoneMixer(Count1)) {
-                    ShowSevereError(state, "AirLoopHVAC:ZoneMixer=\"" + state.dataMixerComponent->MixerCond(Count1).MixerName + "\", duplicate entry.");
+                    ShowSevereError(state,
+                                    "AirLoopHVAC:ZoneMixer=\"" + state.dataMixerComponent->MixerCond(Count1).MixerName + "\", duplicate entry.");
                     ShowContinueError(state, "already exists on AirLoopHVAC:ReturnPath=\"" + FoundNames(Count1) + "\".");
                     ErrFound = true;
                 } else {
@@ -1926,7 +1995,9 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     if (!all(FoundReturnPlenum)) {
         for (Count1 = 1; Count1 <= state.dataZonePlenum->NumZoneReturnPlenums; ++Count1) {
             if (FoundReturnPlenum(Count1)) continue;
-            ShowSevereError(state, "AirLoopHVAC:ReturnPlenum=\"" + state.dataZonePlenum->ZoneRetPlenCond(Count1).ZonePlenumName + "\", not found on any AirLoopHVAC:ReturnPath.");
+            ShowSevereError(state,
+                            "AirLoopHVAC:ReturnPlenum=\"" + state.dataZonePlenum->ZoneRetPlenCond(Count1).ZonePlenumName +
+                                "\", not found on any AirLoopHVAC:ReturnPath.");
             //      ErrFound=.TRUE.
         }
     }
@@ -1934,8 +2005,9 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     if (!all(FoundZoneMixer)) {
         for (Count1 = 1; Count1 <= state.dataMixerComponent->NumMixers; ++Count1) {
             if (FoundZoneMixer(Count1)) continue;
-            ShowSevereError(state, "AirLoopHVAC:ZoneMixer=\"" + state.dataMixerComponent->MixerCond(Count1).MixerName +
-                            "\", not found on any AirLoopHVAC:ReturnPath, AirTerminal:SingleDuct:SeriesPIU:Reheat,");
+            ShowSevereError(state,
+                            "AirLoopHVAC:ZoneMixer=\"" + state.dataMixerComponent->MixerCond(Count1).MixerName +
+                                "\", not found on any AirLoopHVAC:ReturnPath, AirTerminal:SingleDuct:SeriesPIU:Reheat,");
             ShowContinueError(state, "AirTerminal:SingleDuct:ParallelPIU:Reheat or AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction.");
             //      ErrFound=.TRUE.
         }
@@ -2012,9 +2084,9 @@ void CalcZoneSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate,
     SensibleOutput = 0.0;
     if (MassFlow > 0.0) {
         TotalOutput = MassFlow * (Psychrometrics::PsyHFnTdbW(TDBEquip, WEquip) -
-                                  Psychrometrics::PsyHFnTdbW(TDBZone, WZone)); // total addition/removal rate, {W};
+                                  Psychrometrics::PsyHFnTdbW(TDBZone, WZone));                         // total addition/removal rate, {W};
         SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2Tdb1W(TDBEquip, TDBZone, WZone); // sensible addition/removal rate, {W};
-        LatentOutput = TotalOutput - SensibleOutput;                                                          // latent addition/removal rate, {W}
+        LatentOutput = TotalOutput - SensibleOutput;                                                   // latent addition/removal rate, {W}
     }
 }
 

@@ -78,7 +78,6 @@ namespace MatrixDataManager {
 
     // MODULE VARIABLE DECLARATIONS:
 
-
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
     // todo, flush out the following routines, see CurveManager for patterns
@@ -125,7 +124,8 @@ namespace MatrixDataManager {
 
 } // namespace MatrixDataManager
 
-struct MatrixDataManagerData : BaseGlobalStruct {
+struct MatrixDataManagerData : BaseGlobalStruct
+{
 
     Array1D<MatrixDataManager::MatrixDataStruct> MatData;
     int NumMats; // number of matracies in input file

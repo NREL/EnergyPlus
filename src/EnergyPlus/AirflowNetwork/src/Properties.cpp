@@ -71,7 +71,8 @@ namespace AirflowNetwork {
             if (state.dataAFNProps->lowerLimitErrIdx == 0) {
                 ShowWarningMessage(state, "Air temperature below lower limit of -20C for conductivity calculation");
             }
-            ShowRecurringWarningErrorAtEnd(state, format("Air temperature below lower limit of -20C for conductivity calculation. Air temperature of {:.1R} "
+            ShowRecurringWarningErrorAtEnd(state,
+                                           format("Air temperature below lower limit of -20C for conductivity calculation. Air temperature of {:.1R} "
                                                   "used for conductivity calculation.",
                                                   LowerLimit),
                                            state.dataAFNProps->lowerLimitErrIdx);
@@ -80,7 +81,8 @@ namespace AirflowNetwork {
             if (state.dataAFNProps->upperLimitErrIdx == 0) {
                 ShowWarningMessage(state, "Air temperature above upper limit of 70C for conductivity calculation");
             }
-            ShowRecurringWarningErrorAtEnd(state, format("Air temperature above upper limit of 70C for conductivity calculation. Air temperature of {:.1R} "
+            ShowRecurringWarningErrorAtEnd(state,
+                                           format("Air temperature above upper limit of 70C for conductivity calculation. Air temperature of {:.1R} "
                                                   "used for conductivity calculation.",
                                                   UpperLimit),
                                            state.dataAFNProps->upperLimitErrIdx);
@@ -96,7 +98,8 @@ namespace AirflowNetwork {
         return 1.71432e-5 + 4.828e-8 * T;
     }
 
-    Real64 airKinematicVisc(EnergyPlusData &state, Real64 T, // Temperature in Celsius
+    Real64 airKinematicVisc(EnergyPlusData &state,
+                            Real64 T, // Temperature in Celsius
                             Real64 W, // Humidity ratio
                             Real64 P  // Barometric pressure
     )
@@ -117,7 +120,8 @@ namespace AirflowNetwork {
         return airDynamicVisc(T) / AIRDENSITY(state, P, T, W);
     }
 
-    Real64 airThermalDiffusivity(EnergyPlusData &state, Real64 T, // Temperature in Celsius
+    Real64 airThermalDiffusivity(EnergyPlusData &state,
+                                 Real64 T, // Temperature in Celsius
                                  Real64 W, // Humidity ratio
                                  Real64 P  // Barometric pressure
     )
@@ -138,7 +142,8 @@ namespace AirflowNetwork {
         return airThermConductivity(state, T) / (AIRCP(W) * AIRDENSITY(state, P, T, W));
     }
 
-    Real64 airPrandtl(EnergyPlusData &state, Real64 T, // Temperature in Celsius
+    Real64 airPrandtl(EnergyPlusData &state,
+                      Real64 T, // Temperature in Celsius
                       Real64 W, // Humidity ratio
                       Real64 P  // Barometric pressure
     )

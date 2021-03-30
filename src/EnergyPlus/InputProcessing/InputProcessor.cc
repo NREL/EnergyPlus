@@ -115,8 +115,8 @@ InputProcessor::InputProcessor() : idf_parser(std::unique_ptr<IdfParser>(new Idf
     idf_parser = std::unique_ptr<IdfParser>(new IdfParser());
     data = std::unique_ptr<DataStorage>(new DataStorage());
     epJSON = json::object();
-//    objectCacheMap.clear();
-//    unusedInputs.clear();
+    //    objectCacheMap.clear();
+    //    unusedInputs.clear();
     validation = std::unique_ptr<Validation>(new Validation(&schema));
 }
 
@@ -180,7 +180,7 @@ json const &InputProcessor::getPatternProperties(EnergyPlusData &state, json con
 
 // Functions
 
-//void InputProcessor::clear_state() {
+// void InputProcessor::clear_state() {
 //    idf_parser = std::unique_ptr<IdfParser>(new IdfParser());
 //    data = std::unique_ptr<DataStorage>(new DataStorage());
 //    epJSON = json::object();
@@ -1297,7 +1297,7 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
     auto const &schema_properties = schema.at("properties");
 
     // Lambda to avoid repeating code twice (when processing regular fields, and extensible fields)
-    auto processField = [&state](const std::string& field, const json& epJSONObj, const json& schema_field_obj) {
+    auto processField = [&state](const std::string &field, const json &epJSONObj, const json &schema_field_obj) {
         bool hasDefault = false;
         bool canBeAutosized = false;
         bool canBeAutocalculated = false;
@@ -1321,7 +1321,7 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
             for (auto const &anyOf : anyOf_it.value()) {
                 auto const &enum_it = anyOf.find("enum");
                 if (enum_it != anyOf.end()) {
-                    for (auto const &e: enum_it.value()) {
+                    for (auto const &e : enum_it.value()) {
                         if (e.is_string()) {
                             auto const &enumVal = e.get<std::string>();
                             if (enumVal == "Autosize") {
@@ -1365,8 +1365,6 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
         }
     };
 
-
-
     // Loop on all objectTypes
     for (auto epJSON_iter = epJSON.begin(); epJSON_iter != epJSON.end(); ++epJSON_iter) {
         auto const &objectType = epJSON_iter.key();
@@ -1390,7 +1388,7 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
             extension_key = key.value().get<std::string>();
         }
 
-        for (auto const &ep_object: objects) {
+        for (auto const &ep_object : objects) {
 
             // Count number of objects
             ++state.dataOutput->iNumberOfRecords;
@@ -1440,7 +1438,7 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
             } // End extensible fields
 
         } // End loop on each object of a given objectType
-    } // End loop on all objectTypes
+    }     // End loop on all objectTypes
 }
 
 void InputProcessor::reportOrphanRecordObjects(EnergyPlusData &state)
@@ -1463,8 +1461,8 @@ void InputProcessor::reportOrphanRecordObjects(EnergyPlusData &state)
         ShowWarningError(state, "The following lines are \"Unused Objects\".  These objects are in the input");
         ShowContinueError(state, " file but are never obtained by the simulation and therefore are NOT used.");
         if (!state.dataGlobal->DisplayAllWarnings) {
-            ShowContinueError(state,
-                " Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings; to see all.");
+            ShowContinueError(
+                state, " Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings; to see all.");
         } else {
             ShowContinueError(state, " Each unused object is shown.");
         }
@@ -1594,27 +1592,33 @@ void InputProcessor::preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal) 
             {
                 auto const errorType(uppercased(state.dataIPShortCut->cAlphaArgs(2)));
                 if (errorType == "INFORMATION") {
-                    ShowMessage(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                "\" has the following Information message" + Multiples + ':');
+                    ShowMessage(state,
+                                state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                    "\" has the following Information message" + Multiples + ':');
                 } else if (errorType == "WARNING") {
-                    ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                     "\" has the following Warning condition" + Multiples + ':');
+                    ShowWarningError(state,
+                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                         "\" has the following Warning condition" + Multiples + ':');
                 } else if (errorType == "SEVERE") {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\" has the following Severe condition" + Multiples + ':');
+                    ShowSevereError(state,
+                                    state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                        "\" has the following Severe condition" + Multiples + ':');
                 } else if (errorType == "FATAL") {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\" has the following Fatal condition" + Multiples + ':');
+                    ShowSevereError(state,
+                                    state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                        "\" has the following Fatal condition" + Multiples + ':');
                     PreP_Fatal = true;
                 } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" has the following " +
-                                    state.dataIPShortCut->cAlphaArgs(2) + " condition" + Multiples + ':');
+                    ShowSevereError(state,
+                                    state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                        "\" has the following " + state.dataIPShortCut->cAlphaArgs(2) + " condition" + Multiples + ':');
                 }
             }
             CountM = 3;
             if (CountM > NumAlphas) {
-                ShowContinueError(state, state.dataIPShortCut->cCurrentModuleObject + " was blank.  Check " + state.dataIPShortCut->cAlphaArgs(1) +
-                                  " audit trail or error file for possible reasons.");
+                ShowContinueError(state,
+                                  state.dataIPShortCut->cCurrentModuleObject + " was blank.  Check " + state.dataIPShortCut->cAlphaArgs(1) +
+                                      " audit trail or error file for possible reasons.");
             }
             while (CountM <= NumAlphas) {
                 if (len(state.dataIPShortCut->cAlphaArgs(CountM)) == DataGlobalConstants::MaxNameLength) {
@@ -1751,7 +1755,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
         }
     }
 
-    for (auto const & requestedVar : state.dataOutputProcessor->apiVarRequests) {
+    for (auto const &requestedVar : state.dataOutputProcessor->apiVarRequests) {
         addRecordToOutputVariableStructure(state, requestedVar.varKey, requestedVar.varName);
     }
 
@@ -1941,9 +1945,9 @@ void InputProcessor::addVariablesForMonthlyReport(EnergyPlusData &state, std::st
         addRecordToOutputVariableStructure(state, "*", "COOLING TOWER MASS FLOW RATE");
 
     } else if (reportName == "BOILERREPORTMONTHLY") {
-        addRecordToOutputVariableStructure(state, "*", "BOILER HEATING ENERGY");  // on meter
+        addRecordToOutputVariableStructure(state, "*", "BOILER HEATING ENERGY");         // on meter
         addRecordToOutputVariableStructure(state, "*", "BOILER NATURALGAS CONSUMPTION"); // on meter
-        addRecordToOutputVariableStructure(state, "*", "BOILER HEATING ENERGY");  // on meter
+        addRecordToOutputVariableStructure(state, "*", "BOILER HEATING ENERGY");         // on meter
         addRecordToOutputVariableStructure(state, "*", "BOILER HEATING RATE");
         addRecordToOutputVariableStructure(state, "*", "BOILER NATURALGAS CONSUMPTION RATE");
         addRecordToOutputVariableStructure(state, "*", "BOILER INLET TEMPERATURE");
@@ -1953,7 +1957,7 @@ void InputProcessor::addVariablesForMonthlyReport(EnergyPlusData &state, std::st
 
     } else if (reportName == "DXREPORTMONTHLY") {
         addRecordToOutputVariableStructure(state, "*", "COOLING COIL TOTAL COOLING ENERGY"); // on meter
-        addRecordToOutputVariableStructure(state, "*", "COOLING COIL ELECTRICITY ENERGY");      // on meter
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL ELECTRICITY ENERGY");   // on meter
         addRecordToOutputVariableStructure(state, "*", "COOLING COIL SENSIBLE COOLING ENERGY");
         addRecordToOutputVariableStructure(state, "*", "COOLING COIL LATENT COOLING ENERGY");
         addRecordToOutputVariableStructure(state, "*", "COOLING COIL CRANKCASE HEATER ELECTRICITY ENERGY");

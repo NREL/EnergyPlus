@@ -45,7 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
 #ifndef ENERGYPLUS_COILS_COILCOOLINGDXCURVEFITSPEED
 #define ENERGYPLUS_COILS_COILCOOLINGDXCURVEFITSPEED
 
@@ -90,8 +89,8 @@ struct CoilCoolingDXCurveFitSpeed
     std::string parentName;
 
     CoilCoolingDXCurveFitSpeed() = default;
-    explicit CoilCoolingDXCurveFitSpeed(EnergyPlusData &state, const std::string& name);
-    void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitSpeedInputSpecification& input_data);
+    explicit CoilCoolingDXCurveFitSpeed(EnergyPlusData &state, const std::string &name);
+    void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitSpeedInputSpecification &input_data);
 
     CoilCoolingDXCurveFitSpeedInputSpecification original_input_specs;
 
@@ -112,8 +111,8 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 grossRatedSHR = 0.0;            // rated sensible heat ratio at speed
     bool ratedGrossTotalCapIsAutosized = false;
     bool ratedEvapAirFlowRateIsAutosized = false;
-    Real64 RatedCBF = 0.0;                 // rated coil bypass factor at speed
-    Real64 RatedEIR = 0.0;                 // rated energy input ratio at speed {W/W}
+    Real64 RatedCBF = 0.0; // rated coil bypass factor at speed
+    Real64 RatedEIR = 0.0; // rated energy input ratio at speed {W/W}
     Real64 ratedCOP = 0.0;
     Real64 rated_total_capacity = 0.0;
     Real64 rated_evap_fan_power_per_volume_flow_rate = 0.0;
@@ -150,7 +149,7 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 RatedInletAirTemp = 26.6667;        // 26.6667C or 80F
     Real64 RatedInletWetBulbTemp = 19.4444;    // 19.44 or 67F
     Real64 RatedInletAirHumRat = 0.0111847;    // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
-    Real64 RatedOutdoorAirTemp = 35.0;      // 35 C or 95F
+    Real64 RatedOutdoorAirTemp = 35.0;         // 35 C or 95F
     Real64 DryCoilOutletHumRatioMin = 0.00001; // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
     // flow per capacity values, they will be overridden with alternate values later if it is 100% OA coil
@@ -158,10 +157,14 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 maxRatedVolFlowPerRatedTotCap = DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap1;
 
     void CalcSpeedOutput(EnergyPlusData &state,
-        const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int  const fanOpMode, Real64 condInletTemp);
+                         const DataLoopNode::NodeData &inletNode,
+                         DataLoopNode::NodeData &outletNode,
+                         Real64 &PLR,
+                         int const fanOpMode,
+                         Real64 condInletTemp);
     void size(EnergyPlusData &state);
- 
-    Real64 CalcBypassFactor(EnergyPlusData &state, 
+
+    Real64 CalcBypassFactor(EnergyPlusData &state,
                             Real64 const tdb, // Inlet dry-bulb temperature {C}
                             Real64 const w,   // Inlet humidity ratio {kg-H2O/kg-dryair}
                             Real64 const q,   // Total capacity {W}
@@ -180,12 +183,12 @@ struct CoilCoolingDXCurveFitSpeed
 
 private:
     bool processCurve(EnergyPlusData &state,
-                      const std::string& curveName,
+                      const std::string &curveName,
                       int &curveIndex,
                       std::vector<int> validDims,
-                      const std::string& routineName,
-                      const std::string& fieldName,
-                      Real64 Var1,               // required 1st independent variable
+                      const std::string &routineName,
+                      const std::string &fieldName,
+                      Real64 Var1,                     // required 1st independent variable
                       Optional<Real64 const> Var2 = _, // 2nd independent variable
                       Optional<Real64 const> Var3 = _, // 3rd independent variable
                       Optional<Real64 const> Var4 = _, // 4th independent variable

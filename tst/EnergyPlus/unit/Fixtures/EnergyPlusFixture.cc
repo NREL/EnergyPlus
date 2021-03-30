@@ -72,7 +72,7 @@ using json = nlohmann::json;
 
 namespace EnergyPlus {
 
-//void EnergyPlusFixture::SetUpTestCase()
+// void EnergyPlusFixture::SetUpTestCase()
 //{
 //    state->dataInputProcessing->inputProcessor = InputProcessor::factory();
 //}
@@ -91,11 +91,11 @@ void EnergyPlusFixture::openOutputFiles(EnergyPlusData &state)
 
 void EnergyPlusFixture::SetUp()
 {
-//    if (this->state) {
-//        this->state->clear_state();
-//    } else {
+    //    if (this->state) {
+    //        this->state->clear_state();
+    //    } else {
     this->state = new EnergyPlusData;
-//    }
+    //    }
 
     show_message();
 
@@ -132,7 +132,7 @@ void EnergyPlusFixture::TearDown()
     state->files.mtr.del();
     state->files.bnd.del();
     state->files.shade.del();
-//    state->clear_state();
+    //    state->clear_state();
     delete this->state;
 }
 
@@ -297,7 +297,7 @@ bool EnergyPlusFixture::match_err_stream(std::string const &expected_match, bool
     auto const stream_str = this->err_stream->str();
     bool match_found;
     if (use_regex) {
-        match_found = std::regex_match(stream_str,std::regex(expected_match));
+        match_found = std::regex_match(stream_str, std::regex(expected_match));
     } else {
         match_found = stream_str.find(expected_match) != std::string::npos;
     }
@@ -308,7 +308,7 @@ bool EnergyPlusFixture::match_err_stream(std::string const &expected_match, bool
 bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_assertions)
 {
     bool success = true;
-    auto & inputProcessor = state->dataInputProcessing->inputProcessor;
+    auto &inputProcessor = state->dataInputProcessing->inputProcessor;
     inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema, success);
 
     // Add common objects that will trigger a warning if not present
@@ -364,7 +364,7 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
     return successful_processing;
 }
 
-//bool EnergyPlusFixture::process_idd(std::string const &idd, bool &errors_found)
+// bool EnergyPlusFixture::process_idd(std::string const &idd, bool &errors_found)
 //{
 //
 //    std::unique_ptr<std::istream> idd_stream;

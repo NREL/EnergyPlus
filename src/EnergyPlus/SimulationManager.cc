@@ -184,7 +184,7 @@ namespace SimulationManager {
         // hour loop, and a time step loop.
 
         // Using/Aliasing
-        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using BranchInputManager::ManageBranchInput;
         using BranchInputManager::TestBranchIntegrity;
         using BranchNodeConnections::CheckNodeConnections;
@@ -199,11 +199,13 @@ namespace SimulationManager {
         using EMSManager::CheckIfAnyEMS;
         using EMSManager::ManageEMS;
         using ExteriorEnergyUse::ManageExteriorEnergyUse;
+        using FaultsManager::CheckAndReadFaults;
         using HVACControllers::DumpAirLoopStatistics;
         using MixedAir::CheckControllerLists;
         using NodeInputManager::CheckMarkedNodes;
         using NodeInputManager::SetupNodeVarsForReporting;
         using OutputProcessor::ReportForTabularReports;
+        using OutputProcessor::ResetAccumulationWhenWarmupComplete;
         using OutputProcessor::SetupTimePointers;
         using OutputReportPredefined::SetPredefinedTables;
         using OutputReportTabular::CloseOutputTabularFile;
@@ -211,19 +213,17 @@ namespace SimulationManager {
         using OutputReportTabular::ResetTabularReports;
         using OutputReportTabular::WriteTabularReports;
         using PlantManager::CheckIfAnyPlant;
-        using PollutionModule::CheckPollutionMeterReporting;
-        using PollutionModule::SetupPollutionCalculations;
-        using PollutionModule::SetupPollutionMeterReporting;
-        using SizingManager::ManageSizing;
-        using SystemReports::CreateEnergyReportStructure;
-        using SystemReports::ReportAirLoopConnections;
-        using FaultsManager::CheckAndReadFaults;
-        using OutputProcessor::ResetAccumulationWhenWarmupComplete;
         using PlantPipingSystemsManager::CheckIfAnyBasements;
         using PlantPipingSystemsManager::CheckIfAnySlabs;
         using PlantPipingSystemsManager::SimulateGroundDomains;
+        using PollutionModule::CheckPollutionMeterReporting;
+        using PollutionModule::SetupPollutionCalculations;
+        using PollutionModule::SetupPollutionMeterReporting;
         using Psychrometrics::InitializePsychRoutines;
         using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
+        using SizingManager::ManageSizing;
+        using SystemReports::CreateEnergyReportStructure;
+        using SystemReports::ReportAirLoopConnections;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool Available; // an environment is available to process
@@ -245,7 +245,8 @@ namespace SimulationManager {
 
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->sqliteBegin();
-            state.dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, state.dataStrGlobals->VerStringVar, state.dataStrGlobals->CurrentDateTime);
+            state.dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(
+                1, state.dataStrGlobals->VerStringVar, state.dataStrGlobals->CurrentDateTime);
             state.dataSQLiteProcedures->sqlite->sqliteCommit();
         }
 
@@ -259,7 +260,8 @@ namespace SimulationManager {
         state.dataReportFlag->DisplayPerfSimulationFlag = false;
         state.dataReportFlag->DoWeatherInitReporting = false;
         state.dataSimulationManager->RunPeriodsInInput =
-            (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0 || state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod:CustomRange") > 0 || state.dataSysVars->FullAnnualRun);
+            (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0 ||
+             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod:CustomRange") > 0 || state.dataSysVars->FullAnnualRun);
         state.dataErrTracking->AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles(state);
@@ -306,8 +308,10 @@ namespace SimulationManager {
         }
         state.dataGlobal->DoingSizing = false;
 
-        if ((state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing) && !(state.dataGlobal->DoDesDaySim || (state.dataGlobal->DoWeathSim && state.dataSimulationManager->RunPeriodsInInput))) {
-            ShowWarningError(state, "ManageSimulation: Input file has requested Sizing Calculations but no Simulations are requested (in SimulationControl "
+        if ((state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing) &&
+            !(state.dataGlobal->DoDesDaySim || (state.dataGlobal->DoWeathSim && state.dataSimulationManager->RunPeriodsInInput))) {
+            ShowWarningError(state,
+                             "ManageSimulation: Input file has requested Sizing Calculations but no Simulations are requested (in SimulationControl "
                              "object). Succeeding warnings/errors may be confusing.");
         }
         Available = true;
@@ -427,15 +431,18 @@ namespace SimulationManager {
             if (ErrorsFound) break;
             if ((!state.dataGlobal->DoDesDaySim) && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) continue;
             if ((!state.dataGlobal->DoWeathSim) && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) continue;
-            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay) continue; // don't run these here, only for sizing simulations
+            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay)
+                continue; // don't run these here, only for sizing simulations
 
-            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) continue; // don't run these here, only for sizing simulations
+            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign)
+                continue; // don't run these here, only for sizing simulations
 
             ++EnvCount;
 
             if (state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->sqliteBegin();
-                state.dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(state.dataEnvrn->CurEnvirNum, state.dataEnvrn->EnvironmentName, state.dataGlobal->KindOfSim);
+                state.dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
+                    state.dataEnvrn->CurEnvirNum, state.dataEnvrn->EnvironmentName, state.dataGlobal->KindOfSim);
                 state.dataSQLiteProcedures->sqlite->sqliteCommit();
             }
 
@@ -444,7 +451,9 @@ namespace SimulationManager {
             DisplayString(state, "Initializing New Environment Parameters");
 
             state.dataGlobal->BeginEnvrnFlag = true;
-            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
+            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) &&
+                (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
+                     .suppressBegEnvReset)) {
                 // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                 // easily converge fewer warmup days are allowed
                 DisplayString(state, "Design Day Fast Warmup Mode: Suppressing Initialization of New Environment Parameters");
@@ -511,7 +520,8 @@ namespace SimulationManager {
                     state.dataReportFlag->DisplayPerfSimulationFlag = false;
                 }
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
-                if ((state.dataGlobal->DayOfSim > 365) && ((state.dataGlobal->NumOfDayInEnvrn - state.dataGlobal->DayOfSim) == 364) && !state.dataGlobal->WarmupFlag) {
+                if ((state.dataGlobal->DayOfSim > 365) && ((state.dataGlobal->NumOfDayInEnvrn - state.dataGlobal->DayOfSim) == 364) &&
+                    !state.dataGlobal->WarmupFlag) {
                     DisplayString(state, "Starting last  year of environment at:  " + state.dataGlobal->DayOfSimChr);
                     ResetTabularReports(state);
                 }
@@ -522,7 +532,8 @@ namespace SimulationManager {
                     state.dataGlobal->BeginHourFlag = true;
                     state.dataGlobal->EndHourFlag = false;
 
-                    for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++state.dataGlobal->TimeStep) {
+                    for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->NumOfTimeStepInHour;
+                         ++state.dataGlobal->TimeStep) {
                         if (state.dataGlobal->stopSimulation) break;
 
                         if (state.dataGlobal->AnySlabsInModel || state.dataGlobal->AnyBasementsInModel) {
@@ -592,7 +603,8 @@ namespace SimulationManager {
         state.dataGlobal->WarmupFlag = false;
         if (!SimsDone && state.dataGlobal->DoDesDaySim) {
             if ((state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays) == 0) { // if sum is 0, then there was no sizing done.
-                ShowWarningError(state, "ManageSimulation: SizingPeriod:* were requested in SimulationControl but no SizingPeriod:* objects in input.");
+                ShowWarningError(state,
+                                 "ManageSimulation: SizingPeriod:* were requested in SimulationControl but no SizingPeriod:* objects in input.");
             }
         }
 
@@ -670,7 +682,6 @@ namespace SimulationManager {
         auto &deviationFromSetPtThresholdClg = state.dataHVACGlobal->deviationFromSetPtThresholdClg;
         auto &deviationFromSetPtThresholdHtg = state.dataHVACGlobal->deviationFromSetPtThresholdHtg;
 
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_int const Div60(12, {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60});
 
@@ -697,17 +708,17 @@ namespace SimulationManager {
         Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (Num == 1) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          1,
-                                          Alphas,
-                                          NumAlpha,
-                                          Number,
-                                          NumNumber,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
+                                                                     CurrentModuleObject,
+                                                                     1,
+                                                                     Alphas,
+                                                                     NumAlpha,
+                                                                     Number,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             std::string::size_type const lenVer(len(MatchVersion));
             if ((lenVer > 0) && (MatchVersion[lenVer - 1] == '0')) {
                 Which = static_cast<int>(index(Alphas(1).substr(0, lenVer - 2), MatchVersion.substr(0, lenVer - 2)));
@@ -731,17 +742,17 @@ namespace SimulationManager {
         CondFDAlgo = false;
         if (Num > 0) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          1,
-                                          Alphas,
-                                          NumAlpha,
-                                          Number,
-                                          NumNumber,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
+                                                                     CurrentModuleObject,
+                                                                     1,
+                                                                     Alphas,
+                                                                     NumAlpha,
+                                                                     Number,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             {
                 auto const SELECT_CASE_var(Alphas(1));
                 if ((SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") || (SELECT_CASE_var == "CONDFD") ||
@@ -756,17 +767,17 @@ namespace SimulationManager {
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              Item,
-                                              Alphas,
-                                              NumAlpha,
-                                              Number,
-                                              NumNumber,
-                                              IOStat,
-                                              state.dataIPShortCut->lNumericFieldBlanks,
-                                              state.dataIPShortCut->lAlphaFieldBlanks,
-                                              state.dataIPShortCut->cAlphaFieldNames,
-                                              state.dataIPShortCut->cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         Item,
+                                                                         Alphas,
+                                                                         NumAlpha,
+                                                                         Number,
+                                                                         NumNumber,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 {
                     auto const SELECT_CASE_var(Alphas(2));
                     if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
@@ -782,17 +793,17 @@ namespace SimulationManager {
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              1,
-                                              Alphas,
-                                              NumAlpha,
-                                              Number,
-                                              NumNumber,
-                                              IOStat,
-                                              state.dataIPShortCut->lNumericFieldBlanks,
-                                              state.dataIPShortCut->lAlphaFieldBlanks,
-                                              state.dataIPShortCut->cAlphaFieldNames,
-                                              state.dataIPShortCut->cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         1,
+                                                                         Alphas,
+                                                                         NumAlpha,
+                                                                         Number,
+                                                                         NumNumber,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 {
                     auto const SELECT_CASE_var(Alphas(3));
                     if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
@@ -807,17 +818,17 @@ namespace SimulationManager {
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              1,
-                                              state.dataIPShortCut->cAlphaArgs,
-                                              NumAlpha,
-                                              Number,
-                                              NumNumber,
-                                              IOStat,
-                                              state.dataIPShortCut->lNumericFieldBlanks,
-                                              state.dataIPShortCut->lAlphaFieldBlanks,
-                                              state.dataIPShortCut->cAlphaFieldNames,
-                                              state.dataIPShortCut->cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         1,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlpha,
+                                                                         Number,
+                                                                         NumNumber,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 {
                     auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
                     if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
@@ -832,17 +843,17 @@ namespace SimulationManager {
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              1,
-                                              state.dataIPShortCut->cAlphaArgs,
-                                              NumAlpha,
-                                              Number,
-                                              NumNumber,
-                                              IOStat,
-                                              state.dataIPShortCut->lNumericFieldBlanks,
-                                              state.dataIPShortCut->lAlphaFieldBlanks,
-                                              state.dataIPShortCut->cAlphaFieldNames,
-                                              state.dataIPShortCut->cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         1,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlpha,
+                                                                         Number,
+                                                                         NumNumber,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 {
                     auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
                     if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
@@ -857,17 +868,17 @@ namespace SimulationManager {
         Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (Num == 1) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          1,
-                                          Alphas,
-                                          NumAlpha,
-                                          Number,
-                                          NumNumber,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
+                                                                     CurrentModuleObject,
+                                                                     1,
+                                                                     Alphas,
+                                                                     NumAlpha,
+                                                                     Number,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             state.dataGlobal->NumOfTimeStepInHour = Number(1);
             if (state.dataGlobal->NumOfTimeStepInHour <= 0 || state.dataGlobal->NumOfTimeStepInHour > 60) {
                 Alphas(1) = fmt::to_string(state.dataGlobal->NumOfTimeStepInHour);
@@ -896,9 +907,12 @@ namespace SimulationManager {
                 state.dataGlobal->NumOfTimeStepInHour = 20;
             }
             if (state.dataGlobal->NumOfTimeStepInHour < 4 && state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Zone") > 0) {
-                ShowWarningError(
-                    state, format("{}: Requested number ({}) is less than the suggested minimum of 4.", CurrentModuleObject, state.dataGlobal->NumOfTimeStepInHour));
-                ShowContinueError(state, "Please see entry for " + CurrentModuleObject + " in Input/Output Reference for discussion of considerations.");
+                ShowWarningError(state,
+                                 format("{}: Requested number ({}) is less than the suggested minimum of 4.",
+                                        CurrentModuleObject,
+                                        state.dataGlobal->NumOfTimeStepInHour));
+                ShowContinueError(state,
+                                  "Please see entry for " + CurrentModuleObject + " in Input/Output Reference for discussion of considerations.");
             }
         } else if (Num == 0 && state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Zone") > 0 && !CondFDAlgo) {
             ShowWarningError(state, "No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 4.");
@@ -924,24 +938,26 @@ namespace SimulationManager {
         Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (Num == 1) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          1,
-                                          Alphas,
-                                          NumAlpha,
-                                          Number,
-                                          NumNumber,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
+                                                                     CurrentModuleObject,
+                                                                     1,
+                                                                     Alphas,
+                                                                     NumAlpha,
+                                                                     Number,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             MinInt = int(Number(1));
             if (MinInt > state.dataGlobal->MinutesPerTimeStep) {
                 MinInt = state.dataGlobal->MinutesPerTimeStep;
             }
             if (MinInt < 0 || MinInt > 60) {
-                ShowWarningError(state,
-                                 format("{}: Requested {} ({}) invalid. Set to 1 minute.", CurrentModuleObject, state.dataIPShortCut->cNumericFieldNames(1), MinInt));
+                ShowWarningError(
+                    state,
+                    format(
+                        "{}: Requested {} ({}) invalid. Set to 1 minute.", CurrentModuleObject, state.dataIPShortCut->cNumericFieldNames(1), MinInt));
                 state.dataConvergeParams->MinTimeStepSys = 1.0 / 60.0;
             } else if (MinInt == 0) { // Set to TimeStepZone
                 state.dataConvergeParams->MinTimeStepSys = state.dataGlobal->TimeStepZone;
@@ -957,7 +973,8 @@ namespace SimulationManager {
             // trap bad values
             if (state.dataConvergeParams->MinPlantSubIterations < 1) state.dataConvergeParams->MinPlantSubIterations = 1;
             if (state.dataConvergeParams->MaxPlantSubIterations < 3) state.dataConvergeParams->MaxPlantSubIterations = 3;
-            if (state.dataConvergeParams->MinPlantSubIterations > state.dataConvergeParams->MaxPlantSubIterations) state.dataConvergeParams->MaxPlantSubIterations = state.dataConvergeParams->MinPlantSubIterations + 1;
+            if (state.dataConvergeParams->MinPlantSubIterations > state.dataConvergeParams->MaxPlantSubIterations)
+                state.dataConvergeParams->MaxPlantSubIterations = state.dataConvergeParams->MinPlantSubIterations + 1;
 
         } else if (Num == 0) {
             state.dataConvergeParams->MinTimeStepSys = 1.0 / 60.0;
@@ -1067,8 +1084,9 @@ namespace SimulationManager {
                                 //        ENDIF
                                 //        CreateMinimalSurfaceVariables=.FALSE.
                             } else if (!diagnosticName.empty()) {
-                                ShowWarningError(state, "GetProjectData: " + CurrentModuleObject + "=\"" + diagnosticName +
-                                                 "\", Invalid value for field, entered value ignored.");
+                                ShowWarningError(state,
+                                                 "GetProjectData: " + CurrentModuleObject + "=\"" + diagnosticName +
+                                                     "\", Invalid value for field, entered value ignored.");
                             }
                         }
                     }
@@ -1082,17 +1100,18 @@ namespace SimulationManager {
         CurrentModuleObject = "OutputControl:ReportingTolerances";
         Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (Num > 0) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject,
-                                          1,
-                                          Alphas,
-                                          NumAlpha,
-                                          Number,
-                                          NumNumber,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     1,
+                                                                     Alphas,
+                                                                     NumAlpha,
+                                                                     Number,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (!state.dataIPShortCut->lNumericFieldBlanks(1)) {
                 deviationFromSetPtThresholdHtg = -Number(1);
             } else {
@@ -1117,17 +1136,17 @@ namespace SimulationManager {
         if (NumRunControl > 0) {
             state.dataSimulationManager->RunControlInInput = true;
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          1,
-                                          Alphas,
-                                          NumAlpha,
-                                          Number,
-                                          NumNumber,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
+                                                                     CurrentModuleObject,
+                                                                     1,
+                                                                     Alphas,
+                                                                     NumAlpha,
+                                                                     Number,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (Alphas(1) == "YES") state.dataGlobal->DoZoneSizing = true;
             if (Alphas(2) == "YES") state.dataGlobal->DoSystemSizing = true;
             if (Alphas(3) == "YES") state.dataGlobal->DoPlantSizing = true;
@@ -1240,11 +1259,12 @@ namespace SimulationManager {
                             advancedModeUsed = true;
                         }
                         if (advancedModeUsed) {
-                            ShowContinueError(state, "...Care should be used when using the Advanced Override Mode. Results may be significantly different "
+                            ShowContinueError(state,
+                                              "...Care should be used when using the Advanced Override Mode. Results may be significantly different "
                                               "than a simulation not using this mode.");
                         } else {
-                            ShowWarningError(state,
-                                "PerformancePrecisionTradeoffs using the Advanced Override Mode but no specific parameters have been set.");
+                            ShowWarningError(
+                                state, "PerformancePrecisionTradeoffs using the Advanced Override Mode but no specific parameters have been set.");
                         }
                     } else {
                         ShowSevereError(state, "Invalid over ride mode specified in PerformancePrecisionTradeoffs object: " + overrideModeValue);
@@ -1258,23 +1278,25 @@ namespace SimulationManager {
                         state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
                     }
                     if (overrideZoneAirHeatBalAlg) {
-                        ShowWarningError(state,
+                        ShowWarningError(
+                            state,
                             "Due to PerformancePrecisionTradeoffs Override Mode, the ZoneAirHeatBalanceAlgorithm has been changed to EulerMethod.");
                         state.dataHeatBal->OverrideZoneAirSolutionAlgo = true;
                     }
                     if (overrideMinNumWarmupDays) {
-                        ShowWarningError(state,
-                            "Due to PerformancePrecisionTradeoffs Override Mode, the Minimum Number of Warmup Days has been changed to 1.");
+                        ShowWarningError(
+                            state, "Due to PerformancePrecisionTradeoffs Override Mode, the Minimum Number of Warmup Days has been changed to 1.");
                         state.dataHeatBal->MinNumberOfWarmupDays = 1;
                     }
                     if (overrideBeginEnvResetSuppress) {
-                        ShowWarningError(state, "Due to PerformancePrecisionTradeoffs Override Mode, the Begin Environment Reset Mode has been changed to "
+                        ShowWarningError(state,
+                                         "Due to PerformancePrecisionTradeoffs Override Mode, the Begin Environment Reset Mode has been changed to "
                                          "SuppressAllBeginEnvironmentResets.");
                         state.dataEnvrn->forceBeginEnvResetSuppress = true;
                     }
                     if (overrideSystemTimestep) {
-                        ShowWarningError(state,
-                            "Due to PerformancePrecisionTradeoffs Override Mode, the minimum System TimeSteps has been changed to 1 hr.");
+                        ShowWarningError(
+                            state, "Due to PerformancePrecisionTradeoffs Override Mode, the minimum System TimeSteps has been changed to 1 hr.");
                         int MinTimeStepSysOverrideValue = 60.0;
                         if (MinTimeStepSysOverrideValue > state.dataGlobal->MinutesPerTimeStep) {
                             MinTimeStepSysOverrideValue = state.dataGlobal->MinutesPerTimeStep;
@@ -1283,13 +1305,13 @@ namespace SimulationManager {
                         state.dataHVACGlobal->LimitNumSysSteps = int(state.dataGlobal->TimeStepZone / state.dataConvergeParams->MinTimeStepSys);
                     }
                     if (overrideMaxZoneTempDiff) {
-                        ShowWarningError(state,
-                            "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxZoneTempDiff will be set to 1.0 .");
+                        ShowWarningError(
+                            state, "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxZoneTempDiff will be set to 1.0 .");
                         state.dataConvergeParams->MaxZoneTempDiff = 1.0;
                     }
                     if (overrideMaxAllowedDelTemp) {
-                        ShowWarningError(state,
-                            "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxAllowedDelTemp will be set to 0.1 .");
+                        ShowWarningError(
+                            state, "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxAllowedDelTemp will be set to 0.1 .");
                         state.dataHeatBal->MaxAllowedDelTemp = 0.1;
                     }
                 }
@@ -1314,7 +1336,12 @@ namespace SimulationManager {
               "Iterations, Maximum Plant Iterations");
         MinInt = state.dataConvergeParams->MinTimeStepSys * 60.0;
         static constexpr auto Format_733(" System Convergence Limits, {}, {}, {}, {}\n");
-        print(state.files.eio, Format_733, MinInt, state.dataConvergeParams->MaxIter, state.dataConvergeParams->MinPlantSubIterations, state.dataConvergeParams->MaxPlantSubIterations);
+        print(state.files.eio,
+              Format_733,
+              MinInt,
+              state.dataConvergeParams->MaxIter,
+              state.dataConvergeParams->MinPlantSubIterations,
+              state.dataConvergeParams->MaxPlantSubIterations);
 
         if (state.dataGlobal->DoZoneSizing) {
             Alphas(1) = "Yes";
@@ -1433,7 +1460,8 @@ namespace SimulationManager {
     // write the input related portions of the .perflog
     // J.Glazer February 2020
     {
-        UtilityRoutines::appendPerfLog(state, "Program, Version, TimeStamp",
+        UtilityRoutines::appendPerfLog(state,
+                                       "Program, Version, TimeStamp",
                                        state.dataStrGlobals->VerStringVar); // this string already includes three portions and has commas
         UtilityRoutines::appendPerfLog(state, "Use Coil Direct Solution", bool_to_string(state.dataGlobal->DoCoilDirectSolutions));
         if (state.dataHeatBalIntRadExchg->CarrollMethod) {
@@ -1492,7 +1520,7 @@ namespace SimulationManager {
         NumPlantSizing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Sizing:Plant");
         NumDesignDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay");
         NumRunPeriodDesign = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
-                state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
+                             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
         NumSizingDays = NumDesignDays + NumRunPeriodDesign;
 
         WeatherFileAttached = FileSystem::fileExists(state.files.inputWeatherFileName.fileName);
@@ -1501,67 +1529,79 @@ namespace SimulationManager {
             if (state.dataGlobal->DoZoneSizing) {
                 if (NumZoneSizing > 0 && NumSizingDays == 0) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
-                        "CheckEnvironmentSpecifications: Sizing for Zones has been requested but there are no design environments specified.");
+                    ShowSevereError(
+                        state, "CheckEnvironmentSpecifications: Sizing for Zones has been requested but there are no design environments specified.");
                     ShowContinueError(state, "...Add appropriate SizingPeriod:* objects for your simulation.");
                 }
                 if (NumZoneSizing > 0 && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
                     ErrorsFound = true;
-                    ShowSevereError(state, "CheckEnvironmentSpecifications: Sizing for Zones has been requested; Design period from the weather file "
+                    ShowSevereError(state,
+                                    "CheckEnvironmentSpecifications: Sizing for Zones has been requested; Design period from the weather file "
                                     "requested; but no weather file specified.");
                 }
             }
             if (state.dataGlobal->DoSystemSizing) {
                 if (NumSystemSizing > 0 && NumSizingDays == 0) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
+                    ShowSevereError(
+                        state,
                         "CheckEnvironmentSpecifications: Sizing for Systems has been requested but there are no design environments specified.");
                     ShowContinueError(state, "...Add appropriate SizingPeriod:* objects for your simulation.");
                 }
                 if (NumSystemSizing > 0 && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
                     ErrorsFound = true;
-                    ShowSevereError(state, "CheckEnvironmentSpecifications: Sizing for Systems has been requested; Design period from the weather file "
+                    ShowSevereError(state,
+                                    "CheckEnvironmentSpecifications: Sizing for Systems has been requested; Design period from the weather file "
                                     "requested; but no weather file specified.");
                 }
             }
             if (state.dataGlobal->DoPlantSizing) {
                 if (NumPlantSizing > 0 && NumSizingDays == 0) {
                     ErrorsFound = true;
-                    ShowSevereError(state, "CheckEnvironmentSpecifications: Sizing for Equipment/Plants has been requested but there are no design "
+                    ShowSevereError(state,
+                                    "CheckEnvironmentSpecifications: Sizing for Equipment/Plants has been requested but there are no design "
                                     "environments specified.");
                     ShowContinueError(state, "...Add appropriate SizingPeriod:* objects for your simulation.");
                 }
                 if (NumPlantSizing > 0 && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
                     ErrorsFound = true;
-                    ShowSevereError(state, "CheckEnvironmentSpecifications: Sizing for Equipment/Plants has been requested; Design period from the weather "
+                    ShowSevereError(state,
+                                    "CheckEnvironmentSpecifications: Sizing for Equipment/Plants has been requested; Design period from the weather "
                                     "file requested; but no weather file specified.");
                 }
             }
             if (state.dataGlobal->DoDesDaySim && NumSizingDays == 0) {
-                ShowWarningError(state, "CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations, but no design "
+                ShowWarningError(state,
+                                 "CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations, but no design "
                                  "environments specified.");
-                ShowContinueError(state,
+                ShowContinueError(
+                    state,
                     "...No design environment results produced. For these results, add appropriate SizingPeriod:* objects for your simulation.");
             }
             if (state.dataGlobal->DoDesDaySim && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
                 ErrorsFound = true;
-                ShowSevereError(state, "CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations; weather file design "
+                ShowSevereError(state,
+                                "CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations; weather file design "
                                 "environments specified; but no weather file specified.");
             }
             if (state.dataGlobal->DoWeathSim && !state.dataSimulationManager->RunPeriodsInInput) {
-                ShowWarningError(state, "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations, but no run periods for "
+                ShowWarningError(state,
+                                 "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations, but no run periods for "
                                  "weather file specified.  No annual results produced.");
             }
             if (state.dataGlobal->DoWeathSim && state.dataSimulationManager->RunPeriodsInInput && !WeatherFileAttached) {
-                ShowWarningError(state, "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations; run periods for weather "
+                ShowWarningError(state,
+                                 "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations; run periods for weather "
                                  "file specified; but no weather file specified.");
             }
         }
         if (!state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim) {
-            ShowWarningError(state, "\"Do the design day simulations\" and \"Do the weather file simulation\" are both set to \"No\".  No simulations will "
+            ShowWarningError(state,
+                             "\"Do the design day simulations\" and \"Do the weather file simulation\" are both set to \"No\".  No simulations will "
                              "be performed, and most input will not be read.");
         }
-        if (!state.dataGlobal->DoZoneSizing && !state.dataGlobal->DoSystemSizing && !state.dataGlobal->DoPlantSizing && !state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim) {
+        if (!state.dataGlobal->DoZoneSizing && !state.dataGlobal->DoSystemSizing && !state.dataGlobal->DoPlantSizing &&
+            !state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim) {
             ShowSevereError(state, "All elements of SimulationControl are set to \"No\". No simulations can be done.  Program terminates.");
             ErrorsFound = true;
         }
@@ -1591,23 +1631,25 @@ namespace SimulationManager {
         bool ReportingRequested;
 
         ReportingRequested = false;
-        SimPeriods =
-            (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") > 0 ||
-                    state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") > 0 ||
-                    state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType") > 0 || state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0);
+        SimPeriods = (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") > 0 ||
+                      state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") > 0 ||
+                      state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType") > 0 ||
+                      state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0);
 
         if ((state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim) && SimPeriods) {
-            ReportingRequested =
-                (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:SummaryReports") > 0 ||
-                 state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:TimeBins") > 0 || state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:Monthly") > 0 ||
-                 state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Variable") > 0 || state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter") > 0 ||
-                 state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:MeterFileOnly") > 0 ||
-                 state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:Cumulative") > 0 ||
-                 state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:Cumulative:MeterFileOnly") > 0);
+            ReportingRequested = (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:SummaryReports") > 0 ||
+                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:TimeBins") > 0 ||
+                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:Monthly") > 0 ||
+                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Variable") > 0 ||
+                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter") > 0 ||
+                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:MeterFileOnly") > 0 ||
+                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:Cumulative") > 0 ||
+                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:Cumulative:MeterFileOnly") > 0);
             // Not testing for : Output:SQLite or Output:EnvironmentalImpactFactors
             if (!ReportingRequested) {
                 ShowWarningError(state, "No reporting elements have been requested. No simulation results produced.");
-                ShowContinueError(state, "...Review requirements such as \"Output:Table:SummaryReports\", \"Output:Table:Monthly\", \"Output:Variable\", "
+                ShowContinueError(state,
+                                  "...Review requirements such as \"Output:Table:SummaryReports\", \"Output:Table:Monthly\", \"Output:Variable\", "
                                   "\"Output:Meter\" and others.");
             }
         }
@@ -1876,7 +1918,10 @@ namespace SimulationManager {
         if (state.dataHeatBal->AnyCondFD) { // echo out relaxation factor, it may have been changed by the program
             print(
                 state.files.eio, "{}\n", "! <ConductionFiniteDifference Numerical Parameters>, Starting Relaxation Factor, Final Relaxation Factor");
-            print(state.files.eio, "ConductionFiniteDifference Numerical Parameters, {:.3R}, {:.3R}\n", state.dataHeatBal->CondFDRelaxFactorInput, state.dataHeatBal->CondFDRelaxFactor);
+            print(state.files.eio,
+                  "ConductionFiniteDifference Numerical Parameters, {:.3R}, {:.3R}\n",
+                  state.dataHeatBal->CondFDRelaxFactorInput,
+                  state.dataHeatBal->CondFDRelaxFactor);
         }
         // Report number of threads to eio file
         static constexpr auto ThreadingHeader("! <Program Control Information:Threads/Parallel Sims>, Threading Supported,Maximum Number of "
@@ -1926,7 +1971,16 @@ namespace SimulationManager {
             }
         } else { // no threading
             if (state.dataSysVars->lnumActiveSims) {
-                print(state.files.eio, ThreadReport, "No", state.dataSysVars->MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", state.dataSysVars->inumActiveSims);
+                print(state.files.eio,
+                      ThreadReport,
+                      "No",
+                      state.dataSysVars->MaxNumberOfThreads,
+                      "N/A",
+                      "N/A",
+                      "N/A",
+                      "N/A",
+                      "N/A",
+                      state.dataSysVars->inumActiveSims);
             } else {
                 print(state.files.eio, ThreadReport, "No", state.dataSysVars->MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", "N/A");
             }
@@ -2018,7 +2072,8 @@ namespace SimulationManager {
             state.dataGlobal->BeginFullSimFlag = false;
 
             //          ! do another timestep=1
-            if (state.dataSysVars->DeveloperFlag) DisplayString(state, "Initializing Simulation - 2nd timestep 1:" + state.dataEnvrn->EnvironmentName);
+            if (state.dataSysVars->DeveloperFlag)
+                DisplayString(state, "Initializing Simulation - 2nd timestep 1:" + state.dataEnvrn->EnvironmentName);
 
             ManageWeather(state);
 
@@ -2032,7 +2087,8 @@ namespace SimulationManager {
             state.dataGlobal->TimeStep = state.dataGlobal->NumOfTimeStepInHour;
             state.dataGlobal->EndEnvrnFlag = true;
 
-            if (state.dataSysVars->DeveloperFlag) DisplayString(state, "Initializing Simulation - hour 24 timestep 1:" + state.dataEnvrn->EnvironmentName);
+            if (state.dataSysVars->DeveloperFlag)
+                DisplayString(state, "Initializing Simulation - hour 24 timestep 1:" + state.dataEnvrn->EnvironmentName);
             ManageWeather(state);
 
             ManageExteriorEnergyUse(state);
@@ -2101,29 +2157,39 @@ namespace SimulationManager {
                 UtilityRoutines::SameString(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType, "Outlet")) {
                 bool ParentComponentFound = false;
                 for (int Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop1) {
-                    if (state.dataBranchNodeConnections->ParentNodeList(Loop1).CType != state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType ||
-                        state.dataBranchNodeConnections->ParentNodeList(Loop1).CName != state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName)
+                    if (state.dataBranchNodeConnections->ParentNodeList(Loop1).CType !=
+                            state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType ||
+                        state.dataBranchNodeConnections->ParentNodeList(Loop1).CName !=
+                            state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName)
                         continue;
                     ParentComponentFound = true;
                     {
-                        auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType));
+                        auto const SELECT_CASE_var(
+                            UtilityRoutines::MakeUPPERCase(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType));
                         if (SELECT_CASE_var == "INLET") {
-                            state.dataBranchNodeConnections->ParentNodeList(Loop1).InletNodeName = state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
+                            state.dataBranchNodeConnections->ParentNodeList(Loop1).InletNodeName =
+                                state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
                         } else if (SELECT_CASE_var == "OUTLET") {
-                            state.dataBranchNodeConnections->ParentNodeList(Loop1).OutletNodeName = state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
+                            state.dataBranchNodeConnections->ParentNodeList(Loop1).OutletNodeName =
+                                state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
                         }
                     }
                 }
                 if (!ParentComponentFound) {
                     ++state.dataBranchNodeConnections->NumOfActualParents;
-                    state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).CType = state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType;
-                    state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).CName = state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName;
+                    state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).CType =
+                        state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType;
+                    state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).CName =
+                        state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName;
                     {
-                        auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType));
+                        auto const SELECT_CASE_var(
+                            UtilityRoutines::MakeUPPERCase(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType));
                         if (SELECT_CASE_var == "INLET") {
-                            state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).InletNodeName = state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
+                            state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).InletNodeName =
+                                state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
                         } else if (SELECT_CASE_var == "OUTLET") {
-                            state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).OutletNodeName = state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
+                            state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).OutletNodeName =
+                                state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
                         }
                     }
                 }
@@ -2235,14 +2301,18 @@ namespace SimulationManager {
                   state.dataBranchNodeConnections->CompSets(Count).OutletNodeName,
                   state.dataBranchNodeConnections->CompSets(Count).Description);
 
-            if (state.dataBranchNodeConnections->CompSets(Count).ParentCType == "UNDEFINED" || state.dataBranchNodeConnections->CompSets(Count).InletNodeName == "UNDEFINED" ||
+            if (state.dataBranchNodeConnections->CompSets(Count).ParentCType == "UNDEFINED" ||
+                state.dataBranchNodeConnections->CompSets(Count).InletNodeName == "UNDEFINED" ||
                 state.dataBranchNodeConnections->CompSets(Count).OutletNodeName == "UNDEFINED") {
                 if (state.dataErrTracking->AbortProcessing && state.dataSimulationManager->WarningOut) {
-                    ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
+                    ShowWarningError(state,
+                                     "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     state.dataSimulationManager->WarningOut = false;
                 }
-                ShowWarningError(state, "Node Connection Error for object " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
+                ShowWarningError(state,
+                                 "Node Connection Error for object " + state.dataBranchNodeConnections->CompSets(Count).CType +
+                                     ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
                 ShowContinueError(state, "  " + state.dataBranchNodeConnections->CompSets(Count).Description + " not on any Branch or Parent Object");
                 ShowContinueError(state, "  Inlet Node : " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName);
                 ShowContinueError(state, "  Outlet Node: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
@@ -2253,11 +2323,14 @@ namespace SimulationManager {
             }
             if (state.dataBranchNodeConnections->CompSets(Count).Description == "UNDEFINED") {
                 if (state.dataErrTracking->AbortProcessing && state.dataSimulationManager->WarningOut) {
-                    ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
+                    ShowWarningError(state,
+                                     "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     state.dataSimulationManager->WarningOut = false;
                 }
-                ShowWarningError(state, "Potential Node Connection Error for object " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
+                ShowWarningError(state,
+                                 "Potential Node Connection Error for object " + state.dataBranchNodeConnections->CompSets(Count).CType +
+                                     ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
                 ShowContinueError(state, "  Node Types are still UNDEFINED -- See Branch/Node Details file for further information");
                 ShowContinueError(state, "  Inlet Node : " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName);
                 ShowContinueError(state, "  Outlet Node: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
@@ -2269,19 +2342,29 @@ namespace SimulationManager {
             for (int Count1 = Count + 1; Count1 <= state.dataBranchNodeConnections->NumCompSets; ++Count1) {
                 if (state.dataBranchNodeConnections->CompSets(Count).CType != state.dataBranchNodeConnections->CompSets(Count1).CType) continue;
                 if (state.dataBranchNodeConnections->CompSets(Count).CName != state.dataBranchNodeConnections->CompSets(Count1).CName) continue;
-                if (state.dataBranchNodeConnections->CompSets(Count).InletNodeName != state.dataBranchNodeConnections->CompSets(Count1).InletNodeName) continue;
-                if (state.dataBranchNodeConnections->CompSets(Count).OutletNodeName != state.dataBranchNodeConnections->CompSets(Count1).OutletNodeName) continue;
+                if (state.dataBranchNodeConnections->CompSets(Count).InletNodeName != state.dataBranchNodeConnections->CompSets(Count1).InletNodeName)
+                    continue;
+                if (state.dataBranchNodeConnections->CompSets(Count).OutletNodeName !=
+                    state.dataBranchNodeConnections->CompSets(Count1).OutletNodeName)
+                    continue;
                 if (state.dataErrTracking->AbortProcessing && state.dataSimulationManager->WarningOut) {
-                    ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
+                    ShowWarningError(state,
+                                     "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     state.dataSimulationManager->WarningOut = false;
                 }
                 ShowWarningError(state, "Component plus inlet/outlet node pair used more than once:");
-                ShowContinueError(state, "  Component  : " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
+                ShowContinueError(state,
+                                  "  Component  : " + state.dataBranchNodeConnections->CompSets(Count).CType +
+                                      ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
                 ShowContinueError(state, "  Inlet Node : " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName);
                 ShowContinueError(state, "  Outlet Node: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
-                ShowContinueError(state, "  Used by    : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType + ' ' + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
-                ShowContinueError(state, "  and  by    : " + state.dataBranchNodeConnections->CompSets(Count1).ParentCType + ' ' + state.dataBranchNodeConnections->CompSets(Count1).ParentCName);
+                ShowContinueError(state,
+                                  "  Used by    : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType + ' ' +
+                                      state.dataBranchNodeConnections->CompSets(Count).ParentCName);
+                ShowContinueError(state,
+                                  "  and  by    : " + state.dataBranchNodeConnections->CompSets(Count1).ParentCType + ' ' +
+                                      state.dataBranchNodeConnections->CompSets(Count1).ParentCName);
                 ++state.dataBranchNodeConnections->NumNodeConnectionErrors;
             }
         }
@@ -2349,7 +2432,10 @@ namespace SimulationManager {
                         } else {
                             print(state.files.bnd,
                                   "{},",
-                                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn).Name);
+                                  state.dataPlnt->PlantLoop(Count)
+                                      .LoopSide(LoopSideNum)
+                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn)
+                                      .Name);
                         }
 
                         if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1) <= 0) {
@@ -2393,17 +2479,22 @@ namespace SimulationManager {
                         if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1) <= 0) {
                             print(state.files.bnd, "{},", errstring);
                         } else {
-                            print(
-                                state.files.bnd,
-                                "{},",
-                                state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1)).Name);
+                            print(state.files.bnd,
+                                  "{},",
+                                  state.dataPlnt->PlantLoop(Count)
+                                      .LoopSide(LoopSideNum)
+                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1))
+                                      .Name);
                         }
                         if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut <= 0) {
                             print(state.files.bnd, "{},{},Supply\n", errstring, state.dataPlnt->PlantLoop(Count).Name);
                         } else {
                             print(state.files.bnd,
                                   "{},{},{}\n",
-                                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut).Name,
+                                  state.dataPlnt->PlantLoop(Count)
+                                      .LoopSide(LoopSideNum)
+                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut)
+                                      .Name,
                                   state.dataPlnt->PlantLoop(Count).Name,
                                   LoopString);
                         }
@@ -2497,7 +2588,10 @@ namespace SimulationManager {
                         } else {
                             print(state.files.bnd,
                                   "{},",
-                                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn).Name);
+                                  state.dataPlnt->PlantLoop(Count)
+                                      .LoopSide(LoopSideNum)
+                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn)
+                                      .Name);
                         }
                         if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1) <= 0) {
                             print(state.files.bnd, "{},{},{}\n", errstring, state.dataPlnt->PlantLoop(Count).Name, LoopString);
@@ -2543,17 +2637,22 @@ namespace SimulationManager {
                         if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1) <= 0) {
                             print(state.files.bnd, "{},", errstring);
                         } else {
-                            print(
-                                state.files.bnd,
-                                "{},",
-                                state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1)).Name);
+                            print(state.files.bnd,
+                                  "{},",
+                                  state.dataPlnt->PlantLoop(Count)
+                                      .LoopSide(LoopSideNum)
+                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1))
+                                      .Name);
                         }
                         if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut <= 0) {
                             print(state.files.bnd, "{},{},{}\n", errstring, state.dataPlnt->PlantLoop(Count).Name, LoopString);
                         } else {
                             print(state.files.bnd,
                                   "{},{},{}\n",
-                                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut).Name,
+                                  state.dataPlnt->PlantLoop(Count)
+                                      .LoopSide(LoopSideNum)
+                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut)
+                                      .Name,
                                   state.dataPlnt->PlantLoop(Count).Name,
                                   LoopString);
                         }
@@ -2741,7 +2840,8 @@ namespace SimulationManager {
         ErrorsFound = false;
         print(state.files.debug, "{}\n", "Node Type,CompSet Name,Inlet Node,OutletNode");
         for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop) {
-            NumChildren = GetNumChildren(state, state.dataBranchNodeConnections->ParentNodeList(Loop).CType, state.dataBranchNodeConnections->ParentNodeList(Loop).CName);
+            NumChildren = GetNumChildren(
+                state, state.dataBranchNodeConnections->ParentNodeList(Loop).CType, state.dataBranchNodeConnections->ParentNodeList(Loop).CName);
             if (NumChildren > 0) {
                 ChildCType.allocate(NumChildren);
                 ChildCName.allocate(NumChildren);
@@ -2755,7 +2855,8 @@ namespace SimulationManager {
                 ChildOutNodeName = BlankString;
                 ChildInNodeNum = 0;
                 ChildOutNodeNum = 0;
-                GetChildrenData(state, state.dataBranchNodeConnections->ParentNodeList(Loop).CType,
+                GetChildrenData(state,
+                                state.dataBranchNodeConnections->ParentNodeList(Loop).CType,
                                 state.dataBranchNodeConnections->ParentNodeList(Loop).CName,
                                 NumChildren,
                                 ChildCType,
@@ -2852,8 +2953,13 @@ namespace SimulationManager {
         print(state.files.debug, "{}\n", " RepVar,ReportIndex,ReportID,ReportName,Units,ResourceType,EndUse,Group,IndexType");
 
         for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
-            NumVariables = GetNumMeteredVariables(state, state.dataBranchNodeConnections->CompSets(Loop).CType, state.dataBranchNodeConnections->CompSets(Loop).CName);
-            print(state.files.debug, "CompSet, {}, {}, {:5}\n", state.dataBranchNodeConnections->CompSets(Loop).CType, state.dataBranchNodeConnections->CompSets(Loop).CName, NumVariables);
+            NumVariables = GetNumMeteredVariables(
+                state, state.dataBranchNodeConnections->CompSets(Loop).CType, state.dataBranchNodeConnections->CompSets(Loop).CName);
+            print(state.files.debug,
+                  "CompSet, {}, {}, {:5}\n",
+                  state.dataBranchNodeConnections->CompSets(Loop).CType,
+                  state.dataBranchNodeConnections->CompSets(Loop).CName,
+                  NumVariables);
             if (NumVariables <= 0) continue;
             VarIndexes.dimension(NumVariables, 0);
             VarIDs.dimension(NumVariables, 0);
@@ -2868,7 +2974,8 @@ namespace SimulationManager {
 
             EndUses.allocate(NumVariables);
             Groups.allocate(NumVariables);
-            GetMeteredVariables(state, state.dataBranchNodeConnections->CompSets(Loop).CType,
+            GetMeteredVariables(state,
+                                state.dataBranchNodeConnections->CompSets(Loop).CType,
                                 state.dataBranchNodeConnections->CompSets(Loop).CName,
                                 VarIndexes,
                                 VarTypes,
@@ -2920,7 +3027,8 @@ namespace SimulationManager {
 
         state.dataGlobal->DoingInputProcessing = false;
 
-        state.dataInputProcessing->inputProcessor->preProcessorCheck(state, state.dataSimulationManager->PreP_Fatal); // Check Preprocessor objects for warning, severe, etc errors.
+        state.dataInputProcessing->inputProcessor->preProcessorCheck(
+            state, state.dataSimulationManager->PreP_Fatal); // Check Preprocessor objects for warning, severe, etc errors.
 
         if (state.dataSimulationManager->PreP_Fatal) {
             ShowFatalError(state, "Preprocessor condition(s) cause termination.");
@@ -3005,13 +3113,12 @@ void Resimulate(EnergyPlusData &state,
     using HeatBalanceSurfaceManager::InitSurfaceHeatBalance;
     using HVACManager::SimHVAC;
     using RefrigeratedCase::ManageRefrigeratedCaseRacks;
-    using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
     using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
+    using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
     using namespace ZoneEquipmentManager;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneTempChange(0.0); // Dummy variable needed for calling ManageZoneAirUpdates
-
 
     if (ResimExt) {
         ManageExteriorEnergyUse(state);
@@ -3036,10 +3143,13 @@ void Resimulate(EnergyPlusData &state,
     if (ResimHVAC) {
         // HVAC simulation
         ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
-        if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iGetZoneSetPoints, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
-        CalcAirFlowSimple(state, 0, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneMixingFlow, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneInfiltrationFlow);
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
+            ManageZoneContaminanUpdates(state, iGetZoneSetPoints, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
+        CalcAirFlowSimple(
+            state, 0, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneMixingFlow, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneInfiltrationFlow);
         ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
-        if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
+            ManageZoneContaminanUpdates(state, iPredictStep, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
         SimHVAC(state);
 
         ++state.dataDemandManager->DemandManagerHVACIterations;

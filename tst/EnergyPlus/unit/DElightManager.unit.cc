@@ -300,17 +300,17 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     bool foundErrors = false;
 
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
-    EXPECT_FALSE(foundErrors);                              // expect no errors
+    EXPECT_FALSE(foundErrors);                                      // expect no errors
 
     HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                        // expect no errors
+    EXPECT_FALSE(foundErrors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
@@ -321,10 +321,10 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
-    EXPECT_FALSE(foundErrors);                       // expect no errors
+    EXPECT_FALSE(foundErrors);                               // expect no errors
 
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized

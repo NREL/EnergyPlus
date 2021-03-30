@@ -97,7 +97,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TestGetFunctions1)
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurOASysNum = 0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _, _, _);                         // triggers sizing call
+    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _, _, _);                 // triggers sizing call
     Real64 locFanSizeVdot = state->dataHVACFan->fanObjs[0]->designAirVolFlowRate; // get function
     EXPECT_NEAR(1.0000, locFanSizeVdot, 0.00000001);
     Real64 locDesignTempRise = state->dataHVACFan->fanObjs[0]->getFanDesignTemperatureRise(*state);
@@ -140,7 +140,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_FanSizing1)
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurOASysNum = 0;
     state->dataSize->DataNonZoneNonAirloopValue = 1.00635;
-    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _, _, _);                         // triggers sizing call
+    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _, _, _);                 // triggers sizing call
     Real64 locFanSizeVdot = state->dataHVACFan->fanObjs[0]->designAirVolFlowRate; // get function
     EXPECT_NEAR(1.00635, locFanSizeVdot, 0.00001);
     state->dataSize->DataNonZoneNonAirloopValue = 0.0;
