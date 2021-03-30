@@ -228,7 +228,7 @@ namespace EnergyPlus::ChillerElectricEIR {
         bool ErrorsFound(false); // True when input errors are found
 
         state.dataIPShortCut->cCurrentModuleObject = "Chiller:Electric:EIR";
-        state.dataChillerElectricEIR->NumElectricEIRChillers = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataChillerElectricEIR->NumElectricEIRChillers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataChillerElectricEIR->NumElectricEIRChillers <= 0) {
             ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
@@ -243,7 +243,7 @@ namespace EnergyPlus::ChillerElectricEIR {
             int NumAlphas = 0; // Number of elements in the alpha array
             int NumNums = 0;   // Number of elements in the numeric array
             int IOStat = 0;    // IO Status when calling get input subroutine
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           EIRChillerNum,
                                           state.dataIPShortCut->cAlphaArgs,

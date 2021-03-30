@@ -993,10 +993,10 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         for (auto &classToInput : classesToInput) {
             cCurrentModuleObject = classToInput.thisType;
-            int numPLHP = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            int numPLHP = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             if (numPLHP > 0) {
-                auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
-                if (instances == inputProcessor->epJSON.end()) {
+                auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+                if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
                     // Cannot imagine how you would have numPLHP > 0 and yet the instances is empty
                     // this would indicate a major problem in the input processor, not a problem here
                     // I'll still catch this with errorsFound but I cannot make a unit test for it so excluding the line from coverage
@@ -1008,7 +1008,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                 for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                     auto const &fields = instance.value();
                     auto const &thisObjectName = instance.key();
-                    inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
+                    state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
 
                     EIRPlantLoopHeatPump thisPLHP;
                     thisPLHP.plantTypeOfNum = classToInput.thisTypeNum;
@@ -1047,7 +1047,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                         thisPLHP.referenceCOP = fields.at("reference_coefficient_of_performance");
                     } else {
                         Real64 defaultVal = 0.0;
-                        if (!inputProcessor->getDefaultValue(state, cCurrentModuleObject, "reference_coefficient_of_performance", defaultVal)) {
+                        if (!state.dataInputProcessing->inputProcessor->getDefaultValue(state, cCurrentModuleObject, "reference_coefficient_of_performance", defaultVal)) {
                             // this error condition would mean that someone broke the input dictionary, not their
                             // input file.  I can't really unit test it so I'll leave it here as a severe error
                             // but excluding it from coverage
@@ -1063,7 +1063,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                         thisPLHP.sizingFactor = fields.at("sizing_factor");
                     } else {
                         Real64 defaultVal = 0.0;
-                        if (!inputProcessor->getDefaultValue(state, cCurrentModuleObject, "sizing_factor", defaultVal)) {
+                        if (!state.dataInputProcessing->inputProcessor->getDefaultValue(state, cCurrentModuleObject, "sizing_factor", defaultVal)) {
                             // this error condition would mean that someone broke the input dictionary, not their
                             // input file.  I can't really unit test it so I'll leave it here as a severe error
                             // but excluding it from coverage

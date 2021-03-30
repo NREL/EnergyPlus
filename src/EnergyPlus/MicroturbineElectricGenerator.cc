@@ -126,7 +126,7 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
         bool ErrorsFound(false);
 
         state.dataIPShortCut->cCurrentModuleObject = "Generator:MicroTurbine";
-        state.dataMircoturbElectGen->NumMTGenerators = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataMircoturbElectGen->NumMTGenerators = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataMircoturbElectGen->NumMTGenerators <= 0) {
             ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
@@ -143,7 +143,7 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
             int IOStat;
             Array1D<Real64> NumArray(19);
             Array1D_string AlphArray(20);
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           GeneratorNum,
                                           AlphArray,

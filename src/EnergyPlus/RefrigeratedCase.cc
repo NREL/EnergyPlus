@@ -412,25 +412,25 @@ namespace EnergyPlus::RefrigeratedCase {
         auto &CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
         auto &CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
 
-        state.dataRefrigCase->NumSimulationCascadeCondensers = inputProcessor->getNumObjectsFound(state, "Refrigeration:Condenser:Cascade");
-        state.dataRefrigCase->NumSimulationCases = inputProcessor->getNumObjectsFound(state, "Refrigeration:Case");
-        state.dataRefrigCase->NumSimulationCaseAndWalkInLists = inputProcessor->getNumObjectsFound(state, "Refrigeration:CaseAndWalkInList");
-        state.dataRefrigCase->NumRefrigeratedRacks = inputProcessor->getNumObjectsFound(state, "Refrigeration:CompressorRack");
-        state.dataRefrigCase->NumSimulationSecondarySystems = inputProcessor->getNumObjectsFound(state, "Refrigeration:SecondarySystem");
-        state.dataRefrigCase->NumSimulationTransferLoadLists = inputProcessor->getNumObjectsFound(state, "Refrigeration:TransferLoadList");
-        state.dataRefrigCase->NumSimulationWalkIns = inputProcessor->getNumObjectsFound(state, "Refrigeration:WalkIn");
-        state.dataRefrigCase->NumRefrigSystems = inputProcessor->getNumObjectsFound(state, "Refrigeration:System");
-        state.dataRefrigCase->NumTransRefrigSystems = inputProcessor->getNumObjectsFound(state, "Refrigeration:TranscriticalSystem");
-        state.dataRefrigCase->NumSimulationCondAir = inputProcessor->getNumObjectsFound(state, "Refrigeration:Condenser:AirCooled");
-        state.dataRefrigCase->NumSimulationCondEvap = inputProcessor->getNumObjectsFound(state, "Refrigeration:Condenser:EvaporativeCooled");
-        state.dataRefrigCase->NumSimulationCondWater = inputProcessor->getNumObjectsFound(state, "Refrigeration:Condenser:WaterCooled");
-        state.dataRefrigCase->NumSimulationGasCooler = inputProcessor->getNumObjectsFound(state, "Refrigeration:GasCooler:AirCooled");
+        state.dataRefrigCase->NumSimulationCascadeCondensers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:Condenser:Cascade");
+        state.dataRefrigCase->NumSimulationCases = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:Case");
+        state.dataRefrigCase->NumSimulationCaseAndWalkInLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:CaseAndWalkInList");
+        state.dataRefrigCase->NumRefrigeratedRacks = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:CompressorRack");
+        state.dataRefrigCase->NumSimulationSecondarySystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:SecondarySystem");
+        state.dataRefrigCase->NumSimulationTransferLoadLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:TransferLoadList");
+        state.dataRefrigCase->NumSimulationWalkIns = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:WalkIn");
+        state.dataRefrigCase->NumRefrigSystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:System");
+        state.dataRefrigCase->NumTransRefrigSystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:TranscriticalSystem");
+        state.dataRefrigCase->NumSimulationCondAir = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:Condenser:AirCooled");
+        state.dataRefrigCase->NumSimulationCondEvap = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:Condenser:EvaporativeCooled");
+        state.dataRefrigCase->NumSimulationCondWater = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:Condenser:WaterCooled");
+        state.dataRefrigCase->NumSimulationGasCooler = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:GasCooler:AirCooled");
         state.dataRefrigCase->NumRefrigCondensers = state.dataRefrigCase->NumSimulationCondAir + state.dataRefrigCase->NumSimulationCondEvap + state.dataRefrigCase->NumSimulationCondWater + state.dataRefrigCase->NumSimulationCascadeCondensers;
-        state.dataRefrigCase->NumSimulationCompressors = inputProcessor->getNumObjectsFound(state, "Refrigeration:Compressor");
-        state.dataRefrigCase->NumSimulationSubcoolers = inputProcessor->getNumObjectsFound(state, "Refrigeration:Subcooler");
-        int NumCompressorLists = inputProcessor->getNumObjectsFound(state, "Refrigeration:CompressorList");
-        state.dataRefrigCase->NumRefrigChillerSets = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:RefrigerationChillerSet");
-        state.dataRefrigCase->NumSimulationRefrigAirChillers = inputProcessor->getNumObjectsFound(state, "Refrigeration:AirChiller");
+        state.dataRefrigCase->NumSimulationCompressors = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:Compressor");
+        state.dataRefrigCase->NumSimulationSubcoolers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:Subcooler");
+        int NumCompressorLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:CompressorList");
+        state.dataRefrigCase->NumRefrigChillerSets = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneHVAC:RefrigerationChillerSet");
+        state.dataRefrigCase->NumSimulationRefrigAirChillers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:AirChiller");
 
         // Set flags used later to avoid unnecessary steps.
         if (state.dataRefrigCase->NumRefrigeratedRacks == 0) state.dataRefrigCase->HaveRefrigRacks = false;
@@ -494,22 +494,22 @@ namespace EnergyPlus::RefrigeratedCase {
         DayValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataRefrigCase->RefrigPresentInZone.dimension(state.dataGlobal->NumOfZones, false);
 
-        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:Case", MaxNumArgs, MaxNumAlphasCase, MaxNumNumbersCase);
-        inputProcessor->getObjectDefMaxArgs(state,
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:Case", MaxNumArgs, MaxNumAlphasCase, MaxNumNumbersCase);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state,
             "Refrigeration:CaseAndWalkInList", MaxNumArgs, MaxNumAlphasCaseAndWalkInList, MaxNumNumbersCaseAndWalkInList);
-        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:CompressorRack", MaxNumArgs, MaxNumAlphasRack, MaxNumNumbersRack);
-        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:System", MaxNumArgs, MaxNumAlphasSys, MaxNumNumbersSys);
-        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:TranscriticalSystem", MaxNumArgs, MaxNumAlphasTransSys, MaxNumNumbersTransSys);
-        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:Condenser:AirCooled", MaxNumArgs, MaxNumAlphasConda, MaxNumNumbersConda);
-        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:Condenser:EvaporativeCooled", MaxNumArgs, MaxNumAlphasConde, MaxNumNumbersConde);
-        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:Condenser:WaterCooled", MaxNumArgs, MaxNumAlphasCondw, MaxNumNumbersCondw);
-        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:GasCooler:AirCooled", MaxNumArgs, MaxNumAlphasGasCoolera, MaxNumNumbersGasCoolera);
-        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:Compressor", MaxNumArgs, MaxNumAlphasComp, MaxNumNumbersComp);
-        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:CompressorList", MaxNumArgs, MaxNumAlphasCompressorList, MaxNumNumbersCompressorList);
-        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:WalkIn", MaxNumArgs, MaxNumAlphasWalkIn, MaxNumNumbersWalkIn);
-        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:SecondarySystem", MaxNumArgs, MaxNumAlphasSecond, MaxNumNumbersSecond);
-        inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:RefrigerationChillerSet", MaxNumArgs, MaxNumAlphasChillerSet, MaxNumNumbersChillerSet);
-        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:AirChiller", MaxNumArgs, MaxNumAlphasAirChiller, MaxNumNumbersAirChiller);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:CompressorRack", MaxNumArgs, MaxNumAlphasRack, MaxNumNumbersRack);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:System", MaxNumArgs, MaxNumAlphasSys, MaxNumNumbersSys);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:TranscriticalSystem", MaxNumArgs, MaxNumAlphasTransSys, MaxNumNumbersTransSys);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:Condenser:AirCooled", MaxNumArgs, MaxNumAlphasConda, MaxNumNumbersConda);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:Condenser:EvaporativeCooled", MaxNumArgs, MaxNumAlphasConde, MaxNumNumbersConde);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:Condenser:WaterCooled", MaxNumArgs, MaxNumAlphasCondw, MaxNumNumbersCondw);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:GasCooler:AirCooled", MaxNumArgs, MaxNumAlphasGasCoolera, MaxNumNumbersGasCoolera);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:Compressor", MaxNumArgs, MaxNumAlphasComp, MaxNumNumbersComp);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:CompressorList", MaxNumArgs, MaxNumAlphasCompressorList, MaxNumNumbersCompressorList);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:WalkIn", MaxNumArgs, MaxNumAlphasWalkIn, MaxNumNumbersWalkIn);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:SecondarySystem", MaxNumArgs, MaxNumAlphasSecond, MaxNumNumbersSecond);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:RefrigerationChillerSet", MaxNumArgs, MaxNumAlphasChillerSet, MaxNumNumbersChillerSet);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:AirChiller", MaxNumArgs, MaxNumAlphasAirChiller, MaxNumNumbersAirChiller);
 
         MaxNumAlphasAll = max(MaxNumAlphasCase,
                               MaxNumAlphasCaseAndWalkInList,
@@ -552,7 +552,7 @@ namespace EnergyPlus::RefrigeratedCase {
         if (state.dataRefrigCase->NumSimulationCases > 0) {
             CurrentModuleObject = "Refrigeration:Case";
             for (int CaseNum = 1; CaseNum <= state.dataRefrigCase->NumSimulationCases; ++CaseNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               CaseNum,
                                               Alphas,
@@ -1176,7 +1176,7 @@ namespace EnergyPlus::RefrigeratedCase {
         if (state.dataRefrigCase->NumSimulationWalkIns > 0) {
             CurrentModuleObject = "Refrigeration:WalkIn";
             for (int WalkInID = 1; WalkInID <= state.dataRefrigCase->NumSimulationWalkIns; ++WalkInID) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               WalkInID,
                                               Alphas,
@@ -1624,7 +1624,7 @@ namespace EnergyPlus::RefrigeratedCase {
             for (int CoilID = 1; CoilID <= state.dataRefrigCase->NumSimulationRefrigAirChillers; ++CoilID) {
                 // A1
                 AlphaNum = 1;
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               CoilID,
                                               Alphas,
@@ -2209,7 +2209,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
             CurrentModuleObject = "ZoneHVAC:RefrigerationChillerSet";
             for (int SetID = 1; SetID <= state.dataRefrigCase->NumRefrigChillerSets; ++SetID) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               SetID,
                                               Alphas,
@@ -2316,7 +2316,7 @@ namespace EnergyPlus::RefrigeratedCase {
         if (state.dataRefrigCase->NumSimulationCaseAndWalkInLists > 0) {
             CurrentModuleObject = "Refrigeration:CaseAndWalkInList";
             for (int ListNum = 1; ListNum <= state.dataRefrigCase->NumSimulationCaseAndWalkInLists; ++ListNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               ListNum,
                                               Alphas,
@@ -2393,7 +2393,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
             for (int RackNum = 1; RackNum <= state.dataRefrigCase->NumRefrigeratedRacks; ++RackNum) {
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               RackNum,
                                               Alphas,
@@ -2832,7 +2832,7 @@ namespace EnergyPlus::RefrigeratedCase {
             if (state.dataRefrigCase->NumSimulationCondAir > 0) {
                 CurrentModuleObject = "Refrigeration:Condenser:AirCooled";
                 for (int CondNum = 1; CondNum <= state.dataRefrigCase->NumSimulationCondAir; ++CondNum) {
-                    inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                   CurrentModuleObject,
                                                   CondNum,
                                                   Alphas,
@@ -2959,7 +2959,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 CurrentModuleObject = "Refrigeration:Condenser:EvaporativeCooled";
                 for (int CondIndex = 1; CondIndex <= state.dataRefrigCase->NumSimulationCondEvap; ++CondIndex) {
                     int CondNum = CondIndex + state.dataRefrigCase->NumSimulationCondAir;
-                    inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                   CurrentModuleObject,
                                                   CondIndex,
                                                   Alphas,
@@ -3185,7 +3185,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 CurrentModuleObject = "Refrigeration:Condenser:WaterCooled";
                 for (int CondIndex = 1; CondIndex <= state.dataRefrigCase->NumSimulationCondWater; ++CondIndex) {
                     int CondNum = CondIndex + state.dataRefrigCase->NumSimulationCondAir + state.dataRefrigCase->NumSimulationCondEvap;
-                    inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                   CurrentModuleObject,
                                                   CondIndex,
                                                   Alphas,
@@ -3345,7 +3345,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 CurrentModuleObject = "Refrigeration:Condenser:Cascade";
                 for (int CondIndex = 1; CondIndex <= state.dataRefrigCase->NumSimulationCascadeCondensers; ++CondIndex) {
                     int CondNum = CondIndex + state.dataRefrigCase->NumSimulationCondAir + state.dataRefrigCase->NumSimulationCondEvap + state.dataRefrigCase->NumSimulationCondWater;
-                    inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                   CurrentModuleObject,
                                                   CondIndex,
                                                   Alphas,
@@ -3433,7 +3433,7 @@ namespace EnergyPlus::RefrigeratedCase {
             if (state.dataRefrigCase->NumSimulationGasCooler > 0) {
                 CurrentModuleObject = "Refrigeration:GasCooler:AirCooled";
                 for (int GCNum = 1; GCNum <= state.dataRefrigCase->NumSimulationGasCooler; ++GCNum) {
-                    inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                   CurrentModuleObject,
                                                   GCNum,
                                                   Alphas,
@@ -3601,7 +3601,7 @@ namespace EnergyPlus::RefrigeratedCase {
             if (state.dataRefrigCase->NumSimulationSecondarySystems > 0) {
                 CurrentModuleObject = "Refrigeration:SecondarySystem";
                 for (int SecondaryNum = 1; SecondaryNum <= state.dataRefrigCase->NumSimulationSecondarySystems; ++SecondaryNum) {
-                    inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                   CurrentModuleObject,
                                                   SecondaryNum,
                                                   Alphas,
@@ -4215,7 +4215,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
             CurrentModuleObject = "Refrigeration:Compressor";
             for (int CompNum = 1; CompNum <= state.dataRefrigCase->NumSimulationCompressors; ++CompNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               CompNum,
                                               Alphas,
@@ -4314,7 +4314,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 CurrentModuleObject = "Refrigeration:Subcooler";
                 state.dataRefrigCase->NumSimulationMechSubcoolers = 0;
                 for (int SubcoolerNum = 1; SubcoolerNum <= state.dataRefrigCase->NumSimulationSubcoolers; ++SubcoolerNum) {
-                    inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                   CurrentModuleObject,
                                                   SubcoolerNum,
                                                   Alphas,
@@ -4400,7 +4400,7 @@ namespace EnergyPlus::RefrigeratedCase {
             if (state.dataRefrigCase->NumSimulationTransferLoadLists > 0) {
                 CurrentModuleObject = "Refrigeration:TransferLoadList";
                 for (int ListNum = 1; ListNum <= state.dataRefrigCase->NumSimulationTransferLoadLists; ++ListNum) {
-                    inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                   CurrentModuleObject,
                                                   ListNum,
                                                   Alphas,
@@ -4466,7 +4466,7 @@ namespace EnergyPlus::RefrigeratedCase {
             //**** Read Compressor Lists **********************************************************
             CurrentModuleObject = "Refrigeration:CompressorList";
             for (int ListNum = 1; ListNum <= NumCompressorLists; ++ListNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               ListNum,
                                               Alphas,
@@ -4504,7 +4504,7 @@ namespace EnergyPlus::RefrigeratedCase {
             CurrentModuleObject = "Refrigeration:System";
             for (RefrigSysNum = 1; RefrigSysNum <= state.dataRefrigCase->NumRefrigSystems; ++RefrigSysNum) {
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               RefrigSysNum,
                                               Alphas,
@@ -4964,7 +4964,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     int NumSubcooler = 1;
                     if (!lAlphaBlanks(AlphaNum)) {
                         System(RefrigSysNum).SubcoolerNum(NumSubcooler) =
-                            inputProcessor->getObjectItemNum(state, "Refrigeration:Subcooler", Alphas(AlphaNum));
+                            state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Refrigeration:Subcooler", Alphas(AlphaNum));
                         if (System(RefrigSysNum).SubcoolerNum(NumSubcooler) <= 0) {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", has an invalid " +
                                             cAlphaFieldNames(AlphaNum) + " defined as \"" + Alphas(AlphaNum) + "\".");
@@ -4976,7 +4976,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     }
                     if (!lAlphaBlanks(AlphaNum + 1)) {
                         System(RefrigSysNum).SubcoolerNum(NumSubcooler) =
-                            inputProcessor->getObjectItemNum(state, "Refrigeration:Subcooler", Alphas(AlphaNum + 1));
+                            state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Refrigeration:Subcooler", Alphas(AlphaNum + 1));
                         if (System(RefrigSysNum).SubcoolerNum(NumSubcooler) <= 0) {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", has an invalid " +
                                             cAlphaFieldNames(AlphaNum + 1) + " defined as \"" + Alphas(AlphaNum + 1) + "\".");
@@ -5286,7 +5286,7 @@ namespace EnergyPlus::RefrigeratedCase {
             for (int SubcoolerNum = 1; SubcoolerNum <= state.dataRefrigCase->NumSimulationSubcoolers; ++SubcoolerNum) {
                 if (Subcooler(SubcoolerNum).SubcoolerType == iSubcoolerType::LiquidSuction) continue;
                 Subcooler(SubcoolerNum).MechSourceSysID =
-                    inputProcessor->getObjectItemNum(state, "Refrigeration:System", Subcooler(SubcoolerNum).MechSourceSys);
+                    state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Refrigeration:System", Subcooler(SubcoolerNum).MechSourceSys);
                 if (Subcooler(SubcoolerNum).MechSourceSysID == 0) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Subcooler(SubcoolerNum).Name +
                                     "\", Mechanical Subcooler has an invalid Source Refrigeration:System=\"" + Subcooler(SubcoolerNum).MechSourceSys +
@@ -5321,7 +5321,7 @@ namespace EnergyPlus::RefrigeratedCase {
         if (state.dataRefrigCase->NumTransRefrigSystems > 0) {
             CurrentModuleObject = "Refrigeration:TranscriticalSystem";
             for (int TransRefrigSysNum = 1; TransRefrigSysNum <= state.dataRefrigCase->NumTransRefrigSystems; ++TransRefrigSysNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               TransRefrigSysNum,
                                               Alphas,

@@ -192,7 +192,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
 {
     std::string const routineName = "ElectricPowerServiceManager  getPowerManagerInput ";
 
-    numLoadCenters_ = inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Distribution");
+    numLoadCenters_ = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Distribution");
 
     if (numLoadCenters_ > 0) {
         for (auto iLoadCenterNum = 1; iLoadCenterNum <= numLoadCenters_; ++iLoadCenterNum) {
@@ -202,30 +202,30 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
     } else {
         // issue #4639. see if there are any generators, inverters, converters, or storage devcies, that really need a ElectricLoadCenter:Distribution
         bool errorsFound(false);
-        int numGenLists = inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Generators");
+        int numGenLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Generators");
         if (numGenLists > 0) {
             ShowSevereError(state, "ElectricLoadCenter:Generators input object requires an ElectricLoadCenterDistribution input object.");
             errorsFound = true;
         }
-        int numInverters = inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Inverter:Simple");
-        numInverters += inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Inverter:FunctionOfPower");
-        numInverters += inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Inverter:LookUpTable");
+        int numInverters = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Inverter:Simple");
+        numInverters += state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Inverter:FunctionOfPower");
+        numInverters += state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Inverter:LookUpTable");
         if (numInverters > 0) {
             ShowSevereError(state, "ElectricLoadCenter:Inverter:* input objects require an ElectricLoadCenter:Distribution input object.");
             errorsFound = true;
         }
-        int numStorage = inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Storage:Simple");
-        numStorage += inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Storage:Battery");
+        int numStorage = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Storage:Simple");
+        numStorage += state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Storage:Battery");
         if (numStorage > 0) {
             ShowSevereError(state, "ElectricLoadCenter:Storage:* input objects require an ElectricLoadCenter:Distribution input object.");
             errorsFound = true;
         }
-        int numGenerators = inputProcessor->getNumObjectsFound(state, "Generator:InternalCombustionEngine");
-        numGenerators += inputProcessor->getNumObjectsFound(state, "Generator:CombustionTurbine");
-        numGenerators += inputProcessor->getNumObjectsFound(state, "Generator:MicroCHP");
-        numGenerators += inputProcessor->getNumObjectsFound(state, "Generator:FuelCell");
-        numGenerators += inputProcessor->getNumObjectsFound(state, "Generator:Photovoltaic");
-        numGenerators += inputProcessor->getNumObjectsFound(state, "Generator:WindTurbine");
+        int numGenerators = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Generator:InternalCombustionEngine");
+        numGenerators += state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Generator:CombustionTurbine");
+        numGenerators += state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Generator:MicroCHP");
+        numGenerators += state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Generator:FuelCell");
+        numGenerators += state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Generator:Photovoltaic");
+        numGenerators += state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Generator:WindTurbine");
         if (numGenerators > 0) {
             ShowSevereError(state, "Electric generator input objects require an ElectricLoadCenter:Distribution input object.");
             errorsFound = true;
@@ -238,7 +238,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
         // if user input did not include an Electric Load center, create a simple default one here for reporting purposes
         //   but only if there are any other electricity components set up (yet) for metering
         int anyElectricityPresent = GetMeterIndex(state, "ELECTRICITY:FACILITY");
-        int anyPlantLoadProfilePresent = inputProcessor->getNumObjectsFound(state, "LoadProfile:Plant");
+        int anyPlantLoadProfilePresent = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "LoadProfile:Plant");
         if (anyElectricityPresent > 0 || anyPlantLoadProfilePresent > 0) {
             elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(state, 0));
             numLoadCenters_ = 1;
@@ -246,7 +246,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
     }
 
     // see if there are any transformers of the type powerInFromGrid
-    numTransformers_ = inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Transformer");
+    numTransformers_ = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Transformer");
 
     if (numTransformers_ > 0) {
         int numAlphas; // Number of elements in the alpha array
@@ -257,7 +257,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
 
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Transformer";
         for (auto loopTransformer = 1; loopTransformer <= numTransformers_; ++loopTransformer) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           loopTransformer,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -627,7 +627,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
     state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Distribution";
     errorsFound = false;
     if (objectNum > 0) {
-        inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                       state.dataIPShortCut->cCurrentModuleObject,
                                       objectNum,
                                       state.dataIPShortCut->cAlphaArgs,
@@ -647,7 +647,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             generatorListName_ = state.dataIPShortCut->cAlphaArgs(2);
             // check that
 
-            int testIndex = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Generators", generatorListName_);
+            int testIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Generators", generatorListName_);
             if (testIndex == 0) {
                 ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
@@ -875,9 +875,9 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
 
     // now that we are done with processing get input for ElectricLoadCenter:Distribution we can call child input objects without IP shortcut problems
     state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Generators";
-    int genListObjectNum = inputProcessor->getObjectItemNum(state, state.dataIPShortCut->cCurrentModuleObject, generatorListName_);
+    int genListObjectNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, state.dataIPShortCut->cCurrentModuleObject, generatorListName_);
     if (genListObjectNum > 0) {
-        inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                       state.dataIPShortCut->cCurrentModuleObject,
                                       genListObjectNum,
                                       state.dataIPShortCut->cAlphaArgs,
@@ -958,10 +958,10 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
     if (!errorsFound && transformerPresent_) {
 
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Transformer";
-        int transformerItemNum = inputProcessor->getObjectItemNum(state, state.dataIPShortCut->cCurrentModuleObject, transformerName_);
+        int transformerItemNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, state.dataIPShortCut->cCurrentModuleObject, transformerName_);
         int iOStat;
         if (transformerItemNum > 0) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           transformerItemNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -2049,13 +2049,13 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
                 // Except you need GetPVInput to have run already etc
                 // Note: you can't use state.dataIPShortCut->cAlphaArgs etc or it'll override what will still need to be processed in
                 // ElectPowerLoadCenter::ElectPowerLoadCenter after this function is called
-                int PVNum = inputProcessor->getObjectItemNum(state, objectType, UtilityRoutines::MakeUPPERCase(objectName));
+                int PVNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, objectType, UtilityRoutines::MakeUPPERCase(objectName));
                 int NumAlphas; // Number of PV Array parameter alpha names being passed
                 int NumNums;   // Number of PV Array numeric parameters are being passed
                 int IOStat;
                 Array1D_string Alphas(5);       // Alpha items for object
                 Array1D<Real64> Numbers(2);     // Numeric items for object
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               objectType,
                                               PVNum,
                                               Alphas,
@@ -2262,28 +2262,28 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
     int testInvertIndex = 0;
     int invertIDFObjectNum = 0;
 
-    testInvertIndex = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Inverter:LookUpTable", objectName);
+    testInvertIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Inverter:LookUpTable", objectName);
     if (testInvertIndex > 0) {
         foundInverter = true;
         invertIDFObjectNum = testInvertIndex;
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Inverter:LookUpTable";
         modelType_ = InverterModelType::cECLookUpTableModel;
     }
-    testInvertIndex = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Inverter:FunctionOfPower", objectName);
+    testInvertIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Inverter:FunctionOfPower", objectName);
     if (testInvertIndex > 0) {
         foundInverter = true;
         invertIDFObjectNum = testInvertIndex;
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Inverter:FunctionOfPower";
         modelType_ = InverterModelType::curveFuncOfPower;
     }
-    testInvertIndex = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Inverter:Simple", objectName);
+    testInvertIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Inverter:Simple", objectName);
     if (testInvertIndex > 0) {
         foundInverter = true;
         invertIDFObjectNum = testInvertIndex;
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Inverter:Simple";
         modelType_ = InverterModelType::simpleConstantEff;
     }
-    testInvertIndex = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Inverter:PVWatts", objectName);
+    testInvertIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Inverter:PVWatts", objectName);
     if (testInvertIndex > 0) {
         foundInverter = true;
         invertIDFObjectNum = testInvertIndex;
@@ -2293,7 +2293,7 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
 
     if (foundInverter) {
 
-        inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                       state.dataIPShortCut->cCurrentModuleObject,
                                       invertIDFObjectNum,
                                       state.dataIPShortCut->cAlphaArgs,
@@ -2697,12 +2697,12 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
     bool errorsFound = false;
     // if/when add object class name to input object this can be simplified. for now search all possible types
 
-    int testConvertIndex = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Storage:Converter", objectName);
+    int testConvertIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Storage:Converter", objectName);
 
     if (testConvertIndex > 0) {
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Storage:Converter";
 
-        inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                       state.dataIPShortCut->cCurrentModuleObject,
                                       testConvertIndex,
                                       state.dataIPShortCut->cAlphaArgs,
@@ -2965,7 +2965,7 @@ ElectricStorage::ElectricStorage( // main constructor
     }};
 
     for (auto &item : storageTypes) {
-        testStorageIndex = inputProcessor->getObjectItemNum(state, item.first, objectName);
+        testStorageIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, item.first, objectName);
         if (testStorageIndex > 0) {
             foundStorage = true;
             storageIDFObjectNum = testStorageIndex;
@@ -2976,7 +2976,7 @@ ElectricStorage::ElectricStorage( // main constructor
     }
 
     if (foundStorage) {
-        inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                       state.dataIPShortCut->cCurrentModuleObject,
                                       storageIDFObjectNum,
                                       state.dataIPShortCut->cAlphaArgs,
@@ -4167,9 +4167,9 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
     int transformerIDFObjectNum = 0;
     state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Transformer";
 
-    transformerIDFObjectNum = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Transformer", objectName);
+    transformerIDFObjectNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Transformer", objectName);
     if (transformerIDFObjectNum > 0) {
-        inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                       state.dataIPShortCut->cCurrentModuleObject,
                                       transformerIDFObjectNum,
                                       state.dataIPShortCut->cAlphaArgs,

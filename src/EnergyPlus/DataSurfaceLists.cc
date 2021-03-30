@@ -122,15 +122,15 @@ namespace EnergyPlus::DataSurfaceLists {
         auto &NumOfSurfListVentSlab(state.dataSurfLists->NumOfSurfListVentSlab);
 
         ErrorsFound = false;
-        NumOfSurfaceLists = inputProcessor->getNumObjectsFound(state, CurrentModuleObject1);
-        NumOfSurfListVentSlab = inputProcessor->getNumObjectsFound(state, CurrentModuleObject2);
+        NumOfSurfaceLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject1);
+        NumOfSurfListVentSlab = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject2);
 
         SurfList.allocate(NumOfSurfaceLists);
         SlabList.allocate(NumOfSurfListVentSlab);
 
         if (NumOfSurfaceLists > 0) {
 
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject1, NumArgs, MaxAlphas, MaxNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject1, NumArgs, MaxAlphas, MaxNumbers);
             Alphas.allocate(MaxAlphas);
             lAlphaBlanks.dimension(MaxAlphas, false);
             cAlphaFields.allocate(MaxAlphas);
@@ -140,7 +140,7 @@ namespace EnergyPlus::DataSurfaceLists {
 
             for (Item = 1; Item <= NumOfSurfaceLists; ++Item) {
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject1,
                                               Item,
                                               Alphas,
@@ -229,7 +229,7 @@ namespace EnergyPlus::DataSurfaceLists {
         }
 
         if (NumOfSurfListVentSlab > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject2, NumArgs, MaxAlphas, MaxNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject2, NumArgs, MaxAlphas, MaxNumbers);
             Alphas.allocate(MaxAlphas);
             lAlphaBlanks.dimension(MaxAlphas, false);
             cAlphaFields.allocate(MaxAlphas);
@@ -239,7 +239,7 @@ namespace EnergyPlus::DataSurfaceLists {
 
             for (Item = 1; Item <= NumOfSurfListVentSlab; ++Item) {
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject2,
                                               Item,
                                               Alphas,

@@ -405,7 +405,7 @@ void ManageHVAC(EnergyPlusData &state)
                 UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
                 if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                     state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
-                    if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
+                    if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager) state.dataHVACSizingSimMgr->hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
                 }
                 UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
             }
@@ -452,7 +452,7 @@ void ManageHVAC(EnergyPlusData &state)
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                 state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
-                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
+                if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager) state.dataHVACSizingSimMgr->hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
             }
         } else if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface) { // added for FMI
             if (state.dataGlobal->BeginDayFlag && !state.dataEnvrn->PrintEnvrnStampWarmupPrinted) {
@@ -1790,7 +1790,7 @@ void SimHVAC(EnergyPlusData &state)
             DoSetPointTest = false;
         }
 
-        if (stillNeedToReportStandardRatings) {
+        if (state.dataCoilCooingDX->stillNeedToReportStandardRatings) {
             if (!state.dataGlobal->ZoneSizingCalc && !state.dataGlobal->SysSizingCalc && !state.dataGlobal->WarmupFlag) {
                 CoilCoolingDX::reportAllStandardRatings(state);
             }

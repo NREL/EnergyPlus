@@ -357,7 +357,7 @@ namespace HVACUnitaryBypassVAV {
         auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
         auto &NumCBVAV(state.dataHVACUnitaryBypassVAV->NumCBVAV);
 
-        NumCBVAV = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumCBVAV = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         // allocate the data structures
         CBVAV.allocate(NumCBVAV);
@@ -367,7 +367,7 @@ namespace HVACUnitaryBypassVAV {
         for (int CBVAVNum = 1; CBVAVNum <= NumCBVAV; ++CBVAVNum) {
             int HeatCoilInletNodeNum = 0;
             int HeatCoilOutletNodeNum = 0;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CBVAVNum,
                                           Alphas,

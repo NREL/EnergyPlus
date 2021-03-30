@@ -257,7 +257,7 @@ namespace EnergyPlus::CoolingPanelSimple {
         int IOStat;
         bool ErrorsFound(false); // If errors detected in input
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-        state.dataChilledCeilingPanelSimple->NumCoolingPanels = inputProcessor->getNumObjectsFound(state, cCMO_CoolingPanel_Simple);
+        state.dataChilledCeilingPanelSimple->NumCoolingPanels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_CoolingPanel_Simple);
 
         // Count total number of baseboard units
 
@@ -269,7 +269,7 @@ namespace EnergyPlus::CoolingPanelSimple {
         // Get the data from the user input related to cooling panels
         for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCMO_CoolingPanel_Simple,
                                           CoolingPanelNum,
                                           state.dataIPShortCut->cAlphaArgs,

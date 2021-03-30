@@ -59,7 +59,7 @@ using namespace EnergyPlus::Psychrometrics;
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnHPb_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: TEMP. IS FROM  20 C  TO   40 C
     Real64 H = 7.5223e4 - 1.78637e4;
@@ -150,7 +150,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnHPb_Test)
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnPb_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: general
     Real64 PB = 101325.0;
@@ -275,7 +275,7 @@ inline Real64 PsyCpAirFnWTdb(Real64 const dw, // humidity ratio {kgWater/kgDryAi
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyCpAirFn_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: analytical PsyCpAirFnW is independent of temperature
     Real64 W = 0.0080;
@@ -346,7 +346,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyCpAirFn_Test)
 TEST_F(EnergyPlusFixture, Psychrometrics_CpAirValue_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: dry cooling process test, delta enthalpy vs cpair times delta T
     Real64 W1 = 0.0030;
@@ -391,7 +391,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirValue_Test)
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyTwbFnTdbWPb_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test when wet bulb temperature is below zero
     Real64 TDB = 1; // C
@@ -406,7 +406,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyTwbFnTdbWPb_Test)
 TEST_F(EnergyPlusFixture, Psychrometrics_CpAirAverageValue_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: heating process, constant humidity ratio
     Real64 W1 = 0.0030;

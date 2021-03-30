@@ -581,6 +581,10 @@ struct SystemAvailabilityManagerData : BaseGlobalStruct {
     bool MyOneTimeFlag = true; // One time flag
     bool MyEnvrnFlag = true;
 
+    Real64 CurrentEndTime = 0.0;     // Current end time
+    Real64 CurrentEndTimeLast = 0.0; // last end time
+    Real64 TimeStepSysLast = 0.0;    // last system time step
+
     void clear_state() override
     {
         NumSchedSysAvailMgrs = 0;
@@ -620,6 +624,9 @@ struct SystemAvailabilityManagerData : BaseGlobalStruct {
         OptStart_AdaTempGradTrdCool.deallocate();
         MyOneTimeFlag = true;
         MyEnvrnFlag = true;
+        CurrentEndTime = 0.0;
+        CurrentEndTimeLast = 0.0;
+        TimeStepSysLast = 0.0;
     }
 
     // Default Constructor

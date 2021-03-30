@@ -467,30 +467,11 @@ void DXFOut(EnergyPlusData &state,
     // Use the surface absolute coordinate information to produce
     // lines.
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
-        using namespace DataSurfaces;
+    using namespace DataSurfaces;
     using namespace DataSurfaceColors;
-    using DataStringGlobals::VerString;
     using namespace DXFEarClipping;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    //  integer, dimension(7) :: colorno=(/3,4,5,6,2,8,9/)
     bool ThickPolyline(false);
     bool RegularPolyline(false);
     std::string PolylineWidth(" 0.55");
@@ -548,7 +529,7 @@ void DXFOut(EnergyPlusData &state,
 
     print(dxffile, Format_707); // Comment
 
-    print(dxffile, Format_708, "Program Version", ",", VerString);
+    print(dxffile, Format_708, "Program Version", ",", state.dataStrGlobals->VerStringVar);
 
     if (PolygonAction.empty()) {
         print(dxffile, Format_708, "Polygon Action", ",", "ThickPolyline");
@@ -841,29 +822,9 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
     // Use the surface absolute coordinate information to produce
     // lines.
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
-        using namespace DataSurfaces;
+    using namespace DataSurfaces;
     using namespace DataSurfaceColors;
-    using DataStringGlobals::VerString;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    //  integer, dimension(7) :: colorno=(/3,4,5,6,2,8,9/)
 
     // Formats
     constexpr auto Format_702("  0\nSECTION\n  2\nENTITIES\n");
@@ -887,7 +848,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
 
     print(dxffile, Format_707); // Comment
 
-    print(dxffile, Format_708, "Program Version", ",", VerString);
+    print(dxffile, Format_708, "Program Version", ",", state.dataStrGlobals->VerStringVar);
 
     print(dxffile, Format_708, "DXF using Lines", ' ', ' ');
 
@@ -1049,29 +1010,10 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
     // Use the surface absolute coordinate information to produce
     // lines.
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
-        using namespace DataSurfaces;
+    using namespace DataSurfaces;
     using namespace DataSurfaceColors;
-    using DataStringGlobals::VerString;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    //  integer, dimension(7) :: colorno=(/3,4,5,6,2,8,9/)
     std::string const PolylineWidth(" 0.55");
 
     constexpr auto Format_702("  0\nSECTION\n  2\nENTITIES\n");
@@ -1095,7 +1037,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
 
     print(dxffile, Format_707); // Comment
 
-    print(dxffile, Format_708, "Program Version", ",", VerString);
+    print(dxffile, Format_708, "Program Version", ",", state.dataStrGlobals->VerStringVar);
     print(dxffile, Format_708, "DXF using Wireframe", ' ', ' ');
 
     WriteDXFCommon(state, dxffile, ColorScheme);
@@ -1786,25 +1728,12 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     // Use the surface absolute coordinate information to produce
     // lines.
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
-        using namespace DataSurfaces;
-    using DataStringGlobals::VerString;
+    using namespace DataSurfaces;
     using namespace DXFEarClipping;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static Array1D_string const colorstring(7, {"WALL", "WINDOW", "FIXEDSHADE", "SUBSHADE", "ROOF", "FLOOR", "BLDGSHADE"});
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string ShadeType;
@@ -1847,9 +1776,9 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     print(wrlfile, Format_702);
 
     if (ColorScheme == "") {
-        print(wrlfile, Format_707, state.dataHeatBal->BuildingName, VerString, "Default"); // World Info
+        print(wrlfile, Format_707, state.dataHeatBal->BuildingName, state.dataStrGlobals->VerStringVar, "Default"); // World Info
     } else {
-        print(wrlfile, Format_707, state.dataHeatBal->BuildingName, VerString, ColorScheme); // World Info
+        print(wrlfile, Format_707, state.dataHeatBal->BuildingName, state.dataStrGlobals->VerStringVar, ColorScheme); // World Info
     }
 
     print(wrlfile, "# Zone Names\n");

@@ -272,7 +272,7 @@ namespace VentilatedSlab {
         // Figure out how many Ventilated Slab Systems there are in the input file
 
         SteamMessageNeeded = true;
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
         cAlphaArgs.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
         cNumericFields.allocate(NumNumbers);
@@ -283,7 +283,7 @@ namespace VentilatedSlab {
         // make sure data is gotten for surface lists
         BaseNum = GetNumberOfSurfListVentSlab(state);
 
-        state.dataVentilatedSlab->NumOfVentSlabs = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataVentilatedSlab->NumOfVentSlabs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         // Allocate the local derived type and do one-time initializations for all parts of it
 
         state.dataVentilatedSlab->VentSlab.allocate(state.dataVentilatedSlab->NumOfVentSlabs);
@@ -292,7 +292,7 @@ namespace VentilatedSlab {
 
         for (Item = 1; Item <= state.dataVentilatedSlab->NumOfVentSlabs; ++Item) { // Begin looping over the entire ventilated slab systems found in the input file...
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Item,
                                           state.dataIPShortCut->cAlphaArgs,

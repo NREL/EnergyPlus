@@ -200,6 +200,7 @@ struct EnvironmentData : BaseGlobalStruct {
     int varyingLocationSchedIndexLong = 0;
     int varyingOrientationSchedIndex = 0;
     bool forceBeginEnvResetSuppress = false;            // for PerformancePrecisionTradeoffs
+    bool oneTimeCompRptHeaderFlag = true;
 
     void clear_state() override
     {
@@ -319,6 +320,7 @@ struct EnvironmentData : BaseGlobalStruct {
         this->varyingLocationSchedIndexLong = 0;
         this->varyingOrientationSchedIndex = 0;
         this->forceBeginEnvResetSuppress = false;
+        this->oneTimeCompRptHeaderFlag = true;
     }
 };
 

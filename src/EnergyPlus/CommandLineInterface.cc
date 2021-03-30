@@ -113,7 +113,7 @@ namespace CommandLineInterface {
         // Define options
         ezOptionParser opt;
 
-        opt.overview = VerString + "\nPythonLinkage: " + PluginManagement::pythonStringForUsage(state);
+        opt.overview = state.dataStrGlobals->VerStringVar + "\nPythonLinkage: " + PluginManagement::pythonStringForUsage(state);
 
         opt.syntax = "energyplus [options] [input-file]";
 
@@ -202,7 +202,7 @@ namespace CommandLineInterface {
         }
 
         if (opt.isSet("-v")) {
-            DisplayString(state, VerString);
+            DisplayString(state, state.dataStrGlobals->VerStringVar);
             if (eplusRunningViaAPI) {
                 // we need another return code to let runEnergyPlusAsLibrary know it should not try to run anything
                 return static_cast<int>(ReturnCodes::SuccessButHelper);

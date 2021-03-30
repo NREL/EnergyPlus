@@ -150,12 +150,12 @@ namespace EnergyPlus::PollutionModule {
 
         // First determine if the Pollution reporting has been triggered, and is not exit.
         cCurrentModuleObject = "Output:EnvironmentalImpactFactors";
-        NumPolluteRpt = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumPolluteRpt = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataPollutionModule->PollutionReportSetup = true;
 
         for (Loop = 1; Loop <= NumPolluteRpt; ++Loop) {
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -207,10 +207,10 @@ namespace EnergyPlus::PollutionModule {
         state.dataPollutionModule->GetInputFlagPollution = false;
 
         cCurrentModuleObject = "EnvironmentalImpactFactors";
-        state.dataPollutionModule->NumEnvImpactFactors = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataPollutionModule->NumEnvImpactFactors = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataPollutionModule->NumEnvImpactFactors > 0) {
             // Now find and load all of the user inputs and factors.
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           1,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -257,11 +257,11 @@ namespace EnergyPlus::PollutionModule {
 
         // Compare all of the Fuel Factors and compare to PollutionCalculationFactors List
         cCurrentModuleObject = "FuelFactors";
-        state.dataPollutionModule->NumFuelFactors = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataPollutionModule->NumFuelFactors = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         for (Loop = 1; Loop <= state.dataPollutionModule->NumFuelFactors; ++Loop) {
             // Now find and load all of the user inputs and factors.
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
                                           state.dataIPShortCut->cAlphaArgs,

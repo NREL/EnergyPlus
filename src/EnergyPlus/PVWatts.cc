@@ -219,7 +219,7 @@ namespace PVWatts {
         int IOStat;
         bool errorsFound = false;
 
-        inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                       "Generator:PVWatts",
                                       objNum,
                                       cAlphaArgs,
@@ -452,7 +452,7 @@ namespace PVWatts {
     PVWattsGenerator &GetOrCreatePVWattsGenerator(EnergyPlusData &state, std::string const &GeneratorName)
     {
         // Find the generator, and create a new one if it hasn't been loaded yet.
-        int ObjNum = inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(GeneratorName));
+        int ObjNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(GeneratorName));
         assert(ObjNum >= 0);
         if (ObjNum == 0) {
             ShowFatalError(state, "Cannot find Generator:PVWatts " + GeneratorName);

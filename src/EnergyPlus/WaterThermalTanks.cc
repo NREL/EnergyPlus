@@ -671,7 +671,7 @@ namespace EnergyPlus::WaterThermalTanks {
             int NumAlphas;
             int NumNums;
             int IOStat;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           DesuperheaterNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -1095,7 +1095,7 @@ namespace EnergyPlus::WaterThermalTanks {
         bool ErrorsFound = false;
 
         int const NumPumpedCondenser =
-            inputProcessor->getNumObjectsFound(state, cHPWHPumpedCondenser); // number of WaterHeater:HeatPump:PumpedCondenser objects
+                state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cHPWHPumpedCondenser); // number of WaterHeater:HeatPump:PumpedCondenser objects
         int nAlphaOffset;            // the difference of array location between alpha items between pumped and wrapped condensers
         int nNumericOffset;          // the difference of array location between numeric items between pumped and wrapped condensers
         int nNumPossibleNumericArgs; // the number of possible numeric arguments in the idd
@@ -1134,7 +1134,7 @@ namespace EnergyPlus::WaterThermalTanks {
             int NumAlphas;
             int NumNums;
             int IOStat;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           HPWaterHeaterNumOfSpecificType,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -2233,7 +2233,7 @@ namespace EnergyPlus::WaterThermalTanks {
             int NumAlphas;
             int NumNums;
             int IOStat;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           WaterThermalTankNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -2661,7 +2661,7 @@ namespace EnergyPlus::WaterThermalTanks {
             int NumAlphas;
             int NumNums;
             int IOStat;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           WaterThermalTankNum - state.dataWaterThermalTanks->numWaterHeaterMixed,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -3232,7 +3232,7 @@ namespace EnergyPlus::WaterThermalTanks {
             int NumAlphas;
             int NumNums;
             int IOStat;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           WaterThermalTankNum - (state.dataWaterThermalTanks->numWaterHeaterMixed + state.dataWaterThermalTanks->numWaterHeaterStratified),
                                           state.dataIPShortCut->cAlphaArgs,
@@ -3507,7 +3507,7 @@ namespace EnergyPlus::WaterThermalTanks {
             int NumNums;
             int NumAlphas;
             int IOStat;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           WaterThermalTankNum - (state.dataWaterThermalTanks->numWaterHeaterMixed + state.dataWaterThermalTanks->numWaterHeaterStratified + state.dataWaterThermalTanks->numChilledWaterMixed),
                                           state.dataIPShortCut->cAlphaArgs,
@@ -3886,14 +3886,14 @@ namespace EnergyPlus::WaterThermalTanks {
         RefrigeratedCase::CheckRefrigerationInput(state);
 
         if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
-            state.dataWaterThermalTanks->numWaterHeaterMixed = inputProcessor->getNumObjectsFound(state, cMixedWHModuleObj);
-            state.dataWaterThermalTanks->numWaterHeaterStratified = inputProcessor->getNumObjectsFound(state, cStratifiedWHModuleObj);
-            state.dataWaterThermalTanks->numChilledWaterMixed = inputProcessor->getNumObjectsFound(state, cMixedCWTankModuleObj);
-            state.dataWaterThermalTanks->numChilledWaterStratified = inputProcessor->getNumObjectsFound(state, cStratifiedCWTankModuleObj);
+            state.dataWaterThermalTanks->numWaterHeaterMixed = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cMixedWHModuleObj);
+            state.dataWaterThermalTanks->numWaterHeaterStratified = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cStratifiedWHModuleObj);
+            state.dataWaterThermalTanks->numChilledWaterMixed = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cMixedCWTankModuleObj);
+            state.dataWaterThermalTanks->numChilledWaterStratified = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cStratifiedCWTankModuleObj);
             state.dataWaterThermalTanks->numWaterThermalTank = state.dataWaterThermalTanks->numWaterHeaterMixed + state.dataWaterThermalTanks->numWaterHeaterStratified + state.dataWaterThermalTanks->numChilledWaterMixed + state.dataWaterThermalTanks->numChilledWaterStratified;
             state.dataWaterThermalTanks->numHeatPumpWaterHeater =
-                inputProcessor->getNumObjectsFound(state, cHPWHPumpedCondenser) + inputProcessor->getNumObjectsFound(state, cHPWHWrappedCondenser);
-            state.dataWaterThermalTanks->numWaterHeaterDesuperheater = inputProcessor->getNumObjectsFound(state, cCoilDesuperheater);
+                    state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cHPWHPumpedCondenser) + state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cHPWHWrappedCondenser);
+            state.dataWaterThermalTanks->numWaterHeaterDesuperheater = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoilDesuperheater);
 
             if (state.dataWaterThermalTanks->numWaterThermalTank > 0) {
                 static constexpr auto Format_720(
@@ -4011,7 +4011,7 @@ namespace EnergyPlus::WaterThermalTanks {
             if (state.dataWaterThermalTanks->numHeatPumpWaterHeater > 0) {
 
                 int const NumPumpedCondenser =
-                    inputProcessor->getNumObjectsFound(state, cHPWHPumpedCondenser); // number of WaterHeater:HeatPump:PumpedCondenser objects
+                        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cHPWHPumpedCondenser); // number of WaterHeater:HeatPump:PumpedCondenser objects
                 for (int HPWaterHeaterNum = 1; HPWaterHeaterNum <= state.dataWaterThermalTanks->numHeatPumpWaterHeater; ++HPWaterHeaterNum) {
 
                     // Create reference to current HPWH object in array.
@@ -4372,7 +4372,7 @@ namespace EnergyPlus::WaterThermalTanks {
 
             // Get water heater sizing input.
             state.dataIPShortCut->cCurrentModuleObject = "WaterHeater:Sizing";
-            state.dataWaterThermalTanks->numWaterHeaterSizing = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+            state.dataWaterThermalTanks->numWaterHeaterSizing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
             if (state.dataWaterThermalTanks->numWaterHeaterSizing > 0) {
 
@@ -4380,7 +4380,7 @@ namespace EnergyPlus::WaterThermalTanks {
                     int NumAlphas;
                     int NumNums;
                     int IOStat;
-                    inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                   state.dataIPShortCut->cCurrentModuleObject,
                                                   WHsizingNum,
                                                   state.dataIPShortCut->cAlphaArgs,

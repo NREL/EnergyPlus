@@ -303,7 +303,7 @@ namespace EnergyPlus::ChillerExhaustAbsorption {
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "ChillerHeater:Absorption:DoubleEffect";
-        int NumExhaustAbsorbers = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        int NumExhaustAbsorbers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumExhaustAbsorbers <= 0) {
             ShowSevereError(state, "No " + cCurrentModuleObject + " equipment found in input file");
@@ -318,7 +318,7 @@ namespace EnergyPlus::ChillerExhaustAbsorption {
         // LOAD ARRAYS
 
         for (AbsorberNum = 1; AbsorberNum <= NumExhaustAbsorbers; ++AbsorberNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           AbsorberNum,
                                           state.dataIPShortCut->cAlphaArgs,

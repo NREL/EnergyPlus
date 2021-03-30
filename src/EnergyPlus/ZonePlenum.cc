@@ -259,10 +259,10 @@ namespace EnergyPlus::ZonePlenum {
         static std::string const RoutineName("GetZonePlenumInput: "); // include trailing blank space
         std::string InducedNodeListName;
 
-        inputProcessor->getObjectDefMaxArgs(state, "AirLoopHVAC:ReturnPlenum", NumArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirLoopHVAC:ReturnPlenum", NumArgs, NumAlphas, NumNums);
         MaxNums = NumNums;
         MaxAlphas = NumAlphas;
-        inputProcessor->getObjectDefMaxArgs(state, "AirLoopHVAC:SupplyPlenum", NumArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirLoopHVAC:SupplyPlenum", NumArgs, NumAlphas, NumNums);
         MaxNums = max(NumNums, MaxNums);
         MaxAlphas = max(NumAlphas, MaxAlphas);
         AlphArray.allocate(MaxAlphas);
@@ -271,13 +271,13 @@ namespace EnergyPlus::ZonePlenum {
         NumArray.dimension(MaxNums, 0.0);
         lAlphaBlanks.dimension(MaxAlphas, true);
         lNumericBlanks.dimension(MaxNums, true);
-        inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumArgs, NumAlphas, NumNums);
         NodeNums.dimension(NumArgs, 0);
 
         InducedNodeListName = "";
 
-        state.dataZonePlenum->NumZoneReturnPlenums = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:ReturnPlenum");
-        state.dataZonePlenum->NumZoneSupplyPlenums = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:SupplyPlenum");
+        state.dataZonePlenum->NumZoneReturnPlenums = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:ReturnPlenum");
+        state.dataZonePlenum->NumZoneSupplyPlenums = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:SupplyPlenum");
         state.dataZonePlenum->NumZonePlenums = state.dataZonePlenum->NumZoneReturnPlenums + state.dataZonePlenum->NumZoneSupplyPlenums;
 
         if (state.dataZonePlenum->NumZoneReturnPlenums > 0) state.dataZonePlenum->ZoneRetPlenCond.allocate(state.dataZonePlenum->NumZoneReturnPlenums);
@@ -293,7 +293,7 @@ namespace EnergyPlus::ZonePlenum {
 
             CurrentModuleObject = "AirLoopHVAC:ReturnPlenum";
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           ZonePlenumNum,
                                           AlphArray,
@@ -456,7 +456,7 @@ namespace EnergyPlus::ZonePlenum {
 
             CurrentModuleObject = "AirLoopHVAC:SupplyPlenum";
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           ZonePlenumNum,
                                           AlphArray,

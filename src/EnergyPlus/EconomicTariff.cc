@@ -163,10 +163,10 @@ namespace EnergyPlus::EconomicTariff {
         auto &tariff(state.dataEconTariff->tariff);
 
         CurrentModuleObject = "UtilityCost:Tariff";
-        state.dataEconTariff->numTariff = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataEconTariff->numTariff = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         tariff.allocate(state.dataEconTariff->numTariff);
         for (iInObj = 1; iInObj <= state.dataEconTariff->numTariff; ++iInObj) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -626,10 +626,10 @@ namespace EnergyPlus::EconomicTariff {
         auto &qualify(state.dataEconTariff->qualify);
 
         CurrentModuleObject = "UtilityCost:Qualify";
-        state.dataEconTariff->numQualify = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataEconTariff->numQualify = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         qualify.allocate(state.dataEconTariff->numQualify);
         for (iInObj = 1; iInObj <= state.dataEconTariff->numQualify; ++iInObj) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -710,10 +710,10 @@ namespace EnergyPlus::EconomicTariff {
         auto &tariff(state.dataEconTariff->tariff);
 
         CurrentModuleObject = "UtilityCost:Charge:Simple";
-        state.dataEconTariff->numChargeSimple = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataEconTariff->numChargeSimple = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         chargeSimple.allocate(state.dataEconTariff->numChargeSimple);
         for (iInObj = 1; iInObj <= state.dataEconTariff->numChargeSimple; ++iInObj) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -787,10 +787,10 @@ namespace EnergyPlus::EconomicTariff {
 
         CurrentModuleObject = "UtilityCost:Charge:Block";
         hugeNumber = HUGE_(hugeNumber);
-        state.dataEconTariff->numChargeBlock = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataEconTariff->numChargeBlock = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         chargeBlock.allocate(state.dataEconTariff->numChargeBlock);
         for (iInObj = 1; iInObj <= state.dataEconTariff->numChargeBlock; ++iInObj) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -887,10 +887,10 @@ namespace EnergyPlus::EconomicTariff {
         auto &ratchet(state.dataEconTariff->ratchet);
 
         CurrentModuleObject = "UtilityCost:Ratchet";
-        state.dataEconTariff->numRatchet = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataEconTariff->numRatchet = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         ratchet.allocate(state.dataEconTariff->numRatchet);
         for (iInObj = 1; iInObj <= state.dataEconTariff->numRatchet; ++iInObj) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -958,9 +958,9 @@ namespace EnergyPlus::EconomicTariff {
         auto &econVar(state.dataEconTariff->econVar);
 
         CurrentModuleObject = "UtilityCost:Variable";
-        numEconVarObj = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        numEconVarObj = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         for (iInObj = 1; iInObj <= numEconVarObj; ++iInObj) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -1033,7 +1033,7 @@ namespace EnergyPlus::EconomicTariff {
         auto &computation(state.dataEconTariff->computation);
 
         CurrentModuleObject = "UtilityCost:Computation";
-        state.dataEconTariff->numComputation = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataEconTariff->numComputation = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         computation.allocate(state.dataEconTariff->numTariff); // not the number of Computations but the number of tariffs
         // set default values for computation
         for (auto &e : computation) {
@@ -1043,7 +1043,7 @@ namespace EnergyPlus::EconomicTariff {
             e.isUserDef = false;
         }
         for (iInObj = 1; iInObj <= state.dataEconTariff->numComputation; ++iInObj) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -1111,12 +1111,12 @@ namespace EnergyPlus::EconomicTariff {
         int i;
 
         initializeMonetaryUnit(state);
-        NumCurrencyType = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumCurrencyType = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataCostEstimateManager->selectedMonetaryUnit = 0; // invalid
         if (NumCurrencyType == 0) {
             state.dataCostEstimateManager->selectedMonetaryUnit = 1; // USD - U.S. Dollar
         } else if (NumCurrencyType == 1) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           1,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -4147,8 +4147,8 @@ namespace EnergyPlus::EconomicTariff {
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
                     if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                                 tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost");
                         }
                     }
@@ -4208,8 +4208,8 @@ namespace EnergyPlus::EconomicTariff {
                 columnWidth = 14; // array assignment - same for all columns
                 WriteSubtitle(state, "Tariff Summary");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
+                if (state.dataSQLiteProcedures->sqlite) {
+                    state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary");
                 }
                 if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
@@ -4289,8 +4289,8 @@ namespace EnergyPlus::EconomicTariff {
                     columnWidth = 14; // array assignment - same for all columns
                     WriteSubtitle(state, "General");
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "Tariff Report", tariff(iTariff).tariffName, "General");
                     }
                     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
@@ -4680,8 +4680,8 @@ namespace EnergyPlus::EconomicTariff {
         columnWidth = 14; // array assignment - same for all columns
         WriteSubtitle(state, titleString);
         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-        if (sqlite) {
-            sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Tariff Report", forString, titleString);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Tariff Report", forString, titleString);
         }
         if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
             state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Tariff Report", forString,

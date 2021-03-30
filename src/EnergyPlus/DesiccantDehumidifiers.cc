@@ -326,8 +326,8 @@ namespace DesiccantDehumidifiers {
         auto &TotalArgs(state.dataDesiccantDehumidifiers->TotalArgs);
         auto &SteamDensity(state.dataDesiccantDehumidifiers->SteamDensity);
 
-        state.dataDesiccantDehumidifiers->NumSolidDesicDehums = inputProcessor->getNumObjectsFound(state, dehumidifierDesiccantNoFans);
-        state.dataDesiccantDehumidifiers->NumGenericDesicDehums = inputProcessor->getNumObjectsFound(state, "Dehumidifier:Desiccant:System");
+        state.dataDesiccantDehumidifiers->NumSolidDesicDehums = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, dehumidifierDesiccantNoFans);
+        state.dataDesiccantDehumidifiers->NumGenericDesicDehums = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Dehumidifier:Desiccant:System");
         state.dataDesiccantDehumidifiers->NumDesicDehums =
             state.dataDesiccantDehumidifiers->NumSolidDesicDehums + state.dataDesiccantDehumidifiers->NumGenericDesicDehums;
         // allocate the data array
@@ -335,10 +335,10 @@ namespace DesiccantDehumidifiers {
         state.dataDesiccantDehumidifiers->UniqueDesicDehumNames.reserve(state.dataDesiccantDehumidifiers->NumDesicDehums);
         state.dataDesiccantDehumidifiers->GetInputDesiccantDehumidifier = false;
 
-        inputProcessor->getObjectDefMaxArgs(state, dehumidifierDesiccantNoFans, TotalArgs, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, dehumidifierDesiccantNoFans, TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs(state, "Dehumidifier:Desiccant:System", TotalArgs, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Dehumidifier:Desiccant:System", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -354,7 +354,7 @@ namespace DesiccantDehumidifiers {
         for (DesicDehumIndex = 1; DesicDehumIndex <= state.dataDesiccantDehumidifiers->NumSolidDesicDehums; ++DesicDehumIndex) {
             RegenCoilAirInletNode = 0;
             RegenCoilAirOutletNode = 0;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           DesicDehumIndex,
                                           Alphas,
@@ -711,7 +711,7 @@ namespace DesiccantDehumidifiers {
             DesicDehumNum = DesicDehumIndex + state.dataDesiccantDehumidifiers->NumSolidDesicDehums;
             DesicDehum(DesicDehumNum).DehumType = CurrentModuleObject;
             DesicDehum(DesicDehumNum).DehumTypeCode = DesicDehumType::Generic;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           DesicDehum(DesicDehumNum).DehumType,
                                           DesicDehumIndex,
                                           Alphas,

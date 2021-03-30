@@ -270,11 +270,11 @@ namespace EnergyPlus::Pumps {
         ErrorsFound = false;
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
-        NumVarSpeedPumps = inputProcessor->getNumObjectsFound(state, cPump_VarSpeed);
-        NumConstSpeedPumps = inputProcessor->getNumObjectsFound(state, cPump_ConSpeed);
-        NumCondensatePumps = inputProcessor->getNumObjectsFound(state, cPump_Cond);
-        NumPumpBankSimpleVar = inputProcessor->getNumObjectsFound(state, cPumpBank_VarSpeed);
-        NumPumpBankSimpleConst = inputProcessor->getNumObjectsFound(state, cPumpBank_ConSpeed);
+        NumVarSpeedPumps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cPump_VarSpeed);
+        NumConstSpeedPumps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cPump_ConSpeed);
+        NumCondensatePumps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cPump_Cond);
+        NumPumpBankSimpleVar = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cPumpBank_VarSpeed);
+        NumPumpBankSimpleConst = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cPumpBank_ConSpeed);
         state.dataPumps->NumPumps = NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps + NumPumpBankSimpleVar + NumPumpBankSimpleConst;
 
         if (state.dataPumps->NumPumps <= 0) {
@@ -290,7 +290,7 @@ namespace EnergyPlus::Pumps {
 
         for (NumVarPump = 1; NumVarPump <= NumVarSpeedPumps; ++NumVarPump) {
             PumpNum = NumVarPump;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           NumVarPump,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -497,7 +497,7 @@ namespace EnergyPlus::Pumps {
 
         for (NumConstPump = 1; NumConstPump <= NumConstSpeedPumps; ++NumConstPump) {
             PumpNum = NumVarSpeedPumps + NumConstPump;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           NumConstPump,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -635,7 +635,7 @@ namespace EnergyPlus::Pumps {
         cCurrentModuleObject = cPump_Cond;
         for (NumCondPump = 1; NumCondPump <= NumCondensatePumps; ++NumCondPump) {
             PumpNum = NumCondPump + NumVarSpeedPumps + NumConstSpeedPumps;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           NumCondPump,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -745,7 +745,7 @@ namespace EnergyPlus::Pumps {
         cCurrentModuleObject = cPumpBank_VarSpeed;
         for (NumVarPumpBankSimple = 1; NumVarPumpBankSimple <= NumPumpBankSimpleVar; ++NumVarPumpBankSimple) {
             PumpNum = NumVarPumpBankSimple + NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           NumVarPumpBankSimple,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -867,7 +867,7 @@ namespace EnergyPlus::Pumps {
         cCurrentModuleObject = cPumpBank_ConSpeed;
         for (NumConstPumpBankSimple = 1; NumConstPumpBankSimple <= NumPumpBankSimpleConst; ++NumConstPumpBankSimple) {
             PumpNum = NumConstPumpBankSimple + NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps + NumPumpBankSimpleVar;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           NumConstPumpBankSimple,
                                           state.dataIPShortCut->cAlphaArgs,

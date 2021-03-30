@@ -102,8 +102,6 @@ static std::string const BlankString;
 
 using json = nlohmann::json;
 
-std::unique_ptr<InputProcessor> inputProcessor = nullptr;
-
 InputProcessor::InputProcessor() : idf_parser(std::unique_ptr<IdfParser>(new IdfParser())), data(std::unique_ptr<DataStorage>(new DataStorage()))
 {
     auto const embeddedEpJSONSchema = EmbeddedEpJSONSchema::embeddedEpJSONSchema();
@@ -114,7 +112,11 @@ InputProcessor::InputProcessor() : idf_parser(std::unique_ptr<IdfParser>(new Idf
     for (auto it = loc.begin(); it != loc.end(); ++it) {
         caseInsensitiveObjectMap.emplace(convertToUpper(it.key()), it.key());
     }
-
+    idf_parser = std::unique_ptr<IdfParser>(new IdfParser());
+    data = std::unique_ptr<DataStorage>(new DataStorage());
+    epJSON = json::object();
+//    objectCacheMap.clear();
+//    unusedInputs.clear();
     validation = std::unique_ptr<Validation>(new Validation(&schema));
 }
 
@@ -178,16 +180,14 @@ json const &InputProcessor::getPatternProperties(EnergyPlusData &state, json con
 
 // Functions
 
-void InputProcessor::clear_state()
-{
-    idf_parser = std::unique_ptr<IdfParser>(new IdfParser());
-    data = std::unique_ptr<DataStorage>(new DataStorage());
-    epJSON = json::object();
-    objectCacheMap.clear();
-    unusedInputs.clear();
-
-    validation = std::unique_ptr<Validation>(new Validation(&schema));
-}
+//void InputProcessor::clear_state() {
+//    idf_parser = std::unique_ptr<IdfParser>(new IdfParser());
+//    data = std::unique_ptr<DataStorage>(new DataStorage());
+//    epJSON = json::object();
+//    objectCacheMap.clear();
+//    unusedInputs.clear();
+//    validation = std::unique_ptr<Validation>(new Validation(&schema));
+//}
 
 std::vector<std::string> const &InputProcessor::validationErrors()
 {
@@ -563,7 +563,8 @@ const json &InputProcessor::getObjectInstances(std::string const &ObjType)
     return epJSON.find(ObjType).value();
 }
 
-InputProcessor::MaxFields InputProcessor::findMaxFields(EnergyPlusData &state, json const &ep_object, std::string const &extension_key, json const &legacy_idd)
+InputProcessor::MaxFields InputProcessor::findMaxFields(
+    EnergyPlusData &state, json const &ep_object, std::string const &extension_key, json const &legacy_idd, std::size_t const min_fields)
 {
     InputProcessor::MaxFields maxFields;
     if (!state.dataGlobal->isEpJSON) {
@@ -577,6 +578,8 @@ InputProcessor::MaxFields InputProcessor::findMaxFields(EnergyPlusData &state, j
         }
     } else {
         auto const &legacy_idd_fields = legacy_idd["fields"];
+        // start with at least min_fields as the number of fields
+        maxFields.max_fields = min_fields;
         for (auto const &field : ep_object.items()) {
             auto const &field_key = field.key();
             if (field_key == extension_key) continue;
@@ -691,13 +694,13 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
         }
     }
     if (field_type == "a") {
-        if (within_max_fields) NumAlphas++;
+        if (within_max_fields) NumAlphas = alpha_index;
         if (is_AlphaFieldNames) {
             AlphaFieldNames()(alpha_index) = (state.dataGlobal->isEpJSON) ? field : legacy_field_info.at("field_name").get<std::string>();
         }
         alpha_index++;
     } else if (field_type == "n") {
-        if (within_max_fields) NumNumbers++;
+        if (within_max_fields) NumNumbers = numeric_index;
         if (is_NumericFieldNames) {
             NumericFieldNames()(numeric_index) = (state.dataGlobal->isEpJSON) ? field : legacy_field_info.at("field_name").get<std::string>();
         }
@@ -764,6 +767,11 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
     auto const &legacy_idd_fields = legacy_idd["fields"];
     auto const &schema_name_field = epJSON_schema_it_val.find("name");
     auto const has_idd_name_field = schema_name_field != epJSON_schema_it_val.end();
+    auto const &found_min_fields = epJSON_schema_it_val.find("min_fields");
+    size_t min_fields = 0;
+    if (found_min_fields != epJSON_schema_it_val.end()) {
+        min_fields = found_min_fields.value();
+    }
 
     auto key = legacy_idd.find("extension");
     std::string extension_key;
@@ -777,7 +785,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
 
     int alpha_index = 1;
     int numeric_index = 1;
-    auto maxFields = findMaxFields(state, obj_val, extension_key, legacy_idd);
+    auto maxFields = findMaxFields(state, obj_val, extension_key, legacy_idd, min_fields);
 
     Alphas = "";
     Numbers = 0;
@@ -1278,18 +1286,18 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
     // Traverses the IDF Records looking at each field vs object definition for defaults and autosize.
 
     // Reset the globals
-    DataOutputs::iNumberOfRecords = 0;             // Number of IDF Records
-    DataOutputs::iNumberOfDefaultedFields = 0;     // Number of defaulted fields in IDF
-    DataOutputs::iTotalFieldsWithDefaults = 0;     // Total number of fields that could be defaulted
-    DataOutputs::iNumberOfAutoSizedFields = 0;     // Number of autosized fields in IDF
-    DataOutputs::iTotalAutoSizableFields = 0;      // Total number of autosizeable fields
-    DataOutputs::iNumberOfAutoCalcedFields = 0;    // Number of autocalculated fields
-    DataOutputs::iTotalAutoCalculatableFields = 0; // Total number of autocalculatable fields
+    state.dataOutput->iNumberOfRecords = 0;             // Number of IDF Records
+    state.dataOutput->iNumberOfDefaultedFields = 0;     // Number of defaulted fields in IDF
+    state.dataOutput->iTotalFieldsWithDefaults = 0;     // Total number of fields that could be defaulted
+    state.dataOutput->iNumberOfAutoSizedFields = 0;     // Number of autosized fields in IDF
+    state.dataOutput->iTotalAutoSizableFields = 0;      // Total number of autosizeable fields
+    state.dataOutput->iNumberOfAutoCalcedFields = 0;    // Number of autocalculated fields
+    state.dataOutput->iTotalAutoCalculatableFields = 0; // Total number of autocalculatable fields
 
     auto const &schema_properties = schema.at("properties");
 
     // Lambda to avoid repeating code twice (when processing regular fields, and extensible fields)
-    auto processField = [](const std::string& field, const json& epJSONObj, const json& schema_field_obj) {
+    auto processField = [&state](const std::string& field, const json& epJSONObj, const json& schema_field_obj) {
         bool hasDefault = false;
         bool canBeAutosized = false;
         bool canBeAutocalculated = false;
@@ -1300,7 +1308,7 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
 
         auto const &default_it = schema_field_obj.find("default");
         if (default_it != schema_field_obj.end()) {
-            ++DataOutputs::iTotalFieldsWithDefaults;
+            ++state.dataOutput->iTotalFieldsWithDefaults;
             hasDefault = true;
             auto const &default_val = default_it.value();
             if (default_val.is_string()) {
@@ -1317,10 +1325,10 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
                         if (e.is_string()) {
                             auto const &enumVal = e.get<std::string>();
                             if (enumVal == "Autosize") {
-                                ++DataOutputs::iTotalAutoSizableFields;
+                                ++state.dataOutput->iTotalAutoSizableFields;
                                 canBeAutosized = true;
                             } else if (enumVal == "Autocalculate") {
-                                ++DataOutputs::iTotalAutoCalculatableFields;
+                                ++state.dataOutput->iTotalAutoCalculatableFields;
                                 canBeAutocalculated = true;
                             }
                         }
@@ -1341,18 +1349,18 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
                 // * if "AutoSize" is entered for an autosizable field, the result is "Autosize"
                 // * if "AutoSize" is entered for an autocalculatable field, the result is "Autocalculate"
                 if (canBeAutosized && (val == "Autosize")) {
-                    ++DataOutputs::iNumberOfAutoSizedFields;
+                    ++state.dataOutput->iNumberOfAutoSizedFields;
                 } else if (canBeAutocalculated && (val == "Autocalculate")) {
-                    ++DataOutputs::iNumberOfAutoCalcedFields;
+                    ++state.dataOutput->iNumberOfAutoCalcedFields;
                 }
             }
         } else if (hasDefault) {
             // Not found: was defaulted
-            ++DataOutputs::iNumberOfDefaultedFields;
+            ++state.dataOutput->iNumberOfDefaultedFields;
             if (canBeAutosized && (defaultValue == "Autosize")) {
-                ++DataOutputs::iNumberOfAutoSizedFields;
+                ++state.dataOutput->iNumberOfAutoSizedFields;
             } else if (canBeAutocalculated && (defaultValue == "Autocalculate")) {
-                ++DataOutputs::iNumberOfAutoCalcedFields;
+                ++state.dataOutput->iNumberOfAutoCalcedFields;
             }
         }
     };
@@ -1385,7 +1393,7 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
         for (auto const &ep_object: objects) {
 
             // Count number of objects
-            ++DataOutputs::iNumberOfRecords;
+            ++state.dataOutput->iNumberOfRecords;
 
             // Loop on all regular fields
             for (size_t i = 0; i < legacy_idd_fields.size(); ++i) {
@@ -1396,10 +1404,10 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
                 if (has_idd_name_field && field == "name") {
                     auto const &name_iter = schema_name_field.value();
                     if (name_iter.find("default") != name_iter.end()) {
-                        ++DataOutputs::iTotalFieldsWithDefaults;
+                        ++state.dataOutput->iTotalFieldsWithDefaults;
                         auto it = ep_object.find(field);
                         if (it == ep_object.end()) {
-                            ++DataOutputs::iNumberOfDefaultedFields;
+                            ++state.dataOutput->iNumberOfDefaultedFields;
                         }
                     }
                     continue;
@@ -1661,8 +1669,8 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string extension_key;
-    DataOutputs::OutputVariablesForSimulation.reserve(1024);
-    DataOutputs::MaxConsideredOutputVariables = 10000;
+    state.dataOutput->OutputVariablesForSimulation.reserve(1024);
+    state.dataOutput->MaxConsideredOutputVariables = 10000;
 
     // Output Variable
     auto epJSON_objects = epJSON.find(OutputVariable);
@@ -2206,8 +2214,8 @@ void InputProcessor::addRecordToOutputVariableStructure(EnergyPlusData &state, s
 
     std::string const VarName(VariableName.substr(0, vnameLen));
 
-    auto const found = DataOutputs::OutputVariablesForSimulation.find(VarName);
-    if (found == DataOutputs::OutputVariablesForSimulation.end()) {
+    auto const found = state.dataOutput->OutputVariablesForSimulation.find(VarName);
+    if (found == state.dataOutput->OutputVariablesForSimulation.end()) {
         std::unordered_map<std::string,
                            DataOutputs::OutputReportingVariables,
                            UtilityRoutines::case_insensitive_hasher,
@@ -2215,11 +2223,11 @@ void InputProcessor::addRecordToOutputVariableStructure(EnergyPlusData &state, s
             data;
         data.reserve(32);
         data.emplace(KeyValue, DataOutputs::OutputReportingVariables(state, KeyValue, VarName));
-        DataOutputs::OutputVariablesForSimulation.emplace(VarName, std::move(data));
+        state.dataOutput->OutputVariablesForSimulation.emplace(VarName, std::move(data));
     } else {
         found->second.emplace(KeyValue, DataOutputs::OutputReportingVariables(state, KeyValue, VarName));
     }
-    DataOutputs::NumConsideredOutputVariables++;
+    state.dataOutput->NumConsideredOutputVariables++;
 }
 
 } // namespace EnergyPlus

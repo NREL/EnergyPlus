@@ -46,14 +46,12 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include "AirflowNetwork/Properties.hpp"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/General.hh>
 
 namespace EnergyPlus {
 
 namespace AirflowNetwork {
-
-    int lowerLimitErrIdx(0);
-    int upperLimitErrIdx(0);
 
     Real64 airThermConductivity(EnergyPlusData &state, Real64 T // Temperature in Celsius
     )
@@ -70,22 +68,22 @@ namespace AirflowNetwork {
         Real64 const c = -2.40977632412045e-8;
 
         if (T < LowerLimit) {
-            if (lowerLimitErrIdx == 0) {
+            if (state.dataAFNProps->lowerLimitErrIdx == 0) {
                 ShowWarningMessage(state, "Air temperature below lower limit of -20C for conductivity calculation");
             }
             ShowRecurringWarningErrorAtEnd(state, format("Air temperature below lower limit of -20C for conductivity calculation. Air temperature of {:.1R} "
                                                   "used for conductivity calculation.",
                                                   LowerLimit),
-                                           lowerLimitErrIdx);
+                                           state.dataAFNProps->lowerLimitErrIdx);
             T = LowerLimit;
         } else if (T > UpperLimit) {
-            if (upperLimitErrIdx == 0) {
+            if (state.dataAFNProps->upperLimitErrIdx == 0) {
                 ShowWarningMessage(state, "Air temperature above upper limit of 70C for conductivity calculation");
             }
             ShowRecurringWarningErrorAtEnd(state, format("Air temperature above upper limit of 70C for conductivity calculation. Air temperature of {:.1R} "
                                                   "used for conductivity calculation.",
                                                   UpperLimit),
-                                           upperLimitErrIdx);
+                                           state.dataAFNProps->upperLimitErrIdx);
             T = UpperLimit;
         }
 

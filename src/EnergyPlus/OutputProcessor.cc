@@ -662,12 +662,12 @@ namespace OutputProcessor {
         }
 
         cCurrentModuleObject = "Output:Variable";
-        op->NumOfReqVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        op->NumOfReqVariables = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         op->ReqRepVars.allocate(op->NumOfReqVariables);
 
         for (Loop = 1; Loop <= op->NumOfReqVariables; ++Loop) {
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
@@ -1231,14 +1231,14 @@ namespace OutputProcessor {
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "Meter:Custom";
-        NumCustomMeters = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumCustomMeters = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // make list of names for all Meter:Custom since they cannot refer to other Meter:Custom's
         std::unordered_set<std::string> namesOfMeterCustom;
         namesOfMeterCustom.reserve(NumCustomMeters);
 
         for (Loop = 1; Loop <= NumCustomMeters; ++Loop) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -1254,7 +1254,7 @@ namespace OutputProcessor {
         }
 
         for (Loop = 1; Loop <= NumCustomMeters; ++Loop) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -1432,10 +1432,10 @@ namespace OutputProcessor {
         }
 
         cCurrentModuleObject = "Meter:CustomDecrement";
-        NumCustomDecMeters = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumCustomDecMeters = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         for (Loop = 1; Loop <= NumCustomDecMeters; ++Loop) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -3821,8 +3821,8 @@ namespace OutputProcessor {
                          EndMinute(),
                          DayType().c_str());
             print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
-            if (writeToSQL && sqlite) {
-                sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
+            if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
                                                     state.dataGlobal->DayOfSim,
                                                     state.dataEnvrn->CurEnvirNum,
@@ -3850,8 +3850,8 @@ namespace OutputProcessor {
                          60.0,
                          DayType().c_str());
             print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
-            if (writeToSQL && sqlite) {
-                sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
+            if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
                                                     state.dataGlobal->DayOfSim,
                                                     state.dataEnvrn->CurEnvirNum,
@@ -3869,8 +3869,8 @@ namespace OutputProcessor {
         case ReportingFrequency::Daily:
             std::sprintf(state.dataOutputProcessor->stamp, "%s,%s,%2d,%2d,%2d,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), DayType().c_str());
             print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
-            if (writeToSQL && sqlite) {
-                sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
+            if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
                                                     state.dataGlobal->DayOfSim,
                                                     state.dataEnvrn->CurEnvirNum,
@@ -3888,23 +3888,23 @@ namespace OutputProcessor {
         case ReportingFrequency::Monthly:
             std::sprintf(state.dataOutputProcessor->stamp, "%s,%s,%2d", reportIDString.c_str(), DayOfSimChr.c_str(), Month());
             print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
-            if (writeToSQL && sqlite) {
-                sqlite->createSQLiteTimeIndexRecord(
+            if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(
                     static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, state.dataEnvrn->CurEnvirNum, state.dataGlobal->CalendarYear, Month);
             }
             break;
         case ReportingFrequency::Simulation:
             std::sprintf(state.dataOutputProcessor->stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str());
             print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
-            if (writeToSQL && sqlite) {
-                sqlite->createSQLiteTimeIndexRecord(
+            if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(
                     static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, state.dataEnvrn->CurEnvirNum, state.dataGlobal->CalendarYear);
             }
             break;
         default:
-            if (sqlite) {
+            if (state.dataSQLiteProcedures->sqlite) {
                 std::string str(format("Illegal reportingInterval passed to WriteTimeStampFormatData: {}", static_cast<int>(reportingInterval)));
-                sqlite->sqliteWriteMessage(str);
+                state.dataSQLiteProcedures->sqlite->sqliteWriteMessage(str);
             }
             break;
         }
@@ -3917,8 +3917,8 @@ namespace OutputProcessor {
                               bool writeToSQL)
     {
         print(outputFile, "{},{}\n", reportIDString, yearOfSimChr);
-        if (writeToSQL && sqlite) {
-            sqlite->createYearlyTimeIndexRecord(state.dataGlobal->CalendarYear, state.dataEnvrn->CurEnvirNum);
+        if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createYearlyTimeIndexRecord(state.dataGlobal->CalendarYear, state.dataEnvrn->CurEnvirNum);
         }
     }
 
@@ -4016,8 +4016,8 @@ namespace OutputProcessor {
             // No default available?
         }
 
-        if (sqlite) {
-            sqlite->createSQLiteReportDictionaryRecord(reportID,
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(reportID,
                                                        static_cast<int>(storeType),
                                                        indexGroup,
                                                        keyedValue,
@@ -4129,8 +4129,8 @@ namespace OutputProcessor {
         static std::string const keyedValueStringNon;
         std::string const &keyedValueString(cumulativeMeterFlag ? keyedValueStringCum : keyedValueStringNon);
 
-        if (sqlite) {
-            sqlite->createSQLiteReportDictionaryRecord(reportID,
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(reportID,
                                                        static_cast<int>(storeType),
                                                        indexGroup,
                                                        keyedValueString,
@@ -4269,8 +4269,8 @@ namespace OutputProcessor {
             }
         }
 
-        if (sqlite) {
-            sqlite->createSQLiteReportDataRecord(
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(
                 reportID, repVal, static_cast<int>(reportingInterval), minValue, minValueDate, MaxValue, maxValueDate);
         }
 
@@ -4336,8 +4336,8 @@ namespace OutputProcessor {
             NumberOut = std::string(state.dataOutputProcessor->s_WriteCumulativeReportMeterData);
         }
 
-        if (sqlite) {
-            sqlite->createSQLiteReportDataRecord(reportID, repValue);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.mtr.good()) print(state.files.mtr, "{},{}\n", creportID, NumberOut);
@@ -4381,8 +4381,8 @@ namespace OutputProcessor {
             NumberOut = std::string(state.dataOutputProcessor->s_WriteReportMeterData);
         }
 
-        if (sqlite) {
-            sqlite->createSQLiteReportDataRecord(
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(
                 reportID, repValue, static_cast<int>(reportingInterval), minValue, minValueDate, MaxValue, maxValueDate, state.dataGlobal->MinutesPerTimeStep);
         }
 
@@ -4456,8 +4456,8 @@ namespace OutputProcessor {
 
         dtoa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
-        if (sqlite) {
-            sqlite->createSQLiteReportDataRecord(reportID, repValue);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.eso.good()) {
@@ -4488,8 +4488,8 @@ namespace OutputProcessor {
 
         i32toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
-        if (sqlite) {
-            sqlite->createSQLiteReportDataRecord(reportID, repValue);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.eso.good()) {
@@ -4520,8 +4520,8 @@ namespace OutputProcessor {
 
         i64toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
-        if (sqlite) {
-            sqlite->createSQLiteReportDataRecord(reportID, repValue);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.eso.good()) {
@@ -4690,8 +4690,8 @@ namespace OutputProcessor {
 
         rminValue = minValue;
         rmaxValue = MaxValue;
-        if (sqlite) {
-            sqlite->createSQLiteReportDataRecord(
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(
                 reportID, repVal, static_cast<int>(reportingInterval), rminValue, minValueDate, rmaxValue, maxValueDate);
         }
 
@@ -5248,7 +5248,7 @@ void SetupOutputVariable(EnergyPlusData &state,
     }
 
     // DataOutputs::OutputVariablesForSimulation is case-insensitive
-    bool const ThisOneOnTheList = DataOutputs::FindItemInVariableList(KeyedValue, VarName);
+    bool const ThisOneOnTheList = DataOutputs::FindItemInVariableList(state, KeyedValue, VarName);
     bool OnMeter = false; // True if this variable is on a meter
 
     for (Loop = 1; Loop <= op->NumExtraVars; ++Loop) {
@@ -5483,7 +5483,7 @@ void SetupOutputVariable(EnergyPlusData &state,
     }
 
     // DataOutputs::OutputVariablesForSimulation is case-insentitive
-    bool const ThisOneOnTheList = DataOutputs::FindItemInVariableList(KeyedValue, VarName);
+    bool const ThisOneOnTheList = DataOutputs::FindItemInVariableList(state, KeyedValue, VarName);
 
     for (Loop = 1; Loop <= op->NumExtraVars; ++Loop) {
 
@@ -6419,33 +6419,18 @@ void GenOutputVariablesAuditReport(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Use flagged data structure in OutputProcessor.
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
     using namespace OutputProcessor;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::map<ReportingFrequency, std::string> reportFrequency({{ReportingFrequency::EachCall, "Detailed"},
-                                                                      {ReportingFrequency::TimeStep, "TimeStep"},
-                                                                      {ReportingFrequency::Hourly, "Hourly"},
-                                                                      {ReportingFrequency::Daily, "Daily"},
-                                                                      {ReportingFrequency::Monthly, "Monthly"},
-                                                                      {ReportingFrequency::Yearly, "Annual"}});
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Loop;
     auto &op(state.dataOutputProcessor);
+    std::map<ReportingFrequency, std::string> reportFrequency({{ReportingFrequency::EachCall, "Detailed"},
+                                                               {ReportingFrequency::TimeStep, "TimeStep"},
+                                                               {ReportingFrequency::Hourly, "Hourly"},
+                                                               {ReportingFrequency::Daily, "Daily"},
+                                                               {ReportingFrequency::Monthly, "Monthly"},
+                                                               {ReportingFrequency::Yearly, "Annual"}});
 
     for (Loop = 1; Loop <= op->NumOfReqVariables; ++Loop) {
         if (op->ReqRepVars(Loop).Used) continue;
@@ -6571,11 +6556,11 @@ void UpdateMeterReporting(EnergyPlusData &state)
 
     auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Output:Meter";
-    NumReqMeters = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    NumReqMeters = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (Loop = 1; Loop <= NumReqMeters; ++Loop) {
 
-        inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                       cCurrentModuleObject,
                                       Loop,
                                       Alphas,
@@ -6603,10 +6588,10 @@ void UpdateMeterReporting(EnergyPlusData &state)
     }
 
     cCurrentModuleObject = "Output:Meter:MeterFileOnly";
-    NumReqMeterFOs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    NumReqMeterFOs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     for (Loop = 1; Loop <= NumReqMeterFOs; ++Loop) {
 
-        inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                       cCurrentModuleObject,
                                       Loop,
                                       Alphas,
@@ -6634,11 +6619,11 @@ void UpdateMeterReporting(EnergyPlusData &state)
     }
 
     cCurrentModuleObject = "Output:Meter:Cumulative";
-    NumReqMeters = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    NumReqMeters = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (Loop = 1; Loop <= NumReqMeters; ++Loop) {
 
-        inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                       cCurrentModuleObject,
                                       Loop,
                                       Alphas,
@@ -6666,10 +6651,10 @@ void UpdateMeterReporting(EnergyPlusData &state)
     }
 
     cCurrentModuleObject = "Output:Meter:Cumulative:MeterFileOnly";
-    NumReqMeterFOs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    NumReqMeterFOs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     for (Loop = 1; Loop <= NumReqMeterFOs; ++Loop) {
 
-        inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                       cCurrentModuleObject,
                                       Loop,
                                       Alphas,
@@ -8375,7 +8360,6 @@ void ProduceRDDMDD(EnergyPlusData &state)
     // provide a single call for writing out the Report Data Dictionary and Meter Data Dictionary.
 
     // Using/Aliasing
-    using DataStringGlobals::VerString;
     using namespace OutputProcessor;
     using General::ScanForReports;
     using SortAndStringUtilities::SetupAndSort;
@@ -8425,16 +8409,16 @@ void ProduceRDDMDD(EnergyPlusData &state)
     state.files.rdd.ensure_open(state, "ProduceRDDMDD", state.files.outputControl.rdd);
     state.files.mdd.ensure_open(state, "ProduceRDDMDD", state.files.outputControl.mdd);
     if (op->ProduceReportVDD == iReportVDD::Yes) {
-        print(state.files.rdd, "Program Version,{},{}{}", VerString, state.dataStrGlobals->IDDVerString, '\n');
+        print(state.files.rdd, "Program Version,{},{}{}", state.dataStrGlobals->VerStringVar, state.dataStrGlobals->IDDVerString, '\n');
         print(state.files.rdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", '\n');
 
-        print(state.files.mdd, "Program Version,{},{}{}", VerString, state.dataStrGlobals->IDDVerString, '\n');
+        print(state.files.mdd, "Program Version,{},{}{}", state.dataStrGlobals->VerStringVar, state.dataStrGlobals->IDDVerString, '\n');
         print(state.files.mdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", '\n');
     } else if (op->ProduceReportVDD == iReportVDD::IDF) {
-        print(state.files.rdd, "! Program Version,{},{}{}", VerString, state.dataStrGlobals->IDDVerString, '\n');
+        print(state.files.rdd, "! Program Version,{},{}{}", state.dataStrGlobals->VerStringVar, state.dataStrGlobals->IDDVerString, '\n');
         print(state.files.rdd, "! Output:Variable Objects (applicable to this run){}", '\n');
 
-        print(state.files.mdd, "! Program Version,{},{}{}", VerString, state.dataStrGlobals->IDDVerString, '\n');
+        print(state.files.mdd, "! Program Version,{},{}{}", state.dataStrGlobals->VerStringVar, state.dataStrGlobals->IDDVerString, '\n');
         print(state.files.mdd, "! Output:Meter Objects (applicable to this run){}", '\n');
     }
 

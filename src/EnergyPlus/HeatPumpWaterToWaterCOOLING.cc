@@ -224,7 +224,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
 
         bool ErrorsFound(false);
 
-        state.dataHPWaterToWaterClg->NumGSHPs = inputProcessor->getNumObjectsFound(state, ModuleCompNameUC);
+        state.dataHPWaterToWaterClg->NumGSHPs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ModuleCompNameUC);
 
         if (state.dataHPWaterToWaterClg->NumGSHPs <= 0) {
             ShowSevereError(state, "No Equipment found in SimGshp");
@@ -235,7 +235,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
         state.dataHPWaterToWaterClg->GSHP.allocate(state.dataHPWaterToWaterClg->NumGSHPs);
 
         for (GSHPNum = 1; GSHPNum <= state.dataHPWaterToWaterClg->NumGSHPs; ++GSHPNum) {
-            inputProcessor->getObjectItem(state, ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state, ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), ModuleCompNameUC, ErrorsFound);
 
             state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name = AlphArray(1);

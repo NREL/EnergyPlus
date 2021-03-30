@@ -105,7 +105,7 @@ namespace EnergyPlus::OutputReportTabularAnnual {
 
         auto &annualTables(state.dataOutputReportTabularAnnual->annualTables);
 
-        objCount = inputProcessor->getNumObjectsFound(state, currentModuleObject);
+        objCount = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, currentModuleObject);
         if (objCount > 0) {
             // if not a run period using weather do not create reports
             if (!state.dataGlobal->DoWeathSim) {
@@ -114,11 +114,11 @@ namespace EnergyPlus::OutputReportTabularAnnual {
                 return;
             }
         }
-        inputProcessor->getObjectDefMaxArgs(state, currentModuleObject, numParams, numAlphas, numNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, currentModuleObject, numParams, numAlphas, numNums);
         alphArray.allocate(numAlphas);
         numArray.dimension(numNums, 0.0);
         for (int tabNum = 1; tabNum <= objCount; ++tabNum) {
-            inputProcessor->getObjectItem(state, currentModuleObject, tabNum, alphArray, numAlphas, numArray, numNums, IOStat);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state, currentModuleObject, tabNum, alphArray, numAlphas, numArray, numNums, IOStat);
             if (numAlphas >= 5) {
                 annualTables.push_back(AnnualTable(state, alphArray(1), alphArray(2), alphArray(3)));
                 // the remaining fields are repeating in groups of three and need to be added to the data structure
@@ -942,8 +942,8 @@ namespace EnergyPlus::OutputReportTabularAnnual {
             OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose annual XML tables.
         }
         if (produceSQLite_para) {
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, m_name, "Entire Facility", "Custom Annual Report");
+            if (state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, m_name, "Entire Facility", "Custom Annual Report");
             }
         }
         // for the new binning aggregation types create a second table of the bin ranges
@@ -993,8 +993,8 @@ namespace EnergyPlus::OutputReportTabularAnnual {
                             state, tableBodyRange, rowHeadRange, colHeadRange, colWidthRange, true); // transpose annual XML tables.
                     }
                     if (produceSQLite_para) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(
+                        if (state.dataSQLiteProcedures->sqlite) {
+                            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                                 tableBodyRange, rowHeadRange, colHeadRange, m_name, "Entire Facility", "Bin Sizes");
                         }
                     }

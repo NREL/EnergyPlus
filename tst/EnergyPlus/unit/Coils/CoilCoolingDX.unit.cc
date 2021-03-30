@@ -69,7 +69,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXInput )
     std::string idf_objects = this->getCoilObjectString("coolingCoil", false, 2);
     EXPECT_TRUE(process_idf( idf_objects, false ));
     int coilIndex = CoilCoolingDX::factory(*state, "coolingCoil");
-    auto const &thisCoil(coilCoolingDXs[coilIndex]);
+    auto const &thisCoil(state->dataCoilCooingDX->coilCoolingDXs[coilIndex]);
     EXPECT_EQ("COOLINGCOIL", thisCoil.name);
     EXPECT_EQ("PERFORMANCEOBJECTNAME", thisCoil.performance.name);
 }
@@ -144,7 +144,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance )
     });
     EXPECT_TRUE(process_idf( idf_objects, false ));
     int coilIndex = CoilCoolingDX::factory(*state, "Coil");
-    auto &thisCoil(coilCoolingDXs[coilIndex]);
+    auto &thisCoil(state->dataCoilCooingDX->coilCoolingDXs[coilIndex]);
 
     // fix the inlet conditions
     auto &evapInletNode = state->dataLoopNodes->Node(thisCoil.evapInletNodeIndex);
@@ -283,7 +283,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation )
                                                });
     EXPECT_TRUE(process_idf( idf_objects, false ));
     int coilIndex = CoilCoolingDX::factory(*state, "Coil");
-    auto &thisCoil(coilCoolingDXs[coilIndex]);
+    auto &thisCoil(state->dataCoilCooingDX->coilCoolingDXs[coilIndex]);
 
     // fix the inlet conditions
     auto &evapInletNode = state->dataLoopNodes->Node(thisCoil.evapInletNodeIndex);
@@ -671,7 +671,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     });
     EXPECT_TRUE(process_idf(idf_objects, false));
     int coilIndex = CoilCoolingDX::factory(*state, "Coil");
-    auto &thisCoil(coilCoolingDXs[coilIndex]);
+    auto &thisCoil(state->dataCoilCooingDX->coilCoolingDXs[coilIndex]);
 
     // fix the inlet conditions
     auto &evapInletNode = state->dataLoopNodes->Node(thisCoil.evapInletNodeIndex);
@@ -1088,7 +1088,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
         });
     EXPECT_TRUE(process_idf(idf_objects, false));
     int coilIndex = CoilCoolingDX::factory(*state, "Coil");
-    auto& thisCoil(coilCoolingDXs[coilIndex]);
+    auto& thisCoil(state->dataCoilCooingDX->coilCoolingDXs[coilIndex]);
 
     // fix the inlet conditions
     auto& evapInletNode = state->dataLoopNodes->Node(thisCoil.evapInletNodeIndex);

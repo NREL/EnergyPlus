@@ -687,8 +687,8 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 // Test for https://github.com/NREL/EnergyPlus/issues/7550
 TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 {
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->WriteTabularFiles = true;
     state->dataOutRptTab->displayEioSummary = true;
@@ -787,7 +787,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     // Close output files *after* the EIO has been written to
     SimulationManager::CloseOutputFiles(*state);
 
-    EnergyPlus::sqlite->sqliteCommit();
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     std::vector<std::tuple<std::string, std::string>> results_strings({
         {"Hum Ind Value at Max Temp", "90500.00"},

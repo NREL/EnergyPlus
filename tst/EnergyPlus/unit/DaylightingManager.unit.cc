@@ -131,7 +131,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test)
     GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
 
-    int numObjs = inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
+    int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
@@ -233,7 +233,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_
     GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
 
-    int numObjs = inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
+    int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
@@ -1548,7 +1548,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
     HeatBalanceManager::GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
 
-    int numObjs = inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
+    int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     EXPECT_EQ(1, numObjs);
 
     DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
@@ -1659,7 +1659,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_NotArou
     HeatBalanceManager::GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
 
-    int numObjs = inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
+    int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     EXPECT_EQ(1, numObjs);
 
     DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);

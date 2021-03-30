@@ -175,7 +175,7 @@ public:
 
     void setupVariablesOnceAllAreRequested()
     {
-        inputProcessor->preScanReportingVariables(*state);
+        state->dataInputProcessing->inputProcessor->preScanReportingVariables(*state);
         for (auto &val : this->realVariablePlaceholders) {
             if (val.meterType) {
                 SetupOutputVariable(*state,

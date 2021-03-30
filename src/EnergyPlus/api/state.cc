@@ -52,7 +52,6 @@
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
-#include <EnergyPlus/StateManagement.hh>
 
 EnergyPlusState stateNew() {
     auto *state = new EnergyPlus::EnergyPlusData;
@@ -61,9 +60,7 @@ EnergyPlusState stateNew() {
 
 void stateReset(EnergyPlusState state) {
     auto *this_state = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::clearAllStates(*this_state);
-    // also clear out the input processor since the clearAllStates does not do that.
-    EnergyPlus::inputProcessor = EnergyPlus::InputProcessor::factory();
+    this_state->clear_state();
 }
 
 void stateDelete(EnergyPlusState state) {

@@ -151,12 +151,12 @@ namespace EnergyPlus::EarthTube {
         state.dataEarthTube->ZnRptET.allocate(state.dataGlobal->NumOfZones);
 
         std::string cCurrentModuleObject = "ZoneEarthtube";
-        state.dataEarthTube->TotEarthTube = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataEarthTube->TotEarthTube = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         state.dataEarthTube->EarthTubeSys.allocate(state.dataEarthTube->TotEarthTube);
 
         for (Loop = 1; Loop <= state.dataEarthTube->TotEarthTube; ++Loop) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
                                           state.dataIPShortCut->cAlphaArgs,

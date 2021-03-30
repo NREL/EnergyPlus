@@ -476,10 +476,10 @@ namespace EnergyPlus::NodeInputManager {
         Array1D<Real64> rNumbers;
 
         bool localErrorsFound(false);
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NCount, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NCount, NumAlphas, NumNumbers);
         cAlphas.allocate(NumAlphas);
         rNumbers.allocate(NumNumbers);
-        state.dataNodeInputMgr->NumOfNodeLists = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataNodeInputMgr->NumOfNodeLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataNodeInputMgr->NodeLists.allocate(state.dataNodeInputMgr->NumOfNodeLists);
         for (int i = 1; i <= state.dataNodeInputMgr->NumOfNodeLists; ++i) {
             state.dataNodeInputMgr->NodeLists(i).Name.clear();
@@ -488,7 +488,7 @@ namespace EnergyPlus::NodeInputManager {
 
         NCount = 0;
         for (Loop = 1; Loop <= state.dataNodeInputMgr->NumOfNodeLists; ++Loop) {
-            inputProcessor->getObjectItem(state, CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus);
             if (UtilityRoutines::IsNameEmpty(state, cAlphas(1), CurrentModuleObject, localErrorsFound)) continue;
 
             ++NCount;
@@ -697,7 +697,7 @@ namespace EnergyPlus::NodeInputManager {
         int NumNums;
 
         if (state.dataNodeInputMgr->GetOnlySingleNodeFirstTime) {
-            inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
             state.dataNodeInputMgr->GetOnlySingleNodeNodeNums.dimension(NumParams, 0);
             state.dataNodeInputMgr->GetOnlySingleNodeFirstTime = false;
         }

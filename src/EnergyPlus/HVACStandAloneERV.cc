@@ -258,10 +258,10 @@ namespace EnergyPlus::HVACStandAloneERV {
         int ZoneInletCZN;          // used for warning when zone node not listed in equipment connections
         int ZoneExhaustCZN;        // used for warning when zone node not listed in equipment connections
 
-        inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:EnergyRecoveryVentilator", NumArg, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:EnergyRecoveryVentilator", NumArg, NumAlphas, NumNumbers);
         MaxAlphas = NumAlphas;
         MaxNumbers = NumNumbers;
-        inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:EnergyRecoveryVentilator:Controller", NumArg, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:EnergyRecoveryVentilator:Controller", NumArg, NumAlphas, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNumbers);
 
@@ -277,7 +277,7 @@ namespace EnergyPlus::HVACStandAloneERV {
         // find the number of each type of Stand Alone ERV unit
         CurrentModuleObject = "ZoneHVAC:EnergyRecoveryVentilator";
 
-        state.dataHVACStandAloneERV->NumStandAloneERVs = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataHVACStandAloneERV->NumStandAloneERVs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         // allocate the data structures
         state.dataHVACStandAloneERV->StandAloneERV.allocate(state.dataHVACStandAloneERV->NumStandAloneERVs);
@@ -290,7 +290,7 @@ namespace EnergyPlus::HVACStandAloneERV {
         // loop over Stand Alone ERV units; get and load the input data
         for (StandAloneERVIndex = 1; StandAloneERVIndex <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++StandAloneERVIndex) {
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           StandAloneERVIndex,
                                           Alphas,
@@ -563,7 +563,7 @@ namespace EnergyPlus::HVACStandAloneERV {
                     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerNameDefined = false;
                 }
 
-                if (inputProcessor->getObjectItemNum(state,
+                if (state.dataInputProcessing->inputProcessor->getObjectItemNum(state,
                                                      "ZoneHVAC:EnergyRecoveryVentilator:Controller",
                                                      state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerName) <= 0) {
                     ShowSevereError(state, CurrentModuleObject + " controller type ZoneHVAC:EnergyRecoveryVentilator:Controller not found = " + Alphas(6));
@@ -714,7 +714,7 @@ namespace EnergyPlus::HVACStandAloneERV {
                           CompSetExhaustFanOutlet);
 
             // Verify HX name in Stand Alone ERV object matches name of valid HX object
-            if (inputProcessor->getObjectItemNum(state, "HeatExchanger:AirToAir:SensibleAndLatent", state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerName) <=
+            if (state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "HeatExchanger:AirToAir:SensibleAndLatent", state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerName) <=
                 0) {
                 ShowSevereError(state, CurrentModuleObject + " heat exchanger type HeatExchanger:AirToAir:SensibleAndLatent not found = " +
                                 state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerName);
@@ -722,13 +722,13 @@ namespace EnergyPlus::HVACStandAloneERV {
             }
             // Verify supply air fan name in Stand Alone ERV object matches name of valid fan object
             if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                if (inputProcessor->getObjectItemNum(state, "Fan:OnOff", state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanName) <= 0) {
+                if (state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Fan:OnOff", state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanName) <= 0) {
                     ShowSevereError(state, CurrentModuleObject +
                                     " supply fan type Fan:OnOff not found = " + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanName);
                     ErrorsFound = true;
                 }
             } else {
-                if (inputProcessor->getObjectItemNum(state, "Fan:SystemModel", state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanName) <= 0) {
+                if (state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Fan:SystemModel", state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanName) <= 0) {
                     ShowSevereError(state, CurrentModuleObject +
                                     " supply fan type Fan:SystemModel not found = " + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanName);
                     ErrorsFound = true;
@@ -737,13 +737,13 @@ namespace EnergyPlus::HVACStandAloneERV {
 
             // Verify exhaust air fan name in Stand Alone ERV object matches name of valid fan object
             if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                if (inputProcessor->getObjectItemNum(state, "Fan:OnOff", state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanName) <= 0) {
+                if (state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Fan:OnOff", state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanName) <= 0) {
                     ShowSevereError(state, CurrentModuleObject +
                                     " exhaust fan type Fan:OnOff not found = " + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanName);
                     ErrorsFound = true;
                 }
             } else {
-                if (inputProcessor->getObjectItemNum(state, "Fan:SystemModel", state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanName) <= 0) {
+                if (state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Fan:SystemModel", state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanName) <= 0) {
                     ShowSevereError(state, CurrentModuleObject +
                                     " exhaust fan type Fan:SystemModel not found = " + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanName);
                     ErrorsFound = true;
@@ -753,10 +753,10 @@ namespace EnergyPlus::HVACStandAloneERV {
 
         int OutAirNum = 0;
         CurrentModuleObject = "ZoneHVAC:EnergyRecoveryVentilator:Controller";
-        NumERVCtrlrs = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumERVCtrlrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         for (ERVControllerNum = 1; ERVControllerNum <= NumERVCtrlrs; ++ERVControllerNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           ERVControllerNum,
                                           Alphas,

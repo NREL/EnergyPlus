@@ -179,7 +179,7 @@ namespace EnergyPlus::SwimmingPool {
         int MaxAlphas = 0;  // Maximum number of alphas for these input keywords
         int MaxNumbers = 0; // Maximum number of numbers for these input keywords
 
-        inputProcessor->getObjectDefMaxArgs(state, "SwimmingPool:Indoor", NumArgs, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "SwimmingPool:Indoor", NumArgs, NumAlphas, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNumbers);
 
@@ -196,7 +196,7 @@ namespace EnergyPlus::SwimmingPool {
         lNumericBlanks.allocate(MaxNumbers);
         lNumericBlanks = true;
 
-        state.dataSwimmingPools->NumSwimmingPools = inputProcessor->getNumObjectsFound(state, "SwimmingPool:Indoor");
+        state.dataSwimmingPools->NumSwimmingPools = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SwimmingPool:Indoor");
         state.dataSwimmingPools->CheckEquipName.allocate(state.dataSwimmingPools->NumSwimmingPools);
         state.dataSwimmingPools->CheckEquipName = true;
 
@@ -206,7 +206,7 @@ namespace EnergyPlus::SwimmingPool {
         CurrentModuleObject = "SwimmingPool:Indoor";
         for (int Item = 1; Item <= state.dataSwimmingPools->NumSwimmingPools; ++Item) {
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Item,
                                           Alphas,

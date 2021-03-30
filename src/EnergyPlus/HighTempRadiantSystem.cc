@@ -260,7 +260,7 @@ namespace HighTempRadiantSystem {
 
 
         // Initializations and allocations
-        state.dataHighTempRadSys->NumOfHighTempRadSys = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:HighTemperatureRadiant");
+        state.dataHighTempRadSys->NumOfHighTempRadSys = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneHVAC:HighTemperatureRadiant");
 
         state.dataHighTempRadSys->HighTempRadSys.allocate(state.dataHighTempRadSys->NumOfHighTempRadSys);
         state.dataHighTempRadSys->CheckEquipName.allocate(state.dataHighTempRadSys->NumOfHighTempRadSys);
@@ -273,7 +273,7 @@ namespace HighTempRadiantSystem {
         // Obtain all of the user data related to high temperature radiant systems...
         for (Item = 1; Item <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++Item) {
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Item,
                                           state.dataIPShortCut->cAlphaArgs,

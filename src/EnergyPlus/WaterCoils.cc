@@ -291,9 +291,9 @@ namespace EnergyPlus::WaterCoils {
         int TotalArgs(0);                // Total number of alpha and numeric arguments (max) for a certain object in the input file
         bool ErrorsFound(false);         // If errors detected in input
 
-        NumSimpHeat = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Water");
-        NumFlatFin = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:Water:DetailedGeometry");
-        NumCooling = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:Water");
+        NumSimpHeat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:Water");
+        NumFlatFin = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Cooling:Water:DetailedGeometry");
+        NumCooling = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Cooling:Water");
         state.dataWaterCoils->NumWaterCoils = NumSimpHeat + NumFlatFin + NumCooling;
 
         if (state.dataWaterCoils->NumWaterCoils > 0) {
@@ -304,13 +304,13 @@ namespace EnergyPlus::WaterCoils {
             state.dataWaterCoils->CheckEquipName.dimension(state.dataWaterCoils->NumWaterCoils, true);
         }
 
-        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:Water", TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:Water", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:Water:DetailedGeometry", TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:Water:DetailedGeometry", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:Water", TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:Water", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -327,7 +327,7 @@ namespace EnergyPlus::WaterCoils {
 
             CoilNum = SimpHeatNum;
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           SimpHeatNum,
                                           AlphArray,
@@ -475,7 +475,7 @@ namespace EnergyPlus::WaterCoils {
 
             CoilNum = NumSimpHeat + FlatFinNum;
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           FlatFinNum,
                                           AlphArray,
@@ -657,7 +657,7 @@ namespace EnergyPlus::WaterCoils {
 
             CoilNum = NumSimpHeat + NumFlatFin + CoolingNum;
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CoolingNum,
                                           AlphArray,

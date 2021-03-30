@@ -157,34 +157,8 @@ Array1D_string const PsyRoutineNames(NumPsychMonitors,
                                             // PsyWFnTdbTwbPb       16 - HR | PsyTsatFnPb          17 - max iter | PsyTwbFnTdbWPb_cache 18 -
                                             // PsyTwbFnTdbWPb_raw (raw calc) | PsyPsatFnTemp_cache  19 - PsyPsatFnTemp_raw (raw calc)
 #endif
-    
-    // MODULE VARIABLE DECLARATIONS:
-    // na
 
-    // MODULE VARIABLE DEFINITIONS:
-
-    // Subroutine Specifications for the Module
-
-    // Functions
-
-    void clear_state()
-    {
-
-#ifdef EP_cache_PsyTwbFnTdbWPb
-        cached_Twb.deallocate();
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-        cached_Psat.deallocate();
-#endif
-#ifdef EP_cache_PsyTsatFnPb
-        cached_Tsat.deallocate();
-#endif
-#ifdef EP_cache_PsyTsatFnHPb
-        cached_Tsat_HPb.deallocate();
-#endif
-    }
-
-    void InitializePsychRoutines()
+    void InitializePsychRoutines([[maybe_unused]] EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -196,41 +170,17 @@ Array1D_string const PsyRoutineNames(NumPsychMonitors,
         // PURPOSE OF THIS SUBROUTINE:
         // Initializes some variables for PsychRoutines
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
 #ifdef EP_cache_PsyTwbFnTdbWPb
-        cached_Twb.allocate({0, twbcache_size});
+        state.dataPsychCache->cached_Twb.allocate({0, twbcache_size});
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
-        cached_Psat.allocate({0, psatcache_size});
+        state.dataPsychCache->cached_Psat.allocate({0, psatcache_size});
 #endif
 #ifdef EP_cache_PsyTsatFnPb
-        cached_Tsat.allocate({0, tsatcache_size});
+        state.dataPsychCache->cached_Tsat.allocate({0, tsatcache_size});
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
-        cached_Tsat_HPb.allocate({0, tsat_hbp_cache_size});
+        state.dataPsychCache->cached_Tsat_HPb.allocate({0, tsat_hbp_cache_size});
 #endif
     }
 
@@ -436,6 +386,8 @@ Array1D_string const PsyRoutineNames(NumPsychMonitors,
         W_tag = bit_shift(W_tag, -Grid_Shift);
         Pb_tag = bit_shift(Pb_tag, -Grid_Shift);
         hash = bit_and(bit_xor(Tdb_tag, bit_xor(W_tag, Pb_tag)), Int64(twbcache_size - 1));
+
+        auto & cached_Twb = state.dataPsychCache->cached_Twb;
 
         if (cached_Twb(hash).iTdb != Tdb_tag || cached_Twb(hash).iW != W_tag || cached_Twb(hash).iPb != Pb_tag) {
             cached_Twb(hash).iTdb = Tdb_tag;

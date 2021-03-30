@@ -62,10 +62,10 @@ class ResultsFrameworkFixture : public EnergyPlusFixture
 protected:
     using json = nlohmann::json;
 
-    static void SetUpTestCase()
-    {
-        EnergyPlusFixture::SetUpTestCase(); // Sets up the base fixture
-    }
+//    static void SetUpTestCase()
+//    {
+//        EnergyPlusFixture::SetUpTestCase(); // Sets up the base fixture
+//    }
     static void TearDownTestCase()
     {
     }

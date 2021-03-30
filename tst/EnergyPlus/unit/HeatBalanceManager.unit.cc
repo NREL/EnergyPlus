@@ -122,7 +122,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir)
     });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    auto numZones = inputProcessor->getNumObjectsFound(*state, "Zone");
+    auto numZones = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Zone");
     state->dataHeatBalFanSys->ZoneReOrder.allocate(numZones);
     GetZoneData(*state, ErrorsFound);
     GetAirFlowFlag(*state, ErrorsFound);

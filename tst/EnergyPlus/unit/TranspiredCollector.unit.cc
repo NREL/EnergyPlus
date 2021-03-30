@@ -234,7 +234,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
 
     SetSurfaceOutBulbTempAt(*state);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     GetTranspiredCollectorInput(*state);
     EXPECT_FALSE(ErrorsFound);

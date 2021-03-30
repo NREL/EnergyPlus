@@ -239,7 +239,7 @@ namespace EnergyPlus::ChillerAbsorption {
 
         state.dataIPShortCut->cCurrentModuleObject = moduleObjectType;
 
-        state.dataChillerAbsorber->numAbsorbers = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataChillerAbsorber->numAbsorbers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataChillerAbsorber->numAbsorbers <= 0) {
             ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
@@ -253,7 +253,7 @@ namespace EnergyPlus::ChillerAbsorption {
 
         // LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
         for (int AbsorberNum = 1; AbsorberNum <= state.dataChillerAbsorber->numAbsorbers; ++AbsorberNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           AbsorberNum,
                                           state.dataIPShortCut->cAlphaArgs,

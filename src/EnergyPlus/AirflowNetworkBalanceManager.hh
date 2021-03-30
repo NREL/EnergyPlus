@@ -396,7 +396,6 @@ namespace AirflowNetworkBalanceManager {
             this->HybridGlobalErrCount = 0;
             this->AFNNumOfExtOpenings = 0;
             this->OpenNuminZone = 0;
-            solver.clear();
         }
     };
 

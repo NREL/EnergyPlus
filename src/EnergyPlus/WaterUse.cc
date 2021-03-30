@@ -290,13 +290,13 @@ namespace WaterUse {
         int AlphaNum;
 
         state.dataIPShortCut->cCurrentModuleObject = "WaterUse:Equipment";
-        state.dataWaterUse->numWaterEquipment = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataWaterUse->numWaterEquipment = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataWaterUse->numWaterEquipment > 0) {
             state.dataWaterUse->WaterEquipment.allocate(state.dataWaterUse->numWaterEquipment);
 
             for (int WaterEquipNum = 1; WaterEquipNum <= state.dataWaterUse->numWaterEquipment; ++WaterEquipNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               state.dataIPShortCut->cCurrentModuleObject,
                                               WaterEquipNum,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -395,13 +395,13 @@ namespace WaterUse {
         }
 
         state.dataIPShortCut->cCurrentModuleObject = "WaterUse:Connections";
-        state.dataWaterUse->numWaterConnections = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataWaterUse->numWaterConnections = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataWaterUse->numWaterConnections > 0) {
             state.dataWaterUse->WaterConnections.allocate(state.dataWaterUse->numWaterConnections);
 
             for (int WaterConnNum = 1; WaterConnNum <= state.dataWaterUse->numWaterConnections; ++WaterConnNum) {
-                inputProcessor->getObjectItem(state, state.dataIPShortCut->cCurrentModuleObject,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state, state.dataIPShortCut->cCurrentModuleObject,
                                               WaterConnNum,
                                               state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
