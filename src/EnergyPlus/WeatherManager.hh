@@ -1024,8 +1024,8 @@ struct WeatherManagerData : BaseGlobalStruct
         this->GroundTempsFCFromEPWHeader = Array1D<Real64>(12, 0.0);
         this->GroundReflectances = Array1D<Real64>(12, 0.2);
 
-        this->SnowGndRefModifier = 1.0;              // Modifier to ground reflectance during snow
-        this->SnowGndRefModifierForDayltg = 1.0;     // Modifier to ground reflectance during snow for daylighting
+        this->SnowGndRefModifier = 1.0;          // Modifier to ground reflectance during snow
+        this->SnowGndRefModifierForDayltg = 1.0; // Modifier to ground reflectance during snow for daylighting
         this->WaterMainsTempsMethod = WeatherManager::WaterMainsTempCalcMethod::FixedDefault;
         this->WaterMainsTempsSchedule = 0;           // Water mains temperature schedule
         this->WaterMainsTempsAnnualAvgAirTemp = 0.0; // Annual average outdoor air temperature (C)
@@ -1208,14 +1208,15 @@ struct WeatherManagerData : BaseGlobalStruct
           PrintEnvrnStamp(false), Sigma(5.6697e-8), YearOfSim(1), NumDaysInYear(365), EnvironmentReportNbr(0), EnvironmentReportChr(""),
           WeatherFileExists(false), LocationGathered(false), WeatherFileLatitude(0.0), WeatherFileLongitude(0.0), WeatherFileTimeZone(0.0),
           WeatherFileElevation(0.0), GroundTempsFCFromEPWHeader(12, 0.0), GroundReflectances(12, 0.2), SnowGndRefModifier(1.0),
-          SnowGndRefModifierForDayltg(1.0), WaterMainsTempsMethod{WeatherManager::WaterMainsTempCalcMethod::FixedDefault}, WaterMainsTempsSchedule(0), WaterMainsTempsAnnualAvgAirTemp(0.0), WaterMainsTempsMaxDiffAirTemp(0.0),
-          WaterMainsTempsScheduleName(""), wthFCGroundTemps(false), TotRunPers(0), TotRunDesPers(0), NumSpecialDays(0), SpecialDayTypes(366, 0),
-          WeekDayTypes(366, 0), DSTIndex(366, 0), NumDataPeriods(0), NumIntervalsPerHour(1), UseDaylightSaving(true), UseSpecialDays(true),
-          UseRainValues(true), UseSnowValues(true), EPWDaylightSaving(false), IDFDaylightSaving(false), DaylightSavingIsActive(false),
-          WFAllowsLeapYears(false), curSimDayForEndOfRunPeriod(0), Envrn(0), NumOfEnvrn(0), NumEPWTypExtSets(0), NumWPSkyTemperatures(0),
-          RptIsRain(0), RptIsSnow(0), RptDayType(0), HrAngle(0.0), SolarAltitudeAngle(0.0), SolarAzimuthAngle(0.0), HorizIRSky(0.0),
-          TimeStepFraction(0.0), NumSPSiteScheduleNamePtrs(0), EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}), LeapYearAdd(0),
-          DatesShouldBeReset(false), StartDatesCycleShouldBeReset(false), Jan1DatesShouldBeReset(false), RPReadAllWeatherData(false)
+          SnowGndRefModifierForDayltg(1.0), WaterMainsTempsMethod{WeatherManager::WaterMainsTempCalcMethod::FixedDefault}, WaterMainsTempsSchedule(0),
+          WaterMainsTempsAnnualAvgAirTemp(0.0), WaterMainsTempsMaxDiffAirTemp(0.0), WaterMainsTempsScheduleName(""), wthFCGroundTemps(false),
+          TotRunPers(0), TotRunDesPers(0), NumSpecialDays(0), SpecialDayTypes(366, 0), WeekDayTypes(366, 0), DSTIndex(366, 0), NumDataPeriods(0),
+          NumIntervalsPerHour(1), UseDaylightSaving(true), UseSpecialDays(true), UseRainValues(true), UseSnowValues(true), EPWDaylightSaving(false),
+          IDFDaylightSaving(false), DaylightSavingIsActive(false), WFAllowsLeapYears(false), curSimDayForEndOfRunPeriod(0), Envrn(0), NumOfEnvrn(0),
+          NumEPWTypExtSets(0), NumWPSkyTemperatures(0), RptIsRain(0), RptIsSnow(0), RptDayType(0), HrAngle(0.0), SolarAltitudeAngle(0.0),
+          SolarAzimuthAngle(0.0), HorizIRSky(0.0), TimeStepFraction(0.0), NumSPSiteScheduleNamePtrs(0),
+          EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}), LeapYearAdd(0), DatesShouldBeReset(false),
+          StartDatesCycleShouldBeReset(false), Jan1DatesShouldBeReset(false), RPReadAllWeatherData(false)
     {
     }
 };
