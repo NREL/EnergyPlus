@@ -144,10 +144,10 @@ namespace EnergyPlus {
 // 	{
 // 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "SurfaceConvectionAlgorithm:Inside" );
 // 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "RoomAir:Node:AirflowNetwork:InternalGains" );
-// 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "AirflowNetwork:MultiZone:Component:DetailedOpening" );
-// 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit" );
-// 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "HeatPump:WaterToWater:ParameterEstimation:Cooling" );
-// 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "WaterHeater:Stratified" );
+// 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "AirflowNetwork:MultiZone:Component:DetailedOpening"
+// ); 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit" );
+// 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "HeatPump:WaterToWater:ParameterEstimation:Cooling"
+// ); 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "WaterHeater:Stratified" );
 // 	}
 
 // 	EXPECT_EQ( 0ul, total );
@@ -169,10 +169,10 @@ namespace EnergyPlus {
 // 	{
 // 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "SurfaceConvectionAlgorithm:Insides" );
 // 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "RoomAir:Node:AirflowNetwork:InternalGainss" );
-// 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "AirflowNetwork:MultiZone:Component:DetailedOpenings" );
-// 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFits" );
-// 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "HeatPump:WaterToWater:ParameterEstimation:Coolings" );
-// 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "WaterHeater:Stratifieds" );
+// 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "AirflowNetwork:MultiZone:Component:DetailedOpenings"
+// ); 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFits" );
+// 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "HeatPump:WaterToWater:ParameterEstimation:Coolings"
+// ); 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "WaterHeater:Stratifieds" );
 // 	}
 
 // 	EXPECT_EQ( 0ul, total );
@@ -180,52 +180,50 @@ namespace EnergyPlus {
 
 TEST_F(InputProcessorFixture, decode_encode_1)
 {
-    auto const idf = delimited_string({
-        "Building,",
-        "  Ref Bldg Medium Office New2004_v1.3_5.0,",
-        "  0.0,",
-        "  City,",
-        "  0.04,",
-        "  0.2,",
-        "  FullInteriorAndExterior,",
-        "  25.0,",
-        "  6.0;",
-        "",
-        "BuildingSurface:Detailed,",
-        "  Zn009:Flr001,",
-        "  Floor,",
-        "  FLOOR38,",
-        "  SCWINDOW,",
-        "  Surface,",
-        "  Zn009:Flr001,",
-        "  NoSun,",
-        "  NoWind,",
-        "  1.0,",
-        "  4.0,",
-        "  10.0,",
-        "  0.0,",
-        "  0.0,",
-        "  0.0,",
-        "  0.0,",
-        "  0.0,",
-        "  0.0,",
-        "  10.0,",
-        "  0.0,",
-        "  10.0,",
-        "  10.0,",
-        "  0.0;",
-        "",
-        "GlobalGeometryRules,",
-        "  UpperLeftCorner,",
-        "  Counterclockwise,",
-        "  Relative,",
-        "  Relative,",
-        "  Relative;",
-        "",
-        "Version,",
-        "  " + DataStringGlobals::MatchVersion + ";",
-        ""
-    });
+    auto const idf = delimited_string({"Building,",
+                                       "  Ref Bldg Medium Office New2004_v1.3_5.0,",
+                                       "  0.0,",
+                                       "  City,",
+                                       "  0.04,",
+                                       "  0.2,",
+                                       "  FullInteriorAndExterior,",
+                                       "  25.0,",
+                                       "  6.0;",
+                                       "",
+                                       "BuildingSurface:Detailed,",
+                                       "  Zn009:Flr001,",
+                                       "  Floor,",
+                                       "  FLOOR38,",
+                                       "  SCWINDOW,",
+                                       "  Surface,",
+                                       "  Zn009:Flr001,",
+                                       "  NoSun,",
+                                       "  NoWind,",
+                                       "  1.0,",
+                                       "  4.0,",
+                                       "  10.0,",
+                                       "  0.0,",
+                                       "  0.0,",
+                                       "  0.0,",
+                                       "  0.0,",
+                                       "  0.0,",
+                                       "  0.0,",
+                                       "  10.0,",
+                                       "  0.0,",
+                                       "  10.0,",
+                                       "  10.0,",
+                                       "  0.0;",
+                                       "",
+                                       "GlobalGeometryRules,",
+                                       "  UpperLeftCorner,",
+                                       "  Counterclockwise,",
+                                       "  Relative,",
+                                       "  Relative,",
+                                       "  Relative;",
+                                       "",
+                                       "Version,",
+                                       "  " + DataStringGlobals::MatchVersion + ";",
+                                       ""});
 
     ASSERT_TRUE(process_idf(idf));
     std::string encoded = encodeIDF();
@@ -251,43 +249,41 @@ TEST_F(InputProcessorFixture, decode_encode_2)
         "  Yes;",
     }));
 
-    auto const expected(delimited_string({
-        "Building,",
-        "  Bldg,",
-        "  0.0,",
-        "  Suburbs,",
-        "  0.04,",
-        "  0.4,",
-        "  FullExterior,",
-        "  25.0,",
-        "  6.0;",
-        "",
-        "GlobalGeometryRules,",
-        "  UpperLeftCorner,",
-        "  Counterclockwise,",
-        "  Relative,",
-        "  Relative,",
-        "  Relative;",
-        "",
-        "Version,",
-        "  " + DataStringGlobals::MatchVersion + ";",
-        "",
-        "Zone,",
-        "  Core_mid,",
-        "  0.0,",
-        "  0.0,",
-        "  0.0,",
-        "  0.0,",
-        "  1.0,",
-        "  1.0,",
-        "  ,",
-        "  ,",
-        "  Autocalculate,",
-        "  ,",
-        "  ,",
-        "  Yes;",
-        ""
-    }));
+    auto const expected(delimited_string({"Building,",
+                                          "  Bldg,",
+                                          "  0.0,",
+                                          "  Suburbs,",
+                                          "  0.04,",
+                                          "  0.4,",
+                                          "  FullExterior,",
+                                          "  25.0,",
+                                          "  6.0;",
+                                          "",
+                                          "GlobalGeometryRules,",
+                                          "  UpperLeftCorner,",
+                                          "  Counterclockwise,",
+                                          "  Relative,",
+                                          "  Relative,",
+                                          "  Relative;",
+                                          "",
+                                          "Version,",
+                                          "  " + DataStringGlobals::MatchVersion + ";",
+                                          "",
+                                          "Zone,",
+                                          "  Core_mid,",
+                                          "  0.0,",
+                                          "  0.0,",
+                                          "  0.0,",
+                                          "  0.0,",
+                                          "  1.0,",
+                                          "  1.0,",
+                                          "  ,",
+                                          "  ,",
+                                          "  Autocalculate,",
+                                          "  ,",
+                                          "  ,",
+                                          "  Yes;",
+                                          ""}));
 
     ASSERT_TRUE(process_idf(idf));
     std::string encoded = encodeIDF();
@@ -297,51 +293,49 @@ TEST_F(InputProcessorFixture, decode_encode_2)
 TEST_F(InputProcessorFixture, decode_encode_3)
 {
     auto const idf(delimited_string({
-      "Schedule:File,",
-      "  Test Schedule File,      !- Name",
-      "  Any Number,              !- Schedule Type Limits Name",
-      R"(  C:\Users\research\newarea\functional\bad\testing\New Temperatures.csv,  !- File Name)",
-      "  2,                       !- Column Number",
-      "  1,                       !- Rows to Skip at Top",
-      "  8760,                    !- Number of Hours of Data",
-      "  Comma,                   !- Column Separator",
-      "  ,                        !- Interpolate to Timestep",
-      "  10;                      !- Minutes per Item",
+        "Schedule:File,",
+        "  Test Schedule File,      !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        R"(  C:\Users\research\newarea\functional\bad\testing\New Temperatures.csv,  !- File Name)",
+        "  2,                       !- Column Number",
+        "  1,                       !- Rows to Skip at Top",
+        "  8760,                    !- Number of Hours of Data",
+        "  Comma,                   !- Column Separator",
+        "  ,                        !- Interpolate to Timestep",
+        "  10;                      !- Minutes per Item",
     }));
 
-    auto const expected(delimited_string({
-      "Building,",
-      "  Bldg,",
-      "  0.0,",
-      "  Suburbs,",
-      "  0.04,",
-      "  0.4,",
-      "  FullExterior,",
-      "  25.0,",
-      "  6.0;",
-      "",
-      "GlobalGeometryRules,",
-      "  UpperLeftCorner,",
-      "  Counterclockwise,",
-      "  Relative,",
-      "  Relative,",
-      "  Relative;",
-      "",
-      "Schedule:File,",
-      "  Test Schedule File,",
-      "  Any Number,",
-      R"(  C:\Users\research\newarea\functional\bad\testing\New Temperatures.csv,)",
-      "  2.0,",
-      "  1.0,",
-      "  8760.0,",
-      "  Comma,",
-      "  ,",
-      "  10.0;",
-      "",
-      "Version,",
-      "  " + DataStringGlobals::MatchVersion + ";",
-      ""
-    }));
+    auto const expected(delimited_string({"Building,",
+                                          "  Bldg,",
+                                          "  0.0,",
+                                          "  Suburbs,",
+                                          "  0.04,",
+                                          "  0.4,",
+                                          "  FullExterior,",
+                                          "  25.0,",
+                                          "  6.0;",
+                                          "",
+                                          "GlobalGeometryRules,",
+                                          "  UpperLeftCorner,",
+                                          "  Counterclockwise,",
+                                          "  Relative,",
+                                          "  Relative,",
+                                          "  Relative;",
+                                          "",
+                                          "Schedule:File,",
+                                          "  Test Schedule File,",
+                                          "  Any Number,",
+                                          R"(  C:\Users\research\newarea\functional\bad\testing\New Temperatures.csv,)",
+                                          "  2.0,",
+                                          "  1.0,",
+                                          "  8760.0,",
+                                          "  Comma,",
+                                          "  ,",
+                                          "  10.0;",
+                                          "",
+                                          "Version,",
+                                          "  " + DataStringGlobals::MatchVersion + ";",
+                                          ""}));
 
     ASSERT_TRUE(process_idf(idf));
     std::string encoded = encodeIDF();
@@ -350,35 +344,30 @@ TEST_F(InputProcessorFixture, decode_encode_3)
 
 TEST_F(InputProcessorFixture, byte_order_mark)
 {
-    auto const idf(delimited_string(
-            {
-                    "\xEF\xBB\xBF Building,Bldg,0,Suburbs,0.04,0.4,FullExterior,25,6;",
-                    "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative,Relative,Relative;",
-                    "Version," + DataStringGlobals::MatchVersion + ";"
-            }));
+    auto const idf(delimited_string({"\xEF\xBB\xBF Building,Bldg,0,Suburbs,0.04,0.4,FullExterior,25,6;",
+                                     "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative,Relative,Relative;",
+                                     "Version," + DataStringGlobals::MatchVersion + ";"}));
 
-    auto const expected(delimited_string({
-        "Building,",
-        "  Bldg,",
-        "  0.0,",
-        "  Suburbs,",
-        "  0.04,",
-        "  0.4,",
-        "  FullExterior,",
-        "  25.0,",
-        "  6.0;",
-        "",
-        "GlobalGeometryRules,",
-        "  UpperLeftCorner,",
-        "  Counterclockwise,",
-        "  Relative,",
-        "  Relative,",
-        "  Relative;",
-        "",
-        "Version,",
-        "  " + DataStringGlobals::MatchVersion + ";",
-        ""
-    }));
+    auto const expected(delimited_string({"Building,",
+                                          "  Bldg,",
+                                          "  0.0,",
+                                          "  Suburbs,",
+                                          "  0.04,",
+                                          "  0.4,",
+                                          "  FullExterior,",
+                                          "  25.0,",
+                                          "  6.0;",
+                                          "",
+                                          "GlobalGeometryRules,",
+                                          "  UpperLeftCorner,",
+                                          "  Counterclockwise,",
+                                          "  Relative,",
+                                          "  Relative,",
+                                          "  Relative;",
+                                          "",
+                                          "Version,",
+                                          "  " + DataStringGlobals::MatchVersion + ";",
+                                          ""}));
 
     ASSERT_TRUE(process_idf(idf));
     std::string encoded = encodeIDF();
@@ -477,7 +466,7 @@ TEST_F(InputProcessorFixture, parse_utf_8_json)
                          //               {"solar_distribution", ""},
                          {"maximum_number_of_warmup_days", 25},
                          {"minimum_number_of_warmup_days", 6}}}}}};
-    EXPECT_EQ( expected, parsed );
+    EXPECT_EQ(expected, parsed);
 }
 
 TEST_F(InputProcessorFixture, parse_bad_utf_8_json_1)
@@ -494,31 +483,31 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_1)
         "    ;",
     }));
 
-    std::string const expected(
-      "{\"Building\":{"
-        "\"\xED\xA0\x80\":{"
-          "\"idf_max_extensible_fields\":0,"
-          "\"idf_max_fields\":8,"
-          "\"idf_order\":1"
-        "}"
-      "},"
-      "\"GlobalGeometryRules\":{"
-        "\"\":{"
-          "\"coordinate_system\":\"Relative\","
-          "\"daylighting_reference_point_coordinate_system\":\"Relative\","
-          "\"idf_order\":0,"
-          "\"rectangular_surface_coordinate_system\":\"Relative\","
-          "\"starting_vertex_position\":\"UpperLeftCorner\","
-          "\"vertex_entry_direction\":\"Counterclockwise\""
-        "}"
-      "},"
-      "\"Version\":{"
-        "\"\":{"
-          "\"idf_order\":0,"
-          "\"version_identifier\":\"" + DataStringGlobals::MatchVersion + "\""
-        "}"
-      "}}"
-    );
+    std::string const expected("{\"Building\":{"
+                               "\"\xED\xA0\x80\":{"
+                               "\"idf_max_extensible_fields\":0,"
+                               "\"idf_max_fields\":8,"
+                               "\"idf_order\":1"
+                               "}"
+                               "},"
+                               "\"GlobalGeometryRules\":{"
+                               "\"\":{"
+                               "\"coordinate_system\":\"Relative\","
+                               "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+                               "\"idf_order\":0,"
+                               "\"rectangular_surface_coordinate_system\":\"Relative\","
+                               "\"starting_vertex_position\":\"UpperLeftCorner\","
+                               "\"vertex_entry_direction\":\"Counterclockwise\""
+                               "}"
+                               "},"
+                               "\"Version\":{"
+                               "\"\":{"
+                               "\"idf_order\":0,"
+                               "\"version_identifier\":\"" +
+                               DataStringGlobals::MatchVersion +
+                               "\""
+                               "}"
+                               "}}");
 
     ASSERT_TRUE(process_idf(idf));
     json &epJSON = getEpJSON();
@@ -540,38 +529,38 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_2)
         "    ;",
     }));
 
-    std::string const expected(
-      "{\"Building\":{"
-        "\"\":{"
-          "\"idf_max_extensible_fields\":0,"
-          "\"idf_max_fields\":8,"
-          "\"idf_order\":1"
-        "}"
-      "},"
-      "\"GlobalGeometryRules\":{"
-        "\"\":{"
-          "\"coordinate_system\":\"Relative\","
-          "\"daylighting_reference_point_coordinate_system\":\"Relative\","
-          "\"idf_order\":0,"
-          "\"rectangular_surface_coordinate_system\":\"Relative\","
-          "\"starting_vertex_position\":\"UpperLeftCorner\","
-          "\"vertex_entry_direction\":\"Counterclockwise\""
-        "}"
-      "},"
-      "\"Version\":{"
-        "\"\":{"
-          "\"idf_order\":0,"
-          "\"version_identifier\":\"" + DataStringGlobals::MatchVersion + "\""
-        "}"
-      "}}"
-    );
+    std::string const expected("{\"Building\":{"
+                               "\"\":{"
+                               "\"idf_max_extensible_fields\":0,"
+                               "\"idf_max_fields\":8,"
+                               "\"idf_order\":1"
+                               "}"
+                               "},"
+                               "\"GlobalGeometryRules\":{"
+                               "\"\":{"
+                               "\"coordinate_system\":\"Relative\","
+                               "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+                               "\"idf_order\":0,"
+                               "\"rectangular_surface_coordinate_system\":\"Relative\","
+                               "\"starting_vertex_position\":\"UpperLeftCorner\","
+                               "\"vertex_entry_direction\":\"Counterclockwise\""
+                               "}"
+                               "},"
+                               "\"Version\":{"
+                               "\"\":{"
+                               "\"idf_order\":0,"
+                               "\"version_identifier\":\"" +
+                               DataStringGlobals::MatchVersion +
+                               "\""
+                               "}"
+                               "}}");
 
     ASSERT_TRUE(process_idf(idf));
     json &epJSON = getEpJSON();
 
     auto const input_file = epJSON.dump(-1, ' ', false, json::error_handler_t::ignore);
 
-    EXPECT_EQ( expected, input_file );
+    EXPECT_EQ(expected, input_file);
 }
 
 TEST_F(InputProcessorFixture, parse_bad_utf_8_json_3)
@@ -588,38 +577,38 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_3)
         "    ;",
     }));
 
-    std::string const expected(
-      "{\"Building\":{"
-        "\"\xEF\xBF\xBD\xEF\xBF\xBD\xEF\xBF\xBD\":{"
-          "\"idf_max_extensible_fields\":0,"
-          "\"idf_max_fields\":8,"
-          "\"idf_order\":1"
-        "}"
-      "},"
-      "\"GlobalGeometryRules\":{"
-        "\"\":{"
-          "\"coordinate_system\":\"Relative\","
-          "\"daylighting_reference_point_coordinate_system\":\"Relative\","
-          "\"idf_order\":0,"
-          "\"rectangular_surface_coordinate_system\":\"Relative\","
-          "\"starting_vertex_position\":\"UpperLeftCorner\","
-          "\"vertex_entry_direction\":\"Counterclockwise\""
-        "}"
-      "},"
-      "\"Version\":{"
-        "\"\":{"
-          "\"idf_order\":0,"
-          "\"version_identifier\":\"" + DataStringGlobals::MatchVersion + "\""
-        "}"
-      "}}"
-    );
+    std::string const expected("{\"Building\":{"
+                               "\"\xEF\xBF\xBD\xEF\xBF\xBD\xEF\xBF\xBD\":{"
+                               "\"idf_max_extensible_fields\":0,"
+                               "\"idf_max_fields\":8,"
+                               "\"idf_order\":1"
+                               "}"
+                               "},"
+                               "\"GlobalGeometryRules\":{"
+                               "\"\":{"
+                               "\"coordinate_system\":\"Relative\","
+                               "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+                               "\"idf_order\":0,"
+                               "\"rectangular_surface_coordinate_system\":\"Relative\","
+                               "\"starting_vertex_position\":\"UpperLeftCorner\","
+                               "\"vertex_entry_direction\":\"Counterclockwise\""
+                               "}"
+                               "},"
+                               "\"Version\":{"
+                               "\"\":{"
+                               "\"idf_order\":0,"
+                               "\"version_identifier\":\"" +
+                               DataStringGlobals::MatchVersion +
+                               "\""
+                               "}"
+                               "}}");
 
     ASSERT_TRUE(process_idf(idf));
     json &epJSON = getEpJSON();
 
     auto const input_file = epJSON.dump(-1, ' ', false, json::error_handler_t::replace);
 
-    EXPECT_EQ( expected, input_file );
+    EXPECT_EQ(expected, input_file);
 }
 
 TEST_F(InputProcessorFixture, parse_latin1_json)
@@ -627,24 +616,22 @@ TEST_F(InputProcessorFixture, parse_latin1_json)
 
     // Test for #7388 -  Non UTF-8 characters throwing false blank name error
 
-    std::string const idf(delimited_string({
-        "  Construction,",
-        "    \x31\xB0\x70\x69\x61\x6E\x6F,  !- Name",
-        "    intonaco int calce;      !- Outside Layer"
-    }));
+    std::string const idf(
+        delimited_string({"  Construction,", "    \x31\xB0\x70\x69\x61\x6E\x6F,  !- Name", "    intonaco int calce;      !- Outside Layer"}));
 
     EXPECT_FALSE(process_idf(idf, false)); // No assertions
-    const std::string error_string = delimited_string({
-        "   ** Severe  ** <root>[Construction] - Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints: '1\xB0piano'.",
-        "   ** Severe  ** <root>[Construction] - Object name is required and cannot be blank or whitespace, and must be UTF-8 encoded"
-    });
+    const std::string error_string = delimited_string(
+        {"   ** Severe  ** <root>[Construction] - Object contains a property that could not be validated using 'properties' or "
+         "'additionalProperties' constraints: '1\xB0piano'.",
+         "   ** Severe  ** <root>[Construction] - Object name is required and cannot be blank or whitespace, and must be UTF-8 encoded"});
     compare_err_stream(error_string, true);
 
     auto const &errors = validationErrors();
     EXPECT_EQ(errors.size(), 2ul);
-    EXPECT_EQ("<root>[Construction] - Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints: '1\xB0piano'.", errors[0]);
+    EXPECT_EQ("<root>[Construction] - Object contains a property that could not be validated using 'properties' or 'additionalProperties' "
+              "constraints: '1\xB0piano'.",
+              errors[0]);
     EXPECT_EQ("<root>[Construction] - Object name is required and cannot be blank or whitespace, and must be UTF-8 encoded", errors[1]);
-
 
     json &epJSON = getEpJSON();
 
@@ -653,7 +640,6 @@ TEST_F(InputProcessorFixture, parse_latin1_json)
     auto iit = it->begin();
     EXPECT_EQ("1\xB0piano", iit.key());
 }
-
 
 TEST_F(InputProcessorFixture, parse_malformed_idf)
 {
@@ -688,11 +674,10 @@ TEST_F(InputProcessorFixture, parse_malformed_idf)
     }));
 
     EXPECT_FALSE(process_idf(idf, false));
-    EXPECT_TRUE(compare_err_stream(delimited_string({
-        "   ** Severe  ** Line: 16 Index: 9 - Field cannot be Autosize or Autocalculate",
-        "   ** Severe  ** Line: 18 Index: 9 - Field cannot be Autosize or Autocalculate",
-        "   ** Severe  ** <root>[Connector:Splitter][Chiled Water Loop CndW Supply Splitter][branches][20] - Missing required property 'outlet_branch_name'."
-    })));
+    EXPECT_TRUE(compare_err_stream(delimited_string({"   ** Severe  ** Line: 16 Index: 9 - Field cannot be Autosize or Autocalculate",
+                                                     "   ** Severe  ** Line: 18 Index: 9 - Field cannot be Autosize or Autocalculate",
+                                                     "   ** Severe  ** <root>[Connector:Splitter][Chiled Water Loop CndW Supply "
+                                                     "Splitter][branches][20] - Missing required property 'outlet_branch_name'."})));
 }
 
 TEST_F(InputProcessorFixture, parse_two_RunPeriod)
@@ -901,9 +886,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
                          {"solar_distribution", "FullExterior"},
                          {"maximum_number_of_warmup_days", 25},
                          {"minimum_number_of_warmup_days", 6}}}}},
-                     {"Version",
-                      {{"",
-                        {{"version_identifier", DataStringGlobals::MatchVersion}}}}}};
+                     {"Version", {{"", {{"version_identifier", DataStringGlobals::MatchVersion}}}}}};
 
     auto const expected_idf(delimited_string({"Building,",
                                               "  Bldg,",
@@ -2060,13 +2043,23 @@ TEST_F(InputProcessorFixture, getObjectItem_json1)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor->getObjectItem(*state,
-        CurrentModuleObject, NumSQLite, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+                                                              CurrentModuleObject,
+                                                              NumSQLite,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"SIMPLEANDTABULAR",""}), Alphas));
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"Option Type","Unit Conversion for Tabular Data"}), cAlphaFields));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"SIMPLEANDTABULAR", ""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"Option Type", "Unit Conversion for Tabular Data"}), cAlphaFields));
     EXPECT_TRUE(compare_containers(std::vector<std::string>({}), cNumericFields));
     EXPECT_TRUE(compare_containers(std::vector<bool>({}), lNumericBlanks));
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false,true}), lAlphaBlanks));
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false, true}), lAlphaBlanks));
     EXPECT_TRUE(compare_containers(std::vector<Real64>({}), Numbers));
     EXPECT_EQ(1, NumAlphas);
     EXPECT_EQ(0, NumNumbers);
@@ -2108,17 +2101,18 @@ TEST_F(InputProcessorFixture, getObjectItem_json2)
     Array1D_bool lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state, CurrentModuleObject,
-                                  NumGasSteamHums,
-                                  Alphas,
-                                  NumAlphas,
-                                  Numbers,
-                                  NumNumbers,
-                                  IOStatus,
-                                  lNumericBlanks,
-                                  lAlphaBlanks,
-                                  cAlphaFields,
-                                  cNumericFields);
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                              CurrentModuleObject,
+                                                              NumGasSteamHums,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
     EXPECT_TRUE(compare_containers(
         std::vector<std::string>({"MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", ""}),
@@ -2182,17 +2176,18 @@ TEST_F(InputProcessorFixture, getObjectItem_json3)
     Array1D_bool lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state, CurrentModuleObject,
-                                  numBuildingSurfaceDetailed,
-                                  Alphas,
-                                  NumAlphas,
-                                  Numbers,
-                                  NumNumbers,
-                                  IOStatus,
-                                  lNumericBlanks,
-                                  lAlphaBlanks,
-                                  cAlphaFields,
-                                  cNumericFields);
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                              CurrentModuleObject,
+                                                              numBuildingSurfaceDetailed,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
     EXPECT_TRUE(compare_containers(
         std::vector<std::string>({"ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED"}), Alphas));
@@ -2244,17 +2239,18 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state, CurrentModuleObject,
-                                  num_curve_biquadratic_objects,
-                                  Alphas,
-                                  NumAlphas,
-                                  Numbers,
-                                  NumNumbers,
-                                  IOStatus,
-                                  lNumericBlanks,
-                                  lAlphaBlanks,
-                                  cAlphaFields,
-                                  cNumericFields);
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                              CurrentModuleObject,
+                                                              num_curve_biquadratic_objects,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
     EXPECT_EQ(6, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "123456E", "", ""}), Alphas));
@@ -2308,17 +2304,18 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields2)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state, CurrentModuleObject,
-                                  num_curve_biquadratic_objects,
-                                  Alphas,
-                                  NumAlphas,
-                                  Numbers,
-                                  NumNumbers,
-                                  IOStatus,
-                                  lNumericBlanks,
-                                  lAlphaBlanks,
-                                  cAlphaFields,
-                                  cNumericFields);
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                              CurrentModuleObject,
+                                                              num_curve_biquadratic_objects,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
     EXPECT_EQ(6, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "E123", "", ""}), Alphas));
@@ -2380,17 +2377,18 @@ TEST_F(InputProcessorFixture, getObjectItem_empty_fields_with_no_defaults)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state, CurrentModuleObject,
-                                  num_curve_biquadratic_objects,
-                                  Alphas,
-                                  NumAlphas,
-                                  Numbers,
-                                  NumNumbers,
-                                  IOStatus,
-                                  lNumericBlanks,
-                                  lAlphaBlanks,
-                                  cAlphaFields,
-                                  cNumericFields);
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                              CurrentModuleObject,
+                                                              num_curve_biquadratic_objects,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
     EXPECT_EQ(4, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({
@@ -2486,17 +2484,18 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_obj_pulled_up_semicolon)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state, CurrentModuleObject,
-                                  num_curve_biquadratic_objects,
-                                  Alphas,
-                                  NumAlphas,
-                                  Numbers,
-                                  NumNumbers,
-                                  IOStatus,
-                                  lNumericBlanks,
-                                  lAlphaBlanks,
-                                  cAlphaFields,
-                                  cNumericFields);
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                              CurrentModuleObject,
+                                                              num_curve_biquadratic_objects,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"HPACCOOLEIRFT SPEED", "", "", ""}), Alphas));
@@ -2588,17 +2587,18 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state, CurrentModuleObject,
-                                  NumSizingSystem,
-                                  Alphas,
-                                  NumAlphas,
-                                  Numbers,
-                                  NumNumbers,
-                                  IOStatus,
-                                  lNumericBlanks,
-                                  lAlphaBlanks,
-                                  cAlphaFields,
-                                  cNumericFields);
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                              CurrentModuleObject,
+                                                              NumSizingSystem,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
     EXPECT_EQ(11, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"WEST ZONE AIR SYSTEM",
@@ -2673,17 +2673,18 @@ TEST_F(InputProcessorFixture, getObjectItem_missing_numerics_with_defaults_and_a
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state, CurrentModuleObject,
-                                  NumGasSteamHums,
-                                  Alphas,
-                                  NumAlphas,
-                                  Numbers,
-                                  NumNumbers,
-                                  IOStatus,
-                                  lNumericBlanks,
-                                  lAlphaBlanks,
-                                  cAlphaFields,
-                                  cNumericFields);
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                              CurrentModuleObject,
+                                                              NumGasSteamHums,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
     EXPECT_EQ(7, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"MAIN GAS HUMIDIFIER",
@@ -2747,17 +2748,18 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_autosize_fields)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state, CurrentModuleObject,
-                                  NumGasSteamHums,
-                                  Alphas,
-                                  NumAlphas,
-                                  Numbers,
-                                  NumNumbers,
-                                  IOStatus,
-                                  lNumericBlanks,
-                                  lAlphaBlanks,
-                                  cAlphaFields,
-                                  cNumericFields);
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                              CurrentModuleObject,
+                                                              NumGasSteamHums,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
     EXPECT_EQ(2, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"MAIN GAS HUMIDIFIER", "", "", "", "", "", ""}), Alphas));
@@ -2846,17 +2848,18 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state, CurrentModuleObject,
-                                  num_unitary_systems,
-                                  Alphas,
-                                  NumAlphas,
-                                  Numbers,
-                                  NumNumbers,
-                                  IOStatus,
-                                  lNumericBlanks,
-                                  lAlphaBlanks,
-                                  cAlphaFields,
-                                  cNumericFields);
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                              CurrentModuleObject,
+                                                              num_unitary_systems,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
     EXPECT_EQ(22, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"GASHEAT DXAC FURNACE 1",
@@ -2934,17 +2937,18 @@ TEST_F(InputProcessorFixture, getObjectItem_test_numbers_as_strings)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state, CurrentModuleObject,
-                                  num_eq_connections,
-                                  Alphas,
-                                  NumAlphas,
-                                  Numbers,
-                                  NumNumbers,
-                                  IOStatus,
-                                  lNumericBlanks,
-                                  lAlphaBlanks,
-                                  cAlphaFields,
-                                  cNumericFields);
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                              CurrentModuleObject,
+                                                              num_eq_connections,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
     EXPECT_EQ(6, NumAlphas);
     EXPECT_TRUE(compare_containers(
@@ -2994,7 +2998,17 @@ TEST_F(InputProcessorFixture, getObjectItem_test_zone_input)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor->getObjectItem(*state,
-        CurrentModuleObject, num_zones, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+                                                              CurrentModuleObject,
+                                                              num_zones,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"EAST ZONE", "", "", ""}), Alphas));
@@ -3050,17 +3064,18 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state, CurrentModuleObject,
-                                  num_equipment_connections,
-                                  Alphas,
-                                  NumAlphas,
-                                  Numbers,
-                                  NumNumbers,
-                                  IOStatus,
-                                  lNumericBlanks,
-                                  lAlphaBlanks,
-                                  cAlphaFields,
-                                  cNumericFields);
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                              CurrentModuleObject,
+                                                              num_equipment_connections,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
     EXPECT_EQ(6, NumAlphas);
     EXPECT_TRUE(compare_containers(
@@ -3091,17 +3106,18 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
     Array1D_string cAlphaFields2(NumAlphas2);
     Array1D_string cNumericFields2(NumNumbers2);
 
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state, CurrentModuleObject,
-                                  num_equipment_lists,
-                                  Alphas2,
-                                  NumAlphas2,
-                                  Numbers2,
-                                  NumNumbers2,
-                                  IOStatus,
-                                  lNumericBlanks2,
-                                  lAlphaBlanks2,
-                                  cAlphaFields2,
-                                  cNumericFields2);
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                              CurrentModuleObject,
+                                                              num_equipment_lists,
+                                                              Alphas2,
+                                                              NumAlphas2,
+                                                              Numbers2,
+                                                              NumNumbers2,
+                                                              IOStatus,
+                                                              lNumericBlanks2,
+                                                              lAlphaBlanks2,
+                                                              cAlphaFields2,
+                                                              cNumericFields2);
 
     EXPECT_EQ(6, NumAlphas2);
     EXPECT_TRUE(compare_containers(
@@ -3165,8 +3181,8 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
-        CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+    state->dataInputProcessing->inputProcessor->getObjectItem(
+        *state, CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_EQ(7, NumAlphas);
     EXPECT_TRUE(compare_containers(
@@ -3193,7 +3209,17 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
     Array1D_string cNumericFields2(NumNumbers2);
 
     state->dataInputProcessing->inputProcessor->getObjectItem(*state,
-        CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2);
+                                                              CurrentModuleObject,
+                                                              2,
+                                                              Alphas2,
+                                                              NumAlphas2,
+                                                              Numbers2,
+                                                              NumNumbers2,
+                                                              IOStatus,
+                                                              lNumericBlanks2,
+                                                              lAlphaBlanks2,
+                                                              cAlphaFields2,
+                                                              cNumericFields2);
 
     EXPECT_EQ(7, NumAlphas);
     EXPECT_TRUE(compare_containers(
@@ -3251,17 +3277,18 @@ TEST_F(InputProcessorFixture, getObjectItem_schedule_objects)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state, CurrentModuleObject,
-                                  num_schedule_type_limits,
-                                  Alphas,
-                                  NumAlphas,
-                                  Numbers,
-                                  NumNumbers,
-                                  IOStatus,
-                                  lNumericBlanks,
-                                  lAlphaBlanks,
-                                  cAlphaFields,
-                                  cNumericFields);
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                              CurrentModuleObject,
+                                                              num_schedule_type_limits,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"ANY NUMBER", "", ""}), Alphas));
@@ -3290,7 +3317,17 @@ TEST_F(InputProcessorFixture, getObjectItem_schedule_objects)
     Array1D_string cNumericFields2(NumNumbers);
 
     state->dataInputProcessing->inputProcessor->getObjectItem(*state,
-        CurrentModuleObject, 2, Alphas2, NumAlphas, Numbers2, NumNumbers, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2);
+                                                              CurrentModuleObject,
+                                                              2,
+                                                              Alphas2,
+                                                              NumAlphas,
+                                                              Numbers2,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks2,
+                                                              lAlphaBlanks2,
+                                                              cAlphaFields2,
+                                                              cNumericFields2);
 
     // Container size is 4500 here!
     EXPECT_EQ(6, NumAlphas);
@@ -3343,7 +3380,17 @@ TEST_F(InputProcessorFixture, getObjectItem_fan_on_off)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor->getObjectItem(*state,
-        CurrentModuleObject, num_fans, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+                                                              CurrentModuleObject,
+                                                              num_fans,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
     EXPECT_EQ(4, NumAlphas);
     EXPECT_TRUE(compare_containers(
@@ -3406,8 +3453,8 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
-        CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+    state->dataInputProcessing->inputProcessor->getObjectItem(
+        *state, CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLCAPFFF", "", ""}), Alphas));
@@ -3431,7 +3478,17 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
     Array1D_string cNumericFields2(NumNumbers2);
 
     state->dataInputProcessing->inputProcessor->getObjectItem(*state,
-        CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2);
+                                                              CurrentModuleObject,
+                                                              2,
+                                                              Alphas2,
+                                                              NumAlphas2,
+                                                              Numbers2,
+                                                              NumNumbers2,
+                                                              IOStatus,
+                                                              lNumericBlanks2,
+                                                              lAlphaBlanks2,
+                                                              cAlphaFields2,
+                                                              cNumericFields2);
 
     EXPECT_EQ(1, NumAlphas2);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLEIRFFF", "", ""}), Alphas2));
@@ -3455,7 +3512,17 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
     Array1D_string cNumericFields3(NumNumbers3);
 
     state->dataInputProcessing->inputProcessor->getObjectItem(*state,
-        CurrentModuleObject, 3, Alphas3, NumAlphas3, Numbers3, NumNumbers3, IOStatus, lNumericBlanks3, lAlphaBlanks3, cAlphaFields3, cNumericFields3);
+                                                              CurrentModuleObject,
+                                                              3,
+                                                              Alphas3,
+                                                              NumAlphas3,
+                                                              Numbers3,
+                                                              NumNumbers3,
+                                                              IOStatus,
+                                                              lNumericBlanks3,
+                                                              lAlphaBlanks3,
+                                                              cAlphaFields3,
+                                                              cNumericFields3);
 
     EXPECT_EQ(1, NumAlphas3);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"PLFFPLR", "", ""}), Alphas3));
@@ -3616,7 +3683,17 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor->getObjectItem(*state,
-        CurrentModuleObject, num_coils, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+                                                              CurrentModuleObject,
+                                                              num_coils,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
     EXPECT_EQ(49, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"FURNACE ACDXCOIL 1",
@@ -3716,7 +3793,8 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
     EXPECT_EQ(ItemNum, 0); // developer error, CompValType is invalid, ItemNum = 0
 
     CompValType = "indoor_air_inlet_node_name";
-    ItemNum = state->dataInputProcessing->inputProcessor->getObjectItemNum(*state, CurrentModuleObject, CompValType, "DX Cooling Coil Air Inlet Node");
+    ItemNum =
+        state->dataInputProcessing->inputProcessor->getObjectItemNum(*state, CurrentModuleObject, CompValType, "DX Cooling Coil Air Inlet Node");
     EXPECT_GT(ItemNum, 0); // Object type is valid, CompValType is valid, CompValType name is valid, ItemNum > 0
 }
 
@@ -3781,8 +3859,8 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
-        CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+    state->dataInputProcessing->inputProcessor->getObjectItem(
+        *state, CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_EQ(4, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLCAPFT", "TEMPERATURE", "TEMPERATURE", "DIMENSIONLESS"}), Alphas));
@@ -3810,7 +3888,17 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic)
     Array1D_string cNumericFields2(NumNumbers2);
 
     state->dataInputProcessing->inputProcessor->getObjectItem(*state,
-        CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2);
+                                                              CurrentModuleObject,
+                                                              2,
+                                                              Alphas2,
+                                                              NumAlphas2,
+                                                              Numbers2,
+                                                              NumNumbers2,
+                                                              IOStatus,
+                                                              lNumericBlanks2,
+                                                              lAlphaBlanks2,
+                                                              cAlphaFields2,
+                                                              cNumericFields2);
 
     EXPECT_EQ(4, NumAlphas2);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLEIRFT", "TEMPERATURE", "TEMPERATURE", "DIMENSIONLESS"}), Alphas2));
@@ -3870,17 +3958,18 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic2)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    state->dataInputProcessing->inputProcessor->getObjectItem(*state, CurrentModuleObject,
-                                  num_curve_biquad,
-                                  Alphas,
-                                  NumAlphas,
-                                  Numbers,
-                                  NumNumbers,
-                                  IOStatus,
-                                  lNumericBlanks,
-                                  lAlphaBlanks,
-                                  cAlphaFields,
-                                  cNumericFields);
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                              CurrentModuleObject,
+                                                              num_curve_biquad,
+                                                              Alphas,
+                                                              NumAlphas,
+                                                              Numbers,
+                                                              NumNumbers,
+                                                              IOStatus,
+                                                              lNumericBlanks,
+                                                              lAlphaBlanks,
+                                                              cAlphaFields,
+                                                              cNumericFields);
 
     EXPECT_EQ(4, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"HPACCOOLCAPFT SPEED 1", "TEMPERATURE", "TEMPERATURE", "DIMENSIONLESS"}), Alphas));
@@ -3920,7 +4009,6 @@ TEST_F(InputProcessorFixture, FalseDuplicates)
         "  0.6500000;               !- Visible Absorptance",
     }));
 
-
     ASSERT_TRUE(process_idf(idf));
 }
 
@@ -3930,7 +4018,7 @@ TEST_F(InputProcessorFixture, FalseDuplicates_LowerLevel)
     json root;
     std::string obj_name = "Material";
     std::string name1 = "Standard insulation_01";
-    json mat1 = { {"name", name1}, {"Roughness", "MediumRough"}};
+    json mat1 = {{"name", name1}, {"Roughness", "MediumRough"}};
 
     EXPECT_TRUE(mat1.is_object());
 
@@ -3941,7 +4029,7 @@ TEST_F(InputProcessorFixture, FalseDuplicates_LowerLevel)
         // Second material shouldn't be found!
         // Oh Oh, this fails
         auto it = root[obj_name].find(search_name);
-        EXPECT_TRUE( it == root[obj_name].end());
+        EXPECT_TRUE(it == root[obj_name].end());
         if (it != root[obj_name].end()) {
             EXPECT_TRUE(false) << it.key();
         }
@@ -3961,10 +4049,10 @@ TEST_F(InputProcessorFixture, FalseDuplicates_LowerLevel)
 
     // This used to fail before fix in doj/alphanum.hpp
     test("Standard insulation_001");
-
 }
 
-TEST_F(InputProcessorFixture, FalseDuplicates_LowestLevel_AlphaNum) {
+TEST_F(InputProcessorFixture, FalseDuplicates_LowestLevel_AlphaNum)
+{
 
     EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_0010") < 0);
 
@@ -3977,7 +4065,6 @@ TEST_F(InputProcessorFixture, FalseDuplicates_LowestLevel_AlphaNum) {
     EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_1") < 0);
 
     EXPECT_TRUE(doj::alphanum_comp<std::string>("n_010", "n_01") > 0);
-
 }
 
 TEST_F(InputProcessorFixture, Duplicate_Name_Context)
@@ -4000,11 +4087,9 @@ TEST_F(InputProcessorFixture, Duplicate_Name_Context)
         "  Grounds Lights;          !- End-Use Subcategory",
     }));
 
-
     EXPECT_FALSE(process_idf(idf, false)); // No assertions
-    const std::string error_string = delimited_string({
-        "   ** Severe  ** Duplicate name found for object of type \"Exterior:Lights\" named \"ExtLights\". Overwriting existing object."
-    });
+    const std::string error_string = delimited_string(
+        {"   ** Severe  ** Duplicate name found for object of type \"Exterior:Lights\" named \"ExtLights\". Overwriting existing object."});
     compare_err_stream(error_string, true);
 }
 
@@ -4062,14 +4147,14 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_basic)
         // 8 fields with default, 0 Autosizable, 0 Autocalculatable
         // 1 fields defaulted   , 0 Autosized  , 0 Autocalculated
         "Building,",
-        "  ,  !- Name",                                                                     // Has a default   - DEFAULTED - Special case (name)
-        "  0,                       !- North Axis {deg}",                                   // Has a default
-        "  Suburbs,                 !- Terrain",                                            // Has a default
-        "  0.001,                   !- Loads Convergence Tolerance Value",                  // Has a default
-        "  0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}",   // Has a default
-        "  FullInteriorAndExterior, !- Solar Distribution",                                 // Has a default
-        "  25,                      !- Maximum Number of Warmup Days",                      // Has a default
-        "  6;                       !- Minimum Number of Warmup Days",                      // Has a default
+        "  ,  !- Name",                                                                   // Has a default   - DEFAULTED - Special case (name)
+        "  0,                       !- North Axis {deg}",                                 // Has a default
+        "  Suburbs,                 !- Terrain",                                          // Has a default
+        "  0.001,                   !- Loads Convergence Tolerance Value",                // Has a default
+        "  0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}", // Has a default
+        "  FullInteriorAndExterior, !- Solar Distribution",                               // Has a default
+        "  25,                      !- Maximum Number of Warmup Days",                    // Has a default
+        "  6;                       !- Minimum Number of Warmup Days",                    // Has a default
 
         // 2 fields with default, 0 Autosizable, 0 Autocalculatable
         // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
@@ -4084,49 +4169,50 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_basic)
         // 11 fields with defaults, 0 Autosizable, 0 Autocalculatable
         // 1 fields defaulted     , 0 Autosized  , 0 Autocalculated
 
-
-
         // 23 fields with default, 6 Autosizable, 3 Autocalculatable
         // 10 fields defaulted   , 4 Autosized  , 2 Autocalculated
         "CoolingTower:SingleSpeed,",
-        "  CT Single Speed,                        !- Name",                                                      // No Default
-        "  CT Single Speed Inlet Node,             !- Water Inlet Node Name",                                     // No Default
-        "  CT Single Speed Outlet Node,            !- Water Outlet Node Name",                                    // No Default
-        "  AutosiZe,                               !- Design Water Flow Rate {m3/s}",                             // Autosizable, no default (testing casing too)
-        "  Autosize,                               !- Design Air Flow Rate {m3/s}",                               // Autosizable, no default, required
-        "  10000,                                  !- Design Fan Power {W}",                                      // Autosizable, no default, required
-        "  Autosize,                               !- Design U-Factor Times Area Value {W/K}",                    // Autosizable, no default
-        "  AutoSIze,                               !- Free Convection Air Flow Rate {m3/s}",                      // Autocalculatable, default numeric: NOTE, using "Autosize" and not "Autocalculate
-        "  0.1,                                    !- Free Convection Air Flow Rate Sizing Factor",               // Has numeric default
-        "  AutocAlcUlate,                          !- Free Convection U-Factor Times Area Value {W/K}",           // Autocalculatable, default numeric
-        "  ,                                       !- Free Convection U-Factor Times Area Value Sizing Factor",   // Has numeric default - DEFAULTED
-        "  UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",                                  // Has default (UFactorTimesAreaAndDesignWaterFlowRate)
+        "  CT Single Speed,                        !- Name",                                        // No Default
+        "  CT Single Speed Inlet Node,             !- Water Inlet Node Name",                       // No Default
+        "  CT Single Speed Outlet Node,            !- Water Outlet Node Name",                      // No Default
+        "  AutosiZe,                               !- Design Water Flow Rate {m3/s}",               // Autosizable, no default (testing casing too)
+        "  Autosize,                               !- Design Air Flow Rate {m3/s}",                 // Autosizable, no default, required
+        "  10000,                                  !- Design Fan Power {W}",                        // Autosizable, no default, required
+        "  Autosize,                               !- Design U-Factor Times Area Value {W/K}",      // Autosizable, no default
+        "  AutoSIze,                               !- Free Convection Air Flow Rate {m3/s}",        // Autocalculatable, default numeric: NOTE, using
+                                                                                                    // "Autosize" and not "Autocalculate
+        "  0.1,                                    !- Free Convection Air Flow Rate Sizing Factor", // Has numeric default
+        "  AutocAlcUlate,                          !- Free Convection U-Factor Times Area Value {W/K}",         // Autocalculatable, default numeric
+        "  ,                                       !- Free Convection U-Factor Times Area Value Sizing Factor", // Has numeric default - DEFAULTED
+        "  UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method", // Has default (UFactorTimesAreaAndDesignWaterFlowRate)
         "  1.25,                                   !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio", // Has numeric default
         "  ,                                       !- Nominal Capacity {W}",                                      // No default
         "  0,                                      !- Free Convection Capacity {W}",                              // Autocalculatable, no default
         "  ,                                       !- Free Convection Nominal Capacity Sizing Factor",            // Has numeric default - DEFAULTED
         "  ,                                       !- Design Inlet Air Dry-Bulb Temperature {C}",                 // Has numeric default - DEFAULTED
         "  25.6,                                   !- Design Inlet Air Wet-Bulb Temperature {C}",                 // Has numeric default
-        "  ,                                       !- Design Approach Temperature {deltaC}",                      // Autosizable, default Autosize - DEFAULTED
-        "  10,                                     !- Design Range Temperature {deltaC}",                         // Autosizable, default Autosize
-        "  0,                                      !- Basin Heater Capacity {W/K}",                               // Has numeric default
-        "  ,                                       !- Basin Heater Setpoint Temperature {C}",                     // Has numeric default - DEFAULTED
-        "  ,                                       !- Basin Heater Operating Schedule Name",                      // No default
-        "  LossFactor,                             !- Evaporation Loss Mode",                                     // No default
-        "  0.2,                                    !- Evaporation Loss Factor {percent/K}",                       // Has numeric default
-        "  ,                                       !- Drift Loss Percent {percent}",                              // Has numeric default - DEFAULTED
-        "  ConcentrationRatio,                     !- Blowdown Calculation Mode",                                 // No default
-        "  3,                                      !- Blowdown Concentration Ratio",                              // Has numeric default
-        "  ,                                       !- Blowdown Makeup Water Usage Schedule Name",                 // No default
-        "  ,                                       !- Supply Water Storage Tank Name",                            // No default
-        "  ,                                       !- Outdoor Air Inlet Node Name",                               // No default
-        "  FanCycling,                             !- Capacity Control",                                          // Has default
-        "  1,                                      !- Number of Cells",                                           // Has numeric default
-        "  ,                                       !- Cell Control",                                              // Has default - DEFAULTED
-        "  0.33,                                   !- Cell Minimum  Water Flow Rate Fraction",                    // Has numeric default
-        "  ;                                       !- Cell Maximum Water Flow Rate Fraction",                     // Has numeric default - DEFAULTED
-     // "  ,                                       !- Sizing Factor",                                             // Has numeric default - DEFAULTED by ommission
-     // "  ;                                       !- End-Use Subcategory",                                       // Has default - DEFAULTED by ommission
+        "  ,                                       !- Design Approach Temperature {deltaC}",      // Autosizable, default Autosize - DEFAULTED
+        "  10,                                     !- Design Range Temperature {deltaC}",         // Autosizable, default Autosize
+        "  0,                                      !- Basin Heater Capacity {W/K}",               // Has numeric default
+        "  ,                                       !- Basin Heater Setpoint Temperature {C}",     // Has numeric default - DEFAULTED
+        "  ,                                       !- Basin Heater Operating Schedule Name",      // No default
+        "  LossFactor,                             !- Evaporation Loss Mode",                     // No default
+        "  0.2,                                    !- Evaporation Loss Factor {percent/K}",       // Has numeric default
+        "  ,                                       !- Drift Loss Percent {percent}",              // Has numeric default - DEFAULTED
+        "  ConcentrationRatio,                     !- Blowdown Calculation Mode",                 // No default
+        "  3,                                      !- Blowdown Concentration Ratio",              // Has numeric default
+        "  ,                                       !- Blowdown Makeup Water Usage Schedule Name", // No default
+        "  ,                                       !- Supply Water Storage Tank Name",            // No default
+        "  ,                                       !- Outdoor Air Inlet Node Name",               // No default
+        "  FanCycling,                             !- Capacity Control",                          // Has default
+        "  1,                                      !- Number of Cells",                           // Has numeric default
+        "  ,                                       !- Cell Control",                              // Has default - DEFAULTED
+        "  0.33,                                   !- Cell Minimum  Water Flow Rate Fraction",    // Has numeric default
+        "  ;                                       !- Cell Maximum Water Flow Rate Fraction",     // Has numeric default - DEFAULTED
+        // "  ,                                       !- Sizing Factor",                                             // Has numeric default -
+        // DEFAULTED by ommission
+        // "  ;                                       !- End-Use Subcategory",                                       // Has default - DEFAULTED by
+        // ommission
 
     });
 
@@ -4138,13 +4224,13 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_basic)
     // 34 fields with defaults, 6 Autosizable, 3 Autocalculatable
     // 11 fields defaulted    , 4 Autosized  , 2 Autocalculated
 
-    EXPECT_EQ(4,  state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
-    EXPECT_EQ(34, state->dataOutput->iTotalFieldsWithDefaults);     // Total number of fields that could be defaulted
-    EXPECT_EQ(6,  state->dataOutput->iTotalAutoSizableFields);      // Total number of autosizeable fields
-    EXPECT_EQ(3,  state->dataOutput->iTotalAutoCalculatableFields); // Total number of autocalculatable fields
-    EXPECT_EQ(11, state->dataOutput->iNumberOfDefaultedFields);     // Number of defaulted fields in IDF
-    EXPECT_EQ(4,  state->dataOutput->iNumberOfAutoSizedFields);     // Number of autosized fields in IDF
-    EXPECT_EQ(2,  state->dataOutput->iNumberOfAutoCalcedFields);    // Number of autocalculated fields
+    EXPECT_EQ(4, state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
+    EXPECT_EQ(34, state->dataOutput->iTotalFieldsWithDefaults);    // Total number of fields that could be defaulted
+    EXPECT_EQ(6, state->dataOutput->iTotalAutoSizableFields);      // Total number of autosizeable fields
+    EXPECT_EQ(3, state->dataOutput->iTotalAutoCalculatableFields); // Total number of autocalculatable fields
+    EXPECT_EQ(11, state->dataOutput->iNumberOfDefaultedFields);    // Number of defaulted fields in IDF
+    EXPECT_EQ(4, state->dataOutput->iNumberOfAutoSizedFields);     // Number of autosized fields in IDF
+    EXPECT_EQ(2, state->dataOutput->iNumberOfAutoCalcedFields);    // Number of autocalculated fields
 }
 
 TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
@@ -4160,14 +4246,14 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
         // 8 fields with default, 0 Autosizable, 0 Autocalculatable
         // 1 fields defaulted   , 0 Autosized  , 0 Autocalculated
         "Building,",
-        "  ,  !- Name",                                                                     // Has a default   - DEFAULTED - Special case (name)
-        "  0,                       !- North Axis {deg}",                                   // Has a default
-        "  Suburbs,                 !- Terrain",                                            // Has a default
-        "  0.001,                   !- Loads Convergence Tolerance Value",                  // Has a default
-        "  0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}",   // Has a default
-        "  FullInteriorAndExterior, !- Solar Distribution",                                 // Has a default
-        "  25,                      !- Maximum Number of Warmup Days",                      // Has a default
-        "  6;                       !- Minimum Number of Warmup Days",                      // Has a default
+        "  ,  !- Name",                                                                   // Has a default   - DEFAULTED - Special case (name)
+        "  0,                       !- North Axis {deg}",                                 // Has a default
+        "  Suburbs,                 !- Terrain",                                          // Has a default
+        "  0.001,                   !- Loads Convergence Tolerance Value",                // Has a default
+        "  0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}", // Has a default
+        "  FullInteriorAndExterior, !- Solar Distribution",                               // Has a default
+        "  25,                      !- Maximum Number of Warmup Days",                    // Has a default
+        "  6;                       !- Minimum Number of Warmup Days",                    // Has a default
 
         // 2 fields with default, 0 Autosizable, 0 Autocalculatable
         // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
@@ -4187,15 +4273,15 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
         // 1 fields defaulted    , 0 Autosizable, 0 Autocalculatable
         "SurfaceProperty:SurroundingSurfaces,",
         "  SrdSurfs:Living:East,        !- Name",
-        "  0.3,                         !- Sky View Factor",                             // Has numeric default
+        "  0.3,                         !- Sky View Factor", // Has numeric default
         "  ,                            !- Sky Temperature Schedule Name",
-        "  0.1,                         !- Ground View Factor",                          // Has numeric default
+        "  0.1,                         !- Ground View Factor", // Has numeric default
         "  ,                            !- Ground Temperature Schedule Name",
-        "  SurroundingSurface1,         !- Surrounding Surface 1 Name",                  // (begin extensible)
-        "  0.6,                         !- Surrounding Surface 1 View Factor",           // Has numeric default
+        "  SurroundingSurface1,         !- Surrounding Surface 1 Name",        // (begin extensible)
+        "  0.6,                         !- Surrounding Surface 1 View Factor", // Has numeric default
         "  Surrounding Temp Sch 1,      !- Surrounding Surface 1 Temperature Schedule Name",
         "  SurroundingSurface2,         !- Surrounding Surface 2 Name",
-        "  ,                            !- Surrounding Surface 2 View Factor",           //  Has numeric default - DEFAULTED
+        "  ,                            !- Surrounding Surface 2 View Factor", //  Has numeric default - DEFAULTED
         "  Surrounding Temp Sch 1;      !- Surrounding Surface 2 Temperature Schedule Name",
 
     });
@@ -4211,14 +4297,13 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
     // 15 fields with defaults, 0 Autosizable, 0 Autocalculatable
     // 2  fields defaulted    , 0 Autosized  , 0 Autocalculated
 
-    EXPECT_EQ(4,  state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
-    EXPECT_EQ(15, state->dataOutput->iTotalFieldsWithDefaults);     // Total number of fields that could be defaulted
-    EXPECT_EQ(0,  state->dataOutput->iTotalAutoSizableFields);      // Total number of autosizeable fields
-    EXPECT_EQ(0,  state->dataOutput->iTotalAutoCalculatableFields); // Total number of autocalculatable fields
-    EXPECT_EQ(2,  state->dataOutput->iNumberOfDefaultedFields);     // Number of defaulted fields in IDF
-    EXPECT_EQ(0,  state->dataOutput->iNumberOfAutoSizedFields);     // Number of autosized fields in IDF
-    EXPECT_EQ(0,  state->dataOutput->iNumberOfAutoCalcedFields);    // Number of autocalculated fields
-
+    EXPECT_EQ(4, state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
+    EXPECT_EQ(15, state->dataOutput->iTotalFieldsWithDefaults);    // Total number of fields that could be defaulted
+    EXPECT_EQ(0, state->dataOutput->iTotalAutoSizableFields);      // Total number of autosizeable fields
+    EXPECT_EQ(0, state->dataOutput->iTotalAutoCalculatableFields); // Total number of autocalculatable fields
+    EXPECT_EQ(2, state->dataOutput->iNumberOfDefaultedFields);     // Number of defaulted fields in IDF
+    EXPECT_EQ(0, state->dataOutput->iNumberOfAutoSizedFields);     // Number of autosized fields in IDF
+    EXPECT_EQ(0, state->dataOutput->iNumberOfAutoCalcedFields);    // Number of autocalculated fields
 }
 
 TEST_F(InputProcessorFixture, epJSONgetObjectItem_minfields)
@@ -4262,17 +4347,17 @@ TEST_F(InputProcessorFixture, epJSONgetObjectItem_minfields)
     state->dataIPShortCut->rNumericArgs = 0.0;
 
     state->dataInputProcessing->inputProcessor->getObjectItem(*state,
-                                  obj_name1,
-                                  1,
-                                  state->dataIPShortCut->cAlphaArgs,
-                                  numAlphas,
-                                  state->dataIPShortCut->rNumericArgs,
-                                  numNumbers,
-                                  ioStat,
-                                  state->dataIPShortCut->lNumericFieldBlanks,
-                                  state->dataIPShortCut->lAlphaFieldBlanks,
-                                  state->dataIPShortCut->cAlphaFieldNames,
-                                  state->dataIPShortCut->cNumericFieldNames);
+                                                              obj_name1,
+                                                              1,
+                                                              state->dataIPShortCut->cAlphaArgs,
+                                                              numAlphas,
+                                                              state->dataIPShortCut->rNumericArgs,
+                                                              numNumbers,
+                                                              ioStat,
+                                                              state->dataIPShortCut->lNumericFieldBlanks,
+                                                              state->dataIPShortCut->lAlphaFieldBlanks,
+                                                              state->dataIPShortCut->cAlphaFieldNames,
+                                                              state->dataIPShortCut->cNumericFieldNames);
 
     // For Building, min-fields is 8, which is the entire object, regardless of the number of input object fields
     EXPECT_EQ(numAlphas, 3);
@@ -4291,17 +4376,17 @@ TEST_F(InputProcessorFixture, epJSONgetObjectItem_minfields)
     EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(5), 1.0, 0.0001);
 
     state->dataInputProcessing->inputProcessor->getObjectItem(*state,
-                                  obj_name2,
-                                  1,
-                                  state->dataIPShortCut->cAlphaArgs,
-                                  numAlphas,
-                                  state->dataIPShortCut->rNumericArgs,
-                                  numNumbers,
-                                  ioStat,
-                                  state->dataIPShortCut->lNumericFieldBlanks,
-                                  state->dataIPShortCut->lAlphaFieldBlanks,
-                                  state->dataIPShortCut->cAlphaFieldNames,
-                                  state->dataIPShortCut->cNumericFieldNames);
+                                                              obj_name2,
+                                                              1,
+                                                              state->dataIPShortCut->cAlphaArgs,
+                                                              numAlphas,
+                                                              state->dataIPShortCut->rNumericArgs,
+                                                              numNumbers,
+                                                              ioStat,
+                                                              state->dataIPShortCut->lNumericFieldBlanks,
+                                                              state->dataIPShortCut->lAlphaFieldBlanks,
+                                                              state->dataIPShortCut->cAlphaFieldNames,
+                                                              state->dataIPShortCut->cNumericFieldNames);
 
     // For Material:NoMass, min-fields is 3, but the input object above takes it to A2 and N3
     EXPECT_EQ(numAlphas, 2);

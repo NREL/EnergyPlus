@@ -207,30 +207,30 @@ namespace AirLoopHVACDOAS {
 
 } // namespace AirLoopHVACDOAS
 
-    struct AirLoopHVACDOASData : BaseGlobalStruct
+struct AirLoopHVACDOASData : BaseGlobalStruct
+{
+    bool GetInputOnceFlag = true;
+    bool getAirLoopMixerInputOnceFlag = true;
+    bool getAirLoopSplitterInputOnceFlag = true;
+    int numAirLoopDOAS = 0;
+    std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
+    std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
+    std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
+    bool SummerDesignDayFlag = true;
+    bool WinterDesignDayFlag = true;
+    void clear_state() override
     {
-        bool GetInputOnceFlag = true;
-        bool getAirLoopMixerInputOnceFlag = true;
-        bool getAirLoopSplitterInputOnceFlag = true;
-        int numAirLoopDOAS = 0;
-        std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
-        std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
-        std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
-        bool SummerDesignDayFlag = true;
-        bool WinterDesignDayFlag = true;
-        void clear_state() override
-        {
-            this->GetInputOnceFlag = true;
-            this->getAirLoopMixerInputOnceFlag = true;
-            this->getAirLoopSplitterInputOnceFlag = true;
-            this->numAirLoopDOAS = 0;
-            this->airloopDOAS.clear();
-            this->airloopMixer.clear();
-            this->airloopSplitter.clear();
-            this->SummerDesignDayFlag = true;
-            this->WinterDesignDayFlag = true;
-        }
-    };
+        this->GetInputOnceFlag = true;
+        this->getAirLoopMixerInputOnceFlag = true;
+        this->getAirLoopSplitterInputOnceFlag = true;
+        this->numAirLoopDOAS = 0;
+        this->airloopDOAS.clear();
+        this->airloopMixer.clear();
+        this->airloopSplitter.clear();
+        this->SummerDesignDayFlag = true;
+        this->WinterDesignDayFlag = true;
+    }
+};
 
 } // namespace EnergyPlus
 #endif // ENERGYPLUS_AIRLOOPHVACDOAS_HH

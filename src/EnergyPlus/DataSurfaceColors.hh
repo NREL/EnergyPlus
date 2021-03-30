@@ -80,52 +80,54 @@ namespace DataSurfaceColors {
     int constexpr ColorNo_DaylSensor1 = 14;
     int constexpr ColorNo_DaylSensor2 = 15;
 
-    bool MatchAndSetColorTextString(EnergyPlusData &state, std::string const &String,          // string to be matched
-                                    int SetValue,                 // value to be used for the color
-                                    std::string const & ColorType // for now, must be DXF
+    bool MatchAndSetColorTextString(EnergyPlusData &state,
+                                    std::string const &String,   // string to be matched
+                                    int SetValue,                // value to be used for the color
+                                    std::string const &ColorType // for now, must be DXF
     );
 
     void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, Optional_string_const ColorType = _);
 
 } // namespace DataSurfaceColors
 
-struct SurfaceColorData : BaseGlobalStruct {
+struct SurfaceColorData : BaseGlobalStruct
+{
     Array1D_int const defaultcolorno = Array1D_int(DataSurfaceColors::NumColors, {3, 43, 143, 143, 45, 8, 15, 195, 9, 13, 174, 143, 143, 10, 5});
     Array1D_int DXFcolorno = Array1D_int(DataSurfaceColors::NumColors, SurfaceColorData::defaultcolorno);
 
     Array1D_string const colorkeys = Array1D_string(DataSurfaceColors::NumColors,
-    {"Text",
-                "Walls",
-                "Windows",
-                "GlassDoors",
-                "Doors",
-                "Roofs",
-                "Floors",
-                "DetachedBuildingShades",
-                "DetachedFixedShades",
-                "AttachedBuildingShades",
-                "Photovoltaics",
-                "TubularDaylightDomes",
-                "TubularDaylightDiffusers",
-                "DaylightReferencePoint1",
-                "DaylightReferencePoint2"});
+                                                    {"Text",
+                                                     "Walls",
+                                                     "Windows",
+                                                     "GlassDoors",
+                                                     "Doors",
+                                                     "Roofs",
+                                                     "Floors",
+                                                     "DetachedBuildingShades",
+                                                     "DetachedFixedShades",
+                                                     "AttachedBuildingShades",
+                                                     "Photovoltaics",
+                                                     "TubularDaylightDomes",
+                                                     "TubularDaylightDiffusers",
+                                                     "DaylightReferencePoint1",
+                                                     "DaylightReferencePoint2"});
 
     Array1D_int const colorkeyptr = Array1D_int(DataSurfaceColors::NumColors,
-    {DataSurfaceColors::ColorNo_Text,
-                DataSurfaceColors::ColorNo_Wall,
-                DataSurfaceColors::ColorNo_Window,
-                DataSurfaceColors::ColorNo_GlassDoor,
-                DataSurfaceColors::ColorNo_Door,
-                DataSurfaceColors::ColorNo_Floor,
-                DataSurfaceColors::ColorNo_Roof,
-                DataSurfaceColors::ColorNo_ShdDetBldg,
-                DataSurfaceColors::ColorNo_ShdDetFix,
-                DataSurfaceColors::ColorNo_ShdAtt,
-                DataSurfaceColors::ColorNo_PV,
-                DataSurfaceColors::ColorNo_TDDDome,
-                DataSurfaceColors::ColorNo_TDDDiffuser,
-                DataSurfaceColors::ColorNo_DaylSensor1,
-                DataSurfaceColors::ColorNo_DaylSensor2});
+                                                {DataSurfaceColors::ColorNo_Text,
+                                                 DataSurfaceColors::ColorNo_Wall,
+                                                 DataSurfaceColors::ColorNo_Window,
+                                                 DataSurfaceColors::ColorNo_GlassDoor,
+                                                 DataSurfaceColors::ColorNo_Door,
+                                                 DataSurfaceColors::ColorNo_Floor,
+                                                 DataSurfaceColors::ColorNo_Roof,
+                                                 DataSurfaceColors::ColorNo_ShdDetBldg,
+                                                 DataSurfaceColors::ColorNo_ShdDetFix,
+                                                 DataSurfaceColors::ColorNo_ShdAtt,
+                                                 DataSurfaceColors::ColorNo_PV,
+                                                 DataSurfaceColors::ColorNo_TDDDome,
+                                                 DataSurfaceColors::ColorNo_TDDDiffuser,
+                                                 DataSurfaceColors::ColorNo_DaylSensor1,
+                                                 DataSurfaceColors::ColorNo_DaylSensor2});
 
     void clear_state() override
     {

@@ -263,7 +263,17 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     auto &SZVAVModel(state->dataPTHP->PTUnit(1));
     // first pass through will get objects and reset node data
     SZVAVModel::calcSZVAVModel(*state,
-        SZVAVModel, UnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
+                               SZVAVModel,
+                               UnitNum,
+                               FirstHVACIteration,
+                               CoolingLoad,
+                               HeatingLoad,
+                               QZnReq,
+                               OnOffAirFlowRatio,
+                               HXUnitOn,
+                               AirLoopNum,
+                               PLR,
+                               CompressorOnFlag);
 
     // set unit inlet node conditions for cooling
     state->dataLoopNodes->Node(1).Temp = 24.0;
@@ -271,7 +281,8 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     state->dataLoopNodes->Node(1).Enthalpy = 52120.0;
     bool ErrorsFound = false;
     // set zone condition
-    NodeInputManager::GetOnlySingleNode(*state, "ZoneNode",
+    NodeInputManager::GetOnlySingleNode(*state,
+                                        "ZoneNode",
                                         ErrorsFound,
                                         "PTUnit",
                                         "PTUnit",
@@ -297,10 +308,20 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     // Region 1 of control, low air flow rate, modulate coil capacity
     SZVAVModel::calcSZVAVModel(*state,
-        SZVAVModel, UnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
+                               SZVAVModel,
+                               UnitNum,
+                               FirstHVACIteration,
+                               CoolingLoad,
+                               HeatingLoad,
+                               QZnReq,
+                               OnOffAirFlowRatio,
+                               HXUnitOn,
+                               AirLoopNum,
+                               PLR,
+                               CompressorOnFlag);
 
     EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow, 0.00000001); // low speed air flow rate
-    EXPECT_LT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(1).Temp);                              // active cooling
+    EXPECT_LT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(1).Temp);                      // active cooling
     Real64 AirMassFlow = thisUnit.MaxNoCoolHeatAirMassFlow;
     Real64 MinHumRat = min(state->dataLoopNodes->Node(4).HumRat, state->dataLoopNodes->Node(1).HumRat);
     Real64 OutletTemp = state->dataLoopNodes->Node(4).Temp;
@@ -312,11 +333,21 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     // Region 2 of control, modulate air flow rate, modulate coil capacity
     QZnReq = -1200.0;
     SZVAVModel::calcSZVAVModel(*state,
-        SZVAVModel, UnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
+                               SZVAVModel,
+                               UnitNum,
+                               FirstHVACIteration,
+                               CoolingLoad,
+                               HeatingLoad,
+                               QZnReq,
+                               OnOffAirFlowRatio,
+                               HXUnitOn,
+                               AirLoopNum,
+                               PLR,
+                               CompressorOnFlag);
 
     EXPECT_GT(state->dataLoopNodes->Node(1).MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow); // air flow higher than low speed
     EXPECT_LT(state->dataLoopNodes->Node(1).MassFlowRate, thisUnit.MaxCoolAirMassFlow);       // air flow lower than high speed
-    EXPECT_LT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(1).Temp);                // active cooling
+    EXPECT_LT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(1).Temp);        // active cooling
 
     AirMassFlow = state->dataLoopNodes->Node(4).MassFlowRate;
     MinHumRat = min(state->dataLoopNodes->Node(4).HumRat, state->dataLoopNodes->Node(1).HumRat);
@@ -329,10 +360,20 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     // Region 3 of control, high air flow rate, modulate coil capacity
     QZnReq = -2000.0;
     SZVAVModel::calcSZVAVModel(*state,
-        SZVAVModel, UnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
+                               SZVAVModel,
+                               UnitNum,
+                               FirstHVACIteration,
+                               CoolingLoad,
+                               HeatingLoad,
+                               QZnReq,
+                               OnOffAirFlowRatio,
+                               HXUnitOn,
+                               AirLoopNum,
+                               PLR,
+                               CompressorOnFlag);
 
     EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisUnit.MaxCoolAirMassFlow, 0.00000001); // high speed air flow rate
-    EXPECT_LT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(1).Temp);                        // active cooling
+    EXPECT_LT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(1).Temp);                // active cooling
 
     MinHumRat = min(state->dataLoopNodes->Node(4).HumRat, state->dataLoopNodes->Node(1).HumRat);
     OutletTemp = state->dataLoopNodes->Node(4).Temp;
@@ -357,10 +398,20 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     // Region 1 of control, low air flow rate, modulate coil capacity
     QZnReq = 200.0;
     SZVAVModel::calcSZVAVModel(*state,
-        SZVAVModel, UnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
+                               SZVAVModel,
+                               UnitNum,
+                               FirstHVACIteration,
+                               CoolingLoad,
+                               HeatingLoad,
+                               QZnReq,
+                               OnOffAirFlowRatio,
+                               HXUnitOn,
+                               AirLoopNum,
+                               PLR,
+                               CompressorOnFlag);
 
     EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow, 0.00000001); // high speed air flow rate
-    EXPECT_GT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(1).Temp);                              // active heating
+    EXPECT_GT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(1).Temp);                      // active heating
 
     MinHumRat = min(state->dataLoopNodes->Node(4).HumRat, state->dataLoopNodes->Node(1).HumRat);
     OutletTemp = state->dataLoopNodes->Node(4).Temp;
@@ -373,11 +424,21 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     // Region 2 of control, modulate air flow rate, modulate coil capacity
     QZnReq = 1200.0;
     SZVAVModel::calcSZVAVModel(*state,
-        SZVAVModel, UnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
+                               SZVAVModel,
+                               UnitNum,
+                               FirstHVACIteration,
+                               CoolingLoad,
+                               HeatingLoad,
+                               QZnReq,
+                               OnOffAirFlowRatio,
+                               HXUnitOn,
+                               AirLoopNum,
+                               PLR,
+                               CompressorOnFlag);
 
     EXPECT_GT(state->dataLoopNodes->Node(1).MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow); // air flow higher than low speed
     EXPECT_LT(state->dataLoopNodes->Node(1).MassFlowRate, thisUnit.MaxHeatAirMassFlow);       // air flow lower than high speed
-    EXPECT_GT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(1).Temp);                // active heating
+    EXPECT_GT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(1).Temp);        // active heating
 
     AirMassFlow = state->dataLoopNodes->Node(4).MassFlowRate;
     MinHumRat = min(state->dataLoopNodes->Node(4).HumRat, state->dataLoopNodes->Node(1).HumRat);
@@ -390,10 +451,20 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     // Region 3 of control, high air flow rate, modulate coil capacity
     QZnReq = 2000.0;
     SZVAVModel::calcSZVAVModel(*state,
-        SZVAVModel, UnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
+                               SZVAVModel,
+                               UnitNum,
+                               FirstHVACIteration,
+                               CoolingLoad,
+                               HeatingLoad,
+                               QZnReq,
+                               OnOffAirFlowRatio,
+                               HXUnitOn,
+                               AirLoopNum,
+                               PLR,
+                               CompressorOnFlag);
 
     EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisUnit.MaxHeatAirMassFlow, 0.00000001); // high speed air flow rate
-    EXPECT_GT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(1).Temp);                        // active heating
+    EXPECT_GT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(1).Temp);                // active heating
 
     MinHumRat = min(state->dataLoopNodes->Node(4).HumRat, state->dataLoopNodes->Node(1).HumRat);
     OutletTemp = state->dataLoopNodes->Node(4).Temp;
@@ -546,7 +617,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
         "  1.0,                       !- Upper Limit Value",
         "  CONTINUOUS;                !- Numeric Type",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataEnvrn->StdRhoAir = 1.0;
@@ -584,10 +655,12 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
     state->dataLoopNodes->Node(MixerOA.RetNode).Temp = 20.0;
     state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy = 36000;
-    state->dataLoopNodes->Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.RetNode).Temp, state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy);
+    state->dataLoopNodes->Node(MixerOA.RetNode).HumRat =
+        PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.RetNode).Temp, state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy);
     state->dataLoopNodes->Node(MixerOA.InletNode).Temp = 10.0;
     state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy = 18000;
-    state->dataLoopNodes->Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.InletNode).Temp, state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy);
+    state->dataLoopNodes->Node(MixerOA.InletNode).HumRat =
+        PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.InletNode).Temp, state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy);
     // chilled water coil
     auto &CWCoil(state->dataWaterCoils->WaterCoil(1));
     CWCoil.UACoilTotal = 470.0;
@@ -683,7 +756,17 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     QLatOut = 0.0;
     PLR = 0.0;
     SZVAVModel::calcSZVAVModel(*state,
-        SZVAVModel, FanCoilNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
+                               SZVAVModel,
+                               FanCoilNum,
+                               FirstHVACIteration,
+                               CoolingLoad,
+                               HeatingLoad,
+                               QZnReq,
+                               OnOffAirFlowRatio,
+                               HXUnitOn,
+                               AirLoopNum,
+                               PLR,
+                               CompressorOnFlag);
     Calc4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, PLR);
     EXPECT_NEAR(PLR, 0.092, 0.001);
     EXPECT_NEAR(QUnitOut, 1000.0, 1.0);
@@ -697,7 +780,17 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     QLatOut = 0.0;
     PLR = 0.0;
     SZVAVModel::calcSZVAVModel(*state,
-        SZVAVModel, FanCoilNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
+                               SZVAVModel,
+                               FanCoilNum,
+                               FirstHVACIteration,
+                               CoolingLoad,
+                               HeatingLoad,
+                               QZnReq,
+                               OnOffAirFlowRatio,
+                               HXUnitOn,
+                               AirLoopNum,
+                               PLR,
+                               CompressorOnFlag);
     Calc4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, PLR);
     EXPECT_NEAR(PLR, 0.492, 0.001);
     EXPECT_NEAR(QUnitOut, 5000.0, 1.0);
@@ -711,9 +804,18 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     QLatOut = 0.0;
     PLR = 0.0;
     SZVAVModel::calcSZVAVModel(*state,
-        SZVAVModel, FanCoilNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
+                               SZVAVModel,
+                               FanCoilNum,
+                               FirstHVACIteration,
+                               CoolingLoad,
+                               HeatingLoad,
+                               QZnReq,
+                               OnOffAirFlowRatio,
+                               HXUnitOn,
+                               AirLoopNum,
+                               PLR,
+                               CompressorOnFlag);
     Calc4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, PLR);
     EXPECT_NEAR(PLR, 0.892, 0.001);
     EXPECT_NEAR(QUnitOut, 9000.0, 1.0);
-
 }

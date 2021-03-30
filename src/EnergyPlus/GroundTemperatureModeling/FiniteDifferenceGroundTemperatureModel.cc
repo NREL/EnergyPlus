@@ -72,7 +72,8 @@ namespace EnergyPlus {
 //******************************************************************************
 
 // Finite difference model factory
-std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
+std::shared_ptr<FiniteDiffGroundTempsModel>
+FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -84,7 +85,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
     // Read input and creates instance of finite difference ground temp model
 
     // USE STATEMENTS:
-        using namespace GroundTemperatureManager;
+    using namespace GroundTemperatureManager;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -103,7 +104,8 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
+        state.dataInputProcessing->inputProcessor->getObjectItem(
+            state, cCurrentModuleObject, modelNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
 
         if (objectName == state.dataIPShortCut->cAlphaArgs(1)) {
             // Read input into object here
@@ -204,7 +206,8 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
     if (!state.dataWeatherManager->WeatherFileExists) {
         ShowSevereError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.");
-        ShowContinueError(state, "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
+        ShowContinueError(state,
+                          "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
         ShowFatalError(state, "Simulation halted due to input error in ground temperature model.");
     }
 
@@ -218,7 +221,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataWeatherManager->RPReadAllWeatherData = true;
     state.dataGlobal->WeathSimReq = true;
     // RunPeriod is initialized to be one year of simulation
-    //RunPeriodInput(TotRunPers).monWeekDay = 0; // Why do this?
+    // RunPeriodInput(TotRunPers).monWeekDay = 0; // Why do this?
 
     WeatherManager::SetupEnvironmentTypes(state);
 
@@ -332,7 +335,6 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
         }
 
     } // ... End day loop.
-
 
     annualAveAirTemp = annualAveAirTemp_num / state.dataWeatherManager->NumDaysInYear; // Used for initalizing domain
 

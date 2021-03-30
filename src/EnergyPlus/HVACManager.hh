@@ -117,7 +117,7 @@ struct HVACManagerData : BaseGlobalStruct
     bool MyEnvrnFlag2 = true;
     bool FlowMaxAvailAlreadyReset = false;
     bool FlowResolutionNeeded = false;
-    int ErrCount = 0;  // Number of times that the maximum iterations was exceeded
+    int ErrCount = 0; // Number of times that the maximum iterations was exceeded
     int MaxErrCount = 0;
     std::string ErrEnvironmentName;
     Array1D<Real64> MixSenLoad; // Mixing sensible loss or gain

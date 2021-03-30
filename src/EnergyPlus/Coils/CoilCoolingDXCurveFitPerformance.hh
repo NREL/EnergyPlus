@@ -107,7 +107,7 @@ struct CoilCoolingDXCurveFitPerformance
                    DataLoopNode::NodeData &condInletNode,
                    DataLoopNode::NodeData &condOutletNode,
                    bool const singleMode);
-    void calcStandardRatings210240(EnergyPlusData& state);
+    void calcStandardRatings210240(EnergyPlusData &state);
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
     CoilCoolingDXCurveFitPerformance() = default;
     explicit CoilCoolingDXCurveFitPerformance(EnergyPlusData &state, const std::string &name);
@@ -149,14 +149,14 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 NormalSHR = 0.0;
 
     // standard rating stuff -- for now just 210/240
-    Real64 standardRatingCoolingCapacity = 0.0;  // net cooling capacity of single speed DX cooling coil
-    Real64 standardRatingSEER = 0.0;  // seasonal energy efficiency ratio of single speed DX cooling coil
-    Real64 standardRatingEER = 0.0;  // energy efficiency ratio of single speed DX cooling coil
-    Real64 standardRatingIEER = 0.0;  // Integrated energy efficiency ratio of single speed DX cooling coil
+    Real64 standardRatingCoolingCapacity = 0.0; // net cooling capacity of single speed DX cooling coil
+    Real64 standardRatingSEER = 0.0;            // seasonal energy efficiency ratio of single speed DX cooling coil
+    Real64 standardRatingEER = 0.0;             // energy efficiency ratio of single speed DX cooling coil
+    Real64 standardRatingIEER = 0.0;            // Integrated energy efficiency ratio of single speed DX cooling coil
 
     CoilCoolingDXCurveFitOperatingMode normalMode;
-    int hasAlternateMode = 0; // 0 Normal, 1 Enhanced, 2 SubcoolReheat
-    CoilCoolingDXCurveFitOperatingMode alternateMode; // enhanced dehumidifcation or Subcool mode
+    int hasAlternateMode = 0;                          // 0 Normal, 1 Enhanced, 2 SubcoolReheat
+    CoilCoolingDXCurveFitOperatingMode alternateMode;  // enhanced dehumidifcation or Subcool mode
     CoilCoolingDXCurveFitOperatingMode alternateMode2; // Reheat mode
 };
 

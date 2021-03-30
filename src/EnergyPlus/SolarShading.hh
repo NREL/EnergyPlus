@@ -138,20 +138,24 @@ namespace SolarShading {
                 Array1D<Real64> &YVT,
                 Array1D<Real64> &ZVT);
 
-    void HTRANS(EnergyPlusData &state, int const I,          // Mode selector: 0 - Compute H.C. of sides
+    void HTRANS(EnergyPlusData &state,
+                int const I,          // Mode selector: 0 - Compute H.C. of sides
                 int const NS,         // Figure Number
                 int const NumVertices // Number of vertices
     );
 
-    void HTRANS0(EnergyPlusData &state, int const NS,         // Figure Number
+    void HTRANS0(EnergyPlusData &state,
+                 int const NS,         // Figure Number
                  int const NumVertices // Number of vertices
     );
 
-    void HTRANS1(EnergyPlusData &state, int const NS,         // Figure Number
+    void HTRANS1(EnergyPlusData &state,
+                 int const NS,         // Figure Number
                  int const NumVertices // Number of vertices
     );
 
-    void INCLOS(EnergyPlusData &state, int const N1,            // Figure number of figure 1
+    void INCLOS(EnergyPlusData &state,
+                int const N1,            // Figure number of figure 1
                 int const N1NumVert,     // Number of vertices of figure 1
                 int const N2,            // Figure number of figure 2
                 int const N2NumVert,     // Number of vertices of figure 2
@@ -159,30 +163,35 @@ namespace SolarShading {
                 int &NIN                 // Number of vertices of figure 1 within figure 2
     );
 
-    void INTCPT(EnergyPlusData &state, int const NV1, // Number of vertices of figure NS1
+    void INTCPT(EnergyPlusData &state,
+                int const NV1, // Number of vertices of figure NS1
                 int const NV2, // Number of vertices of figure NS2
                 int &NV3,      // Number of vertices of figure NS3
                 int const NS1, // Number of the figure being overlapped
                 int const NS2  // Number of the figure doing overlapping
     );
 
-    void CLIPPOLY(EnergyPlusData &state, int const NS1, // Figure number of figure 1 (The subject polygon)
+    void CLIPPOLY(EnergyPlusData &state,
+                  int const NS1, // Figure number of figure 1 (The subject polygon)
                   int const NS2, // Figure number of figure 2 (The clipping polygon)
                   int const NV1, // Number of vertices of figure 1
                   int const NV2, // Number of vertices of figure 2
                   int &NV3       // Number of vertices of figure 3
     );
 
-    void MULTOL(EnergyPlusData &state, int const NNN,   // argument
+    void MULTOL(EnergyPlusData &state,
+                int const NNN,   // argument
                 int const LOC0,  // Location in the homogeneous coordinate array
                 int const NRFIGS // Number of figures overlapped
     );
 
-    void ORDER(EnergyPlusData &state, int const NV3, // Number of vertices of figure NS3
+    void ORDER(EnergyPlusData &state,
+               int const NV3, // Number of vertices of figure NS3
                int const NS3  // Location to place results of overlap
     );
 
-    void DeterminePolygonOverlap(EnergyPlusData &state, int const NS1, // Number of the figure being overlapped
+    void DeterminePolygonOverlap(EnergyPlusData &state,
+                                 int const NS1, // Number of the figure being overlapped
                                  int const NS2, // Number of the figure doing overlapping
                                  int const NS3  // Location to place results of overlap
     );
@@ -193,7 +202,8 @@ namespace SolarShading {
                           Real64 const AvgCosSolarDeclin  // Average value of Cosine of Solar Declination for period
     );
 
-    void FigureSunCosines(EnergyPlusData &state, int const iHour,
+    void FigureSunCosines(EnergyPlusData &state,
+                          int const iHour,
                           int const iTimeStep,
                           Real64 const EqOfTime,       // value of Equation of Time for period
                           Real64 const SinSolarDeclin, // value of Sine of Solar Declination for period
@@ -209,7 +219,8 @@ namespace SolarShading {
                 int const TS     // Time Step
     );
 
-    void SHDBKS(EnergyPlusData &state, int const NGRS, // Number of the general receiving surface
+    void SHDBKS(EnergyPlusData &state,
+                int const NGRS, // Number of the general receiving surface
                 int const CurSurf,
                 int const NBKS, // Number of back surfaces
                 int const HTS   // Heat transfer surface number of the general receiving surf
@@ -224,7 +235,8 @@ namespace SolarShading {
                 int const HTS      // Heat transfer surface number of the general receiving surf
     );
 
-    void CalcInteriorSolarOverlaps(EnergyPlusData &state, int const iHour, // Hour Index
+    void CalcInteriorSolarOverlaps(EnergyPlusData &state,
+                                   int const iHour, // Hour Index
                                    int const NBKS,  // Number of back surfaces associated with this GRSNR (in general, only
                                    int const HTSS,  // Surface number of the subsurface (exterior window)
                                    int const GRSNR, // General receiving surface number (base surface of the exterior window)
@@ -251,7 +263,8 @@ namespace SolarShading {
 
     void PerformSolarCalculations(EnergyPlusData &state);
 
-    void SHDRVL(EnergyPlusData &state, int const HTSS,  // Heat transfer surface number of the subsurface
+    void SHDRVL(EnergyPlusData &state,
+                int const HTSS,  // Heat transfer surface number of the subsurface
                 int const SBSNR, // Subsurface number
                 int const Hour,
                 int const TS);
@@ -289,7 +302,8 @@ namespace SolarShading {
 
     void CalcWindowProfileAngles(EnergyPlusData &state);
 
-    void CalcFrameDividerShadow(EnergyPlusData &state, int const SurfNum,  // Surface number
+    void CalcFrameDividerShadow(EnergyPlusData &state,
+                                int const SurfNum,  // Surface number
                                 int const FrDivNum, // Frame/divider number
                                 int const HourNum   // Hour number
     );
@@ -321,17 +335,18 @@ namespace SolarShading {
 
 } // namespace SolarShading
 
-struct SolarShadingData : BaseGlobalStruct {
+struct SolarShadingData : BaseGlobalStruct
+{
 
     Real64 const SmallIncrement = 1.0e-10; // Small increment added for shading/sunlit area calculations.
     Real64 const HCMULT = 100000.0;        // Multiplier used to change meters to .01 millimeters for homogeneous coordinates.
-                                          // Homogeneous Coordinates are represented in integers (64 bit). This changes the surface coordinates from meters
-                                          // to .01 millimeters -- making that the resolution for shadowing, polygon clipping, etc.
-    Real64 const sqHCMULT = (HCMULT *HCMULT);         // Square of HCMult used in Homogeneous coordinates
+                                    // Homogeneous Coordinates are represented in integers (64 bit). This changes the surface coordinates from meters
+                                    // to .01 millimeters -- making that the resolution for shadowing, polygon clipping, etc.
+    Real64 const sqHCMULT = (HCMULT * HCMULT);        // Square of HCMult used in Homogeneous coordinates
     Real64 const sqHCMULT_fac = (0.5 / sqHCMULT);     // ( 0.5 / sqHCMULT ) factor
     Real64 const kHCMULT = (1.0 / (HCMULT * HCMULT)); // half of inverse square of HCMult used in Homogeneous coordinates
 
-                                                   // Parameters for use with the variable OverlapStatus...
+    // Parameters for use with the variable OverlapStatus...
     int const NoOverlap = 1;
     int const FirstSurfWithinSecond = 2;
     int const SecondSurfWithinFirst = 3;
@@ -339,14 +354,14 @@ struct SolarShadingData : BaseGlobalStruct {
     int const TooManyVertices = 5;
     int const TooManyFigures = 6;
     Array1D_string const cOverLapStatus;
-    int MaxHCV = 15; // Maximum number of HC vertices
-                    // (needs to be based on maxnumvertices)
-    int MaxHCS = 15000; // 200      ! Maximum number of HC surfaces (was 56)
-                       // Following are initially set in AllocateModuleArrays
+    int MaxHCV = 15;             // Maximum number of HC vertices
+                                 // (needs to be based on maxnumvertices)
+    int MaxHCS = 15000;          // 200      ! Maximum number of HC surfaces (was 56)
+                                 // Following are initially set in AllocateModuleArrays
     int MAXHCArrayBounds = 0;    // Bounds based on Max Number of Vertices in surfaces
     int MAXHCArrayIncrement = 0; // Increment based on Max Number of Vertices in surfaces
-                                // The following variable should be re-engineered to lower in module hierarchy but need more analysis
-    int NVS; // Number of vertices of the shadow/clipped surface
+                                 // The following variable should be re-engineered to lower in module hierarchy but need more analysis
+    int NVS;                     // Number of vertices of the shadow/clipped surface
     int NumVertInShadowOrClippedSurface;
     int CurrentSurfaceBeingShadowed;
     int CurrentShadowingSurface;
@@ -354,29 +369,29 @@ struct SolarShadingData : BaseGlobalStruct {
                        // 1=No overlap; 2=NS1 completely within NS2
                        // 3=NS2 completely within NS1; 4=Partial overlap
 
-    Array1D<Real64> CTHETA;        // Cosine of angle of incidence of sun's rays on surface NS
-    int FBKSHC;                    // HC location of first back surface
-    int FGSSHC;                    // HC location of first general shadowing surface
-    int FINSHC;                    // HC location of first back surface overlap
-    int FRVLHC;                    // HC location of first reveal surface
-    int FSBSHC;                    // HC location of first subsurface
+    Array1D<Real64> CTHETA;         // Cosine of angle of incidence of sun's rays on surface NS
+    int FBKSHC;                     // HC location of first back surface
+    int FGSSHC;                     // HC location of first general shadowing surface
+    int FINSHC;                     // HC location of first back surface overlap
+    int FRVLHC;                     // HC location of first reveal surface
+    int FSBSHC;                     // HC location of first subsurface
     int LOCHCA = 0;                 // Location of highest data in the HC arrays
-    int NBKSHC;                    // Number of back surfaces in the HC arrays
-    int NGSSHC;                    // Number of general shadowing surfaces in the HC arrays
-    int NINSHC;                    // Number of back surface overlaps in the HC arrays
-    int NRVLHC;                    // Number of reveal surfaces in HC array
-    int NSBSHC;                    // Number of subsurfaces in the HC arrays
-    bool CalcSkyDifShading;        // True when sky diffuse solar shading is
+    int NBKSHC;                     // Number of back surfaces in the HC arrays
+    int NGSSHC;                     // Number of general shadowing surfaces in the HC arrays
+    int NINSHC;                     // Number of back surface overlaps in the HC arrays
+    int NRVLHC;                     // Number of reveal surfaces in HC array
+    int NSBSHC;                     // Number of subsurfaces in the HC arrays
+    bool CalcSkyDifShading;         // True when sky diffuse solar shading is
     int ShadowingCalcFrequency = 0; // Frequency for Shadowing Calculations
     int ShadowingDaysLeft = 0;      // Days left in current shadowing period
 
-    Array1D_int HCNS;         // Surface number of back surface HC figures
-    Array1D_int HCNV;         // Number of vertices of each HC figure
-    Array2D<Int64> HCA;       // 'A' homogeneous coordinates of sides
-    Array2D<Int64> HCB;       // 'B' homogeneous coordinates of sides
-    Array2D<Int64> HCC;       // 'C' homogeneous coordinates of sides
-    Array2D<Int64> HCX;       // 'X' homogeneous coordinates of vertices of figure.
-    Array2D<Int64> HCY;       // 'Y' homogeneous coordinates of vertices of figure.
+    Array1D_int HCNS;   // Surface number of back surface HC figures
+    Array1D_int HCNV;   // Number of vertices of each HC figure
+    Array2D<Int64> HCA; // 'A' homogeneous coordinates of sides
+    Array2D<Int64> HCB; // 'B' homogeneous coordinates of sides
+    Array2D<Int64> HCC; // 'C' homogeneous coordinates of sides
+    Array2D<Int64> HCX; // 'X' homogeneous coordinates of vertices of figure.
+    Array2D<Int64> HCY; // 'Y' homogeneous coordinates of vertices of figure.
     Array3D_int WindowRevealStatus;
     Array1D<Real64> HCAREA; // Area of each HC figure.  Sign Convention:  Base Surface
                             // - Positive, Shadow - Negative, Overlap between two shadows
@@ -385,35 +400,35 @@ struct SolarShadingData : BaseGlobalStruct {
     Array1D<Real64> ISABSF; // For simple interior solar distribution (in which all beam
                             // radiation entering zone is assumed to strike the floor),
                             // fraction of beam radiation absorbed by each floor surface
-    Array1D<Real64> SAREA; // Sunlit area of heat transfer surface HTS
-                           // Excludes multiplier for windows
-                           // Shadowing combinations data structure...See ShadowingCombinations type
+    Array1D<Real64> SAREA;  // Sunlit area of heat transfer surface HTS
+                            // Excludes multiplier for windows
+                            // Shadowing combinations data structure...See ShadowingCombinations type
     int NumTooManyFigures = 0;
     int NumTooManyVertices = 0;
     int NumBaseSubSurround = 0;
-    Array1D<Real64> SUNCOS; // Direction cosines of solar position
-    Real64 XShadowProjection;  // X projection of a shadow (formerly called C)
-    Real64 YShadowProjection;  // Y projection of a shadow (formerly called S)
-    Array1D<Real64> XTEMP;     // Temporary 'X' values for HC vertices of the overlap
-    Array1D<Real64> XVC;       // X-vertices of the clipped figure
-    Array1D<Real64> XVS;       // X-vertices of the shadow
-    Array1D<Real64> YTEMP;     // Temporary 'Y' values for HC vertices of the overlap
-    Array1D<Real64> YVC;       // Y-vertices of the clipped figure
-    Array1D<Real64> YVS;       // Y-vertices of the shadow
-    Array1D<Real64> ZVC;       // Z-vertices of the clipped figure
-                               // Used in Sutherland Hodman poly clipping
-    Array1D<Real64> ATEMP;  // Temporary 'A' values for HC vertices of the overlap
-    Array1D<Real64> BTEMP;  // Temporary 'B' values for HC vertices of the overlap
-    Array1D<Real64> CTEMP;  // Temporary 'C' values for HC vertices of the overlap
-    Array1D<Real64> XTEMP1; // Temporary 'X' values for HC vertices of the overlap
-    Array1D<Real64> YTEMP1; // Temporary 'Y' values for HC vertices of the overlap
+    Array1D<Real64> SUNCOS;   // Direction cosines of solar position
+    Real64 XShadowProjection; // X projection of a shadow (formerly called C)
+    Real64 YShadowProjection; // Y projection of a shadow (formerly called S)
+    Array1D<Real64> XTEMP;    // Temporary 'X' values for HC vertices of the overlap
+    Array1D<Real64> XVC;      // X-vertices of the clipped figure
+    Array1D<Real64> XVS;      // X-vertices of the shadow
+    Array1D<Real64> YTEMP;    // Temporary 'Y' values for HC vertices of the overlap
+    Array1D<Real64> YVC;      // Y-vertices of the clipped figure
+    Array1D<Real64> YVS;      // Y-vertices of the shadow
+    Array1D<Real64> ZVC;      // Z-vertices of the clipped figure
+                              // Used in Sutherland Hodman poly clipping
+    Array1D<Real64> ATEMP;    // Temporary 'A' values for HC vertices of the overlap
+    Array1D<Real64> BTEMP;    // Temporary 'B' values for HC vertices of the overlap
+    Array1D<Real64> CTEMP;    // Temporary 'C' values for HC vertices of the overlap
+    Array1D<Real64> XTEMP1;   // Temporary 'X' values for HC vertices of the overlap
+    Array1D<Real64> YTEMP1;   // Temporary 'Y' values for HC vertices of the overlap
     int maxNumberOfFigures = 0;
 
-    #ifdef EP_NO_OPENGL
-        bool penumbra = false;
-    #else
-        std::unique_ptr<Pumbra::Penumbra> penumbra = nullptr;
-    #endif
+#ifdef EP_NO_OPENGL
+    bool penumbra = false;
+#else
+    std::unique_ptr<Pumbra::Penumbra> penumbra = nullptr;
+#endif
 
     bool MustAllocSolarShading = true;
     bool GetInputFlag = true;
@@ -435,43 +450,53 @@ struct SolarShadingData : BaseGlobalStruct {
     Array1D<SolarShading::SurfaceErrorTracking> TrackBaseSubSurround;
 
     Real64 TolValue = 0.0003;
-    Array1D<Real64> XVT; // X Vertices of
-    Array1D<Real64> YVT; // Y vertices of
-    Array1D<Real64> ZVT; // Z vertices of
+    Array1D<Real64> XVT;   // X Vertices of
+    Array1D<Real64> YVT;   // Y vertices of
+    Array1D<Real64> ZVT;   // Z vertices of
     Array1D<Real64> SLOPE; // Slopes from left-most vertex to others.
-    int MaxGSS = 50; // Current Max for GSS array
-    int MaxBKS = 50; // Current Max for BKS array
-    int MaxSBS = 50; // Current Max for SBS array
+    int MaxGSS = 50;       // Current Max for GSS array
+    int MaxBKS = 50;       // Current Max for BKS array
+    int MaxSBS = 50;       // Current Max for SBS array
     int MaxDim = 0;
-    Array1D<Real64> XVrt; // X Vertices of Shadows
-    Array1D<Real64> YVrt; // Y vertices of Shadows
-    Array1D<Real64> ZVrt; // Z vertices of Shadows
+    Array1D<Real64> XVrt;  // X Vertices of Shadows
+    Array1D<Real64> YVrt;  // Y vertices of Shadows
+    Array1D<Real64> ZVrt;  // Z vertices of Shadows
     Array1D<Real64> XVrtx; // X,Y,Z coordinates of vertices of
     Array1D<Real64> YVrtx; // back surfaces projected into system
     Array1D<Real64> ZVrtx; // relative to receiving surface
     Array1D<Real64> XVert;
     Array1D<Real64> YVert;
     Array1D<Real64> ZVert;
-    Array1D<Real64> AbsBeamWin;                  // Glass layer beam solar absorptance of a window
+    Array1D<Real64> AbsBeamWin;                                                               // Glass layer beam solar absorptance of a window
     Array1D<Real64> AbsBeamWinEQL = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL + 1); // layers beam solar absorptance of a window
-    Array1D<Real64> ExtBeamAbsByShadFac; // Factor for exterior beam radiation absorbed by shade (1/m2) (absorbed radation = beam incident * ExtBeamAbsByShad
+    Array1D<Real64>
+        ExtBeamAbsByShadFac; // Factor for exterior beam radiation absorbed by shade (1/m2) (absorbed radation = beam incident * ExtBeamAbsByShad
     Array1D<Real64> IntBeamAbsByShadFac; // Like ExtBeamAbsByShadFac, but for interior beam radiation.
-    Array1D<Real64> WinTransBmSolar;     // Factor for exterior beam solar transmitted through window, or window plus shade, into zone at current time (m2)
-    Array1D<Real64> WinTransDifSolar; // Factor for exterior diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
-    Array1D<Real64> WinTransDifSolarGnd; // Factor for exterior ground diffuse solar transmitted through window with horizontally-slatted blind into zone at current time (m2)
-    Array1D<Real64> WinTransDifSolarSky; // Factor for exterior sky diffuse solar transmitted through window with horizontally-slatted blind into zone at current time (m2)
-    Array2D<Real64> AbsSolBeamEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1); // absorbed exterior beam radiation by layers fraction
-    Array2D<Real64> AbsSolDiffEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1); // absorbed exterior diffuse radiation by layers fraction
-    Array2D<Real64> AbsSolBeamBackEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1); // absorbed interior beam radiation by layers fraction from back
-    Array1D<Real64> WinTransBmBmSolar; // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
-    Array1D<Real64> WinTransBmDifSolar; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
-    Real64 ThetaBig = 0.0;        // Larger of ThetaBlock1 and ThetaBlock2     //Autodesk Used uninitialized in some runs
-    Real64 ThetaSmall = 0.0;      // Smaller of ThetaBlock1 and ThetaBlock2 //Autodesk Used uninitialized in some runs
-    Real64 ThetaMin = 0.0;        // Minimum allowed slat angle, resp. (rad)  //Autodesk Used uninitialized in some runs
-    Real64 ThetaMax = 0.0;        // Maximum allowed slat angle, resp. (rad)  //Autodesk Used uninitialized in some runs
-    Array1D<Real64> XVertex; // X,Y,Z coordinates of vertices of
-    Array1D<Real64> YVertex; // back surfaces projected into system
-    Array1D<Real64> ZVertex; // relative to receiving surface
+    Array1D<Real64>
+        WinTransBmSolar; // Factor for exterior beam solar transmitted through window, or window plus shade, into zone at current time (m2)
+    Array1D<Real64>
+        WinTransDifSolar; // Factor for exterior diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
+    Array1D<Real64> WinTransDifSolarGnd; // Factor for exterior ground diffuse solar transmitted through window with horizontally-slatted blind into
+                                         // zone at current time (m2)
+    Array1D<Real64> WinTransDifSolarSky; // Factor for exterior sky diffuse solar transmitted through window with horizontally-slatted blind into zone
+                                         // at current time (m2)
+    Array2D<Real64> AbsSolBeamEQL =
+        Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1); // absorbed exterior beam radiation by layers fraction
+    Array2D<Real64> AbsSolDiffEQL =
+        Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1); // absorbed exterior diffuse radiation by layers fraction
+    Array2D<Real64> AbsSolBeamBackEQL =
+        Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1); // absorbed interior beam radiation by layers fraction from back
+    Array1D<Real64>
+        WinTransBmBmSolar; // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
+    Array1D<Real64> WinTransBmDifSolar; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at
+                                        // current time (m2)
+    Real64 ThetaBig = 0.0;              // Larger of ThetaBlock1 and ThetaBlock2     //Autodesk Used uninitialized in some runs
+    Real64 ThetaSmall = 0.0;            // Smaller of ThetaBlock1 and ThetaBlock2 //Autodesk Used uninitialized in some runs
+    Real64 ThetaMin = 0.0;              // Minimum allowed slat angle, resp. (rad)  //Autodesk Used uninitialized in some runs
+    Real64 ThetaMax = 0.0;              // Maximum allowed slat angle, resp. (rad)  //Autodesk Used uninitialized in some runs
+    Array1D<Real64> XVertex;            // X,Y,Z coordinates of vertices of
+    Array1D<Real64> YVertex;            // back surfaces projected into system
+    Array1D<Real64> ZVertex;            // relative to receiving surface
     std::vector<Real64> sin_Phi;
     std::vector<Real64> cos_Phi;
     std::vector<Real64> sin_Theta;
@@ -596,10 +621,11 @@ struct SolarShadingData : BaseGlobalStruct {
     }
 
     // Default Constructor
-    SolarShadingData() :
-        cOverLapStatus(6, {"No-Overlap", "1st-Surf-within-2nd", "2nd-Surf-within-1st", "Partial-Overlap", "Too-Many-Vertices", "Too-Many-Figures"}),
-        SUNCOS(3)
-    {}
+    SolarShadingData()
+        : cOverLapStatus(6, {"No-Overlap", "1st-Surf-within-2nd", "2nd-Surf-within-1st", "Partial-Overlap", "Too-Many-Vertices", "Too-Many-Figures"}),
+          SUNCOS(3)
+    {
+    }
 };
 } // namespace EnergyPlus
 

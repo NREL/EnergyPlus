@@ -146,9 +146,8 @@ namespace SystemReports {
         std::vector<Real64> SysTimeAtOALimitOcc = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // time [hrs] at limit [n] during occupied
         std::vector<Real64> SysMechVentTotAtLimitOcc = {
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // air loop mech vent total vol OA at limit [n] {m3} during occupied
-
     };
-        
+
     // Functions
 
     void InitEnergyReports(EnergyPlusData &state);
@@ -274,7 +273,8 @@ namespace SystemReports {
 
 } // namespace SystemReports
 
-struct SystemReportsData : BaseGlobalStruct {
+struct SystemReportsData : BaseGlobalStruct
+{
 
     Array1D<Real64> MaxCoolingLoadMetByVent;
     Array1D<Real64> MaxCoolingLoadAddedByVent;
@@ -361,7 +361,7 @@ struct SystemReportsData : BaseGlobalStruct {
     bool VentLoadsReportEnabled = true;
     bool VentEnergyReportEnabled = false;
     bool VentReportStructureCreated = false;
-    int TotalLoopConnects = 0;              // Total number of loop connections
+    int TotalLoopConnects = 0; // Total number of loop connections
     int MaxLoopArraySize = 100;
     int MaxCompArraySize = 500;
 

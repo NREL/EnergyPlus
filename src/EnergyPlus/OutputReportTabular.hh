@@ -79,7 +79,8 @@ namespace OutputReportTabular {
     // Data
     // MODULE PARAMETER DEFINITIONS:
 
-    enum class iAggType {
+    enum class iAggType
+    {
         Unassigned,
         SumOrAvg,
         Maximum,
@@ -96,7 +97,8 @@ namespace OutputReportTabular {
         MinimumDuringHoursShown,
     };
 
-    enum class iTableStyle {
+    enum class iTableStyle
+    {
         Unassigned,
         Comma,
         Tab,
@@ -105,7 +107,8 @@ namespace OutputReportTabular {
         XML,
     };
 
-    enum class iUnitsStyle {
+    enum class iUnitsStyle
+    {
         None,
         JtoKWH,
         JtoMJ,
@@ -166,7 +169,8 @@ namespace OutputReportTabular {
 
     constexpr const char *validChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:.");
 
-    enum class iOutputType {
+    enum class iOutputType
+    {
         zoneOutput,
         airLoopOutput,
         facilityOutput,
@@ -184,7 +188,8 @@ namespace OutputReportTabular {
     constexpr int maxNumStyles(5);
 
     // LineTypes for reading the stat file
-    enum class StatLineType {
+    enum class StatLineType
+    {
         Initialized, // used as a dummy placeholder
         StatisticsLine,
         LocationLine,
@@ -226,12 +231,12 @@ namespace OutputReportTabular {
         // the lowest bin and above the value of the last bin are also shown.
         int resIndex; // result index - pointer to BinResults array
         int numTables;
-        int typeOfVar;                     // 0=not found, 1=integer, 2=real, 3=meter
-        OutputProcessor::StoreType avgSum; // Variable  is Averaged=1 or Summed=2
-        OutputProcessor::TimeStepType stepType;                      // Variable time step is Zone=1 or HVAC=2
-        OutputProcessor::Unit units;       // the units enumeration
-        std::string ScheduleName;          // the name of the schedule
-        int scheduleIndex;                 // index to the schedule specified - if no schedule use zero
+        int typeOfVar;                          // 0=not found, 1=integer, 2=real, 3=meter
+        OutputProcessor::StoreType avgSum;      // Variable  is Averaged=1 or Summed=2
+        OutputProcessor::TimeStepType stepType; // Variable time step is Zone=1 or HVAC=2
+        OutputProcessor::Unit units;            // the units enumeration
+        std::string ScheduleName;               // the name of the schedule
+        int scheduleIndex;                      // index to the schedule specified - if no schedule use zero
 
         // Default Constructor
         OutputTableBinnedType()
@@ -311,17 +316,17 @@ namespace OutputReportTabular {
     struct MonthlyFieldSetInputType
     {
         // Members
-        std::string variMeter;                // the name of the variable or meter
-        std::string colHead;                  // the column header to use instead of the variable name (only for predefined)
+        std::string variMeter;                     // the name of the variable or meter
+        std::string colHead;                       // the column header to use instead of the variable name (only for predefined)
         iAggType aggregate;                        // the type of aggregation for the variable (see aggType parameters)
-        OutputProcessor::Unit varUnits;       // Units enumeration
-        std::string variMeterUpper;           // the name of the variable or meter uppercased
-        int typeOfVar;                        // 0=not found, 1=integer, 2=real, 3=meter
-        int keyCount;                         // noel
-        OutputProcessor::StoreType varAvgSum; // Variable  is Averaged=1 or Summed=2
-        OutputProcessor::TimeStepType varStepType;                      // Variable time step is Zone=1 or HVAC=2
-        Array1D_string NamesOfKeys;           // keyNames !noel
-        Array1D_int IndexesForKeyVar;         // keyVarIndexes !noel
+        OutputProcessor::Unit varUnits;            // Units enumeration
+        std::string variMeterUpper;                // the name of the variable or meter uppercased
+        int typeOfVar;                             // 0=not found, 1=integer, 2=real, 3=meter
+        int keyCount;                              // noel
+        OutputProcessor::StoreType varAvgSum;      // Variable  is Averaged=1 or Summed=2
+        OutputProcessor::TimeStepType varStepType; // Variable time step is Zone=1 or HVAC=2
+        Array1D_string NamesOfKeys;                // keyNames !noel
+        Array1D_int IndexesForKeyVar;              // keyVarIndexes !noel
 
         // Default Constructor
         MonthlyFieldSetInputType()
@@ -347,18 +352,18 @@ namespace OutputReportTabular {
     struct MonthlyColumnsType
     {
         // Members
-        std::string varName;               // name of variable
-        std::string colHead;               // column header (not used for user defined monthly)
-        int varNum;                        // variable or meter number
-        int typeOfVar;                     // 0=not found, 1=integer, 2=real, 3=meter
-        OutputProcessor::StoreType avgSum; // Variable  is Averaged=1 or Summed=2
-        OutputProcessor::TimeStepType stepType;                      // Variable time step is Zone=1 or HVAC=2
-        OutputProcessor::Unit units;       // the units string, may be blank
+        std::string varName;                    // name of variable
+        std::string colHead;                    // column header (not used for user defined monthly)
+        int varNum;                             // variable or meter number
+        int typeOfVar;                          // 0=not found, 1=integer, 2=real, 3=meter
+        OutputProcessor::StoreType avgSum;      // Variable  is Averaged=1 or Summed=2
+        OutputProcessor::TimeStepType stepType; // Variable time step is Zone=1 or HVAC=2
+        OutputProcessor::Unit units;            // the units string, may be blank
         iAggType aggType;                       // index to the type of aggregation (see list of parameters)
-        Array1D<Real64> reslt;             // monthly results
-        Array1D<Real64> duration;          // the time during which results are summed for use in averages
-        Array1D_int timeStamp;             // encoded timestamp of max or min
-        Real64 aggForStep;                 // holds the aggregation for the HVAC time steps when smaller than
+        Array1D<Real64> reslt;                  // monthly results
+        Array1D<Real64> duration;               // the time during which results are summed for use in averages
+        Array1D_int timeStamp;                  // encoded timestamp of max or min
+        Real64 aggForStep;                      // holds the aggregation for the HVAC time steps when smaller than
         // the zone timestep
 
         // Default Constructor
@@ -472,7 +477,7 @@ namespace OutputReportTabular {
 
     // Functions
 
-    std::ofstream & open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const & filename, bool output_to_file = true);
+    std::ofstream &open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const &filename, bool output_to_file = true);
 
     void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
@@ -488,7 +493,8 @@ namespace OutputReportTabular {
 
     int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int const inNumDigitsShown);
 
-    void AddMonthlyFieldSetInput(EnergyPlusData &state, int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, iAggType const inAggregate);
+    void AddMonthlyFieldSetInput(
+        EnergyPlusData &state, int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, iAggType const inAggregate);
 
     void InitializeTabularMonthly(EnergyPlusData &state);
 
@@ -538,11 +544,14 @@ namespace OutputReportTabular {
 
     void GatherBinResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherMonthlyResultsForTimestep(EnergyPlusData &state,
+                                         OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherBEPSResultsForTimestep(EnergyPlusData &state,
+                                      OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state,
+                                                    OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
@@ -562,7 +571,12 @@ namespace OutputReportTabular {
 
     void WriteTabularReports(EnergyPlusData &state);
 
-    void parseStatLine(const std::string & lineIn, StatLineType &lineType, bool & desConditionlinepassed, bool & heatingDesignlinepassed, bool & coolingDesignlinepassed, bool & isKoppen);
+    void parseStatLine(const std::string &lineIn,
+                       StatLineType &lineType,
+                       bool &desConditionlinepassed,
+                       bool &heatingDesignlinepassed,
+                       bool &coolingDesignlinepassed,
+                       bool &isKoppen);
 
     void FillWeatherPredefinedEntries(EnergyPlusData &state);
 
@@ -669,7 +683,11 @@ namespace OutputReportTabular {
                                         Array2D<Real64> const &surfDelaySeq);
 
     void CollectPeakZoneConditions(EnergyPlusData &state,
-        CompLoadTablesType &compLoad, int const &desDaySelected, int const &timeOfMax, int const &zoneIndex, bool const &isCooling);
+                                   CompLoadTablesType &compLoad,
+                                   int const &desDaySelected,
+                                   int const &timeOfMax,
+                                   int const &zoneIndex,
+                                   bool const &isCooling);
 
     void ComputeEngineeringChecks(CompLoadTablesType &compLoad);
 
@@ -698,7 +716,10 @@ namespace OutputReportTabular {
                                bool produceTabular_para,
                                bool produceSQLite_para);
 
-    void WriteReportHeaders(EnergyPlusData &state, std::string const &reportName, std::string const &objectName, OutputProcessor::StoreType const averageOrSum);
+    void WriteReportHeaders(EnergyPlusData &state,
+                            std::string const &reportName,
+                            std::string const &objectName,
+                            OutputProcessor::StoreType const averageOrSum);
 
     void WriteSubtitle(EnergyPlusData &state, std::string const &subtitle);
 
@@ -730,14 +751,14 @@ namespace OutputReportTabular {
 
     std::string ConvertUnicodeToUTF8(unsigned long const codepoint);
 
-    std::string ConvertToEscaped(std::string const &inString,  // Input String
-                                 bool isXML=true);             // isXML if false assumes HTML and will not convert quotes and apostrophes, for HTML4
+    std::string ConvertToEscaped(std::string const &inString, // Input String
+                                 bool isXML = true);          // isXML if false assumes HTML and will not convert quotes and apostrophes, for HTML4
 
     void DetermineBuildingFloorArea(EnergyPlusData &state);
 
     /* Tables with Subcategories in particular have a blank for rowHead for display in the HTML output.
      * This routine will fill up the blanks for output to Sql in particular */
-    void FillRowHead(Array1D_string & rowHead);
+    void FillRowHead(Array1D_string &rowHead);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -829,7 +850,8 @@ namespace OutputReportTabular {
 
 } // namespace OutputReportTabular
 
-struct OutputReportTabularData : BaseGlobalStruct {
+struct OutputReportTabularData : BaseGlobalStruct
+{
 
     OutputReportTabular::iUnitsStyle unitsStyle = OutputReportTabular::iUnitsStyle::None;
     OutputReportTabular::iUnitsStyle unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::NotFound;
@@ -851,14 +873,16 @@ struct OutputReportTabularData : BaseGlobalStruct {
 
     // From Report:Table:Style
     int numStyles = 0;
-    std::ofstream csv_stream;               // CSV table stream
-    std::ofstream tab_stream;               // Tab table stream
-    std::ofstream fix_stream;               // Fixed table stream
-    std::ofstream htm_stream;               // HTML table stream
-    std::ofstream xml_stream;               // XML table stream
-    Array1D<std::ofstream *> TabularOutputFile = Array1D<std::ofstream *>(OutputReportTabular::maxNumStyles, {&csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream}); // Table stream array
-    Array1D_string del = Array1D_string(OutputReportTabular::maxNumStyles);        // the delimiter to use
-    Array1D<OutputReportTabular::iTableStyle> TableStyle = Array1D<OutputReportTabular::iTableStyle>(OutputReportTabular::maxNumStyles, OutputReportTabular::iTableStyle::Unassigned); // see list of parameters
+    std::ofstream csv_stream; // CSV table stream
+    std::ofstream tab_stream; // Tab table stream
+    std::ofstream fix_stream; // Fixed table stream
+    std::ofstream htm_stream; // HTML table stream
+    std::ofstream xml_stream; // XML table stream
+    Array1D<std::ofstream *> TabularOutputFile = Array1D<std::ofstream *>(
+        OutputReportTabular::maxNumStyles, {&csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream}); // Table stream array
+    Array1D_string del = Array1D_string(OutputReportTabular::maxNumStyles);                                    // the delimiter to use
+    Array1D<OutputReportTabular::iTableStyle> TableStyle = Array1D<OutputReportTabular::iTableStyle>(
+        OutputReportTabular::maxNumStyles, OutputReportTabular::iTableStyle::Unassigned); // see list of parameters
 
     Real64 timeInYear = 0.0;
 
@@ -889,7 +913,7 @@ struct OutputReportTabularData : BaseGlobalStruct {
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
     // arrays that hold the meter numbers that are initialized at get input
-    Array1D_int meterNumTotalsBEPS= Array1D_int(OutputReportTabular::numResourceTypes, 0);
+    Array1D_int meterNumTotalsBEPS = Array1D_int(OutputReportTabular::numResourceTypes, 0);
     Array1D_int meterNumTotalsSource = Array1D_int(OutputReportTabular::numSourceTypes, 0);
     Array1D_bool fuelfactorsused = Array1D_bool(OutputReportTabular::numSourceTypes, false);
     Array1D_bool ffUsed = Array1D_bool(OutputReportTabular::numResourceTypes, false);
@@ -1229,7 +1253,7 @@ struct OutputReportTabularData : BaseGlobalStruct {
         this->displayThermalResilienceSummaryExplicitly = false;
         this->displayCO2ResilienceSummaryExplicitly = false;
         this->displayVisualResilienceSummaryExplicitly = false;
-        this->meterNumTotalsBEPS= Array1D_int(OutputReportTabular::numResourceTypes, 0);
+        this->meterNumTotalsBEPS = Array1D_int(OutputReportTabular::numResourceTypes, 0);
         this->meterNumTotalsSource = Array1D_int(OutputReportTabular::numSourceTypes, 0);
         this->fuelfactorsused = Array1D_bool(OutputReportTabular::numSourceTypes, false);
         this->ffUsed = Array1D_bool(OutputReportTabular::numResourceTypes, false);
@@ -1324,7 +1348,7 @@ struct OutputReportTabularData : BaseGlobalStruct {
         this->decayCurveCool.deallocate();
         this->decayCurveHeat.deallocate();
         this->ITABSFseq.deallocate();
-        this->TMULTseq .deallocate();
+        this->TMULTseq.deallocate();
         this->peopleInstantSeq.deallocate();
         this->peopleLatentSeq.deallocate();
         this->peopleRadSeq.deallocate();

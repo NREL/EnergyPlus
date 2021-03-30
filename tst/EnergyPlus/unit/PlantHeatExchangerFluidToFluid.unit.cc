@@ -1115,7 +1115,8 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
                 state->dataGlobal->BeginHourFlag = true;
                 state->dataGlobal->EndHourFlag = false;
 
-                for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
+                for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour;
+                     ++state->dataGlobal->TimeStep) {
 
                     state->dataGlobal->BeginTimeStepFlag = true;
 
@@ -2206,7 +2207,8 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
                 state->dataGlobal->BeginHourFlag = true;
                 state->dataGlobal->EndHourFlag = false;
 
-                for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
+                for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour;
+                     ++state->dataGlobal->TimeStep) {
 
                     state->dataGlobal->BeginTimeStepFlag = true;
 

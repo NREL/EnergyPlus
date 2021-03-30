@@ -46,10 +46,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/CommandLineInterface.hh>
-#include <EnergyPlus/api/EnergyPlusPgm.hh>
 #include <EnergyPlus/Data/CommonIncludes.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/api/EnergyPlusPgm.hh>
 
 int main(int argc, const char *argv[])
 {
@@ -60,8 +60,8 @@ int main(int argc, const char *argv[])
     std::string datestring; // supposedly returns blank when no date available.
     date_and_time(datestring, _, _, value);
     if (!datestring.empty()) {
-        state.dataStrGlobals->CurrentDateTime = EnergyPlus::format(
-            " YMD={:4}.{:02}.{:02} {:02}:{:02}", value(1), value(2), value(3), value(5), value(6));
+        state.dataStrGlobals->CurrentDateTime =
+            EnergyPlus::format(" YMD={:4}.{:02}.{:02} {:02}:{:02}", value(1), value(2), value(3), value(5), value(6));
     } else {
         state.dataStrGlobals->CurrentDateTime = " unknown date/time";
     }

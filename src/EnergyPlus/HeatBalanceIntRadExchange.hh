@@ -70,7 +70,7 @@ namespace HeatBalanceIntRadExchange {
     void CalcInteriorRadExchange(EnergyPlusData &state,
                                  Array1S<Real64> const SurfaceTemp,       // Current surface temperatures
                                  int const SurfIterations,                // Number of iterations in calling subroutine
-                                 Array1D<Real64> &NetLWRadToSurf,          // Net long wavelength radiant exchange from other surfaces
+                                 Array1D<Real64> &NetLWRadToSurf,         // Net long wavelength radiant exchange from other surfaces
                                  Optional_int_const ZoneToResimulate = _, // if passed in, then only calculate for this zone
                                  std::string const &CalledFrom = "");
 
@@ -129,23 +129,23 @@ namespace HeatBalanceIntRadExchange {
     );
 
     void CalcScriptF(EnergyPlusData &state,
-                     int const N,             // Number of surfaces
+                     int const N,              // Number of surfaces
                      Array1D<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-                     Array2<Real64> const &F, // DIRECT VIEW FACTOR MATRIX (N X N)
+                     Array2<Real64> const &F,  // DIRECT VIEW FACTOR MATRIX (N X N)
                      Array1D<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
-                     Array2<Real64> &ScriptF  // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
+                     Array2<Real64> &ScriptF   // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
     );
 
     void CalcFMRT(EnergyPlusData &state,
-                  int const N,             // Number of surfaces
+                  int const N,              // Number of surfaces
                   Array1D<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
                   Array1D<Real64> &FMRT     // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
     );
 
-    void CalcFp(int const N,             // Number of surfaces
-                Array1D<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
-                Array1D<Real64> &FMRT,    // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
-                Array1D<Real64> &Fp       // VECTOR OF OPPENHEIM RESISTNACE VALUES
+    void CalcFp(int const N,            // Number of surfaces
+                Array1D<Real64> &EMISS, // VECTOR OF SURFACE EMISSIVITIES
+                Array1D<Real64> &FMRT,  // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
+                Array1D<Real64> &Fp     // VECTOR OF OPPENHEIM RESISTNACE VALUES
     );
 
     void CalcMatrixInverse(Array2<Real64> &A, // Matrix: Gets reduced to L\U form
@@ -162,10 +162,11 @@ namespace HeatBalanceIntRadExchange {
 
 } // namespace HeatBalanceIntRadExchange
 
-struct HeatBalanceIntRadExchgData : BaseGlobalStruct {
+struct HeatBalanceIntRadExchgData : BaseGlobalStruct
+{
 
-    int MaxNumOfRadEnclosureSurfs = 0; // Max saved to get large enough space for SurfaceTempInKto4th
-    bool CarrollMethod = false; // Use Carroll MRT method
+    int MaxNumOfRadEnclosureSurfs = 0;            // Max saved to get large enough space for SurfaceTempInKto4th
+    bool CarrollMethod = false;                   // Use Carroll MRT method
     bool CalcInteriorRadExchangefirstTime = true; // Logical flag for one-time initializations
 
     // variables added as part of strategy to reduce calculation time - Glazer 2011-04-22

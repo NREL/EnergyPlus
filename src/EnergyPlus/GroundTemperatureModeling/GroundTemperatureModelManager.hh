@@ -79,15 +79,16 @@ namespace GroundTemperatureManager {
 
 } // namespace GroundTemperatureManager
 
-struct GroundTemperatureManagerData : BaseGlobalStruct {
+struct GroundTemperatureManagerData : BaseGlobalStruct
+{
     Array1D_string const CurrentModuleObjects = Array1D_string(7,
-    {"Site:GroundTemperature:Undisturbed:KusudaAchenbach",
-                "Site:GroundTemperature:Undisturbed:FiniteDifference",
-                "Site:GroundTemperature:BuildingSurface",
-                "Site:GroundTemperature:Shallow",
-                "Site:GroundTemperature:Deep",
-                "Site:GroundTemperature:FCfactorMethod",
-                "Site:GroundTemperature:Undisturbed:Xing"});
+                                                               {"Site:GroundTemperature:Undisturbed:KusudaAchenbach",
+                                                                "Site:GroundTemperature:Undisturbed:FiniteDifference",
+                                                                "Site:GroundTemperature:BuildingSurface",
+                                                                "Site:GroundTemperature:Shallow",
+                                                                "Site:GroundTemperature:Deep",
+                                                                "Site:GroundTemperature:FCfactorMethod",
+                                                                "Site:GroundTemperature:Undisturbed:Xing"});
 
     std::vector<std::shared_ptr<BaseGroundTempsModel>> groundTempModels;
 

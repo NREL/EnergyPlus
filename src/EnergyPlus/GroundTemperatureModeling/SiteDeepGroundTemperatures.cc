@@ -76,7 +76,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
     // Reads input and creates instance of Site:GroundTemperature:Deep object
 
     // USE STATEMENTS:
-        using namespace GroundTemperatureManager;
+    using namespace GroundTemperatureManager;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -96,7 +96,8 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
     if (numCurrObjects == 1) {
 
         // Get the object names for each construction from the input processor
-        state.dataInputProcessing->inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
+        state.dataInputProcessing->inputProcessor->getObjectItem(
+            state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
             ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");

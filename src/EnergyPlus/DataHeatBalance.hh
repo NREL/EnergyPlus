@@ -208,7 +208,8 @@ namespace DataHeatBalance {
     constexpr int MixingSourceZonesOnly(1);
     constexpr int AllZones(2);
 
-    enum class AdjustmentType {
+    enum class AdjustmentType
+    {
         // zone air flow balancing method
         AdjustMixingOnly,
         AdjustReturnOnly,
@@ -370,30 +371,30 @@ namespace DataHeatBalance {
         int PlenumCondNum;                        // Supply or return plenum conditions number, 0 if this is not a plenum zone
         int TempControlledZoneIndex;              // this is the index number for TempControlledZone structure for lookup
         //            Pointers to Surface Data Structure
-        int AllSurfaceFirst;       // First surface in zone including air boundaries
-        int AllSurfaceLast;        // Last  surface in zone including air boundaries
-        int HTSurfaceFirst;        // First Heat Transfer Surface in Zone
-        int HTSurfaceLast;         // Last  Heat Transfer Surface in Zone
-        int OpaqOrIntMassSurfaceFirst; // First Opaque or Interior Mass Heat Transfer Surface (including opaque doors) in Zone
-        int OpaqOrIntMassSurfaceLast;  // Last  Opaque or Interior Mass Heat Transfer Surface (including opaque doors) in Zone
-        int WindowSurfaceFirst;    // First Window Heat Transfer Surface in Zone
-        int WindowSurfaceLast;     // Last  Window Heat Transfer Surface in Zone
-        int OpaqOrWinSurfaceFirst; // First opaque (including IntMass) or window (non TDD Dome) Surface in Zone
-        int OpaqOrWinSurfaceLast;  // Last  opaque (including IntMass) or window (non TDD Dome) Surface in Zone
-        int TDDDomeFirst;          // First TDD Dome Surface in Zone
-        int TDDDomeLast;           // Last  TDD Dome Surface in Zone
-        int InsideConvectionAlgo;  // Ref: appropriate values for Inside Convection solution
-        int NumSurfaces;           // Number of surfaces for this zone
-        int NumSubSurfaces;        // Number of subsurfaces for this zone (windows, doors, tdd dome and diffusers)
-        int NumShadingSurfaces;    // Number of shading surfaces for this zone
-        int OutsideConvectionAlgo; // Ref: appropriate values for Outside Convection solution
-        Vector Centroid;           // Center of the zone found by averaging wall, floor, and roof centroids
-        Real64 MinimumX;           // Minimum X value for entire zone
-        Real64 MaximumX;           // Maximum X value for entire zone
-        Real64 MinimumY;           // Minimum Y value for entire zone
-        Real64 MaximumY;           // Maximum Y value for entire zone
-        Real64 MinimumZ;           // Minimum Z value for entire zone
-        Real64 MaximumZ;           // Maximum Z value for entire zone
+        int AllSurfaceFirst;                         // First surface in zone including air boundaries
+        int AllSurfaceLast;                          // Last  surface in zone including air boundaries
+        int HTSurfaceFirst;                          // First Heat Transfer Surface in Zone
+        int HTSurfaceLast;                           // Last  Heat Transfer Surface in Zone
+        int OpaqOrIntMassSurfaceFirst;               // First Opaque or Interior Mass Heat Transfer Surface (including opaque doors) in Zone
+        int OpaqOrIntMassSurfaceLast;                // Last  Opaque or Interior Mass Heat Transfer Surface (including opaque doors) in Zone
+        int WindowSurfaceFirst;                      // First Window Heat Transfer Surface in Zone
+        int WindowSurfaceLast;                       // Last  Window Heat Transfer Surface in Zone
+        int OpaqOrWinSurfaceFirst;                   // First opaque (including IntMass) or window (non TDD Dome) Surface in Zone
+        int OpaqOrWinSurfaceLast;                    // Last  opaque (including IntMass) or window (non TDD Dome) Surface in Zone
+        int TDDDomeFirst;                            // First TDD Dome Surface in Zone
+        int TDDDomeLast;                             // Last  TDD Dome Surface in Zone
+        int InsideConvectionAlgo;                    // Ref: appropriate values for Inside Convection solution
+        int NumSurfaces;                             // Number of surfaces for this zone
+        int NumSubSurfaces;                          // Number of subsurfaces for this zone (windows, doors, tdd dome and diffusers)
+        int NumShadingSurfaces;                      // Number of shading surfaces for this zone
+        int OutsideConvectionAlgo;                   // Ref: appropriate values for Outside Convection solution
+        Vector Centroid;                             // Center of the zone found by averaging wall, floor, and roof centroids
+        Real64 MinimumX;                             // Minimum X value for entire zone
+        Real64 MaximumX;                             // Maximum X value for entire zone
+        Real64 MinimumY;                             // Minimum Y value for entire zone
+        Real64 MaximumY;                             // Maximum Y value for entire zone
+        Real64 MinimumZ;                             // Minimum Z value for entire zone
+        Real64 MaximumZ;                             // Maximum Z value for entire zone
         std::vector<int> ZoneHTSurfaceList;          // List of HT surfaces related to this zone (includes adjacent interzone surfaces)
         std::vector<int> ZoneIZSurfaceList;          // List of interzone surfaces in this zone
         std::vector<int> ZoneHTNonWindowSurfaceList; // List of non-window HT surfaces related to this zone (includes adjacent interzone surfaces)
@@ -477,10 +478,11 @@ namespace DataHeatBalance {
               ExtWindowArea_Multiplied(0.0), ExtGrossWallArea_Multiplied(0.0), ExtNetWallArea(0.0), TotalSurfArea(0.0), ExteriorTotalSurfArea(0.0),
               ExteriorTotalGroundSurfArea(0.0), ExtGrossGroundWallArea(0.0), ExtGrossGroundWallArea_Multiplied(0.0), SystemZoneNodeNumber(0),
               IsControlled(false), IsSupplyPlenum(false), IsReturnPlenum(false), ZoneEqNum(0), PlenumCondNum(0), TempControlledZoneIndex(0),
-              AllSurfaceFirst(0), AllSurfaceLast(-1), HTSurfaceFirst(0), HTSurfaceLast(-1), OpaqOrIntMassSurfaceFirst(0), OpaqOrIntMassSurfaceLast(-1),
-              WindowSurfaceFirst(0), WindowSurfaceLast(-1), OpaqOrWinSurfaceFirst(0), OpaqOrWinSurfaceLast(-1), TDDDomeFirst(0), TDDDomeLast(-1),
-              InsideConvectionAlgo(ASHRAESimple), NumSurfaces(0), NumSubSurfaces(0), NumShadingSurfaces(0), OutsideConvectionAlgo(ASHRAESimple), Centroid(0.0, 0.0, 0.0),
-              MinimumX(0.0), MaximumX(0.0), MinimumY(0.0), MaximumY(0.0), MinimumZ(0.0), MaximumZ(0.0), RadiantEnclosureNum(0), SolarEnclosureNum(0),
+              AllSurfaceFirst(0), AllSurfaceLast(-1), HTSurfaceFirst(0), HTSurfaceLast(-1), OpaqOrIntMassSurfaceFirst(0),
+              OpaqOrIntMassSurfaceLast(-1), WindowSurfaceFirst(0), WindowSurfaceLast(-1), OpaqOrWinSurfaceFirst(0), OpaqOrWinSurfaceLast(-1),
+              TDDDomeFirst(0), TDDDomeLast(-1), InsideConvectionAlgo(ASHRAESimple), NumSurfaces(0), NumSubSurfaces(0), NumShadingSurfaces(0),
+              OutsideConvectionAlgo(ASHRAESimple), Centroid(0.0, 0.0, 0.0), MinimumX(0.0), MaximumX(0.0), MinimumY(0.0), MaximumY(0.0), MinimumZ(0.0),
+              MaximumZ(0.0), RadiantEnclosureNum(0), SolarEnclosureNum(0),
 
               OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false), OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0),
               OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0), WindSpeedEMSOverrideOn(false),
@@ -1050,16 +1052,20 @@ namespace DataHeatBalance {
     struct ZoneAirMassFlowConservation
     {
         // Members
-        bool EnforceZoneMassBalance; // flag to enforce zone air mass conservation
-        AdjustmentType ZoneFlowAdjustment; // determines how zone air flow is adjusted (AdjustMixingOnly, AdjustReturnOnly, AdjustMixingThenReturn, AdjustReturnThenMixing, None)        int InfiltrationTreatment;   // determines how infiltration is treated for zone mass balance
-        int InfiltrationTreatment;   // determines how infiltration is treated for zone mass balance
-        int InfiltrationZoneType;    // specifies which types of zones allow infiltration to be changed
-        bool AdjustZoneMixingFlow; // used to adjust zone mixing air flows to enforce air flow balance
-        bool AdjustZoneInfiltrationFlow; // used to adjust zone infiltration air flows to enforce air flow balance
-                                     // Note, unique global object
+        bool EnforceZoneMassBalance;       // flag to enforce zone air mass conservation
+        AdjustmentType ZoneFlowAdjustment; // determines how zone air flow is adjusted (AdjustMixingOnly, AdjustReturnOnly, AdjustMixingThenReturn,
+                                           // AdjustReturnThenMixing, None)        int InfiltrationTreatment;   // determines how infiltration is
+                                           // treated for zone mass balance
+        int InfiltrationTreatment;         // determines how infiltration is treated for zone mass balance
+        int InfiltrationZoneType;          // specifies which types of zones allow infiltration to be changed
+        bool AdjustZoneMixingFlow;         // used to adjust zone mixing air flows to enforce air flow balance
+        bool AdjustZoneInfiltrationFlow;   // used to adjust zone infiltration air flows to enforce air flow balance
+                                           // Note, unique global object
 
         // Default Constructor
-        ZoneAirMassFlowConservation() : EnforceZoneMassBalance(false), ZoneFlowAdjustment(AdjustmentType::NoAdjustReturnAndMixing), InfiltrationTreatment(0), InfiltrationZoneType(0), AdjustZoneMixingFlow(false), AdjustZoneInfiltrationFlow(false)
+        ZoneAirMassFlowConservation()
+            : EnforceZoneMassBalance(false), ZoneFlowAdjustment(AdjustmentType::NoAdjustReturnAndMixing), InfiltrationTreatment(0),
+              InfiltrationZoneType(0), AdjustZoneMixingFlow(false), AdjustZoneInfiltrationFlow(false)
         {
         }
     };
@@ -1089,8 +1095,8 @@ namespace DataHeatBalance {
         // Default Constructor
         ZoneMassConservationData()
             : ZonePtr(0), InMassFlowRate(0.0), ExhMassFlowRate(0.0), RetMassFlowRate(0.0), MixingMassFlowRate(0.0), MixingSourceMassFlowRate(0.0),
-              NumSourceZonesMixingObject(0), NumReceivingZonesMixingObject(0), IsOnlySourceZone(false), IsSourceAndReceivingZone(false), InfiltrationPtr(0),
-              InfiltrationMassFlowRate(0.0), IncludeInfilToZoneMassBal(0)
+              NumSourceZonesMixingObject(0), NumReceivingZonesMixingObject(0), IsOnlySourceZone(false), IsSourceAndReceivingZone(false),
+              InfiltrationPtr(0), InfiltrationMassFlowRate(0.0), IncludeInfilToZoneMassBal(0)
         {
         }
     };

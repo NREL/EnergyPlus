@@ -178,7 +178,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIUReheat_GetInputtest)
 
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(*state);  // read schedules
+    ProcessScheduleInput(*state);               // read schedules
 
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -287,7 +287,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SetADUInletNodeTest)
 
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(*state);  // read schedules
+    ProcessScheduleInput(*state);               // read schedules
 
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -301,8 +301,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SetADUInletNodeTest)
     int const ADUNum = 1;
 
     ASSERT_EQ(1, state->dataPowerInductionUnits->NumSeriesPIUs);
-    EXPECT_EQ("SPACE1-1 ATU", state->dataDefineEquipment->AirDistUnit(ADUNum).Name); // ADU name
-    EXPECT_EQ("SPACE1-1 PIU REHEAT", state->dataPowerInductionUnits->PIU(PIUNum).Name);  // PIU series name
+    EXPECT_EQ("SPACE1-1 ATU", state->dataDefineEquipment->AirDistUnit(ADUNum).Name);    // ADU name
+    EXPECT_EQ("SPACE1-1 PIU REHEAT", state->dataPowerInductionUnits->PIU(PIUNum).Name); // PIU series name
     EXPECT_GT(state->dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum, 0);
     EXPECT_EQ(state->dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum, state->dataPowerInductionUnits->PIU(PIUNum).PriAirInNode);
 }
@@ -1477,11 +1477,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
 
     ASSERT_EQ(1, state->dataPowerInductionUnits->NumSeriesPIUs);
     EXPECT_EQ("SERIES PIU ELEC RHT AIR DISTRIBUTION UNIT", state->dataDefineEquipment->AirDistUnit(ADUNum).Name); // ADU name
-    EXPECT_EQ("SERIES PIU ELEC RHT", state->dataPowerInductionUnits->PIU(PIUNum).Name);                               // PIU series name
+    EXPECT_EQ("SERIES PIU ELEC RHT", state->dataPowerInductionUnits->PIU(PIUNum).Name);                           // PIU series name
     EXPECT_EQ(state->dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum, state->dataPowerInductionUnits->PIU(PIUNum).PriAirInNode);
     EXPECT_EQ(state->dataDefineEquipment->AirDistUnit(state->dataPowerInductionUnits->PIU(PIUNum).ADUNum).AirLoopNum,
-              state->dataZoneEquip->ZoneEquipConfig(state->dataPowerInductionUnits->PIU(PIUNum).CtrlZoneNum).InletNodeAirLoopNum(state->dataPowerInductionUnits->PIU(PIUNum).ctrlZoneInNodeIndex));
-    ASSERT_TRUE(state->dataZoneEquip->ZoneEquipConfig(state->dataPowerInductionUnits->PIU(PIUNum).CtrlZoneNum).AirDistUnitCool(state->dataPowerInductionUnits->PIU(PIUNum).ctrlZoneInNodeIndex).SupplyAirPathExists);
+              state->dataZoneEquip->ZoneEquipConfig(state->dataPowerInductionUnits->PIU(PIUNum).CtrlZoneNum)
+                  .InletNodeAirLoopNum(state->dataPowerInductionUnits->PIU(PIUNum).ctrlZoneInNodeIndex));
+    ASSERT_TRUE(state->dataZoneEquip->ZoneEquipConfig(state->dataPowerInductionUnits->PIU(PIUNum).CtrlZoneNum)
+                    .AirDistUnitCool(state->dataPowerInductionUnits->PIU(PIUNum).ctrlZoneInNodeIndex)
+                    .SupplyAirPathExists);
 }
 
 } // namespace EnergyPlus

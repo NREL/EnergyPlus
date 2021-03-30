@@ -394,13 +394,12 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyTwbFnTdbWPb_Test)
     InitializePsychRoutines(*state);
 
     // Test when wet bulb temperature is below zero
-    Real64 TDB = 1; // C
+    Real64 TDB = 1;   // C
     Real64 W = 0.002; // Kg.water/Kg.dryair
     Real64 Pb = 101325.0;
     Real64 result = PsyTwbFnTdbWPb(*state, TDB, W, Pb);
     Real64 expected_result = -2.200; // expected result from psychrometrics chart
     EXPECT_NEAR(result, expected_result, 0.001);
-
 }
 
 TEST_F(EnergyPlusFixture, Psychrometrics_CpAirAverageValue_Test)
@@ -411,9 +410,9 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirAverageValue_Test)
     // Test 1: heating process, constant humidity ratio
     Real64 W1 = 0.0030;
     Real64 W2 = 0.0030;
-    Real64 CpAirIn = PsyCpAirFnW(W1);           // cp of air at state 1
-    Real64 CpAirOut = PsyCpAirFnW(W2);          // cp of air at state 2
-    Real64 CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2));  // cp of air at average humidity ratio
+    Real64 CpAirIn = PsyCpAirFnW(W1);                   // cp of air at state 1
+    Real64 CpAirOut = PsyCpAirFnW(W2);                  // cp of air at state 2
+    Real64 CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2)); // cp of air at average humidity ratio
     Real64 CpAir_average = (CpAirIn + CpAirOut) / 2;
     ;
     // check heating results
@@ -424,9 +423,9 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirAverageValue_Test)
     // Test 2: cooling Processes, dehumidified air
     W1 = 0.010;
     W2 = 0.008;
-    CpAirIn = PsyCpAirFnW(W1);           // cp of air at state 1
-    CpAirOut = PsyCpAirFnW(W2);          // cp of air at state 2
-    CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2));  // cp of air at average humidity ratio
+    CpAirIn = PsyCpAirFnW(W1);                   // cp of air at state 1
+    CpAirOut = PsyCpAirFnW(W2);                  // cp of air at state 2
+    CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2)); // cp of air at average humidity ratio
     CpAir_average = (CpAirIn + CpAirOut) / 2;
     ;
     // check cooling results

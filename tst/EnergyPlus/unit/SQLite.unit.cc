@@ -118,10 +118,14 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteEnvironmentPeriodRecord)
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     // There needs to be a simulation record otherwise the foreign key constraint will fail
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
-    state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(1, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::DesignDay);
-    state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(2, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::DesignDay, 1);
-    state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(3, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::RunPeriodDesign);
-    state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::RunPeriodWeather, 1);
+    state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
+        1, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::DesignDay);
+    state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
+        2, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::DesignDay, 1);
+    state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
+        3, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::RunPeriodDesign);
+    state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
+        4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::RunPeriodWeather, 1);
     auto result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
@@ -137,9 +141,11 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteEnvironmentPeriodRecord)
 
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     // This should fail to insert due to foreign key constraint
-    state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(5, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::DesignDay, 100);
+    state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
+        5, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::DesignDay, 100);
     // This should fail to insert due to duplicate primary key
-    state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::DesignDay, 1);
+    state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
+        4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::DesignDay, 1);
     result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
@@ -151,7 +157,8 @@ TEST_F(SQLiteFixture, SQLiteProcedures_errorRecords)
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     // There needs to be a simulation record otherwise the foreign key constraint will fail
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
-    state->dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1);
+    state->dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(
+        1, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1);
     auto result = queryResult("SELECT * FROM Errors;", "Errors");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
@@ -166,20 +173,21 @@ TEST_F(SQLiteFixture, SQLiteProcedures_errorRecords)
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     ASSERT_EQ(1ul, result.size());
-    std::vector<std::string> testResult1{"1", "1", "0",
-                                         "CheckUsedConstructions: There are 2 nominally unused constructions in input.  New error message", "1"};
+    std::vector<std::string> testResult1{
+        "1", "1", "0", "CheckUsedConstructions: There are 2 nominally unused constructions in input.  New error message", "1"};
     EXPECT_EQ(testResult1, result[0]);
 
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
-    state->dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1);
+    state->dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(
+        1, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1);
     state->dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, 0, "This should be changed.", 1);
     state->dataSQLiteProcedures->sqlite->updateSQLiteErrorRecord("Changed error message.");
     result = queryResult("SELECT * FROM Errors;", "Errors");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     ASSERT_EQ(3ul, result.size());
-    std::vector<std::string> testResult2{"1", "1", "0",
-                                         "CheckUsedConstructions: There are 2 nominally unused constructions in input.  New error message", "1"};
+    std::vector<std::string> testResult2{
+        "1", "1", "0", "CheckUsedConstructions: There are 2 nominally unused constructions in input.  New error message", "1"};
     std::vector<std::string> testResult3{"2", "1", "0", "CheckUsedConstructions: There are 2 nominally unused constructions in input.", "1"};
     std::vector<std::string> testResult4{"3", "1", "0", "This should be changed.  Changed error message.", "1"};
     EXPECT_EQ(testResult2, result[0]);
@@ -188,7 +196,8 @@ TEST_F(SQLiteFixture, SQLiteProcedures_errorRecords)
 
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     // This should fail to insert due to foreign key constraint
-    state->dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(100, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1);
+    state->dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(
+        100, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1);
     result = queryResult("SELECT * FROM Errors;", "Errors");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
@@ -227,17 +236,19 @@ TEST_F(SQLiteFixture, SQLiteProcedures_informationalErrorRecords)
 TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord)
 {
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
-    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
-    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _);
-    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(3, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 3, true, _);
+    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
+        1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
+    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
+        2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _);
+    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
+        3, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 3, true, _);
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(4, 1, "HVAC", "", "AHU-1", 2, "", 1, false, _);
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(5, 1, "HVAC", "", "AHU-1", 2, "", 1, false, "test schedule");
     auto result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     ASSERT_EQ(5ul, result.size());
-    std::vector<std::string> testResult0{"1",      "0", "Avg", "Zone", "Zone", "Environment", "Site Outdoor Air Drybulb Temperature",
-                                         "Hourly", "",  "C"};
+    std::vector<std::string> testResult0{"1", "0", "Avg", "Zone", "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", "Hourly", "", "C"};
     std::vector<std::string> testResult1{"2", "1", "Sum", "Facility:Electricity", "Zone", "", "Facility:Electricity", "Hourly", "", "J"};
     std::vector<std::string> testResult2{"3", "1", "Sum", "Facility:Electricity", "Zone", "", "Facility:Electricity", "Monthly", "", "J"};
     std::vector<std::string> testResult3{"4", "0", "Avg", "HVAC", "HVAC System", "", "AHU-1", "Hourly", "", ""};
@@ -249,16 +260,19 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord)
     EXPECT_EQ(testResult4, result[4]);
 
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
-    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(6, 3, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
-    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(7, 2, "Facility:Electricity", "", "Facility:Electricity", 3, "J", 1, true, _);
-    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(8, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 7, true, _);
+    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
+        6, 3, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
+    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
+        7, 2, "Facility:Electricity", "", "Facility:Electricity", 3, "J", 1, true, _);
+    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
+        8, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 7, true, _);
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(9, 1, "HVAC", "", "AHU-1", 2, "", -2, false, _);
     result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     ASSERT_EQ(9ul, result.size());
-    std::vector<std::string> testResult5{"6",      "0", "Unknown!!!", "Zone", "Zone", "Environment", "Site Outdoor Air Drybulb Temperature",
-                                         "Hourly", "",  "C"};
+    std::vector<std::string> testResult5{
+        "6", "0", "Unknown!!!", "Zone", "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", "Hourly", "", "C"};
     std::vector<std::string> testResult6{"7", "1", "Sum", "Facility:Electricity", "Unknown!!!", "", "Facility:Electricity", "Hourly", "", "J"};
     std::vector<std::string> testResult7{"8", "1", "Sum", "Facility:Electricity", "Zone", "", "Facility:Electricity", "Unknown!!!", "", "J"};
     std::vector<std::string> testResult8{"9", "0", "Avg", "HVAC", "HVAC System", "", "AHU-1", "Unknown!!!", "", ""};
@@ -269,7 +283,8 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord)
 
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     // This should fail to insert due to duplicate primary key
-    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(9, 3, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
+    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
+        9, 3, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
     result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
     EXPECT_EQ(9ul, result.size());
@@ -339,7 +354,8 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDataRecord)
 {
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
-    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
+    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
+        1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(1, 999.9);
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(1, 999.9, 2, 0, 1310459, 100, 7031530, 15);
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(1, 999.9, 0, 0, 1310459, 100, 7031530, 15);
@@ -383,23 +399,33 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDataRecord)
 TEST_F(SQLiteFixture, SQLiteProcedures_addSQLiteZoneSizingRecord)
 {
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
-    state->dataSQLiteProcedures->sqlite->addSQLiteZoneSizingRecord("FLOOR 1 IT HALL", "Cooling", 175, 262, 0.013, 0.019, "CHICAGO ANN CLG .4% CONDNS WB=>MDB",
-                                                  "7/21 06:00:00", 20.7, 0.0157, 0.0033, 416.7);
+    state->dataSQLiteProcedures->sqlite->addSQLiteZoneSizingRecord(
+        "FLOOR 1 IT HALL", "Cooling", 175, 262, 0.013, 0.019, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00", 20.7, 0.0157, 0.0033, 416.7);
     auto result = queryResult("SELECT * FROM ZoneSizes;", "ZoneSizes");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     ASSERT_EQ(1ul, result.size());
-    std::vector<std::string> testResult0{
-        "1",    "FLOOR 1 IT HALL", "Cooling", "175.0", "262.0", "0.013", "0.019", "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00",
-        "20.7", "0.0157",          "0.0033",  "416.7"};
+    std::vector<std::string> testResult0{"1",
+                                         "FLOOR 1 IT HALL",
+                                         "Cooling",
+                                         "175.0",
+                                         "262.0",
+                                         "0.013",
+                                         "0.019",
+                                         "CHICAGO ANN CLG .4% CONDNS WB=>MDB",
+                                         "7/21 06:00:00",
+                                         "20.7",
+                                         "0.0157",
+                                         "0.0033",
+                                         "416.7"};
     EXPECT_EQ(testResult0, result[0]);
 }
 
 TEST_F(SQLiteFixture, SQLiteProcedures_addSQLiteSystemSizingRecord)
 {
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
-    state->dataSQLiteProcedures->sqlite->addSQLiteSystemSizingRecord("VAV_1", "Cooling", "Sensible", 23.3, 6.3, 6.03, "CHICAGO ANN CLG .4% CONDNS WB=>MDB",
-                                                    "7/21 06:00:00");
+    state->dataSQLiteProcedures->sqlite->addSQLiteSystemSizingRecord(
+        "VAV_1", "Cooling", "Sensible", 23.3, 6.3, 6.03, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00");
     auto result = queryResult("SELECT * FROM SystemSizes;", "SystemSizes");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
@@ -412,18 +438,18 @@ TEST_F(SQLiteFixture, SQLiteProcedures_addSQLiteSystemSizingRecord)
 TEST_F(SQLiteFixture, SQLiteProcedures_addSQLiteComponentSizingRecord)
 {
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
-    state->dataSQLiteProcedures->sqlite->addSQLiteComponentSizingRecord("AirTerminal:SingleDuct:VAV:Reheat", "CORE_BOTTOM VAV BOX COMPONENT",
-                                                       "Design Size Maximum Air Flow Rate [m3/s]", 3.23);
-    state->dataSQLiteProcedures->sqlite->addSQLiteComponentSizingRecord("Coil:Heating:Electric", "CORE_BOTTOM VAV BOX REHEAT COIL", "Design Size Nominal Capacity",
-                                                       38689.18);
+    state->dataSQLiteProcedures->sqlite->addSQLiteComponentSizingRecord(
+        "AirTerminal:SingleDuct:VAV:Reheat", "CORE_BOTTOM VAV BOX COMPONENT", "Design Size Maximum Air Flow Rate [m3/s]", 3.23);
+    state->dataSQLiteProcedures->sqlite->addSQLiteComponentSizingRecord(
+        "Coil:Heating:Electric", "CORE_BOTTOM VAV BOX REHEAT COIL", "Design Size Nominal Capacity", 38689.18);
     auto result = queryResult("SELECT * FROM ComponentSizes;", "ComponentSizes");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     ASSERT_EQ(2ul, result.size());
     std::vector<std::string> testResult0{
         "1", "AirTerminal:SingleDuct:VAV:Reheat", "CORE_BOTTOM VAV BOX COMPONENT", "Design Size Maximum Air Flow Rate", "3.23", "m3/s"};
-    std::vector<std::string> testResult1{"2", "Coil:Heating:Electric", "CORE_BOTTOM VAV BOX REHEAT COIL", "Design Size Nominal Capacity", "38689.18",
-                                         ""};
+    std::vector<std::string> testResult1{
+        "2", "Coil:Heating:Electric", "CORE_BOTTOM VAV BOX REHEAT COIL", "Design Size Nominal Capacity", "38689.18", ""};
     EXPECT_EQ(testResult0, result[0]);
     EXPECT_EQ(testResult1, result[1]);
 }
@@ -487,8 +513,8 @@ TEST_F(SQLiteFixture, SQLiteProcedures_DaylightMaping)
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->addZoneData(1, *zone);
     state->dataSQLiteProcedures->sqlite->createZoneExtendedOutput();
-    state->dataSQLiteProcedures->sqlite->createSQLiteDaylightMapTitle(1, "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", 1, "RefPt1=(2.50:2.00:0.80)",
-                                                     "RefPt2=(2.50:18.00:0.80)", 0.8);
+    state->dataSQLiteProcedures->sqlite->createSQLiteDaylightMapTitle(
+        1, "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", 1, "RefPt1=(2.50:2.00:0.80)", "RefPt2=(2.50:18.00:0.80)", 0.8);
     state->dataSQLiteProcedures->sqlite->createSQLiteDaylightMap(1, 2005, 7, 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue);
 
     auto zones = queryResult("SELECT * FROM Zones;", "Zones");
@@ -503,8 +529,8 @@ TEST_F(SQLiteFixture, SQLiteProcedures_DaylightMaping)
     EXPECT_EQ(zone0, zones[0]);
 
     ASSERT_EQ(1ul, daylightMaps.size());
-    std::vector<std::string> daylightMap0{"1",  "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", "1", "RefPt1=(2.50:2.00:0.80)", "RefPt2=(2.50:18.00:0.80)",
-                                          "0.8"};
+    std::vector<std::string> daylightMap0{
+        "1", "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", "1", "RefPt1=(2.50:2.00:0.80)", "RefPt2=(2.50:18.00:0.80)", "0.8"};
     EXPECT_EQ(daylightMap0, daylightMaps[0]);
 
     ASSERT_EQ(1ul, daylightMapHourlyReports.size());
@@ -785,7 +811,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     auto const &roomAirModelData1 = std::unique_ptr<DataRoomAirModel::AirModelData>(new DataRoomAirModel::AirModelData());
     roomAirModelData1->AirModelName = "test roomAirModel 2";
     roomAirModelData1->AirModelType = DataRoomAirModel::RoomAirModel::Mundt;
-    roomAirModelData1->TempCoupleScheme = DataRoomAirModel::CouplingScheme::Direct;  // hmm this was set to 3 which wasn't a valid option
+    roomAirModelData1->TempCoupleScheme = DataRoomAirModel::CouplingScheme::Direct; // hmm this was set to 3 which wasn't a valid option
     roomAirModelData1->SimAirModel = true;
 
     std::string const alwaysOn("always on");
@@ -998,10 +1024,10 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteTabularDataRecords)
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     // tabular data references simulation record... always checks for first simulation record only.
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
-    state->dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(body, rowLabels, columnLabels, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility",
-                                                       "End Uses");
-    state->dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(body2, rowLabels2, columnLabels2, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility",
-                                                       "End Uses By Subcategory");
+    state->dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
+        body, rowLabels, columnLabels, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
+    state->dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
+        body2, rowLabels2, columnLabels2, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory");
     auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
     auto strings = queryResult("SELECT * FROM Strings;", "Strings");
     auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");

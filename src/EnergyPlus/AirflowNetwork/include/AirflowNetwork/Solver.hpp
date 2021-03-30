@@ -88,13 +88,14 @@ namespace AirflowNetwork {
     struct Solver
     {
         Solver() : PB(0.0)
-        {}
+        {
+        }
 
         void allocate(EnergyPlusData &state);
         void initialize(EnergyPlusData &state);
         void setsky(EnergyPlusData &state);
         void airmov(EnergyPlusData &state);
-        void solvzp(EnergyPlusData &state, int &ITER);  // number of iterations
+        void solvzp(EnergyPlusData &state, int &ITER); // number of iterations
         void filjac(EnergyPlusData &state,
                     int const NNZE,  // number of nonzero entries in the "AU" array.
                     bool const LFLAG // if = 1, use laminar relationship (initialization).
@@ -103,7 +104,7 @@ namespace AirflowNetwork {
         void clear()
         {
             PB = 0.0;
-            //LIST = 0;
+            // LIST = 0;
             elements.clear();
             compnum.clear();
             properties.clear();
@@ -131,10 +132,10 @@ namespace AirflowNetwork {
 
         std::vector<AirProperties> properties;
 
-        //int NetworkNumOfLinks;
-        //int NetworkNumOfNodes;
+        // int NetworkNumOfLinks;
+        // int NetworkNumOfNodes;
 
-        //int const NrInt; // Number of intervals for a large opening
+        // int const NrInt; // Number of intervals for a large opening
 
         // Common block AFEDAT
         Array1D<Real64> AFECTL; // This gets used in calculate, encapsulation fail
@@ -145,15 +146,15 @@ namespace AirflowNetwork {
 
         // Common block CONTRL
         Real64 PB;
-        //int LIST;
+        // int LIST;
 
         // Common block ZONL
-        //Array1D<Real64> RHOZ;
-        //Array1D<Real64> SQRTDZ;
-        //Array1D<Real64> VISCZ;
+        // Array1D<Real64> RHOZ;
+        // Array1D<Real64> SQRTDZ;
+        // Array1D<Real64> VISCZ;
         Array1D<Real64> SUMAF;
-        //Array1D<Real64> TZ; // Temperature [C]
-        //Array1D<Real64> WZ; // Humidity ratio [kg/kg]
+        // Array1D<Real64> TZ; // Temperature [C]
+        // Array1D<Real64> WZ; // Humidity ratio [kg/kg]
         Array1D<Real64> PZ; // Pressure [Pa]
 
         // Other array variables
@@ -173,7 +174,8 @@ namespace AirflowNetwork {
 
     // Functions
 
-    int GenericCrack(EnergyPlusData &state, Real64 &coef,               // Flow coefficient
+    int GenericCrack(EnergyPlusData &state,
+                     Real64 &coef,               // Flow coefficient
                      Real64 const expn,          // Flow exponent
                      bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
@@ -193,7 +195,8 @@ namespace AirflowNetwork {
                     std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
     );
 
-    void FACSKY(EnergyPlusData &state, Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
+    void FACSKY(EnergyPlusData &state,
+                Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
                 Array1D<Real64> &AD,   // the main diagonal of [A] before and after factoring
                 Array1D<Real64> &AL,   // the lower triangle of [A] before and after factoring
                 const Array1D_int &IK, // pointer to the top of column/row "K"
@@ -201,7 +204,8 @@ namespace AirflowNetwork {
                 int const NSYM         // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     );
 
-    void SLVSKY(EnergyPlusData &state, const Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
+    void SLVSKY(EnergyPlusData &state,
+                const Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
                 const Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
                 const Array1D<Real64> &AL, // the lower triangle of [A] before and after factoring
                 Array1D<Real64> &B,        // "B" vector (input); "X" vector (output).
@@ -210,7 +214,8 @@ namespace AirflowNetwork {
                 int const NSYM             // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     );
 
-    void FILSKY(EnergyPlusData &state, const Array1D<Real64> &X,    // element array (row-wise sequence)
+    void FILSKY(EnergyPlusData &state,
+                const Array1D<Real64> &X,    // element array (row-wise sequence)
                 std::array<int, 2> const LM, // location matrix
                 const Array1D_int &IK,       // pointer to the top of column/row "K"
                 Array1D<Real64> &AU,         // the upper triangle of [A] before and after factoring
@@ -256,7 +261,8 @@ namespace AirflowNetwork {
                Real64 const g     // gravity field strength [N/kg]
     );
 
-    void LClimb(EnergyPlusData &state, Real64 const G,   // gravity field strength [N/kg]
+    void LClimb(EnergyPlusData &state,
+                Real64 const G,   // gravity field strength [N/kg]
                 Real64 &Rho,      // Density link level (initialized with rho zone) [kg/m3]
                 Real64 const Z,   // Height of the link above the zone reference [m]
                 Real64 &T,        // temperature at link level [C]
@@ -272,7 +278,8 @@ namespace AirflowNetwork {
 
 } // namespace AirflowNetwork
 
-struct AirflowNetworkSolverData : BaseGlobalStruct {
+struct AirflowNetworkSolverData : BaseGlobalStruct
+{
     AirflowNetwork::Solver solver;
 
     // Data
@@ -319,7 +326,8 @@ struct AirflowNetworkSolverData : BaseGlobalStruct {
     Array1D<Real64> RhoProfT; // Density profile in TO zone [kg/m3]
     Array2D<Real64> DpL;      // Array of stack pressures in link
 
-    void clear_state() override {
+    void clear_state() override
+    {
         NetworkNumOfLinks = 0;
         NetworkNumOfNodes = 0;
         AFECTL.clear();
@@ -337,8 +345,7 @@ struct AirflowNetworkSolverData : BaseGlobalStruct {
         AU.clear();
         solver.clear();
     }
-
-    };
+};
 
 } // namespace EnergyPlus
 

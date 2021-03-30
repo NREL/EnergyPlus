@@ -70,20 +70,20 @@ namespace DataPhotovoltaics {
 
     enum class CellIntegration
     {
-        Unassigned,                         // cell temp method not set
-        Decoupled,                          // cell temp method based on energy balance
-        DecoupledUllebergDynamic,           // cell temp method based on energy bal with capacity
-        SurfaceOutsideFace,                 // cell temp method based on coupling to E+'s heat balance
-        TranspiredCollector,                // cell temp method based on coupling to unglazed transpired co
-        ExteriorVentedCavity,               // cell temp method based on coupling to nat vent exterior cavi
-        PVTSolarCollector                   // cell temp method based on coupling to PVT model
+        Unassigned,               // cell temp method not set
+        Decoupled,                // cell temp method based on energy balance
+        DecoupledUllebergDynamic, // cell temp method based on energy bal with capacity
+        SurfaceOutsideFace,       // cell temp method based on coupling to E+'s heat balance
+        TranspiredCollector,      // cell temp method based on coupling to unglazed transpired co
+        ExteriorVentedCavity,     // cell temp method based on coupling to nat vent exterior cavi
+        PVTSolarCollector         // cell temp method based on coupling to PVT model
     };
-  
+
     enum class Efficiency
     {
         Unassigned,
-        Fixed,                              // simple PV, constant efficiency
-        Scheduled                           // simpel PV, scheduled efficiency
+        Fixed,    // simple PV, constant efficiency
+        Scheduled // simpel PV, scheduled efficiency
     };
 
     enum class SiPVCells
@@ -96,12 +96,12 @@ namespace DataPhotovoltaics {
     struct SimplePVParamsStruct
     {
         // Members
-        std::string Name;       // name as identified in Sandia database
-        Real64 AreaCol;         // effective area of solar collection
-        Real64 ActiveFraction;  // fraction of parent surface that has active solar cells
+        std::string Name;              // name as identified in Sandia database
+        Real64 AreaCol;                // effective area of solar collection
+        Real64 ActiveFraction;         // fraction of parent surface that has active solar cells
         Efficiency EfficencyInputMode; // to schedule or not
-        int EffSchedPtr;        // index pointer for efficiency schedule
-        Real64 PVEfficiency;    // fixed or current PV efficiency
+        int EffSchedPtr;               // index pointer for efficiency schedule
+        Real64 PVEfficiency;           // fixed or current PV efficiency
 
         // Default Constructor
         SimplePVParamsStruct() : AreaCol(0.0), ActiveFraction(0.0), EfficencyInputMode(Efficiency::Unassigned), EffSchedPtr(0), PVEfficiency(0.0)
@@ -114,7 +114,7 @@ namespace DataPhotovoltaics {
         // Members
         std::string Name;
         int CellsInSeries;           // cells in series [-]
-        SiPVCells CellType;                // type of PV cell (crystalline, amorphous )
+        SiPVCells CellType;          // type of PV cell (crystalline, amorphous )
         Real64 Area;                 // module area [m2]
         Real64 TauAlpha;             // tau alpha product at normal incidence [-]
         Real64 SemiConductorBandgap; // electron bandgap [eV]
@@ -135,9 +135,9 @@ namespace DataPhotovoltaics {
 
         // Default Constructor
         TRNSYSPVModuleParamsStruct()
-            : CellsInSeries(0), CellType(SiPVCells::Unassigned), Area(0.0), TauAlpha(0.0), SemiConductorBandgap(0.0), ShuntResistance(0.0), RefIsc(0.0), RefVoc(0.0),
-              RefTemperature(0.0), RefInsolation(0.0), Imp(0.0), Vmp(0.0), TempCoefIsc(0.0), TempCoefVoc(0.0), NOCTAmbTemp(0.0), NOCTCellTemp(0.0),
-              NOCTInsolation(0.0), HeatLossCoef(0.0), HeatCapacity(0.0)
+            : CellsInSeries(0), CellType(SiPVCells::Unassigned), Area(0.0), TauAlpha(0.0), SemiConductorBandgap(0.0), ShuntResistance(0.0),
+              RefIsc(0.0), RefVoc(0.0), RefTemperature(0.0), RefInsolation(0.0), Imp(0.0), Vmp(0.0), TempCoefIsc(0.0), TempCoefVoc(0.0),
+              NOCTAmbTemp(0.0), NOCTCellTemp(0.0), NOCTInsolation(0.0), HeatLossCoef(0.0), HeatCapacity(0.0)
         {
         }
     };
@@ -300,17 +300,17 @@ namespace DataPhotovoltaics {
         std::string Name;
         std::string SurfaceName; // named surface in heat balance domain
         std::string PerfObjName;
-        int SurfacePtr;           // index for named surface
-        int Zone;                 // index for zone (for getting any zone multipliers)
-        PVModel PVModelType;          // type of performance modeling, Simple, TRNSYS or Equivalent 1-diode, or Sandia/King model
-        CellIntegration CellIntegrationMode;  // how are PV cells integrated with other E+ modeling
-        Real64 NumModNSeries;     // number of modules in series in one string
-        Real64 NumSeriesNParall;  // number of series strings in parallel
-        int UTSCPtr;              // pointer to UTSC number for INTEGRATED TRANSPIRED COLLECTOR mode
-        int ExtVentCavPtr;        // pointer to Exterior Vented Cavity EXTERIOR VENTED CAVITY
-        int PVTPtr;               // pointer to PVT model
-        Real64 SurfaceSink;       // PV power "sink" for integration
-        PVReportVariables Report; // report variables
+        int SurfacePtr;                      // index for named surface
+        int Zone;                            // index for zone (for getting any zone multipliers)
+        PVModel PVModelType;                 // type of performance modeling, Simple, TRNSYS or Equivalent 1-diode, or Sandia/King model
+        CellIntegration CellIntegrationMode; // how are PV cells integrated with other E+ modeling
+        Real64 NumModNSeries;                // number of modules in series in one string
+        Real64 NumSeriesNParall;             // number of series strings in parallel
+        int UTSCPtr;                         // pointer to UTSC number for INTEGRATED TRANSPIRED COLLECTOR mode
+        int ExtVentCavPtr;                   // pointer to Exterior Vented Cavity EXTERIOR VENTED CAVITY
+        int PVTPtr;                          // pointer to PVT model
+        Real64 SurfaceSink;                  // PV power "sink" for integration
+        PVReportVariables Report;            // report variables
         // nested structs for user input parameters
         SimplePVParamsStruct SimplePVModule;       // simple model input params
         TRNSYSPVModuleParamsStruct TRNSYSPVModule; // equivalent one-diode input params
@@ -322,25 +322,26 @@ namespace DataPhotovoltaics {
 
         // Default Constructor
         PVArrayStruct()
-            : SurfacePtr(0), Zone(0), PVModelType(PVModel::Unassigned), CellIntegrationMode(CellIntegration::Unassigned), NumModNSeries(1.0), NumSeriesNParall(1.0), UTSCPtr(0), ExtVentCavPtr(0),
-              PVTPtr(0), SurfaceSink(0.0)
+            : SurfacePtr(0), Zone(0), PVModelType(PVModel::Unassigned), CellIntegrationMode(CellIntegration::Unassigned), NumModNSeries(1.0),
+              NumSeriesNParall(1.0), UTSCPtr(0), ExtVentCavPtr(0), PVTPtr(0), SurfaceSink(0.0)
         {
         }
     };
 } // namespace DataPhotovoltaics
 
-struct PhotovoltaicsData : BaseGlobalStruct {
+struct PhotovoltaicsData : BaseGlobalStruct
+{
 
     std::string const cPVGeneratorObjectName = "Generator:Photovoltaic";
     std::string const cPVSimplePerfObjectName = "PhotovoltaicPerformance:Simple";
     std::string const cPVEquiv1DiodePerfObjectName = "PhotovoltaicPerformance:EquivalentOne-Diode";
     std::string const cPVSandiaPerfObjectName = "PhotovoltaicPerformance:Sandia";
     Real64 const MinIrradiance = 0.3; // [W/m2] Assume no operation if Ic is below this number (W/m2)
-    int NumPVs = 0;                 // count of number of PV generators
-    int Num1DiodePVModuleTypes = 0; // count for Equivalent one-diode model
-    int NumSimplePVModuleTypes = 0; // count of number of input objs for simple model
-    int NumSNLPVModuleTypes = 0;    // count of number of input objs for Sandia model
-    Real64 ShuntResistance = 0.0; // old "RSH" in common block of trnsys code
+    int NumPVs = 0;                   // count of number of PV generators
+    int Num1DiodePVModuleTypes = 0;   // count for Equivalent one-diode model
+    int NumSimplePVModuleTypes = 0;   // count of number of input objs for simple model
+    int NumSNLPVModuleTypes = 0;      // count of number of input objs for Sandia model
+    Real64 ShuntResistance = 0.0;     // old "RSH" in common block of trnsys code
     Array1D<DataPhotovoltaics::PVArrayStruct> PVarray;
 
     void clear_state() override

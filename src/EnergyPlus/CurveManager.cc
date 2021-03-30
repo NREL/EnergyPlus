@@ -106,19 +106,16 @@ namespace CurveManager {
     // validating it, and storing it in such a manner that the curve manager
     // can provide the simulation with performance curve output.
 
-    std::map<std::string, Btwxt::Method>  BtwxtManager::interpMethods =                                 // NOLINT(cert-err58-cpp)
-            {{"Linear", Btwxt::Method::LINEAR}, {"Cubic", Btwxt::Method::CUBIC}};
+    std::map<std::string, Btwxt::Method> BtwxtManager::interpMethods = // NOLINT(cert-err58-cpp)
+        {{"Linear", Btwxt::Method::LINEAR}, {"Cubic", Btwxt::Method::CUBIC}};
 
-    std::map<std::string, Btwxt::Method>  BtwxtManager::extrapMethods =                                 // NOLINT(cert-err58-cpp)
-            {{"Linear", Btwxt::Method::LINEAR}, {"Constant", Btwxt::Method::CONSTANT}};
+    std::map<std::string, Btwxt::Method> BtwxtManager::extrapMethods = // NOLINT(cert-err58-cpp)
+        {{"Linear", Btwxt::Method::LINEAR}, {"Constant", Btwxt::Method::CONSTANT}};
 
     // Functions
-    void BtwxtMessageCallback(
-        const Btwxt::MsgLevel messageType,
-        const std::string message,
-        void *contextPtr
-    ) {
-        std::pair<EnergyPlusData*, std::string> contextPair = *(std::pair<EnergyPlusData*, std::string>*) contextPtr;
+    void BtwxtMessageCallback(const Btwxt::MsgLevel messageType, const std::string message, void *contextPtr)
+    {
+        std::pair<EnergyPlusData *, std::string> contextPair = *(std::pair<EnergyPlusData *, std::string> *)contextPtr;
         std::string fullMessage = contextPair.second + ": " + message;
         if (messageType == Btwxt::MsgLevel::MSG_ERR) {
             ShowSevereError(*contextPair.first, fullMessage);
@@ -209,7 +206,8 @@ namespace CurveManager {
             }
         }
 
-        if (state.dataCurveManager->PerfCurve(CurveIndex).EMSOverrideOn) CurveValue = state.dataCurveManager->PerfCurve(CurveIndex).EMSOverrideCurveValue;
+        if (state.dataCurveManager->PerfCurve(CurveIndex).EMSOverrideOn)
+            CurveValue = state.dataCurveManager->PerfCurve(CurveIndex).EMSOverrideCurveValue;
 
         state.dataCurveManager->PerfCurve(CurveIndex).CurveOutput = CurveValue;
         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput1 = Var1;
@@ -227,7 +225,7 @@ namespace CurveManager {
         // wrapper for GetInput to allow unit testing when fatal inputs are detected - follow pattern from GetSetPointManagerInputs()
         bool GetInputErrorsFound = false;
 
-        GetCurveInputData(state,GetInputErrorsFound);
+        GetCurveInputData(state, GetInputErrorsFound);
         state.dataCurveManager->GetCurvesInputFlag = false;
 
         if (GetInputErrorsFound) {
@@ -260,37 +258,37 @@ namespace CurveManager {
         // Uses "Get" routines to read in data.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumBiQuad;                   // Number of biquadratic curve objects in the input data file
-        int NumCubic;                    // Number of cubic curve objects in the input data file
-        int NumQuartic;                  // Number of quartic (4th order polynomial) objects in the input data file
-        int NumQuad;                     // Number of quadratic curve objects in the input data file
-        int NumQuadLinear;               // Number of quadratic linear curve objects in the input data file
-        int NumCubicLinear;              // Number of cubic linear curve objects in the input file
-        int NumQLinear;                  // Number of quad linear curve objects in the input data file
-        int NumQuintLinear;               // Number of quint linear curve objects in the input data file
-        int NumLinear;                   // Number of linear curve objects in the input data file
-        int NumBicubic;                  // Number of bicubic curve objects in the input data file
-        int NumTriQuad;                  // Number of triquadratic curve objects in the input file
-        int NumExponent;                 // Number of exponent curve objects in the input file
-        int NumWPCValTab;                // Number of wind pressure coefficient value table objects in the input file
-        int NumChillerPartLoadWithLift;  // Number of ChillerPartLoadWithLift curve objects in the input data file
-        int NumFanPressRise;             // Number of fan pressure rise curve objects in the input file
-        int NumExpSkewNorm;              // Number of exponential skew normal curve objects in the input file
-        int NumSigmoid;                  // Number of sigmoid curve objects in the input file
-        int NumRectHyper1;               // Number of rectangular hyperbola Type 1 curve objects in the input file
-        int NumRectHyper2;               // Number of rectangular hyperbola Type 2 curve objects in the input file
-        int NumExpDecay;                 // Number of exponential decay curve objects in the input file
+        int NumBiQuad;                  // Number of biquadratic curve objects in the input data file
+        int NumCubic;                   // Number of cubic curve objects in the input data file
+        int NumQuartic;                 // Number of quartic (4th order polynomial) objects in the input data file
+        int NumQuad;                    // Number of quadratic curve objects in the input data file
+        int NumQuadLinear;              // Number of quadratic linear curve objects in the input data file
+        int NumCubicLinear;             // Number of cubic linear curve objects in the input file
+        int NumQLinear;                 // Number of quad linear curve objects in the input data file
+        int NumQuintLinear;             // Number of quint linear curve objects in the input data file
+        int NumLinear;                  // Number of linear curve objects in the input data file
+        int NumBicubic;                 // Number of bicubic curve objects in the input data file
+        int NumTriQuad;                 // Number of triquadratic curve objects in the input file
+        int NumExponent;                // Number of exponent curve objects in the input file
+        int NumWPCValTab;               // Number of wind pressure coefficient value table objects in the input file
+        int NumChillerPartLoadWithLift; // Number of ChillerPartLoadWithLift curve objects in the input data file
+        int NumFanPressRise;            // Number of fan pressure rise curve objects in the input file
+        int NumExpSkewNorm;             // Number of exponential skew normal curve objects in the input file
+        int NumSigmoid;                 // Number of sigmoid curve objects in the input file
+        int NumRectHyper1;              // Number of rectangular hyperbola Type 1 curve objects in the input file
+        int NumRectHyper2;              // Number of rectangular hyperbola Type 2 curve objects in the input file
+        int NumExpDecay;                // Number of exponential decay curve objects in the input file
         int NumDoubleExpDecay;
-        int CurveIndex;                  // do loop index
-        int CurveNum;                    // current curve number
-        Array1D_string Alphas(14);       // Alpha items for object
-        Array1D<Real64> Numbers(10000);  // Numeric items for object
-        int NumAlphas;                   // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                  // Number of Numbers for each GetObjectItem call
-        int IOStatus;                    // Used in GetObjectItem
+        int CurveIndex;                 // do loop index
+        int CurveNum;                   // current curve number
+        Array1D_string Alphas(14);      // Alpha items for object
+        Array1D<Real64> Numbers(10000); // Numeric items for object
+        int NumAlphas;                  // Number of Alphas for each GetObjectItem call
+        int NumNumbers;                 // Number of Numbers for each GetObjectItem call
+        int IOStatus;                   // Used in GetObjectItem
         int NumTableLookup;
         std::string CurrentModuleObject; // for ease in renaming.
-        int MaxTableNums(0);      // Maximum number of numeric input fields in Tables
+        int MaxTableNums(0);             // Maximum number of numeric input fields in Tables
         //   certain object in the input file
 
         std::string FileName; // name of external table data file
@@ -317,13 +315,15 @@ namespace CurveManager {
         NumRectHyper2 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:RectangularHyperbola2");
         NumExpDecay = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:ExponentialDecay");
         NumDoubleExpDecay = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:DoubleExponentialDecay");
-        NumChillerPartLoadWithLift = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:ChillerPartLoadWithLift"); // zrp_Aug2014
+        NumChillerPartLoadWithLift =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:ChillerPartLoadWithLift"); // zrp_Aug2014
 
         NumWPCValTab = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirflowNetwork:MultiZone:WindPressureCoefficientValues");
 
-        state.dataCurveManager->NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
-                    NumTableLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
-                    NumExpDecay + NumDoubleExpDecay + NumQLinear + NumQuintLinear + NumChillerPartLoadWithLift + NumWPCValTab;
+        state.dataCurveManager->NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad +
+                                            NumExponent + NumQuartic + NumTableLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid +
+                                            NumRectHyper1 + NumRectHyper2 + NumExpDecay + NumDoubleExpDecay + NumQLinear + NumQuintLinear +
+                                            NumChillerPartLoadWithLift + NumWPCValTab;
 
         // allocate the data structure
         state.dataCurveManager->PerfCurve.allocate(state.dataCurveManager->NumCurves);
@@ -335,18 +335,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:Biquadratic";
         for (CurveIndex = 1; CurveIndex <= NumBiQuad; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
 
             // could add checks for blank numeric fields, and use field names for errors.
@@ -376,12 +381,22 @@ namespace CurveManager {
 
             if (Numbers(7) > Numbers(8)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(7), Numbers(7), state.dataIPShortCut->cNumericFieldNames(8), Numbers(8)));
+                ShowContinueError(state,
+                                  format("{} [{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(7),
+                                         Numbers(7),
+                                         state.dataIPShortCut->cNumericFieldNames(8),
+                                         Numbers(8)));
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(9), Numbers(9), state.dataIPShortCut->cNumericFieldNames(10), Numbers(10)));
+                ShowContinueError(state,
+                                  format("{} [{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(9),
+                                         Numbers(9),
+                                         state.dataIPShortCut->cNumericFieldNames(10),
+                                         Numbers(10)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -405,18 +420,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:ChillerPartLoadWithLift";
         for (CurveIndex = 1; CurveIndex <= NumChillerPartLoadWithLift; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
 
@@ -480,19 +500,24 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:Cubic";
         for (CurveIndex = 1; CurveIndex <= NumCubic; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             ++CurveNum;
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
@@ -515,7 +540,12 @@ namespace CurveManager {
 
             if (Numbers(5) > Numbers(6)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(5), Numbers(5), state.dataIPShortCut->cNumericFieldNames(6), Numbers(6)));
+                ShowContinueError(state,
+                                  format("{}[{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(5),
+                                         Numbers(5),
+                                         state.dataIPShortCut->cNumericFieldNames(6),
+                                         Numbers(6)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -534,18 +564,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:Quartic";
         for (CurveIndex = 1; CurveIndex <= NumQuartic; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quartic;
@@ -570,7 +605,12 @@ namespace CurveManager {
 
             if (Numbers(6) > Numbers(7)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(6), Numbers(6), state.dataIPShortCut->cNumericFieldNames(7), Numbers(7)));
+                ShowContinueError(state,
+                                  format("{}[{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(6),
+                                         Numbers(6),
+                                         state.dataIPShortCut->cNumericFieldNames(7),
+                                         Numbers(7)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -589,18 +629,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:Quadratic";
         for (CurveIndex = 1; CurveIndex <= NumQuad; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
@@ -623,7 +668,12 @@ namespace CurveManager {
 
             if (Numbers(4) > Numbers(5)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(4), Numbers(4), state.dataIPShortCut->cNumericFieldNames(5), Numbers(5)));
+                ShowContinueError(state,
+                                  format("{} [{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(4),
+                                         Numbers(4),
+                                         state.dataIPShortCut->cNumericFieldNames(5),
+                                         Numbers(5)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -642,18 +692,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:QuadraticLinear";
         for (CurveIndex = 1; CurveIndex <= NumQuadLinear; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuadraticLinear;
@@ -681,12 +736,22 @@ namespace CurveManager {
 
             if (Numbers(7) > Numbers(8)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(7), Numbers(7), state.dataIPShortCut->cNumericFieldNames(8), Numbers(8)));
+                ShowContinueError(state,
+                                  format("{} [{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(7),
+                                         Numbers(7),
+                                         state.dataIPShortCut->cNumericFieldNames(8),
+                                         Numbers(8)));
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(9), Numbers(9), state.dataIPShortCut->cNumericFieldNames(10), Numbers(10)));
+                ShowContinueError(state,
+                                  format("{} [{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(9),
+                                         Numbers(9),
+                                         state.dataIPShortCut->cNumericFieldNames(10),
+                                         Numbers(10)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -710,18 +775,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:CubicLinear";
         for (CurveIndex = 1; CurveIndex <= NumCubicLinear; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::CubicLinear;
@@ -749,12 +819,22 @@ namespace CurveManager {
 
             if (Numbers(7) > Numbers(8)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(7), Numbers(7), state.dataIPShortCut->cNumericFieldNames(8), Numbers(8)));
+                ShowContinueError(state,
+                                  format("{} [{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(7),
+                                         Numbers(7),
+                                         state.dataIPShortCut->cNumericFieldNames(8),
+                                         Numbers(8)));
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(9), Numbers(9), state.dataIPShortCut->cNumericFieldNames(10), Numbers(10)));
+                ShowContinueError(state,
+                                  format("{} [{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(9),
+                                         Numbers(9),
+                                         state.dataIPShortCut->cNumericFieldNames(10),
+                                         Numbers(10)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -778,18 +858,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:Linear";
         for (CurveIndex = 1; CurveIndex <= NumLinear; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Linear;
@@ -811,7 +896,12 @@ namespace CurveManager {
 
             if (Numbers(3) > Numbers(4)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(3), Numbers(3), state.dataIPShortCut->cNumericFieldNames(4), Numbers(4)));
+                ShowContinueError(state,
+                                  format("{} [{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(3),
+                                         Numbers(3),
+                                         state.dataIPShortCut->cNumericFieldNames(4),
+                                         Numbers(4)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -830,18 +920,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:Bicubic";
         for (CurveIndex = 1; CurveIndex <= NumBicubic; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiCubic;
@@ -874,13 +969,21 @@ namespace CurveManager {
             if (Numbers(11) > Numbers(12)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(11), Numbers(11), state.dataIPShortCut->cNumericFieldNames(12), Numbers(12)));
+                                  format("{} [{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(11),
+                                         Numbers(11),
+                                         state.dataIPShortCut->cNumericFieldNames(12),
+                                         Numbers(12)));
                 ErrorsFound = true;
             }
             if (Numbers(13) > Numbers(14)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(13), Numbers(13), state.dataIPShortCut->cNumericFieldNames(14), Numbers(14)));
+                                  format("{} [{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(13),
+                                         Numbers(13),
+                                         state.dataIPShortCut->cNumericFieldNames(14),
+                                         Numbers(14)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -904,18 +1007,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:Triquadratic";
         for (CurveIndex = 1; CurveIndex <= NumTriQuad; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::TriQuadratic;
@@ -970,19 +1078,31 @@ namespace CurveManager {
             if (Numbers(28) > Numbers(29)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(28), Numbers(28), state.dataIPShortCut->cNumericFieldNames(29), Numbers(29)));
+                                  format("{} [{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(28),
+                                         Numbers(28),
+                                         state.dataIPShortCut->cNumericFieldNames(29),
+                                         Numbers(29)));
                 ErrorsFound = true;
             }
             if (Numbers(30) > Numbers(31)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(30), Numbers(30), state.dataIPShortCut->cNumericFieldNames(31), Numbers(31)));
+                                  format("{} [{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(30),
+                                         Numbers(30),
+                                         state.dataIPShortCut->cNumericFieldNames(31),
+                                         Numbers(31)));
                 ErrorsFound = true;
             }
             if (Numbers(32) > Numbers(33)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(32), Numbers(32), state.dataIPShortCut->cNumericFieldNames(33), Numbers(33)));
+                                  format("{} [{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(32),
+                                         Numbers(32),
+                                         state.dataIPShortCut->cNumericFieldNames(33),
+                                         Numbers(33)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -1006,23 +1126,28 @@ namespace CurveManager {
                 }
             }
         }
-        
+
         // Loop over quad linear curves and load data
         CurrentModuleObject = "Curve:QuadLinear";
         for (CurveIndex = 1; CurveIndex <= NumQLinear; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuadLinear;
@@ -1055,17 +1180,23 @@ namespace CurveManager {
             const int NumVar = 4;
             std::string VarNames[NumVar] = {"w", "x", "y", "z"};
             for (int i = 1; i <= NumVar; ++i) {
-                int MinIndex = 2*i + 4;
+                int MinIndex = 2 * i + 4;
                 int MaxIndex = MinIndex + 1;
                 if (Numbers(MinIndex) > Numbers(MaxIndex)) { // error
                     ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                    ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(MinIndex), Numbers(MinIndex), state.dataIPShortCut->cNumericFieldNames(MaxIndex), Numbers(MaxIndex)));
+                    ShowContinueError(state,
+                                      format("{} [{:.R2}] > {} [{.R2}]",
+                                             state.dataIPShortCut->cNumericFieldNames(MinIndex),
+                                             Numbers(MinIndex),
+                                             state.dataIPShortCut->cNumericFieldNames(MaxIndex),
+                                             Numbers(MaxIndex)));
                     ErrorsFound = true;
                 }
                 int InputTypeIndex = i + 1;
                 if (NumAlphas >= InputTypeIndex) {
                     if (!IsCurveInputTypeValid(Alphas(InputTypeIndex))) {
-                        ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for " + VarNames[i] + " is invalid.");
+                        ShowWarningError(
+                            state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for " + VarNames[i] + " is invalid.");
                     }
                 }
             }
@@ -1080,18 +1211,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:QuintLinear";
         for (CurveIndex = 1; CurveIndex <= NumQuintLinear; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuintLinear;
@@ -1126,17 +1262,23 @@ namespace CurveManager {
             const int NumVar = 5;
             std::string VarNames[NumVar] = {"v", "w", "x", "y", "z"};
             for (int i = 1; i <= NumVar; ++i) {
-                int MinIndex = 2*i + 5;
+                int MinIndex = 2 * i + 5;
                 int MaxIndex = MinIndex + 1;
                 if (Numbers(MinIndex) > Numbers(MaxIndex)) { // error
                     ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                    ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(MinIndex), Numbers(MinIndex), state.dataIPShortCut->cNumericFieldNames(MaxIndex), Numbers(MaxIndex)));
+                    ShowContinueError(state,
+                                      format("{} [{:.R2}] > {} [{.R2}]",
+                                             state.dataIPShortCut->cNumericFieldNames(MinIndex),
+                                             Numbers(MinIndex),
+                                             state.dataIPShortCut->cNumericFieldNames(MaxIndex),
+                                             Numbers(MaxIndex)));
                     ErrorsFound = true;
                 }
                 int InputTypeIndex = i + 1;
                 if (NumAlphas >= InputTypeIndex) {
                     if (!IsCurveInputTypeValid(Alphas(InputTypeIndex))) {
-                        ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for " + VarNames[i] + " is invalid.");
+                        ShowWarningError(
+                            state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for " + VarNames[i] + " is invalid.");
                     }
                 }
             }
@@ -1151,18 +1293,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:Exponent";
         for (CurveIndex = 1; CurveIndex <= NumExponent; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Exponent;
@@ -1198,18 +1345,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:FanPressureRise";
         for (CurveIndex = 1; CurveIndex <= NumFanPressRise; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::FanPressureRise;
@@ -1236,12 +1388,22 @@ namespace CurveManager {
 
             if (Numbers(5) > Numbers(6)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(5), Numbers(5), state.dataIPShortCut->cNumericFieldNames(6), Numbers(6)));
+                ShowContinueError(state,
+                                  format("{}[{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(5),
+                                         Numbers(5),
+                                         state.dataIPShortCut->cNumericFieldNames(6),
+                                         Numbers(6)));
                 ErrorsFound = true;
             }
             if (Numbers(7) > Numbers(8)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(7), Numbers(7), state.dataIPShortCut->cNumericFieldNames(8), Numbers(8)));
+                ShowContinueError(state,
+                                  format("{}[{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(7),
+                                         Numbers(7),
+                                         state.dataIPShortCut->cNumericFieldNames(8),
+                                         Numbers(8)));
                 ErrorsFound = true;
             }
 
@@ -1251,18 +1413,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:ExponentialSkewNormal";
         for (CurveIndex = 1; CurveIndex <= NumExpSkewNorm; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::ExponentialSkewNormal;
@@ -1287,7 +1454,12 @@ namespace CurveManager {
 
             if (Numbers(5) > Numbers(6)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(5), Numbers(5), state.dataIPShortCut->cNumericFieldNames(6), Numbers(6)));
+                ShowContinueError(state,
+                                  format("{}[{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(5),
+                                         Numbers(5),
+                                         state.dataIPShortCut->cNumericFieldNames(6),
+                                         Numbers(6)));
                 ErrorsFound = true;
             }
 
@@ -1307,18 +1479,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:Sigmoid";
         for (CurveIndex = 1; CurveIndex <= NumSigmoid; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Sigmoid;
@@ -1344,7 +1521,12 @@ namespace CurveManager {
 
             if (Numbers(6) > Numbers(7)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(6), Numbers(6), state.dataIPShortCut->cNumericFieldNames(7), Numbers(7)));
+                ShowContinueError(state,
+                                  format("{}[{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(6),
+                                         Numbers(6),
+                                         state.dataIPShortCut->cNumericFieldNames(7),
+                                         Numbers(7)));
                 ErrorsFound = true;
             }
 
@@ -1364,18 +1546,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:RectangularHyperbola1";
         for (CurveIndex = 1; CurveIndex <= NumRectHyper1; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::RectangularHyperbola1;
@@ -1399,7 +1586,12 @@ namespace CurveManager {
 
             if (Numbers(4) > Numbers(5)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(4), Numbers(4), state.dataIPShortCut->cNumericFieldNames(5), Numbers(5)));
+                ShowContinueError(state,
+                                  format("{}[{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(4),
+                                         Numbers(4),
+                                         state.dataIPShortCut->cNumericFieldNames(5),
+                                         Numbers(5)));
                 ErrorsFound = true;
             }
 
@@ -1419,18 +1611,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:RectangularHyperbola2";
         for (CurveIndex = 1; CurveIndex <= NumRectHyper2; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::RectangularHyperbola2;
@@ -1454,7 +1651,12 @@ namespace CurveManager {
 
             if (Numbers(4) > Numbers(5)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(4), Numbers(4), state.dataIPShortCut->cNumericFieldNames(5), Numbers(5)));
+                ShowContinueError(state,
+                                  format("{}[{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(4),
+                                         Numbers(4),
+                                         state.dataIPShortCut->cNumericFieldNames(5),
+                                         Numbers(5)));
                 ErrorsFound = true;
             }
 
@@ -1474,18 +1676,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:ExponentialDecay";
         for (CurveIndex = 1; CurveIndex <= NumExpDecay; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::ExponentialDecay;
@@ -1509,7 +1716,12 @@ namespace CurveManager {
 
             if (Numbers(4) > Numbers(5)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", state.dataIPShortCut->cNumericFieldNames(4), Numbers(4), state.dataIPShortCut->cNumericFieldNames(5), Numbers(5)));
+                ShowContinueError(state,
+                                  format("{}[{:.R2}] > {} [{.R2}]",
+                                         state.dataIPShortCut->cNumericFieldNames(4),
+                                         Numbers(4),
+                                         state.dataIPShortCut->cNumericFieldNames(5),
+                                         Numbers(5)));
                 ErrorsFound = true;
             }
 
@@ -1529,18 +1741,23 @@ namespace CurveManager {
         CurrentModuleObject = "Curve:DoubleExponentialDecay";
         for (CurveIndex = 1; CurveIndex <= NumDoubleExpDecay; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          CurveIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                                                                     CurrentModuleObject,
+                                                                     CurveIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataCurveManager->UniqueCurveNames,
+                                                     Alphas(1),
+                                                     CurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::DoubleExponentialDecay;
@@ -1583,22 +1800,23 @@ namespace CurveManager {
             int numOfCPArray = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
             if (numOfCPArray != 1) {
-                ShowSevereError(state, "GetCurveInput: Currently exactly one (\"1\") " + CurrentModuleObject +
-                                " object per simulation is required when using the AirflowNetwork model.");
+                ShowSevereError(state,
+                                "GetCurveInput: Currently exactly one (\"1\") " + CurrentModuleObject +
+                                    " object per simulation is required when using the AirflowNetwork model.");
                 ErrorsFound = true;
             } else if (numOfCPArray == 1) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              1,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              state.dataIPShortCut->lNumericFieldBlanks,
-                                              _,
-                                              state.dataIPShortCut->cAlphaFieldNames,
-                                              state.dataIPShortCut->cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         1,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         IOStatus,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         _,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
 
                 std::string wpcName = Alphas(1); // Name of CP array
                 int numWindDir = NumNumbers;
@@ -1613,13 +1831,16 @@ namespace CurveManager {
                     if (j > 1) {
                         if (windDirs[j - 2] >= windDirs[j - 1]) {
                             ShowSevereError(state, "GetCurveInput: An " + CurrentModuleObject + " object ");
-                            ShowContinueError(state, "has either the same values for two consecutive wind directions, or a lower wind direction value after "
+                            ShowContinueError(state,
+                                              "has either the same values for two consecutive wind directions, or a lower wind direction value after "
                                               "a higher wind direction value.");
                             ShowContinueError(state, "Wind direction values must be entered in ascending order.");
-                            ShowContinueError(
-                                state,
-                                format(
-                                    "{} = {:.2R} {} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(j), windDirs[j - 2], state.dataIPShortCut->cNumericFieldNames[j + 1], windDirs[j - 1]));
+                            ShowContinueError(state,
+                                              format("{} = {:.2R} {} = {:.2R}",
+                                                     state.dataIPShortCut->cNumericFieldNames(j),
+                                                     windDirs[j - 2],
+                                                     state.dataIPShortCut->cNumericFieldNames[j + 1],
+                                                     windDirs[j - 1]));
                             ErrorsFound = true;
                         }
                     }
@@ -1636,24 +1857,30 @@ namespace CurveManager {
                 CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientValues";
                 for (int index = 1; index <= NumWPCValTab; ++index) {
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                  CurrentModuleObject,
-                                                  index,
-                                                  Alphas,
-                                                  NumAlphas,
-                                                  Numbers,
-                                                  NumNumbers,
-                                                  IOStatus,
-                                                  state.dataIPShortCut->lNumericFieldBlanks,
-                                                  _,
-                                                  state.dataIPShortCut->cAlphaFieldNames,
-                                                  state.dataIPShortCut->cNumericFieldNames);
+                                                                             CurrentModuleObject,
+                                                                             index,
+                                                                             Alphas,
+                                                                             NumAlphas,
+                                                                             Numbers,
+                                                                             NumNumbers,
+                                                                             IOStatus,
+                                                                             state.dataIPShortCut->lNumericFieldBlanks,
+                                                                             _,
+                                                                             state.dataIPShortCut->cAlphaFieldNames,
+                                                                             state.dataIPShortCut->cNumericFieldNames);
                     ++CurveNum;
-                    GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+                    GlobalNames::VerifyUniqueInterObjectName(state,
+                                                             state.dataCurveManager->UniqueCurveNames,
+                                                             Alphas(1),
+                                                             CurrentModuleObject,
+                                                             state.dataIPShortCut->cAlphaFieldNames(1),
+                                                             ErrorsFound);
 
                     // Ensure the CP array name should be the same as the name of AirflowNetwork:MultiZone:WindPressureCoefficientArray
                     if (!UtilityRoutines::SameString(Alphas(2), wpcName)) {
-                        ShowSevereError(state, "GetCurveInput: Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + Alphas(2) + " in " + CurrentModuleObject + " = " +
-                                        Alphas(1));
+                        ShowSevereError(state,
+                                        "GetCurveInput: Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + Alphas(2) + " in " +
+                                            CurrentModuleObject + " = " + Alphas(1));
                         ShowContinueError(state, "The valid name is " + wpcName);
                         ErrorsFound = true;
                     }
@@ -1665,7 +1892,7 @@ namespace CurveManager {
                     state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::BtwxtMethod;
 
                     std::string contextString = CurrentModuleObject + " \"" + Alphas(1) + "\"";
-                    std::pair<EnergyPlusData*, std::string> callbackPair{&state, contextString};
+                    std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
                     Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
 
                     state.dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
@@ -1701,11 +1928,12 @@ namespace CurveManager {
                         }
 
                         std::vector<Btwxt::GridAxis> gridAxes;
-                        gridAxes.emplace_back(axis, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double> {0.0, 360.0});
+                        gridAxes.emplace_back(axis, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double>{0.0, 360.0});
 
                         auto gridIndex = state.dataCurveManager->btwxtManager.addGrid(Alphas(1), Btwxt::GriddedData(gridAxes));
                         state.dataCurveManager->PerfCurve(CurveNum).TableIndex = gridIndex;
-                        state.dataCurveManager->PerfCurve(CurveNum).GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
+                        state.dataCurveManager->PerfCurve(CurveNum).GridValueIndex =
+                            state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
                     }
                 }
             }
@@ -1720,7 +1948,7 @@ namespace CurveManager {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariable", thisObjectName);
-                state.dataCurveManager->btwxtManager.independentVarRefs.emplace(UtilityRoutines::MakeUPPERCase(thisObjectName),fields);
+                state.dataCurveManager->btwxtManager.independentVarRefs.emplace(UtilityRoutines::MakeUPPERCase(thisObjectName), fields);
             }
         }
 
@@ -1738,13 +1966,13 @@ namespace CurveManager {
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariableList", thisObjectName);
                 std::string varListName = UtilityRoutines::MakeUPPERCase(thisObjectName);
 
-                std::vector<Btwxt::GridAxis > gridAxes;
+                std::vector<Btwxt::GridAxis> gridAxes;
 
                 // Loop through independent variables in list and add them to the grid
                 for (auto indVar : fields.at("independent_variables")) {
                     std::string indVarName = UtilityRoutines::MakeUPPERCase(indVar.at("independent_variable_name"));
                     std::string contextString = "Table:IndependentVariable \"" + indVarName + "\"";
-                    std::pair<EnergyPlusData*, std::string> callbackPair{&state, contextString};
+                    std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
                     Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
 
                     // Find independent variable input data
@@ -1787,7 +2015,7 @@ namespace CurveManager {
                             axis = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray(state, {colNum, rowNum});
 
                             // remove NANs
-                            axis.erase(std::remove_if(axis.begin(), axis.end(), [](const double &x){return std::isnan(x);}), axis.end());
+                            axis.erase(std::remove_if(axis.begin(), axis.end(), [](const double &x) { return std::isnan(x); }), axis.end());
 
                             // sort
                             std::sort(axis.begin(), axis.end());
@@ -1805,7 +2033,7 @@ namespace CurveManager {
                         }
 
                         Btwxt::Method interpMethod, extrapMethod;
-                        if (indVarInstance.count("interpolation_method")){
+                        if (indVarInstance.count("interpolation_method")) {
                             interpMethod = CurveManager::BtwxtManager::interpMethods.at(indVarInstance.at("interpolation_method"));
                         } else {
                             interpMethod = Btwxt::Method::CUBIC;
@@ -1837,7 +2065,7 @@ namespace CurveManager {
                             max_val = max_grid_value;
                         }
 
-                        varListLimits[varListName].push_back({min_val,max_val});
+                        varListLimits[varListName].push_back({min_val, max_val});
 
                         Real64 normalizationRefValue;
                         if (indVarInstance.count("normalization_reference_value")) {
@@ -1852,14 +2080,13 @@ namespace CurveManager {
                         min_val = min(min_val, min_grid_value);
                         max_val = max(max_val, max_grid_value);
 
-                        gridAxes.emplace_back(axis, extrapMethod, interpMethod, std::pair<double, double> {min_val, max_val});
+                        gridAxes.emplace_back(axis, extrapMethod, interpMethod, std::pair<double, double>{min_val, max_val});
 
                     } else {
                         // Independent variable does not exist
                         ShowSevereError(state, contextString + ": No Table:IndependentVariable found.");
                         ErrorsFound = true;
                     }
-
                 }
                 // Add grid to btwxtManager
                 state.dataCurveManager->btwxtManager.addGrid(UtilityRoutines::MakeUPPERCase(thisObjectName), Btwxt::GriddedData(gridAxes));
@@ -1879,11 +2106,10 @@ namespace CurveManager {
                 state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Table:Lookup";
                 state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::BtwxtMethod;
 
-                std::string
-                    indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name"));
+                std::string indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name"));
 
                 std::string contextString = "Table:Lookup \"" + state.dataCurveManager->PerfCurve(CurveNum).Name + "\"";
-                std::pair<EnergyPlusData*, std::string> callbackPair{&state, contextString};
+                std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
                 Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
 
                 // TODO: Actually use this to define output variable units
@@ -1902,22 +2128,22 @@ namespace CurveManager {
                 for (int i = 1; i <= std::min(6, numDims); ++i) {
                     double vMin, vMax;
                     std::tie(vMin, vMax) = varListLimits.at(indVarListName)[i - 1];
-                    if (i==1) {
+                    if (i == 1) {
                         state.dataCurveManager->PerfCurve(CurveNum).Var1Min = vMin;
                         state.dataCurveManager->PerfCurve(CurveNum).Var1Max = vMax;
-                    } else if (i==2) {
+                    } else if (i == 2) {
                         state.dataCurveManager->PerfCurve(CurveNum).Var2Min = vMin;
                         state.dataCurveManager->PerfCurve(CurveNum).Var2Max = vMax;
-                    } else if (i==3) {
+                    } else if (i == 3) {
                         state.dataCurveManager->PerfCurve(CurveNum).Var3Min = vMin;
                         state.dataCurveManager->PerfCurve(CurveNum).Var3Max = vMax;
-                    } else if (i==4) {
+                    } else if (i == 4) {
                         state.dataCurveManager->PerfCurve(CurveNum).Var4Min = vMin;
                         state.dataCurveManager->PerfCurve(CurveNum).Var4Max = vMax;
-                    } else if (i==5) {
+                    } else if (i == 5) {
                         state.dataCurveManager->PerfCurve(CurveNum).Var5Min = vMin;
                         state.dataCurveManager->PerfCurve(CurveNum).Var5Max = vMax;
-                    } else if (i==6) {
+                    } else if (i == 6) {
                         state.dataCurveManager->PerfCurve(CurveNum).Var6Min = vMin;
                         state.dataCurveManager->PerfCurve(CurveNum).Var6Max = vMax;
                     }
@@ -1941,7 +2167,12 @@ namespace CurveManager {
 
                 // Normalize data
                 Real64 normalizationDivisor = 1.0;
-                enum NormalizationMethod {NM_NONE, NM_DIVISOR_ONLY, NM_AUTO_WITH_DIVISOR};
+                enum NormalizationMethod
+                {
+                    NM_NONE,
+                    NM_DIVISOR_ONLY,
+                    NM_AUTO_WITH_DIVISOR
+                };
                 NormalizationMethod normalizeMethod = NM_NONE;
                 if (fields.count("normalization_method")) {
                     if (UtilityRoutines::SameString(fields.at("normalization_method"), "DIVISORONLY")) {
@@ -1971,7 +2202,6 @@ namespace CurveManager {
                     std::size_t colNum = fields.at("external_file_column_number").get<std::size_t>() - 1;
                     std::size_t rowNum = fields.at("external_file_starting_row_number").get<std::size_t>() - 1;
 
-
                     if (!state.dataCurveManager->btwxtManager.tableFiles.count(filePath)) {
                         TableFile tableFile;
                         ErrorsFound |= tableFile.load(state, filePath);
@@ -1983,7 +2213,8 @@ namespace CurveManager {
                     lookupValues = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray(state, {colNum, rowNum});
 
                     // remove NANs
-                    lookupValues.erase(std::remove_if(lookupValues.begin(), lookupValues.end(),  [](const double &x){return std::isnan(x);}), lookupValues.end());
+                    lookupValues.erase(std::remove_if(lookupValues.begin(), lookupValues.end(), [](const double &x) { return std::isnan(x); }),
+                                       lookupValues.end());
 
                 } else if (fields.count("values")) {
                     for (auto value : fields.at("values")) {
@@ -1994,7 +2225,8 @@ namespace CurveManager {
                     ErrorsFound = true;
                 }
 
-                state.dataCurveManager->PerfCurve(CurveNum).GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
+                state.dataCurveManager->PerfCurve(CurveNum).GridValueIndex =
+                    state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
 
                 if (normalizeMethod == NM_AUTO_WITH_DIVISOR) {
                     auto const normalizeTarget = varListNormalizeTargets.at(indVarListName);
@@ -2010,25 +2242,31 @@ namespace CurveManager {
                     }
                     if (pointsSpecified && pointsUnspecified) {
                         ShowSevereError(state,
-                            contextString +
-                            ": Table is to be normalized using AutomaticWithDivisor, but not all independent variables define a normalization reference value. Make sure either:");
+                                        contextString + ": Table is to be normalized using AutomaticWithDivisor, but not all independent variables "
+                                                        "define a normalization reference value. Make sure either:");
                         ShowContinueError(state, "  Make sure either:");
                         ShowContinueError(state, "    a) a normalization reference value is defined for each independent variable, or");
                         ShowContinueError(state, "    b) no normalization reference values are defined.");
                         ErrorsFound = true;
                     } else if (pointsSpecified) {
-                        // normalizeGridValues normalizes curve values to 1.0 at the normalization target, and returns the scalar needed to perform this normalization.
-                        // The result is multiplied by the input normalizationDivisor again for the AutomaticWithDivisor case, in which normalizeGridValues returns a compound scalar.
-                        normalizationDivisor = state.dataCurveManager->btwxtManager.normalizeGridValues(gridIndex, state.dataCurveManager->PerfCurve(CurveNum).GridValueIndex, normalizeTarget, normalizationDivisor)*normalizationDivisor;
+                        // normalizeGridValues normalizes curve values to 1.0 at the normalization target, and returns the scalar needed to perform
+                        // this normalization. The result is multiplied by the input normalizationDivisor again for the AutomaticWithDivisor case, in
+                        // which normalizeGridValues returns a compound scalar.
+                        normalizationDivisor =
+                            state.dataCurveManager->btwxtManager.normalizeGridValues(
+                                gridIndex, state.dataCurveManager->PerfCurve(CurveNum).GridValueIndex, normalizeTarget, normalizationDivisor) *
+                            normalizationDivisor;
                     }
                 }
 
                 if ((normalizeMethod == NM_DIVISOR_ONLY) || (normalizeMethod == NM_AUTO_WITH_DIVISOR)) {
                     if (state.dataCurveManager->PerfCurve(CurveNum).CurveMaxPresent) {
-                        state.dataCurveManager->PerfCurve(CurveNum).CurveMax = state.dataCurveManager->PerfCurve(CurveNum).CurveMax / normalizationDivisor;
+                        state.dataCurveManager->PerfCurve(CurveNum).CurveMax =
+                            state.dataCurveManager->PerfCurve(CurveNum).CurveMax / normalizationDivisor;
                     }
                     if (state.dataCurveManager->PerfCurve(CurveNum).CurveMinPresent) {
-                        state.dataCurveManager->PerfCurve(CurveNum).CurveMin = state.dataCurveManager->PerfCurve(CurveNum).CurveMin / normalizationDivisor;
+                        state.dataCurveManager->PerfCurve(CurveNum).CurveMin =
+                            state.dataCurveManager->PerfCurve(CurveNum).CurveMin / normalizationDivisor;
                     }
                 }
             }
@@ -2036,7 +2274,8 @@ namespace CurveManager {
         state.dataCurveManager->btwxtManager.tableFiles.clear();
     }
 
-    int BtwxtManager::getGridIndex(EnergyPlusData &state, std::string &indVarListName, bool &ErrorsFound) {
+    int BtwxtManager::getGridIndex(EnergyPlusData &state, std::string &indVarListName, bool &ErrorsFound)
+    {
         int gridIndex = -1;
         if (gridMap.count(indVarListName)) {
             gridIndex = gridMap.at(indVarListName);
@@ -2048,7 +2287,8 @@ namespace CurveManager {
         return gridIndex;
     }
 
-    std::pair<double, double> BtwxtManager::getGridAxisLimits(int gridIndex, int axisIndex) {
+    std::pair<double, double> BtwxtManager::getGridAxisLimits(int gridIndex, int axisIndex)
+    {
         return grids[gridIndex].get_axis_limits(axisIndex);
     }
 
@@ -2057,19 +2297,23 @@ namespace CurveManager {
         return (int)grids[gridIndex].add_value_table(values);
     }
 
-    int BtwxtManager::getNumGridDims(int gridIndex) {
+    int BtwxtManager::getNumGridDims(int gridIndex)
+    {
         return (int)grids[gridIndex].get_ndims();
     }
 
-    double BtwxtManager::getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target) {
+    double BtwxtManager::getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target)
+    {
         return grids[gridIndex](target)[outputIndex];
     }
 
-    double BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> &target, const double scalar) {
+    double BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> &target, const double scalar)
+    {
         return grids[gridIndex].normalize_values_at_target(outputIndex, target, scalar);
     }
 
-    void BtwxtManager::clear() {
+    void BtwxtManager::clear()
+    {
         grids.clear();
         gridMap.clear();
         independentVarRefs.clear();
@@ -2083,7 +2327,7 @@ namespace CurveManager {
         std::string fullPath;
         std::string contextString = "CurveManager::TableFile::load: ";
         DataSystemVariables::CheckForActualFileName(state, path, fileFound, fullPath, contextString);
-        if(!fileFound){
+        if (!fileFound) {
             return true;
         }
         std::ifstream file(fullPath);
@@ -2121,11 +2365,12 @@ namespace CurveManager {
         return false;
     }
 
-    std::vector<double>& TableFile::getArray(EnergyPlusData &state, std::pair<std::size_t, std::size_t> colAndRow) {
+    std::vector<double> &TableFile::getArray(EnergyPlusData &state, std::pair<std::size_t, std::size_t> colAndRow)
+    {
         if (!arrays.count(colAndRow)) {
             // create the column from the data if it doesn't exist already
             std::size_t col = colAndRow.first;  // 0 indexed
-            std::size_t row = colAndRow.second;  // 0 indexed
+            std::size_t row = colAndRow.second; // 0 indexed
             auto &content = contents[col];
             if (col >= numColumns) {
                 ShowFatalError(state,
@@ -2141,7 +2386,7 @@ namespace CurveManager {
                 // see https://stackoverflow.com/a/16575025/1344457
                 char *pEnd;
                 double ret = std::strtod(&str[0], &pEnd);
-                if (*pEnd == '\r'){
+                if (*pEnd == '\r') {
                     std::string st = str;
                     st.pop_back();
                     ret = std::strtod(&st[0], &pEnd);
@@ -2180,7 +2425,8 @@ namespace CurveManager {
                 // TODO: Make CurveInput an Array for better looping here...
                 switch (dim) {
                 case 1:
-                    SetupOutputVariable(state, "Performance Curve Input Variable " + numStr + " Value",
+                    SetupOutputVariable(state,
+                                        "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput1,
                                         "HVAC",
@@ -2188,7 +2434,8 @@ namespace CurveManager {
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 2:
-                    SetupOutputVariable(state, "Performance Curve Input Variable " + numStr + " Value",
+                    SetupOutputVariable(state,
+                                        "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput2,
                                         "HVAC",
@@ -2196,7 +2443,8 @@ namespace CurveManager {
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 3:
-                    SetupOutputVariable(state, "Performance Curve Input Variable " + numStr + " Value",
+                    SetupOutputVariable(state,
+                                        "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput3,
                                         "HVAC",
@@ -2204,7 +2452,8 @@ namespace CurveManager {
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 4:
-                    SetupOutputVariable(state, "Performance Curve Input Variable " + numStr + " Value",
+                    SetupOutputVariable(state,
+                                        "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput4,
                                         "HVAC",
@@ -2212,7 +2461,8 @@ namespace CurveManager {
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 5:
-                    SetupOutputVariable(state, "Performance Curve Input Variable " + numStr + " Value",
+                    SetupOutputVariable(state,
+                                        "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput5,
                                         "HVAC",
@@ -2220,7 +2470,8 @@ namespace CurveManager {
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 6:
-                    SetupOutputVariable(state, "Performance Curve Input Variable " + numStr + " Value",
+                    SetupOutputVariable(state,
+                                        "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput6,
                                         "HVAC",
@@ -2233,7 +2484,8 @@ namespace CurveManager {
                 }
             }
             // set the output up last so it shows up after the input in the csv file
-            SetupOutputVariable(state, "Performance Curve Output Value",
+            SetupOutputVariable(state,
+                                "Performance Curve Output Value",
                                 OutputProcessor::Unit::None,
                                 state.dataCurveManager->PerfCurve(CurveIndex).CurveOutput,
                                 "HVAC",
@@ -2242,25 +2494,29 @@ namespace CurveManager {
         }
 
         for (CurveIndex = 1; CurveIndex <= state.dataBranchAirLoopPlant->NumPressureCurves; ++CurveIndex) {
-            SetupOutputVariable(state, "Performance Curve Input Variable 1 Value",
+            SetupOutputVariable(state,
+                                "Performance Curve Input Variable 1 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput1,
                                 "HVAC",
                                 "Average",
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
-            SetupOutputVariable(state, "Performance Curve Input Variable 2 Value",
+            SetupOutputVariable(state,
+                                "Performance Curve Input Variable 2 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput2,
                                 "HVAC",
                                 "Average",
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
-            SetupOutputVariable(state, "Performance Curve Input Variable 3 Value",
+            SetupOutputVariable(state,
+                                "Performance Curve Input Variable 3 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput3,
                                 "HVAC",
                                 "Average",
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
-            SetupOutputVariable(state, "Performance Curve Output Value",
+            SetupOutputVariable(state,
+                                "Performance Curve Output Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveOutput,
                                 "HVAC",
@@ -2270,7 +2526,8 @@ namespace CurveManager {
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (CurveIndex = 1; CurveIndex <= state.dataCurveManager->NumCurves; ++CurveIndex) {
-                SetupEMSActuator(state, "Curve",
+                SetupEMSActuator(state,
+                                 "Curve",
                                  state.dataCurveManager->PerfCurve(CurveIndex).Name,
                                  "Curve Result",
                                  "[unknown]",
@@ -2280,7 +2537,8 @@ namespace CurveManager {
         }
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (CurveIndex = 1; CurveIndex <= state.dataBranchAirLoopPlant->NumPressureCurves; ++CurveIndex) {
-                SetupEMSActuator(state, "Curve",
+                SetupEMSActuator(state,
+                                 "Curve",
                                  state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name,
                                  "Curve Result",
                                  "[unknown]",
@@ -2291,13 +2549,13 @@ namespace CurveManager {
     }
 
     Real64 PerformanceCurveObject(EnergyPlusData &state,
-                                  int const CurveIndex,        // index of curve in curve array
-                                  Real64 const Var1,           // 1st independent variable
-                                  Optional<Real64 const> Var2, // 2nd independent variable
-                                  Optional<Real64 const> Var3, // 3rd independent variable
-                                  Optional<Real64 const> Var4,  // 4th independent variable
-                                  Optional<Real64 const> Var5,  // 5th independent variable
-                                  [[maybe_unused]] Optional<Real64 const> Var6  // 6th independent variable
+                                  int const CurveIndex,                        // index of curve in curve array
+                                  Real64 const Var1,                           // 1st independent variable
+                                  Optional<Real64 const> Var2,                 // 2nd independent variable
+                                  Optional<Real64 const> Var3,                 // 3rd independent variable
+                                  Optional<Real64 const> Var4,                 // 4th independent variable
+                                  Optional<Real64 const> Var5,                 // 5th independent variable
+                                  [[maybe_unused]] Optional<Real64 const> Var6 // 6th independent variable
     )
     {
 
@@ -2333,7 +2591,7 @@ namespace CurveManager {
         Real64 const V3(Var3.present() ? max(min(Var3, Curve.Var3Max), Curve.Var3Min) : 0.0); // 3rd independent variable after limits imposed
         Real64 const V4(Var4.present() ? max(min(Var4, Curve.Var4Max), Curve.Var4Min) : 0.0); // 4th independent variable after limits imposed
         Real64 const V5(Var5.present() ? max(min(Var5, Curve.Var5Max), Curve.Var5Min) : 0.0); // 5th independent variable after limits imposed
-        //Real64 const V6(Var6.present() ? max(min(Var6, Curve.Var6Max), Curve.Var6Min) : 0.0); // 6th independent variable after limits imposed
+        // Real64 const V6(Var6.present() ? max(min(Var6, Curve.Var6Max), Curve.Var6Min) : 0.0); // 6th independent variable after limits imposed
 
         {
             auto const SELECT_CASE_var(Curve.CurveType);
@@ -2425,45 +2683,48 @@ namespace CurveManager {
                                    Optional<Real64 const> Var6  // 6th independent variable
     )
     {
-      // TODO: Generalize for N-dims
-      Real64 var = Var1;
-      var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var1Max), state.dataCurveManager->PerfCurve(CurveIndex).Var1Min);
-      std::vector<double> target{var};
-      if (present(Var2)) {
-        var = Var2;
-        var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var2Max), state.dataCurveManager->PerfCurve(CurveIndex).Var2Min);
-        target.push_back(var);
-      }
-      if (present(Var3)) {
-        var = Var3;
-        var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var3Max), state.dataCurveManager->PerfCurve(CurveIndex).Var3Min);
-        target.push_back(var);
-      }
-      if (present(Var4)) {
-        var = Var4;
-        var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var4Max), state.dataCurveManager->PerfCurve(CurveIndex).Var4Min);
-        target.push_back(var);
-      }
-      if (present(Var5)) {
-        var = Var5;
-        var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var5Max), state.dataCurveManager->PerfCurve(CurveIndex).Var5Min);
-        target.push_back(var);
-      }
-      if (present(Var6)) {
-        var = Var6;
-        var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var6Max), state.dataCurveManager->PerfCurve(CurveIndex).Var6Min);
-        target.push_back(var);
-      }
+        // TODO: Generalize for N-dims
+        Real64 var = Var1;
+        var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var1Max), state.dataCurveManager->PerfCurve(CurveIndex).Var1Min);
+        std::vector<double> target{var};
+        if (present(Var2)) {
+            var = Var2;
+            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var2Max), state.dataCurveManager->PerfCurve(CurveIndex).Var2Min);
+            target.push_back(var);
+        }
+        if (present(Var3)) {
+            var = Var3;
+            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var3Max), state.dataCurveManager->PerfCurve(CurveIndex).Var3Min);
+            target.push_back(var);
+        }
+        if (present(Var4)) {
+            var = Var4;
+            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var4Max), state.dataCurveManager->PerfCurve(CurveIndex).Var4Min);
+            target.push_back(var);
+        }
+        if (present(Var5)) {
+            var = Var5;
+            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var5Max), state.dataCurveManager->PerfCurve(CurveIndex).Var5Min);
+            target.push_back(var);
+        }
+        if (present(Var6)) {
+            var = Var6;
+            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var6Max), state.dataCurveManager->PerfCurve(CurveIndex).Var6Min);
+            target.push_back(var);
+        }
 
-      std::string contextString = "Table:Lookup \"" + state.dataCurveManager->PerfCurve(CurveIndex).Name + "\"";
-      std::pair<EnergyPlusData*, std::string> callbackPair{&state, contextString};
-      Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
-      Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(state.dataCurveManager->PerfCurve(CurveIndex).TableIndex,state.dataCurveManager->PerfCurve(CurveIndex).GridValueIndex,target);
+        std::string contextString = "Table:Lookup \"" + state.dataCurveManager->PerfCurve(CurveIndex).Name + "\"";
+        std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
+        Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
+        Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(
+            state.dataCurveManager->PerfCurve(CurveIndex).TableIndex, state.dataCurveManager->PerfCurve(CurveIndex).GridValueIndex, target);
 
-      if (state.dataCurveManager->PerfCurve(CurveIndex).CurveMinPresent) TableValue = max(TableValue, state.dataCurveManager->PerfCurve(CurveIndex).CurveMin);
-      if (state.dataCurveManager->PerfCurve(CurveIndex).CurveMaxPresent) TableValue = min(TableValue, state.dataCurveManager->PerfCurve(CurveIndex).CurveMax);
+        if (state.dataCurveManager->PerfCurve(CurveIndex).CurveMinPresent)
+            TableValue = max(TableValue, state.dataCurveManager->PerfCurve(CurveIndex).CurveMin);
+        if (state.dataCurveManager->PerfCurve(CurveIndex).CurveMaxPresent)
+            TableValue = min(TableValue, state.dataCurveManager->PerfCurve(CurveIndex).CurveMax);
 
-      return TableValue;
+        return TableValue;
     }
 
     bool IsCurveInputTypeValid(std::string const &InInputType) // index of curve in curve array
@@ -2548,7 +2809,7 @@ namespace CurveManager {
     {
         // Returns true if errors found
         int curveDim = state.dataCurveManager->PerfCurve(CurveIndex).NumDims;
-        if (std::find(validDims.begin(),validDims.end(), curveDim) != validDims.end()) {
+        if (std::find(validDims.begin(), validDims.end(), curveDim) != validDims.end()) {
             // Compatible
             return false;
         } else {
@@ -2560,7 +2821,7 @@ namespace CurveManager {
                 validString += format(" or {}", validDims[i]);
             }
             std::string plural1 = curveDim > 1 ? "s" : "";
-            std::string plural2 = validDims[validDims.size()-1] > 1 ? "s" : "";
+            std::string plural2 = validDims[validDims.size() - 1] > 1 ? "s" : "";
             ShowContinueError(
                 state, format("...Input curve=\"{}\" has {} dimension{}.", state.dataCurveManager->PerfCurve(CurveIndex).Name, curveDim, plural1));
             ShowContinueError(state, "...Curve type must have " + validString + " dimension" + plural2 + ".");
@@ -2760,30 +3021,31 @@ namespace CurveManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumPressure;
-        Array1D_string Alphas(1);     // Alpha items for object
-        Array1D<Real64> Numbers(5);   // Numeric items for object
-        int NumAlphas;                // Number of Alphas for each GetObjectItem call
-        int NumNumbers;               // Number of Numbers for each GetObjectItem call
-        int IOStatus;                 // Used in GetObjectItem
-        bool ErrsFound(false); // Set to true if errors in input, fatal at end of routine
+        Array1D_string Alphas(1);   // Alpha items for object
+        Array1D<Real64> Numbers(5); // Numeric items for object
+        int NumAlphas;              // Number of Alphas for each GetObjectItem call
+        int NumNumbers;             // Number of Numbers for each GetObjectItem call
+        int IOStatus;               // Used in GetObjectItem
+        bool ErrsFound(false);      // Set to true if errors in input, fatal at end of routine
         int CurveNum;
 
         NumPressure = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurveObjectName);
         state.dataBranchAirLoopPlant->PressureCurve.allocate(NumPressure);
         for (CurveNum = 1; CurveNum <= NumPressure; ++CurveNum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurveObjectName,
-                                          CurveNum,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          _,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurveObjectName, state.dataIPShortCut->cAlphaFieldNames(1), ErrsFound);
+                                                                     CurveObjectName,
+                                                                     CurveNum,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurveObjectName, state.dataIPShortCut->cAlphaFieldNames(1), ErrsFound);
             state.dataBranchAirLoopPlant->PressureCurve(CurveNum).Name = Alphas(1);
             state.dataBranchAirLoopPlant->PressureCurve(CurveNum).EquivDiameter = Numbers(1);
             state.dataBranchAirLoopPlant->PressureCurve(CurveNum).MinorLossCoeff = Numbers(2);
@@ -2891,11 +3153,8 @@ namespace CurveManager {
         PressureCurveType = DataBranchAirLoopPlant::PressureCurveType::Error;
     }
 
-    Real64 PressureCurveValue(EnergyPlusData &state,
-                              int const PressureCurveIndex,
-                              Real64 const MassFlow,
-                              Real64 const Density,
-                              Real64 const Viscosity)
+    Real64
+    PressureCurveValue(EnergyPlusData &state, int const PressureCurveIndex, Real64 const MassFlow, Real64 const Density, Real64 const Viscosity)
     {
 
         // FUNCTION INFORMATION:
@@ -2961,7 +3220,8 @@ namespace CurveManager {
         // Pressure drop calculation
         PressureCurveValue = (FrictionFactor * (Length / Diameter) + MinorLossCoeff) * (Density * pow_2(Velocity)) / 2.0;
 
-        if (state.dataBranchAirLoopPlant->PressureCurve(PressureCurveIndex).EMSOverrideOn) PressureCurveValue = state.dataBranchAirLoopPlant->PressureCurve(PressureCurveIndex).EMSOverrideCurveValue;
+        if (state.dataBranchAirLoopPlant->PressureCurve(PressureCurveIndex).EMSOverrideOn)
+            PressureCurveValue = state.dataBranchAirLoopPlant->PressureCurve(PressureCurveIndex).EMSOverrideCurveValue;
 
         state.dataBranchAirLoopPlant->PressureCurve(PressureCurveIndex).CurveInput1 = MassFlow;
         state.dataBranchAirLoopPlant->PressureCurve(PressureCurveIndex).CurveInput2 = Density;

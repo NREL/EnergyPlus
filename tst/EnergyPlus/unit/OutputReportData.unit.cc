@@ -86,12 +86,39 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
     Real64 extLitPow;
     Real64 extLitUse;
 
-    SetupOutputVariable(*state, "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity",
-                        "Exterior Lights", "General");
-    SetupOutputVariable(*state, "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity",
-                        "Exterior Lights", "General");
-    SetupOutputVariable(*state, "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity",
-                        "Exterior Lights", "General");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite1",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite2",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite3",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
     SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
     SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
     SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
@@ -317,12 +344,29 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_Pipe)
 TEST_F(EnergyPlusFixture, OutputReportData_Regex_Brackets)
 {
     std::string const idf_objects = delimited_string({
-        "Output:Variable,", "([A-Za-z] ?)+,", "System Node Mass Flow Rate,",
-        "timestep;",    " Output:Variable,", "[A-Za-z0-9_]+,", "System Node Humidity Ratio,",
-        "timestep;",    " Output:Variable,", "[A-Z]{4},",      "Unitary System Compressor Part Load Ratio,",
-        "timestep;",    " Output:Variable,", "[A-Za-z]{5,6},", "Zone Air System Sensible Heating Rate,",
-        "timestep;",    " Output:Variable,", "[A-Za-z ]{5,},", "Refrigeration Compressor Rack Electric Power,",
-        "timestep;",    " Output:Variable,", "([A-Za-z] ?)+,", "System Node Mass Flow Rate,",
+        "Output:Variable,",
+        "([A-Za-z] ?)+,",
+        "System Node Mass Flow Rate,",
+        "timestep;",
+        " Output:Variable,",
+        "[A-Za-z0-9_]+,",
+        "System Node Humidity Ratio,",
+        "timestep;",
+        " Output:Variable,",
+        "[A-Z]{4},",
+        "Unitary System Compressor Part Load Ratio,",
+        "timestep;",
+        " Output:Variable,",
+        "[A-Za-z]{5,6},",
+        "Zone Air System Sensible Heating Rate,",
+        "timestep;",
+        " Output:Variable,",
+        "[A-Za-z ]{5,},",
+        "Refrigeration Compressor Rack Electric Power,",
+        "timestep;",
+        " Output:Variable,",
+        "([A-Za-z] ?)+,",
+        "System Node Mass Flow Rate,",
         "timestep;",
     });
     EXPECT_FALSE(process_idf(idf_objects, false));

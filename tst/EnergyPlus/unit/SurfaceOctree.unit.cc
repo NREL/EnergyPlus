@@ -437,5 +437,4 @@ TEST_F(EnergyPlusFixture, Composite)
         cube.processSomeSurfaceRayIntersectsCube(*state, a, dir, predicate);
         EXPECT_EQ(8u, n);
     }
-
 }

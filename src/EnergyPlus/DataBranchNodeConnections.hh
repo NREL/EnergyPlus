@@ -126,10 +126,11 @@ namespace DataBranchNodeConnections {
 
 } // namespace DataBranchNodeConnections
 
-struct BranchNodeConnectionsData : BaseGlobalStruct {
+struct BranchNodeConnectionsData : BaseGlobalStruct
+{
 
-    int NumCompSets = 0;                // Number of Component Sets found in branches
-    int NumNodeConnectionErrors = 0;    // Count of node connection errors
+    int NumCompSets = 0;             // Number of Component Sets found in branches
+    int NumNodeConnectionErrors = 0; // Count of node connection errors
     int NumOfNodeConnections = 0;
     int MaxNumOfNodeConnections = 0;
     int NodeConnectionAlloc = 1000;
