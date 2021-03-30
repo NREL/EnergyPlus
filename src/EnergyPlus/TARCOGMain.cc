@@ -436,7 +436,7 @@ namespace EnergyPlus::TARCOGMain {
                   Array1D<Real64> &Ra,                  // Vector of Rayleigh numbers, for each gap
                   Array1D<Real64> &Nu,                  // Vector of Nusselt numbers, for each gap
                   int const standard,                   // Calculation standard switch:
-                  int const ThermalMod,                 // Thermal model:
+                  TARCOGThermalModel const ThermalMod,                 // Thermal model:
                   int const Debug_mode,                 // Switch for debug output files:
                   std::string const &Debug_dir,         // Target directory for debug files
                   std::string const &Debug_file,        // File name template for debug files

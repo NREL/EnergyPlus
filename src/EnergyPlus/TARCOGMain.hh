@@ -154,7 +154,7 @@ namespace TARCOGMain {
                   Array1D<Real64> &Ra,                  // Vector of Rayleigh numbers, for each gap
                   Array1D<Real64> &Nu,                  // Vector of Nusselt numbers, for each gap
                   int standard,                         // Calculation standard switch:
-                  int ThermalMod,                       // Thermal model:
+                  TARCOGParams::TARCOGThermalModel ThermalMod,                       // Thermal model:
                   int Debug_mode,                       // Switch for debug output files:
                   std::string const &Debug_dir,         // Target directory for debug files
                   std::string const &Debug_file,        // File name template for debug files

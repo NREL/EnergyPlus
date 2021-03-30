@@ -236,7 +236,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                        const Array1D<Real64> &sumsol,
                        Array1D<Real64> &Ra,
                        Array1D<Real64> &Nu,
-                       int const ThermalMod,
+                       TARCOGThermalModel const ThermalMod,
                        int const Debug_mode,
                        Real64 &ShadeEmisRatioOut,
                        Real64 &ShadeEmisRatioIn,
@@ -1230,7 +1230,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                  Real64 &ShadeEmisRatioIn,
                  Real64 &ShadeHcModifiedOut,
                  Real64 &ShadeHcModifiedIn,
-                 int const ThermalMod,
+                 TARCOGThermalModel const ThermalMod,
                  [[maybe_unused]] int const Debug_mode,
                  Real64 &AchievedErrorTolerance,
                  int &TotalIndex,
@@ -1401,7 +1401,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
         }
 
         // bi...Set LayerTypeSpec array - need to treat venetians AND woven shades as glass:
-        if (ThermalMod == THERM_MOD_CSM) {
+        if (ThermalMod == TARCOGThermalModel::CSM) {
             for (i = 1; i <= nlayer; ++i) {
                 if (IsShadingLayer(LayerType(i))) {
                     //                    LayerTypeSpec( i ) = 0; //Unused
@@ -1531,7 +1531,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
             if (!(GoAhead(nperr))) return;
 
             // bi...Override hhat values near SHADING DEVICE layer(s), but only for CSM thermal model:
-            if ((ThermalMod == THERM_MOD_CSM) && (SDLayerIndex > 0)) {
+            if ((ThermalMod == TARCOGThermalModel::CSM) && (SDLayerIndex > 0)) {
                 // adjust hhat values
                 // call adjusthhat(SDLayerIndex, ibc, tout, tind, nlayer, theta, wso, wsi, iwd, height, heightt, tilt,  &
                 //               &  thick, gap, hout, hrout, hin, hrin, iprop, frct, presure, nmix, wght, gcon, gvis, gcp, &

@@ -149,7 +149,7 @@ namespace DataComplexFenestration {
         // Members
         std::string Name;           // Window thermal model name
         int CalculationStandard;    // Tarcog calculation standard
-        int ThermalModel;           // Tarcog thermal model
+        TARCOGParams::TARCOGThermalModel ThermalModel;           // Tarcog thermal model
         Real64 SDScalar;            // SDScalar coefficient
         int DeflectionModel;        // Deflection model
         Real64 VacuumPressureLimit; // Pressure limit at which it will be considered vacuum gas state
@@ -158,7 +158,7 @@ namespace DataComplexFenestration {
 
         // Default Constructor
         WindowThermalModelParams()
-            : CalculationStandard(-1), ThermalModel(-1), SDScalar(0.0), DeflectionModel(-1), VacuumPressureLimit(0.0), InitialTemperature(0.0),
+            : CalculationStandard(-1), ThermalModel(TARCOGParams::TARCOGThermalModel::UNASSIGNED), SDScalar(0.0), DeflectionModel(-1), VacuumPressureLimit(0.0), InitialTemperature(0.0),
               InitialPressure(0.0)
         {
         }

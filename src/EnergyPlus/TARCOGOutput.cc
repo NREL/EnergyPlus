@@ -97,7 +97,7 @@ namespace EnergyPlus::TARCOGOutput {
                              Real64 const hout,
                              Real64 const hin,
                              int const standard,
-                             int const ThermalMod,
+                             TARCOGThermalModel const ThermalMod,
                              Real64 const SDScalar,
                              Real64 const height,
                              Real64 const heightt,
@@ -320,17 +320,17 @@ namespace EnergyPlus::TARCOGOutput {
         if (standard == EN673) print(InArgumentsFile, Format_1071, standard);
         if (standard == EN673Design) print(InArgumentsFile, Format_1072, standard);
 
-        if (ThermalMod == THERM_MOD_ISO15099) {
+        if (ThermalMod == TARCOGThermalModel::ISO15099) {
             print(InArgumentsFile, Format_10731, ThermalMod);
             print(InArgumentsFile, Format_10740, SDScalar);
         }
 
-        if (ThermalMod == THERM_MOD_SCW) {
+        if (ThermalMod == TARCOGThermalModel::SCW) {
             print(InArgumentsFile, Format_10732, ThermalMod);
             print(InArgumentsFile, Format_10740, SDScalar);
         }
 
-        if (ThermalMod == THERM_MOD_CSM) {
+        if (ThermalMod == TARCOGThermalModel::CSM) {
             print(InArgumentsFile, Format_10733, ThermalMod);
             print(InArgumentsFile, Format_10740, SDScalar);
         }
@@ -889,7 +889,7 @@ namespace EnergyPlus::TARCOGOutput {
                               Real64 const hout,
                               Real64 const hin,
                               int const standard,
-                              int const ThermalMod,
+                              TARCOGThermalModel const ThermalMod,
                               Real64 const SDScalar,
                               Real64 const height,
                               Real64 const heightt,

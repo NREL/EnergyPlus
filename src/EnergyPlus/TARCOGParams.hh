@@ -76,10 +76,14 @@ namespace EnergyPlus::TARCOGParams {
         VENETBLIND_VERT = 6
     };
 
-    //  Thermal models:
-    int const THERM_MOD_ISO15099(0);
-    int const THERM_MOD_SCW(1);
-    int const THERM_MOD_CSM(2);
+//  Thermal models:
+    enum class TARCOGThermalModel : int{
+        UNASSIGNED = -1,
+        ISO15099 = 0,
+        SCW = 1,
+        CSM = 2,
+        CSM_WithSDThickness = 3
+    };
 
     extern int const YES_SupportPillar;
 

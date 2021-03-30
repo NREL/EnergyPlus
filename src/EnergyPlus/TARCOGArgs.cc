@@ -142,7 +142,7 @@ namespace EnergyPlus::TARCOGArgs {
                  const Array1D<Real64> &LaminateB,
                  const Array1D<Real64> &sumsol,
                  int const standard,
-                 int const ThermalMod,
+                 TARCOGThermalModel const ThermalMod,
                  Real64 const SDScalar,
                  std::string &ErrorMessage)
     {
@@ -345,9 +345,7 @@ namespace EnergyPlus::TARCOGArgs {
             return ArgCheck;
         }
 
-        int constexpr MinThermalMode(0);
-        int constexpr MaxThermalMode(2);
-        if ((ThermalMod < MinThermalMode) || (ThermalMod > MaxThermalMode)) {
+        if ((ThermalMod != TARCOGThermalModel::ISO15099) || (ThermalMod != TARCOGThermalModel::SCW) || (ThermalMod != TARCOGThermalModel::CSM)) {
             ArgCheck = 29;
             ErrorMessage = "Invalid code for thermal mode.";
             return ArgCheck;
@@ -436,12 +434,12 @@ namespace EnergyPlus::TARCOGArgs {
             }
 
             // bi...TEMPORARY! Don't allow CSW and CSM method for outdoor and indoor SD layers
-            if ((IsShadingLayer(LayerType(1))) && ((ThermalMod == THERM_MOD_SCW) || (ThermalMod == THERM_MOD_CSM))) {
+            if ((IsShadingLayer(LayerType(1))) && ((ThermalMod == TARCOGThermalModel::SCW) || (ThermalMod == TARCOGThermalModel::CSM))) {
                 ArgCheck = 39;
                 ErrorMessage = "CSM and SCW thermal models cannot be used for outdoor and indoor SD layers.";
                 return ArgCheck;
             }
-            if ((IsShadingLayer(LayerType(nlayer))) && ((ThermalMod == THERM_MOD_SCW) || (ThermalMod == THERM_MOD_CSM))) {
+            if ((IsShadingLayer(LayerType(nlayer))) && ((ThermalMod == TARCOGThermalModel::SCW) || (ThermalMod == TARCOGThermalModel::CSM))) {
                 ArgCheck = 39;
                 ErrorMessage = "CSM and SCW thermal models cannot be used for outdoor and indoor SD layers.";
                 return ArgCheck;
@@ -522,7 +520,7 @@ namespace EnergyPlus::TARCOGArgs {
                                const Array1D<Real64> &SlatAngle,
                                const Array1D<Real64> &SlatCond,
                                const Array1D<TARCOGLayerType> &LayerType,
-                               int const ThermalMod,
+                               TARCOGThermalModel const ThermalMod,
                                Real64 const SDScalar,
                                Real64 &ShadeEmisRatioOut,
                                Real64 &ShadeEmisRatioIn,
@@ -604,7 +602,7 @@ namespace EnergyPlus::TARCOGArgs {
             if ((TARCOGLayerType)LayerType(i) == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ ||
                 (TARCOGLayerType)LayerType(i) == TARCOGParams::TARCOGLayerType::VENETBLIND_VERT) {
                 scon(i) = SlatCond(i);
-                if (ThermalMod == THERM_MOD_SCW) {
+                if (ThermalMod == TARCOGThermalModel::SCW) {
                     // bi...the idea here is to have glass-to-glass width the same as before scaling
                     // bi...TODO: check for outdoor and indoor blinds! SCW model is only applicable to in-between SDs!!!
                     thick(i) = SlatWidth(i) * std::cos(SlatAngle(i) * DataGlobalConstants::Pi / 180.0);
@@ -612,7 +610,7 @@ namespace EnergyPlus::TARCOGArgs {
                     gap(i) += (1.0 - SDScalar) / 2.0 * thick(i);
                     thick(i) *= SDScalar;
                     if (thick(i) < SlatThick(i)) thick(i) = SlatThick(i);
-                } else if ((ThermalMod == THERM_MOD_ISO15099) || (ThermalMod == THERM_MOD_CSM)) {
+                } else if ((ThermalMod == TARCOGThermalModel::ISO15099) || (ThermalMod == TARCOGThermalModel::CSM)) {
                     thick(i) = SlatThick(i);
                     const Real64 slatAngRad = SlatAngle(i) * 2.0 * DataGlobalConstants::Pi / 360.0;
                     Real64 C4_VENET(0);

@@ -125,7 +125,7 @@ namespace EnergyPlus::TARCOGArgs {
                  const Array1D<Real64> &LaminateB,
                  const Array1D<Real64> &sumsol,
                  int standard,
-                 int ThermalMod,
+                 TARCOGParams::TARCOGThermalModel ThermalMod,
                  Real64 SDScalar,
                  std::string &ErrorMessage);
 
@@ -153,7 +153,7 @@ namespace EnergyPlus::TARCOGArgs {
                                const Array1D<Real64> &SlatAngle,
                                const Array1D<Real64> &SlatCond,
                                const Array1D<TARCOGParams::TARCOGLayerType> &LayerType,
-                               int ThermalMod,
+                               TARCOGParams::TARCOGThermalModel ThermalMod,
                                Real64 SDScalar,
                                Real64 &ShadeEmisRatioOut,
                                Real64 &ShadeEmisRatioIn,
