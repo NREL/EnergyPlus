@@ -857,6 +857,7 @@
     0.1,                     !- Mode 9 Minimum Supply Air Mass Flow Rate Ratio
     1,                       !- Mode 9 Maximum Supply Air Mass Flow Rate Ratio
     ,                        !- Mode 10 Name
+    ,                        !- Mode 10 Supply Air Temperature Lookup Table Name
     ,                        !- Mode 10 Supply Air Humidity Ratio Lookup Table Name
     ,                        !- Mode 10 System Electric Power Lookup Table Name
     ,                        !- Mode 10 Supply Fan Electric Power Lookup Table Name
