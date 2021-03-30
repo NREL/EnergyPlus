@@ -82,13 +82,14 @@ namespace DataStringGlobals {
     char constexpr CharTab('\t');      // tab
     char constexpr CharSpace(' ');     // space
 
-    extern std::string const VerString;            // String that represents version information
-    extern std::string const MatchVersion;         // String to be matched by Version object
+    extern std::string const VerString;    // String that represents version information
+    extern std::string const MatchVersion; // String to be matched by Version object
     extern std::string const PythonAPIVersion;
 
 } // namespace DataStringGlobals
 
-struct DataStringGlobalsData : BaseGlobalStruct {
+struct DataStringGlobalsData : BaseGlobalStruct
+{
 
     std::string outputMddFileName = "eplusout.mdd";
     std::string outputRddFileName = "eplusout.rdd";
@@ -127,7 +128,7 @@ struct DataStringGlobalsData : BaseGlobalStruct {
     std::string IDDVerString;         // Version information from the IDD (line 1)
     std::string CurrentDateTime;      // For printing current date and time at start of run
     std::string VerStringVar;
-    
+
     void clear_state() override
     {
         eplusADSFileName.clear();

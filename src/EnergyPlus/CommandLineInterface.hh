@@ -62,7 +62,8 @@ struct EnergyPlusData;
 
 namespace CommandLineInterface {
 
-    enum class ReturnCodes {
+    enum class ReturnCodes
+    {
         Success,
         Failure,
         SuccessButHelper,

@@ -77,7 +77,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
     // Reads input and creates instance of Site:GroundTemperature:FCfactorMethod object
 
     // USE STATEMENTS:
-        using namespace GroundTemperatureManager;
+    using namespace GroundTemperatureManager;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -98,7 +98,8 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
     if (numCurrObjects == 1) {
 
         // Get the object names for each construction from the input processor
-        state.dataInputProcessing->inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
+        state.dataInputProcessing->inputProcessor->getObjectItem(
+            state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
             ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");

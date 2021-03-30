@@ -76,7 +76,8 @@ namespace TARCOGCommon {
         // Using/Aliasing
         using namespace TARCOGParams;
 
-        return layertype == VENETBLIND_HORIZ || layertype == VENETBLIND_VERT || layertype == WOVSHADE || layertype == PERFORATED || layertype == BSDF || layertype == DIFFSHADE;
+        return layertype == VENETBLIND_HORIZ || layertype == VENETBLIND_VERT || layertype == WOVSHADE || layertype == PERFORATED ||
+               layertype == BSDF || layertype == DIFFSHADE;
     }
 
     Real64 LDSumMax(Real64 const Width, Real64 const Height)

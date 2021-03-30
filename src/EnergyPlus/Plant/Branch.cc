@@ -45,8 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/Branch.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -54,7 +54,8 @@
 namespace EnergyPlus {
 namespace DataPlant {
 
-    Real64 BranchData::DetermineBranchFlowRequest(EnergyPlusData &state) {
+    Real64 BranchData::DetermineBranchFlowRequest(EnergyPlusData &state)
+    {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -95,8 +96,7 @@ namespace DataPlant {
         OverallFlowRequest = PlantUtilities::BoundValueToNodeMinMaxAvail(state, OverallFlowRequest, BranchOutletNodeNum);
 
         return OverallFlowRequest;
-
     }
 
-}
-}
+} // namespace DataPlant
+} // namespace EnergyPlus

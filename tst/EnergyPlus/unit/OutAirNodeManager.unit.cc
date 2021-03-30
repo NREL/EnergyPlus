@@ -74,7 +74,8 @@ TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
     state->dataEnvrn->WindSpeed = 2.0;
     state->dataEnvrn->WindDir = 0.0;
     state->dataEnvrn->OutBaroPress = 101325;
-    state->dataEnvrn->OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
+    state->dataEnvrn->OutHumRat =
+        Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 24.0;
     state->dataOutAirNodeMgr->OutsideAirNodeList(1) = 1;
@@ -102,5 +103,4 @@ TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
     EXPECT_NEAR(14.6467, state->dataLoopNodes->Node(1).OutAirWetBulb, 0.0001);
     EXPECT_NEAR(0.007253013, state->dataLoopNodes->Node(2).HumRat, 0.000001);
     EXPECT_NEAR(0.006543816, state->dataLoopNodes->Node(3).HumRat, 0.000001);
-
 }

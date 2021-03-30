@@ -57,7 +57,8 @@
 
 namespace EnergyPlus {
 
-struct UCSDSharedData : BaseGlobalStruct {
+struct UCSDSharedData : BaseGlobalStruct
+{
     // The Eplus surface numbers will be stored in the arrays Apos according to the
     // type of surface. The PosZ_Wall array has dimension 2 times the Number of Zones and
     // for each zone it has 2 positions: the start and end positions in the Apos_Wall array

@@ -69,18 +69,21 @@ namespace EconomicLifeCycleCost {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    enum class iDiscConv {
+    enum class iDiscConv
+    {
         BeginOfYear,
         MidYear,
         EndOfYear,
     };
 
-    enum class iInflAppr {
+    enum class iInflAppr
+    {
         ConstantDollar,
         CurrentDollar,
     };
 
-    enum class iDeprMethod {
+    enum class iDeprMethod
+    {
         MACRS3,
         MACRS5,
         MACRS7,
@@ -121,12 +124,14 @@ namespace EconomicLifeCycleCost {
     //   Residual oil - FuelOilNo2
     //   Coal
 
-    enum class iStartCosts {
+    enum class iStartCosts
+    {
         ServicePeriod,
         BasePeriod,
     };
 
-    enum class iSourceKind {
+    enum class iSourceKind
+    {
         Unassigned,
         Recurring,
         Nonrecurring,
@@ -134,14 +139,16 @@ namespace EconomicLifeCycleCost {
         Sum,
     };
 
-    enum class iPrValKind {
+    enum class iPrValKind
+    {
         Unassigned,
         Energy,
         NonEnergy,
         NotComputed,
     };
 
-    constexpr const char * MonthNames(int const &i) {
+    constexpr const char *MonthNames(int const &i)
+    {
         switch (i) {
         case 1:
             return "January";
@@ -222,11 +229,11 @@ namespace EconomicLifeCycleCost {
     struct UsePriceEscalationType
     {
         // Members
-        std::string name;           // Name
+        std::string name;                           // Name
         DataGlobalConstants::ResourceType resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-        int escalationStartYear;    // Escalation Start Year 1900-2100
-        int escalationStartMonth;   // Escalation Start Month 1 to 12
-        Array1D<Real64> Escalation; // Escalation by year, first year is baseDateYear
+        int escalationStartYear;                    // Escalation Start Year 1900-2100
+        int escalationStartMonth;                   // Escalation Start Month 1 to 12
+        Array1D<Real64> Escalation;                 // Escalation by year, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
@@ -238,9 +245,9 @@ namespace EconomicLifeCycleCost {
     struct UseAdjustmentType
     {
         // Members
-        std::string name;           // Name
-        DataGlobalConstants::ResourceType resource;               // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-        Array1D<Real64> Adjustment; // Adjustment by year, first year is baseDateYear
+        std::string name;                           // Name
+        DataGlobalConstants::ResourceType resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
+        Array1D<Real64> Adjustment;                 // Adjustment by year, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
@@ -326,7 +333,8 @@ namespace EconomicLifeCycleCost {
 
 } // namespace EconomicLifeCycleCost
 
-struct EconomicLifeCycleCostData : BaseGlobalStruct {
+struct EconomicLifeCycleCostData : BaseGlobalStruct
+{
     // related to LifeCycleCost:Parameters
     bool LCCparamPresent = false; // If a LifeCycleCost:Parameters object is present
     std::string LCCname;          // Name
@@ -369,7 +377,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct {
 
     // present value factors
     Array1D<Real64> SPV;
-    std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>>  energySPV; // yearly equivalent to FEMP UPV* values
+    std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> energySPV; // yearly equivalent to FEMP UPV* values
 
     // arrays related to computing after tax cashflow and present value
     Array1D<Real64> DepreciatedCapital;

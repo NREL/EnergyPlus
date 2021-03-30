@@ -85,7 +85,7 @@ TEST_F(AutoSizingFixture, HeatingWaterflowSizingGauntlet)
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(0.0, sizedValue, 0.01);
     EXPECT_NEAR(5.0, sizer.originalValue, 0.01);
-    sizer.autoSizedValue = 0.0;         // reset for next test
+    sizer.autoSizedValue = 0.0; // reset for next test
 
     state->dataSize->DataFractionUsedForSizing = 1.0;
     state->dataSize->DataConstantUsedForSizing = 0.0;
@@ -93,9 +93,9 @@ TEST_F(AutoSizingFixture, HeatingWaterflowSizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
-    EXPECT_NEAR(0.0, sizedValue, 0.01); // auto calculates to 0
+    EXPECT_NEAR(0.0, sizedValue, 0.01);          // auto calculates to 0
     EXPECT_NEAR(5.0, sizer.originalValue, 0.01); // developer errror, DataFractionUsedForSizing = 0 and Constant > 0
-    sizer.autoSizedValue = 0.0;         // reset for next test
+    sizer.autoSizedValue = 0.0;                  // reset for next test
 
     state->dataSize->DataFractionUsedForSizing = 1.0;
     state->dataSize->DataConstantUsedForSizing = 1.0;
@@ -111,7 +111,7 @@ TEST_F(AutoSizingFixture, HeatingWaterflowSizingGauntlet)
     state->dataSize->DataFractionUsedForSizing = 1.0;
     state->dataSize->DataConstantUsedForSizing = 2.0;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);
-    sizedValue = sizer.size(*this->state, inputValue, errorsFound);  // autosized input
+    sizedValue = sizer.size(*this->state, inputValue, errorsFound); // autosized input
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(2.0, sizedValue, 0.01); // autosizes to 1.0
@@ -185,7 +185,8 @@ TEST_F(AutoSizingFixture, HeatingWaterflowSizingGauntlet)
     EXPECT_NEAR(0.005, state->dataSize->TermUnitSizing(1).MaxHWVolFlow, 0.0001);
     EXPECT_NEAR(1.2, state->dataEnvrn->StdRhoAir, 0.01);
 
-    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Maximum Water Flow Rate [m3/s], 5.00000E-003\n");
+    eiooutput =
+        std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Maximum Water Flow Rate [m3/s], 5.00000E-003\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -287,7 +288,7 @@ TEST_F(AutoSizingFixture, HeatingWaterflowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.000133, sizedValue, 0.000001); // uses a mass flow rate for sizing
-    sizer.autoSizedValue = 0.0;         // reset for next test
+    sizer.autoSizedValue = 0.0;                  // reset for next test
 
     // Test 10 - Zone Equipment, Other Equipment
     state->dataSize->ZoneEqSizing(1).AirVolFlow = 0.0;
@@ -303,7 +304,7 @@ TEST_F(AutoSizingFixture, HeatingWaterflowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.000066, sizedValue, 0.000001); // uses a mass flow rate for sizing
-    sizer.autoSizedValue = 0.0;         // reset for next test
+    sizer.autoSizedValue = 0.0;                  // reset for next test
     state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow = 0.0;
     state->dataSize->ZoneEqSizing(1).HeatingAirFlow = false;
 
@@ -362,7 +363,8 @@ TEST_F(AutoSizingFixture, HeatingWaterflowSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
-    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Maximum Water Flow Rate [m3/s], 1.21516E-004\n");
+    eiooutput =
+        std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Maximum Water Flow Rate [m3/s], 1.21516E-004\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -391,8 +393,9 @@ TEST_F(AutoSizingFixture, HeatingWaterflowSizingGauntlet)
     EXPECT_FALSE(errorsFound);
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
-    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Maximum Water Flow Rate [m3/s], 1.21516E-004\n"
-                            " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Maximum Water Flow Rate [m3/s], 2.00000E-004\n");
+    eiooutput =
+        std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Maximum Water Flow Rate [m3/s], 1.21516E-004\n"
+                    " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Maximum Water Flow Rate [m3/s], 2.00000E-004\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }
 

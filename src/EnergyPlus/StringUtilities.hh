@@ -59,8 +59,7 @@ inline std::stringstream stringReader(std::string str)
     return result;
 }
 
-
-template<typename Param> bool readListItem(std::istream &stream, Param &&param)
+template <typename Param> bool readListItem(std::istream &stream, Param &&param)
 {
     if (stream.good()) {
         stream >> param;

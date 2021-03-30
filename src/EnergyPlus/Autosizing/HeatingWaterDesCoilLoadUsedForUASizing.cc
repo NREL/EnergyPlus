@@ -188,17 +188,17 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(EnergyPlusData &state, Real64
     this->selectSizerOutput(state, errorsFound);
     if (this->isCoilReportObject && this->curSysNum <= this->numPrimaryAirSys) {
         state.dataRptCoilSelection->coilSelectionReportObj->setCoilHeatingCapacity(state,
-                                                       this->compName,
-                                                       this->compType,
-                                                       this->autoSizedValue,
-                                                       this->wasAutoSized,
-                                                       this->curSysNum,
-                                                       this->curZoneEqNum,
-                                                       this->curOASysNum,
-                                                       FanCoolLoad,
-                                                       TotCapTempModFac,
-                                                       DXFlowPerCapMinRatio,
-                                                       DXFlowPerCapMaxRatio);
+                                                                                   this->compName,
+                                                                                   this->compType,
+                                                                                   this->autoSizedValue,
+                                                                                   this->wasAutoSized,
+                                                                                   this->curSysNum,
+                                                                                   this->curZoneEqNum,
+                                                                                   this->curOASysNum,
+                                                                                   FanCoolLoad,
+                                                                                   TotCapTempModFac,
+                                                                                   DXFlowPerCapMinRatio,
+                                                                                   DXFlowPerCapMaxRatio);
     }
     return this->autoSizedValue;
 }

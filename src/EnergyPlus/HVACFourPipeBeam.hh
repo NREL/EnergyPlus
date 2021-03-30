@@ -82,10 +82,11 @@ namespace FourPipeBeam {
               deltaTempRatedHeating(0.0), vDotNormRatedHW(0.0), mDotNormRatedHW(0.0), modHeatingQdotDeltaTFuncNum(0), modHeatingQdotAirFlowFuncNum(0),
               modHeatingQdotHWFlowFuncNum(0), mDotHW(0.0), hWTempIn(0.0), hWTempOut(0.0), hWTempOutErrorCount(0), hWInNodeNum(0), hWOutNodeNum(0),
               hWLocation(PlantLocation(0, 0, 0, 0)), beamCoolingEnergy(0.0), beamCoolingRate(0.0), beamHeatingEnergy(0.0), beamHeatingRate(0.0),
-              supAirCoolingEnergy(0.0), supAirCoolingRate(0.0), supAirHeatingEnergy(0.0), supAirHeatingRate(0.0), primAirFlow(0.0), OutdoorAirFlowRate(0.0), myEnvrnFlag(true),
-              mySizeFlag(true), plantLoopScanFlag(true), zoneEquipmentListChecked(false), tDBZoneAirTemp(0.0), tDBSystemAir(0.0), mDotSystemAir(0.0),
-              cpZoneAir(0.0), cpSystemAir(0.0), qDotSystemAir(0.0), qDotBeamCoolingMax(0.0), qDotBeamHeatingMax(0.0), qDotTotalDelivered(0.0),
-              qDotBeamCooling(0.0), qDotBeamHeating(0.0), qDotZoneReq(0.0), qDotBeamReq(0.0), qDotZoneToHeatSetPt(0.0), qDotZoneToCoolSetPt(0.0)
+              supAirCoolingEnergy(0.0), supAirCoolingRate(0.0), supAirHeatingEnergy(0.0), supAirHeatingRate(0.0), primAirFlow(0.0),
+              OutdoorAirFlowRate(0.0), myEnvrnFlag(true), mySizeFlag(true), plantLoopScanFlag(true), zoneEquipmentListChecked(false),
+              tDBZoneAirTemp(0.0), tDBSystemAir(0.0), mDotSystemAir(0.0), cpZoneAir(0.0), cpSystemAir(0.0), qDotSystemAir(0.0),
+              qDotBeamCoolingMax(0.0), qDotBeamHeatingMax(0.0), qDotTotalDelivered(0.0), qDotBeamCooling(0.0), qDotBeamHeating(0.0), qDotZoneReq(0.0),
+              qDotBeamReq(0.0), qDotZoneToHeatSetPt(0.0), qDotZoneToCoolSetPt(0.0)
         {
         }
 
@@ -113,7 +114,8 @@ namespace FourPipeBeam {
 
     private: // Methods
         void
-        init(EnergyPlusData &state, bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step         MAYBE THIS SHOULD HAVE A DEFAULT ARG OF = false
+        init(EnergyPlusData &state,
+             bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step         MAYBE THIS SHOULD HAVE A DEFAULT ARG OF = false
         );
 
         void set_size(EnergyPlusData &state);
@@ -226,7 +228,8 @@ namespace FourPipeBeam {
 
 } // namespace FourPipeBeam
 
-struct FourPipeBeamData : BaseGlobalStruct {
+struct FourPipeBeamData : BaseGlobalStruct
+{
 
     ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
     Array1D<std::shared_ptr<FourPipeBeam::HVACFourPipeBeam>> FourPipeBeams; // dimension to number of machines

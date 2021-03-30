@@ -64,8 +64,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include "Fixtures/SQLiteFixture.hh"
 
-
-
 using namespace EnergyPlus;
 using namespace EnergyPlus::EconomicTariff;
 using namespace EnergyPlus::OutputProcessor;
@@ -307,7 +305,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
     state->dataOutputProcessor->EnergyMeters(1).Name = "WATER:FACILITY";
     state->dataOutputProcessor->EnergyMeters(1).ResourceType = "WATER";
 
-    UpdateUtilityBills(*state);;
+    UpdateUtilityBills(*state);
+    ;
 
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
@@ -347,7 +346,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
     state->dataOutputProcessor->EnergyMeters(1).Name = "NATURALGAS:FACILITY";
     state->dataOutputProcessor->EnergyMeters(1).ResourceType = "NATURALGAS";
 
-    UpdateUtilityBills(*state);;
+    UpdateUtilityBills(*state);
+    ;
 
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
@@ -388,7 +388,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
     state->dataOutputProcessor->EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
     state->dataOutputProcessor->EnergyMeters(1).ResourceType = "ELECTRICITY";
 
-    UpdateUtilityBills(*state);;
+    UpdateUtilityBills(*state);
+    ;
 
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
@@ -584,8 +585,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
-    state->dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
+    state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
     state->dataGlobal->TimeStepZone = 0.25;
     state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
 
@@ -594,9 +595,9 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     EXPECT_EQ(1, state->dataExteriorEnergyUse->NumExteriorLights);
     EXPECT_EQ(1000, state->dataExteriorEnergyUse->ExteriorLights(1).DesignLevel);
 
-
     // This will only do the get input routines
-    EconomicTariff::UpdateUtilityBills(*state);;
+    EconomicTariff::UpdateUtilityBills(*state);
+    ;
 
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
@@ -643,17 +644,18 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
 
     EXPECT_EQ(1000.0, state->dataExteriorEnergyUse->ExteriorLights(1).Power);
-    EXPECT_EQ(state->dataExteriorEnergyUse->ExteriorLights(1).Power * state->dataGlobal->TimeStepZoneSec, state->dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
+    EXPECT_EQ(state->dataExteriorEnergyUse->ExteriorLights(1).Power * state->dataGlobal->TimeStepZoneSec,
+              state->dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
 
     int curPeriod = 1;
     EXPECT_EQ(0, state->dataEconTariff->tariff(1).gatherEnergy(state->dataEnvrn->Month, curPeriod));
 
     // This Should now call GatherForEconomics
     state->dataGlobal->DoOutputReporting = true;
-    EconomicTariff::UpdateUtilityBills(*state);;
+    EconomicTariff::UpdateUtilityBills(*state);
+    ;
     EXPECT_EQ(1, state->dataEconTariff->tariff(1).seasonForMonth(5));
     EXPECT_EQ(0, state->dataEconTariff->tariff(1).seasonForMonth(6));
-
 
     state->dataEnvrn->Month = 5;
     state->dataEnvrn->DayOfMonth = 31;
@@ -672,13 +674,14 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
 
     EXPECT_EQ(1000.0, state->dataExteriorEnergyUse->ExteriorLights(1).Power);
-    EXPECT_EQ(state->dataExteriorEnergyUse->ExteriorLights(1).Power * state->dataGlobal->TimeStepZoneSec, state->dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
+    EXPECT_EQ(state->dataExteriorEnergyUse->ExteriorLights(1).Power * state->dataGlobal->TimeStepZoneSec,
+              state->dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
 
     // This Should now call GatherForEconomics
-    EconomicTariff::UpdateUtilityBills(*state);;
+    EconomicTariff::UpdateUtilityBills(*state);
+    ;
     EXPECT_EQ(1, state->dataEconTariff->tariff(1).seasonForMonth(5));
     EXPECT_EQ(3, state->dataEconTariff->tariff(1).seasonForMonth(6));
-
 }
 
 TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test0)
@@ -1145,7 +1148,7 @@ TEST_F(SQLiteFixture, WriteEconomicTariffTable_DualUnits)
     state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
     state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoKWH;
     Real64 enerConv = OutputReportTabular::getSpecificUnitDivider(*state, "m2", "ft2");
-    EXPECT_NEAR(enerConv, 0.092903, 0.001); //0.092893973326981863
+    EXPECT_NEAR(enerConv, 0.092903, 0.001); // 0.092893973326981863
 
     ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
     EconomicTariff::UpdateUtilityBills(*state);
@@ -1178,17 +1181,16 @@ TEST_F(SQLiteFixture, WriteEconomicTariffTable_DualUnits)
     EconomicTariff::WriteTabularTariffReports(*state);
 
     EXPECT_EQ(state->dataEconTariff->tariff(1).totalAnnualCost, 2000.0);
-    
+
     // Now test the dual-unit reporting:
     // First case single unit:
     const std::string reportName = "Economics Results Summary Report";
     const std::string tableName = "Annual Cost";
 
-    std::vector<std::tuple<std::string, std::string, std::string, Real64>> results0({
-        {"Total", "Cost", "~~$~~", 2000.0},
-        {"Total", "Cost per Total Building Area", "~~$~~/m2", 10.0},
-        {"Total", "Cost per Net Conditioned Building Area", "~~$~~/m2", 20.0}
-    });
+    std::vector<std::tuple<std::string, std::string, std::string, Real64>> results0(
+        {{"Total", "Cost", "~~$~~", 2000.0},
+         {"Total", "Cost per Total Building Area", "~~$~~/m2", 10.0},
+         {"Total", "Cost per Net Conditioned Building Area", "~~$~~/m2", 20.0}});
 
     for (auto &v : results0) {
 
@@ -1228,11 +1230,10 @@ TEST_F(SQLiteFixture, WriteEconomicTariffTable_DualUnits)
 
     EXPECT_EQ(state->dataEconTariff->tariff(1).totalAnnualCost, 2000.0);
 
-    std::vector<std::tuple<std::string, std::string, std::string, Real64>> results1({
-        {"Total", "Cost", "~~$~~", 2000.0},
-        {"Total", "Cost per Total Building Area", "~~$~~/ft2", 10.0 * enerConv},
-        {"Total", "Cost per Net Conditioned Building Area", "~~$~~/ft2", 20.0 * enerConv}
-        });
+    std::vector<std::tuple<std::string, std::string, std::string, Real64>> results1(
+        {{"Total", "Cost", "~~$~~", 2000.0},
+         {"Total", "Cost per Total Building Area", "~~$~~/ft2", 10.0 * enerConv},
+         {"Total", "Cost per Net Conditioned Building Area", "~~$~~/ft2", 20.0 * enerConv}});
 
     for (auto &v : results1) {
 

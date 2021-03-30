@@ -69,11 +69,11 @@ namespace RuntimeLanguageProcessor {
     using DataRuntimeLanguage::ErlValueType;
 
     int constexpr MaxErrors(20);
-    int constexpr TokenNumber(1);     // matches the ValueNumber
-    int constexpr TokenVariable(4);   // matches the ValueVariable
-    int constexpr TokenExpression(5); // matches the ValueExpression
-    int constexpr TokenOperator(7);   // includes basic operators and built-in functions.
-    int constexpr TokenParenthesis(9); // parenthesis token
+    int constexpr TokenNumber(1);       // matches the ValueNumber
+    int constexpr TokenVariable(4);     // matches the ValueVariable
+    int constexpr TokenExpression(5);   // matches the ValueExpression
+    int constexpr TokenOperator(7);     // includes basic operators and built-in functions.
+    int constexpr TokenParenthesis(9);  // parenthesis token
     int constexpr ParenthesisLeft(10);  // indicates left side parenthesis found in parsing
     int constexpr ParenthesisRight(11); // indicates right side parenthesis found in parsing
 
@@ -123,19 +123,18 @@ namespace RuntimeLanguageProcessor {
                        Optional_int_const Argument2 = _);
 
     void AddError(EnergyPlusData &state,
-                  int StackNum,      // index pointer to location in ErlStack structure
-                  int LineNum,       // Erl program line number
+                  int StackNum,            // index pointer to location in ErlStack structure
+                  int LineNum,             // Erl program line number
                   std::string const &Error // error message to be added to ErlStack
     );
 
     ErlValueType EvaluateStack(EnergyPlusData &state, int StackNum);
 
-    void
-    WriteTrace(EnergyPlusData &state, int StackNum, int InstructionNum, ErlValueType const &ReturnValue, bool seriousErrorFound);
+    void WriteTrace(EnergyPlusData &state, int StackNum, int InstructionNum, ErlValueType const &ReturnValue, bool seriousErrorFound);
 
     void ParseExpression(EnergyPlusData &state,
                          std::string const &InString, // String of expression text written in the Runtime Language
-                         int StackNum,          // Parent StackNum??
+                         int StackNum,                // Parent StackNum??
                          int &ExpressionNum,          // index of expression in structure
                          std::string const &Line      // Actual line from string
     );
@@ -147,10 +146,14 @@ namespace RuntimeLanguageProcessor {
     ErlValueType EvaluateExpression(EnergyPlusData &state, int ExpressionNum, bool &seriousErrorFound);
 
     void TodayTomorrowWeather(EnergyPlusData &state,
-                              int FunctionCode, Real64 Operand1, Real64 Operand2, Array2D<Real64> &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+                              int FunctionCode,
+                              Real64 Operand1,
+                              Real64 Operand2,
+                              Array2D<Real64> &TodayTomorrowWeatherSource,
+                              ErlValueType &ReturnVal);
 
-    void TodayTomorrowWeather(EnergyPlusData &state,
-                              int FunctionCode, Real64 Operand1, Real64 Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+    void TodayTomorrowWeather(
+        EnergyPlusData &state, int FunctionCode, Real64 Operand1, Real64 Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
 
     int TodayTomorrowWeather(EnergyPlusData &state, int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value);
 
@@ -180,16 +183,17 @@ namespace RuntimeLanguageProcessor {
     );
 
     void ExternalInterfaceInitializeErlVariable(EnergyPlusData &state,
-                                                int varNum,                 // The variable index to be written during run time
+                                                int varNum,                       // The variable index to be written during run time
                                                 ErlValueType const &initialValue, // The initial value
-                                                bool setToNull              // Flag, if true, value will be initialized to Null
+                                                bool setToNull                    // Flag, if true, value will be initialized to Null
     );
 
     bool isExternalInterfaceErlVariable(EnergyPlusData &state, int varNum); // The variable index to be written during run time
 
 } // namespace RuntimeLanguageProcessor
 
-struct RuntimeLanguageProcessorData : BaseGlobalStruct {
+struct RuntimeLanguageProcessorData : BaseGlobalStruct
+{
     bool AlreadyDidOnce = false;
     bool GetInput = true;
     bool InitializeOnce = true;
@@ -229,7 +233,8 @@ struct RuntimeLanguageProcessorData : BaseGlobalStruct {
     Array1D<RuntimeLanguageProcessor::TokenType> Token;
     Array1D<RuntimeLanguageProcessor::TokenType> PEToken;
 
-    void clear_state() override {
+    void clear_state() override
+    {
         this->AlreadyDidOnce = false;
         this->GetInput = true;
         this->InitializeOnce = true;

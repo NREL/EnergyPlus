@@ -315,7 +315,8 @@ struct ZoneEquipmentManagerData;
 struct ZonePlenumData;
 struct ZoneTempPredictorCorrectorData;
 
-struct EnergyPlusData : BaseGlobalStruct {
+struct EnergyPlusData : BaseGlobalStruct
+{
 
     IOFiles files;
 
@@ -582,8 +583,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     EnergyPlusData(EnergyPlusData &&) = delete;
 
     void clear_state() override;
-
 };
 
-}
+} // namespace EnergyPlus
 #endif

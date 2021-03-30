@@ -206,9 +206,9 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ResultsFramework.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
 
@@ -224,11 +224,12 @@ int EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath
     return RunEnergyPlus(state, filepath);
 }
 
-void commonInitialize(EnergyPlus::EnergyPlusData &state) {
+void commonInitialize(EnergyPlus::EnergyPlusData &state)
+{
     using namespace EnergyPlus;
     // Disable C++ i/o synching with C methods for speed
-    //std::ios_base::sync_with_stdio(false);
-    //std::cin.tie(nullptr); // Untie cin and cout: Could cause odd behavior for interactive prompts
+    // std::ios_base::sync_with_stdio(false);
+    // std::cin.tie(nullptr); // Untie cin and cout: Could cause odd behavior for interactive prompts
 
 // Enable floating point exceptions
 #ifndef NDEBUG
@@ -240,11 +241,12 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
 #ifdef MSVC_DEBUG
     // the following line enables NaN detection in Visual Studio debug builds. See
     // https://github.com/NREL/EnergyPlus/wiki/Debugging-Tips
-    int fp_control_state = _controlfp(_EM_INEXACT | _EM_UNDERFLOW, _MCW_EM); // These exceptions are disabled (_EM_INEXACT and _EM_UNDERFLOW will not throw)
+    int fp_control_state =
+        _controlfp(_EM_INEXACT | _EM_UNDERFLOW, _MCW_EM); // These exceptions are disabled (_EM_INEXACT and _EM_UNDERFLOW will not throw)
 #endif
 
 #ifdef _MSC_VER
-    #ifndef _DEBUG
+#ifndef _DEBUG
     // If _MSC_VER and not debug then prevent dialogs on error
     SetErrorMode(SEM_NOGPFAULTERRORBOX);
     _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
@@ -265,10 +267,10 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
     state.dataStrGlobals->VerStringVar = DataStringGlobals::VerString + "," + state.dataStrGlobals->CurrentDateTime;
 
     DataSystemVariables::processEnvironmentVariables(state);
-
 }
 
-int commonRun(EnergyPlus::EnergyPlusData &state) {
+int commonRun(EnergyPlus::EnergyPlusData &state)
+{
     using namespace EnergyPlus;
 
     int errStatus = initErrorFile(state);
@@ -297,7 +299,8 @@ int commonRun(EnergyPlus::EnergyPlusData &state) {
     return 0;
 }
 
-int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath) {
+int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath)
+{
     using namespace EnergyPlus;
     commonInitialize(state);
 
@@ -326,12 +329,14 @@ int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & 
     return commonRun(state);
 }
 
-int initializeAsLibrary(EnergyPlus::EnergyPlusData &state) {
+int initializeAsLibrary(EnergyPlus::EnergyPlusData &state)
+{
     commonInitialize(state);
     return commonRun(state);
 }
 
-int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
+int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state)
+{
     using namespace EnergyPlus;
 
     try {
@@ -352,14 +357,14 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         }
 
         if (state.dataGlobal->runReadVars) {
-//            state.files.outputControl.csv = true;
-             if (state.files.outputControl.csv) {
-                 ShowWarningMessage(state, "Native CSV output requested in input file, but running ReadVarsESO due to command line argument.");
-             }
-             int status = CommandLineInterface::runReadVarsESO(state);
-             if (status) {
-                 return status;
-             }
+            //            state.files.outputControl.csv = true;
+            if (state.files.outputControl.csv) {
+                ShowWarningMessage(state, "Native CSV output requested in input file, but running ReadVarsESO due to command line argument.");
+            }
+            int status = CommandLineInterface::runReadVarsESO(state);
+            if (status) {
+                return status;
+            }
         }
     } catch (const FatalError &e) {
         return AbortEnergyPlus(state);
@@ -371,7 +376,7 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
     return EndEnergyPlus(state);
 }
 
-int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath)
+int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath)
 {
 
     // PROGRAM INFORMATION:
@@ -424,7 +429,7 @@ int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const ch
     if (!std::cerr.good()) std::cerr.clear();
     if (!std::cout.good()) std::cout.clear();
 
-    int return_code = EnergyPlus::CommandLineInterface::ProcessArgs(state, argc, argv );
+    int return_code = EnergyPlus::CommandLineInterface::ProcessArgs(state, argc, argv);
     if (return_code == static_cast<int>(EnergyPlus::CommandLineInterface::ReturnCodes::Failure)) {
         return return_code;
     } else if (return_code == static_cast<int>(EnergyPlus::CommandLineInterface::ReturnCodes::SuccessButHelper)) {

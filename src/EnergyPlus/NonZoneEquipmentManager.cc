@@ -47,11 +47,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NonZoneEquipmentManager.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterUse.hh>
-#include <EnergyPlus/DataGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -81,7 +81,8 @@ namespace NonZoneEquipmentManager {
 
     // Functions
 
-    void ManageNonZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration,
+    void ManageNonZoneEquipment(EnergyPlusData &state,
+                                bool const FirstHVACIteration,
                                 bool &SimNonZoneEquipment // Simulation convergence flag
     )
     {
@@ -109,11 +110,12 @@ namespace NonZoneEquipmentManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterHeaterNum; // Water heater object number
-        auto & NumOfWaterHeater = state.dataGlobal->NumOfWaterHeater;
-        auto & CountNonZoneEquip = state.dataGlobal->CountNonZoneEquip;
+        auto &NumOfWaterHeater = state.dataGlobal->NumOfWaterHeater;
+        auto &CountNonZoneEquip = state.dataGlobal->CountNonZoneEquip;
 
         if (CountNonZoneEquip) {
-            NumOfWaterHeater = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WaterHeater:Mixed") + state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WaterHeater:Stratified");
+            NumOfWaterHeater = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WaterHeater:Mixed") +
+                               state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WaterHeater:Stratified");
             CountNonZoneEquip = false;
         }
 

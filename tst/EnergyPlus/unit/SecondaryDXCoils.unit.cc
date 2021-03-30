@@ -189,9 +189,20 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4)
     Real64 SHRTest;
 
     // make the call
-    SHRTest =
-        CalcSecondaryDXCoilsSHR(*state, DXCoilNum, EvapAirMassFlow, TotalHeatRemovalRate, PartLoadRatio, SecCoilRatedSHR, EvapInletDryBulb, EvapInletHumRat,
-                                EvapInletWetBulb, EvapInletEnthalpy, CondInletDryBulb, SecCoilFlowFraction, SecCoilSHRFT, SecCoilSHRFF);
+    SHRTest = CalcSecondaryDXCoilsSHR(*state,
+                                      DXCoilNum,
+                                      EvapAirMassFlow,
+                                      TotalHeatRemovalRate,
+                                      PartLoadRatio,
+                                      SecCoilRatedSHR,
+                                      EvapInletDryBulb,
+                                      EvapInletHumRat,
+                                      EvapInletWetBulb,
+                                      EvapInletEnthalpy,
+                                      CondInletDryBulb,
+                                      SecCoilFlowFraction,
+                                      SecCoilSHRFT,
+                                      SecCoilSHRFF);
 
     EXPECT_DOUBLE_EQ(1.0, SHRTest);
 

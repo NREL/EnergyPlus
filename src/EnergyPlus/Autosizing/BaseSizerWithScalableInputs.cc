@@ -101,22 +101,23 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
         case DataAirSystems::structArrayLegacyFanModels: {
             if (SupFanNum > 0) {
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                                                             this->compName,
-                                                             this->compType,
-                                                             state.dataFans->Fan(SupFanNum).FanName,
-                                                             DataAirSystems::structArrayLegacyFanModels,
-                                                             this->primaryAirSystem(this->curSysNum).SupFanNum);
+                                                                                         this->compName,
+                                                                                         this->compType,
+                                                                                         state.dataFans->Fan(SupFanNum).FanName,
+                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         this->primaryAirSystem(this->curSysNum).SupFanNum);
             }
             break;
         }
         case DataAirSystems::objectVectorOOFanSystemModel: {
             if (this->primaryAirSystem(this->curSysNum).supFanVecIndex >= 0) {
-                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                                                             this->compName,
-                                                             this->compType,
-                                                             state.dataHVACFan->fanObjs[this->primaryAirSystem(this->curSysNum).supFanVecIndex]->name,
-                                                             DataAirSystems::objectVectorOOFanSystemModel,
-                                                             this->primaryAirSystem(this->curSysNum).supFanVecIndex);
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
+                    state,
+                    this->compName,
+                    this->compType,
+                    state.dataHVACFan->fanObjs[this->primaryAirSystem(this->curSysNum).supFanVecIndex]->name,
+                    DataAirSystems::objectVectorOOFanSystemModel,
+                    this->primaryAirSystem(this->curSysNum).supFanVecIndex);
             }
             break;
         }
@@ -135,8 +136,8 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
             this->dataConstantUsedForSizing = this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow;
             if (coolingSAFMethod == DataSizing::FlowPerFloorArea) {
                 state.dataSize->DataScalableSizingON = true;
-                this->dataConstantUsedForSizing =
-                    this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                this->dataConstantUsedForSizing = this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow *
+                                                  state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
             } else if (coolingSAFMethod == DataSizing::FractionOfAutosizedCoolingAirflow) {
                 state.dataSize->DataFracOfAutosizedCoolingAirflow = this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow;
                 state.dataSize->DataScalableSizingON = true;

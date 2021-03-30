@@ -2790,20 +2790,21 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     std::string TypeOfComp = "HeatPump:PlantLoop:EIR:Cooling";
     std::string NameOfComp = thisCoolingPLHP->name;
     int NumVariables = GetNumMeteredVariables(*state, TypeOfComp, NameOfComp);
-    Array1D_int VarIndexes(NumVariables);                     // Variable Numbers
-    Array1D_int VarTypes(NumVariables);                       // Variable Types (1=integer, 2=real, 3=meter)
-    Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables);                     // Variable Index Types (1=Zone,2=HVAC)
-    Array1D<OutputProcessor::Unit> unitsForVar(NumVariables); // units from enum for each variable
+    Array1D_int VarIndexes(NumVariables);                            // Variable Numbers
+    Array1D_int VarTypes(NumVariables);                              // Variable Types (1=integer, 2=real, 3=meter)
+    Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
+    Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
     std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;  // ResourceTypes for each variable
-    Array1D_string EndUses(NumVariables);                     // EndUses for each variable
-    Array1D_string Groups(NumVariables);                      // Groups for each variable
-    Array1D_string Names(NumVariables);                       // Variable Names for each variable
+    Array1D_string EndUses(NumVariables);                            // EndUses for each variable
+    Array1D_string Groups(NumVariables);                             // Groups for each variable
+    Array1D_string Names(NumVariables);                              // Variable Names for each variable
 
     for (int varN = 1; varN <= NumVariables; ++varN) {
         ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
     }
 
-    GetMeteredVariables(*state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
+    GetMeteredVariables(
+        *state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
     EXPECT_EQ(2, NumFound);
     EXPECT_EQ(ResourceTypes.at(1), DataGlobalConstants::ResourceType::EnergyTransfer); // ENERGYTRANSFER
@@ -2890,20 +2891,21 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     std::string TypeOfComp = "HeatPump:PlantLoop:EIR:Heating";
     std::string NameOfComp = thisHeatingPLHP->name;
     int NumVariables = GetNumMeteredVariables(*state, TypeOfComp, NameOfComp);
-    Array1D_int VarIndexes(NumVariables);                     // Variable Numbers
-    Array1D_int VarTypes(NumVariables);                       // Variable Types (1=integer, 2=real, 3=meter)
-    Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables);                     // Variable Index Types (1=Zone,2=HVAC)
-    Array1D<OutputProcessor::Unit> unitsForVar(NumVariables); // units from enum for each variable
+    Array1D_int VarIndexes(NumVariables);                            // Variable Numbers
+    Array1D_int VarTypes(NumVariables);                              // Variable Types (1=integer, 2=real, 3=meter)
+    Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
+    Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
     std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;  // ResourceTypes for each variable
-    Array1D_string EndUses(NumVariables);                     // EndUses for each variable
-    Array1D_string Groups(NumVariables);                      // Groups for each variable
-    Array1D_string Names(NumVariables);                       // Variable Names for each variable
+    Array1D_string EndUses(NumVariables);                            // EndUses for each variable
+    Array1D_string Groups(NumVariables);                             // Groups for each variable
+    Array1D_string Names(NumVariables);                              // Variable Names for each variable
 
     for (int varN = 1; varN <= NumVariables; ++varN) {
         ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
     }
 
-    GetMeteredVariables(*state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
+    GetMeteredVariables(
+        *state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
     EXPECT_EQ(2, NumFound);
     EXPECT_EQ(ResourceTypes.at(1), DataGlobalConstants::ResourceType::EnergyTransfer); // ENERGYTRANSFER
@@ -2916,4 +2918,3 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
 
 #pragma clang diagnostic pop
 #pragma clang diagnostic pop
-

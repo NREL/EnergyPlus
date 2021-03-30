@@ -64,10 +64,10 @@ class InputProcessorFixture : public EnergyPlusFixture
 protected:
     using json = nlohmann::json;
 
-//    static void SetUpTestCase()
-//    {
-//        EnergyPlusFixture::SetUpTestCase(); // Sets up the base fixture
-//    }
+    //    static void SetUpTestCase()
+    //    {
+    //        EnergyPlusFixture::SetUpTestCase(); // Sets up the base fixture
+    //    }
     static void TearDownTestCase()
     {
     }
@@ -82,10 +82,10 @@ protected:
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
     }
 
-//    bool process_idd(std::string const &idd, bool &errors_found)
-//    {
-//        return EnergyPlusFixture::process_idd(idd, errors_found);
-//    }
+    //    bool process_idd(std::string const &idd, bool &errors_found)
+    //    {
+    //        return EnergyPlusFixture::process_idd(idd, errors_found);
+    //    }
 
     bool processErrors(EnergyPlusData &state)
     {
@@ -104,7 +104,8 @@ protected:
 
     std::string encodeIDF()
     {
-        return state->dataInputProcessing->inputProcessor->idf_parser->encode(state->dataInputProcessing->inputProcessor->epJSON, state->dataInputProcessing->inputProcessor->schema);
+        return state->dataInputProcessing->inputProcessor->idf_parser->encode(state->dataInputProcessing->inputProcessor->epJSON,
+                                                                              state->dataInputProcessing->inputProcessor->schema);
     }
 
     json &getEpJSON()
