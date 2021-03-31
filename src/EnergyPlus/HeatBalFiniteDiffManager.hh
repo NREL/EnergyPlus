@@ -395,18 +395,18 @@ template <typename T, typename I> void tdma(const T &a, T &b, const T &c, T &x, 
     assert(N > 1);
     // Forward elimination
     for (I i = 1; i < N; ++i) {
-        assert(b[i - 1] != 0.0);
-        Real64 w = a[i] / b[i - 1];
-        b[i] -= w * c[i - 1];
-        x[i] -= w * x[i - 1];
+        assert(b[i - (I)(1)] != 0.0);
+        Real64 w = a[i] / b[i - (I)(1)];
+        b[i] -= w * c[i - (I)(1)];
+        x[i] -= w * x[i - (I)(1)];
     }
     // Back substitution
-    x[N - 1] /= b[N - 1];
-    size_t i = N - 1;
+    x[N - (I)(1)] /= b[N - (I)(1)];
+    I i = N - 1;
     do {
         --i;
         // for (size_t i = N - 2; i >= 0; --i) {
-        x[i] = (x[i] - c[i] * x[i + 1]) / b[i];
+        x[i] = (x[i] - c[i] * x[i + (I)(1)]) / b[i];
     } while (i > 0);
 }
 
