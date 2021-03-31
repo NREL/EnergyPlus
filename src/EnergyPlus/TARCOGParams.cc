@@ -65,12 +65,6 @@ namespace EnergyPlus::TARCOGParams {
 
     int const YES_SupportPillar(1);
 
-    // definition of parameters for deflection sum.  These parameters define maximum number of loop to which sum
-    // will perform. By equation, these numbers will go to infinite and some test showed that going to nmax and mmax
-    // values would produce enough precision
-    int const mmax(5); // top m value for which "deflection sum" will be calculated
-    int const nmax(5); // top n value for which "deflection sum" will be calculated
-
     //  CalcForcedVentilation flag:
     //  0 = Skip forced ventilation calc
     //  1 = Allow forced ventilation calc

@@ -98,8 +98,10 @@ namespace EnergyPlus::TARCOGParams {
     // definition of parameters for deflection sum.  These parameters define maximum number of loop to which sum
     // will perform. By equation, these numbers will go to infinite and some test showed that going to nmax and mmax
     // values would produce enough precision
-    extern int const mmax; // top m value for which "deflection sum" will be calculated
-    extern int const nmax; // top n value for which "deflection sum" will be calculated
+    enum class DeflectionParameters : int {
+        mmax = 5, // top m value for which "deflection sum" will be calculated
+        nmax = 5 // top n value for which "deflection sum" will be calculated
+    };
 
     //  CalcForcedVentilation flag:
     //  0 = Skip forced ventilation calc
