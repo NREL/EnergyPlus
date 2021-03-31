@@ -113,11 +113,15 @@ struct MoistureBalanceEMPDManagerData : BaseGlobalStruct
     // Array of structs that hold the empd report vars data, one for each surface.
     Array1D<MoistureBalanceEMPDManager::EMPDReportVarsData> EMPDReportVars;
     bool InitEnvrnFlag = true;
+    int ErrCount = 0;
+    bool OneTimeFlag = true;
 
     void clear_state() override
     {
         this->EMPDReportVars.deallocate();
         this->InitEnvrnFlag = true;
+        this->ErrCount = 0;
+        this->OneTimeFlag = true;
     }
 };
 

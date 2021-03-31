@@ -128,14 +128,14 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                                 // ATMixer has priority over Equipment OA vol flow
                                 if (this->zoneEqSizing(this->curZoneEqNum).ATMixerVolFlow > 0.0) { // NEW ATMixer coil sizing method
                                     Real64 DesMassFlow = DesVolFlow * state.dataEnvrn->StdRhoAir;
-                                    CoilInTemp =
-                                        setCoolCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(state, DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
-                                                                            zoneEqSizing(this->curZoneEqNum),
-                                                                            finalZoneSizing(this->curZoneEqNum));
-                                    CoilInHumRat =
-                                        setCoolCoilInletHumRatForZoneEqSizing(setOAFracForZoneEqSizing(state, DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
-                                                                              zoneEqSizing(this->curZoneEqNum),
-                                                                              finalZoneSizing(this->curZoneEqNum));
+                                    CoilInTemp = setCoolCoilInletTempForZoneEqSizing(
+                                        setOAFracForZoneEqSizing(state, DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
+                                        zoneEqSizing(this->curZoneEqNum),
+                                        finalZoneSizing(this->curZoneEqNum));
+                                    CoilInHumRat = setCoolCoilInletHumRatForZoneEqSizing(
+                                        setOAFracForZoneEqSizing(state, DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
+                                        zoneEqSizing(this->curZoneEqNum),
+                                        finalZoneSizing(this->curZoneEqNum));
                                 } else if (this->zoneEqSizing(this->curZoneEqNum).OAVolFlow > 0.0) {
                                     CoilInTemp = this->finalZoneSizing(this->curZoneEqNum).DesCoolCoilInTemp;
                                     CoilInHumRat = this->finalZoneSizing(this->curZoneEqNum).DesCoolCoilInHumRat;
@@ -147,14 +147,14 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             } else if (this->zoneEqFanCoil) {
                                 // use fan coil flow (i.e., set by parent) or flow used during sizing?
                                 Real64 DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesCoolMassFlow;
-                                CoilInTemp =
-                                    setCoolCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(state, DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
-                                                                        zoneEqSizing(this->curZoneEqNum),
-                                                                        finalZoneSizing(this->curZoneEqNum));
-                                CoilInHumRat =
-                                    setCoolCoilInletHumRatForZoneEqSizing(setOAFracForZoneEqSizing(state, DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
-                                                                          zoneEqSizing(this->curZoneEqNum),
-                                                                          finalZoneSizing(this->curZoneEqNum));
+                                CoilInTemp = setCoolCoilInletTempForZoneEqSizing(
+                                    setOAFracForZoneEqSizing(state, DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
+                                    zoneEqSizing(this->curZoneEqNum),
+                                    finalZoneSizing(this->curZoneEqNum));
+                                CoilInHumRat = setCoolCoilInletHumRatForZoneEqSizing(
+                                    setOAFracForZoneEqSizing(state, DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
+                                    zoneEqSizing(this->curZoneEqNum),
+                                    finalZoneSizing(this->curZoneEqNum));
                             } else {
                                 CoilInTemp = this->finalZoneSizing(this->curZoneEqNum).DesCoolCoilInTemp;
                                 CoilInHumRat = this->finalZoneSizing(this->curZoneEqNum).DesCoolCoilInHumRat;
@@ -167,8 +167,8 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             if (DDNum > 0 && TimeStepNumAtMax > 0) {
                                 OutTemp = state.dataSize->DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
                             }
-                            Real64 rhoair =
-                                Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, CoilInTemp, CoilInHumRat, this->callingRoutine);
+                            Real64 rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(
+                                state, state.dataEnvrn->StdBaroPress, CoilInTemp, CoilInHumRat, this->callingRoutine);
                             Real64 CoilInEnth = Psychrometrics::PsyHFnTdbW(CoilInTemp, CoilInHumRat);
                             Real64 CoilOutEnth = Psychrometrics::PsyHFnTdbW(CoilOutTemp, CoilOutHumRat);
                             Real64 PeakCoilLoad = max(0.0, (rhoair * DesVolFlow * (CoilInEnth - CoilOutEnth)));
@@ -219,7 +219,8 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 this->autoSizedValue = this->autoSizedValue * this->dataFracOfAutosizedCoolingCapacity;
                 this->dataDesAccountForFanHeat = true; // reset for next water coil
                 if (state.dataGlobal->DisplayExtraWarnings && this->autoSizedValue <= 0.0) {
-                    ShowWarningMessage(state, this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName);
+                    ShowWarningMessage(state,
+                                       this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName);
                     ShowContinueError(state, format("...Rated Total Cooling Capacity = {:.2T} [W]", this->autoSizedValue));
                     if (this->zoneEqSizing(this->curZoneEqNum).CoolingCapacity) {
                         ShowContinueError(state,
@@ -268,13 +269,13 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     TotCapTempModFac = state.dataSize->DataCoilSizingCapFT;
                     if (state.dataRptCoilSelection->coilSelectionReportObj->isCompTypeCoil(this->compType)) {
                         state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirHumRat(state, this->compName, this->compType, CoilInHumRat);
-                        state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirTemp(state, this->compName, this->compType, CoilInTemp, this->curSysNum, this->curZoneEqNum);
+                        state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirTemp(
+                            state, this->compName, this->compType, CoilInTemp, this->curSysNum, this->curZoneEqNum);
                         state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirTemp(state, this->compName, this->compType, CoilOutTemp);
                         state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirHumRat(state, this->compName, this->compType, CoilOutHumRat);
                     }
                 } else if (this->curOASysNum > 0 && this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                    DesVolFlow =
-                        this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow / state.dataEnvrn->StdRhoAir;
+                    DesVolFlow = this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow / state.dataEnvrn->StdRhoAir;
                     if (this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].DXCoilFlag) {
                         this->autoSizedValue = DesVolFlow / 0.00005;
                     } else {
@@ -284,7 +285,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanTypeNum ==
                                 SimAirServingZones::Fan_System_Object) {
                             int FanIndex = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanIndex;
-                            Real64 DeltaT = HVACFan::fanObjs[FanIndex]->getFanDesignTemperatureRise(state);
+                            Real64 DeltaT = state.dataHVACFan->fanObjs[FanIndex]->getFanDesignTemperatureRise(state);
                             CoilInTemp += DeltaT;
                         }
                         CoilInHumRat = this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOAHumRat;
@@ -359,7 +360,8 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY")) {
                             rhoair = state.dataEnvrn->StdRhoAir;
                         } else {
-                            rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, CoilInTemp, CoilInHumRat, this->callingRoutine);
+                            rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(
+                                state, state.dataEnvrn->StdBaroPress, CoilInTemp, CoilInHumRat, this->callingRoutine);
                         }
                         CoilOutTemp = min(CoilInTemp, CoilOutTemp);
                         CoilOutHumRat = min(CoilInHumRat, CoilOutHumRat);
@@ -410,8 +412,8 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
                                 CoilInTemp += FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
                                 // include change in inlet condition in TotCapTempModFac
-                                CoilInWetBulb =
-                                    Psychrometrics::PsyTwbFnTdbWPb(state, CoilInTemp, CoilInHumRat, state.dataEnvrn->StdBaroPress, this->callingRoutine);
+                                CoilInWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
+                                    state, CoilInTemp, CoilInHumRat, state.dataEnvrn->StdBaroPress, this->callingRoutine);
                             } else if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
                                 CoilOutTemp -= FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
                             }
@@ -440,7 +442,8 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 }                                                                      // IF(OASysFlag) THEN or ELSE IF(AirLoopSysFlag) THEN
                 this->dataDesAccountForFanHeat = true;                                 // reset for next water coil
                 if (state.dataGlobal->DisplayExtraWarnings && this->autoSizedValue <= 0.0) {
-                    ShowWarningMessage(state, this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName);
+                    ShowWarningMessage(state,
+                                       this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName);
                     ShowContinueError(state, format("...Rated Total Cooling Capacity = {:.2T} [W]", this->autoSizedValue));
                     if (this->oaSysFlag || this->airLoopSysFlag ||
                         this->finalSysSizing(this->curSysNum).CoolingCapMethod == DataSizing::CapacityPerFloorArea ||
@@ -487,8 +490,8 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 if (RatedVolFlowPerRatedTotCap < state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT)) {
                     if (!this->dataEMSOverride && state.dataGlobal->DisplayExtraWarnings && this->printWarningFlag) {
                         ShowWarningError(state, this->callingRoutine + ' ' + this->compType + ' ' + this->compName);
-                        ShowContinueError(state, "..." + this->sizingString +
-                                          " will be limited by the minimum rated volume flow per rated total capacity ratio.");
+                        ShowContinueError(
+                            state, "..." + this->sizingString + " will be limited by the minimum rated volume flow per rated total capacity ratio.");
                         ShowContinueError(state, format("...DX coil volume flow rate (m3/s ) = {:.6T}", DesVolFlow));
                         ShowContinueError(state, format("...Requested capacity (W ) = {:.3T}", this->autoSizedValue));
                         ShowContinueError(state, format("...Requested flow/capacity ratio (m3/s/W ) = {:.3T}", RatedVolFlowPerRatedTotCap));
@@ -507,8 +510,8 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 } else if (RatedVolFlowPerRatedTotCap > state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT)) {
                     if (!this->dataEMSOverride && state.dataGlobal->DisplayExtraWarnings && this->printWarningFlag) {
                         ShowWarningError(state, this->callingRoutine + ' ' + this->compType + ' ' + this->compName);
-                        ShowContinueError(state, "..." + this->sizingString +
-                                          " will be limited by the maximum rated volume flow per rated total capacity ratio.");
+                        ShowContinueError(
+                            state, "..." + this->sizingString + " will be limited by the maximum rated volume flow per rated total capacity ratio.");
                         ShowContinueError(state, format("...DX coil volume flow rate ( m3/s ) = {:.6T}", DesVolFlow));
                         ShowContinueError(state, format("...Requested capacity ( W ) = {:.3T}", this->autoSizedValue));
                         ShowContinueError(state, format("...Requested flow/capacity ratio ( m3/s/W ) = {:.3T}", RatedVolFlowPerRatedTotCap));
@@ -547,7 +550,8 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
 
     if (this->isCoilReportObject && this->curSysNum <= state.dataHVACGlobal->NumPrimaryAirSys) {
         if (CoilInTemp > -999.0) { // set inlet air properties used during capacity sizing if available, allow for negative winter temps
-            state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirTemp(state, this->compName, this->compType, CoilInTemp, this->curSysNum, this->curZoneEqNum);
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirTemp(
+                state, this->compName, this->compType, CoilInTemp, this->curSysNum, this->curZoneEqNum);
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirHumRat(state, this->compName, this->compType, CoilInHumRat);
         }
         if (CoilOutTemp > -999.0) { // set outlet air properties used during capacity sizing if available
@@ -555,17 +559,17 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirHumRat(state, this->compName, this->compType, CoilOutHumRat);
         }
         state.dataRptCoilSelection->coilSelectionReportObj->setCoilCoolingCapacity(state,
-                                                       this->compName,
-                                                       this->compType,
-                                                       this->autoSizedValue,
-                                                       this->wasAutoSized,
-                                                       this->curSysNum,
-                                                       this->curZoneEqNum,
-                                                       this->curOASysNum,
-                                                       FanCoolLoad,
-                                                       TotCapTempModFac,
-                                                       DXFlowPerCapMinRatio,
-                                                       DXFlowPerCapMaxRatio);
+                                                                                   this->compName,
+                                                                                   this->compType,
+                                                                                   this->autoSizedValue,
+                                                                                   this->wasAutoSized,
+                                                                                   this->curSysNum,
+                                                                                   this->curZoneEqNum,
+                                                                                   this->curOASysNum,
+                                                                                   FanCoolLoad,
+                                                                                   TotCapTempModFac,
+                                                                                   DXFlowPerCapMinRatio,
+                                                                                   DXFlowPerCapMaxRatio);
     }
     return this->autoSizedValue;
 }

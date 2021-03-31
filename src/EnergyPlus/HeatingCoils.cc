@@ -157,7 +157,6 @@ namespace HeatingCoils {
         Real64 PartLoadFrac;  // part-load fraction of heating coil
         Real64 QCoilRequired; // local variable for optional argument
 
-
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (state.dataHeatingCoils->GetCoilsInputFlag) { // First time subroutine has been entered
             GetHeatingCoilInput(state);
@@ -230,7 +229,8 @@ namespace HeatingCoils {
         if (state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num == Coil_HeatingElectric) {
             CalcElectricHeatingCoil(state, CoilNum, QCoilRequired, QCoilActual2, OpMode, PartLoadFrac);
         } else if (state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num == Coil_HeatingElectric_MultiStage) {
-            CalcMultiStageElectricHeatingCoil(state, CoilNum,
+            CalcMultiStageElectricHeatingCoil(state,
+                                              CoilNum,
                                               SpeedRatio,
                                               PartLoadRatio,
                                               StageNum,
@@ -282,8 +282,8 @@ namespace HeatingCoils {
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
         using CurveManager::GetCurveIndex;
-        using NodeInputManager::GetOnlySingleNode;
         using GlobalNames::VerifyUniqueCoilName;
+        using NodeInputManager::GetOnlySingleNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetHeatingCoilInput: "); // include trailing blank space
@@ -311,14 +311,16 @@ namespace HeatingCoils {
 
         auto &HeatingCoil(state.dataHeatingCoils->HeatingCoil);
 
-        state.dataHeatingCoils->NumElecCoil = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Electric");
-        state.dataHeatingCoils->NumElecCoilMultiStage = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Electric:MultiStage");
-        state.dataHeatingCoils->NumFuelCoil = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Fuel");
-        state.dataHeatingCoils->NumGasCoilMultiStage = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Gas:MultiStage");
-        state.dataHeatingCoils->NumDesuperheaterCoil = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Desuperheater");
+        state.dataHeatingCoils->NumElecCoil = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:Electric");
+        state.dataHeatingCoils->NumElecCoilMultiStage =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:Electric:MultiStage");
+        state.dataHeatingCoils->NumFuelCoil = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:Fuel");
+        state.dataHeatingCoils->NumGasCoilMultiStage =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:Gas:MultiStage");
+        state.dataHeatingCoils->NumDesuperheaterCoil =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:Desuperheater");
         state.dataHeatingCoils->NumHeatingCoils = state.dataHeatingCoils->NumElecCoil + state.dataHeatingCoils->NumElecCoilMultiStage +
-                                                  state.dataHeatingCoils->NumFuelCoil +
-                                                  state.dataHeatingCoils->NumGasCoilMultiStage +
+                                                  state.dataHeatingCoils->NumFuelCoil + state.dataHeatingCoils->NumGasCoilMultiStage +
                                                   state.dataHeatingCoils->NumDesuperheaterCoil;
         if (state.dataHeatingCoils->NumHeatingCoils > 0) {
             HeatingCoil.allocate(state.dataHeatingCoils->NumHeatingCoils);
@@ -327,19 +329,24 @@ namespace HeatingCoils {
             state.dataHeatingCoils->CheckEquipName.dimension(state.dataHeatingCoils->NumHeatingCoils, true);
         }
 
-        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:Electric", state.dataHeatingCoils->TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+            state, "Coil:Heating:Electric", state.dataHeatingCoils->TotalArgs, NumAlphas, NumNums);
         state.dataHeatingCoils->MaxNums = max(state.dataHeatingCoils->MaxNums, NumNums);
         state.dataHeatingCoils->MaxAlphas = max(state.dataHeatingCoils->MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:Electric:MultiStage", state.dataHeatingCoils->TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+            state, "Coil:Heating:Electric:MultiStage", state.dataHeatingCoils->TotalArgs, NumAlphas, NumNums);
         state.dataHeatingCoils->MaxNums = max(state.dataHeatingCoils->MaxNums, NumNums);
         state.dataHeatingCoils->MaxAlphas = max(state.dataHeatingCoils->MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:Fuel", state.dataHeatingCoils->TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+            state, "Coil:Heating:Fuel", state.dataHeatingCoils->TotalArgs, NumAlphas, NumNums);
         state.dataHeatingCoils->MaxNums = max(state.dataHeatingCoils->MaxNums, NumNums);
         state.dataHeatingCoils->MaxAlphas = max(state.dataHeatingCoils->MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:Gas:MultiStage", state.dataHeatingCoils->TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+            state, "Coil:Heating:Gas:MultiStage", state.dataHeatingCoils->TotalArgs, NumAlphas, NumNums);
         state.dataHeatingCoils->MaxNums = max(state.dataHeatingCoils->MaxNums, NumNums);
         state.dataHeatingCoils->MaxAlphas = max(state.dataHeatingCoils->MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:Desuperheater", state.dataHeatingCoils->TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+            state, "Coil:Heating:Desuperheater", state.dataHeatingCoils->TotalArgs, NumAlphas, NumNums);
         state.dataHeatingCoils->MaxNums = max(state.dataHeatingCoils->MaxNums, NumNums);
         state.dataHeatingCoils->MaxAlphas = max(state.dataHeatingCoils->MaxAlphas, NumAlphas);
 
@@ -358,18 +365,18 @@ namespace HeatingCoils {
             CurrentModuleObject = "Coil:Heating:Electric";
             HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
 
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          ElecCoilNum,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNums,
-                                          IOStat,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     ElecCoilNum,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
 
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames.allocate(state.dataHeatingCoils->MaxNums);
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames = "";
@@ -387,8 +394,9 @@ namespace HeatingCoils {
             } else {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                    cAlphaFields(1) + '=' + Alphas(1));
+                    ShowSevereError(state,
+                                    RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                                        cAlphaFields(1) + '=' + Alphas(1));
                     state.dataHeatingCoils->InputErrorsFound = true;
                 }
             }
@@ -400,24 +408,46 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).Efficiency = Numbers(1);
             HeatingCoil(CoilNum).NominalCapacity = Numbers(2);
             errFlag = false;
-            HeatingCoil(CoilNum).AirInletNodeNum =
-                GetOnlySingleNode(state, Alphas(3), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
+            HeatingCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
+                                                                     Alphas(3),
+                                                                     errFlag,
+                                                                     CurrentModuleObject,
+                                                                     Alphas(1),
+                                                                     DataLoopNode::NodeFluidType::Air,
+                                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                                     1,
+                                                                     ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
             errFlag = false;
-            HeatingCoil(CoilNum).AirOutletNodeNum =
-                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
+            HeatingCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
+                                                                      Alphas(4),
+                                                                      errFlag,
+                                                                      CurrentModuleObject,
+                                                                      Alphas(1),
+                                                                      DataLoopNode::NodeFluidType::Air,
+                                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                                      1,
+                                                                      ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             errFlag = false;
-            HeatingCoil(CoilNum).TempSetPointNodeNum =
-                GetOnlySingleNode(state, Alphas(5), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
+            HeatingCoil(CoilNum).TempSetPointNodeNum = GetOnlySingleNode(state,
+                                                                         Alphas(5),
+                                                                         errFlag,
+                                                                         CurrentModuleObject,
+                                                                         Alphas(1),
+                                                                         DataLoopNode::NodeFluidType::Air,
+                                                                         DataLoopNode::NodeConnectionType::Sensor,
+                                                                         1,
+                                                                         ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
             // Setup Report variables for the Electric Coils
             // CurrentModuleObject = "Coil:Heating:Electric"
-            SetupOutputVariable(state, "Heating Coil Heating Energy",
+            SetupOutputVariable(state,
+                                "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).HeatingCoilLoad,
                                 "System",
@@ -428,13 +458,15 @@ namespace HeatingCoils {
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(state, "Heating Coil Heating Rate",
+            SetupOutputVariable(state,
+                                "Heating Coil Heating Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).HeatingCoilRate,
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable(state, "Heating Coil Electricity Energy",
+            SetupOutputVariable(state,
+                                "Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).ElecUseLoad,
                                 "System",
@@ -445,7 +477,8 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable(state, "Heating Coil Electricity Rate",
+            SetupOutputVariable(state,
+                                "Heating Coil Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).ElecUseRate,
                                 "System",
@@ -461,18 +494,18 @@ namespace HeatingCoils {
             CurrentModuleObject = "Coil:Heating:Electric:MultiStage";
             HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
 
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          ElecCoilNum,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNums,
-                                          IOStat,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     ElecCoilNum,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
 
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames.allocate(state.dataHeatingCoils->MaxNums);
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames = "";
@@ -488,8 +521,9 @@ namespace HeatingCoils {
             } else {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                    cAlphaFields(1) + '=' + Alphas(1));
+                    ShowSevereError(state,
+                                    RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                                        cAlphaFields(1) + '=' + Alphas(1));
                     state.dataHeatingCoils->InputErrorsFound = true;
                 }
             }
@@ -510,24 +544,46 @@ namespace HeatingCoils {
             }
 
             errFlag = false;
-            HeatingCoil(CoilNum).AirInletNodeNum =
-                GetOnlySingleNode(state, Alphas(3), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
+            HeatingCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
+                                                                     Alphas(3),
+                                                                     errFlag,
+                                                                     CurrentModuleObject,
+                                                                     Alphas(1),
+                                                                     DataLoopNode::NodeFluidType::Air,
+                                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                                     1,
+                                                                     ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
             errFlag = false;
-            HeatingCoil(CoilNum).AirOutletNodeNum =
-                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
+            HeatingCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
+                                                                      Alphas(4),
+                                                                      errFlag,
+                                                                      CurrentModuleObject,
+                                                                      Alphas(1),
+                                                                      DataLoopNode::NodeFluidType::Air,
+                                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                                      1,
+                                                                      ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             errFlag = false;
-            HeatingCoil(CoilNum).TempSetPointNodeNum =
-                GetOnlySingleNode(state, Alphas(5), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
+            HeatingCoil(CoilNum).TempSetPointNodeNum = GetOnlySingleNode(state,
+                                                                         Alphas(5),
+                                                                         errFlag,
+                                                                         CurrentModuleObject,
+                                                                         Alphas(1),
+                                                                         DataLoopNode::NodeFluidType::Air,
+                                                                         DataLoopNode::NodeConnectionType::Sensor,
+                                                                         1,
+                                                                         ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
             // Setup Report variables for the Electric Coils
             // CurrentModuleObject = "Coil:Heating:Electric:MultiStage"
-            SetupOutputVariable(state, "Heating Coil Heating Energy",
+            SetupOutputVariable(state,
+                                "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).HeatingCoilLoad,
                                 "System",
@@ -538,13 +594,15 @@ namespace HeatingCoils {
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(state, "Heating Coil Heating Rate",
+            SetupOutputVariable(state,
+                                "Heating Coil Heating Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).HeatingCoilRate,
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable(state, "Heating Coil Electricity Energy",
+            SetupOutputVariable(state,
+                                "Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).ElecUseLoad,
                                 "System",
@@ -555,7 +613,8 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable(state, "Heating Coil Electricity Rate",
+            SetupOutputVariable(state,
+                                "Heating Coil Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).ElecUseRate,
                                 "System",
@@ -571,18 +630,18 @@ namespace HeatingCoils {
 
             CurrentModuleObject = "Coil:Heating:Fuel";
 
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          FuelCoilNum,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNums,
-                                          IOStat,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     FuelCoilNum,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
 
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames.allocate(state.dataHeatingCoils->MaxNums);
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames = "";
@@ -598,8 +657,9 @@ namespace HeatingCoils {
             } else {
                 coil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (coil.SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                    cAlphaFields(1) + '=' + Alphas(1));
+                    ShowSevereError(state,
+                                    RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                                        cAlphaFields(1) + '=' + Alphas(1));
                     state.dataHeatingCoils->InputErrorsFound = true;
                 }
             }
@@ -609,12 +669,18 @@ namespace HeatingCoils {
             coil.HCoilType_Num = Coil_HeatingGasOrOtherFuel;
 
             coil.FuelType_Num = AssignResourceTypeNum(Alphas(3));
-            if (!(coil.FuelType_Num == DataGlobalConstants::ResourceType::Natural_Gas || coil.FuelType_Num == DataGlobalConstants::ResourceType::Propane || coil.FuelType_Num == DataGlobalConstants::ResourceType::Diesel ||
-                  coil.FuelType_Num == DataGlobalConstants::ResourceType::Gasoline || coil.FuelType_Num == DataGlobalConstants::ResourceType::FuelOil_1 || coil.FuelType_Num == DataGlobalConstants::ResourceType::FuelOil_2 ||
-                  coil.FuelType_Num == DataGlobalConstants::ResourceType::OtherFuel1 || coil.FuelType_Num == DataGlobalConstants::ResourceType::OtherFuel2 || coil.FuelType_Num == DataGlobalConstants::ResourceType::Coal) ||
+            if (!(coil.FuelType_Num == DataGlobalConstants::ResourceType::Natural_Gas ||
+                  coil.FuelType_Num == DataGlobalConstants::ResourceType::Propane || coil.FuelType_Num == DataGlobalConstants::ResourceType::Diesel ||
+                  coil.FuelType_Num == DataGlobalConstants::ResourceType::Gasoline ||
+                  coil.FuelType_Num == DataGlobalConstants::ResourceType::FuelOil_1 ||
+                  coil.FuelType_Num == DataGlobalConstants::ResourceType::FuelOil_2 ||
+                  coil.FuelType_Num == DataGlobalConstants::ResourceType::OtherFuel1 ||
+                  coil.FuelType_Num == DataGlobalConstants::ResourceType::OtherFuel2 ||
+                  coil.FuelType_Num == DataGlobalConstants::ResourceType::Coal) ||
                 coil.FuelType_Num == DataGlobalConstants::ResourceType::None) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(3) + " entered =" + Alphas(3) + " for " +
-                                cAlphaFields(1) + '=' + Alphas(1));
+                ShowSevereError(state,
+                                RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(3) + " entered =" + Alphas(3) + " for " +
+                                    cAlphaFields(1) + '=' + Alphas(1));
                 state.dataHeatingCoils->InputErrorsFound = true;
             }
             std::string const FuelType(GetResourceTypeChar(coil.FuelType_Num));
@@ -622,19 +688,40 @@ namespace HeatingCoils {
             coil.Efficiency = Numbers(1);
             coil.NominalCapacity = Numbers(2);
             errFlag = false;
-            coil.AirInletNodeNum =
-                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
+            coil.AirInletNodeNum = GetOnlySingleNode(state,
+                                                     Alphas(4),
+                                                     errFlag,
+                                                     CurrentModuleObject,
+                                                     Alphas(1),
+                                                     DataLoopNode::NodeFluidType::Air,
+                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                     1,
+                                                     ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
             errFlag = false;
-            coil.AirOutletNodeNum =
-                GetOnlySingleNode(state, Alphas(5), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
+            coil.AirOutletNodeNum = GetOnlySingleNode(state,
+                                                      Alphas(5),
+                                                      errFlag,
+                                                      CurrentModuleObject,
+                                                      Alphas(1),
+                                                      DataLoopNode::NodeFluidType::Air,
+                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                      1,
+                                                      ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Air Nodes");
 
             errFlag = false;
-            coil.TempSetPointNodeNum =
-                GetOnlySingleNode(state, Alphas(6), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
+            coil.TempSetPointNodeNum = GetOnlySingleNode(state,
+                                                         Alphas(6),
+                                                         errFlag,
+                                                         CurrentModuleObject,
+                                                         Alphas(1),
+                                                         DataLoopNode::NodeFluidType::Air,
+                                                         DataLoopNode::NodeConnectionType::Sensor,
+                                                         1,
+                                                         ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
             // parasitic electric load associated with the fuel heating coil
@@ -648,7 +735,8 @@ namespace HeatingCoils {
             // Setup Report variables for the Fuel Coils
             // CurrentModuleObject = "Coil:Heating:OtherFuel"
 
-            SetupOutputVariable(state, "Heating Coil Heating Energy",
+            SetupOutputVariable(state,
+                                "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
                                 coil.HeatingCoilLoad,
                                 "System",
@@ -660,7 +748,8 @@ namespace HeatingCoils {
                                 _,
                                 "System");
             SetupOutputVariable(state, "Heating Coil Heating Rate", OutputProcessor::Unit::W, coil.HeatingCoilRate, "System", "Average", coil.Name);
-            SetupOutputVariable(state, "Heating Coil " + FuelType + " Energy",
+            SetupOutputVariable(state,
+                                "Heating Coil " + FuelType + " Energy",
                                 OutputProcessor::Unit::J,
                                 coil.FuelUseLoad,
                                 "System",
@@ -671,8 +760,10 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable(state, "Heating Coil " + FuelType + " Rate", OutputProcessor::Unit::W, coil.FuelUseRate, "System", "Average", coil.Name);
-            SetupOutputVariable(state, "Heating Coil Electricity Energy",
+            SetupOutputVariable(
+                state, "Heating Coil " + FuelType + " Rate", OutputProcessor::Unit::W, coil.FuelUseRate, "System", "Average", coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 coil.ElecUseLoad,
                                 "System",
@@ -686,8 +777,14 @@ namespace HeatingCoils {
             SetupOutputVariable(state, "Heating Coil Electricity Rate", OutputProcessor::Unit::W, coil.ElecUseRate, "System", "Average", coil.Name);
             SetupOutputVariable(state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, coil.RTF, "System", "Average", coil.Name);
             SetupOutputVariable(state,
-                "Heating Coil Ancillary " + FuelType + " Rate", OutputProcessor::Unit::W, coil.ParasiticFuelRate, "System", "Average", coil.Name);
-            SetupOutputVariable(state, "Heating Coil Ancillary " + FuelType + " Energy",
+                                "Heating Coil Ancillary " + FuelType + " Rate",
+                                OutputProcessor::Unit::W,
+                                coil.ParasiticFuelRate,
+                                "System",
+                                "Average",
+                                coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Ancillary " + FuelType + " Energy",
                                 OutputProcessor::Unit::J,
                                 coil.ParasiticFuelLoad,
                                 "System",
@@ -709,18 +806,18 @@ namespace HeatingCoils {
             CurrentModuleObject = "Coil:Heating:Gas:MultiStage";
             HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Natural_Gas;
 
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          FuelCoilNum,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNums,
-                                          IOStat,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     FuelCoilNum,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
 
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames.allocate(state.dataHeatingCoils->MaxNums);
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames = "";
@@ -736,8 +833,9 @@ namespace HeatingCoils {
             } else {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                    cAlphaFields(1) + '=' + Alphas(1));
+                    ShowSevereError(state,
+                                    RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                                        cAlphaFields(1) + '=' + Alphas(1));
                     state.dataHeatingCoils->InputErrorsFound = true;
                 }
             }
@@ -762,19 +860,40 @@ namespace HeatingCoils {
             }
 
             errFlag = false;
-            HeatingCoil(CoilNum).AirInletNodeNum =
-                GetOnlySingleNode(state, Alphas(3), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
+            HeatingCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
+                                                                     Alphas(3),
+                                                                     errFlag,
+                                                                     CurrentModuleObject,
+                                                                     Alphas(1),
+                                                                     DataLoopNode::NodeFluidType::Air,
+                                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                                     1,
+                                                                     ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
             errFlag = false;
-            HeatingCoil(CoilNum).AirOutletNodeNum =
-                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
+            HeatingCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
+                                                                      Alphas(4),
+                                                                      errFlag,
+                                                                      CurrentModuleObject,
+                                                                      Alphas(1),
+                                                                      DataLoopNode::NodeFluidType::Air,
+                                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                                      1,
+                                                                      ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             errFlag = false;
-            HeatingCoil(CoilNum).TempSetPointNodeNum =
-                GetOnlySingleNode(state, Alphas(5), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
+            HeatingCoil(CoilNum).TempSetPointNodeNum = GetOnlySingleNode(state,
+                                                                         Alphas(5),
+                                                                         errFlag,
+                                                                         CurrentModuleObject,
+                                                                         Alphas(1),
+                                                                         DataLoopNode::NodeFluidType::Air,
+                                                                         DataLoopNode::NodeConnectionType::Sensor,
+                                                                         1,
+                                                                         ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
             // parasitic electric load associated with the gas heating coil
@@ -786,7 +905,8 @@ namespace HeatingCoils {
 
             // Setup Report variables for the Gas Coils
             // CurrentModuleObject = "Coil:Heating:Gas:MultiStage"
-            SetupOutputVariable(state, "Heating Coil Heating Energy",
+            SetupOutputVariable(state,
+                                "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).HeatingCoilLoad,
                                 "System",
@@ -797,13 +917,15 @@ namespace HeatingCoils {
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(state, "Heating Coil Heating Rate",
+            SetupOutputVariable(state,
+                                "Heating Coil Heating Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).HeatingCoilRate,
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable(state, "Heating Coil NaturalGas Energy",
+            SetupOutputVariable(state,
+                                "Heating Coil NaturalGas Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).FuelUseLoad,
                                 "System",
@@ -814,13 +936,15 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable(state, "Heating Coil NaturalGas Rate",
+            SetupOutputVariable(state,
+                                "Heating Coil NaturalGas Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).FuelUseRate,
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable(state, "Heating Coil Electricity Energy",
+            SetupOutputVariable(state,
+                                "Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).ElecUseLoad,
                                 "System",
@@ -831,25 +955,29 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable(state, "Heating Coil Electricity Rate",
+            SetupOutputVariable(state,
+                                "Heating Coil Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).ElecUseRate,
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable(state, "Heating Coil Runtime Fraction",
+            SetupOutputVariable(state,
+                                "Heating Coil Runtime Fraction",
                                 OutputProcessor::Unit::None,
                                 HeatingCoil(CoilNum).RTF,
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable(state, "Heating Coil Ancillary NaturalGas Rate",
+            SetupOutputVariable(state,
+                                "Heating Coil Ancillary NaturalGas Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).ParasiticFuelRate,
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable(state, "Heating Coil Ancillary NaturalGas Energy",
+            SetupOutputVariable(state,
+                                "Heating Coil Ancillary NaturalGas Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).ParasiticFuelLoad,
                                 "System",
@@ -866,24 +994,23 @@ namespace HeatingCoils {
         for (DesuperheaterCoilNum = 1; DesuperheaterCoilNum <= state.dataHeatingCoils->NumDesuperheaterCoil; ++DesuperheaterCoilNum) {
 
             CoilNum = state.dataHeatingCoils->NumElecCoil + state.dataHeatingCoils->NumElecCoilMultiStage + state.dataHeatingCoils->NumFuelCoil +
-                      state.dataHeatingCoils->NumGasCoilMultiStage +
-                      DesuperheaterCoilNum;
+                      state.dataHeatingCoils->NumGasCoilMultiStage + DesuperheaterCoilNum;
 
             CurrentModuleObject = "Coil:Heating:Desuperheater";
             HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
 
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          DesuperheaterCoilNum,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNums,
-                                          IOStat,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     DesuperheaterCoilNum,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
 
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames.allocate(state.dataHeatingCoils->MaxNums);
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames = "";
@@ -899,8 +1026,9 @@ namespace HeatingCoils {
             } else {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                    cAlphaFields(1) + '=' + Alphas(1));
+                    ShowSevereError(state,
+                                    RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                                        cAlphaFields(1) + '=' + Alphas(1));
                     state.dataHeatingCoils->InputErrorsFound = true;
                 }
             }
@@ -924,12 +1052,26 @@ namespace HeatingCoils {
             //       identifying souce type.
 
             errFlag = false;
-            HeatingCoil(CoilNum).AirInletNodeNum =
-                GetOnlySingleNode(state, Alphas(3), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
+            HeatingCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
+                                                                     Alphas(3),
+                                                                     errFlag,
+                                                                     CurrentModuleObject,
+                                                                     Alphas(1),
+                                                                     DataLoopNode::NodeFluidType::Air,
+                                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                                     1,
+                                                                     ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
             errFlag = false;
-            HeatingCoil(CoilNum).AirOutletNodeNum =
-                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
+            HeatingCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
+                                                                      Alphas(4),
+                                                                      errFlag,
+                                                                      CurrentModuleObject,
+                                                                      Alphas(1),
+                                                                      DataLoopNode::NodeFluidType::Air,
+                                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                                      1,
+                                                                      ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
@@ -942,8 +1084,9 @@ namespace HeatingCoils {
                 } else {
                     HeatingCoil(CoilNum).Efficiency = Numbers(1);
                     if (Numbers(1) < 0.0 || Numbers(1) > 0.9) {
-                        ShowSevereError(state, CurrentModuleObject + ", \"" + HeatingCoil(CoilNum).Name +
-                                        "\" heat reclaim recovery efficiency must be >= 0 and <=0.9");
+                        ShowSevereError(state,
+                                        CurrentModuleObject + ", \"" + HeatingCoil(CoilNum).Name +
+                                            "\" heat reclaim recovery efficiency must be >= 0 and <=0.9");
                         state.dataHeatingCoils->InputErrorsFound = true;
                     }
                 }
@@ -953,8 +1096,9 @@ namespace HeatingCoils {
                 } else {
                     HeatingCoil(CoilNum).Efficiency = Numbers(1);
                     if (Numbers(1) < 0.0 || Numbers(1) > 0.3) {
-                        ShowSevereError(state, CurrentModuleObject + ", \"" + HeatingCoil(CoilNum).Name +
-                                        "\" heat reclaim recovery efficiency must be >= 0 and <=0.3");
+                        ShowSevereError(state,
+                                        CurrentModuleObject + ", \"" + HeatingCoil(CoilNum).Name +
+                                            "\" heat reclaim recovery efficiency must be >= 0 and <=0.3");
                         state.dataHeatingCoils->InputErrorsFound = true;
                     }
                 }
@@ -978,9 +1122,10 @@ namespace HeatingCoils {
                         }
                         HeatReclaim.ReclaimEfficiencyTotal += HeatingCoil(CoilNum).Efficiency;
                         if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
-                            ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
-                                            "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                            HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
+                            ShowSevereError(state,
+                                            cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
+                                                "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
+                                                HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
                         }
                         state.dataHeatingCoils->ValidSourceType(CoilNum) = true;
                     }
@@ -1002,9 +1147,10 @@ namespace HeatingCoils {
                         }
                         HeatReclaim.ReclaimEfficiencyTotal += HeatingCoil(CoilNum).Efficiency;
                         if (HeatReclaim.ReclaimEfficiencyTotal > 0.9) {
-                            ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
-                                            "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                            HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.9");
+                            ShowSevereError(state,
+                                            cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
+                                                "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
+                                                HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.9");
                         }
                         state.dataHeatingCoils->ValidSourceType(CoilNum) = true;
                     }
@@ -1015,7 +1161,8 @@ namespace HeatingCoils {
                     state, Alphas(6), HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5), ObjexxFCL::Optional_bool_const());
                 if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(state.dataHeatBal->HeatReclaimDXCoil)) {
-                        DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimDXCoil(HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum);
+                        DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
+                            state.dataHeatBal->HeatReclaimDXCoil(HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum);
                         if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
                             HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
                             for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
@@ -1023,9 +1170,10 @@ namespace HeatingCoils {
                         }
                         HeatReclaim.ReclaimEfficiencyTotal += HeatingCoil(CoilNum).Efficiency;
                         if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
-                            ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
-                                            "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                            HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
+                            ShowSevereError(state,
+                                            cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
+                                                "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
+                                                HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
                         }
                         state.dataHeatingCoils->ValidSourceType(CoilNum) = true;
                     }
@@ -1046,9 +1194,10 @@ namespace HeatingCoils {
                         }
                         HeatReclaim.ReclaimEfficiencyTotal += HeatingCoil(CoilNum).Efficiency;
                         if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
-                            ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
-                                            "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                            HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
+                            ShowSevereError(state,
+                                            cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
+                                                "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
+                                                HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
                         }
                         state.dataHeatingCoils->ValidSourceType(CoilNum) = true;
                     }
@@ -1059,7 +1208,8 @@ namespace HeatingCoils {
                     state, Alphas(6), HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5), ObjexxFCL::Optional_bool_const());
                 if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(state.dataHeatBal->HeatReclaimDXCoil)) {
-                        DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimDXCoil(HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum);
+                        DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
+                            state.dataHeatBal->HeatReclaimDXCoil(HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum);
                         if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
                             HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
                             for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
@@ -1067,9 +1217,10 @@ namespace HeatingCoils {
                         }
                         HeatReclaim.ReclaimEfficiencyTotal += HeatingCoil(CoilNum).Efficiency;
                         if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
-                            ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
-                                            "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                            HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
+                            ShowSevereError(state,
+                                            cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
+                                                "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
+                                                HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
                         }
                         state.dataHeatingCoils->ValidSourceType(CoilNum) = true;
                     }
@@ -1080,7 +1231,8 @@ namespace HeatingCoils {
                     state, Alphas(6), HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5), ObjexxFCL::Optional_bool_const());
                 if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(state.dataHeatBal->HeatReclaimDXCoil)) {
-                        DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimDXCoil(HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum);
+                        DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
+                            state.dataHeatBal->HeatReclaimDXCoil(HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum);
                         if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
                             HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
                             for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
@@ -1088,18 +1240,21 @@ namespace HeatingCoils {
                         }
                         HeatReclaim.ReclaimEfficiencyTotal += HeatingCoil(CoilNum).Efficiency;
                         if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
-                            ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
-                                            "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                            HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
+                            ShowSevereError(state,
+                                            cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
+                                                "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
+                                                HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
                         }
                         state.dataHeatingCoils->ValidSourceType(CoilNum) = true;
                     }
                 }
             } else {
-                ShowSevereError(state, CurrentModuleObject + ", \"" + HeatingCoil(CoilNum).Name +
-                                "\" valid desuperheater heat source object type not found: " + Alphas(5));
+                ShowSevereError(state,
+                                CurrentModuleObject + ", \"" + HeatingCoil(CoilNum).Name +
+                                    "\" valid desuperheater heat source object type not found: " + Alphas(5));
                 ShowContinueError(state, "Valid desuperheater heat source objects are:");
-                ShowContinueError(state, "Refrigeration:CompressorRack, Coil:Cooling:DX:SingleSpeed, Refrigeration:Condenser:AirCooled, "
+                ShowContinueError(state,
+                                  "Refrigeration:CompressorRack, Coil:Cooling:DX:SingleSpeed, Refrigeration:Condenser:AirCooled, "
                                   "Refrigeration:Condenser:EvaporativeCooled, Refrigeration:Condenser:WaterCooled,Coil:Cooling:DX:TwoSpeed, and "
                                   "Coil:Cooling:DX:TwoStageWithHumidityControlMode");
                 state.dataHeatingCoils->InputErrorsFound = true;
@@ -1108,8 +1263,15 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).ReclaimHeatingCoilName = Alphas(6);
 
             errFlag = false;
-            HeatingCoil(CoilNum).TempSetPointNodeNum =
-                GetOnlySingleNode(state, Alphas(7), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
+            HeatingCoil(CoilNum).TempSetPointNodeNum = GetOnlySingleNode(state,
+                                                                         Alphas(7),
+                                                                         errFlag,
+                                                                         CurrentModuleObject,
+                                                                         Alphas(1),
+                                                                         DataLoopNode::NodeFluidType::Air,
+                                                                         DataLoopNode::NodeConnectionType::Sensor,
+                                                                         1,
+                                                                         ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
             // parasitic electric load associated with the desuperheater heating coil
@@ -1122,7 +1284,8 @@ namespace HeatingCoils {
 
             // Setup Report variables for the Desuperheater Heating Coils
             // CurrentModuleObject = "Coil:Heating:Desuperheater"
-            SetupOutputVariable(state, "Heating Coil Heating Energy",
+            SetupOutputVariable(state,
+                                "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).HeatingCoilLoad,
                                 "HVAC",
@@ -1133,13 +1296,15 @@ namespace HeatingCoils {
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(state, "Heating Coil Heating Rate",
+            SetupOutputVariable(state,
+                                "Heating Coil Heating Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).HeatingCoilRate,
                                 "HVAC",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable(state, "Heating Coil Electricity Energy",
+            SetupOutputVariable(state,
+                                "Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).ElecUseLoad,
                                 "HVAC",
@@ -1150,14 +1315,20 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable(state, "Heating Coil Electricity Rate",
+            SetupOutputVariable(state,
+                                "Heating Coil Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).ElecUseRate,
                                 "HVAC",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
             SetupOutputVariable(state,
-                "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, HeatingCoil(CoilNum).RTF, "HVAC", "Average", HeatingCoil(CoilNum).Name);
+                                "Heating Coil Runtime Fraction",
+                                OutputProcessor::Unit::None,
+                                HeatingCoil(CoilNum).RTF,
+                                "HVAC",
+                                "Average",
+                                HeatingCoil(CoilNum).Name);
         }
 
         if (state.dataHeatingCoils->InputErrorsFound) {
@@ -1197,13 +1368,13 @@ namespace HeatingCoils {
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int AirInletNode;                         // coil air inlet node number
-        int AirOutletNode;                        // coil air outlet node number
-        int ControlNode;                          // coil control node number
-        int RackNum;                              // Index to refrigerated case compressor rack
-        int CondNum;                              // Index to refrigeration condenser
-        int DXCoilNum;                            // Index to DX cooling coil
-        
+        int AirInletNode;  // coil air inlet node number
+        int AirOutletNode; // coil air outlet node number
+        int ControlNode;   // coil control node number
+        int RackNum;       // Index to refrigerated case compressor rack
+        int CondNum;       // Index to refrigeration condenser
+        int DXCoilNum;     // Index to DX cooling coil
+
         auto &HeatingCoil(state.dataHeatingCoils->HeatingCoil);
 
         if (state.dataHeatingCoils->MyOneTimeFlag) {
@@ -1249,7 +1420,8 @@ namespace HeatingCoils {
         } else if (ControlNode == AirOutletNode) {
             HeatingCoil(CoilNum).DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint;
         } else {
-            HeatingCoil(CoilNum).DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint - (state.dataLoopNodes->Node(ControlNode).Temp - state.dataLoopNodes->Node(AirOutletNode).Temp);
+            HeatingCoil(CoilNum).DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint -
+                                                     (state.dataLoopNodes->Node(ControlNode).Temp - state.dataLoopNodes->Node(AirOutletNode).Temp);
         }
 
         if (QCoilRequired == SensedLoadFlagValue && state.dataHeatingCoils->MySPTestFlag(CoilNum) &&
@@ -1321,7 +1493,8 @@ namespace HeatingCoils {
             ++state.dataHeatingCoils->ValidSourceTypeCounter;
             if (HeatingCoil(CoilNum).ReclaimHeatingSource == HeatObjTypes::COMPRESSORRACK_REFRIGERATEDCASE) {
                 for (RackNum = 1; RackNum <= state.dataRefrigCase->NumRefrigeratedRacks; ++RackNum) {
-                    if (!UtilityRoutines::SameString(state.dataHeatBal->HeatReclaimRefrigeratedRack(RackNum).Name, HeatingCoil(CoilNum).ReclaimHeatingCoilName))
+                    if (!UtilityRoutines::SameString(state.dataHeatBal->HeatReclaimRefrigeratedRack(RackNum).Name,
+                                                     HeatingCoil(CoilNum).ReclaimHeatingCoilName))
                         continue;
                     HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum = RackNum;
                     if (allocated(state.dataHeatBal->HeatReclaimRefrigeratedRack)) {
@@ -1333,9 +1506,10 @@ namespace HeatingCoils {
                                 num = 0.0;
                             HeatReclaim.ReclaimEfficiencyTotal += HeatingCoil(CoilNum).Efficiency;
                             if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
-                                ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
-                                                "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                                HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
+                                ShowSevereError(state,
+                                                cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
+                                                    "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
+                                                    HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
                             }
                         }
                         state.dataHeatingCoils->ValidSourceType(CoilNum) = true;
@@ -1344,7 +1518,9 @@ namespace HeatingCoils {
                 }
             } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == HeatObjTypes::CONDENSER_REFRIGERATION) {
                 for (CondNum = 1; CondNum <= state.dataRefrigCase->NumRefrigCondensers; ++CondNum) {
-                    if (!UtilityRoutines::SameString(state.dataHeatBal->HeatReclaimRefrigCondenser(CondNum).Name, HeatingCoil(CoilNum).ReclaimHeatingCoilName)) continue;
+                    if (!UtilityRoutines::SameString(state.dataHeatBal->HeatReclaimRefrigCondenser(CondNum).Name,
+                                                     HeatingCoil(CoilNum).ReclaimHeatingCoilName))
+                        continue;
                     HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum = CondNum;
                     if (allocated(state.dataHeatBal->HeatReclaimRefrigCondenser)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
@@ -1355,9 +1531,10 @@ namespace HeatingCoils {
                                 num = 0.0;
                             HeatReclaim.ReclaimEfficiencyTotal += HeatingCoil(CoilNum).Efficiency;
                             if (HeatReclaim.ReclaimEfficiencyTotal > 0.9) {
-                                ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
-                                                "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                                HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.9");
+                                ShowSevereError(state,
+                                                cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
+                                                    "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
+                                                    HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.9");
                             }
                         }
                         state.dataHeatingCoils->ValidSourceType(CoilNum) = true;
@@ -1368,19 +1545,23 @@ namespace HeatingCoils {
                        HeatingCoil(CoilNum).ReclaimHeatingSource == HeatObjTypes::COIL_DX_MULTISPEED ||
                        HeatingCoil(CoilNum).ReclaimHeatingSource == HeatObjTypes::COIL_DX_MULTIMODE) {
                 for (DXCoilNum = 1; DXCoilNum <= state.dataDXCoils->NumDXCoils; ++DXCoilNum) {
-                    if (!UtilityRoutines::SameString(state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).Name, HeatingCoil(CoilNum).ReclaimHeatingCoilName)) continue;
+                    if (!UtilityRoutines::SameString(state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).Name,
+                                                     HeatingCoil(CoilNum).ReclaimHeatingCoilName))
+                        continue;
                     HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum = DXCoilNum;
                     if (allocated(state.dataHeatBal->HeatReclaimDXCoil)) {
-                        DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimDXCoil(HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum);
+                        DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
+                            state.dataHeatBal->HeatReclaimDXCoil(HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum);
                         if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
                             HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
                             for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
                                 num = 0.0;
                             HeatReclaim.ReclaimEfficiencyTotal += HeatingCoil(CoilNum).Efficiency;
                             if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
-                                ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
-                                                "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                                HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
+                                ShowSevereError(state,
+                                                cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
+                                                    "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
+                                                    HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
                             }
                         }
                         state.dataHeatingCoils->ValidSourceType(CoilNum) = true;
@@ -1402,9 +1583,10 @@ namespace HeatingCoils {
                                 num = 0.0;
                             HeatReclaim.ReclaimEfficiencyTotal += HeatingCoil(CoilNum).Efficiency;
                             if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
-                                ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
-                                                "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                                HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
+                                ShowSevereError(state,
+                                                cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
+                                                    "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
+                                                    HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
                             }
                         }
                         state.dataHeatingCoils->ValidSourceType(CoilNum) = true;
@@ -1413,10 +1595,10 @@ namespace HeatingCoils {
                 }
             }
             if ((state.dataHeatingCoils->ValidSourceTypeCounter > state.dataHeatingCoils->NumDesuperheaterCoil * 2) &&
-                state.dataHeatingCoils->ShowSingleWarning(CoilNum) &&
-                !state.dataHeatingCoils->ValidSourceType(CoilNum)) {
-                ShowWarningError(state, "Coil:Heating:Desuperheater, \"" + HeatingCoil(CoilNum).Name +
-                                 "\" desuperheater heat source object name not found: " + HeatingCoil(CoilNum).ReclaimHeatingCoilName);
+                state.dataHeatingCoils->ShowSingleWarning(CoilNum) && !state.dataHeatingCoils->ValidSourceType(CoilNum)) {
+                ShowWarningError(state,
+                                 "Coil:Heating:Desuperheater, \"" + HeatingCoil(CoilNum).Name +
+                                     "\" desuperheater heat source object name not found: " + HeatingCoil(CoilNum).ReclaimHeatingCoilName);
                 ShowContinueError(state, " Desuperheater heating coil is not modeled and simulation continues.");
                 state.dataHeatingCoils->ShowSingleWarning(CoilNum) = false;
             }
@@ -1468,7 +1650,6 @@ namespace HeatingCoils {
         auto &OASysEqSizing(state.dataSize->OASysEqSizing);
         auto &HeatingCoil(state.dataHeatingCoils->HeatingCoil);
 
-
         if (HeatingCoil(CoilNum).HCoilType_Num == Coil_HeatingElectric_MultiStage) {
             FieldNum = 1 + (HeatingCoil(CoilNum).NumOfStages * 2);
             TempCap = HeatingCoil(CoilNum).MSNominalCapacity(HeatingCoil(CoilNum).NumOfStages);
@@ -1485,7 +1666,8 @@ namespace HeatingCoils {
         CompType = "Coil:" + HeatingCoil(CoilNum).HeatingCoilType + ':' + HeatingCoil(CoilNum).HeatingCoilModel;
         CompName = HeatingCoil(CoilNum).Name;
         state.dataSize->DataCoilIsSuppHeater = state.dataHeatingCoils->CoilIsSuppHeater; // set global instead of using optional argument
-        state.dataSize->DataCoolCoilCap = 0.0; // global only used for heat pump heating coils, non-HP heating coils are sized with other global variables
+        state.dataSize->DataCoolCoilCap =
+            0.0; // global only used for heat pump heating coils, non-HP heating coils are sized with other global variables
 
         if (TempCap == AutoSize) {
             if (HeatingCoil(CoilNum).DesiccantRegenerationCoil) {
@@ -1504,7 +1686,8 @@ namespace HeatingCoils {
 
                 if (state.dataSize->CurOASysNum > 0) {
                     OASysEqSizing(state.dataSize->CurOASysNum).AirFlow = true;
-                    OASysEqSizing(state.dataSize->CurOASysNum).AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
+                    OASysEqSizing(state.dataSize->CurOASysNum).AirVolFlow =
+                        state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
                 }
                 state.dataSize->DataDesicDehumNum = 0;
                 bPRINT = true;
@@ -1546,14 +1729,16 @@ namespace HeatingCoils {
                     } else {
                         if (HeatingCoil(CoilNum).MSNominalCapacity(StageNum) > 0.0 && NominalCapacityDes > 0.0) {
                             NominalCapacityUser = TempCap * StageNum / NumOfStages; // HeatingCoil( CoilNum ).MSNominalCapacity( StageNum );
-                            BaseSizer::reportSizerOutput(state, CompType,
+                            BaseSizer::reportSizerOutput(state,
+                                                         CompType,
                                                          CompName,
                                                          "Design Size " + SizingString,
                                                          NominalCapacityDes,
                                                          "User-Specified " + SizingString,
                                                          NominalCapacityUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(NominalCapacityDes - NominalCapacityUser) / NominalCapacityUser) > state.dataSize->AutoVsHardSizingThreshold) {
+                                if ((std::abs(NominalCapacityDes - NominalCapacityUser) / NominalCapacityUser) >
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeHeatingCoil: Potential issue with equipment sizing for " + CompType + ", " + CompName);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NominalCapacityUser));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", NominalCapacityDes));
@@ -1568,8 +1753,8 @@ namespace HeatingCoils {
                 NumOfStages = HeatingCoil(CoilNum).NumOfStages;
                 for (StageNum = NumOfStages - 1; StageNum >= 1; --StageNum) {
                     if (HeatingCoil(CoilNum).MSNominalCapacity(StageNum) > 0.0) {
-                        BaseSizer::reportSizerOutput(state,
-                            CompType, CompName, "User-Specified " + SizingString, HeatingCoil(CoilNum).MSNominalCapacity(StageNum));
+                        BaseSizer::reportSizerOutput(
+                            state, CompType, CompName, "User-Specified " + SizingString, HeatingCoil(CoilNum).MSNominalCapacity(StageNum));
                     }
                 }
             }
@@ -1600,25 +1785,38 @@ namespace HeatingCoils {
             auto const SELECT_CASE_var(HeatingCoil(CoilNum).HCoilType_Num);
             if (SELECT_CASE_var == Coil_HeatingElectric) {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Electric");
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
+                PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).Efficiency);
             } else if (SELECT_CASE_var == Coil_HeatingElectric_MultiStage) {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Electric:MultiStage");
                 PreDefTableEntry(state,
-                    state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).MSNominalCapacity(HeatingCoil(CoilNum).NumOfStages));
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).MSEfficiency(HeatingCoil(CoilNum).NumOfStages));
+                                 state.dataOutRptPredefined->pdchHeatCoilNomCap,
+                                 HeatingCoil(CoilNum).Name,
+                                 HeatingCoil(CoilNum).MSNominalCapacity(HeatingCoil(CoilNum).NumOfStages));
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchHeatCoilNomEff,
+                                 HeatingCoil(CoilNum).Name,
+                                 HeatingCoil(CoilNum).MSEfficiency(HeatingCoil(CoilNum).NumOfStages));
             } else if (SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Fuel");
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
+                PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).Efficiency);
             } else if (SELECT_CASE_var == Coil_HeatingGas_MultiStage) {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Gas:MultiStage");
                 PreDefTableEntry(state,
-                    state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).MSNominalCapacity(HeatingCoil(CoilNum).NumOfStages));
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).MSEfficiency(HeatingCoil(CoilNum).NumOfStages));
+                                 state.dataOutRptPredefined->pdchHeatCoilNomCap,
+                                 HeatingCoil(CoilNum).Name,
+                                 HeatingCoil(CoilNum).MSNominalCapacity(HeatingCoil(CoilNum).NumOfStages));
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchHeatCoilNomEff,
+                                 HeatingCoil(CoilNum).Name,
+                                 HeatingCoil(CoilNum).MSEfficiency(HeatingCoil(CoilNum).NumOfStages));
             } else if (SELECT_CASE_var == Coil_HeatingDesuperheater) {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Desuperheater");
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
+                PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).Efficiency);
             }
         }
@@ -1652,7 +1850,7 @@ namespace HeatingCoils {
         // REFERENCES:
 
         // Using/Aliasing
-        auto & ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
+        auto &ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
         using DataHVACGlobals::TempControlTol;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1688,7 +1886,8 @@ namespace HeatingCoils {
         TempSetPoint = HeatingCoil(CoilNum).DesiredOutletTemp;
 
         // If there is a fault of coil SAT Sensor
-        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
+        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
+            (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = HeatingCoil(CoilNum).FaultyCoilSATIndex;
             HeatingCoil(CoilNum).FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
@@ -1715,8 +1914,8 @@ namespace HeatingCoils {
         //  Also the coil has to be scheduled to be available.
 
         // Control output to meet load QCoilReq (QCoilReq is passed in if load controlled, otherwise QCoilReq=-999)
-        if ((AirMassFlow > 0.0 && HeatingCoil(CoilNum).NominalCapacity > 0.0) && (GetCurrentScheduleValue(state, HeatingCoil(CoilNum).SchedPtr) > 0.0) &&
-            (QCoilReq > 0.0)) {
+        if ((AirMassFlow > 0.0 && HeatingCoil(CoilNum).NominalCapacity > 0.0) &&
+            (GetCurrentScheduleValue(state, HeatingCoil(CoilNum).SchedPtr) > 0.0) && (QCoilReq > 0.0)) {
 
             // check to see if the Required heating capacity is greater than the user specified capacity.
             if (QCoilReq > HeatingCoil(CoilNum).NominalCapacity) {
@@ -1788,8 +1987,9 @@ namespace HeatingCoils {
             }
         } else {
             if (HeatingCoil(CoilNum).AirLoopNum > 0) {
-                state.dataAirLoop->AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF = max(
-                    state.dataAirLoop->AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF, HeatingCoilLoad / HeatingCoil(CoilNum).NominalCapacity);
+                state.dataAirLoop->AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF =
+                    max(state.dataAirLoop->AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF,
+                        HeatingCoilLoad / HeatingCoil(CoilNum).NominalCapacity);
             }
         }
 
@@ -1823,7 +2023,7 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        auto & ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
+        auto &ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
         auto &MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
         auto &MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
 
@@ -1893,7 +2093,8 @@ namespace HeatingCoils {
 
         OutdoorPressure = state.dataEnvrn->OutBaroPress;
 
-        if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, HeatingCoil(CoilNum).SchedPtr) > 0.0) && ((CycRatio > 0.0) || (SpeedRatio > 0.0))) {
+        if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, HeatingCoil(CoilNum).SchedPtr) > 0.0) &&
+            ((CycRatio > 0.0) || (SpeedRatio > 0.0))) {
 
             if (StageNum > 1) {
 
@@ -2077,7 +2278,8 @@ namespace HeatingCoils {
         CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
 
         // If there is a fault of coil SAT Sensor
-        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
+        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
+            (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = HeatingCoil(CoilNum).FaultyCoilSATIndex;
             HeatingCoil(CoilNum).FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
@@ -2090,8 +2292,8 @@ namespace HeatingCoils {
         //  Also the coil has to be scheduled to be available.
 
         // Control output to meet load QCoilReq (QCoilReq is passed in if load controlled, otherwise QCoilReq=-999)
-        if ((AirMassFlow > 0.0 && HeatingCoil(CoilNum).NominalCapacity > 0.0) && (GetCurrentScheduleValue(state, HeatingCoil(CoilNum).SchedPtr) > 0.0) &&
-            (QCoilReq > 0.0)) {
+        if ((AirMassFlow > 0.0 && HeatingCoil(CoilNum).NominalCapacity > 0.0) &&
+            (GetCurrentScheduleValue(state, HeatingCoil(CoilNum).SchedPtr) > 0.0) && (QCoilReq > 0.0)) {
 
             // check to see if the Required heating capacity is greater than the user specified capacity.
             if (QCoilReq > HeatingCoil(CoilNum).NominalCapacity) {
@@ -2160,13 +2362,15 @@ namespace HeatingCoils {
                 if (PLF < 0.7) {
                     if (HeatingCoil(CoilNum).PLFErrorCount < 1) {
                         ++HeatingCoil(CoilNum).PLFErrorCount;
-                        ShowWarningError(state, "CalcFuelHeatingCoil: " + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + "=\"" +
-                                         HeatingCoil(CoilNum).Name + "\", PLF curve values");
+                        ShowWarningError(state,
+                                         "CalcFuelHeatingCoil: " + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + "=\"" +
+                                             HeatingCoil(CoilNum).Name + "\", PLF curve values");
                         ShowContinueError(state, format("The PLF curve value = {:.5T} for part-load ratio = {:.5T}", PLF, PartLoadRat));
                         ShowContinueError(state, "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and the simulation continues...");
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel].");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(state, HeatingCoil(CoilNum).Name + ", Heating coil PLF curve < 0.7 warning continues... ",
+                        ShowRecurringWarningErrorAtEnd(state,
+                                                       HeatingCoil(CoilNum).Name + ", Heating coil PLF curve < 0.7 warning continues... ",
                                                        HeatingCoil(CoilNum).PLFErrorIndex,
                                                        PLF,
                                                        PLF);
@@ -2178,13 +2382,15 @@ namespace HeatingCoils {
                 if (HeatingCoil(CoilNum).RTF > 1.0 && std::abs(HeatingCoil(CoilNum).RTF - 1.0) > 0.001) {
                     if (HeatingCoil(CoilNum).RTFErrorCount < 1) {
                         ++HeatingCoil(CoilNum).RTFErrorCount;
-                        ShowWarningError(state, "CalcFuelHeatingCoil: " + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + "=\"" +
-                                         HeatingCoil(CoilNum).Name + "\", runtime fraction");
+                        ShowWarningError(state,
+                                         "CalcFuelHeatingCoil: " + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + "=\"" +
+                                             HeatingCoil(CoilNum).Name + "\", runtime fraction");
                         ShowContinueError(state, format("The runtime fraction exceeded 1.0. [{:.4T}].", HeatingCoil(CoilNum).RTF));
                         ShowContinueError(state, "Runtime fraction is set to 1.0 and the simulation continues...");
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel].");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(state, HeatingCoil(CoilNum).Name + ", Heating coil runtime fraction > 1.0 warning continues... ",
+                        ShowRecurringWarningErrorAtEnd(state,
+                                                       HeatingCoil(CoilNum).Name + ", Heating coil runtime fraction > 1.0 warning continues... ",
                                                        HeatingCoil(CoilNum).RTFErrorIndex,
                                                        HeatingCoil(CoilNum).RTF,
                                                        HeatingCoil(CoilNum).RTF);
@@ -2251,7 +2457,7 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        auto & ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
+        auto &ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
         auto &MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
         auto &MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
 
@@ -2323,7 +2529,8 @@ namespace HeatingCoils {
 
         OutdoorPressure = state.dataEnvrn->OutBaroPress;
 
-        if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, HeatingCoil(CoilNum).SchedPtr) > 0.0) && ((CycRatio > 0.0) || (SpeedRatio > 0.0))) {
+        if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, HeatingCoil(CoilNum).SchedPtr) > 0.0) &&
+            ((CycRatio > 0.0) || (SpeedRatio > 0.0))) {
 
             if (StageNum > 1) {
 
@@ -2454,13 +2661,15 @@ namespace HeatingCoils {
                 if (PLF < 0.7) {
                     if (HeatingCoil(CoilNum).PLFErrorCount < 1) {
                         ++HeatingCoil(CoilNum).PLFErrorCount;
-                        ShowWarningError(state, "CalcFuelHeatingCoil: " + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + "=\"" +
-                                         HeatingCoil(CoilNum).Name + "\", PLF curve values");
+                        ShowWarningError(state,
+                                         "CalcFuelHeatingCoil: " + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + "=\"" +
+                                             HeatingCoil(CoilNum).Name + "\", PLF curve values");
                         ShowContinueError(state, format("The PLF curve value = {:.5T} for part-load ratio = {:.5T}", PLF, PartLoadRat));
                         ShowContinueError(state, "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and the simulation continues...");
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel].");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(state, HeatingCoil(CoilNum).Name + ", Heating coil PLF curve < 0.7 warning continues... ",
+                        ShowRecurringWarningErrorAtEnd(state,
+                                                       HeatingCoil(CoilNum).Name + ", Heating coil PLF curve < 0.7 warning continues... ",
                                                        HeatingCoil(CoilNum).PLFErrorIndex,
                                                        PLF,
                                                        PLF);
@@ -2472,13 +2681,15 @@ namespace HeatingCoils {
                 if (HeatingCoil(CoilNum).RTF > 1.0 && std::abs(HeatingCoil(CoilNum).RTF - 1.0) > 0.001) {
                     if (HeatingCoil(CoilNum).RTFErrorCount < 1) {
                         ++HeatingCoil(CoilNum).RTFErrorCount;
-                        ShowWarningError(state, "CalcFuelHeatingCoil: " + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + "=\"" +
-                                         HeatingCoil(CoilNum).Name + "\", runtime fraction");
+                        ShowWarningError(state,
+                                         "CalcFuelHeatingCoil: " + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + "=\"" +
+                                             HeatingCoil(CoilNum).Name + "\", runtime fraction");
                         ShowContinueError(state, format("The runtime fraction exceeded 1.0. [{:.4T}].", HeatingCoil(CoilNum).RTF));
                         ShowContinueError(state, "Runtime fraction is set to 1.0 and the simulation continues...");
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel].");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(state, HeatingCoil(CoilNum).Name + ", Heating coil runtime fraction > 1.0 warning continues... ",
+                        ShowRecurringWarningErrorAtEnd(state,
+                                                       HeatingCoil(CoilNum).Name + ", Heating coil runtime fraction > 1.0 warning continues... ",
                                                        HeatingCoil(CoilNum).RTFErrorIndex,
                                                        HeatingCoil(CoilNum).RTF,
                                                        HeatingCoil(CoilNum).RTF);
@@ -2502,7 +2713,8 @@ namespace HeatingCoils {
         state.dataLoopNodes->Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
     }
 
-    void CalcDesuperheaterHeatingCoil(EnergyPlusData &state, int const CoilNum,     // index to desuperheater heating coil
+    void CalcDesuperheaterHeatingCoil(EnergyPlusData &state,
+                                      int const CoilNum,     // index to desuperheater heating coil
                                       Real64 const QCoilReq, // load requested by the simulation for load based control [W]
                                       Real64 &QCoilActual    // coil load actually delivered
     )
@@ -2567,7 +2779,8 @@ namespace HeatingCoils {
         TempSetPoint = HeatingCoil(CoilNum).DesiredOutletTemp;
 
         // If there is a fault of coil SAT Sensor
-        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
+        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
+            (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = HeatingCoil(CoilNum).FaultyCoilSATIndex;
             HeatingCoil(CoilNum).FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
@@ -2584,26 +2797,29 @@ namespace HeatingCoils {
                 // Added last term to available energy equations to avoid double counting reclaimed energy
                 // because refrigeration systems are solved outside the hvac time step iterations
                 HeatingCoil(CoilNum).RTF = 1.0;
-                HeatingCoil(CoilNum).NominalCapacity = state.dataHeatBal->HeatReclaimRefrigeratedRack(SourceID).AvailCapacity * Effic -
-                                                       state.dataHeatBal->HeatReclaimRefrigeratedRack(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal;
+                HeatingCoil(CoilNum).NominalCapacity =
+                    state.dataHeatBal->HeatReclaimRefrigeratedRack(SourceID).AvailCapacity * Effic -
+                    state.dataHeatBal->HeatReclaimRefrigeratedRack(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal;
             } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == HeatObjTypes::CONDENSER_REFRIGERATION) {
                 AvailTemp = state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).AvailTemperature;
                 HeatingCoil(CoilNum).RTF = 1.0;
                 if (AvailTemp <= TempAirIn) {
                     HeatingCoil(CoilNum).NominalCapacity = 0.0;
-                    ShowRecurringWarningErrorAtEnd(state, "Coil:Heating:Desuperheater " + HeatingCoil(CoilNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   "Coil:Heating:Desuperheater " + HeatingCoil(CoilNum).Name +
                                                        " - Waste heat source temperature was too low to be useful.",
                                                    HeatingCoil(CoilNum).InsuffTemperatureWarn);
                 } else {
-                    HeatingCoil(CoilNum).NominalCapacity = state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).AvailCapacity * Effic -
-                                                           state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal;
+                    HeatingCoil(CoilNum).NominalCapacity =
+                        state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).AvailCapacity * Effic -
+                        state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal;
                 }
             } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == HeatObjTypes::COIL_DX_COOLING ||
                        HeatingCoil(CoilNum).ReclaimHeatingSource == HeatObjTypes::COIL_DX_MULTISPEED ||
                        HeatingCoil(CoilNum).ReclaimHeatingSource == HeatObjTypes::COIL_DX_MULTIMODE) {
                 HeatingCoil(CoilNum).RTF = state.dataDXCoils->DXCoil(SourceID).CoolingCoilRuntimeFraction;
-                HeatingCoil(CoilNum).NominalCapacity =
-                    state.dataHeatBal->HeatReclaimDXCoil(SourceID).AvailCapacity * Effic - state.dataHeatBal->HeatReclaimDXCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal;
+                HeatingCoil(CoilNum).NominalCapacity = state.dataHeatBal->HeatReclaimDXCoil(SourceID).AvailCapacity * Effic -
+                                                       state.dataHeatBal->HeatReclaimDXCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal;
             } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == HeatObjTypes::COIL_DX_VARIABLE_COOLING) {
                 // condenser heat rejection
                 HeatingCoil(CoilNum).RTF = state.dataVariableSpeedCoils->VarSpeedCoil(SourceID).RunFrac;
@@ -2684,8 +2900,7 @@ namespace HeatingCoils {
             //   Refrigerated cases are simulated at the zone time step, do not decrement available capacity
             //   (the heat reclaim available capacity will not get reinitialized as the air loop iterates)
             int DesuperheaterNum = CoilNum - state.dataHeatingCoils->NumElecCoil - state.dataHeatingCoils->NumElecCoilMultiStage -
-                                   state.dataHeatingCoils->NumFuelCoil -
-                                   state.dataHeatingCoils->NumGasCoilMultiStage;
+                                   state.dataHeatingCoils->NumFuelCoil - state.dataHeatingCoils->NumGasCoilMultiStage;
             if (HeatingCoil(CoilNum).ReclaimHeatingSource == HeatObjTypes::COMPRESSORRACK_REFRIGERATEDCASE) {
                 state.dataHeatBal->HeatReclaimRefrigeratedRack(SourceID).HVACDesuperheaterReclaimedHeat(DesuperheaterNum) = HeatingCoilLoad;
                 state.dataHeatBal->HeatReclaimRefrigeratedRack(SourceID).HVACDesuperheaterReclaimedHeatTotal = 0.0;
@@ -2797,7 +3012,7 @@ namespace HeatingCoils {
         // This subroutine updates the report variable for the coils.
 
         // Using/Aliasing
-        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
@@ -2839,11 +3054,11 @@ namespace HeatingCoils {
             if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(state,
                                                                                       state.dataHeatingCoils->HeatingCoil(CoilNum).Name,
-                                                          coilObjClassName,
-                                                          state.dataHeatingCoils->HeatingCoil(CoilNum).NominalCapacity,
-                                                          state.dataHeatingCoils->HeatingCoil(CoilNum).NominalCapacity,
-                                                          -999.0,
-                                                          -999.0);
+                                                                                      coilObjClassName,
+                                                                                      state.dataHeatingCoils->HeatingCoil(CoilNum).NominalCapacity,
+                                                                                      state.dataHeatingCoils->HeatingCoil(CoilNum).NominalCapacity,
+                                                                                      -999.0,
+                                                                                      -999.0);
                 state.dataHeatingCoils->HeatingCoil(CoilNum).reportCoilFinalSizes = false;
             }
         }
@@ -2915,8 +3130,7 @@ namespace HeatingCoils {
                 ShowSevereError(state, "CheckHeatingCoilSchedule: Coil=\"" + CompName + "\"");
                 ShowContinueError(state,
                                   "...expected type=\"" + CompType + "\", actual type=\"" +
-                                      cAllCoilTypes(state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num) +
-                                  "\".");
+                                      cAllCoilTypes(state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num) + "\".");
                 ShowFatalError(state, "Program terminates due to preceding conditions.");
             }
             CompIndex = CoilNum;
@@ -2938,8 +3152,7 @@ namespace HeatingCoils {
                                        state.dataHeatingCoils->HeatingCoil(CoilNum).Name));
                 ShowContinueError(state,
                                   "...expected type=\"" + CompType + "\", actual type=\"" +
-                                      cAllCoilTypes(state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num) +
-                                  "\".");
+                                      cAllCoilTypes(state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num) + "\".");
                 ShowFatalError(state, "Program terminates due to preceding conditions.");
             }
             Value = GetCurrentScheduleValue(state, state.dataHeatingCoils->HeatingCoil(CoilNum).SchedPtr); // not scheduled?
@@ -2998,8 +3211,9 @@ namespace HeatingCoils {
                 ShowSevereError(state, "GetCoilCapacity: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
             } else if (FoundType > 0) {
                 ShowSevereError(state, "GetCoilCapacity: Invalid coil type for capacity, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
-                ShowContinueError(state, "...only " + cAllCoilTypes(Coil_HeatingElectric) + ", " + cAllCoilTypes(Coil_HeatingGasOrOtherFuel) + " or " +
-                                  cAllCoilTypes(Coil_HeatingDesuperheater) + " are valid in this context.");
+                ShowContinueError(state,
+                                  "...only " + cAllCoilTypes(Coil_HeatingElectric) + ", " + cAllCoilTypes(Coil_HeatingGasOrOtherFuel) + " or " +
+                                      cAllCoilTypes(Coil_HeatingDesuperheater) + " are valid in this context.");
             }
             ShowContinueError(state, "... returning Coil Capacity as -1000.");
             ErrorsFound = true;

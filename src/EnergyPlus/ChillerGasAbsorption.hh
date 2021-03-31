@@ -206,9 +206,11 @@ namespace ChillerGasAbsorption {
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void
+        simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(
+            EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &SizFac) override;
 
@@ -243,16 +245,17 @@ namespace ChillerGasAbsorption {
 
 } // namespace ChillerGasAbsorption
 
-    struct ChillerGasAbsorptionData : BaseGlobalStruct {
-        bool getGasAbsorberInputs = true;
-        Array1D<ChillerGasAbsorption::GasAbsorberSpecs> GasAbsorber;
+struct ChillerGasAbsorptionData : BaseGlobalStruct
+{
+    bool getGasAbsorberInputs = true;
+    Array1D<ChillerGasAbsorption::GasAbsorberSpecs> GasAbsorber;
 
-        void clear_state() override
-        {
-            this->getGasAbsorberInputs = true;
-            this->GasAbsorber.deallocate();
-        }
-    };
+    void clear_state() override
+    {
+        this->getGasAbsorberInputs = true;
+        this->GasAbsorber.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -45,59 +45,114 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/StateManagement.hh>
+#ifndef PsychCacheData_hh_INCLUDED
+#define PsychCacheData_hh_INCLUDED
 
-#include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
-#include <EnergyPlus/Autosizing/Base.hh>
-#include <EnergyPlus/Coils/CoilCoolingDX.hh>
-#include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/DataViewFactorInformation.hh>
-#include <EnergyPlus/EvaporativeFluidCoolers.hh>
-#include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/HVACDuct.hh>
-#include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/HybridModel.hh>
-#include <EnergyPlus/IntegratedHeatPump.hh>
-#include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutsideEnergySources.hh>
-#include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
-#include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
-#include <EnergyPlus/Photovoltaics.hh>
-#include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
-#include <EnergyPlus/RoomAirModelUserTempPattern.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 
-void EnergyPlus::clearAllStates(EnergyPlusData &state)
+namespace EnergyPlus {
+
+#ifdef EP_nocache_Psychrometrics
+#undef EP_cache_PsyTwbFnTdbWPb
+#undef EP_cache_PsyPsatFnTemp
+#undef EP_cache_PsyTsatFnPb
+#undef EP_cache_PsyTsatFnHPb
+#else
+#define EP_cache_PsyTwbFnTdbWPb
+#define EP_cache_PsyPsatFnTemp
+#define EP_cache_PsyTsatFnPb
+#define EP_cache_PsyTsatFnHPb
+#endif
+
+#ifdef EP_cache_PsyTwbFnTdbWPb
+struct cached_twb_t
 {
-    // clear the passed in state
-    state.clear_state();
-    // then clear any other remaining global state, the number of these here will reduce over time
-    using namespace EnergyPlus;
-    // A to Z order
-    autosizing_clear_state();
-    CoilCoolingDX::clear_state();
-    AirflowNetwork::clear_state();
-    DataOutputs::clear_state();
-    DataStringGlobals::clear_state();
-    DataViewFactorInformation::clear_state();
-    EvaporativeFluidCoolers::clear_state();
-    FluidProperties::clear_state();
-    HeatBalanceManager::clear_state();
-    HVACDuct::clear_state();
-    HVACFan::clearHVACFanObjects();
-    HybridModel::clear_state();
-    HysteresisPhaseChange::clear_state();
-    Photovoltaics::clear_state();
-    PhotovoltaicThermalCollectors::clear_state();
-    Psychrometrics::clear_state();
-    RoomAirModelAirflowNetwork::clear_state();
-    RoomAirModelUserTempPattern::clear_state();
-}
+    // Members
+    Int64 iTdb;
+    Int64 iW;
+    Int64 iPb;
+    Real64 Twb;
+
+    // Default Constructor
+    cached_twb_t() : iTdb(0), iW(0), iPb(0), Twb(0.0)
+    {
+    }
+};
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+struct cached_tsat_h_pb
+{
+    // Members
+    Int64 iH;
+    Int64 iPb;
+    Real64 Tsat;
+
+    // Default Constructor
+    cached_tsat_h_pb() : iH(0), iPb(0), Tsat(0.0)
+    {
+    }
+};
+#endif
+#ifdef EP_cache_PsyPsatFnTemp
+struct cached_psat_t
+{
+    // Members
+    Int64 iTdb;
+    Real64 Psat;
+
+    // Default Constructor
+    cached_psat_t() : iTdb(-1000), Psat(0.0)
+    {
+    }
+};
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+struct cached_tsat_pb
+{
+    // Members
+    Int64 iPb;
+    Real64 Tsat;
+
+    // Default Constructor
+    cached_tsat_pb() : iPb(-1000), Tsat(0.0)
+    {
+    }
+};
+#endif
+
+struct PsychrometricCacheData : BaseGlobalStruct
+{
+
+#ifdef EP_cache_PsyTwbFnTdbWPb
+    Array1D<cached_twb_t> cached_Twb; // DIMENSION(0:twbcache_size)
+#endif
+#ifdef EP_cache_PsyPsatFnTemp
+    Array1D<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+    Array1D<cached_tsat_pb> cached_Tsat; // DIMENSION(0:tsatcache_size)
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+    Array1D<cached_tsat_h_pb> cached_Tsat_HPb; // DIMENSION(0:tsat_hbp_cache_size)
+#endif
+
+    void clear_state() override
+    {
+#ifdef EP_cache_PsyTwbFnTdbWPb
+        cached_Twb.clear();
+#endif
+#ifdef EP_cache_PsyPsatFnTemp
+        cached_Psat.clear();
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+        cached_Tsat.clear();
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+        cached_Tsat_HPb.clear();
+#endif
+    }
+};
+
+} // namespace EnergyPlus
+
+#endif // PsychCacheData_hh_INCLUDED

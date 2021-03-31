@@ -103,8 +103,18 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -124,8 +134,18 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -145,8 +165,18 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -166,8 +196,18 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;              // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -187,8 +227,18 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -208,8 +258,18 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -300,7 +360,7 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
         "	0.00236,              !- Outdoor Air Flow per Person { m3/s-person }",
         "	0.000305,             !- Outdoor Air Flow per Zone Floor Area { m3/s-m2 }",
         "	0.0;                  !- Outdoor Air Flow per Zone { m3/s }",
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -369,7 +429,7 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
         "	0.00236,              !- Outdoor Air Flow per Person { m3/s-person }",
         "	0.000305,             !- Outdoor Air Flow per Zone Floor Area { m3/s-m2 }",
         "	0.0;                  !- Outdoor Air Flow per Zone { m3/s }",
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -398,9 +458,9 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     int HourNum;
     int TimeStepNum;
 
-    //Tests for when to do a pulse test for the Load Component Output Report
+    // Tests for when to do a pulse test for the Load Component Output Report
 
-    //Test 1a: Everything as it should be to set this to true-->result should be true
+    // Test 1a: Everything as it should be to set this to true-->result should be true
     PulseSizing = true;
     WarmupFlag = false;
     HourNum = 10;
@@ -410,7 +470,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_TRUE(Answer);
 
-    //Test 16: Everything as it should be to set this to true-->result should be true
+    // Test 16: Everything as it should be to set this to true-->result should be true
     PulseSizing = true;
     WarmupFlag = false;
     HourNum = 10;
@@ -420,7 +480,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_TRUE(Answer);
 
-    //Test 2: PulseSizing is false-->result should be false
+    // Test 2: PulseSizing is false-->result should be false
     PulseSizing = false;
     WarmupFlag = false;
     HourNum = 10;
@@ -430,7 +490,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
-    //Test 3: Warmup is true-->result should be false
+    // Test 3: Warmup is true-->result should be false
     PulseSizing = false;
     WarmupFlag = true;
     HourNum = 10;
@@ -440,7 +500,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
-    //Test 4: HourNum not 10-->result should be false
+    // Test 4: HourNum not 10-->result should be false
     PulseSizing = true;
     WarmupFlag = false;
     HourNum = 7;
@@ -450,7 +510,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
-    //Test 5: TimeStepNum not 1-->result should be false
+    // Test 5: TimeStepNum not 1-->result should be false
     PulseSizing = true;
     WarmupFlag = false;
     HourNum = 10;
@@ -460,7 +520,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
-    //Test 6: DayOfSim not 1 and KindSim not weather file period --> result should be false
+    // Test 6: DayOfSim not 1 and KindSim not weather file period --> result should be false
     PulseSizing = true;
     WarmupFlag = false;
     HourNum = 10;
@@ -470,7 +530,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
-    //Test 7: everything set to make the answer false
+    // Test 7: everything set to make the answer false
     PulseSizing = false;
     WarmupFlag = true;
     HourNum = 2;
@@ -479,5 +539,4 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     state->dataGlobal->DayOfSim = 2;
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
-
 }

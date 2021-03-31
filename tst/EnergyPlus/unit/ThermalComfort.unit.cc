@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -63,12 +64,11 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/Psychrometrics.hh>
-#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ThermalComfort;
@@ -79,7 +79,7 @@ using namespace EnergyPlus::DataRoomAirModel;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalSurface;
-//using namespace EnergyPlus::ScheduleManager;
+// using namespace EnergyPlus::ScheduleManager;
 using namespace SimulationManager;
 using namespace ObjexxFCL;
 
@@ -104,8 +104,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     state->dataHeatBalFanSys->TempControlType(1) = SingleHeatingSetPoint;
 
     // heating
-    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                     // 70F
-    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
+    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                    // 72F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
     CalcIfSetPointMet(*state);
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
@@ -114,8 +114,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // cooling
-    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                      // 77F
-    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
+    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                         // 77F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                     // 75F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
     CalcIfSetPointMet(*state);
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
@@ -128,8 +128,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     state->dataHeatBalFanSys->TempControlType(1) = SingleCoolingSetPoint;
 
     // heating
-    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                     // 70F
-    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
+    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                    // 72F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
     CalcIfSetPointMet(*state);
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
@@ -138,8 +138,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // cooling
-    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                      // 77F
-    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
+    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                         // 77F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                     // 75F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
     CalcIfSetPointMet(*state);
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
@@ -152,8 +152,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     state->dataHeatBalFanSys->TempControlType(1) = SingleHeatCoolSetPoint;
 
     // heating
-    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                     // 70F
-    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
+    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                    // 72F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
     CalcIfSetPointMet(*state);
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
@@ -162,8 +162,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // cooling
-    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                      // 77F
-    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
+    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                         // 77F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                     // 75F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
     CalcIfSetPointMet(*state);
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
@@ -176,8 +176,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     state->dataHeatBalFanSys->TempControlType(1) = DualSetPointWithDeadBand;
 
     // heating
-    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                     // 70F
-    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
+    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                    // 72F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
     CalcIfSetPointMet(*state);
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
@@ -186,8 +186,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // cooling
-    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                      // 77F
-    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
+    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                         // 77F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                     // 75F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
     CalcIfSetPointMet(*state);
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
@@ -906,9 +906,9 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     state->dataHeatBalFanSys->TempControlType(1) = DualSetPointWithDeadBand;
 
     // heating
-    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                     // 70F
-    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
-    state->dataHeatBalFanSys->ZoneThermostatSetPointLoAver(1) = 22.2;                 // 72F
+    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                    // 72F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLoAver(1) = 22.2;                // 72F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
     CalcIfSetPointMet(*state);
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
@@ -917,9 +917,9 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // cooling
-    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                      // 77F
-    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
-    state->dataHeatBalFanSys->ZoneThermostatSetPointHiAver(1) = 23.9;                  // 75F
+    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                         // 77F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                     // 75F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHiAver(1) = 23.9;                 // 75F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
     CalcIfSetPointMet(*state);
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
@@ -939,7 +939,6 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).totalNotMetHeatingOccupied);
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).totalNotMetCooling);
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).totalNotMetCoolingOccupied);
-
 }
 
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
@@ -1018,7 +1017,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
 
     state->dataHeatBalFanSys->ZTAVComf(1) = AirTemp;
     state->dataHeatBal->MRT(1) = RadTemp;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) = Psychrometrics::PsyWFnTdbRhPb(*state, state->dataHeatBalFanSys->ZTAVComf(1), RelHum, state->dataEnvrn->OutBaroPress);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) =
+        Psychrometrics::PsyWFnTdbRhPb(*state, state->dataHeatBalFanSys->ZTAVComf(1), RelHum, state->dataEnvrn->OutBaroPress);
     state->dataScheduleMgr->Schedule(1).CurrentValue = ActMet * BodySurfaceArea * state->dataThermalComforts->ActLevelConv;
     state->dataScheduleMgr->Schedule(2).CurrentValue = CloUnit;
 
@@ -1030,7 +1030,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     Real64 StillAirVel = 0.1;
     Real64 RelAirVel = CalcRelativeAirVelocity(AirVel, ActMet);
     Real64 InitialSET = CalcStandardEffectiveTemp(*state, AirTemp, RadTemp, RelHum, RelAirVel, ActMet, CloUnit, WorkEff);
-    Real64 CoolingEffectSET = CalcStandardEffectiveTemp(*state, AirTemp - CoolingEffect, RadTemp - CoolingEffect, RelHum, StillAirVel, ActMet, CloUnit, WorkEff);
+    Real64 CoolingEffectSET =
+        CalcStandardEffectiveTemp(*state, AirTemp - CoolingEffect, RadTemp - CoolingEffect, RelHum, StillAirVel, ActMet, CloUnit, WorkEff);
     EXPECT_NEAR(CoolingEffectSET, InitialSET, 0.1);
 
     // Test 2 - Air velocity = 1 m/s.
@@ -1038,7 +1039,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataScheduleMgr->Schedule(3).CurrentValue = AirVel;
     CalcThermalComfortCoolingEffectASH(*state);
     CoolingEffect = state->dataThermalComforts->ThermalComfortData(1).CoolingEffectASH55;
-    CoolingEffectSET = CalcStandardEffectiveTemp(*state, AirTemp - CoolingEffect, RadTemp - CoolingEffect, RelHum, StillAirVel, ActMet, CloUnit, WorkEff);
+    CoolingEffectSET =
+        CalcStandardEffectiveTemp(*state, AirTemp - CoolingEffect, RadTemp - CoolingEffect, RelHum, StillAirVel, ActMet, CloUnit, WorkEff);
 
     RelAirVel = CalcRelativeAirVelocity(AirVel, ActMet);
     InitialSET = CalcStandardEffectiveTemp(*state, AirTemp, RadTemp, RelHum, RelAirVel, ActMet, CloUnit, WorkEff);

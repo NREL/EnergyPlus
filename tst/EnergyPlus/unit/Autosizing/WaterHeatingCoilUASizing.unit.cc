@@ -89,7 +89,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(35.0, sizedValue, 0.01); // hard-sized value
-    sizer.autoSizedValue = 0.0;         // reset for next test
+    sizer.autoSizedValue = 0.0;          // reset for next test
 
     // reset eio stream
     has_eio_output(true);
@@ -100,7 +100,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(35.0, sizedValue, 0.01); // hard-sized value
-    sizer.autoSizedValue = 0.0;         // reset for next test
+    sizer.autoSizedValue = 0.0;          // reset for next test
 
     std::string eiooutput =
         std::string("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n"
@@ -160,7 +160,8 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(98.35, sizedValue, 0.01);
 
-    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size U-Factor Times Area Value [W/K], 98.35096\n");
+    eiooutput =
+        std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size U-Factor Times Area Value [W/K], 98.35096\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -237,7 +238,8 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
-    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size U-Factor Times Area Value [W/K], 98.35096\n");
+    eiooutput =
+        std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size U-Factor Times Area Value [W/K], 98.35096\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -313,8 +315,9 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     EXPECT_FALSE(errorsFound);
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
-    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size U-Factor Times Area Value [W/K], 98.35096\n"
-                            " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified U-Factor Times Area Value [W/K], 5.00000\n");
+    eiooutput =
+        std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size U-Factor Times Area Value [W/K], 98.35096\n"
+                    " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified U-Factor Times Area Value [W/K], 5.00000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }
 

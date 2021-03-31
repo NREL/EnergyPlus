@@ -176,7 +176,8 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state,
+                                                          FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     state->dataSingleDuct->sd_airterminal(SysNum).SimVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
@@ -189,7 +190,8 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     FirstHVACIteration = false;
-    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state,
+                                                          FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     state->dataSingleDuct->sd_airterminal(SysNum).SimVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     EXPECT_EQ(SysMaxMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMinMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
@@ -206,7 +208,8 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state,
+                                                          FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     state->dataSingleDuct->sd_airterminal(SysNum).SimVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
@@ -219,7 +222,8 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     FirstHVACIteration = false;
-    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state,
+                                                          FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     state->dataSingleDuct->sd_airterminal(SysNum).SimVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     EXPECT_EQ(SysMaxMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMaxMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
@@ -348,7 +352,8 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state,
+                                                          FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     state->dataSingleDuct->sd_airterminal(SysNum).SimVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
@@ -361,7 +366,8 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     FirstHVACIteration = false;
-    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state,
+                                                          FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     state->dataSingleDuct->sd_airterminal(SysNum).SimVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     EXPECT_EQ(SysMaxMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMinMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
@@ -378,7 +384,8 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state,
+                                                          FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     state->dataSingleDuct->sd_airterminal(SysNum).SimVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
@@ -391,7 +398,8 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     FirstHVACIteration = false;
-    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state,
+                                                          FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     state->dataSingleDuct->sd_airterminal(SysNum).SimVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     EXPECT_EQ(SysMaxMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMaxMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
@@ -1259,15 +1267,19 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
 
     // zone floor area of zone 1 = 0, zone 2 > 0. Expect TU MaxAirVolFlowRateDuringReheat = 0 only for zone 1.
     // this test isn't relevant anymore since defaulting is done differently
-    Real64 MaxAirVolFlowRateDuringReheatDes = min(state->dataSize->FinalZoneSizing(1).DesHeatVolFlowMax, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate);
-    // Real64 MaxAirVolFlowRateDuringReheatDes = min( 0.002032 * state->dataSingleDuct->sd_airterminal( 1 ).ZoneFloorArea, state->dataSingleDuct->sd_airterminal( 1 ).MaxAirVolFlowRate );
-    // apply limit based on min stop
+    Real64 MaxAirVolFlowRateDuringReheatDes =
+        min(state->dataSize->FinalZoneSizing(1).DesHeatVolFlowMax, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate);
+    // Real64 MaxAirVolFlowRateDuringReheatDes = min( 0.002032 * state->dataSingleDuct->sd_airterminal( 1 ).ZoneFloorArea,
+    // state->dataSingleDuct->sd_airterminal( 1 ).MaxAirVolFlowRate ); apply limit based on min stop
     MaxAirVolFlowRateDuringReheatDes =
-        max(MaxAirVolFlowRateDuringReheatDes, (state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate * state->dataSingleDuct->sd_airterminal(1).ZoneMinAirFrac));
+        max(MaxAirVolFlowRateDuringReheatDes,
+            (state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate * state->dataSingleDuct->sd_airterminal(1).ZoneMinAirFrac));
 
     // This isn't relevant any more since the default is calculated differently
-    Real64 MaxAirVolFractionDuringReheatDes = min(1.0, (state->dataSize->FinalZoneSizing(1).DesHeatVolFlowMax / state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate));
-    // Real64 MaxAirVolFractionDuringReheatDes = min( 1.0, ( 0.002032 * state->dataSingleDuct->sd_airterminal( 1 ).ZoneFloorArea / state->dataSingleDuct->sd_airterminal( 1 ).MaxAirVolFlowRate )
+    Real64 MaxAirVolFractionDuringReheatDes =
+        min(1.0, (state->dataSize->FinalZoneSizing(1).DesHeatVolFlowMax / state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate));
+    // Real64 MaxAirVolFractionDuringReheatDes = min( 1.0, ( 0.002032 * state->dataSingleDuct->sd_airterminal( 1 ).ZoneFloorArea /
+    // state->dataSingleDuct->sd_airterminal( 1 ).MaxAirVolFlowRate )
     // ); apply limit based on min stop
     MaxAirVolFractionDuringReheatDes = max(MaxAirVolFractionDuringReheatDes, state->dataSingleDuct->sd_airterminal(1).ZoneMinAirFrac);
     // apply model math
@@ -1279,10 +1291,13 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRateDuringReheat, MaxAirVolFlowRateDuringReheatDes, 0.0000000000001);
     EXPECT_NEAR(MaxAirVolFractionDuringReheatDes, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFractionDuringReheat, 0.0000000000001);
 
-    MaxAirVolFlowRateDuringReheatDes = min(state->dataSize->FinalZoneSizing(2).DesHeatVolFlowMax, state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate);
     MaxAirVolFlowRateDuringReheatDes =
-        max(MaxAirVolFlowRateDuringReheatDes, (state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate * state->dataSingleDuct->sd_airterminal(2).ZoneMinAirFrac));
-    MaxAirVolFractionDuringReheatDes = min(1.0, (state->dataSize->FinalZoneSizing(2).DesHeatVolFlowMax / state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate));
+        min(state->dataSize->FinalZoneSizing(2).DesHeatVolFlowMax, state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate);
+    MaxAirVolFlowRateDuringReheatDes =
+        max(MaxAirVolFlowRateDuringReheatDes,
+            (state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate * state->dataSingleDuct->sd_airterminal(2).ZoneMinAirFrac));
+    MaxAirVolFractionDuringReheatDes =
+        min(1.0, (state->dataSize->FinalZoneSizing(2).DesHeatVolFlowMax / state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate));
     MaxAirVolFractionDuringReheatDes = max(MaxAirVolFractionDuringReheatDes, state->dataSingleDuct->sd_airterminal(2).ZoneMinAirFrac);
     MaxAirVolFlowRateDuringReheatDes =
         min(max(MaxAirVolFlowRateDuringReheatDes, MaxAirVolFractionDuringReheatDes * state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate),

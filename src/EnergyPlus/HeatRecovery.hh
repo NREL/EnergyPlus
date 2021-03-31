@@ -183,32 +183,31 @@ namespace HeatRecovery {
         Real64 SecOutEnth;     // secondary air outlet enthalpy (J/kg)
         Real64 SecOutMassFlow; // secondary air outlet mass flow rate (kg/s)
         // report values
-        Real64 SensHeatingRate;   // rate of sensible heat being added to the supply (primary) air [W]
-        Real64 SensHeatingEnergy; // sensible heat added to the supply (primary) air [J]
-        Real64 LatHeatingRate;    // rate of latent heat being added to the supply (primary) air [W]
-        Real64 LatHeatingEnergy;  // latent heat added to the supply (primary) air [J]
-        Real64 TotHeatingRate;    // rate of total heat being added to the supply (primary) air [W]
-        Real64 TotHeatingEnergy;  // total heat added to the supply (primary) air [J]
-        Real64 SensCoolingRate;   // rate of sensible heat being removed from the supply (primary) air [W]
-        Real64 SensCoolingEnergy; // sensible heat removed from the supply (primary) air [J]
-        Real64 LatCoolingRate;    // rate of latent heat being removed from the supply (primary) air [W]
-        Real64 LatCoolingEnergy;  // latent heat removed from the supply (primary) air [J]
-        Real64 TotCoolingRate;    // rate of total heat being removed from the supply (primary) air [W]
-        Real64 TotCoolingEnergy;  // total heat removed from the supply (primary) air [J]
-        Real64 ElecUseEnergy;     // electricity consumption [J]
-        Real64 ElecUseRate;       // electricity consumption rate [W]
-        Real64 SensEffectiveness; // heat exchanger sensible effectiveness [-]
-        Real64 LatEffectiveness;  // heat exchanger latent effectiveness [-]
-        Real64 SupBypassMassFlow; // supply air mass flow rate bypassing the heat exchanger [kg/s]
-        Real64 SecBypassMassFlow; // secondary air mass flow rate bypassing the heat exchanger [kg/s]
-        int LowFlowErrCount;      // Counter for recurring warning message
-        int LowFlowErrIndex;      // Index to recurring warning message
-        int UnBalancedErrCount;   // Counter for recurring warning message
-        int UnBalancedErrIndex;   // Index to recurring warning message
-        bool myEnvrnFlag;         // one-time-init flag
+        Real64 SensHeatingRate;     // rate of sensible heat being added to the supply (primary) air [W]
+        Real64 SensHeatingEnergy;   // sensible heat added to the supply (primary) air [J]
+        Real64 LatHeatingRate;      // rate of latent heat being added to the supply (primary) air [W]
+        Real64 LatHeatingEnergy;    // latent heat added to the supply (primary) air [J]
+        Real64 TotHeatingRate;      // rate of total heat being added to the supply (primary) air [W]
+        Real64 TotHeatingEnergy;    // total heat added to the supply (primary) air [J]
+        Real64 SensCoolingRate;     // rate of sensible heat being removed from the supply (primary) air [W]
+        Real64 SensCoolingEnergy;   // sensible heat removed from the supply (primary) air [J]
+        Real64 LatCoolingRate;      // rate of latent heat being removed from the supply (primary) air [W]
+        Real64 LatCoolingEnergy;    // latent heat removed from the supply (primary) air [J]
+        Real64 TotCoolingRate;      // rate of total heat being removed from the supply (primary) air [W]
+        Real64 TotCoolingEnergy;    // total heat removed from the supply (primary) air [J]
+        Real64 ElecUseEnergy;       // electricity consumption [J]
+        Real64 ElecUseRate;         // electricity consumption rate [W]
+        Real64 SensEffectiveness;   // heat exchanger sensible effectiveness [-]
+        Real64 LatEffectiveness;    // heat exchanger latent effectiveness [-]
+        Real64 SupBypassMassFlow;   // supply air mass flow rate bypassing the heat exchanger [kg/s]
+        Real64 SecBypassMassFlow;   // secondary air mass flow rate bypassing the heat exchanger [kg/s]
+        int LowFlowErrCount;        // Counter for recurring warning message
+        int LowFlowErrIndex;        // Index to recurring warning message
+        int UnBalancedErrCount;     // Counter for recurring warning message
+        int UnBalancedErrIndex;     // Index to recurring warning message
+        bool myEnvrnFlag;           // one-time-init flag
         bool SensEffectivenessFlag; // flag for error message when sensible effectiveness is negative
-        bool LatEffectivenessFlag; // flag for error message when latent effectiveness is negative
-
+        bool LatEffectivenessFlag;  // flag for error message when latent effectiveness is negative
 
         // Default Constructor
         HeatExchCond()
@@ -507,7 +506,8 @@ namespace HeatRecovery {
 
     // Functions
 
-    void SimHeatRecovery(EnergyPlusData &state, std::string const &CompName,                 // name of the heat exchanger unit
+    void SimHeatRecovery(EnergyPlusData &state,
+                         std::string const &CompName,                 // name of the heat exchanger unit
                          bool const FirstHVACIteration,               // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                              // Pointer to Component
                          int const FanOpMode,                         // Supply air fan operating mode
@@ -522,7 +522,8 @@ namespace HeatRecovery {
 
     void GetHeatRecoveryInput(EnergyPlusData &state);
 
-    void InitHeatRecovery(EnergyPlusData &state, int const ExchNum, // number of the current heat exchanger being simulated
+    void InitHeatRecovery(EnergyPlusData &state,
+                          int const ExchNum, // number of the current heat exchanger being simulated
                           int const CompanionCoilIndex,
                           int const CompanionCoilType_Num);
 
@@ -688,26 +689,74 @@ namespace HeatRecovery {
 
 } // namespace HeatRecovery
 
-struct HeatRecoveryData : BaseGlobalStruct {
+struct HeatRecoveryData : BaseGlobalStruct
+{
 
     bool MyOneTimeAllocate = true;
     // Object Data
-    int NumHeatExchangers = 0;         // number of heat exchangers
-    int NumAirToAirPlateExchs = 0;     // number of air to air plate heat exchangers
-    int NumAirToAirGenericExchs = 0;   // number of air to air generic heat exchangers
-    int NumDesiccantBalancedExchs = 0; // number of desiccant balanced heat exchangers
-    int NumDesBalExchsPerfDataType1 = 0;   // number of desiccant balanced heat exchanger performance data maps
-    Real64 FullLoadOutAirTemp = 0.0;   // Used with desiccant HX empirical model, water coils use inlet node condition
+    int NumHeatExchangers = 0;           // number of heat exchangers
+    int NumAirToAirPlateExchs = 0;       // number of air to air plate heat exchangers
+    int NumAirToAirGenericExchs = 0;     // number of air to air generic heat exchangers
+    int NumDesiccantBalancedExchs = 0;   // number of desiccant balanced heat exchangers
+    int NumDesBalExchsPerfDataType1 = 0; // number of desiccant balanced heat exchanger performance data maps
+    Real64 FullLoadOutAirTemp = 0.0;     // Used with desiccant HX empirical model, water coils use inlet node condition
     // DX coils use DXCoilFullLoadOutAirTemp when coil is ON otherwise inlet node
     Real64 FullLoadOutAirHumRat = 0.0; // Used with desiccant HX empirical model, water coils use inlet node condition
     // DX coils use DXCoilFullLoadOutAirHumRat when coil is ON otherwise inlet node
     bool GetInputFlag = true;           // First time, input is "gotten"
     bool CalledFromParentObject = true; // Indicates that HX is called from parent object (this object is not on a branch)
     Array1D_bool CheckEquipName;
-
+    std::string OutputChar;           // character string for warning messages
+    std::string OutputCharLo;         // character string for warning messages
+    std::string OutputCharHi;         // character string for warning messages
+    std::string CharValue;            // character string for warning messages
+    Real64 TimeStepSysLast = 0.0;     // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime = 0.0;      // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast = 0.0;  // end time of time step for last simulation time step
+    std::string OutputChar2;          // character string for warning messages
+    std::string OutputCharLo2;        // character string for warning messages
+    std::string OutputCharHi2;        // character string for warning messages
+    std::string CharValue2;           // character string for warning messages
+    Real64 TimeStepSysLast2 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime2 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast2 = 0.0; // end time of time step for last simulation time step
+    std::string OutputChar3;          // character string for warning messages
+    std::string OutputCharLo3;        // character string for warning messages
+    std::string OutputCharHi3;        // character string for warning messages
+    std::string CharValue3;           // character string for warning messages
+    Real64 TimeStepSysLast3 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime3 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast3 = 0.0; // end time of time step for last simulation time step
+    std::string OutputChar4;          // character string for warning messages
+    std::string OutputCharLo4;        // character string for warning messages
+    std::string OutputCharHi4;        // character string for warning messages
+    std::string CharValue4;           // character string for warning messages
+    Real64 TimeStepSysLast4 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime4 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast4 = 0.0; // end time of time step for last simulation time step
+    std::string OutputChar5;          // character string for warning messages
+    std::string OutputCharLo5;        // character string for warning messages
+    std::string OutputCharHi5;        // character string for warning messages
+    Real64 TimeStepSysLast5 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime5 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast5 = 0.0; // end time of time step for last simulation time step
+    std::string OutputChar6;          // character string for warning messages
+    std::string OutputCharLo6;        // character string for warning messages
+    std::string OutputCharHi6;        // character string for warning messages
+    Real64 TimeStepSysLast6 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime6 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast6 = 0.0; // end time of time step for last simulation time step
+    std::string OutputCharProc;       // character string for warning messages
+    std::string OutputCharRegen;      // character string for warning messages
+    Real64 TimeStepSysLast7 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime7 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast7 = 0.0; // end time of time step for last simulation time step
+    Real64 RegenInletRH = 0.0;        // Regeneration inlet air relative humidity
+    Real64 ProcInletRH = 0.0;         // Process inlet air relative humidity
+    Real64 RegenInletRH2 = 0.0;       // Regeneration inlet air relative humidity
+    Real64 ProcInletRH2 = 0.0;        // Process inlet air relative humidity
 
     std::unordered_map<std::string, std::string> HeatExchangerUniqueNames;
-
 
     // static variables
     Array1D_bool MySetPointTest;
@@ -736,7 +785,28 @@ struct HeatRecoveryData : BaseGlobalStruct {
         BalDesDehumPerfData.clear();
         HeatExchCondNumericFields.clear();
         BalDesDehumPerfNumericFields.clear();
-
+        TimeStepSysLast = 0.0;
+        CurrentEndTime = 0.0;
+        CurrentEndTimeLast = 0.0;
+        TimeStepSysLast2 = 0.0;
+        CurrentEndTime2 = 0.0;
+        CurrentEndTimeLast2 = 0.0;
+        TimeStepSysLast3 = 0.0;
+        CurrentEndTime3 = 0.0;
+        CurrentEndTimeLast3 = 0.0;
+        TimeStepSysLast4 = 0.0;
+        CurrentEndTime4 = 0.0;
+        CurrentEndTimeLast4 = 0.0;
+        TimeStepSysLast5 = 0.0;
+        CurrentEndTime5 = 0.0;
+        CurrentEndTimeLast5 = 0.0;
+        TimeStepSysLast6 = 0.0;
+        CurrentEndTime6 = 0.0;
+        CurrentEndTimeLast6 = 0.0;
+        RegenInletRH = 0.0;
+        ProcInletRH = 0.0;
+        RegenInletRH2 = 0.0;
+        ProcInletRH2 = 0.0;
         // static variables
         MySetPointTest.clear();
         MySizeFlag.clear();

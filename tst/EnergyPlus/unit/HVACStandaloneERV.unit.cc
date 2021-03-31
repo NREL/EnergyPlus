@@ -123,10 +123,12 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
     state->dataHeatBal->People(1).ZonePtr = 1;
     state->dataHeatBal->People(1).NumberOfPeople = 100.0;
-    state->dataHeatBal->People(1).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    state->dataHeatBal->People(1).NumberOfPeoplePtr =
+        DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
     state->dataHeatBal->People(2).ZonePtr = 1;
     state->dataHeatBal->People(2).NumberOfPeople = 200.0;
-    state->dataHeatBal->People(2).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    state->dataHeatBal->People(2).NumberOfPeoplePtr =
+        DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
 
     state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
 
@@ -213,7 +215,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
 
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(*state);  // read schedules
+    ProcessScheduleInput(*state);               // read schedules
 
     GetFanInput(*state);
 

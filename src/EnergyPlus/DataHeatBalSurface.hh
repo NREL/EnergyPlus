@@ -66,22 +66,23 @@ namespace DataHeatBalSurface {
     Real64 constexpr MinSurfaceTempLimit(-100.0);            // Lowest inside surface temperature allowed in Celsius
     Real64 constexpr MinSurfaceTempLimitBeforeFatal(-250.0); // 2.5 times MinSurfaceTempLimit
     Real64 constexpr DefaultSurfaceTempLimit(200.0);         // Highest inside surface temperature allowed in Celsius
-    Real64 constexpr IterDampConst(5.0);                         // Damping constant for inside surface temperature iterations
-    int constexpr ItersReevalConvCoeff(30);                      // Number of iterations between inside convection coefficient reevaluations
-    int constexpr MaxIterations(500);                            // Maximum number of iterations allowed for inside surface temps
-    Real64 constexpr PoolIsOperatingLimit(0.0001);               // Limit to determine if swimming pool is operating or not
-    int constexpr MinEMPDIterations(4);                          // Minimum number of iterations required for EMPD solution
-    int constexpr IterationsForCondFDRelaxChange(5);             // number of iterations for inside temps that triggers a change
+    Real64 constexpr IterDampConst(5.0);                     // Damping constant for inside surface temperature iterations
+    int constexpr ItersReevalConvCoeff(30);                  // Number of iterations between inside convection coefficient reevaluations
+    int constexpr MaxIterations(500);                        // Maximum number of iterations allowed for inside surface temps
+    Real64 constexpr PoolIsOperatingLimit(0.0001);           // Limit to determine if swimming pool is operating or not
+    int constexpr MinEMPDIterations(4);                      // Minimum number of iterations required for EMPD solution
+    int constexpr IterationsForCondFDRelaxChange(5);         // number of iterations for inside temps that triggers a change
 
 } // namespace DataHeatBalSurface
 
-struct HeatBalSurfData : BaseGlobalStruct {
+struct HeatBalSurfData : BaseGlobalStruct
+{
 
     std::vector<bool> Zone_has_mixed_HT_models; // True if any surfaces in zone use CondFD, HAMT, or Kiva
 
     // Integer Variables for the Heat Balance Simulation
     Array1D_int SUMH; // From Old Bldctf.inc
-            
+
     // Surface heat balance limits and convergence parameters
     Real64 MaxSurfaceTempLimit = 200.0;            // Highest inside surface temperature allowed in Celsius
     Real64 MaxSurfaceTempLimitBeforeFatal = 500.0; // 2.5 times MaxSurfaceTempLimit
@@ -255,9 +256,9 @@ struct HeatBalSurfData : BaseGlobalStruct {
     Array2D<Real64> TuserHistM; // Master temperature history at the user specified location (SurfNum,Term)
     Array2D<Real64> QsrcHistM;  // Master heat source/sink history for the surface (SurfNum,Term)
 
-    Array2D<Real64> FractDifShortZtoZ; // Fraction of diffuse short radiation in Zone 2 transmitted to Zone 1
-    Array1D_bool RecDifShortFromZ;     // True if Zone gets short radiation from another
-    bool InterZoneWindow = false;       // True if there is an interzone window
+    Array2D<Real64> FractDifShortZtoZ;   // Fraction of diffuse short radiation in Zone 2 transmitted to Zone 1
+    Array1D_bool RecDifShortFromZ;       // True if Zone gets short radiation from another
+    bool InterZoneWindow = false;        // True if there is an interzone window
     Real64 SumSurfaceHeatEmission = 0.0; // Heat emission from all surfaces
 
     void clear_state() override
@@ -365,7 +366,6 @@ struct HeatBalSurfData : BaseGlobalStruct {
         this->RecDifShortFromZ.deallocate();
         this->InterZoneWindow = false;
         this->SumSurfaceHeatEmission = 0;
-
     }
 };
 

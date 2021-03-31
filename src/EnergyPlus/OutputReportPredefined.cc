@@ -396,8 +396,8 @@ namespace OutputReportPredefined {
         s->pdchZnClPkOAHum = newPreDefColumn(state, s->pdstZoneClSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgDryAir]");
         s->pdchZnClPkOAMinFlow = newPreDefColumn(state, s->pdstZoneClSize, "Minimum Outdoor Air Flow Rate [m3/s]");
         s->pdchZnClPkDOASHeatGain = newPreDefColumn(state, s->pdstZoneClSize, "Heat Gain Rate from DOAS [W]");
-        addFootNoteSubTable(state, s->pdstZoneClSize,
-                            "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads.");
+        addFootNoteSubTable(
+            state, s->pdstZoneClSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads.");
         s->pdstZoneHtSize = newPreDefSubTable(state, s->pdrSizing, "Zone Sensible Heating");
 
         s->pdchZnHtCalcDesLd = newPreDefColumn(state, s->pdstZoneHtSize, "Calculated Design Load [W]");
@@ -414,8 +414,8 @@ namespace OutputReportPredefined {
         s->pdchZnHtPkOAHum = newPreDefColumn(state, s->pdstZoneHtSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgDryAir]");
         s->pdchZnHtPkOAMinFlow = newPreDefColumn(state, s->pdstZoneHtSize, "Minimum Outdoor Air Flow Rate [m3/s]");
         s->pdchZnHtPkDOASHeatGain = newPreDefColumn(state, s->pdstZoneHtSize, "Heat Gain Rate from DOAS [W]");
-        addFootNoteSubTable(state, s->pdstZoneHtSize,
-                            "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads.");
+        addFootNoteSubTable(
+            state, s->pdstZoneHtSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads.");
         s->pdstSystemSize = newPreDefSubTable(state, s->pdrSizing, "System Design Air Flow Rates");
 
         s->pdchSysSizCalcClAir = newPreDefColumn(state, s->pdstSystemSize, "Calculated cooling [m3/s]");
@@ -449,8 +449,10 @@ namespace OutputReportPredefined {
         // coil Final size summary, regardless of how determined (
         s->pdch2CoilFinalTotalCap = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Final Gross Total Capacity [W]");
         s->pdch2CoilFinalSensCap = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Final Gross Sensible Capacity [W]");
-        s->pdch2CoilFinalAirVolFlowRate = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Final Reference Air Volume Flow Rate [m3/s]");
-        s->pdch2CoilFinalPlantVolFlowRate = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Final Reference Plant Fluid Volume Flow Rate [m3/s]");
+        s->pdch2CoilFinalAirVolFlowRate =
+            newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Final Reference Air Volume Flow Rate [m3/s]");
+        s->pdch2CoilFinalPlantVolFlowRate =
+            newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Final Reference Plant Fluid Volume Flow Rate [m3/s]");
         s->pdch2CoilUA = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil U-value Times Area Value [W/K]");
 
         // results from regular zone and system sizing calcs, "At Ideal Loads Peak"
@@ -461,24 +463,33 @@ namespace OutputReportPredefined {
 
         s->pdch2CoilTotalCapIdealPeak = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Total Capacity at Ideal Loads Peak [W]");
         s->pdch2CoilSensCapIdealPeak = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Sensible Capacity at Ideal Loads Peak [W]");
-        s->pdch2CoilAirVolumeFlowIdealPeak = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Air Volume Flow Rate at Ideal Loads Peak [m3/s]");
-        s->pdch2CoilEntDryBulbIdealPeak = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Entering Air Drybulb at Ideal Loads Peak [C]");
-        s->pdch2CoilEntWetBulbIdealPeak = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Entering Air Wetbulb at Ideal Loads Peak [C]");
+        s->pdch2CoilAirVolumeFlowIdealPeak =
+            newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Air Volume Flow Rate at Ideal Loads Peak [m3/s]");
+        s->pdch2CoilEntDryBulbIdealPeak =
+            newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Entering Air Drybulb at Ideal Loads Peak [C]");
+        s->pdch2CoilEntWetBulbIdealPeak =
+            newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Entering Air Wetbulb at Ideal Loads Peak [C]");
         s->pdch2CoilEntHumRatIdealPeak =
             newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
-        s->pdch2CoilLvgDryBulbIdealPeak = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Leaving Air Drybulb at Ideal Loads Peak [C]");
-        s->pdch2CoilLvgWetBulbIdealPeak = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Leaving Air Wetbulb at Ideal Loads Peak [C]");
+        s->pdch2CoilLvgDryBulbIdealPeak =
+            newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Leaving Air Drybulb at Ideal Loads Peak [C]");
+        s->pdch2CoilLvgWetBulbIdealPeak =
+            newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Leaving Air Wetbulb at Ideal Loads Peak [C]");
         s->pdch2CoilLvgHumRatIdealPeak =
             newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
         s->pdch2OADryBulbIdealPeak = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Outdoor Air Drybulb at Ideal Loads Peak [C]");
-        s->pdch2OAHumRatIdealPeak = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Outdoor Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
+        s->pdch2OAHumRatIdealPeak =
+            newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Outdoor Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
         s->pdch2OAWetBulbatIdealPeak = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Outdoor Air Wetbulb at Ideal Loads Peak [C]");
-        s->pdch2OAFlowPrcntIdealPeak = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Outdoor Air Flow Percentage at Ideal Loads Peak [%]");
+        s->pdch2OAFlowPrcntIdealPeak =
+            newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Outdoor Air Flow Percentage at Ideal Loads Peak [%]");
         s->pdch2ZoneAirDryBulbIdealPeak = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Zone Air Drybulb at Ideal Loads Peak [C]");
         s->pdch2ZoneAirHumRatIdealPeak =
             newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Zone Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
-        s->pdch2ZoneAirRelHumIdealPeak = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Zone Air Relative Humidity at Ideal Loads Peak [%]");
-        s->pdch2ZoneSensibleLoadIdealPeak = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Zone Sensible Heat Gain at Ideal Loads Peak [W]");
+        s->pdch2ZoneAirRelHumIdealPeak =
+            newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Zone Air Relative Humidity at Ideal Loads Peak [%]");
+        s->pdch2ZoneSensibleLoadIdealPeak =
+            newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Zone Sensible Heat Gain at Ideal Loads Peak [W]");
         s->pdch2ZoneLatentLoadIdealPeak = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Zone Latent Heat Gain at Ideal Loads Peak [W]");
         // results for coil at Rated Conditions
         s->pdch2CoilRatedTotalCap = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Total Capacity at Rating Conditions [W]");
@@ -508,7 +519,8 @@ namespace OutputReportPredefined {
         s->pdchCoilFinalTotalCap = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Final Gross Total Capacity [W]");
         s->pdchCoilFinalSensCap = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Final Gross Sensible Capacity [W]");
         s->pdchCoilFinalAirVolFlowRate = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Final Reference Air Volume Flow Rate [m3/s]");
-        s->pdchCoilFinalPlantVolFlowRate = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Final Reference Plant Fluid Volume Flow Rate [m3/s]");
+        s->pdchCoilFinalPlantVolFlowRate =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Final Reference Plant Fluid Volume Flow Rate [m3/s]");
 
         // Misc Design output
         s->pdchCoilUA = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil U-value Times Area Value [W/K]");
@@ -519,8 +531,9 @@ namespace OutputReportPredefined {
             newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "DX Coil Capacity Decrease Ratio from Too High Flow/Capacity Ratio");
 
         s->pdchMoistAirSpecificHeat =
-            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Moist Air Heat Capacity [J/kg-K]");                    // standard? for ideal sizing calcs?
-        s->pdchDryAirSpecificHeat = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Dry Air Heat Capacity [J/kg-K]"); // standard? for ideal sizing calcs?
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Moist Air Heat Capacity [J/kg-K]"); // standard? for ideal sizing calcs?
+        s->pdchDryAirSpecificHeat =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Dry Air Heat Capacity [J/kg-K]"); // standard? for ideal sizing calcs?
         s->pdchStandRhoAir = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Standard Air Density Adjusted for Elevation [kg/m3]");
 
         // Fan info for coil
@@ -531,7 +544,8 @@ namespace OutputReportPredefined {
 
         // Plant info for coil
         s->pdchCoilPlantLoopName = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Plant Name for Coil");
-        s->pdchPlantFluidSpecificHeat = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Plant Fluid Specific Heat Capacity [J/kg-K]"); // standard/inits ?
+        s->pdchPlantFluidSpecificHeat =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Plant Fluid Specific Heat Capacity [J/kg-K]"); // standard/inits ?
         s->pdchPlantFluidDensity =
             newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Plant Fluid Density [kg/m3]"); // standard/inits ? for ideal sizing calcs?
         s->pdchPlantMassFlowMaximum = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Plant Maximum Fluid Mass Flow Rate [kg/s]");
@@ -539,8 +553,10 @@ namespace OutputReportPredefined {
         s->pdchPlantSupTempDesign = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Plant Design Fluid Supply Temperature [C]");
         s->pdchPlantDeltaTempDesign = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Plant Design Fluid Temperature Difference [deltaC]");
         s->pdchPlantCapacity = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Plant Design Capacity [W]");
-        s->pdchCoilCapPrcntPlantCapacity = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Capacity Percentage of Plant Design Capacity [%]");
-        s->pdchCoilFlowPrcntPlantFlow = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Fluid Flow Rate Percentage of Plant Design Flow Rate [%]");
+        s->pdchCoilCapPrcntPlantCapacity =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Capacity Percentage of Plant Design Capacity [%]");
+        s->pdchCoilFlowPrcntPlantFlow =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Fluid Flow Rate Percentage of Plant Design Flow Rate [%]");
 
         // results from regular zone and system sizing calcs, "At Ideal Loads Peak"
         s->pdchCoilDDnameSensIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Design Day Name at Sensible Ideal Loads Peak");
@@ -555,36 +571,47 @@ namespace OutputReportPredefined {
         s->pdchCoilSensCapIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Sensible Capacity at Ideal Loads Peak [W]");
         s->pdchCoilOffRatingCapacityModifierIdealPeak =
             newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Off-Rating Capacity Modifier at Ideal Loads Peak [ ]");
-        s->pdchCoilAirMassFlowIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Air Mass Flow Rate at Ideal Loads Peak [kg/s]");
-        s->pdchCoilAirVolumeFlowIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Air Volume Flow Rate at Ideal Loads Peak [m3/s]");
+        s->pdchCoilAirMassFlowIdealPeak =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Air Mass Flow Rate at Ideal Loads Peak [kg/s]");
+        s->pdchCoilAirVolumeFlowIdealPeak =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Air Volume Flow Rate at Ideal Loads Peak [m3/s]");
         s->pdchCoilEntDryBulbIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Entering Air Drybulb at Ideal Loads Peak [C]");
         s->pdchCoilEntWetBulbIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Entering Air Wetbulb at Ideal Loads Peak [C]");
         s->pdchCoilEntHumRatIdealPeak =
             newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
-        s->pdchCoilEntEnthalpyIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Entering Air Enthalpy at Ideal Loads Peak [J/KG-K]");
+        s->pdchCoilEntEnthalpyIdealPeak =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Entering Air Enthalpy at Ideal Loads Peak [J/KG-K]");
         s->pdchCoilLvgDryBulbIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Leaving Air Drybulb at Ideal Loads Peak [C]");
         s->pdchCoilLvgWetBulbIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Leaving Air Wetbulb at Ideal Loads Peak [C]");
         s->pdchCoilLvgHumRatIdealPeak =
             newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
-        s->pdchCoilLvgEnthalpyIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Leaving Air Enthalpy at Ideal Loads Peak [J/KG-K]");
-        s->pdchCoilWaterMassFlowIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Plant Fluid Mass Flow Rate at Ideal Loads Peak [kg/s]");
+        s->pdchCoilLvgEnthalpyIdealPeak =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Leaving Air Enthalpy at Ideal Loads Peak [J/KG-K]");
+        s->pdchCoilWaterMassFlowIdealPeak =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Plant Fluid Mass Flow Rate at Ideal Loads Peak [kg/s]");
         s->pdchCoilEntWaterTempIdealPeak =
             newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Entering Plant Fluid Temperature at Ideal Loads Peak [C]");
-        s->pdchCoilLvgWaterTempIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Leaving Plant Fluid Temperature at Ideal Loads Peak [C]");
+        s->pdchCoilLvgWaterTempIdealPeak =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Leaving Plant Fluid Temperature at Ideal Loads Peak [C]");
         s->pdchCoilWaterDeltaTempIdealPeak =
             newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Plant Fluid Temperature Difference at Ideal Loads Peak [deltaC]");
         s->pdchFanHeatGainIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Supply Fan Air Heat Gain at Ideal Loads Peak [W]");
-        s->pdchCoilNetTotalCapacityIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil and Fan Net Total Capacity at Ideal Loads Peak [W]");
+        s->pdchCoilNetTotalCapacityIdealPeak =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil and Fan Net Total Capacity at Ideal Loads Peak [W]");
         s->pdchOADryBulbIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Outdoor Air Drybulb at Ideal Loads Peak [C]");
-        s->pdchOAHumRatIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Outdoor Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
+        s->pdchOAHumRatIdealPeak =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Outdoor Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
         s->pdchOAWetBulbatIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Outdoor Air Wetbulb at Ideal Loads Peak [C]");
-        s->pdchOAVolFlowIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Outdoor Air Volume Flow Rate at Ideal Loads Peak [m3/s]");
+        s->pdchOAVolFlowIdealPeak =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Outdoor Air Volume Flow Rate at Ideal Loads Peak [m3/s]");
         s->pdchOAFlowPrcntIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Outdoor Air Flow Percentage at Ideal Loads Peak [%]");
-        s->pdchAirSysRADryBulbIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "System Return Air Drybulb at Ideal Loads Peak [C]");
+        s->pdchAirSysRADryBulbIdealPeak =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "System Return Air Drybulb at Ideal Loads Peak [C]");
         s->pdchAirSysRAHumRatIdealPeak =
             newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "System Return Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
         s->pdchZoneAirDryBulbIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Zone Air Drybulb at Ideal Loads Peak [C]");
-        s->pdchZoneAirHumRatIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Zone Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
+        s->pdchZoneAirHumRatIdealPeak =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Zone Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
         s->pdchZoneAirRelHumIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Zone Air Relative Humidity at Ideal Loads Peak [%]");
         s->pdchZoneSensibleLoadIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Zone Sensible Heat Gain at Ideal Loads Peak [W]");
         s->pdchZoneLatentLoadIdealPeak = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Zone Latent Heat Gain at Ideal Loads Peak [W]");
@@ -597,12 +624,14 @@ namespace OutputReportPredefined {
         s->pdchCoilRatedEntWetBulb = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Entering Air Wetbulb at Rating Conditions [C]");
         s->pdchCoilRatedEntHumRat =
             newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Rating Conditions [kgWater/kgDryAir]");
-        s->pdchCoilRatedEntEnthalpy = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Entering Air Enthalpy at Rating Conditions [J/KG-K]");
+        s->pdchCoilRatedEntEnthalpy =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Entering Air Enthalpy at Rating Conditions [J/KG-K]");
         s->pdchCoilRatedLvgDryBulb = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Leaving Air Drybulb at Rating Conditions [C]");
         s->pdchCoilRatedLvgWetBulb = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Leaving Air Wetbulb at Rating Conditions [C]");
         s->pdchCoilRatedLvgHumRat =
             newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Rating Conditions [kgWater/kgDryAir]");
-        s->pdchCoilRatedLvgEnthalpy = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Leaving Air Enthalpy at Rating Conditions [J/KG-K]");
+        s->pdchCoilRatedLvgEnthalpy =
+            newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Leaving Air Enthalpy at Rating Conditions [J/KG-K]");
 
         // System Summary Report
 
@@ -707,47 +736,47 @@ namespace OutputReportPredefined {
         s->pdchOaOccBzTmAbove = newPreDefColumn(state, s->pdstOAavgOccByZone, "Time Above Voz-dyn [hr]");
 
         s->pdstOAtotAirByLoop = newPreDefSubTable(state, s->pdrOutsideAirDetails, "Total Outdoor Air by AirLoop");
-        s->pdchOaTaAlMechVent = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Mechanical Ventilation [m3]"); 
+        s->pdchOaTaAlMechVent = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Mechanical Ventilation [m3]");
         s->pdchOaTaAlNatVent = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Natural Ventilation [m3/s]");
         s->pdchOaTaAlTotVent = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Total Ventilation [m3/s]");
-        s->pdchOaTaAlSumDynTrgVent = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Sum Zone Dynamic Target Ventilation - Voz-sum-dyn [m3]"); 
-        s->pdchOaTaAlTmBelow = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Time Below Voz-sum-dyn [hr]"); 
-        s->pdchOaTaAlTmAt = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Time At Voz-sum-dyn [hr]"); 
-        s->pdchOaTaAlTmAbove = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Time Above Voz-sum-dyn [hr]"); 
-        s->pdchOaTaAlTmAboveUnocc = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Time Above Zero When Unoccupied [hr]"); 
+        s->pdchOaTaAlSumDynTrgVent = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Sum Zone Dynamic Target Ventilation - Voz-sum-dyn [m3]");
+        s->pdchOaTaAlTmBelow = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Time Below Voz-sum-dyn [hr]");
+        s->pdchOaTaAlTmAt = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Time At Voz-sum-dyn [hr]");
+        s->pdchOaTaAlTmAbove = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Time Above Voz-sum-dyn [hr]");
+        s->pdchOaTaAlTmAboveUnocc = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Time Above Zero When Unoccupied [hr]");
 
         s->pdstOAavgOccByLoop = newPreDefSubTable(state, s->pdrOutsideAirDetails, "Average Outdoor Air During Occupancy by AirLoop");
-        s->pdchOaOccAlMechVent = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Mechanical Ventilation [m3/s]"); 
+        s->pdchOaOccAlMechVent = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Mechanical Ventilation [m3/s]");
         s->pdchOaOccAlNatVent = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Natural Ventilation [m3/s]");
         s->pdchOaOccAlTotVent = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Total Ventilation [m3/s]");
-        s->pdchOaOccAlSumDynTrgVent = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Sum Zone Dynamic Target Ventilation - Voz-sum-dyn [m3/s]"); 
-        s->pdchOaOccAlTmBelow = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Time Below Voz-sum-dyn [hr]"); 
-        s->pdchOaOccAlTmAt = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Time At Voz-sum-dyn [hr]"); 
-        s->pdchOaOccAlTmAbove = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Time Above Voz-sum-dyn [hr]"); 
+        s->pdchOaOccAlSumDynTrgVent = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Sum Zone Dynamic Target Ventilation - Voz-sum-dyn [m3/s]");
+        s->pdchOaOccAlTmBelow = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Time Below Voz-sum-dyn [hr]");
+        s->pdchOaOccAlTmAt = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Time At Voz-sum-dyn [hr]");
+        s->pdchOaOccAlTmAbove = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Time Above Voz-sum-dyn [hr]");
 
         s->pdstOAtimeFactorsDurOcc = newPreDefSubTable(state, s->pdrOutsideAirDetails, "Outdoor Air Controller Limiting Factors by AirLoop");
-        s->pdchOaTmFctNoLimit = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "No Limiting Factor [hr]"); //todo
-        s->pdchOaTmFctLimit = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Limits and Scheduled Limits [hr]"); //todo
-        s->pdchOaTmFctEcono = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Economizer [hr]"); //todo
-        s->pdchOaTmFctExhaust = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Exhaust Flow [hr]"); //todo
-        s->pdchOaTmFctMixedLimit = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Mixed Air Flow [hr]"); //todo
-        s->pdchOaTmFctHiHumid = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "High Humidity [hr]"); //todo
-        s->pdchOaTmFctDCV = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Demand Controlled Ventilation [hr]"); //todo
-        s->pdchOaTmFctNiteVent = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Night Ventilation [hr]"); //todo
-        s->pdchOaTmFctDemand = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Demand Limiting [hr]"); //todo
-        s->pdchOaTmFctEMS = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Energy Management System [hr]"); //todo
+        s->pdchOaTmFctNoLimit = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "No Limiting Factor [hr]");        // todo
+        s->pdchOaTmFctLimit = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Limits and Scheduled Limits [hr]"); // todo
+        s->pdchOaTmFctEcono = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Economizer [hr]");                  // todo
+        s->pdchOaTmFctExhaust = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Exhaust Flow [hr]");              // todo
+        s->pdchOaTmFctMixedLimit = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Mixed Air Flow [hr]");         // todo
+        s->pdchOaTmFctHiHumid = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "High Humidity [hr]");             // todo
+        s->pdchOaTmFctDCV = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Demand Controlled Ventilation [hr]"); // todo
+        s->pdchOaTmFctNiteVent = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Night Ventilation [hr]");        // todo
+        s->pdchOaTmFctDemand = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Demand Limiting [hr]");            // todo
+        s->pdchOaTmFctEMS = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Energy Management System [hr]");      // todo
 
         s->pdstOAavgFactorsDurOcc = newPreDefSubTable(state, s->pdrOutsideAirDetails, "Average Outdoor Air for Limiting Factors During Occupancy");
-        s->pdchOaAvFctNoLimit = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "No Limiting Factor [m3/s]"); //todo
-        s->pdchOaAvFctLimit = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Limits and Scheduled Limits [m3/s]"); //todo
-        s->pdchOaAvFctEcono = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Economizer [m3/s]"); //todo
-        s->pdchOaAvFctExhaust = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Exhaust Flow [m3/s]"); //todo
-        s->pdchOaAvFctMixedLimit = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Mixed Air Flow [m3/s]"); //todo
-        s->pdchOaAvFctHiHumid = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "High Humidity [m3/s]"); //todo
-        s->pdchOaAvFctDCV = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Demand Controlled Ventilation [m3/s]"); //todo
-        s->pdchOaAvFctNiteVent = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Night Ventilation [m3/s]"); //todo
-        s->pdchOaAvFctDemand = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Demand Limiting [m3/s]"); //todo
-        s->pdchOaAvFctEMS = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Energy Management System [m3/s]"); //todo
+        s->pdchOaAvFctNoLimit = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "No Limiting Factor [m3/s]");        // todo
+        s->pdchOaAvFctLimit = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Limits and Scheduled Limits [m3/s]"); // todo
+        s->pdchOaAvFctEcono = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Economizer [m3/s]");                  // todo
+        s->pdchOaAvFctExhaust = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Exhaust Flow [m3/s]");              // todo
+        s->pdchOaAvFctMixedLimit = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Mixed Air Flow [m3/s]");         // todo
+        s->pdchOaAvFctHiHumid = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "High Humidity [m3/s]");             // todo
+        s->pdchOaAvFctDCV = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Demand Controlled Ventilation [m3/s]"); // todo
+        s->pdchOaAvFctNiteVent = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Night Ventilation [m3/s]");        // todo
+        s->pdchOaAvFctDemand = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Demand Limiting [m3/s]");            // todo
+        s->pdchOaAvFctEMS = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Energy Management System [m3/s]");      // todo
 
         // Object Count Report
         s->pdrObjCnt = newPreDefReport(state, "ObjectCountSummary", "Count", "Object Count Summary");
@@ -1239,10 +1268,10 @@ namespace OutputReportPredefined {
         s->pdchIllumOccuHourDim = newPreDefColumn(state, s->pdstIllumOccuHours, "Dim (> 100, <= 300 lux) [hr]");
         s->pdchIllumOccuHourAdequate = newPreDefColumn(state, s->pdstIllumOccuHours, "Adequate (> 300, <= 500 lux) [hr]");
         s->pdchIllumOccuHourBright = newPreDefColumn(state, s->pdstIllumOccuHours, "Bright (>500 lux) [hr]");
-
     }
 
-    void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName, Real64 const tableEntryReal, Optional_int_const numSigDigits)
+    void PreDefTableEntry(
+        EnergyPlusData &state, int const columnIndex, std::string const &objName, Real64 const tableEntryReal, Optional_int_const numSigDigits)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1290,11 +1319,12 @@ namespace OutputReportPredefined {
         }
 
         if (tableEntryReal < 1e8) { // change from 1e10 for more robust entry writing
-            state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry = format("{:#12.{}F}", tableEntryReal, sigDigitCount);
+            state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry =
+                format("{:#12.{}F}", tableEntryReal, sigDigitCount);
         } else {
-            state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry = format("{:12.{}Z}", tableEntryReal, sigDigitCount);
+            state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry =
+                format("{:12.{}Z}", tableEntryReal, sigDigitCount);
         }
-
 
         if (state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry.size() > 12) {
             state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry = "  Too Big";
@@ -1390,7 +1420,8 @@ namespace OutputReportPredefined {
     std::string RetrievePreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName)
     {
         for (int iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numTableEntry; ++iTableEntry) {
-            if (state.dataOutRptPredefined->tableEntry(iTableEntry).indexColumn == columnIndex && state.dataOutRptPredefined->tableEntry(iTableEntry).objectName == objName) {
+            if (state.dataOutRptPredefined->tableEntry(iTableEntry).indexColumn == columnIndex &&
+                state.dataOutRptPredefined->tableEntry(iTableEntry).objectName == objName) {
                 return trimmed(ljustified(state.dataOutRptPredefined->tableEntry(iTableEntry).charEntry));
             }
         }
@@ -1437,14 +1468,18 @@ namespace OutputReportPredefined {
             ++state.dataOutRptPredefined->numTableEntry;
             // if larger than current size grow the array
             if (state.dataOutRptPredefined->numTableEntry > state.dataOutRptPredefined->sizeTableEntry) {
-                state.dataOutRptPredefined->tableEntry.redimension(state.dataOutRptPredefined->sizeTableEntry *=
-                                       2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
+                state.dataOutRptPredefined->tableEntry.redimension(
+                    state.dataOutRptPredefined->sizeTableEntry *=
+                    2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
             }
         }
     }
 
-    void
-    AddCompSizeTableEntry(EnergyPlusData &state, std::string const &FieldType, std::string const &FieldName, std::string const &FieldDescription, Real64 const FieldValue)
+    void AddCompSizeTableEntry(EnergyPlusData &state,
+                               std::string const &FieldType,
+                               std::string const &FieldName,
+                               std::string const &FieldDescription,
+                               Real64 const FieldValue)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1485,8 +1520,9 @@ namespace OutputReportPredefined {
             ++state.dataOutRptPredefined->numCompSizeTableEntry;
             // if larger than current size grow the array
             if (state.dataOutRptPredefined->numCompSizeTableEntry > state.dataOutRptPredefined->sizeCompSizeTableEntry) {
-                state.dataOutRptPredefined->CompSizeTableEntry.redimension(state.dataOutRptPredefined->sizeCompSizeTableEntry *=
-                                               2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
+                state.dataOutRptPredefined->CompSizeTableEntry.redimension(
+                    state.dataOutRptPredefined->sizeCompSizeTableEntry *=
+                    2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
             }
         }
         state.dataOutRptPredefined->CompSizeTableEntry(state.dataOutRptPredefined->numCompSizeTableEntry).typeField = FieldType;
@@ -1539,8 +1575,9 @@ namespace OutputReportPredefined {
             ++state.dataOutRptPredefined->numShadowRelate;
             // if larger than current size grow the array
             if (state.dataOutRptPredefined->numShadowRelate > state.dataOutRptPredefined->sizeShadowRelate) {
-                state.dataOutRptPredefined->ShadowRelate.redimension(state.dataOutRptPredefined->sizeShadowRelate *=
-                                         2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
+                state.dataOutRptPredefined->ShadowRelate.redimension(
+                    state.dataOutRptPredefined->sizeShadowRelate *=
+                    2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
             }
         }
         state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = castingField;
@@ -1548,7 +1585,10 @@ namespace OutputReportPredefined {
         state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = receivingKind;
     }
 
-    int newPreDefReport(EnergyPlusData &state, std::string const &inReportName, std::string const &inReportAbrev, std::string const &inReportNamewithSpaces)
+    int newPreDefReport(EnergyPlusData &state,
+                        std::string const &inReportName,
+                        std::string const &inReportAbrev,
+                        std::string const &inReportNamewithSpaces)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1591,8 +1631,9 @@ namespace OutputReportPredefined {
             ++state.dataOutRptPredefined->numReportName;
             // if larger than current size grow the array
             if (state.dataOutRptPredefined->numReportName > state.dataOutRptPredefined->sizeReportName) {
-                state.dataOutRptPredefined->reportName.redimension(state.dataOutRptPredefined->sizeReportName *=
-                                       2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
+                state.dataOutRptPredefined->reportName.redimension(
+                    state.dataOutRptPredefined->sizeReportName *=
+                    2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
             }
         }
         // initialize new record
@@ -1646,7 +1687,9 @@ namespace OutputReportPredefined {
             ++state.dataOutRptPredefined->numSubTable;
             // if larger than current size then grow the array
             if (state.dataOutRptPredefined->numSubTable > state.dataOutRptPredefined->sizeSubTable) {
-                state.dataOutRptPredefined->subTable.redimension(state.dataOutRptPredefined->sizeSubTable *= 2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
+                state.dataOutRptPredefined->subTable.redimension(
+                    state.dataOutRptPredefined->sizeSubTable *=
+                    2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
             }
         }
         // initialize new record)
@@ -1735,7 +1778,9 @@ namespace OutputReportPredefined {
             ++state.dataOutRptPredefined->numColumnTag;
             // if larger than current size grow the array
             if (state.dataOutRptPredefined->numColumnTag > state.dataOutRptPredefined->sizeColumnTag) {
-                state.dataOutRptPredefined->columnTag.redimension(state.dataOutRptPredefined->sizeColumnTag *= 2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
+                state.dataOutRptPredefined->columnTag.redimension(
+                    state.dataOutRptPredefined->sizeColumnTag *=
+                    2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
             }
         }
         // initialize new record)

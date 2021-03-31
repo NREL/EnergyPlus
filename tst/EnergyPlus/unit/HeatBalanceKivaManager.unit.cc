@@ -182,17 +182,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     int DualZoneNum(1);
 
-    state->dataEnvrn->DayOfYear_Schedule = 1;    // must initialize this to get schedules initialized
-    state->dataEnvrn->DayOfWeek = 1;             // must initialize this to get schedules initialized
-    state->dataGlobal->HourOfDay = 1;                 // must initialize this to get schedules initialized
-    state->dataGlobal->TimeStep = 1;                  // must initialize this to get schedules initialized
-    state->dataGlobal->NumOfTimeStepInHour = 1;       // must initialize this to get schedules initialized
-    state->dataGlobal->MinutesPerTimeStep = 60;       // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(*state);    // read schedules
+    state->dataEnvrn->DayOfYear_Schedule = 1;      // must initialize this to get schedules initialized
+    state->dataEnvrn->DayOfWeek = 1;               // must initialize this to get schedules initialized
+    state->dataGlobal->HourOfDay = 1;              // must initialize this to get schedules initialized
+    state->dataGlobal->TimeStep = 1;               // must initialize this to get schedules initialized
+    state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
     ZoneTempPredictorCorrector::GetZoneAirSetPoints(*state);
 
-    state->dataScheduleMgr->Schedule(state->dataZoneCtrls->TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataScheduleMgr->Schedule(state->dataZoneCtrls->TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue =
+        DataHVACGlobals::DualSetPointWithDeadBand;
 
     // Test Initial Indoor Temperature input of 15C with Cooling/Heating Setpoints of 24C/20C
 
@@ -259,7 +260,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     EXPECT_NEAR(expectedResult4, zoneAssumedTemperature4 + DataGlobalConstants::KelvinConv, 0.001);
 }
 
-TEST_F(EnergyPlusFixture, OpaqueSkyCover_InterpretWeatherMissingOpaqueSkyCover) {
+TEST_F(EnergyPlusFixture, OpaqueSkyCover_InterpretWeatherMissingOpaqueSkyCover)
+{
 
     // DERIVED TYPE DEFINITIONS:
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -272,7 +274,9 @@ TEST_F(EnergyPlusFixture, OpaqueSkyCover_InterpretWeatherMissingOpaqueSkyCover) 
 
     Real64 TDewK = 264.25;
     Real64 expected_OSky = 5;
-    Real64 expected_ESky = (0.787 + 0.764 * std::log(TDewK / DataGlobalConstants::KelvinConv)) * (1.0 + 0.0224 * expected_OSky - 0.0035 * pow_2(expected_OSky) + 0.00028 * pow_3(expected_OSky));;
+    Real64 expected_ESky = (0.787 + 0.764 * std::log(TDewK / DataGlobalConstants::KelvinConv)) *
+                           (1.0 + 0.0224 * expected_OSky - 0.0035 * pow_2(expected_OSky) + 0.00028 * pow_3(expected_OSky));
+    ;
 
     EXPECT_NEAR(expected_ESky, km.kivaWeather.skyEmissivity[0], 0.01);
 }

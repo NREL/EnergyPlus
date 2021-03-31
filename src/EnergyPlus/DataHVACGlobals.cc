@@ -58,12 +58,11 @@ namespace DataHVACGlobals {
     // PURPOSE OF THIS MODULE:
     // This data-only module is a repository for HVAC variables which are considered
     // to be "global" in nature in EnergyPlus.
-    
+
     Array1D_string const
         cFanTypes(NumAllFanTypes,
                   {"Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel"});
 
-    
     Array1D_string const cFurnaceTypes(NumUnitarySystemTypes,
                                        {"AirLoopHVAC:Unitary:Furnace:HeatOnly",
                                         "AirLoopHVAC:Unitary:Furnace:HeatCool",
@@ -72,7 +71,6 @@ namespace DataHVACGlobals {
                                         "AirLoopHVAC:UnitaryHeatPump:AirToAir",
                                         "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
                                         "AirLoopHVAC:UnitarySystem"});
-
 
     Array1D_string const cAllCoilTypes(NumAllCoilTypes,
                                        {"Coil:Cooling:DX:SingleSpeed",
