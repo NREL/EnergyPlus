@@ -1967,6 +1967,10 @@ struct HeatBalanceData : BaseGlobalStruct
     Real64 CondFDRelaxFactor = 1.0;      // Relaxation factor, for looping across all the surfaces.
     Real64 CondFDRelaxFactorInput = 1.0; // Relaxation factor, for looping across all the surfaces, user input value
     bool CondFD_TDMA = false;            // Use TDMA solver
+    Array1D<Real64> CondFD_a;
+    Array1D<Real64> CondFD_b;
+    Array1D<Real64> CondFD_c;
+    Array1D<Real64> CondFD_d;
     int ZoneAirSolutionAlgo = DataHeatBalance::Use3rdOrder; // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
     bool OverrideZoneAirSolutionAlgo = false;               // Override the zone air solution algorithm in PerformancePrecisionTradeoffs
     Real64 BuildingRotationAppendixG = 0.0;                 // Building Rotation for Appendix G
@@ -2249,6 +2253,10 @@ struct HeatBalanceData : BaseGlobalStruct
         this->CondFDRelaxFactor = 1.0;
         this->CondFDRelaxFactorInput = 1.0;
         this->CondFD_TDMA = false;
+        this->CondFD_a.deallocate();
+        this->CondFD_b.deallocate();
+        this->CondFD_c.deallocate();
+        this->CondFD_d.deallocate();
         this->ZoneAirSolutionAlgo = DataHeatBalance::Use3rdOrder;
         this->OverrideZoneAirSolutionAlgo = false;
         this->BuildingRotationAppendixG = 0.0;

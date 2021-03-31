@@ -230,6 +230,69 @@ namespace HeatBalFiniteDiffManager {
 
     Real64 terpld(Array2<Real64> const &a, Real64 const x1, int const nind, int const ndep);
 
+    void ExteriorBCCoeffs(EnergyPlusData &state,
+                          int const Delt,            // Time Increment
+                          int const i,               // Node Index
+                          int const Lay,             // Layer Number for Construction
+                          int const Surf,            // Surface number
+                          Array1D<Real64> const &TD, // The old dry Temperature at each node for the CondFD algorithm..
+                          Array1D<Real64> &TDT,      // The current or new Temperature at each node location for the CondFD solution..
+                          Array1D<Real64> &EnthOld,  // Old Nodal enthalpy
+                          Array1D<Real64> &EnthNew,  // New Nodal enthalpy
+                          int const TotNodes,        // Total nodes in layer
+                          Real64 const HMovInsul,    // Conductance of movable(transparent) insulation.
+                          Array1D<Real64> &a,        // TDMA a vector, lower diagonal, i-1 terms
+                          Array1D<Real64> &b,        // TDMA b vector, main diagonal
+                          Array1D<Real64> &c,        // TDMA c vector, upper diagonal, i+1 terms
+                          Array1D<Real64> &d         // TDMA d vector, rhs
+    );
+
+    void InteriorNodeCoeffs(EnergyPlusData &state,
+                            int const Delt,            // Time Increment
+                            int const i,               // Node Index
+                            int const Lay,             // Layer Number for Construction
+                            int const Surf,            // Surface number
+                            Array1D<Real64> const &TD, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                            Array1D<Real64> &TDT,      // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                            Array1D<Real64> &EnthOld,  // Old Nodal enthalpy
+                            Array1D<Real64> &EnthNew,  // New Nodal enthalpy
+                            Array1D<Real64> &a,        // TDMA a vector, lower diagonal, i-1 terms
+                            Array1D<Real64> &b,        // TDMA b vector, main diagonal
+                            Array1D<Real64> &c,        // TDMA c vector, upper diagonal, i+1 terms
+                            Array1D<Real64> &d         // TDMA d vector, rhs
+    );
+
+    void IntInterfaceNodeCoeffs(EnergyPlusData &state,
+                                int const Delt,                                  // Time Increment
+                                int const i,                                     // Node Index
+                                int const Lay,                                   // Layer Number for Construction
+                                int const Surf,                                  // Surface number
+                                Array1D<Real64> const &TD,                       // OLD NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
+                                Array1D<Real64> &TDT,                            // NEW NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
+                                [[maybe_unused]] Array1D<Real64> const &EnthOld, // Old Nodal enthalpy
+                                Array1D<Real64> &EnthNew,                        // New Nodal enthalpy
+                                Array1D<Real64> &a,                              // TDMA a vector, lower diagonal, i-1 terms
+                                Array1D<Real64> &b,                              // TDMA b vector, main diagonal
+                                Array1D<Real64> &c,                              // TDMA c vector, upper diagonal, i+1 terms
+                                Array1D<Real64> &d                               // TDMA d vector, rhs
+    );
+
+    void InteriorBCCoeffs(EnergyPlusData &state,
+                          int const Delt,            // Time Increment
+                          int const i,               // Node Index
+                          int const Lay,             // Layer Number for Construction
+                          int const Surf,            // Surface number
+                          Array1D<Real64> const &TD, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                          Array1D<Real64> &TDT,      // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                          Array1D<Real64> &EnthOld,  // Old Nodal enthalpy
+                          Array1D<Real64> &EnthNew,  // New Nodal enthalpy
+                          Array1D<Real64> &TDreport, // Temperature value from previous HeatSurfaceHeatManager iteration's value
+                          Array1D<Real64> &a,        // TDMA a vector, lower diagonal, i-1 terms
+                          Array1D<Real64> &b,        // TDMA b vector, main diagonal
+                          Array1D<Real64> &c,        // TDMA c vector, upper diagonal, i+1 terms
+                          Array1D<Real64> &d         // TDMA d vector, rhs
+    );
+
     void ExteriorBCEqns(EnergyPlusData &state,
                         int const Delt,              // Time Increment
                         int const i,                 // Node Index
@@ -321,6 +384,31 @@ struct HeatBalFiniteDiffMgr : BaseGlobalStruct {
 
     }
 };
+
+// Will need to get this into agreement with the other TDMA in Gu's window-related PR
+template <typename T, typename I> void tdma(const T &a, T &b, const T &c, T &x, I N)
+{
+    assert(N <= a.size());
+    assert(N <= b.size());
+    assert(N <= c.size());
+    assert(N <= x.size());
+    assert(N > 1);
+    // Forward elimination
+    for (I i = 1; i < N; ++i) {
+        assert(b[i - 1] != 0.0);
+        Real64 w = a[i] / b[i - 1];
+        b[i] -= w * c[i - 1];
+        x[i] -= w * x[i - 1];
+    }
+    // Back substitution
+    x[N - 1] /= b[N - 1];
+    size_t i = N - 1;
+    do {
+        --i;
+        // for (size_t i = N - 2; i >= 0; --i) {
+        x[i] = (x[i] - c[i] * x[i + 1]) / b[i];
+    } while (i > 0);
+}
 
 } // namespace EnergyPlus
 
