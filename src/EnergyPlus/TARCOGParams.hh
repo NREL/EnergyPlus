@@ -88,9 +88,12 @@ namespace EnergyPlus::TARCOGParams {
     extern int const YES_SupportPillar;
 
     // Deflection parameters
-    extern int const NO_DEFLECTION_CALCULATION;
-    extern int const DEFLECTION_CALC_TEMPERATURE;
-    extern int const DEFLECTION_CALC_GAP_WIDTHS;
+    enum class DeflectionCalculation : int {
+        UNASSIGNED = -1,
+        NONE = 0,
+        TEMPERATURE = 1,
+        GAP_WIDTHS = 2
+    };
 
     // definition of parameters for deflection sum.  These parameters define maximum number of loop to which sum
     // will perform. By equation, these numbers will go to infinite and some test showed that going to nmax and mmax

@@ -90,7 +90,7 @@ namespace EnergyPlus::TARCOGArgs {
                  Real64 const fclr,
                  Real64 const VacuumPressure,
                  Real64 const VacuumMaxGapThickness,
-                 int const CalcDeflection,
+                 DeflectionCalculation const CalcDeflection,
                  Real64 const Pa,
                  Real64 const Pini,
                  Real64 const Tini,
@@ -384,7 +384,7 @@ namespace EnergyPlus::TARCOGArgs {
             }
             // Deflection cannot be calculated with IGU containing shading layer. This error check is to be
             // removed once that extension is programmed
-            if ((CalcDeflection > 0.0) && (LayerType(i) != TARCOGParams::TARCOGLayerType::SPECULAR)) {
+            if ((CalcDeflection != TARCOGParams::DeflectionCalculation::NONE) && (LayerType(i) != TARCOGParams::TARCOGLayerType::SPECULAR)) {
                 ArgCheck = 42;
                 ErrorMessage = "Cannot calculate deflection with IGU containing shading devices.";
                 return ArgCheck;

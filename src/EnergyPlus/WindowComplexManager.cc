@@ -2517,7 +2517,7 @@ namespace WindowComplexManager {
 
         // Deflection
         // Tarcog requires deflection as input parameters.  Deflection is NOT used in EnergyPlus simulations
-        int CalcDeflection; // Deflection calculation flag:
+        TARCOGParams::DeflectionCalculation CalcDeflection; // Deflection calculation flag:
         //    0 - no deflection calculations
         //    1 - perform deflection calculation (input is Pressure/Temp)
         //    2 - perform deflection calculation (input is measured deflection)
@@ -2659,7 +2659,7 @@ namespace WindowComplexManager {
 
         // fill local vars
 
-        CalcDeflection = 0;
+        CalcDeflection = TARCOGParams::DeflectionCalculation::NONE;
         CalcSHGC = 0;
 
         if (CalcCondition == DataBSDFWindow::noCondition) {

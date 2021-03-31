@@ -358,7 +358,7 @@ namespace EnergyPlus::TARCOGMain {
                   Real64 const fclr,                    // Fraction of sky that is clear
                   Real64 const VacuumPressure,          // maximal pressure for gas to be considered as vacuum
                   Real64 &VacuumMaxGapThickness,        // maximum allowed thickness without producing warning message
-                  int const CalcDeflection,             // Deflection calculation flag:
+                  DeflectionCalculation const CalcDeflection,             // Deflection calculation flag:
                   Real64 const Pa,                      // Atmospheric (outside/inside) pressure (used onlu if CalcDeflection = 1)
                   Real64 const Pini,                    // Initial presssure at time of fabrication (used only if CalcDeflection = 1)
                   Real64 const Tini,                    // Initial temperature at time of fabrication (used only if CalcDeflection = 1)
@@ -732,7 +732,7 @@ namespace EnergyPlus::TARCOGMain {
         // in case of provided deflected gap widths just store deflected widhts before temperatures calculation
         // deflections in this case do not depend of temperatures and it should be calculated before to avoid
         // one extra call of temperatures calculations
-        if (CalcDeflection == DEFLECTION_CALC_GAP_WIDTHS) {
+        if (CalcDeflection == DeflectionCalculation::GAP_WIDTHS) {
             PanesDeflection(CalcDeflection,
                             width,
                             height,
@@ -758,7 +758,7 @@ namespace EnergyPlus::TARCOGMain {
         // in case of deflection calculation for temperature & pressure input some variables needs to be stored because
         // Calc_ISO15099 and EN673 routines will change them and for deflection recalculation everything needs to be
         // called in same way except for changed gap widths
-        if (CalcDeflection == DEFLECTION_CALC_TEMPERATURE) {
+        if (CalcDeflection == DeflectionCalculation::TEMPERATURE) {
             eskyTemp = esky;
             trminTemp = trmin;
             hinTemp = hin;
@@ -911,7 +911,7 @@ namespace EnergyPlus::TARCOGMain {
                 return;
             }
 
-            if (CalcDeflection == DEFLECTION_CALC_TEMPERATURE) {
+            if (CalcDeflection == DeflectionCalculation::TEMPERATURE) {
                 state.dataTARCOGMain->converged = false;
                 while (!(state.dataTARCOGMain->converged)) {
                     PanesDeflection(CalcDeflection,
@@ -1106,7 +1106,7 @@ namespace EnergyPlus::TARCOGMain {
                         ErrorMessage = "Deflection calculations failed to converge";
                     }
                 } // do while (.not.(converged))
-            }     // if ((CalcDeflection.eq.DEFLECTION_CALC_TEMPERATURE).or.(CalcDeflection.eq.DEFLECTION_CALC_GAP_WIDTHS)) then
+            }     // if ((CalcDeflection.eq.DeflectionCalculation::TEMPERATURE).or.(CalcDeflection.eq.DeflectionCalculation::GAP_WIDTHS)) then
         }         // if (GoAhead(nperr)) then
 
         FinishDebugOutputFiles(files, nperr);

@@ -81,11 +81,6 @@ namespace DataComplexFenestration {
     constexpr int tmConvectiveScalarModel_NoSDThickness(2);
     constexpr int tmConvectiveScalarModel_WithSDThickness(3);
 
-    // Parameters for deflection model
-    constexpr int dmNoDeflection(0);
-    constexpr int dmTemperatureAndPressureInput(1);
-    constexpr int dmMeasuredDeflection(2);
-
     // Types
 
     struct GapSupportPillar
@@ -151,14 +146,15 @@ namespace DataComplexFenestration {
         int CalculationStandard;    // Tarcog calculation standard
         TARCOGParams::TARCOGThermalModel ThermalModel;           // Tarcog thermal model
         Real64 SDScalar;            // SDScalar coefficient
-        int DeflectionModel;        // Deflection model
+        TARCOGParams::DeflectionCalculation DeflectionModel;        // Deflection model
         Real64 VacuumPressureLimit; // Pressure limit at which it will be considered vacuum gas state
         Real64 InitialTemperature;  // Window(s) temperature in time of fabrication
         Real64 InitialPressure;     // Window(s) pressure in time of fabrication
 
         // Default Constructor
         WindowThermalModelParams()
-            : CalculationStandard(-1), ThermalModel(TARCOGParams::TARCOGThermalModel::UNASSIGNED), SDScalar(0.0), DeflectionModel(-1), VacuumPressureLimit(0.0), InitialTemperature(0.0),
+            : CalculationStandard(-1), ThermalModel(TARCOGParams::TARCOGThermalModel::UNASSIGNED), SDScalar(0.0),
+              DeflectionModel(TARCOGParams::DeflectionCalculation::UNASSIGNED), VacuumPressureLimit(0.0), InitialTemperature(0.0),
               InitialPressure(0.0)
         {
         }

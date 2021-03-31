@@ -65,11 +65,6 @@ namespace EnergyPlus::TARCOGParams {
 
     int const YES_SupportPillar(1);
 
-    // Deflection parameters
-    int const NO_DEFLECTION_CALCULATION(0);
-    int const DEFLECTION_CALC_TEMPERATURE(1);
-    int const DEFLECTION_CALC_GAP_WIDTHS(2);
-
     // definition of parameters for deflection sum.  These parameters define maximum number of loop to which sum
     // will perform. By equation, these numbers will go to infinite and some test showed that going to nmax and mmax
     // values would produce enough precision

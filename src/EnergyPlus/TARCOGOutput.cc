@@ -881,7 +881,7 @@ namespace EnergyPlus::TARCOGOutput {
                               Real64 const fclr,
                               Real64 const VacuumPressure,
                               Real64 const VacuumMaxGapThickness,
-                              int const CalcDeflection,
+                              DeflectionCalculation const CalcDeflection,
                               Real64 const Pa,
                               Real64 const Pini,
                               Real64 const Tini,

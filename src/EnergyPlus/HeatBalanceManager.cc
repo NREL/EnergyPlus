@@ -8698,11 +8698,11 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(4));
                 if (SELECT_CASE_var == "NODEFLECTION") {
-                    state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel = dmNoDeflection;
+                    state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel = TARCOGParams::DeflectionCalculation::NONE;
                 } else if (SELECT_CASE_var == "TEMPERATUREANDPRESSUREINPUT") {
-                    state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel = dmTemperatureAndPressureInput;
+                    state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel = TARCOGParams::DeflectionCalculation::TEMPERATURE;
                 } else if (SELECT_CASE_var == "MEASUREDDEFLECTION") {
-                    state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel = dmMeasuredDeflection;
+                    state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel = TARCOGParams::DeflectionCalculation::GAP_WIDTHS;
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state,
@@ -8714,7 +8714,7 @@ namespace HeatBalanceManager {
                 }
             }
 
-            if (state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel == dmTemperatureAndPressureInput) {
+            if (state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel == TARCOGParams::DeflectionCalculation::GAP_WIDTHS) {
                 state.dataHeatBal->WindowThermalModel(Loop).VacuumPressureLimit = state.dataIPShortCut->rNumericArgs(2);
                 if (state.dataIPShortCut->rNumericArgs(2) <= 0.0) {
                     ErrorsFound = true;

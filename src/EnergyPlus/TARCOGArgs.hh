@@ -73,7 +73,7 @@ namespace EnergyPlus::TARCOGArgs {
                  Real64 fclr,
                  Real64 VacuumPressure,
                  Real64 VacuumMaxGapThickness,
-                 int CalcDeflection,
+                 TARCOGParams::DeflectionCalculation CalcDeflection,
                  Real64 Pa,
                  Real64 Pini,
                  Real64 Tini,
