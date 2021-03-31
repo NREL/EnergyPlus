@@ -50,8 +50,8 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGGasses90.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
@@ -1034,8 +1034,7 @@ namespace TarcogShading {
                 P = -H / H0;
                 if (P < -700.0) {
                     beta = 0.0;
-                }
-                else {
+                } else {
                     beta = std::pow(e, P);
                 }
                 Tgapout = Tav - (Tav - Tenv) * beta;

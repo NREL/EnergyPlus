@@ -159,7 +159,6 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
     state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp(1).Name = "SecondPool";
     state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 11;
 
-
     // Test 1
     state->dataSwimmingPools->Pool(1).initSwimmingPoolPlantLoopIndex(*state);
     EXPECT_EQ(state->dataSwimmingPools->Pool(1).HWLoopNum, 1);
@@ -236,7 +235,6 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
     thisPool.initSwimmingPoolPlantNodeFlow(*state);
     EXPECT_EQ(state->dataSize->CompDesWaterFlow(1).SupNode, 1);
     EXPECT_EQ(state->dataSize->CompDesWaterFlow(1).DesVolFlowRate, 0.002);
-
 }
 
 TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
@@ -254,13 +252,13 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     static std::string const AlphaField2("cSecondString");
     bool ErrFnd = false;
 
-    auto & poolReference = state->dataSwimmingPools->Pool(1);
+    auto &poolReference = state->dataSwimmingPools->Pool(1);
 
     // Test 1: SurfacePtr is zero--this is not allowed and should produce an error
     ErrFnd = false;
     poolReference.SurfacePtr = 0;
 
-    poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1,Alpha2,AlphaField2,ErrFnd);
+    poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1, Alpha2, AlphaField2, ErrFnd);
 
     EXPECT_TRUE(ErrFnd);
 
@@ -269,7 +267,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     poolReference.SurfacePtr = 1;
     state->dataSurface->Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = true;
 
-    poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1,Alpha2,AlphaField2,ErrFnd);
+    poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1, Alpha2, AlphaField2, ErrFnd);
 
     EXPECT_TRUE(ErrFnd);
 
@@ -279,7 +277,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     state->dataSurface->Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = false;
     state->dataSurface->Surface(poolReference.SurfacePtr).HeatTransferAlgorithm = DataSurfaces::iHeatTransferModel::CondFD;
 
-    poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1,Alpha2,AlphaField2,ErrFnd);
+    poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1, Alpha2, AlphaField2, ErrFnd);
 
     EXPECT_TRUE(ErrFnd);
 
@@ -290,7 +288,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     state->dataSurface->Surface(poolReference.SurfacePtr).HeatTransferAlgorithm = DataSurfaces::iHeatTransferModel::CTF;
     state->dataSurface->Surface(poolReference.SurfacePtr).Class = DataSurfaces::SurfaceClass::Window;
 
-    poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1,Alpha2,AlphaField2,ErrFnd);
+    poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1, Alpha2, AlphaField2, ErrFnd);
 
     EXPECT_TRUE(ErrFnd);
 
@@ -302,7 +300,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     state->dataSurface->Surface(poolReference.SurfacePtr).Class = DataSurfaces::SurfaceClass::Floor;
     state->dataSurface->Surface(poolReference.SurfacePtr).MaterialMovInsulInt = 1;
 
-    poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1,Alpha2,AlphaField2,ErrFnd);
+    poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1, Alpha2, AlphaField2, ErrFnd);
 
     EXPECT_TRUE(ErrFnd);
 
@@ -316,7 +314,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     state->dataSurface->Surface(poolReference.SurfacePtr).Construction = 1;
     state->dataConstruction->Construct(state->dataSurface->Surface(poolReference.SurfacePtr).Construction).SourceSinkPresent = true;
 
-    poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1,Alpha2,AlphaField2,ErrFnd);
+    poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1, Alpha2, AlphaField2, ErrFnd);
 
     EXPECT_TRUE(ErrFnd);
 
@@ -329,7 +327,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     state->dataSurface->Surface(poolReference.SurfacePtr).MaterialMovInsulInt = 1;
     state->dataConstruction->Construct(state->dataSurface->Surface(poolReference.SurfacePtr).Construction).SourceSinkPresent = false;
 
-    poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1,Alpha2,AlphaField2,ErrFnd);
+    poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1, Alpha2, AlphaField2, ErrFnd);
 
     EXPECT_TRUE(ErrFnd);
 
@@ -346,11 +344,10 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     state->dataSurface->Surface(poolReference.SurfacePtr).IsPool = false;
     poolReference.ZonePtr = 0;
 
-    poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1,Alpha2,AlphaField2,ErrFnd);
+    poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1, Alpha2, AlphaField2, ErrFnd);
 
     EXPECT_FALSE(ErrFnd);
     EXPECT_TRUE(state->dataSurface->Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool);
     EXPECT_TRUE(state->dataSurface->Surface(poolReference.SurfacePtr).IsPool);
-    EXPECT_EQ(state->dataSurface->Surface(poolReference.SurfacePtr).Zone,poolReference.ZonePtr);
-
+    EXPECT_EQ(state->dataSurface->Surface(poolReference.SurfacePtr).Zone, poolReference.ZonePtr);
 }

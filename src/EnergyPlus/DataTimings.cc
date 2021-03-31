@@ -275,11 +275,25 @@ namespace DataTimings {
 
         for (loop = 1; loop <= state.dataTimingsData->NumTimingElements; ++loop) {
             if (Timing(loop).calls > 0) {
-                print(auditFile, "{}{}{}{}{:.3R}{}{:.3R}\n", Timing(loop).Element, tabchar, Timing(loop).calls, tabchar,
-                      Timing(loop).currentTimeSum, tabchar, Timing(loop).currentTimeSum / double(Timing(loop).calls));
+                print(auditFile,
+                      "{}{}{}{}{:.3R}{}{:.3R}\n",
+                      Timing(loop).Element,
+                      tabchar,
+                      Timing(loop).calls,
+                      tabchar,
+                      Timing(loop).currentTimeSum,
+                      tabchar,
+                      Timing(loop).currentTimeSum / double(Timing(loop).calls));
             } else {
-                print(auditFile, "{}{}{}{}{:.3R}{}{:.3R}\n", Timing(loop).Element, tabchar, Timing(loop).calls, tabchar ,
-                      Timing(loop).currentTimeSum, tabchar , -999.0);
+                print(auditFile,
+                      "{}{}{}{}{:.3R}{}{:.3R}\n",
+                      Timing(loop).Element,
+                      tabchar,
+                      Timing(loop).calls,
+                      tabchar,
+                      Timing(loop).currentTimeSum,
+                      tabchar,
+                      -999.0);
             }
         }
         print(auditFile, "Time from CPU_Time{}{:.3R}\n", tabchar, TimeUsed_CPUTime);

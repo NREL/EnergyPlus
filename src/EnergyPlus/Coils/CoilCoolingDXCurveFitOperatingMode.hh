@@ -45,7 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
 #ifndef ENERGYPLUS_COILS_COILCOOLINGDXCURVEFITOPERATINGMODE
 #define ENERGYPLUS_COILS_COILCOOLINGDXCURVEFITOPERATINGMODE
 
@@ -88,7 +87,7 @@ struct CoilCoolingDXCurveFitOperatingMode
     void oneTimeInit(EnergyPlusData &state);
     CoilCoolingDXCurveFitOperatingModeInputSpecification original_input_specs;
     CoilCoolingDXCurveFitOperatingMode() = default;
-    explicit CoilCoolingDXCurveFitOperatingMode(EnergyPlusData &state, const std::string& name_to_find);
+    explicit CoilCoolingDXCurveFitOperatingMode(EnergyPlusData &state, const std::string &name_to_find);
     Real64 getCurrentEvapCondPumpPower(int speedNum);
     void CalcOperatingMode(EnergyPlusData &state,
                            const DataLoopNode::NodeData &inletNode,
@@ -118,9 +117,9 @@ struct CoilCoolingDXCurveFitOperatingMode
     bool applyLatentDegradationAllSpeeds = false;
 
     // results from coil model at speed
-//    Real64 OpModeOutletTemp = 0.0;
-//    Real64 OpModeOutletHumRat = 0.0;
-//    Real64 OpModeOutletEnth = 0.0;
+    //    Real64 OpModeOutletTemp = 0.0;
+    //    Real64 OpModeOutletHumRat = 0.0;
+    //    Real64 OpModeOutletEnth = 0.0;
     Real64 OpModePower = 0.0;
     Real64 OpModeRTF = 0.0;
     Real64 OpModeWasteHeat = 0.0;
@@ -144,7 +143,6 @@ struct CoilCoolingDXCurveFitOperatingMode
     Real64 condInletTemp = 0.0; // condenser inlet node temp or outdoor temp if no condenser node {C}
 
     std::vector<CoilCoolingDXCurveFitSpeed> speeds;
-
 };
 
 } // namespace EnergyPlus

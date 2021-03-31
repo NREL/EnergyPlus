@@ -89,7 +89,8 @@ void IterateRootFinder(EnergyPlusData &state,
                        bool &IsDoneFlag                    // If TRUE indicates that the iteration should be stopped
 );
 
-DataRootFinder::iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const &RootFinderData); // Data used by root finding algorithm
+DataRootFinder::iStatus CheckInternalConsistency(EnergyPlusData &state,
+                                                 RootFinderDataType const &RootFinderData); // Data used by root finding algorithm
 
 bool CheckRootFinderCandidate(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
                               Real64 X                                  // X value for current iterate

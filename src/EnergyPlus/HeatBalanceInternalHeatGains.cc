@@ -108,7 +108,8 @@ void SetupZoneInternalGain(EnergyPlusData &state,
 
     // Check if IntGainComp_TypeOfNum and cComponentObject are consistent
     if (!UtilityRoutines::SameString(UpperCaseObjectType, ZoneIntGainDeviceTypes(IntGainComp_TypeOfNum))) {
-        ShowSevereError(state, "SetupZoneInternalGain: developer error, trapped inconsistent internal gains object types sent to SetupZoneInternalGain");
+        ShowSevereError(state,
+                        "SetupZoneInternalGain: developer error, trapped inconsistent internal gains object types sent to SetupZoneInternalGain");
         ShowContinueError(state, "Object type character = " + cComponentObject);
         ShowContinueError(state, "Type of Num object name = " + ZoneIntGainDeviceTypes(IntGainComp_TypeOfNum));
         return;
@@ -149,39 +150,52 @@ void SetupZoneInternalGain(EnergyPlusData &state,
 
     // note pointer assignments in code below!
     if (ConvectionGainRate) {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrConvectGainRate = ConvectionGainRate;
+        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrConvectGainRate =
+            ConvectionGainRate;
     } else {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrConvectGainRate = &state.dataHeatBal->zeroPointerVal;
+        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrConvectGainRate =
+            &state.dataHeatBal->zeroPointerVal;
     }
     if (ReturnAirConvectionGainRate) {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirConvGainRate = ReturnAirConvectionGainRate;
+        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirConvGainRate =
+            ReturnAirConvectionGainRate;
     } else {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirConvGainRate = &state.dataHeatBal->zeroPointerVal;
+        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirConvGainRate =
+            &state.dataHeatBal->zeroPointerVal;
     }
     if (ThermalRadiationGainRate) {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrRadiantGainRate = ThermalRadiationGainRate;
+        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrRadiantGainRate =
+            ThermalRadiationGainRate;
     } else {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrRadiantGainRate = &state.dataHeatBal->zeroPointerVal;
+        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrRadiantGainRate =
+            &state.dataHeatBal->zeroPointerVal;
     }
     if (LatentGainRate) {
         state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrLatentGainRate = LatentGainRate;
     } else {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrLatentGainRate = &state.dataHeatBal->zeroPointerVal;
+        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrLatentGainRate =
+            &state.dataHeatBal->zeroPointerVal;
     }
     if (ReturnAirLatentGainRate) {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirLatentGainRate = ReturnAirLatentGainRate;
+        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirLatentGainRate =
+            ReturnAirLatentGainRate;
     } else {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirLatentGainRate = &state.dataHeatBal->zeroPointerVal;
+        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirLatentGainRate =
+            &state.dataHeatBal->zeroPointerVal;
     }
     if (CarbonDioxideGainRate) {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrCarbonDioxideGainRate = CarbonDioxideGainRate;
+        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrCarbonDioxideGainRate =
+            CarbonDioxideGainRate;
     } else {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrCarbonDioxideGainRate = &state.dataHeatBal->zeroPointerVal;
+        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrCarbonDioxideGainRate =
+            &state.dataHeatBal->zeroPointerVal;
     }
     if (GenericContamGainRate) {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrGenericContamGainRate = GenericContamGainRate;
+        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrGenericContamGainRate =
+            GenericContamGainRate;
     } else {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrGenericContamGainRate = &state.dataHeatBal->zeroPointerVal;
+        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrGenericContamGainRate =
+            &state.dataHeatBal->zeroPointerVal;
     }
     state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).ReturnAirNodeNum = RetNodeNum;
 }

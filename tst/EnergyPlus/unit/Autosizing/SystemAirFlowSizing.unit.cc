@@ -86,7 +86,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(5.0, sizedValue, 0.0001); // hard-sized value
-    sizer.autoSizedValue = 0.0;         // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     // reset eio stream
     has_eio_output(true);
@@ -97,7 +97,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(5.0, sizedValue, 0.0001); // hard-sized value
-    sizer.autoSizedValue = 0.0;         // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     std::string eiooutput =
         std::string("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n"
@@ -142,7 +142,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.6, sizedValue, 0.0001);
-    sizer.autoSizedValue = 0.0;         // reset for next test
+    sizer.autoSizedValue = 0.0; // reset for next test
 
     eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Maximum Flow Rate [m3/s], 1.60000\n");
 
@@ -158,7 +158,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.2, sizedValue, 0.0001);
-    sizer.autoSizedValue = 0.0;         // reset for next test
+    sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 4 - Zone Equipment, set cooling only fan
     state->dataSize->ZoneHeatingOnlyFan = false;
@@ -171,7 +171,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.6, sizedValue, 0.0001);
-    sizer.autoSizedValue = 0.0;         // reset for next test
+    sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 5 - Zone Equipment, cooling only fan, set fraction used for sizing
     state->dataSize->DataFractionUsedForSizing = 0.5;
@@ -182,8 +182,8 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(0.8, sizedValue, 0.0001); // 1/2 of zone cooling air flow rate
-    sizer.autoSizedValue = 0.0;         // reset for next test
+    EXPECT_NEAR(0.8, sizedValue, 0.0001);             // 1/2 of zone cooling air flow rate
+    sizer.autoSizedValue = 0.0;                       // reset for next test
     state->dataSize->DataFractionUsedForSizing = 0.0; // reset for next test
 
     // Test 6 - Zone Equipment, set ZoneEqSizing data
@@ -198,7 +198,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.8, sizedValue, 0.0001); // max of zone cooling/heating/ZoneEqSizing
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     // Test 7 - Zone Equipment, set cooling only fan
     state->dataSize->ZoneEqSizing(1).SystemAirFlow = false;
@@ -211,7 +211,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.6, sizedValue, 0.0001); // zone cooling flow
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     // Test 8 - Zone Equipment, set heating only fan
     state->dataSize->ZoneCoolingOnlyFan = false;
@@ -224,7 +224,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.2, sizedValue, 0.0001); // zone heating flow
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     // Test 9 - Zone Equipment, set ZoneEqSizing cooling air flow
     state->dataSize->ZoneHeatingOnlyFan = false;
@@ -238,7 +238,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(2.2, sizedValue, 0.0001); // ZoneEqSizing cooling flow
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     // Test 10 - Zone Equipment, set ZoneEqSizing heating air flow
     state->dataSize->ZoneEqSizing(1).CoolingAirFlow = false;
@@ -252,7 +252,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(3.2, sizedValue, 0.0001); // ZoneEqSizing heating flow
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     // Test 11 - Zone Equipment, set ZoneEqSizing cooling and heating air flow
     state->dataSize->ZoneEqSizing(1).CoolingAirFlow = true;
@@ -264,7 +264,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(3.2, sizedValue, 0.0001); // max of ZoneEqSizing cooling/heating flow
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
     state->dataSize->ZoneEqSizing(1).CoolingAirFlow = false;
     state->dataSize->ZoneEqSizing(1).HeatingAirFlow = false;
 
@@ -281,7 +281,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.64, sizedValue, 0.0001); // max of ZoneEqSizing cooling/heating flow
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
 
     // Test 13 - Zone Equipment, set fraction of autosized heating flow for heating only fan
     state->dataSize->DataFracOfAutosizedHeatingAirflow = 0.4;
@@ -295,7 +295,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.48, sizedValue, 0.0001); // max of ZoneEqSizing cooling/heating flow
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
 
     // Test 14 - Zone Equipment, cooling or heating fan not set
     state->dataSize->ZoneHeatingOnlyFan = false;
@@ -307,7 +307,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.64, sizedValue, 0.0001); // max of FinalZoneSizing cooling/heating flow * fraction
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
 
     // Test 15 - Zone Equipment, ZoneEqSizing cooling
     state->dataSize->ZoneEqSizing(1).CoolingAirFlow = true;
@@ -319,7 +319,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.88, sizedValue, 0.0001); // max of ZoneEqSizing cooling/heating flow * fraction
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
 
     // Test 16 - Zone Equipment, ZoneEqSizing heating
     state->dataSize->ZoneEqSizing(1).CoolingAirFlow = false;
@@ -332,7 +332,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.28, sizedValue, 0.0001); // max of ZoneEqSizing cooling/heating flow * fraction
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
 
     // Test 17 - Zone Equipment, ZoneEqSizing cooling and heating fan
     state->dataSize->ZoneEqSizing(1).CoolingAirFlow = true;
@@ -344,7 +344,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.28, sizedValue, 0.0001); // max of FinalZoneSizing cooling/heating flow * fraction
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
 
     state->dataSize->ZoneEqSizing(1).SizingMethod(int(sizer.sizingType)) = DataSizing::FractionOfAutosizedHeatingAirflow;
 
@@ -359,7 +359,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.64, sizedValue, 0.0001); // max of ZoneEqSizing cooling/heating flow
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
 
     // Test 19 - Zone Equipment, set fraction of autosized heating flow for heating only fan
     state->dataSize->ZoneCoolingOnlyFan = false;
@@ -372,7 +372,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.48, sizedValue, 0.0001); // max of ZoneEqSizing cooling/heating flow
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
 
     // Test 20 - Zone Equipment, cooling or heating fan not set, ZoneEqSizing CoolingAirFlow is set
     state->dataSize->ZoneHeatingOnlyFan = false;
@@ -385,7 +385,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.88, sizedValue, 0.0001); // max of ZoneEqSizing cooling flow * fraction
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
 
     // Test 21 - Zone Equipment, cooling or heating fan not set, ZoneEqSizing HeatingAirFlow is set
     state->dataSize->ZoneEqSizing(1).HeatingAirFlow = true;
@@ -398,7 +398,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.28, sizedValue, 0.0001); // max of ZoneEqSizing heating flow * fraction
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
 
     // Test 22 - Zone Equipment, cooling or heating fan not set, ZoneEqSizing Cooling/HeatingAirFlow are set
     state->dataSize->ZoneEqSizing(1).CoolingAirFlow = true;
@@ -410,7 +410,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.28, sizedValue, 0.0001); // max of ZoneEqSizing cooling/heating flow * fraction
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
     state->dataSize->ZoneEqSizing(1).CoolingAirFlow = false;
     state->dataSize->ZoneEqSizing(1).HeatingAirFlow = false;
 
@@ -423,7 +423,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.64, sizedValue, 0.0001); // max of FinalZoneSizing cooling/heating flow * fraction
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
 
     state->dataSize->ZoneEqSizing(1).SizingMethod(int(sizer.sizingType)) = DataSizing::FlowPerCoolingCapacity;
 
@@ -441,7 +441,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.5, sizedValue, 0.0001); // flow per cooling capacity
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     // Test 25 - Zone Equipment, set fraction of autosized heating flow for heating only fan
     state->dataSize->ZoneCoolingOnlyFan = false;
@@ -454,7 +454,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.2, sizedValue, 0.0001); // flow per heating capacity
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     // Test 26 - Zone Equipment, cooling or heating fan not set, ZoneEqSizing CoolingAirFlow is set
     state->dataSize->ZoneHeatingOnlyFan = false;
@@ -467,7 +467,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.5, sizedValue, 0.0001); // max of ZoneEqSizing cooling capacity * fraction
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     // Test 27 - Zone Equipment, cooling or heating fan not set, ZoneEqSizing HeatingAirFlow is set
     state->dataSize->ZoneEqSizing(1).HeatingAirFlow = true;
@@ -480,7 +480,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.2, sizedValue, 0.0001); // ZoneEqSizing heating capacity * fraction
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     // Test 28 - Zone Equipment, cooling or heating fan not set, ZoneEqSizing Cooling/HeatingAirFlow are set
     state->dataSize->ZoneEqSizing(1).CoolingAirFlow = true;
@@ -492,7 +492,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.2, sizedValue, 0.0001); // max of ZoneEqSizing cooling/heating flow * fraction
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
     state->dataSize->ZoneEqSizing(1).CoolingAirFlow = false;
     state->dataSize->ZoneEqSizing(1).HeatingAirFlow = false;
 
@@ -505,7 +505,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.2, sizedValue, 0.0001); // max of autosized cooling/heating capacity * fraction
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     state->dataSize->ZoneEqSizing(1).SizingMethod(int(sizer.sizingType)) = DataSizing::FlowPerHeatingCapacity;
 
@@ -519,7 +519,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.5, sizedValue, 0.0001); // flow per cooling capacity
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     // Test 31 - Zone Equipment, set fraction of autosized heating flow for heating only fan
     state->dataSize->ZoneCoolingOnlyFan = false;
@@ -532,7 +532,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.2, sizedValue, 0.0001); // flow per heating capacity
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     // Test 32 - Zone Equipment, cooling or heating fan not set, ZoneEqSizing CoolingAirFlow is set
     state->dataSize->ZoneHeatingOnlyFan = false;
@@ -545,7 +545,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.5, sizedValue, 0.0001); // max of autosized cooling capacity * fraction
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     // Test 33 - Zone Equipment, cooling or heating fan not set, ZoneEqSizing HeatingAirFlow is set
     state->dataSize->ZoneEqSizing(1).HeatingAirFlow = true;
@@ -558,7 +558,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.2, sizedValue, 0.0001); // autosized heating capacity * fraction
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     // Test 34 - Zone Equipment, cooling or heating fan not set, ZoneEqSizing Cooling/HeatingAirFlow are set
     state->dataSize->ZoneEqSizing(1).CoolingAirFlow = true;
@@ -570,7 +570,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.2, sizedValue, 0.0001); // max of autosized cooling/heating capacity * fraction
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
     state->dataSize->ZoneEqSizing(1).CoolingAirFlow = false;
     state->dataSize->ZoneEqSizing(1).HeatingAirFlow = false;
 
@@ -583,7 +583,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.2, sizedValue, 0.0001); // max of autosized cooling/heating capacity * fraction
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     // Test 36 - Zone Equipment, set design size from parent
     state->dataSize->ZoneEqSizing(1).DesignSizeFromParent = true;
@@ -595,7 +595,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1.75, sizedValue, 0.0001); // parent passed size
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
     state->dataSize->ZoneEqSizing(1).DesignSizeFromParent = false;
 
     // Test 37 - Zone Equipment, hard size with zone sizing run
@@ -606,7 +606,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(1.44, sizedValue, 0.0001); // hard sized result
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
 
     // Test 38 - Zone Equipment, hard size
     inputValue = 1.44;
@@ -617,7 +617,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(1.44, sizedValue, 0.0001); // hard sized result
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
 
     // Test 39 - EMS override
     state->dataSize->DataEMSOverrideON = true;
@@ -629,11 +629,11 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
-    EXPECT_NEAR(1.33, sizedValue, 0.0001); // override result
+    EXPECT_NEAR(1.33, sizedValue, 0.0001);          // override result
     EXPECT_NEAR(1.44, sizer.originalValue, 0.0001); // original input
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;                     // reset for next test
 
-                                // reset eio stream
+    // reset eio stream
     has_eio_output(true);
     eiooutput = "";
 
@@ -659,7 +659,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(5.0, sizedValue, 0.0001); // hard-sized value
-    sizer.autoSizedValue = 0.0;         // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test 41 - Airloop Equipment - ems override is on
@@ -958,7 +958,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
     eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Maximum Flow Rate [m3/s], 3.50000\n"
-        " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Maximum Flow Rate [m3/s], 2.20000\n");
+                            " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Maximum Flow Rate [m3/s], 2.20000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }
 

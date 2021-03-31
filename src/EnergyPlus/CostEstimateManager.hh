@@ -73,11 +73,11 @@ namespace CostEstimateManager {
         Real64 PerCubicMeter;      // cost per cubic meter
         Real64 PerCubMeterPerSec;  // cost per cubic meter per second
         Real64 PerUAinWattperDelK; // cost per (UA) in Watt/deltaK
-        int LineNumber;      // number of line item in detail list
-        Real64 Qty;          // quantity in calculations (can be input)
-        std::string Units;   // Reported units
-        Real64 ValuePer;     // Cost used in final calculation
-        Real64 LineSubTotal; // line item total  Qty * ValuePer
+        int LineNumber;            // number of line item in detail list
+        Real64 Qty;                // quantity in calculations (can be input)
+        std::string Units;         // Reported units
+        Real64 ValuePer;           // Cost used in final calculation
+        Real64 LineSubTotal;       // line item total  Qty * ValuePer
 
         // Default Constructor
         CostLineItemStruct()
@@ -101,8 +101,8 @@ namespace CostEstimateManager {
         Real64 GrandTotal;         // = 0.0 ! the Grand Total of all line items plus all other costs
 
         // Default Constructor
-        CostAdjustmentStruct() :
-              LineItemTot(0.0), MiscCostperSqMeter(0.0), DesignFeeFrac(0.0), ContractorFeeFrac(0.0), ContingencyFrac(0.0), BondCostFrac(0.0),
+        CostAdjustmentStruct()
+            : LineItemTot(0.0), MiscCostperSqMeter(0.0), DesignFeeFrac(0.0), ContractorFeeFrac(0.0), ContingencyFrac(0.0), BondCostFrac(0.0),
               CommissioningFrac(0.0), RegionalModifier(0.0), GrandTotal(0.0)
         {
         }
@@ -117,7 +117,7 @@ namespace CostEstimateManager {
                              Real64 const CommissioningFrac,  // = 0.0 ! holds user-defined fraction for commissioning costs
                              Real64 const RegionalModifier,   // = 1.0 ! holds user-defined multiplier to account for regional diffs
                              Real64 const GrandTotal          // = 0.0 ! the Grand Total of all line items plus all other costs
-        )
+                             )
             : LineItemTot(LineItemTot), MiscCostperSqMeter(MiscCostperSqMeter), DesignFeeFrac(DesignFeeFrac), ContractorFeeFrac(ContractorFeeFrac),
               ContingencyFrac(ContingencyFrac), BondCostFrac(BondCostFrac), CommissioningFrac(CommissioningFrac), RegionalModifier(RegionalModifier),
               GrandTotal(GrandTotal)
@@ -133,8 +133,7 @@ namespace CostEstimateManager {
         std::string html; // representation for HTML file - contains unicode references
 
         // Default Constructor
-        monetaryUnitType() :
-            code(std::string()), txt(std::string()), html(std::string())
+        monetaryUnitType() : code(std::string()), txt(std::string()), html(std::string())
         {
         }
     };
@@ -149,50 +148,51 @@ namespace CostEstimateManager {
 
 } // namespace CostEstimateManager
 
-    struct CostEstimateManagerData : BaseGlobalStruct {
+struct CostEstimateManagerData : BaseGlobalStruct
+{
 
-        bool GetCostInput = true;
-        int NumLineItems = 0 ;        // number of cost estimate line items
-        bool DoCostEstimate = false;  // set to true if any cost estimating needed
-        int numMonetaryUnit = 0;
-        int selectedMonetaryUnit = 0;
+    bool GetCostInput = true;
+    int NumLineItems = 0;        // number of cost estimate line items
+    bool DoCostEstimate = false; // set to true if any cost estimating needed
+    int numMonetaryUnit = 0;
+    int selectedMonetaryUnit = 0;
 
-        Array1D<CostEstimateManager::CostLineItemStruct> CostLineItem;
+    Array1D<CostEstimateManager::CostLineItemStruct> CostLineItem;
 
-        CostEstimateManager::CostAdjustmentStruct CurntBldg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
-        // holds total from line item cost calculations | holds user-defined
-        // constant cost model | holds user-defined fraction for design fees
-        // | holds user-defined fraction for contractor fees | holds
-        // user-defined fraction for contingencies | holds user-defined
-        // fraction for bonding costs | holds user-defined fraction for
-        // commissioning costs | holds user-defined multiplier to account for
-        // regional diffs | the Grand Total of all line items plus all other
-        // costs
+    CostEstimateManager::CostAdjustmentStruct CurntBldg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
+    // holds total from line item cost calculations | holds user-defined
+    // constant cost model | holds user-defined fraction for design fees
+    // | holds user-defined fraction for contractor fees | holds
+    // user-defined fraction for contingencies | holds user-defined
+    // fraction for bonding costs | holds user-defined fraction for
+    // commissioning costs | holds user-defined multiplier to account for
+    // regional diffs | the Grand Total of all line items plus all other
+    // costs
 
-        CostEstimateManager::CostAdjustmentStruct RefrncBldg{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
-        // holds total from line item cost calculations | holds user-defined
-        // constant cost model | holds user-defined fraction for design fees
-        // | holds user-defined fraction for contractor fees | holds
-        // user-defined fraction for contingencies | holds user-defined
-        // fraction for bonding costs | holds user-defined fraction for
-        // commissioning costs | holds user-defined multiplier to account
-        // for regional diffs | the Grand Total of all line items plus all
-        // other costs
+    CostEstimateManager::CostAdjustmentStruct RefrncBldg{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
+    // holds total from line item cost calculations | holds user-defined
+    // constant cost model | holds user-defined fraction for design fees
+    // | holds user-defined fraction for contractor fees | holds
+    // user-defined fraction for contingencies | holds user-defined
+    // fraction for bonding costs | holds user-defined fraction for
+    // commissioning costs | holds user-defined multiplier to account
+    // for regional diffs | the Grand Total of all line items plus all
+    // other costs
 
-        Array1D<CostEstimateManager::monetaryUnitType> monetaryUnit;
+    Array1D<CostEstimateManager::monetaryUnitType> monetaryUnit;
 
-        void clear_state() override
-        {
-            this->GetCostInput = true;
-            this->NumLineItems = 0;
-            this->DoCostEstimate = false;
-            this->numMonetaryUnit = 0;
-            this->selectedMonetaryUnit = 0;
-            this->CurntBldg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
-            this->RefrncBldg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
-            this->monetaryUnit.deallocate();
-        }
-    };
+    void clear_state() override
+    {
+        this->GetCostInput = true;
+        this->NumLineItems = 0;
+        this->DoCostEstimate = false;
+        this->numMonetaryUnit = 0;
+        this->selectedMonetaryUnit = 0;
+        this->CurntBldg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
+        this->RefrncBldg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
+        this->monetaryUnit.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

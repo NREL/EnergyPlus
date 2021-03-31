@@ -66,10 +66,14 @@ namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInput)
 {
-    std::string const idf_objects = delimited_string(
-        {"Coil:Heating:Fuel,", "  Furnace Coil,            !- Name", "  ,    !- Availability Schedule Name", "  OtherFuel1,              !- FuelType",
-         "  0.8,                     !- Gas Burner Efficiency", "  20000,                   !- Nominal Capacity {W}",
-         "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name", "  Air Loop Outlet Node;    !- Air Outlet Node Name"});
+    std::string const idf_objects = delimited_string({"Coil:Heating:Fuel,",
+                                                      "  Furnace Coil,            !- Name",
+                                                      "  ,    !- Availability Schedule Name",
+                                                      "  OtherFuel1,              !- FuelType",
+                                                      "  0.8,                     !- Gas Burner Efficiency",
+                                                      "  20000,                   !- Nominal Capacity {W}",
+                                                      "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
+                                                      "  Air Loop Outlet Node;    !- Air Outlet Node Name"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -106,10 +110,14 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInputError)
 
 TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeCoal)
 {
-    std::string const idf_objects = delimited_string(
-        {"Coil:Heating:Fuel,", "  Furnace Coil,            !- Name", "  ,    !- Availability Schedule Name", "  Coal,                 !- FuelType",
-         "  0.8,                     !- Gas Burner Efficiency", "  20000,                   !- Nominal Capacity {W}",
-         "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name", "  Air Loop Outlet Node;    !- Air Outlet Node Name"});
+    std::string const idf_objects = delimited_string({"Coil:Heating:Fuel,",
+                                                      "  Furnace Coil,            !- Name",
+                                                      "  ,    !- Availability Schedule Name",
+                                                      "  Coal,                 !- FuelType",
+                                                      "  0.8,                     !- Gas Burner Efficiency",
+                                                      "  20000,                   !- Nominal Capacity {W}",
+                                                      "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
+                                                      "  Air Loop Outlet Node;    !- Air Outlet Node Name"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -120,10 +128,14 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeCoal)
 
 TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
 {
-    std::string const idf_objects = delimited_string(
-        {"Coil:Heating:Fuel,", "  Furnace Coil,            !- Name", "  ,    !- Availability Schedule Name", "  Propane,                 !- FuelType",
-         "  0.8,                     !- Gas Burner Efficiency", "  20000,                   !- Nominal Capacity {W}",
-         "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name", "  Air Loop Outlet Node;    !- Air Outlet Node Name"});
+    std::string const idf_objects = delimited_string({"Coil:Heating:Fuel,",
+                                                      "  Furnace Coil,            !- Name",
+                                                      "  ,    !- Availability Schedule Name",
+                                                      "  Propane,                 !- FuelType",
+                                                      "  0.8,                     !- Gas Burner Efficiency",
+                                                      "  20000,                   !- Nominal Capacity {W}",
+                                                      "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
+                                                      "  Air Loop Outlet Node;    !- Air Outlet Node Name"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -161,8 +173,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
 
     state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirMassFlowRate = OffMassFlowrate;
     HeatingCoils::CalcMultiStageGasHeatingCoil(*state, CoilNum, 0.0, 0.0, 1, 2);
-    Real64 HeatLoad00 =
-        state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirMassFlowRate *
+    Real64 HeatLoad00 = state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirMassFlowRate *
                         (Psychrometrics::PsyHFnTdbW(state->dataHeatingCoils->HeatingCoil(CoilNum).OutletAirTemp,
                                                     state->dataHeatingCoils->HeatingCoil(CoilNum).OutletAirHumRat) -
                          state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirEnthalpy);
@@ -170,8 +181,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
 
     state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirMassFlowRate = 0.5 * OnMassFlowrate + (1.0 - 0.5) * OffMassFlowrate;
     HeatingCoils::CalcMultiStageGasHeatingCoil(*state, CoilNum, 0.0, 0.5, 1, 2);
-    Real64 HeatLoad05 =
-        state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirMassFlowRate *
+    Real64 HeatLoad05 = state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirMassFlowRate *
                         (Psychrometrics::PsyHFnTdbW(state->dataHeatingCoils->HeatingCoil(CoilNum).OutletAirTemp,
                                                     state->dataHeatingCoils->HeatingCoil(CoilNum).OutletAirHumRat) -
                          state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirEnthalpy);
@@ -179,8 +189,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
 
     state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirMassFlowRate = OnMassFlowrate;
     HeatingCoils::CalcMultiStageGasHeatingCoil(*state, CoilNum, 0.0, 1.0, 1, 2);
-    Real64 HeatLoad10 =
-        state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirMassFlowRate *
+    Real64 HeatLoad10 = state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirMassFlowRate *
                         (Psychrometrics::PsyHFnTdbW(state->dataHeatingCoils->HeatingCoil(CoilNum).OutletAirTemp,
                                                     state->dataHeatingCoils->HeatingCoil(CoilNum).OutletAirHumRat) -
                          state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirEnthalpy);

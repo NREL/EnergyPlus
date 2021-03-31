@@ -83,7 +83,14 @@ struct CoilCoolingDX
     static void reportAllStandardRatings(EnergyPlusData &state);
     void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXInputSpecification &input_data);
     void oneTimeInit(EnergyPlusData &state);
-    void simulate(EnergyPlusData &state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int const fanOpMode, bool const singleMode, Real64 LoadSHR = -1.0);
+    void simulate(EnergyPlusData &state,
+                  int useAlternateMode,
+                  Real64 PLR,
+                  int speedNum,
+                  Real64 speedRatio,
+                  int const fanOpMode,
+                  bool const singleMode,
+                  Real64 LoadSHR = -1.0);
     void setData(int fanIndex, int fanType, std::string const &fanName, int airLoopNum);
     void getFixedData(int &evapInletNodeIndex,
                       int &evapOutletNodeIndex,
@@ -166,16 +173,17 @@ struct CoilCoolingDX
     bool isHundredPercentDOAS = false;
 };
 
-extern std::vector<CoilCoolingDX> coilCoolingDXs;
-extern bool stillNeedToReportStandardRatings; // standard ratings flag for all coils to report at the same time
-extern bool coilCoolingDXGetInputFlag;
-extern std::string const coilCoolingDXObjectName;
-
-struct CoilCoolingDXData : BaseGlobalStruct {
-
+struct CoilCoolingDXData : BaseGlobalStruct
+{
+    std::vector<CoilCoolingDX> coilCoolingDXs;
+    bool coilCoolingDXGetInputFlag = true;
+    std::string const coilCoolingDXObjectName = "Coil:Cooling:DX";
+    bool stillNeedToReportStandardRatings = true; // standard ratings flag for all coils to report at the same time
     void clear_state() override
     {
-
+        coilCoolingDXs.clear();
+        coilCoolingDXGetInputFlag = true;
+        stillNeedToReportStandardRatings = true;
     }
 };
 

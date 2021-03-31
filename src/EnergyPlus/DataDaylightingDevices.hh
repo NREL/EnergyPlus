@@ -63,7 +63,8 @@ namespace DataDaylightingDevices {
     constexpr int MaxTZones(10);   // Maximum number of transition zones
     constexpr int NumOfAngles(19); // Number of data points on transmittance vs. angle curve
 
-    enum class iRadType {
+    enum class iRadType
+    {
         VisibleBeam,
         SolarBeam,
         SolarAniso,
@@ -107,9 +108,9 @@ namespace DataDaylightingDevices {
         // Default Constructor
         TDDPipeData()
             : Dome(0), Diffuser(0), Construction(0), Diameter(0.0), TotLength(0.0), Reff(0.0), NumOfTZones(0), AspectRatio(0.0), ReflectVis(0.0),
-              ReflectSol(0.0), PipeTransVisBeam(DataDaylightingDevices::NumOfAngles, 0.0), PipeTransSolBeam(DataDaylightingDevices::NumOfAngles, 0.0), TransSolIso(0.0), TransSolHorizon(0.0),
-              ExtLength(0.0), TransmittedSolar(0.0), PipeAbsorbedSolar(0.0), HeatGain(0.0), HeatLoss(0.0), TransVisBeam(0.0), TransSolBeam(0.0),
-              TransVisDiff(0.0), TransSolDiff(0.0)
+              ReflectSol(0.0), PipeTransVisBeam(DataDaylightingDevices::NumOfAngles, 0.0), PipeTransSolBeam(DataDaylightingDevices::NumOfAngles, 0.0),
+              TransSolIso(0.0), TransSolHorizon(0.0), ExtLength(0.0), TransmittedSolar(0.0), PipeAbsorbedSolar(0.0), HeatGain(0.0), HeatLoss(0.0),
+              TransVisBeam(0.0), TransSolBeam(0.0), TransVisDiff(0.0), TransSolDiff(0.0)
         {
         }
     };
@@ -137,7 +138,8 @@ namespace DataDaylightingDevices {
 
 } // namespace DataDaylightingDevices
 
-struct DataDaylightingDevicesData : BaseGlobalStruct {
+struct DataDaylightingDevicesData : BaseGlobalStruct
+{
 
     int NumOfTDDPipes = 0; // Number of TDD pipes in the input file
     int NumOfShelf = 0;    // Number of daylighting shelves in the input file

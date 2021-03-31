@@ -52,9 +52,9 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/PlantComponent.hh>
-#include <EnergyPlus/ConvectionCoefficients.hh>
 
 namespace EnergyPlus {
 
@@ -166,7 +166,11 @@ namespace PhotovoltaicThermalCollectors {
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         void setupReportVars(EnergyPlusData &state);
 
@@ -195,7 +199,8 @@ namespace PhotovoltaicThermalCollectors {
 
 } // namespace PhotovoltaicThermalCollectors
 
-struct PhotovoltaicThermalCollectorsData : BaseGlobalStruct {
+struct PhotovoltaicThermalCollectorsData : BaseGlobalStruct
+{
 
     bool GetInputFlag = true; // First time, input is "gotten"
 
@@ -208,7 +213,6 @@ struct PhotovoltaicThermalCollectorsData : BaseGlobalStruct {
         GetInputFlag = true;
         NumPVT = 0;
         PVT.deallocate();
-
     }
 };
 

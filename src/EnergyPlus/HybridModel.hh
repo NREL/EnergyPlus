@@ -130,14 +130,15 @@ namespace HybridModel {
 
 } // namespace HybridModel
 
-struct HybridModelData : BaseGlobalStruct {
+struct HybridModelData : BaseGlobalStruct
+{
 
     bool FlagHybridModel = false;    // True if hybrid model is activated
     bool FlagHybridModel_TM = false; // User input IM option - True if hybrid model (thermal mass) is activated
     bool FlagHybridModel_AI = false; // User input IM option - True if hybrid model (air infiltration) is activated
     bool FlagHybridModel_PC = false; // User input IM option - True if hybrid model (people count) is activated
 
-    int NumOfHybridModelZones = 0;    // Number of hybrid model zones in the model
+    int NumOfHybridModelZones = 0;   // Number of hybrid model zones in the model
     std::string CurrentModuleObject; // to assist in getting input
 
     Array1D<HybridModel::HybridModelProperties> HybridModelZone;

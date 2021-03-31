@@ -61,7 +61,8 @@
 
 using namespace EnergyPlus;
 
-void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, CoilCoolingDXCurveFitOperatingModeInputSpecification input_data)
+void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state,
+                                                                  CoilCoolingDXCurveFitOperatingModeInputSpecification input_data)
 {
     static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
@@ -117,9 +118,9 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
     }
 }
 
-CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlus::EnergyPlusData &state, const std::string& name_to_find)
+CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlus::EnergyPlusData &state, const std::string &name_to_find)
 {
-    int numModes = inputProcessor->getNumObjectsFound(state, CoilCoolingDXCurveFitOperatingMode::object_name);
+    int numModes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CoilCoolingDXCurveFitOperatingMode::object_name);
     if (numModes <= 0) {
         // error
     }
@@ -128,8 +129,14 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlu
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        inputProcessor->getObjectItem(
-            state, CoilCoolingDXCurveFitOperatingMode::object_name, modeNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 CoilCoolingDXCurveFitOperatingMode::object_name,
+                                                                 modeNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNumbers,
+                                                                 IOStatus);
         if (!UtilityRoutines::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
             continue;
         }
@@ -168,13 +175,15 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlu
 void CoilCoolingDXCurveFitOperatingMode::oneTimeInit(EnergyPlus::EnergyPlusData &state)
 {
     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-        SetupEMSActuator(state, this->object_name,
+        SetupEMSActuator(state,
+                         this->object_name,
                          this->name,
                          "Autosized Rated Air Flow Rate",
                          "[m3/s]",
                          this->ratedAirVolFlowEMSOverrideON,
                          this->ratedAirVolFlowEMSOverrideValue);
-        SetupEMSActuator(state, this->object_name,
+        SetupEMSActuator(state,
+                         this->object_name,
                          this->name,
                          "Autosized Rated Total Cooling Capacity",
                          "[W]",
@@ -226,7 +235,6 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
     sizerCondAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
     this->ratedCondAirFlowRate = sizerCondAirFlow.size(state, TempSize, errorsFound);
 
-
     if (this->condenserType != CondenserType::AIRCOOLED) {
         // Auto size Nominal Evaporative Condenser Pump Power to Total Capacity * 0.004266 w/w (15 W/ton)
         AutoCalculateSizer sizerCondEvapPumpPower;
@@ -271,7 +279,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
                                                            Real64 &PLR,
                                                            int &speedNum,
                                                            Real64 &speedRatio,
-                                                           int  const fanOpMode,
+                                                           int const fanOpMode,
                                                            DataLoopNode::NodeData &condInletNode,
                                                            [[maybe_unused]] DataLoopNode::NodeData &condOutletNode,
                                                            [[maybe_unused]] bool const singleMode)
@@ -287,8 +295,8 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
     if (this->condenserType == CondenserType::AIRCOOLED) {
         this->condInletTemp = condInletNode.Temp;
     } else if (this->condenserType == CondenserType::EVAPCOOLED) {
-        this->condInletTemp = Psychrometrics::PsyTwbFnTdbWPb(state,
-            condInletNode.Temp, condInletNode.HumRat, condInletNode.Press, "CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode");
+        this->condInletTemp = Psychrometrics::PsyTwbFnTdbWPb(
+            state, condInletNode.Temp, condInletNode.HumRat, condInletNode.Press, "CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode");
     }
     thisspeed.ambPressure = condInletNode.Press;
     thisspeed.AirMassFlow = inletNode.MassFlowRate;
@@ -374,12 +382,12 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
         }
 
         outletNode.HumRat = (outSpeed1HumRat * speedRatio * thisspeed.AirMassFlow + (1.0 - speedRatio) * outletNode.HumRat * lowerspeed.AirMassFlow) /
-            inletNode.MassFlowRate;
+                            inletNode.MassFlowRate;
         outletNode.Enthalpy =
             (outSpeed1Enthalpy * speedRatio * thisspeed.AirMassFlow + (1.0 - speedRatio) * outletNode.Enthalpy * lowerspeed.AirMassFlow) /
             inletNode.MassFlowRate;
-        //outletNode.HumRat = outSpeed1HumRat * speedRatio + (1.0 - speedRatio) * outletNode.HumRat;
-        //outletNode.Enthalpy = outSpeed1Enthalpy * speedRatio + (1.0 - speedRatio) * outletNode.Enthalpy;
+        // outletNode.HumRat = outSpeed1HumRat * speedRatio + (1.0 - speedRatio) * outletNode.HumRat;
+        // outletNode.Enthalpy = outSpeed1Enthalpy * speedRatio + (1.0 - speedRatio) * outletNode.Enthalpy;
         outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
 
         this->OpModePower += (1.0 - thisspeed.RTF) * lowerspeed.fullLoadPower;

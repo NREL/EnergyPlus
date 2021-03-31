@@ -137,22 +137,26 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     state->dataPlantCentralGSHP->Wrapper(1).GLHELoopNum = PltSizCondNum;
 
     // Calculate expected values
-    Real64 rho_evap = FluidProperties::GetDensityGlycol(*state, state->dataPlnt->PlantLoop(PltSizNum).FluidName,
+    Real64 rho_evap = FluidProperties::GetDensityGlycol(*state,
+                                                        state->dataPlnt->PlantLoop(PltSizNum).FluidName,
                                                         DataGlobalConstants::CWInitConvTemp,
                                                         state->dataPlnt->PlantLoop(PltSizNum).FluidIndex,
                                                         "ChillerHeater_Autosize_TEST");
 
-    Real64 Cp_evap = FluidProperties::GetSpecificHeatGlycol(*state, state->dataPlnt->PlantLoop(PltSizNum).FluidName,
+    Real64 Cp_evap = FluidProperties::GetSpecificHeatGlycol(*state,
+                                                            state->dataPlnt->PlantLoop(PltSizNum).FluidName,
                                                             DataGlobalConstants::CWInitConvTemp,
                                                             state->dataPlnt->PlantLoop(PltSizNum).FluidIndex,
                                                             "ChillerHeater_Autosize_TEST");
 
-    Real64 rho_cond = FluidProperties::GetDensityGlycol(*state, state->dataPlnt->PlantLoop(PltSizCondNum).FluidName,
+    Real64 rho_cond = FluidProperties::GetDensityGlycol(*state,
+                                                        state->dataPlnt->PlantLoop(PltSizCondNum).FluidName,
                                                         DataGlobalConstants::CWInitConvTemp,
                                                         state->dataPlnt->PlantLoop(PltSizCondNum).FluidIndex,
                                                         "ChillerHeater_Autosize_TEST");
 
-    Real64 Cp_cond = FluidProperties::GetSpecificHeatGlycol(*state, state->dataPlnt->PlantLoop(PltSizCondNum).FluidName,
+    Real64 Cp_cond = FluidProperties::GetSpecificHeatGlycol(*state,
+                                                            state->dataPlnt->PlantLoop(PltSizCondNum).FluidName,
                                                             state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).TempRefCondInCooling,
                                                             state->dataPlnt->PlantLoop(PltSizCondNum).FluidIndex,
                                                             "ChillerHeater_Autosize_TEST");
@@ -160,14 +164,15 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     // Note: Each individual chiller heater module is sized to be capable of supporting the total load on the wrapper
 
     // Flow is multiplied by the SizFac
-    Real64 EvapVolFlowRateExpected = state->dataSize->PlantSizData(PltSizNum).DesVolFlowRate * state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).SizFac;
+    Real64 EvapVolFlowRateExpected =
+        state->dataSize->PlantSizData(PltSizNum).DesVolFlowRate * state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).SizFac;
 
     Real64 RefCapCoolingExpected = rho_evap * Cp_evap * EvapVolFlowRateExpected * state->dataSize->PlantSizData(PltSizNum).DeltaT;
 
-    Real64 CondVolFlowRateExpected =
-        RefCapCoolingExpected *
-        (1.0 + (1.0 / state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).RefCOPCooling) * state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).OpenMotorEff) /
-        (rho_cond * Cp_cond * state->dataSize->PlantSizData(PltSizCondNum).DeltaT);
+    Real64 CondVolFlowRateExpected = RefCapCoolingExpected *
+                                     (1.0 + (1.0 / state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).RefCOPCooling) *
+                                                state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).OpenMotorEff) /
+                                     (rho_cond * Cp_cond * state->dataSize->PlantSizData(PltSizCondNum).DeltaT);
 
     // now call sizing routine
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;

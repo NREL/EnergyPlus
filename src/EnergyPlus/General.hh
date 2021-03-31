@@ -79,75 +79,75 @@ namespace WeatherManager {
 
 namespace General {
 
-    void SolveRoot(EnergyPlusData &state, Real64 Eps, // required absolute accuracy
-                   int MaxIte, // maximum number of allowed iterations
-                   int &Flag,        // integer storing exit status
-                   Real64 &XRes,     // value of x that solves f(x,Par) = 0
+    void SolveRoot(EnergyPlusData &state,
+                   Real64 Eps,   // required absolute accuracy
+                   int MaxIte,   // maximum number of allowed iterations
+                   int &Flag,    // integer storing exit status
+                   Real64 &XRes, // value of x that solves f(x,Par) = 0
                    std::function<Real64(Real64 const, std::vector<Real64> const &)> f,
-                   Real64 X_0,              // 1st bound of interval that contains the solution
-                   Real64 X_1,              // 2nd bound of interval that contains the solution
+                   Real64 X_0,                    // 1st bound of interval that contains the solution
+                   Real64 X_1,                    // 2nd bound of interval that contains the solution
                    std::vector<Real64> const &Par // array with additional parameters used for function evaluation
     );
 
     void SolveRoot(EnergyPlusData &state,
-                   Real64 Eps, // required absolute accuracy
-                   int MaxIte, // maximum number of allowed iterations
-                   int &Flag,        // integer storing exit status
-                   Real64 &XRes,     // value of x that solves f(x,Par) = 0
+                   Real64 Eps,   // required absolute accuracy
+                   int MaxIte,   // maximum number of allowed iterations
+                   int &Flag,    // integer storing exit status
+                   Real64 &XRes, // value of x that solves f(x,Par) = 0
                    std::function<Real64(EnergyPlusData &state, Real64 const, std::vector<Real64> const &)> f,
-                   Real64 X_0,              // 1st bound of interval that contains the solution
-                   Real64 X_1,              // 2nd bound of interval that contains the solution
+                   Real64 X_0,                    // 1st bound of interval that contains the solution
+                   Real64 X_1,                    // 2nd bound of interval that contains the solution
                    std::vector<Real64> const &Par // array with additional parameters used for function evaluation
     );
 
-    void SolveRoot(EnergyPlusData &state, Real64 Eps, // required absolute accuracy
-                   int MaxIte, // maximum number of allowed iterations
-                   int &Flag,        // integer storing exit status
-                   Real64 &XRes,     // value of x that solves f(x [,Par]) = 0
+    void SolveRoot(EnergyPlusData &state,
+                   Real64 Eps,   // required absolute accuracy
+                   int MaxIte,   // maximum number of allowed iterations
+                   int &Flag,    // integer storing exit status
+                   Real64 &XRes, // value of x that solves f(x [,Par]) = 0
                    std::function<Real64(Real64 const, Array1D<Real64> const &)> f,
-                   Real64 X_0,         // 1st bound of interval that contains the solution
-                   Real64 X_1,         // 2nd bound of interval that contains the solution
+                   Real64 X_0,                // 1st bound of interval that contains the solution
+                   Real64 X_1,                // 2nd bound of interval that contains the solution
                    Array1D<Real64> const &Par // array with additional parameters used for function evaluation
     );
 
-    void SolveRoot(Real64 Eps, // required absolute accuracy
-                   int MaxIte, // maximum number of allowed iterations
-                   int &Flag,        // integer storing exit status
-                   Real64 &XRes,     // value of x that solves f(x [,Par]) = 0
+    void SolveRoot(Real64 Eps,   // required absolute accuracy
+                   int MaxIte,   // maximum number of allowed iterations
+                   int &Flag,    // integer storing exit status
+                   Real64 &XRes, // value of x that solves f(x [,Par]) = 0
                    std::function<Real64(Real64 const, Array1D<Real64> const &)> f,
-                   Real64 X_0,           // 1st bound of interval that contains the solution
-                   Real64 X_1,           // 2nd bound of interval that contains the solution
+                   Real64 X_0,                 // 1st bound of interval that contains the solution
+                   Real64 X_1,                 // 2nd bound of interval that contains the solution
                    Array1D<Real64> const &Par, // array with additional parameters used for function evaluation
-                   int AlgorithmTypeNum, // ALgorithm selection
+                   int AlgorithmTypeNum,       // ALgorithm selection
                    Real64 &XX_0,               // Low bound obtained with maximum number of allowed iterations
                    Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
     );
 
-    void SolveRoot(EnergyPlusData &state, Real64 Eps, // required absolute accuracy
-                   int MaxIte, // maximum number of allowed iterations
-                   int &Flag,        // integer storing exit status
-                   Real64 &XRes,     // value of x that solves f(x) = 0
+    void SolveRoot(EnergyPlusData &state,
+                   Real64 Eps,   // required absolute accuracy
+                   int MaxIte,   // maximum number of allowed iterations
+                   int &Flag,    // integer storing exit status
+                   Real64 &XRes, // value of x that solves f(x) = 0
                    std::function<Real64(Real64 const)> f,
                    Real64 X_0, // 1st bound of interval that contains the solution
                    Real64 X_1  // 2nd bound of interval that contains the solution
     );
 
-    void SolveRoot(Real64 Eps, // required absolute accuracy
-                   int MaxIte, // maximum number of allowed iterations
-                   int &Flag,        // integer storing exit status
-                   Real64 &XRes,     // value of x that solves f(x) = 0
+    void SolveRoot(Real64 Eps,   // required absolute accuracy
+                   int MaxIte,   // maximum number of allowed iterations
+                   int &Flag,    // integer storing exit status
+                   Real64 &XRes, // value of x that solves f(x) = 0
                    std::function<Real64(Real64 const)> f,
                    Real64 X_0,           // 1st bound of interval that contains the solution
                    Real64 X_1,           // 2nd bound of interval that contains the solution
                    int AlgorithmTypeNum, // ALgorithm selection
-                   Real64 &XX_0,               // Low bound obtained with maximum number of allowed iterations
-                   Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
+                   Real64 &XX_0,         // Low bound obtained with maximum number of allowed iterations
+                   Real64 &XX_1          // Hign bound obtained with maximum number of allowed iterations
     );
 
-    constexpr Real64 InterpGeneral(Real64 const Lower,
-                                Real64 const Upper,
-                                Real64 const InterpFac
-    )
+    constexpr Real64 InterpGeneral(Real64 const Lower, Real64 const Upper, Real64 const InterpFac)
     {
         return Lower + InterpFac * (Upper - Lower);
     }
@@ -157,8 +157,7 @@ namespace General {
                                     Real64 const ProfLower,
                                     Real64 const ProfUpper,
                                     Real64 const SlatInterpFac,
-                                    Real64 const ProfInterpFac
-    )
+                                    Real64 const ProfInterpFac)
     {
         Real64 ValA = SlatLower + SlatInterpFac * (SlatUpper - SlatLower);
         Real64 ValB = ProfLower + SlatInterpFac * (ProfUpper - ProfLower);
@@ -217,20 +216,20 @@ namespace General {
                  Array1A<Real64> A // Polynomial coefficients
     );
 
-    Real64 POLYF(Real64 X,         // Cosine of angle of incidence
+    Real64 POLYF(Real64 X,               // Cosine of angle of incidence
                  Array1<Real64> const &A // Polynomial coefficients
     );
 
-    Real64 POLYF(Real64 X,          // Cosine of angle of incidence
+    Real64 POLYF(Real64 X,                // Cosine of angle of incidence
                  Array1S<Real64> const &A // Polynomial coefficients
     );
 
     std::string &strip_trailing_zeros(std::string &InputString);
 
-    void MovingAvg(Array1A<Real64> DataIn, // input data that needs smoothing
-                   int NumDataItems,       // number of values in DataIn
-                   int NumItemsInAvg,      // number of items in the averaging window
-                   Array1A<Real64> SmoothedData  // output data after smoothing
+    void MovingAvg(Array1A<Real64> DataIn,      // input data that needs smoothing
+                   int NumDataItems,            // number of values in DataIn
+                   int NumItemsInAvg,           // number of items in the averaging window
+                   Array1A<Real64> SmoothedData // output data after smoothing
     );
 
     void ProcessDateString(EnergyPlusData &state,
@@ -244,13 +243,13 @@ namespace General {
 
     void DetermineDateTokens(EnergyPlusData &state,
                              std::string const &String,
-                             int &NumTokens,            // Number of tokens found in string
-                             int &TokenDay,             // Value of numeric field found
-                             int &TokenMonth,           // Value of Month field found (1=Jan, 2=Feb, etc)
-                             int &TokenWeekday,         // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
-                             WeatherManager::DateType &DateType,             // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
-                             bool &ErrorsFound,         // Set to true if cannot process this string as a date
-                             Optional_int TokenYear = _ // Value of Year if one appears to be present and this argument is present
+                             int &NumTokens,                     // Number of tokens found in string
+                             int &TokenDay,                      // Value of numeric field found
+                             int &TokenMonth,                    // Value of Month field found (1=Jan, 2=Feb, etc)
+                             int &TokenWeekday,                  // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
+                             WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                             bool &ErrorsFound,                  // Set to true if cannot process this string as a date
+                             Optional_int TokenYear = _          // Value of Year if one appears to be present and this argument is present
     );
 
     void ValidateMonthDay(EnergyPlusData &state,
@@ -281,14 +280,14 @@ namespace General {
 
     Real64 SafeDivide(Real64 a, Real64 b);
 
-    void Iterate(Real64 &ResultX,  // ResultX is the final Iteration result passed back to the calling routine
-                 Real64 Tol, // Tolerance for Convergence
-                 Real64 X0,  // Current value of X
-                 Real64 Y0,  // Current value of the function Y(X)
-                 Real64 &X1,       // First Previous values of X
-                 Real64 &Y1,       // First Previous values of Y(X1)
-                 int Iter,   // Number of iterations
-                 int &Cnvg         // Convergence flag  Cnvg = 0:  Not converged
+    void Iterate(Real64 &ResultX, // ResultX is the final Iteration result passed back to the calling routine
+                 Real64 Tol,      // Tolerance for Convergence
+                 Real64 X0,       // Current value of X
+                 Real64 Y0,       // Current value of the function Y(X)
+                 Real64 &X1,      // First Previous values of X
+                 Real64 &Y1,      // First Previous values of Y(X1)
+                 int Iter,        // Number of iterations
+                 int &Cnvg        // Convergence flag  Cnvg = 0:  Not converged
     );
 
     int FindNumberInList(int WhichNumber, Array1A_int ListOfItems, int NumItems);
@@ -301,8 +300,7 @@ namespace General {
     template <typename Container,
               class = typename std::enable_if<
                   !std::is_same<typename Container::value_type, std::string>::value>::type> // Container needs isize() and operator(i) and value_type
-    inline int
-    FindNumberInList(int const WhichNumber, Container const &ListOfItems, int Container::value_type::*num_p)
+    inline int FindNumberInList(int const WhichNumber, Container const &ListOfItems, int Container::value_type::*num_p)
     {
         int FindNumberInList(0);
         for (int Count = 1, NumItems = ListOfItems.isize(); Count <= NumItems; ++Count) {
@@ -314,17 +312,18 @@ namespace General {
         return FindNumberInList;
     }
 
-    void DecodeMonDayHrMin(int Item, // word containing encoded month, day, hour, minute
-                           int &Month,     // month in integer format (1-12)
-                           int &Day,       // day in integer format (1-31)
-                           int &Hour,      // hour in integer format (1-24)
-                           int &Minute     // minute in integer format (0:59)
+    void DecodeMonDayHrMin(int Item,   // word containing encoded month, day, hour, minute
+                           int &Month, // month in integer format (1-12)
+                           int &Day,   // day in integer format (1-31)
+                           int &Hour,  // hour in integer format (1-24)
+                           int &Minute // minute in integer format (0:59)
     );
 
     // TODO: this probably shouldn't be here
-    int DetermineMinuteForReporting(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // kind of reporting, Zone Timestep or System
+    int DetermineMinuteForReporting(EnergyPlusData &state,
+                                    OutputProcessor::TimeStepType t_timeStepType); // kind of reporting, Zone Timestep or System
 
-    void EncodeMonDayHrMin(int &Item,       // word containing encoded month, day, hour, minute
+    void EncodeMonDayHrMin(int &Item, // word containing encoded month, day, hour, minute
                            int Month, // month in integer format (1:12)
                            int Day,   // day in integer format (1:31)
                            int Hour,  // hour in integer format (1:24)
@@ -345,14 +344,18 @@ namespace General {
                                          Real64 EndTime    // End of current interval in seconds
     );
 
-    void ParseTime(Real64 Time, // Time value in seconds
-                   int &Hours,        // Number of hours
-                   int &Minutes,      // Number of minutes < 60
-                   Real64 &Seconds    // Number of seconds < 60
+    void ParseTime(Real64 Time,    // Time value in seconds
+                   int &Hours,     // Number of hours
+                   int &Minutes,   // Number of minutes < 60
+                   Real64 &Seconds // Number of seconds < 60
     );
 
-    void ScanForReports(
-        EnergyPlusData &state, std::string const &reportName, bool &DoReport, Optional_string_const ReportKey = _, Optional_string Option1 = _, Optional_string Option2 = _);
+    void ScanForReports(EnergyPlusData &state,
+                        std::string const &reportName,
+                        bool &DoReport,
+                        Optional_string_const ReportKey = _,
+                        Optional_string Option1 = _,
+                        Optional_string Option2 = _);
 
     inline void ReallocateRealArray(Array1D<Real64> &Array,
                                     int &ArrayMax,     // Current and resultant dimension for Array
@@ -363,15 +366,15 @@ namespace General {
     }
 
     void CheckCreatedZoneItemName(EnergyPlusData &state,
-                                  std::string const &calledFrom,                  // routine called from
-                                  std::string const &CurrentObject,               // object being parsed
-                                  std::string const &ZoneName,                    // Zone Name associated
+                                  std::string const &calledFrom,            // routine called from
+                                  std::string const &CurrentObject,         // object being parsed
+                                  std::string const &ZoneName,              // Zone Name associated
                                   std::string::size_type MaxZoneNameLength, // maximum length of zonelist zone names
-                                  std::string const &ItemName,                    // Item name (People, Lights, etc object)
-                                  Array1_string const &ItemNames,                 // Item Names to check for duplication
+                                  std::string const &ItemName,              // Item name (People, Lights, etc object)
+                                  Array1_string const &ItemNames,           // Item Names to check for duplication
                                   int NumItems,                             // Number of items in ItemNames array
-                                  std::string &ResultName,                        // Resultant name
-                                  bool &errFlag                                   // Error flag set to true if error found here.
+                                  std::string &ResultName,                  // Resultant name
+                                  bool &errFlag                             // Error flag set to true if error found here.
     );
 
     template <typename T, class = typename std::enable_if<!std::is_same<T, std::string>::value>::type>
@@ -400,13 +403,14 @@ namespace General {
         if (denominator == 0.0) {
             return 0.0;
         } else {
-            return std::exp(numerator/denominator);
+            return std::exp(numerator / denominator);
         }
     }
 
 } // namespace General
 
-struct GeneralData : BaseGlobalStruct {
+struct GeneralData : BaseGlobalStruct
+{
     bool GetReportInput = true;
     bool SurfVert = false;
     bool SurfDet = false;
