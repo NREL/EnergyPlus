@@ -65,9 +65,5 @@ namespace EnergyPlus::TARCOGParams {
 
     int const YES_SupportPillar(1);
 
-    //  CalcForcedVentilation flag:
-    //  0 = Skip forced ventilation calc
-    //  1 = Allow forced ventilation calc
-    int const CalcForcedVentilation(0);
 
 } // namespace EnergyPlus

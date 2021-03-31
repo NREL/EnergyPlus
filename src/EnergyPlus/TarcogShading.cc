@@ -368,7 +368,7 @@ namespace TarcogShading {
                     // speed1 = vvent(i)
                     // speed2 = vvent(i+1)
 
-                    if ((CalcForcedVentilation != 0) && ((vvent(i) != 0) || (vvent(i + 1) != 0))) {
+                    if (((int)CalcForcedVentilation::allow) && ((vvent(i) != 0) || (vvent(i + 1) != 0))) {
                         forcedventilation(state,
                                           state.dataTarcogShading->iprop1,
                                           state.dataTarcogShading->frct1,
@@ -1017,7 +1017,7 @@ namespace TarcogShading {
             // dr...recalculate speed if forced speed exist
             // bi...skip forced vent for now
             //  if (forcedspeed.ne.0) then
-            if ((forcedspeed != 0.0) && (CalcForcedVentilation != 0)) {
+            if ((forcedspeed != 0.0) && ((int)CalcForcedVentilation::allow)) {
                 speed = forcedspeed;
             } else {
                 speed = (std::sqrt(pow_2(A2) + std::abs(4.0 * A * A1)) - A2) / (2.0 * A1);

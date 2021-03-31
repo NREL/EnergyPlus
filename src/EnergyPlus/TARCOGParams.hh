@@ -106,7 +106,10 @@ namespace EnergyPlus::TARCOGParams {
     //  CalcForcedVentilation flag:
     //  0 = Skip forced ventilation calc
     //  1 = Allow forced ventilation calc
-    extern int const CalcForcedVentilation;
+    enum class CalcForcedVentilation : int {
+        skip = 0,
+        allow = 1
+    };
 
     //  Calculation outcome
     enum class CalculationOutcome { Unknown, OK };
