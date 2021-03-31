@@ -57,7 +57,8 @@
 
 namespace EnergyPlus {
 
-struct IPShortCutsData : BaseGlobalStruct {
+struct IPShortCutsData : BaseGlobalStruct
+{
     Array1D_string cAlphaFieldNames;
     Array1D_string cNumericFieldNames;
     Array1D_bool lNumericFieldBlanks;

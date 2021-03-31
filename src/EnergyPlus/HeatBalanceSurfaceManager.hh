@@ -53,8 +53,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -123,7 +123,8 @@ namespace HeatBalanceSurfaceManager {
 
     void UpdateThermalHistories(EnergyPlusData &state);
 
-    void CalculateZoneMRT(EnergyPlusData &state, Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
+    void CalculateZoneMRT(EnergyPlusData &state,
+                          Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
     // End of Record Keeping subroutines for the HB Module
     // *****************************************************************************
@@ -168,11 +169,8 @@ namespace HeatBalanceSurfaceManager {
                                            const std::vector<int> &IZSurfs, // Last zone to simulate
                                            Optional_int_const ZoneToResimulate = _);
 
-    void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state,
-                                               Real64 TH12,
-                                               DataSurfaces::SurfaceData &surface,
-                                               DataHeatBalance::ZoneData &zone,
-                                               int WarmupSurfTemp);
+    void TestSurfTempCalcHeatBalanceInsideSurf(
+        EnergyPlusData &state, Real64 TH12, DataSurfaces::SurfaceData &surface, DataHeatBalance::ZoneData &zone, int WarmupSurfTemp);
 
     void CalcOutsideSurfTemp(EnergyPlusData &state,
                              int SurfNum,      // Surface number DO loop counter
@@ -180,7 +178,7 @@ namespace HeatBalanceSurfaceManager {
                              int ConstrNum,    // Construction index for the current surface
                              Real64 HMovInsul, // "Convection" coefficient of movable insulation
                              Real64 TempExt,   // Exterior temperature boundary condition
-                             bool &ErrorFlag         // Error flag for movable insulation problem
+                             bool &ErrorFlag   // Error flag for movable insulation problem
     );
 
     void CalcExteriorVentedCavity(EnergyPlusData &state, int SurfNum); // index of surface
@@ -189,7 +187,8 @@ namespace HeatBalanceSurfaceManager {
 
 } // namespace HeatBalanceSurfaceManager
 
-struct HeatBalSurfMgr : BaseGlobalStruct {
+struct HeatBalSurfMgr : BaseGlobalStruct
+{
 
     Array1D<Real64> QExt1;    // Heat flux at the exterior surface during first time step/series
     Array1D<Real64> QInt1;    // Heat flux at the interior surface during first time step/series
@@ -231,9 +230,12 @@ struct HeatBalSurfMgr : BaseGlobalStruct {
     int calcHeatBalInsideSurfWarmupErrCount = 0;
     bool calcHeatBalInsideSurEnvrnFlag = true;
     Array1D<Real64> RefAirTemp; // inside surface convection reference air temperatures
-    Array1D<Real64> AbsDiffWin = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL);    // Diffuse solar absorptance of glass layers //Tuned Made static
-    Array1D<Real64> AbsDiffWinGnd = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL); // Ground diffuse solar absorptance of glass layers //Tuned Made static
-    Array1D<Real64> AbsDiffWinSky = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL); // Sky diffuse solar absorptance of glass layers //Tuned Made static
+    Array1D<Real64> AbsDiffWin =
+        Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL); // Diffuse solar absorptance of glass layers //Tuned Made static
+    Array1D<Real64> AbsDiffWinGnd =
+        Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL); // Ground diffuse solar absorptance of glass layers //Tuned Made static
+    Array1D<Real64> AbsDiffWinSky =
+        Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL); // Sky diffuse solar absorptance of glass layers //Tuned Made static
 
     void clear_state() override
     {

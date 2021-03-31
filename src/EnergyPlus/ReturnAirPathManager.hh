@@ -71,7 +71,8 @@ namespace ReturnAirPathManager {
 
 } // namespace ReturnAirPathManager
 
-struct ReturnAirPathMgr : BaseGlobalStruct {
+struct ReturnAirPathMgr : BaseGlobalStruct
+{
 
     bool GetInputFlag = true;
 

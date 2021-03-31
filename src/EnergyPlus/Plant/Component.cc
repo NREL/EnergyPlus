@@ -52,7 +52,8 @@
 namespace EnergyPlus {
 namespace DataPlant {
 
-    bool CompData::isPump() {
+    bool CompData::isPump()
+    {
         if (this->TypeOf_Num == DataPlant::TypeOf_PumpConstantSpeed) {
             return true;
         } else if (this->TypeOf_Num == DataPlant::TypeOf_PumpVariableSpeed) {
@@ -67,7 +68,8 @@ namespace DataPlant {
         return false;
     }
 
-    void CompData::simulate(EnergyPlusData &state, bool const FirstHVACIteration, bool &InitLoopEquip, bool const GetCompSizFac) {
+    void CompData::simulate(EnergyPlusData &state, bool const FirstHVACIteration, bool &InitLoopEquip, bool const GetCompSizFac)
+    {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -131,8 +133,9 @@ namespace DataPlant {
                 // I anticipate the list of components that fall through to be very small, so that is the check I will do.
                 // If std::find returns the .end() iterator, that means it didn't find it in the list, which means it's not one of the ones to fall
                 // through, so RETURN
-                if (std::find(state.dataPlnt->compsToSimAfterInitLoopEquip.begin(), state.dataPlnt->compsToSimAfterInitLoopEquip.end(), this->TypeOf_Num) ==
-                    state.dataPlnt->compsToSimAfterInitLoopEquip.end()) {
+                if (std::find(state.dataPlnt->compsToSimAfterInitLoopEquip.begin(),
+                              state.dataPlnt->compsToSimAfterInitLoopEquip.end(),
+                              this->TypeOf_Num) == state.dataPlnt->compsToSimAfterInitLoopEquip.end()) {
                     return;
                 }
             }
@@ -140,5 +143,5 @@ namespace DataPlant {
         }
     }
 
-}
-}
+} // namespace DataPlant
+} // namespace EnergyPlus

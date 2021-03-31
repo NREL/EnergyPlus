@@ -69,11 +69,11 @@ void SetupZoneInternalGain(EnergyPlusData &state,
                            int RetNodeNum = 0 // for return air heat gains
 );
 
-struct HeatBalInternalHeatGainsData : BaseGlobalStruct {
+struct HeatBalInternalHeatGainsData : BaseGlobalStruct
+{
 
     void clear_state() override
     {
-
     }
 };
 

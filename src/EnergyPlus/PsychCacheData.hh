@@ -45,42 +45,114 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus Headers
-#include <EnergyPlus/DataIPShortCuts.hh>
+#ifndef PsychCacheData_hh_INCLUDED
+#define PsychCacheData_hh_INCLUDED
+
+#include <EnergyPlus/Data/BaseData.hh>
 
 namespace EnergyPlus {
 
-namespace DataIPShortCuts {
+#ifdef EP_nocache_Psychrometrics
+#undef EP_cache_PsyTwbFnTdbWPb
+#undef EP_cache_PsyPsatFnTemp
+#undef EP_cache_PsyTsatFnPb
+#undef EP_cache_PsyTsatFnHPb
+#else
+#define EP_cache_PsyTwbFnTdbWPb
+#define EP_cache_PsyPsatFnTemp
+#define EP_cache_PsyTsatFnPb
+#define EP_cache_PsyTsatFnHPb
+#endif
 
-    // MODULE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   July 2008
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+#ifdef EP_cache_PsyTwbFnTdbWPb
+struct cached_twb_t
+{
+    // Members
+    Int64 iTdb;
+    Int64 iW;
+    Int64 iPb;
+    Real64 Twb;
 
-    // PURPOSE OF THIS MODULE:
-    // This data-only module is a data holder for field names to be passed into
-    // input processing GetObject routines so that individual Get routines do not have
-    // to create them. These will be passed in rather than filled by the GetObject
-    // routines automatically.  The field names are used for error messages. They are
-    // dimensioned to the max alpha/numeric found in the IDD.
-
-    // MODULE VARIABLE DECLARATIONS:
-    Array1D_string cAlphaFieldNames;
-    Array1D_string cNumericFieldNames;
-    Array1D_bool lNumericFieldBlanks;
-    Array1D_bool lAlphaFieldBlanks;
-    Array1D_string cAlphaArgs;
-    Array1D<Real64> rNumericArgs;
-    std::string cCurrentModuleObject;
-
-    // Clears the global data in DataIPShortCuts.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
+    // Default Constructor
+    cached_twb_t() : iTdb(0), iW(0), iPb(0), Twb(0.0)
     {
-
     }
+};
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+struct cached_tsat_h_pb
+{
+    // Members
+    Int64 iH;
+    Int64 iPb;
+    Real64 Tsat;
 
-} // namespace DataIPShortCuts
+    // Default Constructor
+    cached_tsat_h_pb() : iH(0), iPb(0), Tsat(0.0)
+    {
+    }
+};
+#endif
+#ifdef EP_cache_PsyPsatFnTemp
+struct cached_psat_t
+{
+    // Members
+    Int64 iTdb;
+    Real64 Psat;
+
+    // Default Constructor
+    cached_psat_t() : iTdb(-1000), Psat(0.0)
+    {
+    }
+};
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+struct cached_tsat_pb
+{
+    // Members
+    Int64 iPb;
+    Real64 Tsat;
+
+    // Default Constructor
+    cached_tsat_pb() : iPb(-1000), Tsat(0.0)
+    {
+    }
+};
+#endif
+
+struct PsychrometricCacheData : BaseGlobalStruct
+{
+
+#ifdef EP_cache_PsyTwbFnTdbWPb
+    Array1D<cached_twb_t> cached_Twb; // DIMENSION(0:twbcache_size)
+#endif
+#ifdef EP_cache_PsyPsatFnTemp
+    Array1D<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+    Array1D<cached_tsat_pb> cached_Tsat; // DIMENSION(0:tsatcache_size)
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+    Array1D<cached_tsat_h_pb> cached_Tsat_HPb; // DIMENSION(0:tsat_hbp_cache_size)
+#endif
+
+    void clear_state() override
+    {
+#ifdef EP_cache_PsyTwbFnTdbWPb
+        cached_Twb.clear();
+#endif
+#ifdef EP_cache_PsyPsatFnTemp
+        cached_Psat.clear();
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+        cached_Tsat.clear();
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+        cached_Tsat_HPb.clear();
+#endif
+    }
+};
 
 } // namespace EnergyPlus
+
+#endif // PsychCacheData_hh_INCLUDED

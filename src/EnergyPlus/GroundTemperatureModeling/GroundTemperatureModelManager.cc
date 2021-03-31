@@ -67,7 +67,8 @@ namespace EnergyPlus {
 
 namespace GroundTemperatureManager {
 
-    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &objectType_str, std::string const &objectName)
+    std::shared_ptr<BaseGroundTempsModel>
+    GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &objectType_str, std::string const &objectName)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Matt Mitchell
@@ -82,8 +83,7 @@ namespace GroundTemperatureManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int objectType(0);
 
-        auto & CurrentModuleObjects = state.dataGrndTempModelMgr->CurrentModuleObjects;
-        auto & groundTempModels = state.dataGrndTempModelMgr->groundTempModels;
+        auto &CurrentModuleObjects = state.dataGrndTempModelMgr->CurrentModuleObjects;
 
         std::string objectType_str_UPPERCase = UtilityRoutines::MakeUPPERCase(objectType_str);
 
@@ -107,17 +107,16 @@ namespace GroundTemperatureManager {
             ShowFatalError(state, "GetGroundTempsModelAndInit: Ground temperature object " + objectType_str + " not recognized.");
         }
 
-        int numGTMs = groundTempModels.size();
+        int numGTMs = state.dataGrndTempModelMgr->groundTempModels.size();
 
         // Check if this instance of this model has already been retrieved
         for (int i = 0; i < numGTMs; ++i) {
-            auto currentModel(groundTempModels[i]);
+            auto currentModel(state.dataGrndTempModelMgr->groundTempModels[i]);
             // Check if the type and name match
             if (objectType == currentModel->objectType && objectName == currentModel->objectName) {
-                return groundTempModels[i];
+                return state.dataGrndTempModelMgr->groundTempModels[i];
             }
         }
-
 
         // If not found, create new instance of the model
         if (objectType == objectType_KusudaGroundTemp) {

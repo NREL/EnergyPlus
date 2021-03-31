@@ -83,10 +83,10 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataEnvrn->StdRhoAir = 1.2;
     // call simulate to trigger sizing call
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(*state, "MyFan"));
+    state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "MyFan"));
     state->dataLoopNodes->Node(1).Press = 101325.0;
     state->dataLoopNodes->Node(1).Temp = 24.0;
-    HVACFan::fanObjs[0]->simulate(*state, _, _, _, _);
+    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _, _, _);
 
     // this global state is what would be set up by E+ currently
     static std::string const routineName("CoolingCapacitySizingGauntlet");
@@ -396,7 +396,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(4740.64, sizedValue, 0.01);                              // change in capacity because precool conditions mixed with return
     EXPECT_NEAR(158.33, sizer.primaryAirSystem(1).FanDesCoolLoad, 0.01); // air loop fan heat is saved in sizer class
-    EXPECT_NEAR(state->dataSize->DataCoilSizingAirInTemp, 23.44, 0.01);       // does not include fan heat because PrimaryAirSys fan place not set
+    EXPECT_NEAR(state->dataSize->DataCoilSizingAirInTemp, 23.44, 0.01);  // does not include fan heat because PrimaryAirSys fan place not set
     EXPECT_EQ(1.0, state->dataSize->DataFracOfAutosizedCoolingCapacity);
     sizer.autoSizedValue = 0.0; // reset for next test
     Real64 unScaledCapacity = sizedValue;
@@ -416,8 +416,8 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(unScaledCapacity * 0.5, sizedValue, 0.01);               // change in capacity because precool conditions mixed with return
     EXPECT_NEAR(158.33, sizer.primaryAirSystem(1).FanDesCoolLoad, 0.01); // air loop fan heat is saved in sizer class
-    EXPECT_EQ(1.0, state->dataSize->DataFracOfAutosizedCoolingCapacity);      // Data global is not affected
-    EXPECT_NEAR(state->dataSize->DataCoilSizingAirInTemp, 24.22, 0.01);       // does include fan heat becase PrimaryAirSys fan place is set
+    EXPECT_EQ(1.0, state->dataSize->DataFracOfAutosizedCoolingCapacity); // Data global is not affected
+    EXPECT_NEAR(state->dataSize->DataCoilSizingAirInTemp, 24.22, 0.01);  // does include fan heat becase PrimaryAirSys fan place is set
     EXPECT_EQ(0.5, sizer.dataFracOfAutosizedCoolingCapacity);            // sizer class holds fractional value
     sizer.autoSizedValue = 0.0;                                          // reset for next test
 

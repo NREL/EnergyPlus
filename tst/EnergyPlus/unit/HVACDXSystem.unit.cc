@@ -704,15 +704,15 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     state->dataLoopNodes->Node(InletNode).MassFlowRate = 1.396964 * state->dataEnvrn->StdRhoAir;
     state->dataLoopNodes->Node(InletNode).Temp = 24.0;
     state->dataLoopNodes->Node(InletNode).HumRat = 0.014; // high zone RH, about 75%
-    state->dataLoopNodes->Node(InletNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat); // 55029.3778; // conditions at 65 % RH
+    state->dataLoopNodes->Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat); // 55029.3778; // conditions at 65 % RH
     state->dataLoopNodes->Node(ControlNode).TempSetPoint = state->dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp;
 
     // test sensible control
     HVACDXSystem::ControlDXSystem(*state, DXSystemNum, FirstHVACIteration, HXUnitOn);
     Real64 SHR = state->dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state->dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 0.49605, 0.0001);
-    EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport); // latent degradation only works at low speed
+    EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport);             // latent degradation only works at low speed
     EXPECT_NEAR(0.199, state->dataVariableSpeedCoils->VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is low
 
     // add latent degradation model
@@ -720,14 +720,14 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     state->dataVariableSpeedCoils->VarSpeedCoil(1).Gamma_Rated = 1.5;
     HVACDXSystem::ControlDXSystem(*state, DXSystemNum, FirstHVACIteration, HXUnitOn);
     SHR = state->dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state->dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
-    EXPECT_NEAR(SHR, 1.0, 0.0001); // more sensible capacity so PLR should be lower
-    EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport); // latent degradation only works at low speed
+    EXPECT_NEAR(SHR, 1.0, 0.0001);                                                           // more sensible capacity so PLR should be lower
+    EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport);             // latent degradation only works at low speed
     EXPECT_NEAR(0.099, state->dataVariableSpeedCoils->VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is lower, latent capacity is 0
 
     // test more reasonable zone RH,about 50%
     state->dataLoopNodes->Node(InletNode).HumRat = 0.0092994;
-    state->dataLoopNodes->Node(InletNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat); // 55029.3778; // conditions at 65 % RH
+    state->dataLoopNodes->Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat); // 55029.3778; // conditions at 65 % RH
     state->dataLoopNodes->Node(ControlNode).TempSetPoint = state->dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp;
 
     // remove latent degradation model
@@ -737,7 +737,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     HVACDXSystem::ControlDXSystem(*state, DXSystemNum, FirstHVACIteration, HXUnitOn);
     SHR = state->dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state->dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 0.7624, 0.0001);
-    EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport); // latent degradation only works at low speed
+    EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport);             // latent degradation only works at low speed
     EXPECT_NEAR(0.143, state->dataVariableSpeedCoils->VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is low
 
     // add latent degradation model
@@ -745,8 +745,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     state->dataVariableSpeedCoils->VarSpeedCoil(1).Gamma_Rated = 1.5;
     HVACDXSystem::ControlDXSystem(*state, DXSystemNum, FirstHVACIteration, HXUnitOn);
     SHR = state->dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state->dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
-    EXPECT_NEAR(SHR, 1.0, 0.0001); // more sensible capacity so PLR should be lower
-    EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport); // latent degradation only works at low speed
+    EXPECT_NEAR(SHR, 1.0, 0.0001);                                                           // more sensible capacity so PLR should be lower
+    EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport);             // latent degradation only works at low speed
     EXPECT_NEAR(0.109, state->dataVariableSpeedCoils->VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is lower, latent capacity is 0
 }
 

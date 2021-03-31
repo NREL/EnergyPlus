@@ -72,15 +72,13 @@ namespace EnergyPlus {
 class EvapFluidCoolersFixture : public EnergyPlusFixture
 {
 public:
-
 protected:
     virtual void SetUp()
     {
         EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 
-        NumSimpleEvapFluidCoolers = 1;
-        SimpleEvapFluidCooler.allocate(NumSimpleEvapFluidCoolers);
-
+        state->dataEvapFluidCoolers->NumSimpleEvapFluidCoolers = 1;
+        state->dataEvapFluidCoolers->SimpleEvapFluidCooler.allocate(state->dataEvapFluidCoolers->NumSimpleEvapFluidCoolers);
     }
 
     virtual void TearDown()
@@ -88,7 +86,6 @@ protected:
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
     }
 };
-
 
 TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
 {
@@ -102,7 +99,7 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     // Set up information required to actually run the routines that get called as a result of running this test.
     // In general, values set here attempt to avoid as much code as possible so that only the defect code is run.
     // Obviously, not everything can be skipped so some of this information is needed to avoid crashes in other routines.
-    auto &thisEFC = SimpleEvapFluidCooler(1);
+    auto &thisEFC = state->dataEvapFluidCoolers->SimpleEvapFluidCooler(1);
     thisEFC.TypeOf_Num = DataPlant::TypeOf_EvapFluidCooler_TwoSpd;
     thisEFC.MyOneTimeFlag = false;
     thisEFC.OneTimeFlagForEachEvapFluidCooler = false;
@@ -163,10 +160,9 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     PlantLocation loc = PlantLocation(1, 1, 1, 1);
     thisEFC.onInitLoopEquip(*state, loc);
     thisEFC.getDesignCapacities(*state, pl, MaxLoad, MinLoad, OptLoad);
-    EXPECT_NEAR(MaxLoad, ExpectedMaxLoad,0.01);
-    EXPECT_NEAR(MinLoad, ExpectedMinLoad,0.01);
-    EXPECT_NEAR(OptLoad, ExpectedOptLoad,0.01);
-
+    EXPECT_NEAR(MaxLoad, ExpectedMaxLoad, 0.01);
+    EXPECT_NEAR(MinLoad, ExpectedMinLoad, 0.01);
+    EXPECT_NEAR(OptLoad, ExpectedOptLoad, 0.01);
 }
 
 } // namespace EnergyPlus
