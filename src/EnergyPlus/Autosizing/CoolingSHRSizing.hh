@@ -61,14 +61,12 @@ struct CoolingSHRSizer : BaseSizer
     {
         this->sizingType = AutoSizingType::CoolingSHRSizing;
         this->sizingString = "Gross Rated Sensible Heat Ratio";
-
     }
     ~CoolingSHRSizer() = default;
 
     Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 
     void updateSizingString(EnergyPlusData &state);
-
 };
 
 } // namespace EnergyPlus

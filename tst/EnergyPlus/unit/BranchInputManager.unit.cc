@@ -118,11 +118,22 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
         int BCount = 0;
         for (int Count = 1; Count <= NumOfBranches; ++Count) {
 
-            state->dataInputProcessing->inputProcessor->getObjectItem(*state, CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks,
-                                          cAlphaFields, cNumericFields);
+            state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                                      CurrentModuleObject,
+                                                                      Count,
+                                                                      Alphas,
+                                                                      NumAlphas,
+                                                                      Numbers,
+                                                                      NumNumbers,
+                                                                      IOStat,
+                                                                      lNumericBlanks,
+                                                                      lAlphaBlanks,
+                                                                      cAlphaFields,
+                                                                      cNumericFields);
             IsNotOK = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(*state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+            UtilityRoutines::VerifyName(
+                *state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
             if (IsNotOK) {
                 if (IsBlank) {
                     continue;
@@ -274,11 +285,22 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
         int BCount = 0;
         for (int Count = 1; Count <= NumOfBranches; ++Count) {
 
-            state->dataInputProcessing->inputProcessor->getObjectItem(*state, CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks,
-                                          cAlphaFields, cNumericFields);
+            state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                                      CurrentModuleObject,
+                                                                      Count,
+                                                                      Alphas,
+                                                                      NumAlphas,
+                                                                      Numbers,
+                                                                      NumNumbers,
+                                                                      IOStat,
+                                                                      lNumericBlanks,
+                                                                      lAlphaBlanks,
+                                                                      cAlphaFields,
+                                                                      cNumericFields);
             IsNotOK = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(*state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+            UtilityRoutines::VerifyName(
+                *state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
             if (IsNotOK) {
                 if (IsBlank) {
                     continue;

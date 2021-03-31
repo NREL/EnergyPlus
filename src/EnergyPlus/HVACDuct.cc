@@ -126,7 +126,7 @@ namespace HVACDuct {
         // Using/Aliasing
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int DuctNum;                    // index of duct being simulated
+        int DuctNum; // index of duct being simulated
 
         if (state.dataHVACDuct->GetInputFlag) {
             GetDuctInput(state);
@@ -143,9 +143,11 @@ namespace HVACDuct {
         } else {
             DuctNum = CompIndex;
             if (DuctNum > state.dataHVACDuct->NumDucts || DuctNum < 1) {
-                ShowFatalError(
-                    state,
-                    format("SimDuct:  Invalid CompIndex passed={}, Number of Components={}, Entered Component name={}", DuctNum, state.dataHVACDuct->NumDucts, CompName));
+                ShowFatalError(state,
+                               format("SimDuct:  Invalid CompIndex passed={}, Number of Components={}, Entered Component name={}",
+                                      DuctNum,
+                                      state.dataHVACDuct->NumDucts,
+                                      CompName));
             }
             if (state.dataHVACDuct->CheckEquipName(DuctNum)) {
                 if (CompName != state.dataHVACDuct->Duct(DuctNum).Name) {
@@ -190,11 +192,11 @@ namespace HVACDuct {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DuctNum; // duct index
         static std::string const RoutineName("GetDuctInput:");
-        int NumAlphas;                  // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                 // Number of Numbers for each GetObjectItem call
-        int IOStatus;                   // Used in GetObjectItem
+        int NumAlphas;           // Number of Alphas for each GetObjectItem call
+        int NumNumbers;          // Number of Numbers for each GetObjectItem call
+        int IOStatus;            // Used in GetObjectItem
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        auto& cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Duct";
         state.dataHVACDuct->NumDucts = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataHVACDuct->Duct.allocate(state.dataHVACDuct->NumDucts);
@@ -202,25 +204,44 @@ namespace HVACDuct {
 
         for (DuctNum = 1; DuctNum <= state.dataHVACDuct->NumDucts; ++DuctNum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
-                                          DuctNum,
-                                          state.dataIPShortCut->cAlphaArgs,
-                                          NumAlphas,
-                                          state.dataIPShortCut->rNumericArgs,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     DuctNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataHVACDuct->Duct(DuctNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataHVACDuct->Duct(DuctNum).InletNodeNum = GetOnlySingleNode(state,
-                                                                               state.dataIPShortCut->cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
+                                                                               state.dataIPShortCut->cAlphaArgs(2),
+                                                                               ErrorsFound,
+                                                                               cCurrentModuleObject,
+                                                                               state.dataIPShortCut->cAlphaArgs(1),
+                                                                               DataLoopNode::NodeFluidType::Air,
+                                                                               DataLoopNode::NodeConnectionType::Inlet,
+                                                                               1,
+                                                                               ObjectIsNotParent);
             state.dataHVACDuct->Duct(DuctNum).OutletNodeNum = GetOnlySingleNode(state,
-                                                                                state.dataIPShortCut->cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
-            TestCompSet(state, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(3), "Air Nodes");
+                                                                                state.dataIPShortCut->cAlphaArgs(3),
+                                                                                ErrorsFound,
+                                                                                cCurrentModuleObject,
+                                                                                state.dataIPShortCut->cAlphaArgs(1),
+                                                                                DataLoopNode::NodeFluidType::Air,
+                                                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                                                1,
+                                                                                ObjectIsNotParent);
+            TestCompSet(state,
+                        cCurrentModuleObject,
+                        state.dataIPShortCut->cAlphaArgs(1),
+                        state.dataIPShortCut->cAlphaArgs(2),
+                        state.dataIPShortCut->cAlphaArgs(3),
+                        "Air Nodes");
         }
 
         // No output variables

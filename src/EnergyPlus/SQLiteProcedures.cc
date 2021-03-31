@@ -59,9 +59,9 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -123,10 +123,10 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
                             sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
                         } else { // (UtilityRoutines::SameString(option2, "UseOutputControlTableStyles")) {
                             // Jan 2021 Note: Since here we do not know weather sql_ort->unitsStyle has been processed or not,
-                            // the value "NotFound" is used for the option "UseOutputControlTableStyles" at this point; 
+                            // the value "NotFound" is used for the option "UseOutputControlTableStyles" at this point;
                             // This will be updated again and got concretely assigned first thing in OutputReportTabular::WriteTabularReports().
-                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::NotFound;  // sql_ort->unitsStyle;
-                        } 
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::NotFound; // sql_ort->unitsStyle;
+                        }
                     }
                 } else if (UtilityRoutines::SameString(option, "Simple")) {
                     writeOutputToSQLite = true;
@@ -161,10 +161,10 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
         for (int scheduleNumber = 1, numberOfSchedules = ScheduleManager::GetNumberOfSchedules(state); scheduleNumber <= numberOfSchedules;
              ++scheduleNumber) {
             state.dataSQLiteProcedures->sqlite->addScheduleData(scheduleNumber,
-                                    ScheduleManager::GetScheduleName(state, scheduleNumber),
-                                    ScheduleManager::GetScheduleType(state, scheduleNumber),
-                                    ScheduleManager::GetScheduleMinValue(state, scheduleNumber),
-                                    ScheduleManager::GetScheduleMaxValue(state, scheduleNumber));
+                                                                ScheduleManager::GetScheduleName(state, scheduleNumber),
+                                                                ScheduleManager::GetScheduleType(state, scheduleNumber),
+                                                                ScheduleManager::GetScheduleMinValue(state, scheduleNumber),
+                                                                ScheduleManager::GetScheduleMaxValue(state, scheduleNumber));
         }
         for (int surfaceNumber = 1; surfaceNumber <= state.dataSurface->TotSurfaces; ++surfaceNumber) {
             auto const &surface = state.dataSurface->Surface(surfaceNumber);
@@ -2134,7 +2134,9 @@ void SQLite::addMaterialData(int const number, EnergyPlus::Material::MaterialPro
 {
     materials.push_back(std::unique_ptr<Material>(new Material(m_errorStream, m_db, number, materialData)));
 }
-void SQLite::addConstructionData(int const number, EnergyPlus::Construction::ConstructionProps const &constructionData, double const &constructionUValue)
+void SQLite::addConstructionData(int const number,
+                                 EnergyPlus::Construction::ConstructionProps const &constructionData,
+                                 double const &constructionUValue)
 {
     constructions.push_back(std::unique_ptr<Construction>(new Construction(m_errorStream, m_db, number, constructionData, constructionUValue)));
 }

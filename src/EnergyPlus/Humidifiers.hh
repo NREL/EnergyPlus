@@ -80,7 +80,7 @@ namespace Humidifiers {
     private:
     public:
         // Members
-        std::string Name; // unique name of component
+        std::string Name;           // unique name of component
         int HumType_Code;           // Pointer to Humidifier in list of humidifiers
         int EquipIndex;             // Pointer to Humidifier in list of humidifiers
         std::string Sched;          // name of availability schedule
@@ -131,8 +131,8 @@ namespace Humidifiers {
         // Default Constructor
         HumidifierData()
             : HumType_Code(0), EquipIndex(0), SchedPtr(0), NomCapVol(0.0), NomCap(0.0), NomPower(0.0), ThermalEffRated(1.0), CurMakeupWaterTemp(0.0),
-              EfficiencyCurvePtr(0), InletWaterTempOption(0), FanPower(0.0), StandbyPower(0.0), AirInNode(0), AirOutNode(0),
-              AirInTemp(0.0), AirInHumRat(0.0), AirInEnthalpy(0.0), AirInMassFlowRate(0.0), AirOutTemp(0.0), AirOutHumRat(0.0), AirOutEnthalpy(0.0),
+              EfficiencyCurvePtr(0), InletWaterTempOption(0), FanPower(0.0), StandbyPower(0.0), AirInNode(0), AirOutNode(0), AirInTemp(0.0),
+              AirInHumRat(0.0), AirInEnthalpy(0.0), AirInMassFlowRate(0.0), AirOutTemp(0.0), AirOutHumRat(0.0), AirOutEnthalpy(0.0),
               AirOutMassFlowRate(0.0), HumRatSet(0.0), WaterAdd(0.0), ElecUseEnergy(0.0), ElecUseRate(0.0), WaterCons(0.0), WaterConsRate(0.0),
               SuppliedByWaterSystem(false), WaterTankID(0), WaterTankDemandARRID(0), TankSupplyVdot(0.0), TankSupplyVol(0.0), StarvedSupplyVdot(0.0),
               StarvedSupplyVol(0.0), TankSupplyID(0), MySizeFlag(true), MyEnvrnFlag(true), MySetPointCheckFlag(true), ThermalEff(0.0),
@@ -144,7 +144,8 @@ namespace Humidifiers {
 
         void SizeHumidifier(EnergyPlusData &state); // number of the current humidifier being sized
 
-        void ControlHumidifier(EnergyPlusData &state, Real64 &WaterAddNeeded // moisture addition rate needed to meet minimum humidity ratio setpoint [kg/s]
+        void ControlHumidifier(EnergyPlusData &state,
+                               Real64 &WaterAddNeeded // moisture addition rate needed to meet minimum humidity ratio setpoint [kg/s]
         );
 
         void CalcElecSteamHumidifier(EnergyPlusData &state, Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
@@ -168,13 +169,9 @@ namespace Humidifiers {
 
     void GetHumidifierInput(EnergyPlusData &state);
 
-    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &HumidifierName,
-        bool &ErrorsFound
-    );
+    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &HumidifierName, bool &ErrorsFound);
 
-    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &HumidifierName,
-        bool &ErrorsFound
-    );
+    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &HumidifierName, bool &ErrorsFound);
 
 } // namespace Humidifiers
 

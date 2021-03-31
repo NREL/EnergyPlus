@@ -127,7 +127,6 @@ namespace FluidProperties {
 
     // MODULE VARIABLE DECLARATIONS
 
-
     // ACCESSIBLE SPECIFICATIONS OF MODULE SUBROUTINES OR FUNCTONS:
 
     // Object Data
@@ -481,7 +480,6 @@ namespace FluidProperties {
         Array1D<PressureSequence> PressurePtr;
         Array1D<FluidData> FluidNames;
 
-
         MaxAlphas = 0;
         MaxNumbers = 0;
         if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidProperties:Name") > 0) {
@@ -490,7 +488,8 @@ namespace FluidProperties {
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
         if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidProperties:GlycolConcentration") > 0) {
-            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "FluidProperties:GlycolConcentration", Status, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+                state, "FluidProperties:GlycolConcentration", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
@@ -550,17 +549,17 @@ namespace FluidProperties {
         FluidNum = 0;
         for (Loop = 1; Loop <= NumOfOptionalInput; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          Loop,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          Status,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                                                     CurrentModuleObject,
+                                                                     Loop,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericFieldBlanks,
+                                                                     lAlphaFieldBlanks,
+                                                                     cAlphaFieldNames,
+                                                                     cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound)) continue;
             ++FluidNum;
             FluidNames(FluidNum).Name = Alphas(1);
@@ -642,8 +641,10 @@ namespace FluidProperties {
         state.dataFluidProps->RefrigData(1).NumSuperPressPts = DefaultNumSteamSuperheatedPressure;
         state.dataFluidProps->RefrigData(1).SHTemps.allocate(state.dataFluidProps->RefrigData(1).NumSuperTempPts);
         state.dataFluidProps->RefrigData(1).SHPress.allocate(state.dataFluidProps->RefrigData(1).NumSuperPressPts);
-        state.dataFluidProps->RefrigData(1).HshValues.allocate(state.dataFluidProps->RefrigData(1).NumSuperPressPts, state.dataFluidProps->RefrigData(1).NumSuperTempPts);
-        state.dataFluidProps->RefrigData(1).RhoshValues.allocate(state.dataFluidProps->RefrigData(1).NumSuperPressPts, state.dataFluidProps->RefrigData(1).NumSuperTempPts);
+        state.dataFluidProps->RefrigData(1).HshValues.allocate(state.dataFluidProps->RefrigData(1).NumSuperPressPts,
+                                                               state.dataFluidProps->RefrigData(1).NumSuperTempPts);
+        state.dataFluidProps->RefrigData(1).RhoshValues.allocate(state.dataFluidProps->RefrigData(1).NumSuperPressPts,
+                                                                 state.dataFluidProps->RefrigData(1).NumSuperTempPts);
         state.dataFluidProps->RefrigData(1).SHTemps = DefaultSteamSuperheatedTemps;
         state.dataFluidProps->RefrigData(1).SHPress = DefaultSteamSuperheatedPressData;
         state.dataFluidProps->RefrigData(1).HshValues = DefaultSteamSuperheatedEnthalpyData;
@@ -657,17 +658,17 @@ namespace FluidProperties {
         for (Loop = 1; Loop <= NumOfFluidTempArrays; ++Loop) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          Loop,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          Status,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                                                     CurrentModuleObject,
+                                                                     Loop,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericFieldBlanks,
+                                                                     lAlphaFieldBlanks,
+                                                                     cAlphaFieldNames,
+                                                                     cNumericFieldNames);
 
             FluidTemps(Loop).Name = Alphas(1);
             FluidTemps(Loop).NumOfTemps = NumNumbers;
@@ -677,8 +678,8 @@ namespace FluidProperties {
 
             for (TempLoop = 2; TempLoop <= FluidTemps(Loop).NumOfTemps; ++TempLoop) {
                 if (FluidTemps(Loop).Temps(TempLoop) <= FluidTemps(Loop).Temps(TempLoop - 1)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + " name=" + FluidTemps(Loop).Name +
-                                    ", lists must have data in ascending order");
+                    ShowSevereError(
+                        state, RoutineName + CurrentModuleObject + " name=" + FluidTemps(Loop).Name + ", lists must have data in ascending order");
                     ShowContinueError(state,
                                       format("First out of order occurrence at Temperature #({}) {{{:.R3}}} >= Temp({}) {{{:.R3}}}",
                                              TempLoop - 1,
@@ -708,20 +709,20 @@ namespace FluidProperties {
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              InData,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         InData,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Pressure)) &&
-                    (UtilityRoutines::SameString(Alphas(3), GasFluid))) {
+                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
+                    (UtilityRoutines::SameString(Alphas(2), Pressure)) && (UtilityRoutines::SameString(Alphas(3), GasFluid))) {
 
                     for (TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
 
@@ -736,8 +737,9 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumPsPoints) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                                ShowContinueError(state, "Temperature Name=" + TempsName +
-                                                  ", Temperature array and fluid saturation pressure array must have the same number of points");
+                                ShowContinueError(state,
+                                                  "Temperature Name=" + TempsName +
+                                                      ", Temperature array and fluid saturation pressure array must have the same number of points");
                                 ShowContinueError(state,
                                                   format("Temperature # points={} whereas {} # pressure points={}",
                                                          NumNumbers,
@@ -771,8 +773,9 @@ namespace FluidProperties {
                 // then no sat press data found
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowContinueError(state, "No Gas/Fluid Saturation Pressure found. Need properties with " + cAlphaFieldNames(2) + "=\"Pressure\" and " +
-                                      cAlphaFieldNames(3) + "=\"FluidGas\".");
+                    ShowContinueError(state,
+                                      "No Gas/Fluid Saturation Pressure found. Need properties with " + cAlphaFieldNames(2) + "=\"Pressure\" and " +
+                                          cAlphaFieldNames(3) + "=\"FluidGas\".");
                     ErrorsFound = true;
                 }
 
@@ -784,20 +787,20 @@ namespace FluidProperties {
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              InData,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         InData,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Enthalpy)) &&
-                    (UtilityRoutines::SameString(Alphas(3), Fluid))) {
+                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
+                    (UtilityRoutines::SameString(Alphas(2), Enthalpy)) && (UtilityRoutines::SameString(Alphas(3), Fluid))) {
 
                     for (TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
 
@@ -812,8 +815,9 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumHPoints) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                                ShowSevereError(state, "Temperature Name=" + TempsName +
-                                                ", Temperature array and saturated fluid enthalpy array must have the same number of points");
+                                ShowSevereError(state,
+                                                "Temperature Name=" + TempsName +
+                                                    ", Temperature array and saturated fluid enthalpy array must have the same number of points");
                                 ShowContinueError(state,
                                                   format("Temperature # points={} whereas {} # points={}",
                                                          NumNumbers,
@@ -846,8 +850,9 @@ namespace FluidProperties {
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat fluid enthalpy data found
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowContinueError(state, "No Saturated Fluid Enthalpy found. Need properties to be entered with " + cAlphaFieldNames(2) +
-                                      "=\"Enthalpy\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
+                    ShowContinueError(state,
+                                      "No Saturated Fluid Enthalpy found. Need properties to be entered with " + cAlphaFieldNames(2) +
+                                          "=\"Enthalpy\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
                     ErrorsFound = true;
                 }
 
@@ -858,20 +863,20 @@ namespace FluidProperties {
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              InData,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         InData,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Enthalpy)) &&
-                    (UtilityRoutines::SameString(Alphas(3), GasFluid))) {
+                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
+                    (UtilityRoutines::SameString(Alphas(2), Enthalpy)) && (UtilityRoutines::SameString(Alphas(3), GasFluid))) {
 
                     for (TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
 
@@ -890,8 +895,10 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumHPoints) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                                ShowContinueError(state, "Temperature Name=" + TempsName +
-                                                  ", Temperature array and saturated gas/fluid enthalpy array must have the same number of points");
+                                ShowContinueError(
+                                    state,
+                                    "Temperature Name=" + TempsName +
+                                        ", Temperature array and saturated gas/fluid enthalpy array must have the same number of points");
                                 ShowContinueError(state,
                                                   format("Temperature # points={} whereas {} # points={}",
                                                          NumNumbers,
@@ -923,8 +930,9 @@ namespace FluidProperties {
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat f/g enthalpy data found
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowContinueError(state, "No Saturated Gas/Fluid Enthalpy found. Need properties to be entered with " + cAlphaFieldNames(2) +
-                                      "=\"Enthalpy\" and " + cAlphaFieldNames(3) + "=\"FluidGas\".");
+                    ShowContinueError(state,
+                                      "No Saturated Gas/Fluid Enthalpy found. Need properties to be entered with " + cAlphaFieldNames(2) +
+                                          "=\"Enthalpy\" and " + cAlphaFieldNames(3) + "=\"FluidGas\".");
                     ErrorsFound = true;
                 }
 
@@ -936,20 +944,20 @@ namespace FluidProperties {
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              InData,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         InData,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), SpecificHeat)) &&
-                    (UtilityRoutines::SameString(Alphas(3), Fluid))) {
+                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
+                    (UtilityRoutines::SameString(Alphas(2), SpecificHeat)) && (UtilityRoutines::SameString(Alphas(3), Fluid))) {
 
                     for (TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
 
@@ -964,8 +972,9 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumCpPoints) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                                ShowSevereError(state, "Temperature Name=" + TempsName +
-                                                ", Temperature array and saturated fluid Cp array must have the same number of points");
+                                ShowSevereError(state,
+                                                "Temperature Name=" + TempsName +
+                                                    ", Temperature array and saturated fluid Cp array must have the same number of points");
                                 ShowContinueError(state,
                                                   format("Temperature # points={} whereas {} # Cp points={}",
                                                          NumNumbers,
@@ -998,8 +1007,9 @@ namespace FluidProperties {
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat fluid Cp data found
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowContinueError(state, "No Saturated Fluid Specific Heat found. Need properties to be entered with " + cAlphaFieldNames(2) +
-                                      "=\"SpecificHeat\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
+                    ShowContinueError(state,
+                                      "No Saturated Fluid Specific Heat found. Need properties to be entered with " + cAlphaFieldNames(2) +
+                                          "=\"SpecificHeat\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
                     ErrorsFound = true;
                 }
 
@@ -1010,20 +1020,20 @@ namespace FluidProperties {
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              InData,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         InData,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), SpecificHeat)) &&
-                    (UtilityRoutines::SameString(Alphas(3), GasFluid))) {
+                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
+                    (UtilityRoutines::SameString(Alphas(2), SpecificHeat)) && (UtilityRoutines::SameString(Alphas(3), GasFluid))) {
 
                     for (TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
 
@@ -1042,8 +1052,9 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumCpPoints) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                                ShowContinueError(state, "Temperature Name=" + TempsName +
-                                                  ", Temperature array and saturated gas/fluid Cp array must have the same number of points");
+                                ShowContinueError(state,
+                                                  "Temperature Name=" + TempsName +
+                                                      ", Temperature array and saturated gas/fluid Cp array must have the same number of points");
                                 ShowContinueError(state,
                                                   format("Temperature # points={} whereas {} # Cp points={}",
                                                          NumNumbers,
@@ -1075,8 +1086,9 @@ namespace FluidProperties {
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat f/g Cp data found
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowContinueError(state, "No Saturated Gas/Fluid Specific Heat found. Need properties to be entered with " + cAlphaFieldNames(2) +
-                                      "=\"SpecificHeat\" and " + cAlphaFieldNames(3) + "=\"FluidGas\".");
+                    ShowContinueError(state,
+                                      "No Saturated Gas/Fluid Specific Heat found. Need properties to be entered with " + cAlphaFieldNames(2) +
+                                          "=\"SpecificHeat\" and " + cAlphaFieldNames(3) + "=\"FluidGas\".");
                     ErrorsFound = true;
                 }
 
@@ -1088,20 +1100,20 @@ namespace FluidProperties {
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              InData,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         InData,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Density)) &&
-                    (UtilityRoutines::SameString(Alphas(3), Fluid))) {
+                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
+                    (UtilityRoutines::SameString(Alphas(2), Density)) && (UtilityRoutines::SameString(Alphas(3), Fluid))) {
 
                     for (TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
 
@@ -1116,8 +1128,9 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumRhoPoints) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                                ShowContinueError(state, "Temperature Name=" + TempsName +
-                                                  ", Temperature array and saturated fluid density array must have the same number of points");
+                                ShowContinueError(state,
+                                                  "Temperature Name=" + TempsName +
+                                                      ", Temperature array and saturated fluid density array must have the same number of points");
                                 ShowContinueError(state,
                                                   format("Temperature # points={} whereas {} # Density points={}",
                                                          NumNumbers,
@@ -1150,8 +1163,9 @@ namespace FluidProperties {
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat fluid density data found
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowContinueError(state, "No Saturated Fluid Density found. Need properties to be entered with " + cAlphaFieldNames(2) +
-                                      "=\"Density\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
+                    ShowContinueError(state,
+                                      "No Saturated Fluid Density found. Need properties to be entered with " + cAlphaFieldNames(2) +
+                                          "=\"Density\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
                     ErrorsFound = true;
                 }
 
@@ -1162,20 +1176,20 @@ namespace FluidProperties {
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              InData,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         InData,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Density)) &&
-                    (UtilityRoutines::SameString(Alphas(3), GasFluid))) {
+                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
+                    (UtilityRoutines::SameString(Alphas(2), Density)) && (UtilityRoutines::SameString(Alphas(3), GasFluid))) {
 
                     for (TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop) {
 
@@ -1194,8 +1208,10 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumRhoPoints) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                                ShowContinueError(state, "Temperature Name=" + TempsName +
-                                                  ", Temperature array and saturated gas/fluid density array must have the same number of points");
+                                ShowContinueError(
+                                    state,
+                                    "Temperature Name=" + TempsName +
+                                        ", Temperature array and saturated gas/fluid density array must have the same number of points");
                                 ShowContinueError(state,
                                                   format("Temperature # points={} whereas {} # density points={}",
                                                          NumNumbers,
@@ -1227,8 +1243,9 @@ namespace FluidProperties {
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat f/g density data found
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowSevereError(state, "No Saturated Gas/Fluid Density found. Need properties to be entered with " + cAlphaFieldNames(2) +
-                                    "=\"Density\" and " + cAlphaFieldNames(3) + "=\"FluidGas\".");
+                    ShowSevereError(state,
+                                    "No Saturated Gas/Fluid Density found. Need properties to be entered with " + cAlphaFieldNames(2) +
+                                        "=\"Density\" and " + cAlphaFieldNames(3) + "=\"FluidGas\".");
                     ErrorsFound = true;
                 }
 
@@ -1251,9 +1268,8 @@ namespace FluidProperties {
             //          String2=ADJUSTL(String2)
             //          String4=TrimSigDigits(RefrigData(Loop)%CpTemps(TempLoop),3)
             //          String4=ADJUSTL(String4)
-            //          CALL ShowContinueError(state, 'First Occurrence at CpTemp('//TRIM(String1)//') {'//TRIM(String2)//'} /= {'//TRIM(String4)//'}')
-            //          ErrorsFound=.TRUE.
-            //          EXIT
+            //          CALL ShowContinueError(state, 'First Occurrence at CpTemp('//TRIM(String1)//') {'//TRIM(String2)//'} /=
+            //          {'//TRIM(String4)//'}') ErrorsFound=.TRUE. EXIT
             //        ENDIF
             //      END DO
             //    END IF
@@ -1264,24 +1280,25 @@ namespace FluidProperties {
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              InData,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         InData,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
                 if (UtilityRoutines::SameString(Alphas(3), Fluid)) {
                     if (!UtilityRoutines::SameString(Alphas(2), Enthalpy) && !UtilityRoutines::SameString(Alphas(2), SpecificHeat) &&
                         !UtilityRoutines::SameString(Alphas(2), Density)) {
                         if (iTemp == 0) {
                             ShowWarningError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                            ShowContinueError(state, cAlphaFieldNames(3) + "=\"" + Fluid + "\", but " + cAlphaFieldNames(2) + "=\"" + Alphas(2) +
-                                              "\" is not valid.");
+                            ShowContinueError(state,
+                                              cAlphaFieldNames(3) + "=\"" + Fluid + "\", but " + cAlphaFieldNames(2) + "=\"" + Alphas(2) +
+                                                  "\" is not valid.");
                             ShowContinueError(state, "Valid choices are \"" + Enthalpy + "\", \"" + SpecificHeat + "\", \"" + Density + "\".");
                             ShowContinueError(state, "This fluid property will not be processed mor available for the simulation.");
                         }
@@ -1292,10 +1309,12 @@ namespace FluidProperties {
                         !UtilityRoutines::SameString(Alphas(2), SpecificHeat) && !UtilityRoutines::SameString(Alphas(2), Density)) {
                         if (iTemp == 0) {
                             ShowWarningError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                            ShowContinueError(state, cAlphaFieldNames(3) + "=\"" + Fluid + "\", but " + cAlphaFieldNames(2) + "=\"" + Alphas(2) +
-                                              "\" is not valid.");
-                            ShowContinueError(state, "Valid choices are \"" + Pressure + "\", \"" + Enthalpy + "\", \"" + SpecificHeat + "\", \"" + Density +
-                                              "\".");
+                            ShowContinueError(state,
+                                              cAlphaFieldNames(3) + "=\"" + Fluid + "\", but " + cAlphaFieldNames(2) + "=\"" + Alphas(2) +
+                                                  "\" is not valid.");
+                            ShowContinueError(state,
+                                              "Valid choices are \"" + Pressure + "\", \"" + Enthalpy + "\", \"" + SpecificHeat + "\", \"" + Density +
+                                                  "\".");
                             ShowContinueError(state, "This fluid property will not be processed nor available for the simulation.");
                         }
                         ++iTemp;
@@ -1325,19 +1344,20 @@ namespace FluidProperties {
             NumOfPressPts = 0;
             for (InData = 1; InData <= NumOfSHFluidPropArrays; ++InData) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              InData,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         InData,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Enthalpy))) {
+                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
+                    (UtilityRoutines::SameString(Alphas(2), Enthalpy))) {
                     ++NumOfPressPts;
                     if (FirstSHMatch) {
                         TempsName = Alphas(3);
@@ -1378,7 +1398,8 @@ namespace FluidProperties {
             // Next, allocate the pressure related arrays
             state.dataFluidProps->RefrigData(Loop).NumSuperPressPts = NumOfPressPts;
             state.dataFluidProps->RefrigData(Loop).SHPress.allocate(state.dataFluidProps->RefrigData(Loop).NumSuperPressPts);
-            state.dataFluidProps->RefrigData(Loop).HshValues.allocate(state.dataFluidProps->RefrigData(Loop).NumSuperPressPts, state.dataFluidProps->RefrigData(Loop).NumSuperTempPts);
+            state.dataFluidProps->RefrigData(Loop).HshValues.allocate(state.dataFluidProps->RefrigData(Loop).NumSuperPressPts,
+                                                                      state.dataFluidProps->RefrigData(Loop).NumSuperTempPts);
 
             // Finally, get the pressure and enthalpy values from the user input
             CurrentModuleObject = "FluidProperties:Superheated";
@@ -1386,19 +1407,20 @@ namespace FluidProperties {
             PressurePtr.allocate(NumOfSHFluidPropArrays);
             for (InData = 1; InData <= NumOfSHFluidPropArrays; ++InData) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              InData,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         InData,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
 
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Enthalpy))) {
+                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
+                    (UtilityRoutines::SameString(Alphas(2), Enthalpy))) {
                     ++NumOfPressPts;
                     if (Numbers(1) <= 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
@@ -1428,17 +1450,17 @@ namespace FluidProperties {
 
             for (InData = 1; InData <= NumOfPressPts; ++InData) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              PressurePtr(InData).InPtr,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         PressurePtr(InData).InPtr,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
                 state.dataFluidProps->RefrigData(Loop).SHPress(InData) = Numbers(1);
                 // a little error trapping
                 if (InData > 1) {
@@ -1456,7 +1478,8 @@ namespace FluidProperties {
                     }
                 }
                 if ((NumNumbers - 1) == state.dataFluidProps->RefrigData(Loop).NumSuperTempPts) {
-                    state.dataFluidProps->RefrigData(Loop).HshValues(InData, {1, state.dataFluidProps->RefrigData(Loop).NumSuperTempPts}) = Numbers({2, NumNumbers});
+                    state.dataFluidProps->RefrigData(Loop).HshValues(InData, {1, state.dataFluidProps->RefrigData(Loop).NumSuperTempPts}) =
+                        Numbers({2, NumNumbers});
                 } else {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                     ShowContinueError(state, "Number of superheated enthalpy data points not equal to number of temperature points");
@@ -1470,24 +1493,26 @@ namespace FluidProperties {
             // First find the number of pressure value syntax lines have been entered and
             // make sure that all of the pressure input is linked to the same temperature list
             // Then allocate the arrays and read the data into the proper place
-            state.dataFluidProps->RefrigData(Loop).RhoshValues.allocate(state.dataFluidProps->RefrigData(Loop).NumSuperPressPts, state.dataFluidProps->RefrigData(Loop).NumSuperTempPts);
+            state.dataFluidProps->RefrigData(Loop).RhoshValues.allocate(state.dataFluidProps->RefrigData(Loop).NumSuperPressPts,
+                                                                        state.dataFluidProps->RefrigData(Loop).NumSuperTempPts);
             CurrentModuleObject = "FluidProperties:Superheated";
             NumOfPressPts = 0;
             PressurePtr.allocate(NumOfSHFluidPropArrays);
             for (InData = 1; InData <= NumOfSHFluidPropArrays; ++InData) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              InData,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Density))) {
+                                                                         CurrentModuleObject,
+                                                                         InData,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
+                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->RefrigData(Loop).Name)) &&
+                    (UtilityRoutines::SameString(Alphas(2), Density))) {
                     ++NumOfPressPts;
                     if (Numbers(1) <= 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
@@ -1517,17 +1542,17 @@ namespace FluidProperties {
 
             for (InData = 1; InData <= NumOfPressPts; ++InData) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              PressurePtr(InData).InPtr,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         PressurePtr(InData).InPtr,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
                 if (std::abs(Numbers(1) - state.dataFluidProps->RefrigData(Loop).SHPress(InData)) > PressToler) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                     ShowContinueError(state, "All superheated data for the same refrigerant must use the same pressure data");
@@ -1539,7 +1564,8 @@ namespace FluidProperties {
                     ErrorsFound = true;
                 }
                 if ((NumNumbers - 1) == state.dataFluidProps->RefrigData(Loop).NumSuperTempPts) {
-                    state.dataFluidProps->RefrigData(Loop).RhoshValues(InData, {1, state.dataFluidProps->RefrigData(Loop).NumSuperTempPts}) = Numbers({2, NumNumbers});
+                    state.dataFluidProps->RefrigData(Loop).RhoshValues(InData, {1, state.dataFluidProps->RefrigData(Loop).NumSuperTempPts}) =
+                        Numbers({2, NumNumbers});
                 } else {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                     ShowContinueError(state, "Number of superheated density data points not equal to number of temperature points");
@@ -1555,17 +1581,17 @@ namespace FluidProperties {
             for (InData = 1; InData <= NumOfSHFluidPropArrays; ++InData) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              InData,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         InData,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
                 if (!UtilityRoutines::SameString(Alphas(2), Enthalpy) && !UtilityRoutines::SameString(Alphas(2), Density)) {
                     if (iTemp == 0) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
@@ -1611,18 +1637,19 @@ namespace FluidProperties {
             state.dataFluidProps->GlyRawData(Loop).CpDataPresent = false;
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for specific heat are consistant
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-CurrentModuleObject,
-                                              InData,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), SpecificHeat))) {
+                                                                         CurrentModuleObject,
+                                                                         InData,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
+                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) &&
+                    (UtilityRoutines::SameString(Alphas(2), SpecificHeat))) {
                     ++NumOfConcPts;
                     if (FirstSHMatch) {
                         TempsName = Alphas(3);
@@ -1658,25 +1685,27 @@ CurrentModuleObject,
                 // Next, allocate the specific heat related arrays
                 state.dataFluidProps->GlyRawData(Loop).NumCpConcPts = NumOfConcPts;
                 state.dataFluidProps->GlyRawData(Loop).CpConcs.allocate(state.dataFluidProps->GlyRawData(Loop).NumCpConcPts);
-                state.dataFluidProps->GlyRawData(Loop).CpValues.allocate(state.dataFluidProps->GlyRawData(Loop).NumCpConcPts, state.dataFluidProps->GlyRawData(Loop).NumCpTempPts);
+                state.dataFluidProps->GlyRawData(Loop).CpValues.allocate(state.dataFluidProps->GlyRawData(Loop).NumCpConcPts,
+                                                                         state.dataFluidProps->GlyRawData(Loop).NumCpTempPts);
 
                 // Finally, get the specific heat and concentration values from the user input
                 CurrentModuleObject = "FluidProperties:Concentration";
                 NumOfConcPts = 0;
                 for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) {
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                  CurrentModuleObject,
-                                                  InData,
-                                                  Alphas,
-                                                  NumAlphas,
-                                                  Numbers,
-                                                  NumNumbers,
-                                                  Status,
-                                                  lNumericFieldBlanks,
-                                                  lAlphaFieldBlanks,
-                                                  cAlphaFieldNames,
-                                                  cNumericFieldNames);
-                    if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), SpecificHeat))) {
+                                                                             CurrentModuleObject,
+                                                                             InData,
+                                                                             Alphas,
+                                                                             NumAlphas,
+                                                                             Numbers,
+                                                                             NumNumbers,
+                                                                             Status,
+                                                                             lNumericFieldBlanks,
+                                                                             lAlphaFieldBlanks,
+                                                                             cAlphaFieldNames,
+                                                                             cNumericFieldNames);
+                    if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) &&
+                        (UtilityRoutines::SameString(Alphas(2), SpecificHeat))) {
                         ++NumOfConcPts;
                         state.dataFluidProps->GlyRawData(Loop).CpConcs(NumOfConcPts) = Numbers(1);
                         // a little error trapping
@@ -1687,14 +1716,16 @@ CurrentModuleObject,
                                 ErrorsFound = true;
                             }
                         } else {
-                            if (state.dataFluidProps->GlyRawData(Loop).CpConcs(NumOfConcPts) <= state.dataFluidProps->GlyRawData(Loop).CpConcs(NumOfConcPts - 1)) {
+                            if (state.dataFluidProps->GlyRawData(Loop).CpConcs(NumOfConcPts) <=
+                                state.dataFluidProps->GlyRawData(Loop).CpConcs(NumOfConcPts - 1)) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                                 ShowContinueError(state, "Concentrations must be entered in ascending order for fluid property data");
                                 ErrorsFound = true;
                             }
                         }
                         if ((NumNumbers - 1) == state.dataFluidProps->GlyRawData(Loop).NumCpTempPts) {
-                            state.dataFluidProps->GlyRawData(Loop).CpValues(NumOfConcPts, {1, state.dataFluidProps->GlyRawData(Loop).NumCpTempPts}) = Numbers({2, NumNumbers});
+                            state.dataFluidProps->GlyRawData(Loop).CpValues(NumOfConcPts, {1, state.dataFluidProps->GlyRawData(Loop).NumCpTempPts}) =
+                                Numbers({2, NumNumbers});
                         } else {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                             ShowContinueError(state, "Number of specific heat data points not equal to number of temperature points");
@@ -1713,18 +1744,19 @@ CurrentModuleObject,
             CurrentModuleObject = "FluidProperties:Concentration";
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for density are consistant
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              InData,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Density))) {
+                                                                         CurrentModuleObject,
+                                                                         InData,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
+                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) &&
+                    (UtilityRoutines::SameString(Alphas(2), Density))) {
                     ++NumOfConcPts;
                     if (FirstSHMatch) {
                         TempsName = Alphas(3);
@@ -1760,25 +1792,27 @@ CurrentModuleObject,
                 // Next, allocate the density related arrays
                 state.dataFluidProps->GlyRawData(Loop).NumRhoConcPts = NumOfConcPts;
                 state.dataFluidProps->GlyRawData(Loop).RhoConcs.allocate(state.dataFluidProps->GlyRawData(Loop).NumRhoConcPts);
-                state.dataFluidProps->GlyRawData(Loop).RhoValues.allocate(state.dataFluidProps->GlyRawData(Loop).NumRhoConcPts, state.dataFluidProps->GlyRawData(Loop).NumRhoTempPts);
+                state.dataFluidProps->GlyRawData(Loop).RhoValues.allocate(state.dataFluidProps->GlyRawData(Loop).NumRhoConcPts,
+                                                                          state.dataFluidProps->GlyRawData(Loop).NumRhoTempPts);
 
                 // Finally, get the density and concentration values from the user input
                 NumOfConcPts = 0;
                 CurrentModuleObject = "FluidProperties:Concentration";
                 for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) {
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                  CurrentModuleObject,
-                                                  InData,
-                                                  Alphas,
-                                                  NumAlphas,
-                                                  Numbers,
-                                                  NumNumbers,
-                                                  Status,
-                                                  lNumericFieldBlanks,
-                                                  lAlphaFieldBlanks,
-                                                  cAlphaFieldNames,
-                                                  cNumericFieldNames);
-                    if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Density))) {
+                                                                             CurrentModuleObject,
+                                                                             InData,
+                                                                             Alphas,
+                                                                             NumAlphas,
+                                                                             Numbers,
+                                                                             NumNumbers,
+                                                                             Status,
+                                                                             lNumericFieldBlanks,
+                                                                             lAlphaFieldBlanks,
+                                                                             cAlphaFieldNames,
+                                                                             cNumericFieldNames);
+                    if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) &&
+                        (UtilityRoutines::SameString(Alphas(2), Density))) {
                         ++NumOfConcPts;
                         state.dataFluidProps->GlyRawData(Loop).RhoConcs(NumOfConcPts) = Numbers(1);
                         // a little error trapping
@@ -1789,14 +1823,16 @@ CurrentModuleObject,
                                 ErrorsFound = true;
                             }
                         } else {
-                            if (state.dataFluidProps->GlyRawData(Loop).RhoConcs(NumOfConcPts) <= state.dataFluidProps->GlyRawData(Loop).RhoConcs(NumOfConcPts - 1)) {
+                            if (state.dataFluidProps->GlyRawData(Loop).RhoConcs(NumOfConcPts) <=
+                                state.dataFluidProps->GlyRawData(Loop).RhoConcs(NumOfConcPts - 1)) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                                 ShowContinueError(state, "Concentrations must be entered in ascending order for fluid property data");
                                 ErrorsFound = true;
                             }
                         }
                         if ((NumNumbers - 1) == state.dataFluidProps->GlyRawData(Loop).NumRhoTempPts) {
-                            state.dataFluidProps->GlyRawData(Loop).RhoValues(NumOfConcPts, {1, state.dataFluidProps->GlyRawData(Loop).NumRhoTempPts}) = Numbers({2, NumNumbers});
+                            state.dataFluidProps->GlyRawData(Loop).RhoValues(
+                                NumOfConcPts, {1, state.dataFluidProps->GlyRawData(Loop).NumRhoTempPts}) = Numbers({2, NumNumbers});
                         } else {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                             ShowContinueError(state, "Number of density data points not equal to number of temperature points");
@@ -1815,18 +1851,19 @@ CurrentModuleObject,
             CurrentModuleObject = "FluidProperties:Concentration";
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for conductivity are consistant
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              InData,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Conductivity))) {
+                                                                         CurrentModuleObject,
+                                                                         InData,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
+                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) &&
+                    (UtilityRoutines::SameString(Alphas(2), Conductivity))) {
                     ++NumOfConcPts;
                     if (FirstSHMatch) {
                         TempsName = Alphas(3);
@@ -1862,25 +1899,27 @@ CurrentModuleObject,
                 // Next, allocate the conductivity related arrays
                 state.dataFluidProps->GlyRawData(Loop).NumCondConcPts = NumOfConcPts;
                 state.dataFluidProps->GlyRawData(Loop).CondConcs.allocate(state.dataFluidProps->GlyRawData(Loop).NumCondConcPts);
-                state.dataFluidProps->GlyRawData(Loop).CondValues.allocate(state.dataFluidProps->GlyRawData(Loop).NumCondConcPts, state.dataFluidProps->GlyRawData(Loop).NumCondTempPts);
+                state.dataFluidProps->GlyRawData(Loop).CondValues.allocate(state.dataFluidProps->GlyRawData(Loop).NumCondConcPts,
+                                                                           state.dataFluidProps->GlyRawData(Loop).NumCondTempPts);
 
                 // Finally, get the conductivity and concentration values from the user input
                 NumOfConcPts = 0;
                 CurrentModuleObject = "FluidProperties:Concentration";
                 for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) {
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                  CurrentModuleObject,
-                                                  InData,
-                                                  Alphas,
-                                                  NumAlphas,
-                                                  Numbers,
-                                                  NumNumbers,
-                                                  Status,
-                                                  lNumericFieldBlanks,
-                                                  lAlphaFieldBlanks,
-                                                  cAlphaFieldNames,
-                                                  cNumericFieldNames);
-                    if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Conductivity))) {
+                                                                             CurrentModuleObject,
+                                                                             InData,
+                                                                             Alphas,
+                                                                             NumAlphas,
+                                                                             Numbers,
+                                                                             NumNumbers,
+                                                                             Status,
+                                                                             lNumericFieldBlanks,
+                                                                             lAlphaFieldBlanks,
+                                                                             cAlphaFieldNames,
+                                                                             cNumericFieldNames);
+                    if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) &&
+                        (UtilityRoutines::SameString(Alphas(2), Conductivity))) {
                         ++NumOfConcPts;
                         state.dataFluidProps->GlyRawData(Loop).CondConcs(NumOfConcPts) = Numbers(1);
                         // a little error trapping
@@ -1891,14 +1930,16 @@ CurrentModuleObject,
                                 ErrorsFound = true;
                             }
                         } else {
-                            if (state.dataFluidProps->GlyRawData(Loop).CondConcs(NumOfConcPts) <= state.dataFluidProps->GlyRawData(Loop).CondConcs(NumOfConcPts - 1)) {
+                            if (state.dataFluidProps->GlyRawData(Loop).CondConcs(NumOfConcPts) <=
+                                state.dataFluidProps->GlyRawData(Loop).CondConcs(NumOfConcPts - 1)) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                                 ShowContinueError(state, "Concentrations must be entered in ascending order for fluid property data");
                                 ErrorsFound = true;
                             }
                         }
                         if ((NumNumbers - 1) == state.dataFluidProps->GlyRawData(Loop).NumCondTempPts) {
-                            state.dataFluidProps->GlyRawData(Loop).CondValues(NumOfConcPts, {1, state.dataFluidProps->GlyRawData(Loop).NumCondTempPts}) = Numbers({2, NumNumbers});
+                            state.dataFluidProps->GlyRawData(Loop).CondValues(
+                                NumOfConcPts, {1, state.dataFluidProps->GlyRawData(Loop).NumCondTempPts}) = Numbers({2, NumNumbers});
                         } else {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                             ShowContinueError(state, "Number of conductivity data points not equal to number of temperature points");
@@ -1917,18 +1958,19 @@ CurrentModuleObject,
             CurrentModuleObject = "FluidProperties:Concentration";
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for viscosity are consistant
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              InData,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              Status,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
-                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Viscosity))) {
+                                                                         CurrentModuleObject,
+                                                                         InData,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNumbers,
+                                                                         Status,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
+                if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) &&
+                    (UtilityRoutines::SameString(Alphas(2), Viscosity))) {
                     ++NumOfConcPts;
                     if (FirstSHMatch) {
                         TempsName = Alphas(3);
@@ -1964,25 +2006,27 @@ CurrentModuleObject,
                 // Next, allocate the viscosity related arrays
                 state.dataFluidProps->GlyRawData(Loop).NumViscConcPts = NumOfConcPts;
                 state.dataFluidProps->GlyRawData(Loop).ViscConcs.allocate(state.dataFluidProps->GlyRawData(Loop).NumViscConcPts);
-                state.dataFluidProps->GlyRawData(Loop).ViscValues.allocate(state.dataFluidProps->GlyRawData(Loop).NumViscConcPts, state.dataFluidProps->GlyRawData(Loop).NumViscTempPts);
+                state.dataFluidProps->GlyRawData(Loop).ViscValues.allocate(state.dataFluidProps->GlyRawData(Loop).NumViscConcPts,
+                                                                           state.dataFluidProps->GlyRawData(Loop).NumViscTempPts);
 
                 // Finally, get the viscosity and concentration values from the user input
                 NumOfConcPts = 0;
                 CurrentModuleObject = "FluidProperties:Concentration";
                 for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) {
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                  CurrentModuleObject,
-                                                  InData,
-                                                  Alphas,
-                                                  NumAlphas,
-                                                  Numbers,
-                                                  NumNumbers,
-                                                  Status,
-                                                  lNumericFieldBlanks,
-                                                  lAlphaFieldBlanks,
-                                                  cAlphaFieldNames,
-                                                  cNumericFieldNames);
-                    if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Viscosity))) {
+                                                                             CurrentModuleObject,
+                                                                             InData,
+                                                                             Alphas,
+                                                                             NumAlphas,
+                                                                             Numbers,
+                                                                             NumNumbers,
+                                                                             Status,
+                                                                             lNumericFieldBlanks,
+                                                                             lAlphaFieldBlanks,
+                                                                             cAlphaFieldNames,
+                                                                             cNumericFieldNames);
+                    if ((UtilityRoutines::SameString(Alphas(1), state.dataFluidProps->GlyRawData(Loop).Name)) &&
+                        (UtilityRoutines::SameString(Alphas(2), Viscosity))) {
                         ++NumOfConcPts;
                         state.dataFluidProps->GlyRawData(Loop).ViscConcs(NumOfConcPts) = Numbers(1);
                         // a little error trapping
@@ -1993,14 +2037,16 @@ CurrentModuleObject,
                                 ErrorsFound = true;
                             }
                         } else {
-                            if (state.dataFluidProps->GlyRawData(Loop).ViscConcs(NumOfConcPts) <= state.dataFluidProps->GlyRawData(Loop).ViscConcs(NumOfConcPts - 1)) {
+                            if (state.dataFluidProps->GlyRawData(Loop).ViscConcs(NumOfConcPts) <=
+                                state.dataFluidProps->GlyRawData(Loop).ViscConcs(NumOfConcPts - 1)) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                                 ShowContinueError(state, "Concentrations must be entered in ascending order for fluid property data");
                                 ErrorsFound = true;
                             }
                         }
                         if ((NumNumbers - 1) == state.dataFluidProps->GlyRawData(Loop).NumViscTempPts) {
-                            state.dataFluidProps->GlyRawData(Loop).ViscValues(NumOfConcPts, {1, state.dataFluidProps->GlyRawData(Loop).NumViscTempPts}) = Numbers({2, NumNumbers});
+                            state.dataFluidProps->GlyRawData(Loop).ViscValues(
+                                NumOfConcPts, {1, state.dataFluidProps->GlyRawData(Loop).NumViscTempPts}) = Numbers({2, NumNumbers});
                         } else {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                             ShowContinueError(state, "Number of viscosity data points not equal to number of temperature points");
@@ -2046,7 +2092,6 @@ CurrentModuleObject,
         state.dataFluidProps->GlycolData.allocate(NumOfGlyConcs);
         state.dataFluidProps->GlycolUsed.dimension(NumOfGlyConcs, false);
 
-
         state.dataFluidProps->GlycolUsed(1) = true; // mark Water as always used
 
         // First "glycol" is always pure water.  Load data from default arrays
@@ -2083,17 +2128,17 @@ CurrentModuleObject,
 
         for (Loop = 1; Loop <= NumOfOptionalInput; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          Loop,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          Status,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                                                     CurrentModuleObject,
+                                                                     Loop,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericFieldBlanks,
+                                                                     lAlphaFieldBlanks,
+                                                                     cAlphaFieldNames,
+                                                                     cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound)) {
                 continue;
             }
@@ -2143,7 +2188,8 @@ CurrentModuleObject,
                 state.dataFluidProps->GlycolData(Loop).GlycolIndex = PropyleneGlycolIndex;
             } else {
                 for (InData = 1; InData <= state.dataFluidProps->NumOfGlycols; ++InData) {
-                    if (UtilityRoutines::SameString(state.dataFluidProps->GlycolData(Loop).GlycolName, state.dataFluidProps->GlyRawData(InData).Name)) {
+                    if (UtilityRoutines::SameString(state.dataFluidProps->GlycolData(Loop).GlycolName,
+                                                    state.dataFluidProps->GlyRawData(InData).Name)) {
                         state.dataFluidProps->GlycolData(Loop).GlycolIndex = InData;
                         break; // DO LOOP through user defined glycols
                     }
@@ -2151,7 +2197,8 @@ CurrentModuleObject,
             }
 
             // Set the rest of the parameters...
-            if ((state.dataFluidProps->GlycolData(Loop).GlycolIndex == EthyleneGlycolIndex) || (state.dataFluidProps->GlycolData(Loop).GlycolIndex == PropyleneGlycolIndex)) {
+            if ((state.dataFluidProps->GlycolData(Loop).GlycolIndex == EthyleneGlycolIndex) ||
+                (state.dataFluidProps->GlycolData(Loop).GlycolIndex == PropyleneGlycolIndex)) {
 
                 state.dataFluidProps->GlycolData(Loop).CpDataPresent = true;
                 state.dataFluidProps->GlycolData(Loop).NumCpTempPts = DefaultNumGlyTemps;
@@ -2175,50 +2222,58 @@ CurrentModuleObject,
                 state.dataFluidProps->GlycolData(Loop).ViscTemps = DefaultGlycolTemps;
 
                 if (state.dataFluidProps->GlycolData(Loop).GlycolIndex == EthyleneGlycolIndex) {
-                    InterpDefValuesForGlycolConc(state, DefaultNumGlyConcs,
+                    InterpDefValuesForGlycolConc(state,
+                                                 DefaultNumGlyConcs,
                                                  DefaultNumGlyTemps,
                                                  DefaultGlycolConcs,
                                                  DefaultEthGlyCpData,
                                                  state.dataFluidProps->GlycolData(Loop).Concentration,
                                                  state.dataFluidProps->GlycolData(Loop).CpValues);
-                    InterpDefValuesForGlycolConc(state, DefaultNumGlyConcs,
+                    InterpDefValuesForGlycolConc(state,
+                                                 DefaultNumGlyConcs,
                                                  DefaultNumGlyTemps,
                                                  DefaultGlycolConcs,
                                                  DefaultEthGlyRhoData,
                                                  state.dataFluidProps->GlycolData(Loop).Concentration,
                                                  state.dataFluidProps->GlycolData(Loop).RhoValues);
-                    InterpDefValuesForGlycolConc(state, DefaultNumGlyConcs,
+                    InterpDefValuesForGlycolConc(state,
+                                                 DefaultNumGlyConcs,
                                                  DefaultNumGlyTemps,
                                                  DefaultGlycolConcs,
                                                  DefaultEthGlyCondData,
                                                  state.dataFluidProps->GlycolData(Loop).Concentration,
                                                  state.dataFluidProps->GlycolData(Loop).CondValues);
-                    InterpDefValuesForGlycolConc(state, DefaultNumGlyConcs,
+                    InterpDefValuesForGlycolConc(state,
+                                                 DefaultNumGlyConcs,
                                                  DefaultNumGlyTemps,
                                                  DefaultGlycolConcs,
                                                  DefaultEthGlyViscData,
                                                  state.dataFluidProps->GlycolData(Loop).Concentration,
                                                  state.dataFluidProps->GlycolData(Loop).ViscValues);
                 } else { // == PropyleneGlycolIndex
-                    InterpDefValuesForGlycolConc(state, DefaultNumGlyConcs,
+                    InterpDefValuesForGlycolConc(state,
+                                                 DefaultNumGlyConcs,
                                                  DefaultNumGlyTemps,
                                                  DefaultGlycolConcs,
                                                  DefaultPropGlyCpData,
                                                  state.dataFluidProps->GlycolData(Loop).Concentration,
                                                  state.dataFluidProps->GlycolData(Loop).CpValues);
-                    InterpDefValuesForGlycolConc(state, DefaultNumGlyConcs,
+                    InterpDefValuesForGlycolConc(state,
+                                                 DefaultNumGlyConcs,
                                                  DefaultNumGlyTemps,
                                                  DefaultGlycolConcs,
                                                  DefaultPropGlyRhoData,
                                                  state.dataFluidProps->GlycolData(Loop).Concentration,
                                                  state.dataFluidProps->GlycolData(Loop).RhoValues);
-                    InterpDefValuesForGlycolConc(state, DefaultNumGlyConcs,
+                    InterpDefValuesForGlycolConc(state,
+                                                 DefaultNumGlyConcs,
                                                  DefaultNumGlyTemps,
                                                  DefaultGlycolConcs,
                                                  DefaultPropGlyCondData,
                                                  state.dataFluidProps->GlycolData(Loop).Concentration,
                                                  state.dataFluidProps->GlycolData(Loop).CondValues);
-                    InterpDefValuesForGlycolConc(state, DefaultNumGlyConcs,
+                    InterpDefValuesForGlycolConc(state,
+                                                 DefaultNumGlyConcs,
                                                  DefaultNumGlyTemps,
                                                  DefaultGlycolConcs,
                                                  DefaultPropGlyViscData,
@@ -2237,7 +2292,8 @@ CurrentModuleObject,
                     state.dataFluidProps->GlycolData(Loop).CpTemps.allocate(state.dataFluidProps->GlycolData(Loop).NumCpTempPts);
                     state.dataFluidProps->GlycolData(Loop).CpValues.allocate(state.dataFluidProps->GlycolData(Loop).NumCpTempPts);
                     state.dataFluidProps->GlycolData(Loop).CpTemps = state.dataFluidProps->GlyRawData(Index).CpTemps;
-                    InterpValuesForGlycolConc(state, state.dataFluidProps->GlyRawData(Index).NumCpConcPts,
+                    InterpValuesForGlycolConc(state,
+                                              state.dataFluidProps->GlyRawData(Index).NumCpConcPts,
                                               state.dataFluidProps->GlyRawData(Index).NumCpTempPts,
                                               state.dataFluidProps->GlyRawData(Index).CpConcs,
                                               state.dataFluidProps->GlyRawData(Index).CpValues,
@@ -2258,7 +2314,8 @@ CurrentModuleObject,
                     state.dataFluidProps->GlycolData(Loop).RhoTemps.allocate(state.dataFluidProps->GlycolData(Loop).NumRhoTempPts);
                     state.dataFluidProps->GlycolData(Loop).RhoValues.allocate(state.dataFluidProps->GlycolData(Loop).NumRhoTempPts);
                     state.dataFluidProps->GlycolData(Loop).RhoTemps = state.dataFluidProps->GlyRawData(Index).RhoTemps;
-                    InterpValuesForGlycolConc(state, state.dataFluidProps->GlyRawData(Index).NumRhoConcPts,
+                    InterpValuesForGlycolConc(state,
+                                              state.dataFluidProps->GlyRawData(Index).NumRhoConcPts,
                                               state.dataFluidProps->GlyRawData(Index).NumRhoTempPts,
                                               state.dataFluidProps->GlyRawData(Index).RhoConcs,
                                               state.dataFluidProps->GlyRawData(Index).RhoValues,
@@ -2279,7 +2336,8 @@ CurrentModuleObject,
                     state.dataFluidProps->GlycolData(Loop).CondTemps.allocate(state.dataFluidProps->GlycolData(Loop).NumCondTempPts);
                     state.dataFluidProps->GlycolData(Loop).CondValues.allocate(state.dataFluidProps->GlycolData(Loop).NumCondTempPts);
                     state.dataFluidProps->GlycolData(Loop).CondTemps = state.dataFluidProps->GlyRawData(Index).CondTemps;
-                    InterpValuesForGlycolConc(state, state.dataFluidProps->GlyRawData(Index).NumCondConcPts,
+                    InterpValuesForGlycolConc(state,
+                                              state.dataFluidProps->GlyRawData(Index).NumCondConcPts,
                                               state.dataFluidProps->GlyRawData(Index).NumCondTempPts,
                                               state.dataFluidProps->GlyRawData(Index).CondConcs,
                                               state.dataFluidProps->GlyRawData(Index).CondValues,
@@ -2300,7 +2358,8 @@ CurrentModuleObject,
                     state.dataFluidProps->GlycolData(Loop).ViscTemps.allocate(state.dataFluidProps->GlycolData(Loop).NumViscTempPts);
                     state.dataFluidProps->GlycolData(Loop).ViscValues.allocate(state.dataFluidProps->GlycolData(Loop).NumViscTempPts);
                     state.dataFluidProps->GlycolData(Loop).ViscTemps = state.dataFluidProps->GlyRawData(Index).ViscTemps;
-                    InterpValuesForGlycolConc(state, state.dataFluidProps->GlyRawData(Index).NumViscConcPts,
+                    InterpValuesForGlycolConc(state,
+                                              state.dataFluidProps->GlyRawData(Index).NumViscConcPts,
                                               state.dataFluidProps->GlyRawData(Index).NumViscTempPts,
                                               state.dataFluidProps->GlyRawData(Index).ViscConcs,
                                               state.dataFluidProps->GlyRawData(Index).ViscValues,
@@ -2339,9 +2398,12 @@ CurrentModuleObject,
         }
 
         if (state.dataInputProcessing->inputProcessor->getNumSectionsFound("REPORTGLYCOLS") > 0) state.dataFluidProps->DebugReportGlycols = true;
-        if (state.dataInputProcessing->inputProcessor->getNumSectionsFound("REPORTREFRIGERANTS") > 0) state.dataFluidProps->DebugReportRefrigerants = true;
-        if (state.dataInputProcessing->inputProcessor->getNumSectionsFound("INCREASEGLYCOLERRORLIMIT") > 0) state.dataFluidProps->GlycolErrorLimitTest += 10;
-        if (state.dataInputProcessing->inputProcessor->getNumSectionsFound("INCREASEREFRIGERANTERRORLIMIT") > 0) state.dataFluidProps->RefrigerantErrorLimitTest += 10;
+        if (state.dataInputProcessing->inputProcessor->getNumSectionsFound("REPORTREFRIGERANTS") > 0)
+            state.dataFluidProps->DebugReportRefrigerants = true;
+        if (state.dataInputProcessing->inputProcessor->getNumSectionsFound("INCREASEGLYCOLERRORLIMIT") > 0)
+            state.dataFluidProps->GlycolErrorLimitTest += 10;
+        if (state.dataInputProcessing->inputProcessor->getNumSectionsFound("INCREASEREFRIGERANTERRORLIMIT") > 0)
+            state.dataFluidProps->RefrigerantErrorLimitTest += 10;
 
         if (state.dataFluidProps->DebugReportGlycols) ReportAndTestGlycols(state);
         if (state.dataFluidProps->DebugReportRefrigerants) ReportAndTestRefrigerants(state);
@@ -5122,8 +5184,9 @@ CurrentModuleObject,
                 if (state.dataFluidProps->GlycolData(GlycolNum).ViscHighTempIndex == 0) Failure = true;
             }
             if (Failure) {
-                ShowSevereError(state, "InitializeGlycolTempLimits: Required values for Glycol=" + state.dataFluidProps->GlycolData(GlycolNum).Name +
-                                " are all zeroes for some data types.");
+                ShowSevereError(state,
+                                "InitializeGlycolTempLimits: Required values for Glycol=" + state.dataFluidProps->GlycolData(GlycolNum).Name +
+                                    " are all zeroes for some data types.");
                 ErrorsFound = true;
             }
         }
@@ -5288,8 +5351,9 @@ CurrentModuleObject,
                 if (state.dataFluidProps->RefrigData(RefrigNum).RhofgHighTempIndex == 0) Failure = true;
             }
             if (Failure) {
-                ShowSevereError(state, "InitializeRefrigerantLimits: Required values for Refrigerant=" + state.dataFluidProps->RefrigData(RefrigNum).Name +
-                                " are all zeroes for some data types.");
+                ShowSevereError(state,
+                                "InitializeRefrigerantLimits: Required values for Refrigerant=" + state.dataFluidProps->RefrigData(RefrigNum).Name +
+                                    " are all zeroes for some data types.");
                 ErrorsFound = true;
             }
         }
@@ -5347,7 +5411,10 @@ CurrentModuleObject,
             GlycolIndex = 0; // used in routine calls -- value is returned when first 0
             // Lay out the basic values:
             if (state.dataFluidProps->GlycolData(GlycolNum).GlycolName != "") {
-                print(state.files.debug, "Glycol={}, Mixture fluid={}\n", state.dataFluidProps->GlycolData(GlycolNum).Name, state.dataFluidProps->GlycolData(GlycolNum).GlycolName);
+                print(state.files.debug,
+                      "Glycol={}, Mixture fluid={}\n",
+                      state.dataFluidProps->GlycolData(GlycolNum).Name,
+                      state.dataFluidProps->GlycolData(GlycolNum).GlycolName);
             } else {
                 print(state.files.debug, "Glycol={}\n", state.dataFluidProps->GlycolData(GlycolNum).Name);
             }
@@ -5363,12 +5430,16 @@ CurrentModuleObject,
                 for (Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop));
                 }
-                print(state.files.debug, ",{}\n", state.dataFluidProps->GlycolData(GlycolNum).CpTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts));
+                print(state.files.debug,
+                      ",{}\n",
+                      state.dataFluidProps->GlycolData(GlycolNum).CpTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts));
                 print(state.files.debug, "{}", "Specific Heat:");
                 for (Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).CpValues(Loop));
                 }
-                print(state.files.debug, ",{}\n", state.dataFluidProps->GlycolData(GlycolNum).CpValues(state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts));
+                print(state.files.debug,
+                      ",{}\n",
+                      state.dataFluidProps->GlycolData(GlycolNum).CpValues(state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts));
             }
             if (state.dataFluidProps->GlycolData(GlycolNum).RhoDataPresent) {
                 print(state.files.debug,
@@ -5381,12 +5452,16 @@ CurrentModuleObject,
                 for (Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop));
                 }
-                print(state.files.debug, ",{}\n", state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts));
+                print(state.files.debug,
+                      ",{}\n",
+                      state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts));
                 print(state.files.debug, "{}", "Density:");
                 for (Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).RhoValues(Loop));
                 }
-                print(state.files.debug, ",{}\n", state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts));
+                print(state.files.debug,
+                      ",{}\n",
+                      state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts));
             }
             if (state.dataFluidProps->GlycolData(GlycolNum).CondDataPresent) {
                 print(state.files.debug,
@@ -5399,12 +5474,16 @@ CurrentModuleObject,
                 for (Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop));
                 }
-                print(state.files.debug, ",{}\n", state.dataFluidProps->GlycolData(GlycolNum).CondTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts));
+                print(state.files.debug,
+                      ",{}\n",
+                      state.dataFluidProps->GlycolData(GlycolNum).CondTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts));
                 print(state.files.debug, "{}", "Conductivity:");
                 for (Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).CondValues(Loop));
                 }
-                print(state.files.debug, ",{}\n", state.dataFluidProps->GlycolData(GlycolNum).CondValues(state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts));
+                print(state.files.debug,
+                      ",{}\n",
+                      state.dataFluidProps->GlycolData(GlycolNum).CondValues(state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts));
             }
             if (state.dataFluidProps->GlycolData(GlycolNum).ViscDataPresent) {
                 print(state.files.debug,
@@ -5417,12 +5496,16 @@ CurrentModuleObject,
                 for (Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop));
                 }
-                print(state.files.debug, ",{}\n", state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts));
+                print(state.files.debug,
+                      ",{}\n",
+                      state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts));
                 print(state.files.debug, "{}", "Viscosity:");
                 for (Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).ViscValues(Loop));
                 }
-                print(state.files.debug, ",{}\n", state.dataFluidProps->GlycolData(GlycolNum).ViscValues(state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts));
+                print(state.files.debug,
+                      ",{}\n",
+                      state.dataFluidProps->GlycolData(GlycolNum).ViscValues(state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts));
             }
             // ============================================
             // Glycol Results, using out of bounds to out of bounds values in calling
@@ -5437,22 +5520,32 @@ CurrentModuleObject,
                 for (Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop));
                     Temperature =
-                        state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop) + (state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop + 1) - state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop)) / 2.0;
+                        state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop) +
+                        (state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop + 1) - state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop)) /
+                            2.0;
                     print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).CpTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts));
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->GlycolData(GlycolNum).CpTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts) + incr);
+                print(state.files.debug,
+                      ",{:.2R}",
+                      state.dataFluidProps->GlycolData(GlycolNum).CpTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->GlycolData(GlycolNum).CpTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts) + incr);
                 print(state.files.debug, "Specific Heat:");
                 Temperature = state.dataFluidProps->GlycolData(GlycolNum).CpTemps(1) - incr;
                 ReturnValue = GetSpecificHeatGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.2R}", ReturnValue);
                 for (Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts - 1; ++Loop) {
                     Temperature = state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop);
-                    ReturnValue = GetSpecificHeatGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                    ReturnValue =
+                        GetSpecificHeatGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
                     print(state.files.debug, ",{:.2R}", ReturnValue);
                     Temperature =
-                        state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop) + (state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop + 1) - state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop)) / 2.0;
-                    ReturnValue = GetSpecificHeatGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                        state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop) +
+                        (state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop + 1) - state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop)) /
+                            2.0;
+                    ReturnValue =
+                        GetSpecificHeatGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
                     print(state.files.debug, ",{:.2R}", ReturnValue);
                 }
                 Temperature = state.dataFluidProps->GlycolData(GlycolNum).CpTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts);
@@ -5469,12 +5562,18 @@ CurrentModuleObject,
                 print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(1) - incr);
                 for (Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop));
-                    Temperature = state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop) +
-                                  (state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop + 1) - state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop)) / 2.0;
+                    Temperature =
+                        state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop) + (state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop + 1) -
+                                                                                      state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop)) /
+                                                                                         2.0;
                     print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(state.files.debug, ",{}", state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts));
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts) + incr);
+                print(state.files.debug,
+                      ",{}",
+                      state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts) + incr);
                 print(state.files.debug, "Density:");
                 Temperature = state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(1) - incr;
                 ReturnValue = GetDensityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
@@ -5483,8 +5582,10 @@ CurrentModuleObject,
                     Temperature = state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop);
                     ReturnValue = GetDensityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
                     print(state.files.debug, ",{:.3R}", ReturnValue);
-                    Temperature = state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop) +
-                                  (state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop + 1) - state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop)) / 2.0;
+                    Temperature =
+                        state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop) + (state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop + 1) -
+                                                                                      state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop)) /
+                                                                                         2.0;
                     ReturnValue = GetDensityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
                     print(state.files.debug, ",{:.3R}", ReturnValue);
                 }
@@ -5499,32 +5600,43 @@ CurrentModuleObject,
             // ========= Conductivity from Temperatures
             if (state.dataFluidProps->GlycolData(GlycolNum).CondDataPresent) {
                 print(state.files.debug, "Conductivity Results at Temperatures:");
-                print(state.files.debug, ",{:.2R}",state.dataFluidProps->GlycolData(GlycolNum).CondTemps(1) - incr);
+                print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).CondTemps(1) - incr);
                 for (Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop));
                     Temperature = state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop) +
-                                  (state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop + 1) - state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop)) / 2.0;
+                                  (state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop + 1) -
+                                   state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop)) /
+                                      2.0;
                     print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).CondTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts));
-                print(state.files.debug, ",{:.2R}\n" , state.dataFluidProps->GlycolData(GlycolNum).CondTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts) + incr);
+                print(state.files.debug,
+                      ",{:.2R}",
+                      state.dataFluidProps->GlycolData(GlycolNum).CondTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->GlycolData(GlycolNum).CondTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts) + incr);
                 print(state.files.debug, "Conductivity:");
                 Temperature = state.dataFluidProps->GlycolData(GlycolNum).CondTemps(1) - incr;
                 ReturnValue = GetConductivityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.3R}", ReturnValue);
                 for (Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts - 1; ++Loop) {
                     Temperature = state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop);
-                    ReturnValue = GetConductivityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                    ReturnValue =
+                        GetConductivityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
                     print(state.files.debug, ",{:.3R}", ReturnValue);
                     Temperature = state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop) +
-                                  (state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop + 1) - state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop)) / 2.0;
-                    ReturnValue = GetConductivityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                                  (state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop + 1) -
+                                   state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop)) /
+                                      2.0;
+                    ReturnValue =
+                        GetConductivityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
                     print(state.files.debug, ",{:.3R}", ReturnValue);
                 }
                 Temperature = state.dataFluidProps->GlycolData(GlycolNum).CondTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts);
                 ReturnValue = GetConductivityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.3R}", ReturnValue);
-                Temperature = state.dataFluidProps->GlycolData(GlycolNum).CondTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts) + incr;
+                Temperature =
+                    state.dataFluidProps->GlycolData(GlycolNum).CondTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts) + incr;
                 ReturnValue = GetConductivityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.3R}\n", ReturnValue);
             }
@@ -5532,15 +5644,21 @@ CurrentModuleObject,
             // ========= Viscosity from Temperatures
             if (state.dataFluidProps->GlycolData(GlycolNum).ViscDataPresent) {
                 print(state.files.debug, "Viscosity Results at Temperatures:");
-                print(state.files.debug, ",{:.2R}",state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(1) - incr);
+                print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(1) - incr);
                 for (Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop));
                     Temperature = state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop) +
-                                  (state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop + 1) - state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop)) / 2.0;
+                                  (state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop + 1) -
+                                   state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop)) /
+                                      2.0;
                     print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts));
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts) + incr);
+                print(state.files.debug,
+                      ",{:.2R}",
+                      state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts) + incr);
                 print(state.files.debug, "Viscosity:");
                 Temperature = state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(1) - incr;
                 ReturnValue = GetViscosityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
@@ -5550,14 +5668,17 @@ CurrentModuleObject,
                     ReturnValue = GetViscosityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
                     print(state.files.debug, ",{:.4R}", ReturnValue);
                     Temperature = state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop) +
-                                  (state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop + 1) - state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop)) / 2.0;
+                                  (state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop + 1) -
+                                   state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop)) /
+                                      2.0;
                     ReturnValue = GetViscosityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
                     print(state.files.debug, ",{:.4R}", ReturnValue);
                 }
                 Temperature = state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts);
                 ReturnValue = GetViscosityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.4R}", ReturnValue);
-                Temperature = state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts) + incr;
+                Temperature =
+                    state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts) + incr;
                 ReturnValue = GetViscosityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.4R}\n", ReturnValue);
             }
@@ -5631,12 +5752,16 @@ CurrentModuleObject,
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumPsPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).PsTemps(Loop));
                 }
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->RefrigData(RefrigNum).PsTemps(state.dataFluidProps->RefrigData(RefrigNum).NumPsPoints));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).PsTemps(state.dataFluidProps->RefrigData(RefrigNum).NumPsPoints));
                 print(state.files.debug, "Saturation Pressure:");
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumPsPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).PsValues(Loop));
                 }
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->RefrigData(RefrigNum).PsValues(state.dataFluidProps->RefrigData(RefrigNum).NumPsPoints));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).PsValues(state.dataFluidProps->RefrigData(RefrigNum).NumPsPoints));
             }
             if (state.dataFluidProps->RefrigData(RefrigNum).NumHPoints > 0) {
                 print(state.files.debug,
@@ -5649,12 +5774,16 @@ CurrentModuleObject,
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).HTemps(Loop));
                 }
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->RefrigData(RefrigNum).HTemps(state.dataFluidProps->RefrigData(RefrigNum).NumHPoints));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).HTemps(state.dataFluidProps->RefrigData(RefrigNum).NumHPoints));
                 print(state.files.debug, "Enthalpy Saturated Fluid:");
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).HfValues(Loop));
                 }
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->RefrigData(RefrigNum).HfValues(state.dataFluidProps->RefrigData(RefrigNum).NumHPoints));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).HfValues(state.dataFluidProps->RefrigData(RefrigNum).NumHPoints));
                 print(state.files.debug,
                       "Enthalpy Saturated Fluid/Gas Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       state.dataFluidProps->RefrigData(RefrigNum).HfgLowTempValue,
@@ -5666,12 +5795,16 @@ CurrentModuleObject,
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).HTemps(Loop));
                 }
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->RefrigData(RefrigNum).HTemps(state.dataFluidProps->RefrigData(RefrigNum).NumHPoints));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).HTemps(state.dataFluidProps->RefrigData(RefrigNum).NumHPoints));
                 print(state.files.debug, "Enthalpy Saturated Fluid/Gas:");
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).HfgValues(Loop));
                 }
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->RefrigData(RefrigNum).HfgValues(state.dataFluidProps->RefrigData(RefrigNum).NumHPoints));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).HfgValues(state.dataFluidProps->RefrigData(RefrigNum).NumHPoints));
             }
             if (state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints > 0) {
                 print(state.files.debug,
@@ -5684,12 +5817,16 @@ CurrentModuleObject,
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).CpTemps(Loop));
                 }
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->RefrigData(RefrigNum).CpTemps(state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).CpTemps(state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints));
                 print(state.files.debug, "Specific Heat Saturated Fluid:");
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->RefrigData(RefrigNum).CpfValues(Loop));
                 }
-                print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).CpfValues(state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints));
+                print(state.files.debug,
+                      ",{:.2R}",
+                      state.dataFluidProps->RefrigData(RefrigNum).CpfValues(state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints));
                 print(state.files.debug,
                       "Specific Heat Saturated Fluid/Gas Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       state.dataFluidProps->RefrigData(RefrigNum).CpfgLowTempValue,
@@ -5700,12 +5837,16 @@ CurrentModuleObject,
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).CpTemps(Loop));
                 }
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->RefrigData(RefrigNum).CpTemps(state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).CpTemps(state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints));
                 print(state.files.debug, "Specific Heat Saturated Fluid/Gas:");
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).CpfgValues(Loop));
                 }
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->RefrigData(RefrigNum).CpfgValues(state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).CpfgValues(state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints));
             }
             if (state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints > 0) {
                 print(state.files.debug,
@@ -5718,27 +5859,36 @@ CurrentModuleObject,
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(Loop));
                 }
-                print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints));
+                print(state.files.debug,
+                      ",{:.2R}",
+                      state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints));
                 print(state.files.debug, "Density Saturated Fluid:");
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).RhofValues(Loop));
                 }
-                print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).RhofValues(state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints));
-                print(state.files.debug, "Density Saturated Fluid/Gas Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
-                                                         state.dataFluidProps->RefrigData(RefrigNum).RhofgLowTempValue,
-                                                         state.dataFluidProps->RefrigData(RefrigNum).RhofgLowTempIndex,
-                                                         state.dataFluidProps->RefrigData(RefrigNum).RhofgHighTempValue,
-                                                         state.dataFluidProps->RefrigData(RefrigNum).RhofgHighTempIndex);
+                print(state.files.debug,
+                      ",{:.2R}",
+                      state.dataFluidProps->RefrigData(RefrigNum).RhofValues(state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints));
+                print(state.files.debug,
+                      "Density Saturated Fluid/Gas Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).RhofgLowTempValue,
+                      state.dataFluidProps->RefrigData(RefrigNum).RhofgLowTempIndex,
+                      state.dataFluidProps->RefrigData(RefrigNum).RhofgHighTempValue,
+                      state.dataFluidProps->RefrigData(RefrigNum).RhofgHighTempIndex);
                 print(state.files.debug, "Temperatures:");
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(Loop));
                 }
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints));
                 print(state.files.debug, "Density Saturated Fluid/Gas:");
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).RhofgValues(Loop));
                 }
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->RefrigData(RefrigNum).RhofgValues(state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).RhofgValues(state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints));
             }
 
             if (state.dataFluidProps->RefrigData(RefrigNum).NumSuperTempPts > 0 && state.dataFluidProps->RefrigData(RefrigNum).NumSuperPressPts > 0) {
@@ -5750,19 +5900,25 @@ CurrentModuleObject,
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumSuperTempPts - 1; ++Loop) {
                     print(state.files.debug, ",{:.3R}", state.dataFluidProps->RefrigData(RefrigNum).SHTemps(Loop));
                 }
-                print(state.files.debug, ",{:.3R}\n", state.dataFluidProps->RefrigData(RefrigNum).SHTemps(state.dataFluidProps->RefrigData(RefrigNum).NumSuperTempPts));
+                print(state.files.debug,
+                      ",{:.3R}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).SHTemps(state.dataFluidProps->RefrigData(RefrigNum).NumSuperTempPts));
                 print(state.files.debug, "Superheated Pressures:");
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumSuperPressPts - 1; ++Loop) {
                     print(state.files.debug, ",{:.3R}", state.dataFluidProps->RefrigData(RefrigNum).SHPress(Loop));
                 }
-                print(state.files.debug, ",{:.3R}\n", state.dataFluidProps->RefrigData(RefrigNum).SHPress(state.dataFluidProps->RefrigData(RefrigNum).NumSuperPressPts));
+                print(state.files.debug,
+                      ",{:.3R}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).SHPress(state.dataFluidProps->RefrigData(RefrigNum).NumSuperPressPts));
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumSuperPressPts; ++Loop) {
                     print(state.files.debug, "Superheated Pressure:#{}={:.2R}\n", Loop, state.dataFluidProps->RefrigData(RefrigNum).SHPress(Loop));
                     print(state.files.debug, "Enthalpy Superheated Gas:");
                     for (Loop1 = 1; Loop1 <= state.dataFluidProps->RefrigData(RefrigNum).NumSuperTempPts - 1; ++Loop1) {
                         print(state.files.debug, ",{:.3R}", state.dataFluidProps->RefrigData(RefrigNum).HshValues(Loop, Loop1));
                     }
-                    print(state.files.debug, ",{:.3R}\n", state.dataFluidProps->RefrigData(RefrigNum).HshValues(Loop, state.dataFluidProps->RefrigData(RefrigNum).NumSuperTempPts));
+                    print(state.files.debug,
+                          ",{:.3R}\n",
+                          state.dataFluidProps->RefrigData(RefrigNum).HshValues(Loop, state.dataFluidProps->RefrigData(RefrigNum).NumSuperTempPts));
                 }
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumSuperPressPts; ++Loop) {
                     print(state.files.debug, "Superheated Pressure:#{}={:.2R}\n", Loop, state.dataFluidProps->RefrigData(RefrigNum).SHPress(Loop));
@@ -5770,7 +5926,9 @@ CurrentModuleObject,
                     for (Loop1 = 1; Loop1 <= state.dataFluidProps->RefrigData(RefrigNum).NumSuperTempPts - 1; ++Loop1) {
                         print(state.files.debug, ",{:.3R}", state.dataFluidProps->RefrigData(RefrigNum).RhoshValues(Loop, Loop1));
                     }
-                    print(state.files.debug, ",{:.3R}\n", state.dataFluidProps->RefrigData(RefrigNum).RhoshValues(Loop, state.dataFluidProps->RefrigData(RefrigNum).NumSuperTempPts));
+                    print(state.files.debug,
+                          ",{:.3R}\n",
+                          state.dataFluidProps->RefrigData(RefrigNum).RhoshValues(Loop, state.dataFluidProps->RefrigData(RefrigNum).NumSuperTempPts));
                 }
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumSuperTempPts; ++Loop) {
                     print(state.files.debug, "Superheated Temperature:#{}={:.2R}\n", Loop, state.dataFluidProps->RefrigData(RefrigNum).SHTemps(Loop));
@@ -5778,7 +5936,9 @@ CurrentModuleObject,
                     for (Loop1 = 1; Loop1 <= state.dataFluidProps->RefrigData(RefrigNum).NumSuperPressPts - 1; ++Loop1) {
                         print(state.files.debug, ",{:.3R}", state.dataFluidProps->RefrigData(RefrigNum).HshValues(Loop1, Loop));
                     }
-                    print(state.files.debug, ",{:.3R}\n", state.dataFluidProps->RefrigData(RefrigNum).HshValues(state.dataFluidProps->RefrigData(RefrigNum).NumSuperPressPts, Loop));
+                    print(state.files.debug,
+                          ",{:.3R}\n",
+                          state.dataFluidProps->RefrigData(RefrigNum).HshValues(state.dataFluidProps->RefrigData(RefrigNum).NumSuperPressPts, Loop));
                 }
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumSuperTempPts; ++Loop) {
                     print(state.files.debug, "Superheated Temperature:#{}={:.2R}\n", Loop, state.dataFluidProps->RefrigData(RefrigNum).SHTemps(Loop));
@@ -5786,7 +5946,10 @@ CurrentModuleObject,
                     for (Loop1 = 1; Loop1 <= state.dataFluidProps->RefrigData(RefrigNum).NumSuperPressPts - 1; ++Loop1) {
                         print(state.files.debug, ",{:.3R}", state.dataFluidProps->RefrigData(RefrigNum).RhoshValues(Loop1, Loop));
                     }
-                    print(state.files.debug, ",{:.3R}\n", state.dataFluidProps->RefrigData(RefrigNum).RhoshValues(state.dataFluidProps->RefrigData(RefrigNum).NumSuperPressPts, Loop));
+                    print(
+                        state.files.debug,
+                        ",{:.3R}\n",
+                        state.dataFluidProps->RefrigData(RefrigNum).RhoshValues(state.dataFluidProps->RefrigData(RefrigNum).NumSuperPressPts, Loop));
                 }
             }
 
@@ -5802,22 +5965,32 @@ CurrentModuleObject,
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumPsPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).PsTemps(Loop));
                     Temperature =
-                        state.dataFluidProps->RefrigData(RefrigNum).PsTemps(Loop) + (state.dataFluidProps->RefrigData(RefrigNum).PsTemps(Loop + 1) - state.dataFluidProps->RefrigData(RefrigNum).PsTemps(Loop)) / 2.0;
+                        state.dataFluidProps->RefrigData(RefrigNum).PsTemps(Loop) +
+                        (state.dataFluidProps->RefrigData(RefrigNum).PsTemps(Loop + 1) - state.dataFluidProps->RefrigData(RefrigNum).PsTemps(Loop)) /
+                            2.0;
                     print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).PsTemps(state.dataFluidProps->RefrigData(RefrigNum).NumPsPoints));
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->RefrigData(RefrigNum).PsTemps(state.dataFluidProps->RefrigData(RefrigNum).NumPsPoints) + incr);
+                print(state.files.debug,
+                      ",{:.2R}",
+                      state.dataFluidProps->RefrigData(RefrigNum).PsTemps(state.dataFluidProps->RefrigData(RefrigNum).NumPsPoints));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).PsTemps(state.dataFluidProps->RefrigData(RefrigNum).NumPsPoints) + incr);
                 print(state.files.debug, "Saturated Pressures:");
                 Temperature = state.dataFluidProps->RefrigData(RefrigNum).PsTemps(1) - incr;
                 ReturnValue = GetSatPressureRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
                 print(state.files.debug, ",{:.2R}", ReturnValue);
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumPsPoints - 1; ++Loop) {
                     Temperature = state.dataFluidProps->RefrigData(RefrigNum).PsTemps(Loop);
-                    ReturnValue = GetSatPressureRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
+                    ReturnValue =
+                        GetSatPressureRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
                     print(state.files.debug, ",{:.2R}", ReturnValue);
                     Temperature =
-                        state.dataFluidProps->RefrigData(RefrigNum).PsTemps(Loop) + (state.dataFluidProps->RefrigData(RefrigNum).PsTemps(Loop + 1) - state.dataFluidProps->RefrigData(RefrigNum).PsTemps(Loop)) / 2.0;
-                    ReturnValue = GetSatPressureRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
+                        state.dataFluidProps->RefrigData(RefrigNum).PsTemps(Loop) +
+                        (state.dataFluidProps->RefrigData(RefrigNum).PsTemps(Loop + 1) - state.dataFluidProps->RefrigData(RefrigNum).PsTemps(Loop)) /
+                            2.0;
+                    ReturnValue =
+                        GetSatPressureRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
                     print(state.files.debug, ",{:.2R}", ReturnValue);
                 }
                 Temperature = state.dataFluidProps->RefrigData(RefrigNum).PsTemps(state.dataFluidProps->RefrigData(RefrigNum).NumPsPoints);
@@ -5835,29 +6008,42 @@ CurrentModuleObject,
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).HTemps(Loop));
                     Temperature =
-                        state.dataFluidProps->RefrigData(RefrigNum).HTemps(Loop) + (state.dataFluidProps->RefrigData(RefrigNum).HTemps(Loop + 1) - state.dataFluidProps->RefrigData(RefrigNum).HTemps(Loop)) / 2.0;
+                        state.dataFluidProps->RefrigData(RefrigNum).HTemps(Loop) +
+                        (state.dataFluidProps->RefrigData(RefrigNum).HTemps(Loop + 1) - state.dataFluidProps->RefrigData(RefrigNum).HTemps(Loop)) /
+                            2.0;
                     print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).HTemps(state.dataFluidProps->RefrigData(RefrigNum).NumHPoints));
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->RefrigData(RefrigNum).HTemps(state.dataFluidProps->RefrigData(RefrigNum).NumHPoints) + incr);
+                print(state.files.debug,
+                      ",{:.2R}",
+                      state.dataFluidProps->RefrigData(RefrigNum).HTemps(state.dataFluidProps->RefrigData(RefrigNum).NumHPoints));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).HTemps(state.dataFluidProps->RefrigData(RefrigNum).NumHPoints) + incr);
                 print(state.files.debug, "Saturated Enthalpy:");
                 Temperature = state.dataFluidProps->RefrigData(RefrigNum).HTemps(1) - incr;
-                ReturnValue = GetSatEnthalpyRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                ReturnValue =
+                    GetSatEnthalpyRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
                 print(state.files.debug, ",{:.2R}", ReturnValue);
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
                     Temperature = state.dataFluidProps->RefrigData(RefrigNum).HTemps(Loop);
-                    ReturnValue = GetSatEnthalpyRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                    ReturnValue =
+                        GetSatEnthalpyRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
                     print(state.files.debug, ",{:.2R}", ReturnValue);
                     Temperature =
-                        state.dataFluidProps->RefrigData(RefrigNum).HTemps(Loop) + (state.dataFluidProps->RefrigData(RefrigNum).HTemps(Loop + 1) - state.dataFluidProps->RefrigData(RefrigNum).HTemps(Loop)) / 2.0;
-                    ReturnValue = GetSatEnthalpyRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                        state.dataFluidProps->RefrigData(RefrigNum).HTemps(Loop) +
+                        (state.dataFluidProps->RefrigData(RefrigNum).HTemps(Loop + 1) - state.dataFluidProps->RefrigData(RefrigNum).HTemps(Loop)) /
+                            2.0;
+                    ReturnValue =
+                        GetSatEnthalpyRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
                     print(state.files.debug, ",{:.2R}", ReturnValue);
                 }
                 Temperature = state.dataFluidProps->RefrigData(RefrigNum).HTemps(state.dataFluidProps->RefrigData(RefrigNum).NumHPoints);
-                ReturnValue = GetSatEnthalpyRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                ReturnValue =
+                    GetSatEnthalpyRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
                 print(state.files.debug, ",{:.2R}", ReturnValue);
                 Temperature = state.dataFluidProps->RefrigData(RefrigNum).HTemps(state.dataFluidProps->RefrigData(RefrigNum).NumHPoints) + incr;
-                ReturnValue = GetSatEnthalpyRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                ReturnValue =
+                    GetSatEnthalpyRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
                 print(state.files.debug, ",{:.2R}\n", ReturnValue);
             }
 
@@ -5868,29 +6054,42 @@ CurrentModuleObject,
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).CpTemps(Loop));
                     Temperature =
-                        state.dataFluidProps->RefrigData(RefrigNum).CpTemps(Loop) + (state.dataFluidProps->RefrigData(RefrigNum).CpTemps(Loop + 1) - state.dataFluidProps->RefrigData(RefrigNum).CpTemps(Loop)) / 2.0;
+                        state.dataFluidProps->RefrigData(RefrigNum).CpTemps(Loop) +
+                        (state.dataFluidProps->RefrigData(RefrigNum).CpTemps(Loop + 1) - state.dataFluidProps->RefrigData(RefrigNum).CpTemps(Loop)) /
+                            2.0;
                     print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(state.files.debug,  ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).CpTemps(state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints));
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->RefrigData(RefrigNum).CpTemps(state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints) + incr);
+                print(state.files.debug,
+                      ",{:.2R}",
+                      state.dataFluidProps->RefrigData(RefrigNum).CpTemps(state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).CpTemps(state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints) + incr);
                 print(state.files.debug, "Saturated Specific Heat:");
                 Temperature = state.dataFluidProps->RefrigData(RefrigNum).CpTemps(1) - incr;
-                ReturnValue = GetSatSpecificHeatRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                ReturnValue =
+                    GetSatSpecificHeatRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
                 print(state.files.debug, ",{:.2R}", ReturnValue);
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
                     Temperature = state.dataFluidProps->RefrigData(RefrigNum).CpTemps(Loop);
-                    ReturnValue = GetSatSpecificHeatRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                    ReturnValue = GetSatSpecificHeatRefrig(
+                        state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
                     print(state.files.debug, ",{:.2R}", ReturnValue);
                     Temperature =
-                        state.dataFluidProps->RefrigData(RefrigNum).CpTemps(Loop) + (state.dataFluidProps->RefrigData(RefrigNum).CpTemps(Loop + 1) - state.dataFluidProps->RefrigData(RefrigNum).CpTemps(Loop)) / 2.0;
-                    ReturnValue = GetSatSpecificHeatRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                        state.dataFluidProps->RefrigData(RefrigNum).CpTemps(Loop) +
+                        (state.dataFluidProps->RefrigData(RefrigNum).CpTemps(Loop + 1) - state.dataFluidProps->RefrigData(RefrigNum).CpTemps(Loop)) /
+                            2.0;
+                    ReturnValue = GetSatSpecificHeatRefrig(
+                        state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
                     print(state.files.debug, ",{:.2R}", ReturnValue);
                 }
                 Temperature = state.dataFluidProps->RefrigData(RefrigNum).CpTemps(state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints);
-                ReturnValue = GetSatSpecificHeatRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                ReturnValue =
+                    GetSatSpecificHeatRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
                 print(state.files.debug, ",{:.2R}", ReturnValue);
                 Temperature = state.dataFluidProps->RefrigData(RefrigNum).CpTemps(state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints) + incr;
-                ReturnValue = GetSatSpecificHeatRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                ReturnValue =
+                    GetSatSpecificHeatRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
                 print(state.files.debug, ",{:.2R}\n", ReturnValue);
             }
 
@@ -5900,30 +6099,43 @@ CurrentModuleObject,
                 print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(1) - incr);
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(Loop));
-                    Temperature = state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(Loop) +
-                                  (state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(Loop + 1) - state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(Loop)) / 2.0;
+                    Temperature =
+                        state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(Loop) + (state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(Loop + 1) -
+                                                                                      state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(Loop)) /
+                                                                                         2.0;
                     print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(state.files.debug, ",{:.2R}", state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints));
-                print(state.files.debug, ",{:.2R}\n", state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints) + incr);
+                print(state.files.debug,
+                      ",{:.2R}",
+                      state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints));
+                print(state.files.debug,
+                      ",{:.2R}\n",
+                      state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints) + incr);
                 print(state.files.debug, "Saturated Density:");
                 Temperature = state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(1) - incr;
-                ReturnValue = GetSatDensityRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                ReturnValue =
+                    GetSatDensityRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
                 print(state.files.debug, ",{:.2R}", ReturnValue);
                 for (Loop = 1; Loop <= state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
                     Temperature = state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(Loop);
-                    ReturnValue = GetSatDensityRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                    ReturnValue =
+                        GetSatDensityRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
                     print(state.files.debug, ",{:.2R}", ReturnValue);
-                    Temperature = state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(Loop) +
-                                  (state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(Loop + 1) - state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(Loop)) / 2.0;
-                    ReturnValue = GetSatDensityRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                    Temperature =
+                        state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(Loop) + (state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(Loop + 1) -
+                                                                                      state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(Loop)) /
+                                                                                         2.0;
+                    ReturnValue =
+                        GetSatDensityRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
                     print(state.files.debug, ",{:.2R}", ReturnValue);
                 }
                 Temperature = state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints);
-                ReturnValue = GetSatDensityRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                ReturnValue =
+                    GetSatDensityRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
                 print(state.files.debug, ",{:.2R}", ReturnValue);
                 Temperature = state.dataFluidProps->RefrigData(RefrigNum).RhoTemps(state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints) + incr;
-                ReturnValue = GetSatDensityRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                ReturnValue =
+                    GetSatDensityRefrig(state, state.dataFluidProps->RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
                 print(state.files.debug, ",{:.2R}\n", ReturnValue);
             }
         }
@@ -5981,7 +6193,6 @@ CurrentModuleObject,
         // error counters and dummy string
         bool ErrorFlag; // error flag for current call
 
-
         if (state.dataFluidProps->GetInput) {
             GetFluidPropertiesData(state);
             state.dataFluidProps->GetInput = false;
@@ -5989,7 +6200,8 @@ CurrentModuleObject,
 
         RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatPressureRefrig", "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(
+                state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatPressureRefrig", "properties", CalledFrom);
         }
 
         ErrorFlag = false;
@@ -6000,7 +6212,8 @@ CurrentModuleObject,
             // Find which refrigerant (index) is being requested
             RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatPressureRefrig", "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(
+                    state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatPressureRefrig", "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -6029,8 +6242,9 @@ CurrentModuleObject,
             ++state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatTempErrCount;
             // send warning
             if (state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatTempErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
-                ShowSevereMessage(state, RoutineName + "Saturation temperature is out of range for refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
-                                  "] supplied data: **");
+                ShowSevereMessage(state,
+                                  RoutineName + "Saturation temperature is out of range for refrigerant [" +
+                                      state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name + "] supplied data: **");
                 ShowContinueError(state,
                                   format("...Called From:{}, supplied data range=[{:.2R},{:.2R}]",
                                          CalledFrom,
@@ -6040,7 +6254,8 @@ CurrentModuleObject,
                     state, format("...Supplied Refrigerant Temperature={:.2R} Returned saturated pressure value = {:.0R}", Temperature, ReturnValue));
                 ShowContinueErrorTimeStamp(state, "");
             }
-            ShowRecurringSevereErrorAtEnd(state, RoutineName + "Saturation temperature is out of range for refrigerant [" +
+            ShowRecurringSevereErrorAtEnd(state,
+                                          RoutineName + "Saturation temperature is out of range for refrigerant [" +
                                               state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
                                           state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatTempErrIndex,
                                           Temperature,
@@ -6105,7 +6320,6 @@ CurrentModuleObject,
         // error counters and dummy string
         bool ErrorFlag; // error flag for current call
 
-
         if (state.dataFluidProps->GetInput) {
             GetFluidPropertiesData(state);
             state.dataFluidProps->GetInput = false;
@@ -6113,7 +6327,8 @@ CurrentModuleObject,
 
         RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatTemperatureRefrig", "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(
+                state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatTemperatureRefrig", "properties", CalledFrom);
         }
 
         ErrorFlag = false;
@@ -6124,7 +6339,14 @@ CurrentModuleObject,
             // Find which refrigerant (index) is being requested
             RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatTemperatureRefrig", "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(state,
+                                             state.dataFluidProps->NumOfRefrigerants,
+                                             RefrigNum,
+                                             true,
+                                             Refrigerant,
+                                             "GetSatTemperatureRefrig",
+                                             "properties",
+                                             CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -6153,8 +6375,9 @@ CurrentModuleObject,
             ++state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatPressErrCount;
             // send warning
             if (state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatPressErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
-                ShowSevereMessage(state, RoutineName + "Saturation pressure is out of range for refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
-                                  "] supplied data: **");
+                ShowSevereMessage(state,
+                                  RoutineName + "Saturation pressure is out of range for refrigerant [" +
+                                      state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name + "] supplied data: **");
                 ShowContinueError(state,
                                   format("...Called From:{}, supplied data range=[{:.0R},{:.0R}]",
                                          CalledFrom,
@@ -6164,7 +6387,8 @@ CurrentModuleObject,
                     state, format("...Supplied Refrigerant Pressure={:.0R} Returned saturated temperature value ={:.2R}", Pressure, ReturnValue));
                 ShowContinueErrorTimeStamp(state, "");
             }
-            ShowRecurringSevereErrorAtEnd(state, RoutineName + "Saturation pressure is out of range for refrigerant [" +
+            ShowRecurringSevereErrorAtEnd(state,
+                                          RoutineName + "Saturation pressure is out of range for refrigerant [" +
                                               state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
                                           state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatPressErrIndex,
                                           Pressure,
@@ -6225,7 +6449,6 @@ CurrentModuleObject,
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int RefrigNum; // index for refrigerant under consideration
 
-
         if (state.dataFluidProps->GetInput) {
             GetFluidPropertiesData(state);
             state.dataFluidProps->GetInput = false;
@@ -6233,7 +6456,8 @@ CurrentModuleObject,
 
         RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(
+                state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
         }
 
         if ((Quality < 0.0) || (Quality > 1.0)) {
@@ -6248,7 +6472,8 @@ CurrentModuleObject,
             // Find which refrigerant (index) is being requested
             RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(
+                    state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -6318,7 +6543,6 @@ CurrentModuleObject,
 
         // error counters and dummy string
 
-
         if (state.dataFluidProps->GetInput) {
             GetFluidPropertiesData(state);
             state.dataFluidProps->GetInput = false;
@@ -6326,7 +6550,8 @@ CurrentModuleObject,
 
         RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatDensityRefrig", "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(
+                state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatDensityRefrig", "properties", CalledFrom);
         }
 
         if ((Quality < 0.0) || (Quality > 1.0)) {
@@ -6343,7 +6568,8 @@ CurrentModuleObject,
             // Find which refrigerant (index) is being requested
             RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatDensityRefrig", "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(
+                    state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatDensityRefrig", "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -6394,8 +6620,9 @@ CurrentModuleObject,
             ++state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatTempDensityErrCount;
             // send warning
             if (state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatTempDensityErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
-                ShowSevereMessage(state, RoutineName + "Saturation temperature is out of range for refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
-                                  "] supplied data: **");
+                ShowSevereMessage(state,
+                                  RoutineName + "Saturation temperature is out of range for refrigerant [" +
+                                      state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name + "] supplied data: **");
                 ShowContinueError(state,
                                   format("...Called From:{}, supplied data range=[{:.2R},{:.2R}]",
                                          CalledFrom,
@@ -6405,7 +6632,8 @@ CurrentModuleObject,
                     state, format("...Supplied Refrigerant Temperature={:.2R} Returned saturated density value ={:.2R}", Temperature, ReturnValue));
                 ShowContinueErrorTimeStamp(state, "");
             }
-            ShowRecurringSevereErrorAtEnd(state, RoutineName + "Saturation temperature is out of range for refrigerant [" +
+            ShowRecurringSevereErrorAtEnd(state,
+                                          RoutineName + "Saturation temperature is out of range for refrigerant [" +
                                               state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
                                           state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatTempDensityErrIndex,
                                           Temperature,
@@ -6467,7 +6695,6 @@ CurrentModuleObject,
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int RefrigNum; // index for refrigerant under consideration
 
-
         if (state.dataFluidProps->GetInput) {
             GetFluidPropertiesData(state);
             state.dataFluidProps->GetInput = false;
@@ -6475,7 +6702,8 @@ CurrentModuleObject,
 
         RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatSpecificHeatRefrig", "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(
+                state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatSpecificHeatRefrig", "properties", CalledFrom);
         }
 
         if ((Quality < 0.0) || (Quality > 1.0)) {
@@ -6492,15 +6720,29 @@ CurrentModuleObject,
             // Find which refrigerant (index) is being requested
             RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatSpecificHeatRefrig", "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(state,
+                                             state.dataFluidProps->NumOfRefrigerants,
+                                             RefrigNum,
+                                             true,
+                                             Refrigerant,
+                                             "GetSatSpecificHeatRefrig",
+                                             "properties",
+                                             CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
         auto const &refrig(state.dataFluidProps->RefrigData(RefrigNum));
 
         // Apply linear interpolation function
-        ReturnValue = GetInterpolatedSatProp(
-            state, Temperature, refrig.CpTemps, refrig.CpfValues, refrig.CpfgValues, Quality, CalledFrom, refrig.CpfLowTempIndex, refrig.CpfHighTempIndex);
+        ReturnValue = GetInterpolatedSatProp(state,
+                                             Temperature,
+                                             refrig.CpTemps,
+                                             refrig.CpfValues,
+                                             refrig.CpfgValues,
+                                             Quality,
+                                             CalledFrom,
+                                             refrig.CpfLowTempIndex,
+                                             refrig.CpfHighTempIndex);
 
         return ReturnValue;
     }
@@ -6591,7 +6833,8 @@ CurrentModuleObject,
 
         RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineNameNoColon, "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(
+                state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineNameNoColon, "properties", CalledFrom);
         }
 
         ErrCount = 0;
@@ -6607,7 +6850,8 @@ CurrentModuleObject,
             // Find which refrigerant (index) is being requested
             RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineNameNoColon, "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(
+                    state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineNameNoColon, "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -6690,18 +6934,21 @@ CurrentModuleObject,
             ReturnValue = GetSatEnthalpyRefrig(state, Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoSpace + CalledFrom);
             // send warning
             if (!state.dataGlobal->WarmupFlag) {
-                state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrCount += state.dataFluidProps->SatErrCountGetSupHeatEnthalpyRefrig;
+                state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrCount +=
+                    state.dataFluidProps->SatErrCountGetSupHeatEnthalpyRefrig;
                 // send warning
                 if (state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatTempDensityErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
-                                       "] is saturated at the given conditions, saturated enthalpy at given temperature returned. **");
+                    ShowWarningMessage(state,
+                                       RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                           "] is saturated at the given conditions, saturated enthalpy at given temperature returned. **");
                     ShowContinueError(state, "...Called From:" + CalledFrom);
                     ShowContinueError(state, format("Refrigerant temperature = {:.2R}", Temperature));
                     ShowContinueError(state, format("Refrigerant pressure = {:.0R}", Pressure));
                     ShowContinueError(state, format("Returned Enthalpy value = {:.3R}", ReturnValue));
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                    "] saturated at the given conditions **",
                                                state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrIndex,
                                                Temperature,
@@ -6718,14 +6965,17 @@ CurrentModuleObject,
             if (ErrCount > 0) {
                 // send temp range error if flagged
                 state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyTempErrCount += CurTempRangeErrCount;
-                if (CurTempRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyTempErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
-                                       "] Temperature is out of range for superheated refrigerant enthalpy: values capped **");
+                if (CurTempRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyTempErrCount <=
+                                                    state.dataFluidProps->RefrigerantErrorLimitTest) {
+                    ShowWarningMessage(state,
+                                       RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                           "] Temperature is out of range for superheated refrigerant enthalpy: values capped **");
                     ShowContinueError(state, " Called From:" + CalledFrom);
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurTempRangeErrCount > 0) {
-                    ShowRecurringWarningErrorAtEnd(state, RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                        "] Temperature is out of range for superheated refrigerant enthalpy: values capped **",
                                                    state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyTempErrIndex,
                                                    Temperature,
@@ -6737,14 +6987,17 @@ CurrentModuleObject,
 
                 // send pressure range error if flagged
                 state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyPresErrCount += CurPresRangeErrCount;
-                if (CurPresRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyPresErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
-                                       "] Pressure is out of range for superheated refrigerant enthalpy: values capped **");
+                if (CurPresRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyPresErrCount <=
+                                                    state.dataFluidProps->RefrigerantErrorLimitTest) {
+                    ShowWarningMessage(state,
+                                       RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                           "] Pressure is out of range for superheated refrigerant enthalpy: values capped **");
                     ShowContinueError(state, " Called From:" + CalledFrom);
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurPresRangeErrCount > 0) {
-                    ShowRecurringWarningErrorAtEnd(state, RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                        "] Pressure is out of range for superheated refrigerant enthalpy: values capped **",
                                                    state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyPresErrIndex,
                                                    Pressure,
@@ -6849,7 +7102,6 @@ CurrentModuleObject,
         int CurEnthalpyRangeErrCount; // error counter for current call
         int CurSatErrCount;           // error counter for current call
 
-
         if (state.dataFluidProps->GetInput) {
             GetFluidPropertiesData(state);
             state.dataFluidProps->GetInput = false;
@@ -6857,7 +7109,8 @@ CurrentModuleObject,
 
         RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(
+                state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
         }
 
         ErrCount = 0;
@@ -6873,7 +7126,14 @@ CurrentModuleObject,
             // Find which refrigerant (index) is being requested
             RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(state,
+                                             state.dataFluidProps->NumOfRefrigerants,
+                                             RefrigNum,
+                                             true,
+                                             Refrigerant,
+                                             "GetSupHeatPressureRefrig",
+                                             "properties",
+                                             CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -7000,8 +7260,10 @@ CurrentModuleObject,
                 state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupPressureErrCount += CurSatErrCount;
                 // send warning
                 if (state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupPressureErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
-                    ShowSevereMessage(state, RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
-                                      "] is saturated at the given enthalpy and temperature, saturated enthalpy at given temperature returned. **");
+                    ShowSevereMessage(
+                        state,
+                        RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                            "] is saturated at the given enthalpy and temperature, saturated enthalpy at given temperature returned. **");
                     ShowContinueError(state, "...Called From:" + CalledFrom);
                     ShowContinueError(state, format("Refrigerant temperature = {:.2R}", Temperature));
                     ShowContinueError(state, format("Refrigerant Enthalpy = {:.3R}", Enthalpy));
@@ -7009,7 +7271,8 @@ CurrentModuleObject,
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurSatErrCount > 0) {
-                    ShowRecurringSevereErrorAtEnd(state, RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state,
+                                                  RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                       "] saturated at the given enthalpy and temperature **",
                                                   state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupPressureErrIndex,
                                                   ReturnValue,
@@ -7021,14 +7284,17 @@ CurrentModuleObject,
 
                 // send temp range error if flagged
                 state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupPressureTempErrCount += CurTempRangeErrCount;
-                if (CurTempRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupPressureTempErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
-                                       "] Temperature is out of range for superheated refrigerant pressure: values capped **");
+                if (CurTempRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupPressureTempErrCount <=
+                                                    state.dataFluidProps->RefrigerantErrorLimitTest) {
+                    ShowWarningMessage(state,
+                                       RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                           "] Temperature is out of range for superheated refrigerant pressure: values capped **");
                     ShowContinueError(state, " Called From:" + CalledFrom);
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurTempRangeErrCount > 0) {
-                    ShowRecurringWarningErrorAtEnd(state, RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                        "] Temperature is out of range for superheated refrigerant pressure: values capped **",
                                                    state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupPressureTempErrIndex,
                                                    Temperature,
@@ -7040,14 +7306,17 @@ CurrentModuleObject,
 
                 // send enthalpy range error if flagged
                 state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupPressureEnthErrCount += CurEnthalpyRangeErrCount;
-                if (CurEnthalpyRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupPressureEnthErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
-                                       "] Pressure is out of range for superheated refrigerant enthalpy: values capped **");
+                if (CurEnthalpyRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupPressureEnthErrCount <=
+                                                        state.dataFluidProps->RefrigerantErrorLimitTest) {
+                    ShowWarningMessage(state,
+                                       RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                           "] Pressure is out of range for superheated refrigerant enthalpy: values capped **");
                     ShowContinueError(state, " Called From:" + CalledFrom);
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurEnthalpyRangeErrCount > 0) {
-                    ShowRecurringWarningErrorAtEnd(state, RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                        "] Pressure is out of range for superheated refrigerant pressure: values capped **",
                                                    state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupPressureEnthErrIndex,
                                                    Enthalpy,
@@ -7112,7 +7381,8 @@ CurrentModuleObject,
 
         RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(
+                state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
         }
 
         // Find which refrigerant (index) is being requested and then determine
@@ -7123,7 +7393,14 @@ CurrentModuleObject,
             // Find which refrigerant (index) is being requested
             RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(state,
+                                             state.dataFluidProps->NumOfRefrigerants,
+                                             RefrigNum,
+                                             true,
+                                             Refrigerant,
+                                             "GetSupHeatPressureRefrig",
+                                             "properties",
+                                             CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -7134,22 +7411,25 @@ CurrentModuleObject,
         RefTSat = GetSatTemperatureRefrig(state, Refrigerant, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom);
 
         if (TempLow < RefTSat) {
-            ShowWarningMessage(state, RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
-                               "] temperature lower bound is out of range for superheated refrigerant: values capped **");
+            ShowWarningMessage(state,
+                               RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                   "] temperature lower bound is out of range for superheated refrigerant: values capped **");
             ShowContinueError(state, " Called From:" + CalledFrom);
             ShowContinueErrorTimeStamp(state, "");
             TempLow = RefTSat;
         }
         if (TempUp > RefTHigh) {
-            ShowWarningMessage(state, RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
-                               "] temperature lower bound is out of range for superheated refrigerant: values capped **");
+            ShowWarningMessage(state,
+                               RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                   "] temperature lower bound is out of range for superheated refrigerant: values capped **");
             ShowContinueError(state, " Called From:" + CalledFrom);
             ShowContinueErrorTimeStamp(state, "");
             TempUp = RefTHigh;
         }
         if (TempLow >= TempUp) {
-            ShowWarningMessage(state, RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
-                               "] temperature lower bound is out of range for superheated refrigerant: values capped **");
+            ShowWarningMessage(state,
+                               RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                   "] temperature lower bound is out of range for superheated refrigerant: values capped **");
             ShowContinueError(state, " Called From:" + CalledFrom);
             ShowContinueErrorTimeStamp(state, "");
             TempLow = RefTSat;
@@ -7331,7 +7611,8 @@ CurrentModuleObject,
 
         RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(
+                state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
         }
 
         ErrCount = 0; // initialize for this call
@@ -7347,7 +7628,8 @@ CurrentModuleObject,
             // Find which refrigerant (index) is being requested
             RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(
+                    state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -7437,8 +7719,9 @@ CurrentModuleObject,
             state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupDensityErrCount += state.dataFluidProps->SatErrCountGetSupHeatDensityRefrig;
             // send warning
             if (state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupDensityErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
-                ShowWarningMessage(state, RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
-                                   "] is saturated at the given conditions, saturated density at given temperature returned. **");
+                ShowWarningMessage(state,
+                                   RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                       "] is saturated at the given conditions, saturated density at given temperature returned. **");
                 ShowContinueError(state, "...Called From:" + CalledFrom);
                 ShowContinueError(state, format("Refrigerant temperature = {:.2R}", Temperature));
                 ShowContinueError(state, format("Refrigerant pressure = {:.0R}", Pressure));
@@ -7446,7 +7729,8 @@ CurrentModuleObject,
                 ShowContinueErrorTimeStamp(state, "");
             }
             if (state.dataFluidProps->SatErrCountGetSupHeatDensityRefrig > 0) {
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                    "] saturated at the given conditions **",
                                                state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrIndex,
                                                Temperature,
@@ -7463,14 +7747,17 @@ CurrentModuleObject,
             if (ErrCount > 0) {
                 // send temp range error if flagged
                 state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupDensityTempErrCount += CurTempRangeErrCount;
-                if (CurTempRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupDensityTempErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
-                                       "] Temperature is out of range for superheated refrigerant density: values capped **");
+                if (CurTempRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupDensityTempErrCount <=
+                                                    state.dataFluidProps->RefrigerantErrorLimitTest) {
+                    ShowWarningMessage(state,
+                                       RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                           "] Temperature is out of range for superheated refrigerant density: values capped **");
                     ShowContinueError(state, " Called From:" + CalledFrom);
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurTempRangeErrCount > 0) {
-                    ShowRecurringWarningErrorAtEnd(state, RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                        "] Temperature is out of range for superheated refrigerant density: values capped **",
                                                    state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupDensityTempErrIndex,
                                                    Temperature,
@@ -7482,14 +7769,17 @@ CurrentModuleObject,
 
                 // send pressure range error if flagged
                 state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupDensityPresErrCount += CurPresRangeErrCount;
-                if (CurPresRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupDensityPresErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
-                                       "] Pressure is out of range for superheated refrigerant density: values capped **");
+                if (CurPresRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupDensityPresErrCount <=
+                                                    state.dataFluidProps->RefrigerantErrorLimitTest) {
+                    ShowWarningMessage(state,
+                                       RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                           "] Pressure is out of range for superheated refrigerant density: values capped **");
                     ShowContinueError(state, " Called From:" + CalledFrom);
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurPresRangeErrCount > 0) {
-                    ShowRecurringWarningErrorAtEnd(state, RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                        "] Pressure is out of range for superheated refrigerant density: values capped **",
                                                    state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupDensityPresErrIndex,
                                                    Pressure,
@@ -7561,7 +7851,9 @@ CurrentModuleObject,
 
         // If no glycols, no fluid properties can be evaluated
         int GlycolNum(0);
-        if (state.dataFluidProps->NumOfGlycols == 0) ReportFatalGlycolErrors(state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom);
+        if (state.dataFluidProps->NumOfGlycols == 0)
+            ReportFatalGlycolErrors(
+                state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom);
 
         // If glycol index has not yet been found for this fluid, find its value now
         if (GlycolIndex > 0) {
@@ -7569,7 +7861,8 @@ CurrentModuleObject,
         } else { // Find which glycol (index) is being requested
             GlycolNum = FindGlycol(state, Glycol);
             if (GlycolNum == 0) {
-                ReportFatalGlycolErrors(state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom);
+                ReportFatalGlycolErrors(
+                    state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom);
             }
             GlycolIndex = GlycolNum;
         }
@@ -7577,16 +7870,25 @@ CurrentModuleObject,
 
         // If user didn't input data (shouldn't get this far, but just in case...), we can't find a value
         if (!glycol_data.CpDataPresent) {
-            ReportFatalGlycolErrors(state, state.dataFluidProps->NumOfGlycols, GlycolNum, glycol_data.CpDataPresent, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom);
+            ReportFatalGlycolErrors(state,
+                                    state.dataFluidProps->NumOfGlycols,
+                                    GlycolNum,
+                                    glycol_data.CpDataPresent,
+                                    Glycol,
+                                    "GetSpecificHeatGlycol",
+                                    "specific heat",
+                                    CalledFrom);
         }
 
         // Now determine the value of specific heat using interpolation
         if (Temperature < glycol_data.CpLowTempValue) { // Temperature too low
             if (!state.dataGlobal->WarmupFlag) {
-                state.dataFluidProps->LowTempLimitErrGetSpecificHeatGlycol_raw = ++state.dataFluidProps->GlycolErrorTracking(GlycolIndex).SpecHeatLowErrCount;
+                state.dataFluidProps->LowTempLimitErrGetSpecificHeatGlycol_raw =
+                    ++state.dataFluidProps->GlycolErrorTracking(GlycolIndex).SpecHeatLowErrCount;
                 if (state.dataFluidProps->LowTempLimitErrGetSpecificHeatGlycol_raw <= state.dataFluidProps->GlycolErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + "Temperature is out of range (too low) for fluid [" + glycol_data.Name +
-                                       "] specific heat supplied values **");
+                    ShowWarningMessage(state,
+                                       RoutineName + "Temperature is out of range (too low) for fluid [" + glycol_data.Name +
+                                           "] specific heat supplied values **");
                     ShowContinueError(state,
                                       format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                              CalledFrom,
@@ -7595,7 +7897,8 @@ CurrentModuleObject,
                                              glycol_data.CpHighTempValue));
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Temperature out of range (too low) for fluid [" + glycol_data.Name +
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Temperature out of range (too low) for fluid [" + glycol_data.Name +
                                                    "] specific heat **",
                                                state.dataFluidProps->GlycolErrorTracking(GlycolIndex).SpecHeatLowErrIndex,
                                                Temperature,
@@ -7607,9 +7910,11 @@ CurrentModuleObject,
             return glycol_data.CpValues(glycol_data.CpLowTempIndex);
         } else if (Temperature > glycol_data.CpHighTempValue) { // Temperature too high
             if (!state.dataGlobal->WarmupFlag) {
-                state.dataFluidProps->HighTempLimitErrGetSpecificHeatGlycol_raw = ++state.dataFluidProps->GlycolErrorTracking(GlycolIndex).SpecHeatHighErrCount;
+                state.dataFluidProps->HighTempLimitErrGetSpecificHeatGlycol_raw =
+                    ++state.dataFluidProps->GlycolErrorTracking(GlycolIndex).SpecHeatHighErrCount;
                 if (state.dataFluidProps->HighTempLimitErrGetSpecificHeatGlycol_raw <= state.dataFluidProps->GlycolErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + "Temperature is out of range (too high) for fluid [" + glycol_data.Name + "] specific heat **");
+                    ShowWarningMessage(state,
+                                       RoutineName + "Temperature is out of range (too high) for fluid [" + glycol_data.Name + "] specific heat **");
                     ShowContinueError(state,
                                       format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                              CalledFrom,
@@ -7618,7 +7923,8 @@ CurrentModuleObject,
                                              glycol_data.CpHighTempValue));
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Temperature out of range (too high) for fluid [" + glycol_data.Name +
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Temperature out of range (too high) for fluid [" + glycol_data.Name +
                                                    "] specific heat **",
                                                state.dataFluidProps->GlycolErrorTracking(GlycolIndex).SpecHeatHighErrIndex,
                                                Temperature,
@@ -7715,7 +8021,8 @@ CurrentModuleObject,
 
         // If no glycols, no fluid properties can be evaluated
         GlycolNum = 0;
-        if (state.dataFluidProps->NumOfGlycols == 0) ReportFatalGlycolErrors(state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetDensityGlycol", "density", CalledFrom);
+        if (state.dataFluidProps->NumOfGlycols == 0)
+            ReportFatalGlycolErrors(state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetDensityGlycol", "density", CalledFrom);
 
         // If glycol index has not yet been found for this fluid, find its value now
         if (GlycolIndex > 0) {
@@ -7723,7 +8030,8 @@ CurrentModuleObject,
         } else { // Find which refrigerant (index) is being requested
             GlycolNum = FindGlycol(state, Glycol);
             if (GlycolNum == 0) {
-                ReportFatalGlycolErrors(state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetDensityGlycol", "density", CalledFrom);
+                ReportFatalGlycolErrors(
+                    state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetDensityGlycol", "density", CalledFrom);
             }
             GlycolIndex = GlycolNum;
         }
@@ -7731,7 +8039,13 @@ CurrentModuleObject,
         // If user didn't input data (shouldn't get this far, but just in case...), we can't find a value
         if (!state.dataFluidProps->GlycolData(GlycolIndex).RhoDataPresent) {
             ReportFatalGlycolErrors(state,
-                state.dataFluidProps->NumOfGlycols, GlycolNum, state.dataFluidProps->GlycolData(GlycolIndex).RhoDataPresent, Glycol, "GetDensityGlycol", "density", CalledFrom);
+                                    state.dataFluidProps->NumOfGlycols,
+                                    GlycolNum,
+                                    state.dataFluidProps->GlycolData(GlycolIndex).RhoDataPresent,
+                                    Glycol,
+                                    "GetDensityGlycol",
+                                    "density",
+                                    CalledFrom);
         }
 
         // Now determine the value of specific heat using interpolation
@@ -7744,7 +8058,9 @@ CurrentModuleObject,
         } else { // Temperature somewhere between the lowest and highest value
             ReturnValue = state.dataFluidProps->GlycolData(GlycolIndex).RhoValues(state.dataFluidProps->GlycolData(GlycolIndex).RhoLowTempIndex);
             // bracket is temp > low, <= high (for interpolation
-            for (Loop = state.dataFluidProps->GlycolData(GlycolIndex).RhoLowTempIndex + 1; Loop <= state.dataFluidProps->GlycolData(GlycolIndex).RhoHighTempIndex; ++Loop) {
+            for (Loop = state.dataFluidProps->GlycolData(GlycolIndex).RhoLowTempIndex + 1;
+                 Loop <= state.dataFluidProps->GlycolData(GlycolIndex).RhoHighTempIndex;
+                 ++Loop) {
                 if (Temperature > state.dataFluidProps->GlycolData(GlycolIndex).RhoTemps(Loop)) continue;
                 ReturnValue = GetInterpValue(state,
                                              Temperature,
@@ -7769,7 +8085,9 @@ CurrentModuleObject,
             }
 
             if ((LowErrorThisTime) && (state.dataFluidProps->LowTempLimitErrGetDensityGlycol <= state.dataFluidProps->GlycolErrorLimitTest)) {
-                ShowWarningMessage(state, RoutineName + "Temperature is out of range (too low) for fluid [" + state.dataFluidProps->GlycolData(GlycolIndex).Name + "] density **");
+                ShowWarningMessage(state,
+                                   RoutineName + "Temperature is out of range (too low) for fluid [" +
+                                       state.dataFluidProps->GlycolData(GlycolIndex).Name + "] density **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                          CalledFrom,
@@ -7779,8 +8097,9 @@ CurrentModuleObject,
                 ShowContinueErrorTimeStamp(state, "");
             }
             if (LowErrorThisTime) {
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Temperature out of range (too low) for fluid [" + state.dataFluidProps->GlycolData(GlycolIndex).Name +
-                                                   "] density **",
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Temperature out of range (too low) for fluid [" +
+                                                   state.dataFluidProps->GlycolData(GlycolIndex).Name + "] density **",
                                                state.dataFluidProps->GlycolErrorTracking(GlycolIndex).DensityLowErrIndex,
                                                Temperature,
                                                Temperature,
@@ -7790,8 +8109,9 @@ CurrentModuleObject,
             }
 
             if ((HighErrorThisTime) && (state.dataFluidProps->HighTempLimitErrGetDensityGlycol <= state.dataFluidProps->GlycolErrorLimitTest)) {
-                ShowWarningMessage(state, RoutineName + "Temperature is out of range (too high) for fluid [" + state.dataFluidProps->GlycolData(GlycolIndex).Name +
-                                   "] density **");
+                ShowWarningMessage(state,
+                                   RoutineName + "Temperature is out of range (too high) for fluid [" +
+                                       state.dataFluidProps->GlycolData(GlycolIndex).Name + "] density **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                          CalledFrom,
@@ -7801,8 +8121,9 @@ CurrentModuleObject,
                 ShowContinueErrorTimeStamp(state, "");
             }
             if (HighErrorThisTime) {
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Temperature out of range (too high) for fluid [" + state.dataFluidProps->GlycolData(GlycolIndex).Name +
-                                                   "] density **",
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Temperature out of range (too high) for fluid [" +
+                                                   state.dataFluidProps->GlycolData(GlycolIndex).Name + "] density **",
                                                state.dataFluidProps->GlycolErrorTracking(GlycolIndex).DensityHighErrIndex,
                                                Temperature,
                                                Temperature,
@@ -7880,7 +8201,9 @@ CurrentModuleObject,
 
         // If no glycols, no fluid properties can be evaluated
         GlycolNum = 0;
-        if (state.dataFluidProps->NumOfGlycols == 0) ReportFatalGlycolErrors(state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetConductivityGlycol", "conductivity", CalledFrom);
+        if (state.dataFluidProps->NumOfGlycols == 0)
+            ReportFatalGlycolErrors(
+                state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetConductivityGlycol", "conductivity", CalledFrom);
 
         // If glycol index has not yet been found for this fluid, find its value now
         if (GlycolIndex > 0) {
@@ -7888,7 +8211,8 @@ CurrentModuleObject,
         } else { // Find which refrigerant (index) is being requested
             GlycolNum = FindGlycol(state, Glycol);
             if (GlycolNum == 0) {
-                ReportFatalGlycolErrors(state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetConductivityGlycol", "conductivity", CalledFrom);
+                ReportFatalGlycolErrors(
+                    state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetConductivityGlycol", "conductivity", CalledFrom);
             }
             GlycolIndex = GlycolNum;
         }
@@ -7896,7 +8220,13 @@ CurrentModuleObject,
         // If user didn't input data (shouldn't get this far, but just in case...), we can't find a value
         if (!state.dataFluidProps->GlycolData(GlycolIndex).CondDataPresent) {
             ReportFatalGlycolErrors(state,
-                state.dataFluidProps->NumOfGlycols, GlycolNum, state.dataFluidProps->GlycolData(GlycolIndex).CondDataPresent, Glycol, "GetConductivityGlycol", "conductivity", CalledFrom);
+                                    state.dataFluidProps->NumOfGlycols,
+                                    GlycolNum,
+                                    state.dataFluidProps->GlycolData(GlycolIndex).CondDataPresent,
+                                    Glycol,
+                                    "GetConductivityGlycol",
+                                    "conductivity",
+                                    CalledFrom);
         }
 
         // Now determine the value of specific heat using interpolation
@@ -7909,7 +8239,9 @@ CurrentModuleObject,
         } else { // Temperature somewhere between the lowest and highest value
             ReturnValue = state.dataFluidProps->GlycolData(GlycolIndex).CondValues(state.dataFluidProps->GlycolData(GlycolIndex).CondLowTempIndex);
             // bracket is temp > low, <= high (for interpolation
-            for (Loop = state.dataFluidProps->GlycolData(GlycolIndex).CondLowTempIndex + 1; Loop <= state.dataFluidProps->GlycolData(GlycolIndex).CondHighTempIndex; ++Loop) {
+            for (Loop = state.dataFluidProps->GlycolData(GlycolIndex).CondLowTempIndex + 1;
+                 Loop <= state.dataFluidProps->GlycolData(GlycolIndex).CondHighTempIndex;
+                 ++Loop) {
                 if (Temperature > state.dataFluidProps->GlycolData(GlycolIndex).CondTemps(Loop)) continue;
                 ReturnValue = GetInterpValue(state,
                                              Temperature,
@@ -7926,16 +8258,19 @@ CurrentModuleObject,
 
             if (LowErrorThisTime) {
                 ++state.dataFluidProps->GlycolErrorTracking(GlycolIndex).ConductivityLowErrCount;
-                state.dataFluidProps->LowTempLimitErrGetConductivityGlycol = state.dataFluidProps->GlycolErrorTracking(GlycolIndex).ConductivityLowErrCount;
+                state.dataFluidProps->LowTempLimitErrGetConductivityGlycol =
+                    state.dataFluidProps->GlycolErrorTracking(GlycolIndex).ConductivityLowErrCount;
             }
             if (HighErrorThisTime) {
                 ++state.dataFluidProps->GlycolErrorTracking(GlycolIndex).ConductivityHighErrCount;
-                state.dataFluidProps->HighTempLimitErrGetConductivityGlycol = state.dataFluidProps->GlycolErrorTracking(GlycolIndex).ConductivityHighErrCount;
+                state.dataFluidProps->HighTempLimitErrGetConductivityGlycol =
+                    state.dataFluidProps->GlycolErrorTracking(GlycolIndex).ConductivityHighErrCount;
             }
 
             if ((LowErrorThisTime) && (state.dataFluidProps->LowTempLimitErrGetConductivityGlycol <= state.dataFluidProps->GlycolErrorLimitTest)) {
-                ShowWarningMessage(state, RoutineName + "Temperature is out of range (too low) for fluid [" + state.dataFluidProps->GlycolData(GlycolIndex).Name +
-                                   "] conductivity **");
+                ShowWarningMessage(state,
+                                   RoutineName + "Temperature is out of range (too low) for fluid [" +
+                                       state.dataFluidProps->GlycolData(GlycolIndex).Name + "] conductivity **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                          CalledFrom,
@@ -7945,8 +8280,9 @@ CurrentModuleObject,
                 ShowContinueErrorTimeStamp(state, "");
             }
             if (LowErrorThisTime) {
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Temperature out of range (too low) for fluid [" + state.dataFluidProps->GlycolData(GlycolIndex).Name +
-                                                   "] conductivity **",
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Temperature out of range (too low) for fluid [" +
+                                                   state.dataFluidProps->GlycolData(GlycolIndex).Name + "] conductivity **",
                                                state.dataFluidProps->GlycolErrorTracking(GlycolIndex).ConductivityLowErrIndex,
                                                Temperature,
                                                Temperature,
@@ -7956,8 +8292,9 @@ CurrentModuleObject,
             }
 
             if ((HighErrorThisTime) && (state.dataFluidProps->HighTempLimitErrGetConductivityGlycol <= state.dataFluidProps->GlycolErrorLimitTest)) {
-                ShowWarningMessage(state, RoutineName + "Temperature is out of range (too high) for fluid [" + state.dataFluidProps->GlycolData(GlycolIndex).Name +
-                                   "] conductivity **");
+                ShowWarningMessage(state,
+                                   RoutineName + "Temperature is out of range (too high) for fluid [" +
+                                       state.dataFluidProps->GlycolData(GlycolIndex).Name + "] conductivity **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                          CalledFrom,
@@ -7967,8 +8304,9 @@ CurrentModuleObject,
                 ShowContinueErrorTimeStamp(state, "");
             }
             if (HighErrorThisTime) {
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Temperature out of range (too high) for fluid [" + state.dataFluidProps->GlycolData(GlycolIndex).Name +
-                                                   "] conductivity **",
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Temperature out of range (too high) for fluid [" +
+                                                   state.dataFluidProps->GlycolData(GlycolIndex).Name + "] conductivity **",
                                                state.dataFluidProps->GlycolErrorTracking(GlycolIndex).ConductivityHighErrIndex,
                                                Temperature,
                                                Temperature,
@@ -8046,7 +8384,9 @@ CurrentModuleObject,
 
         // If no glycols, no fluid properties can be evaluated
         GlycolNum = 0;
-        if (state.dataFluidProps->NumOfGlycols == 0) ReportFatalGlycolErrors(state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetViscosityGlycol", "viscosity", CalledFrom);
+        if (state.dataFluidProps->NumOfGlycols == 0)
+            ReportFatalGlycolErrors(
+                state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetViscosityGlycol", "viscosity", CalledFrom);
 
         // If glycol index has not yet been found for this fluid, find its value now
         if (GlycolIndex > 0) {
@@ -8054,7 +8394,8 @@ CurrentModuleObject,
         } else { // Find which refrigerant (index) is being requested
             GlycolNum = FindGlycol(state, Glycol);
             if (GlycolNum == 0) {
-                ReportFatalGlycolErrors(state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetViscosityGlycol", "viscosity", CalledFrom);
+                ReportFatalGlycolErrors(
+                    state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetViscosityGlycol", "viscosity", CalledFrom);
             }
             GlycolIndex = GlycolNum;
         }
@@ -8062,7 +8403,13 @@ CurrentModuleObject,
         // If user didn't input data (shouldn't get this far, but just in case...), we can't find a value
         if (!state.dataFluidProps->GlycolData(GlycolIndex).ViscDataPresent) {
             ReportFatalGlycolErrors(state,
-                state.dataFluidProps->NumOfGlycols, GlycolNum, state.dataFluidProps->GlycolData(GlycolIndex).ViscDataPresent, Glycol, "GetViscosityGlycol", "viscosity", CalledFrom);
+                                    state.dataFluidProps->NumOfGlycols,
+                                    GlycolNum,
+                                    state.dataFluidProps->GlycolData(GlycolIndex).ViscDataPresent,
+                                    Glycol,
+                                    "GetViscosityGlycol",
+                                    "viscosity",
+                                    CalledFrom);
         }
 
         // Now determine the value of specific heat using interpolation
@@ -8075,7 +8422,9 @@ CurrentModuleObject,
         } else { // Temperature somewhere between the lowest and highest value
             ReturnValue = state.dataFluidProps->GlycolData(GlycolIndex).ViscValues(state.dataFluidProps->GlycolData(GlycolIndex).ViscLowTempIndex);
             // bracket is temp > low, <= high (for interpolation
-            for (Loop = state.dataFluidProps->GlycolData(GlycolIndex).ViscLowTempIndex + 1; Loop <= state.dataFluidProps->GlycolData(GlycolIndex).ViscHighTempIndex; ++Loop) {
+            for (Loop = state.dataFluidProps->GlycolData(GlycolIndex).ViscLowTempIndex + 1;
+                 Loop <= state.dataFluidProps->GlycolData(GlycolIndex).ViscHighTempIndex;
+                 ++Loop) {
                 if (Temperature > state.dataFluidProps->GlycolData(GlycolIndex).ViscTemps(Loop)) continue;
                 ReturnValue = GetInterpValue(state,
                                              Temperature,
@@ -8096,12 +8445,14 @@ CurrentModuleObject,
             }
             if (HighErrorThisTime) {
                 ++state.dataFluidProps->GlycolErrorTracking(GlycolIndex).ViscosityHighErrCount;
-                state.dataFluidProps->HighTempLimitErrGetViscosityGlycol = state.dataFluidProps->GlycolErrorTracking(GlycolIndex).ViscosityHighErrCount;
+                state.dataFluidProps->HighTempLimitErrGetViscosityGlycol =
+                    state.dataFluidProps->GlycolErrorTracking(GlycolIndex).ViscosityHighErrCount;
             }
 
             if ((LowErrorThisTime) && (state.dataFluidProps->LowTempLimitErrGetViscosityGlycol <= state.dataFluidProps->GlycolErrorLimitTest)) {
-                ShowWarningMessage(state, RoutineName + "Temperature is out of range (too low) for fluid [" + state.dataFluidProps->GlycolData(GlycolIndex).Name +
-                                   "] viscosity **");
+                ShowWarningMessage(state,
+                                   RoutineName + "Temperature is out of range (too low) for fluid [" +
+                                       state.dataFluidProps->GlycolData(GlycolIndex).Name + "] viscosity **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                          CalledFrom,
@@ -8111,8 +8462,9 @@ CurrentModuleObject,
                 ShowContinueErrorTimeStamp(state, "");
             }
             if (LowErrorThisTime) {
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Temperature out of range (too low) for fluid [" + state.dataFluidProps->GlycolData(GlycolIndex).Name +
-                                                   "] viscosity **",
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Temperature out of range (too low) for fluid [" +
+                                                   state.dataFluidProps->GlycolData(GlycolIndex).Name + "] viscosity **",
                                                state.dataFluidProps->GlycolErrorTracking(GlycolIndex).ViscosityLowErrIndex,
                                                Temperature,
                                                Temperature,
@@ -8122,8 +8474,9 @@ CurrentModuleObject,
             }
 
             if ((HighErrorThisTime) && (state.dataFluidProps->HighTempLimitErrGetViscosityGlycol <= state.dataFluidProps->GlycolErrorLimitTest)) {
-                ShowWarningMessage(state, RoutineName + "Temperature is out of range (too high) for fluid [" + state.dataFluidProps->GlycolData(GlycolIndex).Name +
-                                   "] viscosity **");
+                ShowWarningMessage(state,
+                                   RoutineName + "Temperature is out of range (too high) for fluid [" +
+                                       state.dataFluidProps->GlycolData(GlycolIndex).Name + "] viscosity **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                          CalledFrom,
@@ -8133,8 +8486,9 @@ CurrentModuleObject,
                 ShowContinueErrorTimeStamp(state, "");
             }
             if (HighErrorThisTime) {
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Temperature out of range (too high) for fluid [" + state.dataFluidProps->GlycolData(GlycolIndex).Name +
-                                                   "] viscosity **",
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Temperature out of range (too high) for fluid [" +
+                                                   state.dataFluidProps->GlycolData(GlycolIndex).Name + "] viscosity **",
                                                state.dataFluidProps->GlycolErrorTracking(GlycolIndex).ViscosityHighErrIndex,
                                                Temperature,
                                                Temperature,
@@ -8213,7 +8567,8 @@ CurrentModuleObject,
 
         RefrigNum = 0;
         if (state.dataFluidProps->NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetQualityRefrig", "enthalpy", CalledFrom);
+            ReportFatalRefrigerantErrors(
+                state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetQualityRefrig", "enthalpy", CalledFrom);
         }
 
         // Find which refrigerant (index) is being requested and then determine
@@ -8224,7 +8579,8 @@ CurrentModuleObject,
             // Find which refrigerant (index) is being requested
             RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetQualityRefrig", "enthalpy", CalledFrom);
+                ReportFatalRefrigerantErrors(
+                    state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetQualityRefrig", "enthalpy", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -8239,7 +8595,8 @@ CurrentModuleObject,
             SatVapEnthalpy = refrig.HfgValues(refrig.HfLowTempIndex);
             // Temperature supplied is out of bounds--produce an error message...
             if (!state.dataGlobal->WarmupFlag)
-                ShowRecurringWarningErrorAtEnd(state, "GetQualityRefrig: ** Temperature for requested quality is below the range of data supplied **",
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "GetQualityRefrig: ** Temperature for requested quality is below the range of data supplied **",
                                                state.dataFluidProps->TempLoRangeErrIndexGetQualityRefrig,
                                                Temperature,
                                                Temperature,
@@ -8252,7 +8609,8 @@ CurrentModuleObject,
             SatVapEnthalpy = refrig.HfgValues(refrig.HfHighTempIndex);
             // Temperature supplied is out of bounds--produce an error message...
             if (!state.dataGlobal->WarmupFlag)
-                ShowRecurringWarningErrorAtEnd(state, "GetQualityRefrig: ** Temperature requested quality is above the range of data supplied **",
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "GetQualityRefrig: ** Temperature requested quality is above the range of data supplied **",
                                                state.dataFluidProps->TempHiRangeErrIndexGetQualityRefrig,
                                                Temperature,
                                                Temperature,
@@ -8310,7 +8668,6 @@ CurrentModuleObject,
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Found; // Indicator for found item
 
-
         // Make sure we have already read in the input
         if (state.dataFluidProps->GetInput) {
             GetFluidPropertiesData(state);
@@ -8356,7 +8713,6 @@ CurrentModuleObject,
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Found; // Indicator for found item
-
 
         // Make sure we have already read in the input
         if (state.dataFluidProps->GetInput) {
@@ -8424,8 +8780,6 @@ CurrentModuleObject,
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
-
-
 
         // Check to see if this glycol shows up in the glycol data
         //  ArrayLength = SIZE(GlycolData)
@@ -8598,7 +8952,7 @@ CurrentModuleObject,
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         // error counters and dummy string
-        bool ErrorFlag(false);           // error flag for current call
+        bool ErrorFlag(false); // error flag for current call
 
         int const LoTempIndex = FindArrayIndex(Temperature, PropTemps, LowBound, UpperBound); // array index for temp above input temp
 
@@ -8635,7 +8989,8 @@ CurrentModuleObject,
                 ShowContinueError(state, format("Refrigerant temperature = {:.2R}", Temperature));
                 ShowContinueError(state, format("Returned saturated property value = {:.3R}", ReturnValue));
             } else {
-                ShowRecurringWarningErrorAtEnd(state, "GetInterpolatedSatProp: Refrigerant temperature for interpolation out of range error",
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "GetInterpolatedSatProp: Refrigerant temperature for interpolation out of range error",
                                                state.dataFluidProps->TempRangeErrIndexGetInterpolatedSatProp,
                                                Temperature,
                                                Temperature,
@@ -8650,7 +9005,8 @@ CurrentModuleObject,
 
     //*****************************************************************************
 
-    int CheckFluidPropertyName(EnergyPlusData &state, std::string const &NameToCheck) // Name from input(?) to be checked against valid FluidPropertyNames
+    int CheckFluidPropertyName(EnergyPlusData &state,
+                               std::string const &NameToCheck) // Name from input(?) to be checked against valid FluidPropertyNames
     {
 
         // FUNCTION INFORMATION:
@@ -8680,7 +9036,8 @@ CurrentModuleObject,
         }
         if (Found == 0) {
             if (state.dataFluidProps->NumOfGlycols > 0) {
-                Found = UtilityRoutines::FindItemInList(NameToCheck, state.dataFluidProps->GlycolData, state.dataFluidProps->NumOfGlycols); // GlycolData is allocated to NumOfGlyConcs
+                Found = UtilityRoutines::FindItemInList(
+                    NameToCheck, state.dataFluidProps->GlycolData, state.dataFluidProps->NumOfGlycols); // GlycolData is allocated to NumOfGlyConcs
             }
         }
 
@@ -8799,13 +9156,15 @@ CurrentModuleObject,
         RefrigNo = FindRefrigerant(state, GlycolName);
 
         if (NumGlycols == 0) {
-            ShowSevereError(state, RoutineName + ": no glycols found -- cannot evaluate fluid " + Property + " for \"" + GlycolName +
-                            "\", called from: " + CalledFrom);
+            ShowSevereError(state,
+                            RoutineName + ": no glycols found -- cannot evaluate fluid " + Property + " for \"" + GlycolName +
+                                "\", called from: " + CalledFrom);
         } else if (GlycolNum == 0) {
             ShowSevereError(state, RoutineName + ": data not found in input for requested glycol \"" + GlycolName + "\", called from: " + CalledFrom);
         } else if (!DataPresent) {
-            ShowSevereError(state, RoutineName + ": " + Property + " data not found in input for requested glycol \"" + GlycolName +
-                            "\", called from: " + CalledFrom);
+            ShowSevereError(state,
+                            RoutineName + ": " + Property + " data not found in input for requested glycol \"" + GlycolName +
+                                "\", called from: " + CalledFrom);
         }
         if (RefrigNo > 0) ShowContinueError(state, "Note: that fluid is listed as a Refrigerant from input.");
 
@@ -8860,14 +9219,16 @@ CurrentModuleObject,
         GlycolNo = FindGlycol(state, RefrigerantName);
 
         if (NumRefrigerants == 0) {
-            ShowSevereError(state, RoutineName + ": no refrigerants found -- cannot evaluate fluid " + Property + " for \"" + RefrigerantName +
-                            "\", called from: " + CalledFrom);
+            ShowSevereError(state,
+                            RoutineName + ": no refrigerants found -- cannot evaluate fluid " + Property + " for \"" + RefrigerantName +
+                                "\", called from: " + CalledFrom);
         } else if (RefrigerantNum == 0) {
-            ShowSevereError(state, RoutineName + ": data not found in input for requested refrigerant \"" + RefrigerantName +
-                            "\", called from: " + CalledFrom);
+            ShowSevereError(
+                state, RoutineName + ": data not found in input for requested refrigerant \"" + RefrigerantName + "\", called from: " + CalledFrom);
         } else if (!DataPresent) {
-            ShowSevereError(state, RoutineName + ": " + Property + " data not found in input for requested refrigerant \"" + RefrigerantName +
-                            "\", called from: " + CalledFrom);
+            ShowSevereError(state,
+                            RoutineName + ": " + Property + " data not found in input for requested refrigerant \"" + RefrigerantName +
+                                "\", called from: " + CalledFrom);
         }
         if (GlycolNo > 0) ShowContinueError(state, "Note: that fluid is listed as a Glycol from input.");
 
@@ -8968,7 +9329,8 @@ CurrentModuleObject,
         }
     }
 
-    GlycolAPI::GlycolAPI(EnergyPlusData &state, std::string const &glycolName) {
+    GlycolAPI::GlycolAPI(EnergyPlusData &state, std::string const &glycolName)
+    {
         this->glycolName = EnergyPlus::UtilityRoutines::MakeUPPERCase(glycolName);
         this->glycolIndex = 0;
         this->cf = "GlycolAPI:Instance";
@@ -8976,20 +9338,25 @@ CurrentModuleObject,
             EnergyPlus::ShowFatalError(state, "Can only do water right now");
         }
     }
-    Real64 GlycolAPI::specificHeat(EnergyPlusData &state, Real64 temperature) {
+    Real64 GlycolAPI::specificHeat(EnergyPlusData &state, Real64 temperature)
+    {
         return FluidProperties::GetSpecificHeatGlycol(state, this->glycolName, temperature, this->glycolIndex, this->cf);
     }
-    Real64 GlycolAPI::density(EnergyPlusData &state, Real64 temperature) {
+    Real64 GlycolAPI::density(EnergyPlusData &state, Real64 temperature)
+    {
         return FluidProperties::GetDensityGlycol(state, this->glycolName, temperature, this->glycolIndex, this->cf);
     }
-    Real64 GlycolAPI::conductivity(EnergyPlusData &state, Real64 temperature) {
+    Real64 GlycolAPI::conductivity(EnergyPlusData &state, Real64 temperature)
+    {
         return FluidProperties::GetConductivityGlycol(state, this->glycolName, temperature, this->glycolIndex, this->cf);
     }
-    Real64 GlycolAPI::viscosity(EnergyPlusData &state, Real64 temperature) {
+    Real64 GlycolAPI::viscosity(EnergyPlusData &state, Real64 temperature)
+    {
         return FluidProperties::GetViscosityGlycol(state, this->glycolName, temperature, this->glycolIndex, this->cf);
     }
 
-    RefrigerantAPI::RefrigerantAPI(EnergyPlusData &state, std::string const &refrigName) {
+    RefrigerantAPI::RefrigerantAPI(EnergyPlusData &state, std::string const &refrigName)
+    {
         this->rName = EnergyPlus::UtilityRoutines::MakeUPPERCase(refrigName);
         this->rIndex = 0;
         this->cf = "RefrigerantAPI:Instance";
@@ -8997,28 +9364,36 @@ CurrentModuleObject,
             EnergyPlus::ShowFatalError(state, "Can only do steam right now");
         }
     }
-    Real64 RefrigerantAPI::saturationPressure(EnergyPlusData &state, Real64 temperature) {
+    Real64 RefrigerantAPI::saturationPressure(EnergyPlusData &state, Real64 temperature)
+    {
         return FluidProperties::GetSatPressureRefrig(state, this->rName, temperature, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::saturationTemperature(EnergyPlusData &state, Real64 pressure) {
+    Real64 RefrigerantAPI::saturationTemperature(EnergyPlusData &state, Real64 pressure)
+    {
         return FluidProperties::GetSatTemperatureRefrig(state, this->rName, pressure, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::saturatedEnthalpy(EnergyPlusData &state, Real64 temperature, Real64 quality) {
+    Real64 RefrigerantAPI::saturatedEnthalpy(EnergyPlusData &state, Real64 temperature, Real64 quality)
+    {
         return FluidProperties::GetSatEnthalpyRefrig(state, this->rName, temperature, quality, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::saturatedDensity(EnergyPlusData &state, Real64 temperature, Real64 quality) {
+    Real64 RefrigerantAPI::saturatedDensity(EnergyPlusData &state, Real64 temperature, Real64 quality)
+    {
         return FluidProperties::GetSatDensityRefrig(state, this->rName, temperature, quality, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::saturatedSpecificHeat(EnergyPlusData &state, Real64 temperature, Real64 quality) {
+    Real64 RefrigerantAPI::saturatedSpecificHeat(EnergyPlusData &state, Real64 temperature, Real64 quality)
+    {
         return FluidProperties::GetSatSpecificHeatRefrig(state, this->rName, temperature, quality, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::superHeatedEnthalpy(EnergyPlusData &state, Real64 temperature, Real64 pressure) {
+    Real64 RefrigerantAPI::superHeatedEnthalpy(EnergyPlusData &state, Real64 temperature, Real64 pressure)
+    {
         return FluidProperties::GetSupHeatEnthalpyRefrig(state, this->rName, temperature, pressure, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::superHeatedPressure(EnergyPlusData &state, Real64 temperature, Real64 enthalpy) {
+    Real64 RefrigerantAPI::superHeatedPressure(EnergyPlusData &state, Real64 temperature, Real64 enthalpy)
+    {
         return FluidProperties::GetSupHeatPressureRefrig(state, this->rName, temperature, enthalpy, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::superHeatedDensity(EnergyPlusData &state, Real64 temperature, Real64 pressure) {
+    Real64 RefrigerantAPI::superHeatedDensity(EnergyPlusData &state, Real64 temperature, Real64 pressure)
+    {
         return FluidProperties::GetSupHeatDensityRefrig(state, this->rName, temperature, pressure, this->rIndex, this->cf);
     }
 

@@ -793,7 +793,8 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                 state->dataGlobal->BeginHourFlag = true;
                 state->dataGlobal->EndHourFlag = false;
 
-                for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
+                for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour;
+                     ++state->dataGlobal->TimeStep) {
 
                     state->dataGlobal->BeginTimeStepFlag = true;
 
@@ -1550,15 +1551,15 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
 
     // Check that we are outputing the correct values
     EXPECT_EQ("HeatPump:WaterToWater:EquationFit:Heating",
-              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechType,
-                                                               state->dataHPWaterToWaterSimple->GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(
+                  *state, state->dataOutRptPredefined->pdchMechType, state->dataHPWaterToWaterSimple->GSHP(1).Name));
 
     EXPECT_EQ("3.35",
-              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechNomEff,
-                                                               state->dataHPWaterToWaterSimple->GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(
+                  *state, state->dataOutRptPredefined->pdchMechNomEff, state->dataHPWaterToWaterSimple->GSHP(1).Name));
 
     EXPECT_EQ("7200.71",
-              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechNomCap,
-                                                               state->dataHPWaterToWaterSimple->GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(
+                  *state, state->dataOutRptPredefined->pdchMechNomCap, state->dataHPWaterToWaterSimple->GSHP(1).Name));
 }
 } // namespace EnergyPlus

@@ -110,7 +110,6 @@ TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
 
     // Additional tests for fuel type input
     EXPECT_EQ(thisBoiler.BoilerFuelTypeForOutputVariable, "NaturalGas");
-
 }
 
 TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
@@ -189,5 +188,5 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
     EXPECT_EQ(thisBoiler.BoilerLoad, 1000000);
     EXPECT_NEAR(thisBoiler.FuelUsed, 1562498, 1.0);
     Real64 ExpectedBoilerEff = thisBoiler.BoilerLoad / thisBoiler.FuelUsed;
-    EXPECT_NEAR(thisBoiler.BoilerEff, ExpectedBoilerEff,0.01);
+    EXPECT_NEAR(thisBoiler.BoilerEff, ExpectedBoilerEff, 0.01);
 }

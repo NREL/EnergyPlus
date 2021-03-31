@@ -45,12 +45,11 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
 #ifndef EnergyPlusAPIFunctional_h_INCLUDED
 #define EnergyPlusAPIFunctional_h_INCLUDED
 
-#include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/api/EnergyPlusAPI.h>
+#include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/api/state.h>
 
 #ifdef __cplusplus
@@ -93,7 +92,7 @@ ENERGYPLUSLIB_API void initializeFunctionalAPI(EnergyPlusState state);
 ///          This function can be used by users as a way to target a specific major version of the API and avoid
 ///          problems if the API ever changes.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
-ENERGYPLUSLIB_API const char * apiVersionFromEPlus(EnergyPlusState state);
+ENERGYPLUSLIB_API const char *apiVersionFromEPlus(EnergyPlusState state);
 
 /// \brief Allows a user to register an error callback function.
 /// \details If a user script registers a callback function here, then when EnergyPlus is sending an error message to
@@ -103,14 +102,14 @@ ENERGYPLUSLIB_API const char * apiVersionFromEPlus(EnergyPlusState state);
 /// \param[in] f A function that accepts an integer error level and an error string, and will be called by EnergyPlus when an error is emitted.
 /// \remark A future version of this method will enable additional functionality including an argument indicating the
 ///         error type, and allowing the return value from this callback to determine how EnergyPlus should behave.
-ENERGYPLUSLIB_API void registerErrorCallback(EnergyPlusState state, void (*f)(int, const char * errorMessage));
+ENERGYPLUSLIB_API void registerErrorCallback(EnergyPlusState state, void (*f)(int, const char *errorMessage));
 
 /// \brief This typedef is a convenient pointer to an internal glycol property class inside EnergyPlus.
 /// \details In a default EnergyPlus simulation, pure water properties are available directly.  To access properties of
 ///          ethylene glycol or propylene glycol, user-input is required.  For the current time, the only glycol available
 ///          through the API is pure water.  Accessing the glycol API is initiated using the `glycolNew` function.
 /// \see glycolNew
-ENERGYPLUSLIB_API typedef void * Glycol;
+ENERGYPLUSLIB_API typedef void *Glycol;
 /// \brief Returns a new reference to a Glycol class
 /// \details The glycol class allows access to fluid properties.  Eventually ethylene and propylene glycol properties will
 ///          be made available but for now the only fluid is pure water.
@@ -121,7 +120,7 @@ ENERGYPLUSLIB_API typedef void * Glycol;
 /// \remark In API applications, when the calling script is done with the glycol instance, call `glycolDelete` to clean up the instance.
 /// \see Glycol
 /// \see glycolDelete
-ENERGYPLUSLIB_API Glycol glycolNew(EnergyPlusState state, const char* glycolName);
+ENERGYPLUSLIB_API Glycol glycolNew(EnergyPlusState state, const char *glycolName);
 /// \brief Deletes an instance of a Glycol class
 /// \details When an instance of a Glycol class is created using `glycolNew`, it should be cleaned up when totally done with it.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
@@ -162,13 +161,12 @@ ENERGYPLUSLIB_API Real64 glycolConductivity(EnergyPlusState state, Glycol glycol
 /// \see glycolNew
 ENERGYPLUSLIB_API Real64 glycolViscosity(EnergyPlusState state, Glycol glycol, Real64 temperature);
 
-
 /// \brief This typedef is a convenient pointer to an internal refrigerant property class inside EnergyPlus.
 /// \details In a default EnergyPlus simulation, refrigerant properties for steam are available directly.  To access properties of
 ///          other refrigerants, user-input is required.  For the current time, the only refrigerant available
 ///          through the API is pure steam.  Accessing the refrigerant API is initiated using the `refrigerantNew` function.
 /// \see refrigerantNew
-ENERGYPLUSLIB_API typedef void * Refrigerant;
+ENERGYPLUSLIB_API typedef void *Refrigerant;
 /// \brief Returns a new reference to a Refrigerant class
 /// \details The refrigerant class allows access to refrigerant properties.  Eventually more refrigerant properties will
 ///          be made available but for now the only refrigerant is pure steam.
@@ -179,7 +177,7 @@ ENERGYPLUSLIB_API typedef void * Refrigerant;
 /// \remark In API applications, when the calling script is done with the refrigerant instance, call `refrigerantDelete` to clean up the instance.
 /// \see Refrigerant
 /// \see refrigerantDelete
-ENERGYPLUSLIB_API Refrigerant refrigerantNew(EnergyPlusState state, const char* refrigerantName);
+ENERGYPLUSLIB_API Refrigerant refrigerantNew(EnergyPlusState state, const char *refrigerantName);
 /// \brief Deletes an instance of a Refrigerant class
 /// \details When an instance of a Refrigerant class is created using `refrigerantNew`, it should be cleaned up when totally done with it.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
@@ -230,10 +228,9 @@ ENERGYPLUSLIB_API Real64 refrigerantSaturatedDensity(EnergyPlusState state, Refr
 /// \see Refrigerant
 /// \see refrigerantNew
 ENERGYPLUSLIB_API Real64 refrigerantSaturatedSpecificHeat(EnergyPlusState state, Refrigerant refrigerant, Real64 temperature, Real64 quality);
-//ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedEnthalpy(Refrigerant, Real64 temperature, Real64 pressure);
-//ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedPressure(Refrigerant, Real64 temperature, Real64 enthalpy);
-//ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedDensity(Refrigerant, Real64 temperature, Real64 pressure);
-
+// ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedEnthalpy(Refrigerant, Real64 temperature, Real64 pressure);
+// ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedPressure(Refrigerant, Real64 temperature, Real64 enthalpy);
+// ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedDensity(Refrigerant, Real64 temperature, Real64 pressure);
 
 /// \brief Returns the psychrometric density at given conditions.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
@@ -371,5 +368,4 @@ ENERGYPLUSLIB_API Real64 psyTdpFnTdbTwbPb(EnergyPlusState state, Real64 TDB, Rea
 }
 #endif
 
-
-#endif //EnergyPlusAPIFunctional_h_INCLUDED
+#endif // EnergyPlusAPIFunctional_h_INCLUDED

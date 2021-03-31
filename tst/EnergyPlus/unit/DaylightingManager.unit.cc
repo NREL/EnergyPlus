@@ -809,17 +809,17 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     bool foundErrors = false;
 
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
-    EXPECT_FALSE(foundErrors);                              // expect no errors
+    EXPECT_FALSE(foundErrors);                                      // expect no errors
 
     HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                        // expect no errors
+    EXPECT_FALSE(foundErrors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
@@ -832,10 +832,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
-    EXPECT_FALSE(foundErrors);                       // expect no errors
+    EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
@@ -1325,20 +1325,20 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
 
     bool foundErrors = false;
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
-    EXPECT_FALSE(foundErrors);                              // expect no errors
+    EXPECT_FALSE(foundErrors);                                      // expect no errors
 
     HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                        // expect no errors
+    EXPECT_FALSE(foundErrors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
-    EXPECT_FALSE(foundErrors);                       // expect no errors
+    EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
     int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", state->dataHeatBal->Zone);
@@ -1406,7 +1406,6 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
 }
-
 
 // Test for #7809: Daylighting:Controls has 10 ref points with fraction that do sum exactly to 1,
 // yet with double rounding errors it throws a severe about sum of fraction > 1.0
@@ -1583,10 +1582,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
     std::vector<Real64> fractions({0.1053, 0.0936, 0.1213, 0.1018, 0.0893, 0.0842, 0.0882, 0.1026, 0.1134, 0.1003});
     Real64 sum(0.0);
     int i = 1;
-    for (auto frac: fractions) {
+    for (auto frac : fractions) {
         sum += frac;
         EXPECT_EQ(i, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtNum(i));
-        EXPECT_EQ(format("WEST ZONE_DAYLREFPT{}", i), state->dataDaylightingData->DaylRefPt(state->dataDaylightingData->ZoneDaylight(1).DaylRefPtNum(i)).Name);
+        EXPECT_EQ(format("WEST ZONE_DAYLREFPT{}", i),
+                  state->dataDaylightingData->DaylRefPt(state->dataDaylightingData->ZoneDaylight(1).DaylRefPtNum(i)).Name);
         EXPECT_EQ(frac, state->dataDaylightingData->ZoneDaylight(1).FracZoneDaylit(i));
         EXPECT_EQ(200., state->dataDaylightingData->ZoneDaylight(1).IllumSetPoint(i));
         ++i;
@@ -1598,7 +1598,6 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
     // Yet, if you are being very litteral, then it's slightly more
     EXPECT_TRUE(sum > 1.0);
     EXPECT_FALSE(sum < 1.0);
-
 }
 
 TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_NotAroundOne)
@@ -1670,8 +1669,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_NotArou
     DaylightingManager::GetDaylightingControls(*state, numObjs, foundErrors);
 
     std::string const error_string = delimited_string({
-      "   ** Severe  ** GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.",
-      "   **   ~~~   ** ..discovered in \"Daylighting:Controls\" for Zone=\"WEST ZONE\", trying to control 1.001 of the zone.",
+        "   ** Severe  ** GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.",
+        "   **   ~~~   ** ..discovered in \"Daylighting:Controls\" for Zone=\"WEST ZONE\", trying to control 1.001 of the zone.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_TRUE(foundErrors);
@@ -2085,17 +2084,17 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     bool foundErrors = false;
 
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
-    EXPECT_FALSE(foundErrors);                              // expect no errors
+    EXPECT_FALSE(foundErrors);                                      // expect no errors
 
     HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                        // expect no errors
+    EXPECT_FALSE(foundErrors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
@@ -2108,10 +2107,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
-    EXPECT_FALSE(foundErrors);                       // expect no errors
+    EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
@@ -2179,138 +2178,143 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     // EIO/DFS output uses specifically newline `\n`, so pass that in or on Windows it'll use '\r\n`
     std::string const delim = "\n";
 
-    std::string const eiooutput = delimited_string({
-        "! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones",
-        "Zone/Window Adjacency Daylighting Counts, WEST ZONE,2,-1",
-        "Zone/Window Adjacency Daylighting Counts, EAST ZONE,2,-1",
-        "! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent Zone Names - 1st 100 (max)",
-        "Zone/Window Adjacency Daylighting Matrix, WEST ZONE,0",
-        "Zone/Window Adjacency Daylighting Matrix, EAST ZONE,0",
-        "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor",
-        " Sky Daylight Factors,Clear Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Clear Turbid Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Intermediate Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Overcast Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-        " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-        " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-        " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-        " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-        " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-        " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-        " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-    }, delim);
+    std::string const eiooutput = delimited_string(
+        {
+            "! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones",
+            "Zone/Window Adjacency Daylighting Counts, WEST ZONE,2,-1",
+            "Zone/Window Adjacency Daylighting Counts, EAST ZONE,2,-1",
+            "! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent Zone Names - 1st 100 (max)",
+            "Zone/Window Adjacency Daylighting Matrix, WEST ZONE,0",
+            "Zone/Window Adjacency Daylighting Matrix, EAST ZONE,0",
+            "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor",
+            " Sky Daylight Factors,Clear Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+        },
+        delim);
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    std::string const dfsoutput = delimited_string({
+    std::string const dfsoutput = delimited_string(
+        {
 
-        "This file contains daylight factors for all exterior windows of daylight zones.",
-        "MonthAndDay,Zone Name,Window Name,Window State",
-        "Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Turbid Sky,Daylight Factor for Intermediate Sky,Daylight Factor for Overcast Sky",
-        "01/21,WEST ZONE,ZN001:WALL001:WIN001,Base Window",
-        "1,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "2,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "3,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "4,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "5,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "6,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "7,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "8,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "9,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "10,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "11,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "12,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "13,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "14,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "15,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "16,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "17,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "18,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "19,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "20,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "21,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "22,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "23,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "24,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "01/21,EAST ZONE,ZN002:WALL001:WIN001,Base Window",
-        "1,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "1,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "1,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "2,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "2,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "2,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "3,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "3,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "3,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "4,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "4,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "4,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "5,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "5,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "5,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "6,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "6,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "6,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "7,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "7,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "7,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "8,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "8,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "8,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "9,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "9,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "9,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "10,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "10,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "10,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "11,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "11,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "11,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "12,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "12,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "12,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "13,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "13,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "13,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "14,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "14,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "14,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "15,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "15,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "15,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "16,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "16,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "16,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "17,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "17,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "17,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "18,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "18,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "18,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "19,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "19,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "19,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "20,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "20,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "20,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "21,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "21,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "21,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "22,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "22,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "22,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "23,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "23,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "23,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "24,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "24,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "24,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-    }, delim);
+            "This file contains daylight factors for all exterior windows of daylight zones.",
+            "MonthAndDay,Zone Name,Window Name,Window State",
+            "Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Turbid Sky,Daylight Factor for Intermediate Sky,Daylight "
+            "Factor for Overcast Sky",
+            "01/21,WEST ZONE,ZN001:WALL001:WIN001,Base Window",
+            "1,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "2,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "3,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "4,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "5,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "6,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "7,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "8,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "9,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "10,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "11,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "12,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "13,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "14,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "15,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "16,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "17,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "18,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "19,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "20,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "21,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "22,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "23,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "24,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "01/21,EAST ZONE,ZN002:WALL001:WIN001,Base Window",
+            "1,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "1,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "1,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "2,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "2,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "2,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "3,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "3,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "3,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "4,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "4,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "4,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "5,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "5,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "5,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "6,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "6,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "6,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "7,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "7,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "7,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "8,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "8,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "8,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "9,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "9,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "9,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "10,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "10,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "10,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "11,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "11,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "11,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "12,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "12,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "12,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "13,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "13,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "13,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "14,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "14,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "14,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "15,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "15,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "15,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "16,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "16,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "16,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "17,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "17,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "17,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "18,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "18,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "18,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "19,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "19,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "19,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "20,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "20,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "20,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "21,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "21,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "21,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "22,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "22,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "22,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "23,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "23,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "23,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "24,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "24,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "24,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+        },
+        delim);
 
     EXPECT_TRUE(compare_dfs_stream(dfsoutput, true));
 }
@@ -2833,17 +2837,17 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     bool foundErrors = false;
 
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
-    EXPECT_FALSE(foundErrors);                              // expect no errors
+    EXPECT_FALSE(foundErrors);                                      // expect no errors
 
     HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                        // expect no errors
+    EXPECT_FALSE(foundErrors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
@@ -2856,19 +2860,21 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
-    EXPECT_FALSE(foundErrors);                       // expect no errors
+    EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
-    state->dataConstruction->Construct(state->dataSurface->Surface(7).Construction).TransDiff = 0.001;  // required for GetTDDInput function to work.
+    state->dataConstruction->Construct(state->dataSurface->Surface(7).Construction).TransDiff = 0.001; // required for GetTDDInput function to work.
     DaylightingDevices::GetTDDInput(*state);
     CalcDayltgCoefficients(*state);
 
     std::string const error_string = delimited_string({
-      "   ** Warning ** DaylightingDevice:Tubular = PIPE1:  is not connected to a Zone that has Daylighting, no visible transmittance will be modeled through the daylighting device.",
-      "   ** Warning ** DaylightingDevice:Tubular = PIPE2:  is not connected to a Zone that has Daylighting, no visible transmittance will be modeled through the daylighting device.",
+        "   ** Warning ** DaylightingDevice:Tubular = PIPE1:  is not connected to a Zone that has Daylighting, no visible transmittance will be "
+        "modeled through the daylighting device.",
+        "   ** Warning ** DaylightingDevice:Tubular = PIPE2:  is not connected to a Zone that has Daylighting, no visible transmittance will be "
+        "modeled through the daylighting device.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }

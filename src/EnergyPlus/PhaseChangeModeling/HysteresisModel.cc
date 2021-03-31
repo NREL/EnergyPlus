@@ -319,7 +319,8 @@ namespace HysteresisPhaseChange {
 
         // convenience variables
         state.dataIPShortCut->cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
-        state.dataHysteresisPhaseChange->numHysteresisModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataHysteresisPhaseChange->numHysteresisModels =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         // loop over all hysteresis input instances, if zero, this will simply not do anything
         for (int hmNum = 1; hmNum <= state.dataHysteresisPhaseChange->numHysteresisModels; ++hmNum) {
@@ -331,17 +332,17 @@ namespace HysteresisPhaseChange {
 
             // get the input data and store it in the Shortcuts structures
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                          state.dataIPShortCut->cCurrentModuleObject,
-                                          hmNum,
-                                          state.dataIPShortCut->cAlphaArgs,
-                                          numAlphas,
-                                          state.dataIPShortCut->rNumericArgs,
-                                          numNumbers,
-                                          ioStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataIPShortCut->cCurrentModuleObject,
+                                                                     hmNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     numAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     numNumbers,
+                                                                     ioStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             // the input processor validates the numeric inputs based on the IDD definition
             // still validate the name to make sure there aren't any duplicates or blanks
@@ -353,8 +354,9 @@ namespace HysteresisPhaseChange {
             // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
             for (auto &existingHysteresisModel : state.dataHysteresisPhaseChange->hysteresisPhaseChangeModels) {
                 if (state.dataIPShortCut->cAlphaArgs(1) == existingHysteresisModel.name) {
-                    ShowFatalError(state, "Invalid input for " + state.dataIPShortCut->cCurrentModuleObject +
-                                   " object: Duplicate name found: " + existingHysteresisModel.name);
+                    ShowFatalError(state,
+                                   "Invalid input for " + state.dataIPShortCut->cCurrentModuleObject +
+                                       " object: Duplicate name found: " + existingHysteresisModel.name);
                 }
             }
 

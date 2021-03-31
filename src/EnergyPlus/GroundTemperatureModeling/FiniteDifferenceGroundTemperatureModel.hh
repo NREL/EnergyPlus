@@ -145,7 +145,7 @@ public:
 
     void developMesh();
 
-    void performSimulation(EnergyPlusData& state);
+    void performSimulation(EnergyPlusData &state);
 
     void updateSurfaceCellTemperature(EnergyPlusData &state);
 
@@ -153,7 +153,7 @@ public:
 
     void updateBottomCellTemperature();
 
-    void initDomain(EnergyPlusData& state);
+    void initDomain(EnergyPlusData &state);
 
     bool checkFinalTemperatureConvergence(EnergyPlusData &state);
 
@@ -165,11 +165,11 @@ public:
 
     void doStartOfTimeStepInits();
 
-    Real64 getGroundTemp(EnergyPlusData& state) override;
+    Real64 getGroundTemp(EnergyPlusData &state) override;
 
-    Real64 getGroundTempAtTimeInSeconds(EnergyPlusData& state, Real64 const depth, Real64 const timeInSecondsOfSim) override;
+    Real64 getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(EnergyPlusData& state, Real64 const depth, int const monthOfSim) override;
+    Real64 getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const depth, int const monthOfSim) override;
 
     void evaluateSoilRhoCp(Optional<int const> cell = _, Optional_bool_const InitOnly = _);
 
@@ -185,7 +185,6 @@ public:
         surfaceCoverType_shortGrass = 2,
         surfaceCoverType_longGrass = 3
     };
-
 };
 
 } // namespace EnergyPlus

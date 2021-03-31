@@ -84,8 +84,9 @@ namespace TARCOGGasses90 {
                   std::string &ErrorMessage);
 
     void GassesLow(Real64 tmean, Real64 mwght, Real64 pressure, Real64 gama, Real64 &cond, int &nperr, std::string &ErrorMessage);
-}
-struct TARCOGGasses90Data : BaseGlobalStruct {
+} // namespace TARCOGGasses90
+struct TARCOGGasses90Data : BaseGlobalStruct
+{
 
     Array1D<Real64> fvis = Array1D<Real64>(TARCOGGassesParams::maxgas);
     Array1D<Real64> fcon = Array1D<Real64>(TARCOGGassesParams::maxgas);

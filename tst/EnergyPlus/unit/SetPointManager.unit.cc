@@ -548,7 +548,7 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
     ScheduleManager::UpdateScheduleValues(*state);
 
     // CtrlType Bug
-//    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::CoolingOp;
+    //    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::CoolingOp;
     state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::HeatingOp;
 
     state->dataSetPointManager->SchTESSetPtMgr(schManNum).SchedPtr = OnSched;
@@ -569,7 +569,7 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
     EXPECT_EQ(state->dataSetPointManager->SchTESSetPtMgr(schManNum).ChargeCHWTemp, state->dataSetPointManager->SchTESSetPtMgr(schManNum).SetPt);
 
     // CtrlType Bug
-//    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::DualOp;
+    //    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::DualOp;
     state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::CoolingOp;
 
     state->dataSetPointManager->SchTESSetPtMgr(schManNum).calculate(*state);
@@ -604,71 +604,80 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
-    state->dataAirSystemsData->PrimaryAirSystems(1).OASysOutletNodeNum = NodeInputManager::GetOnlySingleNode(*state, "FAN INLET NODE",
-                                                                                                 ErrorsFound,
-                                                                                                 "FAN",
-                                                                                                 "SZRHtest",
-                                                                                                 DataLoopNode::NodeFluidType::Air,
-                                                                                                 DataLoopNode::NodeConnectionType::Internal,
-                                                                                                 1,
-                                                                                                 DataLoopNode::ObjectIsNotParent,
-                                                                                                 "AHU node");
-    state->dataAirSystemsData->PrimaryAirSystems(1).OASysInletNodeNum = NodeInputManager::GetOnlySingleNode(*state, "RETURN NODE",
-                                                                                                ErrorsFound,
-                                                                                                "OA MIXER",
-                                                                                                "SZRHtest",
-                                                                                                DataLoopNode::NodeFluidType::Air,
-                                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                1,
-                                                                                                DataLoopNode::ObjectIsNotParent,
-                                                                                                "AHU node");
-    state->dataAirSystemsData->PrimaryAirSystems(1).OAMixOAInNodeNum = NodeInputManager::GetOnlySingleNode(*state, "OA INLET TO MIXER",
-                                                                                               ErrorsFound,
-                                                                                               "OA MIXER",
-                                                                                               "SZRHtest",
-                                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                                               DataLoopNode::NodeConnectionType::Internal,
-                                                                                               1,
-                                                                                               DataLoopNode::ObjectIsNotParent,
-                                                                                               "AHU node");
-    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
-    state->dataAirSystemsData->PrimaryAirSystems(1).InletBranchNum.allocate(1);
-    state->dataAirSystemsData->PrimaryAirSystems(1).InletBranchNum(1) = 1;
-
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches);
-
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNumIn = NodeInputManager::GetOnlySingleNode(*state, "RETURN NODE",
-                                                                                                  ErrorsFound,
-                                                                                                  "OAsysinlet",
-                                                                                                  "SZRHtest",
-                                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                  1,
-                                                                                                  DataLoopNode::ObjectIsNotParent,
-                                                                                                  "AHU node");
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
-
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).NodeNumIn = NodeInputManager::GetOnlySingleNode(*state, "FAN INLET NODE",
-                                                                                                          ErrorsFound,
-                                                                                                          "FAN",
-                                                                                                          "SZRHtest",
-                                                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                                                          DataLoopNode::NodeConnectionType::Internal,
-                                                                                                          1,
-                                                                                                          DataLoopNode::ObjectIsNotParent,
-                                                                                                          "AHU node");
-
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).NodeNumOut = NodeInputManager::GetOnlySingleNode(*state, "FAN OUTLET NODE",
+    state->dataAirSystemsData->PrimaryAirSystems(1).OASysOutletNodeNum =
+        NodeInputManager::GetOnlySingleNode(*state,
+                                            "FAN INLET NODE",
+                                            ErrorsFound,
+                                            "FAN",
+                                            "SZRHtest",
+                                            DataLoopNode::NodeFluidType::Air,
+                                            DataLoopNode::NodeConnectionType::Internal,
+                                            1,
+                                            DataLoopNode::ObjectIsNotParent,
+                                            "AHU node");
+    state->dataAirSystemsData->PrimaryAirSystems(1).OASysInletNodeNum = NodeInputManager::GetOnlySingleNode(*state,
+                                                                                                            "RETURN NODE",
+                                                                                                            ErrorsFound,
+                                                                                                            "OA MIXER",
+                                                                                                            "SZRHtest",
+                                                                                                            DataLoopNode::NodeFluidType::Air,
+                                                                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                                                                            1,
+                                                                                                            DataLoopNode::ObjectIsNotParent,
+                                                                                                            "AHU node");
+    state->dataAirSystemsData->PrimaryAirSystems(1).OAMixOAInNodeNum = NodeInputManager::GetOnlySingleNode(*state,
+                                                                                                           "OA INLET TO MIXER",
                                                                                                            ErrorsFound,
-                                                                                                           "FAN",
+                                                                                                           "OA MIXER",
                                                                                                            "SZRHtest",
                                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                                            DataLoopNode::NodeConnectionType::Internal,
                                                                                                            1,
                                                                                                            DataLoopNode::ObjectIsNotParent,
                                                                                                            "AHU node");
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).InletBranchNum.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).InletBranchNum(1) = 1;
+
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches);
+
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNumIn = NodeInputManager::GetOnlySingleNode(*state,
+                                                                                                              "RETURN NODE",
+                                                                                                              ErrorsFound,
+                                                                                                              "OAsysinlet",
+                                                                                                              "SZRHtest",
+                                                                                                              DataLoopNode::NodeFluidType::Air,
+                                                                                                              DataLoopNode::NodeConnectionType::Inlet,
+                                                                                                              1,
+                                                                                                              DataLoopNode::ObjectIsNotParent,
+                                                                                                              "AHU node");
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).NodeNumIn =
+        NodeInputManager::GetOnlySingleNode(*state,
+                                            "FAN INLET NODE",
+                                            ErrorsFound,
+                                            "FAN",
+                                            "SZRHtest",
+                                            DataLoopNode::NodeFluidType::Air,
+                                            DataLoopNode::NodeConnectionType::Internal,
+                                            1,
+                                            DataLoopNode::ObjectIsNotParent,
+                                            "AHU node");
+
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).NodeNumOut =
+        NodeInputManager::GetOnlySingleNode(*state,
+                                            "FAN OUTLET NODE",
+                                            ErrorsFound,
+                                            "FAN",
+                                            "SZRHtest",
+                                            DataLoopNode::NodeFluidType::Air,
+                                            DataLoopNode::NodeConnectionType::Internal,
+                                            1,
+                                            DataLoopNode::ObjectIsNotParent,
+                                            "AHU node");
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
@@ -677,7 +686,8 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
-    int zoneAirNode = NodeInputManager::GetOnlySingleNode(*state, "KITCHEN AIR NODE",
+    int zoneAirNode = NodeInputManager::GetOnlySingleNode(*state,
+                                                          "KITCHEN AIR NODE",
                                                           ErrorsFound,
                                                           "Zone",
                                                           "SZRHspmTest",
@@ -687,7 +697,8 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                           DataLoopNode::ObjectIsNotParent,
                                                           "Test zone node");
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = zoneAirNode;
-    int zoneInletNode = NodeInputManager::GetOnlySingleNode(*state, "KITCHEN DIRECT AIR INLET NODE NAME",
+    int zoneInletNode = NodeInputManager::GetOnlySingleNode(*state,
+                                                            "KITCHEN DIRECT AIR INLET NODE NAME",
                                                             ErrorsFound,
                                                             "Zone",
                                                             "SZRHspmTest",
@@ -1196,7 +1207,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     ScheduleManager::ProcessScheduleInput(*state);
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
-    EXPECT_FALSE(ErrorsFound);                    // zones are specified in the idf snippet
+    EXPECT_FALSE(ErrorsFound);                            // zones are specified in the idf snippet
     DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SingleDuct::GetSysInput(*state);
@@ -1239,12 +1250,12 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     Real64 ZoneSetPointTemp(0.0);
 
     CpAir = Psychrometrics::PsyCpAirFnW(state->dataLoopNodes->Node(2).HumRat);
-    ZoneSetPointTemp = state->dataLoopNodes->Node(5).Temp +
-                       state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired / (CpAir * state->dataLoopNodes->Node(2).MassFlowRateMax);
+    ZoneSetPointTemp = state->dataLoopNodes->Node(5).Temp + state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired /
+                                                                (CpAir * state->dataLoopNodes->Node(2).MassFlowRateMax);
     // check the value of ZoneSetPointTemp matches to the value calculated by ColdestSetPtMgr
     EXPECT_EQ(state->dataLoopNodes->NodeID(12), "HCOIL OUTLET NODE");
     EXPECT_DOUBLE_EQ(ZoneSetPointTemp, state->dataSetPointManager->ColdestSetPtMgr(1).SetPt); // 29.74 deg C
-    EXPECT_DOUBLE_EQ(ZoneSetPointTemp, state->dataLoopNodes->Node(12).TempSetPoint);       // 29.74 deg C
+    EXPECT_DOUBLE_EQ(ZoneSetPointTemp, state->dataLoopNodes->Node(12).TempSetPoint);          // 29.74 deg C
 }
 
 TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)

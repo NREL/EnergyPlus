@@ -127,7 +127,7 @@ namespace HeatBalanceManager {
                          Array1D_bool const &lAlphaFieldBlanks,
                          Array1D_string const &cAlphaFieldNames,
                          Array1D_string const &cNumericFieldNames, // Unused
-                         bool &ErrorsFound                        // If errors found in input
+                         bool &ErrorsFound                         // If errors found in input
     );
 
     void InitHeatBalance(EnergyPlusData &state);
@@ -188,7 +188,8 @@ namespace HeatBalanceManager {
 
 } // namespace HeatBalanceManager
 
-struct HeatBalanceMgrData : BaseGlobalStruct {
+struct HeatBalanceMgrData : BaseGlobalStruct
+{
 
     bool ManageHeatBalanceGetInputFlag = true;
     bool DoReport = false;

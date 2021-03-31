@@ -80,8 +80,8 @@ namespace DaylightingDevices {
     );
 
     Real64 TransTDD(EnergyPlusData &state,
-                    int const PipeNum,      // TDD pipe object number
-                    Real64 const COSI,      // Cosine of the incident angle
+                    int const PipeNum,                                   // TDD pipe object number
+                    Real64 const COSI,                                   // Cosine of the incident angle
                     DataDaylightingDevices::iRadType const RadiationType // Radiation type flag
     );
 
@@ -100,7 +100,8 @@ namespace DaylightingDevices {
 
 } // namespace DaylightingDevices
 
-struct DaylightingDevicesData : BaseGlobalStruct {
+struct DaylightingDevicesData : BaseGlobalStruct
+{
 
     Array1D<Real64> COSAngle = Array1D<Real64>(DataDaylightingDevices::NumOfAngles); // List of cosines of incident angle
     bool ShelfReported = false;

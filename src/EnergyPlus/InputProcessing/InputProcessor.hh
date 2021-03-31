@@ -189,7 +189,7 @@ public:
 
     const json &getObjectInstances(std::string const &ObjType);
 
-//    void clear_state();
+    //    void clear_state();
 private:
     friend class EnergyPlusFixture;
     friend class InputProcessorFixture;
@@ -312,9 +312,11 @@ private:
 
 }; // InputProcessor
 
-struct DataInputProcessing : BaseGlobalStruct {
+struct DataInputProcessing : BaseGlobalStruct
+{
     std::unique_ptr<InputProcessor> inputProcessor = InputProcessor::factory();
-    void clear_state() override {
+    void clear_state() override
+    {
         inputProcessor.reset();
         inputProcessor = EnergyPlus::InputProcessor::factory();
     }
