@@ -2804,8 +2804,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
         for (int PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
             int SurfNum = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser; // TDD: Diffuser object number
             int SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;    // TDD: DOME object number
-            int ConstrNum = Surface(SurfNum).Construction;
-            if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
+            int ConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(SurfNum);
 
             // Reconstruct the beam, sky, and ground radiation transmittance of just the TDD:DOME and TDD pipe
             // by dividing out diffuse solar transmittance of TDD:DIFFUSER
@@ -2856,8 +2855,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
             int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
             int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
-                int ConstrNum = Surface(SurfNum).Construction;
-                if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
+                int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
                 if (Surface(SurfNum).ExtSolar) {
                     // Exclude special shading surfaces which required QRadSWOut calculations above
                     int RoughIndexMovInsul = 0; // Roughness index of movable insulation
@@ -2913,8 +2911,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
                     if (Surface(SurfNum).MaterialMovInsulExt > 0) EvalOutsideMovableInsulation(state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
 
-                    int ConstrNum = Surface(SurfNum).Construction;
-                    if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
+                    int ConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(SurfNum);
                     if (RoughIndexMovInsul <= 0) {                     // No movable insulation present
                         Real64 CosInc = currCosInc(SurfNum);           // Cosine of incidence angle of beam solar on glass
                         Real64 BeamSolar = currBeamSolar(SurfNum);     // Local variable for BeamSolarRad
@@ -3623,11 +3620,9 @@ void InitIntSolarDistribution(EnergyPlusData &state)
 
             if (state.dataSurface->SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
 
-                int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
-                if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) {
-                    ConstrNum = Surface(SurfNum).StormWinConstruction;
-                    ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
-                }
+                ConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(SurfNum);
+                int ConstrNumSh = state.dataSurface->SurfWinActiveStormWinShadedConstr(SurfNum);
+
                 int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                 WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
 
@@ -6147,7 +6142,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                         continue;
                     }
 
-                    if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
+                    ConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(SurfNum);
                     // Roughness index of the exterior surface
                     int RoughSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
                     // Thermal absoptance of the exterior surface
@@ -7135,7 +7130,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                     state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area * state.dataConstruction->Construct(surface.Construction).TransDiff;
             } else {                                                // Regular window
                 if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
-                    if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = surface.StormWinConstruction;
+                    ConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(SurfNum);
                     // Get outside convection coeff for exterior window here to avoid calling
                     // InitExteriorConvectionCoeff from CalcWindowHeatBalance, which avoids circular reference
                     // (HeatBalanceSurfaceManager USEing and WindowManager and
@@ -7896,7 +7891,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                                                                state.dataConstruction->Construct(surface.Construction).TransDiff;
                 } else {                                                // Regular window
                     if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
-                        if (state.dataSurface->SurfWinStormWinFlag(surfNum) == 1) ConstrNum = surface.StormWinConstruction;
+                        ConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(surfNum);
                         // Get outside convection coeff for exterior window here to avoid calling
                         // InitExteriorConvectionCoeff from CalcWindowHeatBalance, which avoids circular reference
                         // (HeatBalanceSurfaceManager USEing and WindowManager and

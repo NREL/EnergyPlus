@@ -1737,8 +1737,7 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
         ExtWinType = DataDaylighting::iExtWinType::AdjZoneExtWin;
     }
 
-    IConst = state.dataSurface->Surface(IWin).Construction;
-    if (state.dataSurface->SurfWinStormWinFlag(IWin) == 1) IConst = state.dataSurface->Surface(IWin).StormWinConstruction;
+    IConst = state.dataSurface->SurfWinActiveStormWinConstr(IWin);
 
     // For thermochromic windows, the daylight and glare factors are calculated for a base window cosntruction
     //  at base TC layer temperature. During each time step calculations at DayltgInteriorIllum,
@@ -3389,8 +3388,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                     ObsVisRefl = 1.0 - state.dataMaterial->Material(state.dataConstruction->Construct(ObsConstrNum).LayerPoint(1)).AbsorpVisible;
                 } else {
                     // Obstruction is a window; assume it is bare
-                    if (state.dataSurface->SurfWinStormWinFlag(NearestHitSurfNum) == 1)
-                        ObsConstrNum = state.dataSurface->Surface(NearestHitSurfNum).StormWinConstruction;
+                    ObsConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(NearestHitSurfNum);
                     ObsVisRefl = state.dataConstruction->Construct(ObsConstrNum).ReflectVisDiffFront;
                 }
             } else {
@@ -3800,9 +3798,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             SpecReflectance = 0.0;
                             CosIncAngRefl = std::abs(dot(RAYCOS, ReflNorm));
                             if (state.dataSurface->Surface(ReflSurfNum).Class == SurfaceClass::Window) {
-                                ConstrNumRefl = state.dataSurface->Surface(ReflSurfNum).Construction;
-                                if (state.dataSurface->SurfWinStormWinFlag(ReflSurfNum) == 1)
-                                    ConstrNumRefl = state.dataSurface->Surface(ReflSurfNum).StormWinConstruction;
+                                ConstrNumRefl = state.dataSurface->SurfWinActiveStormWinConstr(ReflSurfNum);
                                 SpecReflectance =
                                     POLYF(std::abs(CosIncAngRefl), state.dataConstruction->Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
                             }
@@ -6727,8 +6723,7 @@ void DayltgInteriorIllum(EnergyPlusData &state, int &ZoneNum) // Zone number
                         continue;
                     }
 
-                    IConst = state.dataSurface->Surface(IWin).Construction;
-                    if (state.dataSurface->SurfWinStormWinFlag(IWin) == 1) IConst = state.dataSurface->Surface(IWin).StormWinConstruction;
+                    IConst = state.dataSurface->SurfWinActiveStormWinConstr(IWin);
                     // Vis trans at normal incidence of unswitched glass
                     TVIS1(igroup) =
                         POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin);
@@ -7733,8 +7728,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     FLCWSK = 0.0;
     FLCWSU = 0.0;
 
-    IConst = state.dataSurface->Surface(IWin).Construction;
-    if (state.dataSurface->SurfWinStormWinFlag(IWin) == 1) IConst = state.dataSurface->Surface(IWin).StormWinConstruction;
+    IConst = state.dataSurface->SurfWinActiveStormWinConstr(IWin);
     BlindOn = false;
     ShadeOn = false;
     ScreenOn = false;
@@ -7899,8 +7893,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                 1.0 - state.dataMaterial->Material(state.dataConstruction->Construct(ObsConstrNum).LayerPoint(1)).AbsorpVisible;
                         } else {
                             // Obstruction is a window; assume it is bare
-                            if (state.dataSurface->SurfWinStormWinFlag(NearestHitSurfNum) == 1)
-                                ObsConstrNum = state.dataSurface->Surface(NearestHitSurfNum).StormWinConstruction;
+                            ObsConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(NearestHitSurfNum);
                             ObsVisRefl = state.dataConstruction->Construct(ObsConstrNum).ReflectVisDiffFront;
                         }
                     } else {

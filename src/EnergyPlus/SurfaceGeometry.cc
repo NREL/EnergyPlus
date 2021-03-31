@@ -4857,7 +4857,6 @@ namespace SurfaceGeometry {
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).shadedConstructionList.clear();
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeShadedConstruction = 0;
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).shadedStormWinConstructionList.clear();
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeStormWinShadedConstruction = 0;
 
             if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Window ||
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor ||
@@ -5248,7 +5247,6 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).shadedConstructionList.clear();
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeShadedConstruction = 0;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).shadedStormWinConstructionList.clear();
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeStormWinShadedConstruction = 0;
 
                 InitialAssociateWindowShadingControlFenestration(state, ErrorsFound, SurfNum);
 
@@ -13581,10 +13579,6 @@ namespace SurfaceGeometry {
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeShadedConstruction;
         state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).windowShadingControlList =
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).windowShadingControlList;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).StormWinConstruction =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).StormWinConstruction;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).activeStormWinShadedConstruction =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeStormWinShadedConstruction;
         state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).shadedStormWinConstructionList =
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).shadedStormWinConstructionList;
         state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).FrameDivider =
