@@ -822,7 +822,7 @@ namespace DXCoils {
                               Optional<Real64> MaxOATHeating = _, // Parameter equivalent of condenser Max OAT for compressor heating operation
                               Optional_int HeatingPerformanceOATType = _, // Parameter equivalent to condenser entering air temp type (1-db, 2=wb)
                               Optional_int DefrostStrategy = _,
-                              Optional_int DefrostControl = _,
+                              Optional<StandardRatings::HPdefrostControl> DefrostControl = _,
                               Optional_int DefrostEIRPtr = _,
                               Optional<Real64> DefrostFraction = _,
                               Optional<Real64> DefrostCapacity = _,

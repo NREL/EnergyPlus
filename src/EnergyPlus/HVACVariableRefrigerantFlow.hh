@@ -58,6 +58,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/SingleDuct.hh>
+#include <EnergyPlus/StandardRatings.hh>
 
 namespace EnergyPlus {
 
@@ -213,7 +214,7 @@ namespace HVACVariableRefrigerantFlow {
         int DefrostEIRPtr;         // index to defrost EIR curve
         Real64 DefrostFraction;    // defrost time period fraction (hr)
         int DefrostStrategy;       // Type of defrost (reversecycle or resistive)
-        int DefrostControl;        // type of defrost control (timed or ondemand)
+        StandardRatings::HPdefrostControl DefrostControl;        // type of defrost control (timed or ondemand)
         Real64 DefrostCapacity;    // capacity of resistive defrost heating element (W)
         Real64 DefrostPower;       // power used during defrost (W)
         Real64 DefrostConsumption; // energy used during defrost (J)
@@ -386,7 +387,7 @@ namespace HVACVariableRefrigerantFlow {
               SchedPriorityPtr(0), ZoneTUListPtr(0), HeatRecoveryUsed(false), VertPipeLngth(0.0), PCFLengthCoolPtr(0), PCFHeightCool(0.0),
               EquivPipeLngthCool(0.0), PipingCorrectionCooling(1.0), PCFLengthHeatPtr(0), PCFHeightHeat(0.0), EquivPipeLngthHeat(0.0),
               PipingCorrectionHeating(1.0), CCHeaterPower(0.0), CompressorSizeRatio(0.0), NumCompressors(0), MaxOATCCHeater(0.0), DefrostEIRPtr(0),
-              DefrostFraction(0.0), DefrostStrategy(0), DefrostControl(0), DefrostCapacity(0.0), DefrostPower(0.0), DefrostConsumption(0.0),
+              DefrostFraction(0.0), DefrostStrategy(0), DefrostControl(StandardRatings::HPdefrostControl::Unassigned), DefrostCapacity(0.0), DefrostPower(0.0), DefrostConsumption(0.0),
               MaxOATDefrost(0.0), CondenserType(0), CondenserNodeNum(0), SkipCondenserNodeNumCheck(false), CondenserOutletNodeNum(0),
               WaterCondVolFlowRate(0.0), EvapCondEffectiveness(0.0), EvapCondAirVolFlowRate(0.0), EvapCondPumpPower(0.0), CoolCombRatioPTR(0),
               HeatCombRatioPTR(0), OperatingMode(0), ElecPower(0.0), ElecCoolingPower(0.0), ElecHeatingPower(0.0), CoolElecConsumption(0.0),

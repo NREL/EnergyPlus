@@ -447,7 +447,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.CrankcaseHeaterCapacity = 0.0;
     Coil.MaxOATDefrost = 0.0;
     Coil.DefrostStrategy = Resistive;
-    Coil.DefrostControl = Timed;
+    Coil.DefrostControl = StandardRatings::HPdefrostControl::Timed;
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
@@ -800,7 +800,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.CrankcaseHeaterCapacity = 0.0;
     Coil.MaxOATDefrost = 0.0;
     Coil.DefrostStrategy = Resistive;
-    Coil.DefrostControl = Timed;
+    Coil.DefrostControl = StandardRatings::HPdefrostControl::Timed;
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
@@ -1778,7 +1778,7 @@ TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)
 
     ASSERT_EQ(1, state->dataDXCoils->NumDXCoils);
     ASSERT_EQ(state->dataDXCoils->DXCoil(1).DefrostStrategy, ReverseCycle);
-    ASSERT_EQ(state->dataDXCoils->DXCoil(1).DefrostControl, Timed);
+    ASSERT_EQ(state->dataDXCoils->DXCoil(1).DefrostControl, StandardRatings::HPdefrostControl::Timed);
     ASSERT_EQ(state->dataDXCoils->DXCoil(1).DefrostEIRFT, 1);
     ASSERT_EQ(state->dataDXCoils->DXCoil(1).MaxOATDefrost, 5.0);
     ASSERT_EQ(state->dataDXCoils->DXCoil(1).DefrostTime, 0.058333);

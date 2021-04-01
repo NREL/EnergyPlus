@@ -2151,9 +2151,9 @@ namespace EnergyPlus::DXCoils {
                 ErrorsFound = true;
             }
 
-            if (UtilityRoutines::SameString(Alphas(12), "Timed")) state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = Timed;
-            if (UtilityRoutines::SameString(Alphas(12), "OnDemand")) state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = OnDemand;
-            if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == 0) {
+            if (UtilityRoutines::SameString(Alphas(12), "Timed")) state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = StandardRatings::HPdefrostControl::Timed;
+            if (UtilityRoutines::SameString(Alphas(12), "OnDemand")) state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
+            if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Unassigned) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError(state, "...illegal " + cAlphaFields(12) + "=\"" + Alphas(12) + "\".");
                 ShowContinueError(state, "...valid values for this field are Timed or OnDemand.");
@@ -2197,7 +2197,7 @@ namespace EnergyPlus::DXCoils {
 
             // Set defrost time period
             state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime = Numbers(10);
-            if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime == 0.0 && state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == Timed) {
+            if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime == 0.0 && state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Timed) {
                 ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", ");
                 ShowContinueError(state, "..." + cNumericFields(10) + " = 0.0 for defrost control = TIMED.");
             }
@@ -4261,9 +4261,9 @@ namespace EnergyPlus::DXCoils {
                 ErrorsFound = true;
             }
 
-            if (UtilityRoutines::SameString(Alphas(7), "Timed")) state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = Timed;
-            if (UtilityRoutines::SameString(Alphas(7), "OnDemand")) state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = OnDemand;
-            if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == 0) {
+            if (UtilityRoutines::SameString(Alphas(7), "Timed")) state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = StandardRatings::HPdefrostControl::Timed;
+            if (UtilityRoutines::SameString(Alphas(7), "OnDemand")) state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
+            if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Unassigned) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError(state, "...illegal " + cAlphaFields(7) + "=\"" + Alphas(7) + "\".");
                 ShowContinueError(state, "...valid values for this field are Timed or OnDemand.");
@@ -4275,7 +4275,7 @@ namespace EnergyPlus::DXCoils {
 
             // Set defrost time period
             state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime = Numbers(6);
-            if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime == 0.0 && state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == Timed) {
+            if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime == 0.0 && state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Timed) {
                 ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", ");
                 ShowContinueError(state, "..." + cNumericFields(5) + " = 0.0 for defrost control = TIMED.");
             }
@@ -10295,7 +10295,7 @@ namespace EnergyPlus::DXCoils {
             // Check outdoor temperature to determine of defrost is active
             if (OutdoorDryBulb <= state.dataDXCoils->DXCoil(DXCoilNum).MaxOATDefrost && state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(Mode) != WaterCooled) {
                 // Calculate defrost adjustment factors depending on defrost control type
-                if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == Timed) {
+                if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Timed) {
                     FractionalDefrostTime = state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime;
                     if (FractionalDefrostTime > 0.0) {
                         HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
@@ -12896,7 +12896,7 @@ namespace EnergyPlus::DXCoils {
                 // Check outdoor temperature to determine of defrost is active
                 if (OutdoorDryBulb <= state.dataDXCoils->DXCoil(DXCoilNum).MaxOATDefrost) {
                     // Calculate defrost adjustment factors depending on defrost control type
-                    if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == Timed) {
+                    if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Timed) {
                         FractionalDefrostTime = state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime;
                         if (FractionalDefrostTime > 0.0) {
                             HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
@@ -12910,7 +12910,7 @@ namespace EnergyPlus::DXCoils {
 
                     if (FractionalDefrostTime > 0.0) {
                         // Calculate defrost adjustment factors depending on defrost control strategy
-                        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostStrategy == ReverseCycle && state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == OnDemand) {
+                        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostStrategy == ReverseCycle && state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
                             DefrostEIRTempModFac =
                                 CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).DefrostEIRFT, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
                             LoadDueToDefrostLS =
@@ -13106,7 +13106,7 @@ namespace EnergyPlus::DXCoils {
                 // Check outdoor temperature to determine of defrost is active
                 if (OutdoorDryBulb <= state.dataDXCoils->DXCoil(DXCoilNum).MaxOATDefrost) {
                     // Calculate defrost adjustment factors depending on defrost control type
-                    if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == Timed) {
+                    if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Timed) {
                         FractionalDefrostTime = state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime;
                         if (FractionalDefrostTime > 0.0) {
                             HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
@@ -13120,7 +13120,7 @@ namespace EnergyPlus::DXCoils {
 
                     if (FractionalDefrostTime > 0.0) {
                         // Calculate defrost adjustment factors depending on defrost control strategy
-                        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostStrategy == ReverseCycle && state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == OnDemand) {
+                        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostStrategy == ReverseCycle && state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
                             LoadDueToDefrost =
                                 (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) * (state.dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap(1) / 1.01667);
                             DefrostEIRTempModFac =
@@ -15043,7 +15043,7 @@ namespace EnergyPlus::DXCoils {
                               Optional<Real64> MaxOATHeating,         // Parameter equivalent of condenser Max OAT for compressor heating operation
                               Optional_int HeatingPerformanceOATType, // Parameter equivalent to condenser entering air temp type (1-db, 2=wb)
                               Optional_int DefrostStrategy,
-                              Optional_int DefrostControl,
+                              Optional<StandardRatings::HPdefrostControl> DefrostControl,
                               Optional_int DefrostEIRPtr,
                               Optional<Real64> DefrostFraction,
                               Optional<Real64> DefrostCapacity,
