@@ -155,10 +155,10 @@ namespace DXFEarClipping {
                     int const nsides, // number of sides to polygon
                     Array1D<Vector> &polygon,
                     Array1D<dTriangle> &outtriangles,
-                    Real64 const surfazimuth,    // surface azimuth angle (outward facing normal)
-                    Real64 const surftilt,       // surface tilt angle
-                    std::string const &surfname, // surface name (for error messages)
-                    DataSurfaces::SurfaceClass surfclass          // surface class
+                    Real64 const surfazimuth,            // surface azimuth angle (outward facing normal)
+                    Real64 const surftilt,               // surface tilt angle
+                    std::string const &surfname,         // surface name (for error messages)
+                    DataSurfaces::SurfaceClass surfclass // surface class
     )
     {
 
@@ -183,7 +183,7 @@ namespace DXFEarClipping {
         // Argument array dimensioning
         EP_SIZE_CHECK(polygon, nsides);
 
-       // Subroutine parameter definitions:
+        // Subroutine parameter definitions:
         Real64 const point_tolerance(0.00001);
 
         // Subroutine local variable declarations:
@@ -209,7 +209,6 @@ namespace DXFEarClipping {
         int nrangles;
         int ncverts;
         std::string line;
-        static int errcount(0);
 
         // Object Data
         Array1D<Vector_2d> vertex(nsides);
@@ -259,17 +258,18 @@ namespace DXFEarClipping {
         while (nvertcur > 3) {
             generate_ears(state, nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
             if (!any_gt(ears, 0)) {
-                ShowWarningError(state, "DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
-                                 "\", check surface vertex order(entry)");
-                ++errcount;
-                if (errcount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                ShowWarningError(state,
+                                 "DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
+                                     "\", check surface vertex order(entry)");
+                ++state.dataDXFEarClipping->errcount;
+                if (state.dataDXFEarClipping->errcount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                     ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                 }
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowMessage(state, format(" surface={} class={}", surfname, cSurfaceClass(surfclass)));
 
                     for (int j = 1; j <= nsides; ++j) {
-                        ShowMessage(state, format(" side={} ({:.1R},{:.1R},{:.1R})",j,polygon(j).x,polygon(j).y, polygon(j).z));
+                        ShowMessage(state, format(" side={} ({:.1R},{:.1R},{:.1R})", j, polygon(j).x, polygon(j).y, polygon(j).z));
                     }
                     ShowMessage(state, format(" number of triangles found={:12}", ncount));
                     for (int j = 1; j <= nrangles; ++j) {

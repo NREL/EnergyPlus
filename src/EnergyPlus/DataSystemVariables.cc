@@ -45,7 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-//C++ Headers
+// C++ Headers
 #include <utility>
 
 // ObjexxFCL Headers
@@ -75,26 +75,9 @@ namespace DataSystemVariables {
     // This data-only module is a repository for system (such as environment) variables that are set
     // before a run or set of runs.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
     // Using/Aliasing
     using DataStringGlobals::altpathChar;
-    using DataStringGlobals::CurrentWorkingFolder;
     using DataStringGlobals::pathChar;
-    using DataStringGlobals::ProgramPath;
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
 
     constexpr const char *DDOnlyEnvVar("DDONLY");       // Only run design days
     constexpr const char *ReverseDDEnvVar("REVERSEDD"); // Reverse DD during run
@@ -142,7 +125,6 @@ namespace DataSystemVariables {
 
     // Shading methods
 
-
     // Functions
 
     void CheckForActualFileName(EnergyPlusData &state,
@@ -181,7 +163,7 @@ namespace DataSystemVariables {
                 if (pos != std::string::npos) state.dataSysVars->envinputpath1.erase(pos + 1);
             }
             get_environment_variable(cInputPath2, state.dataSysVars->envinputpath2);
-            get_environment_variable(cProgramPath, ProgramPath);
+            get_environment_variable(cProgramPath, state.dataStrGlobals->ProgramPath);
             state.dataSysVars->firstTime = false;
         }
 
@@ -192,53 +174,52 @@ namespace DataSystemVariables {
 
         std::vector<std::pair<std::string, std::string>> pathsChecked;
 
-        const std::array<std::pair<std::string, std::string>, 7> pathsToCheck = {{
-            {InputFileName, "Current Working Directory"},
-            {DataStringGlobals::inputDirPathName + InputFileName, "IDF Directory"},
-            {DataStringGlobals::exeDirectory + InputFileName, "EnergyPlus Executable Directory"},
-            {state.dataSysVars->envinputpath1 + InputFileName, "\"epin\" Environment Variable"},
-            {state.dataSysVars->envinputpath2 + InputFileName, "\"input_path\" Environment Variable"},
-            {CurrentWorkingFolder + InputFileName, "INI File Directory"},
-            {ProgramPath + InputFileName, "\"program\", \"dir\" from INI File"}}
-        };
+        const std::array<std::pair<std::string, std::string>, 7> pathsToCheck = {
+            {{InputFileName, "Current Working Directory"},
+             {state.dataStrGlobals->inputDirPathName + InputFileName, "IDF Directory"},
+             {state.dataStrGlobals->exeDirectory + InputFileName, "EnergyPlus Executable Directory"},
+             {state.dataSysVars->envinputpath1 + InputFileName, "\"epin\" Environment Variable"},
+             {state.dataSysVars->envinputpath2 + InputFileName, "\"input_path\" Environment Variable"},
+             {state.dataStrGlobals->CurrentWorkingFolder + InputFileName, "INI File Directory"},
+             {state.dataStrGlobals->ProgramPath + InputFileName, "\"program\", \"dir\" from INI File"}}};
 
-        std::size_t numPathsToNotTest = (state.dataSysVars->TestAllPaths) ? pathsToCheck.size()-2 : pathsToCheck.size();
+        std::size_t numPathsToNotTest = (state.dataSysVars->TestAllPaths) ? pathsToCheck.size() - 2 : pathsToCheck.size();
 
-        for(std::size_t i = 0; i < numPathsToNotTest; i++) {
+        for (std::size_t i = 0; i < numPathsToNotTest; i++) {
             if (FileSystem::fileExists(pathsToCheck[i].first)) {
                 FileFound = true;
                 CheckedFileName = pathsToCheck[i].first;
-                print(state.files.audit, "{}={}\n", "found (" + pathsToCheck[i].second +")", FileSystem::getAbsolutePath(CheckedFileName));
+                print(state.files.audit, "{}={}\n", "found (" + pathsToCheck[i].second + ")", FileSystem::getAbsolutePath(CheckedFileName));
                 return;
             } else {
-                std::pair <std::string,std::string> currentPath(
-                        FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(pathsToCheck[i].first)),
-                        pathsToCheck[i].second);
+                std::pair<std::string, std::string> currentPath(
+                    FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(pathsToCheck[i].first)), pathsToCheck[i].second);
                 bool found = false;
-                for(auto path: pathsChecked){
-                    if (path.first == currentPath.first){
+                for (auto path : pathsChecked) {
+                    if (path.first == currentPath.first) {
                         found = true;
                     }
                 }
-                if (!found){
+                if (!found) {
                     pathsChecked.push_back(currentPath);
                 }
-                print(state.files.audit, "{}={}\n", "not found (" + pathsToCheck[i].second +")\"",
-                      FileSystem::getAbsolutePath(pathsToCheck[i].first));
+                print(
+                    state.files.audit, "{}={}\n", "not found (" + pathsToCheck[i].second + ")\"", FileSystem::getAbsolutePath(pathsToCheck[i].first));
             }
         }
         if (!FileFound) {
-            ShowSevereError(state, contextString+ "\"" + originalInputFileName + "\" not found.");
+            ShowSevereError(state, contextString + "\"" + originalInputFileName + "\" not found.");
             ShowContinueError(state, "  Paths searched:");
-            for(auto path: pathsChecked){
-                ShowContinueError(state, "    " + path.second +": \"" + path.first +"\"");
+            for (auto path : pathsChecked) {
+                ShowContinueError(state, "    " + path.second + ": \"" + path.first + "\"");
             }
         }
     }
 
-    void processEnvironmentVariables(EnergyPlusData &state) {
+    void processEnvironmentVariables(EnergyPlusData &state)
+    {
 
-        static std::string cEnvValue;
+        std::string cEnvValue;
 
         get_environment_variable(DDOnlyEnvVar, cEnvValue);
         state.dataSysVars->DDOnly = env_var_on(cEnvValue); // Yes or True
@@ -280,11 +261,11 @@ namespace DataSystemVariables {
 
         get_environment_variable(cReportDuringWarmup, cEnvValue);
         if (!cEnvValue.empty()) state.dataSysVars->ReportDuringWarmup = env_var_on(cEnvValue); // Yes or True
-        if (state.dataSysVars->ReverseDD) state.dataSysVars->ReportDuringWarmup = false;                          // force to false for ReverseDD runs
+        if (state.dataSysVars->ReverseDD) state.dataSysVars->ReportDuringWarmup = false;       // force to false for ReverseDD runs
 
         get_environment_variable(cReportDuringWarmup, cEnvValue);
-        if (!cEnvValue.empty()) state.dataSysVars->ReportDuringWarmup = env_var_on(cEnvValue); // Yes or True
-        if (state.dataSysVars->DisableGLHECaching) state.dataSysVars->ReportDuringWarmup = true;                  // force to true for standard runs runs
+        if (!cEnvValue.empty()) state.dataSysVars->ReportDuringWarmup = env_var_on(cEnvValue);   // Yes or True
+        if (state.dataSysVars->DisableGLHECaching) state.dataSysVars->ReportDuringWarmup = true; // force to true for standard runs runs
 
         get_environment_variable(cReportDuringHVACSizingSimulation, cEnvValue);
         if (!cEnvValue.empty()) state.dataSysVars->ReportDuringHVACSizingSimulation = env_var_on(cEnvValue); // Yes or True
@@ -334,7 +315,6 @@ namespace DataSystemVariables {
 
         get_environment_variable(cDisplayInputInAuditEnvVar, cEnvValue);
         if (!cEnvValue.empty()) state.dataGlobal->DisplayInputInAudit = env_var_on(cEnvValue); // Yes or True
-
     }
 
 } // namespace DataSystemVariables

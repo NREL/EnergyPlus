@@ -78,6 +78,18 @@ void CostInfoOut(EnergyPlusData &state);
 
 void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std::string &ColorScheme);
 
+struct OutputReportsData : BaseGlobalStruct
+{
+    bool optiondone = false;
+    std::string lastoption;
+
+    void clear_state() override
+    {
+        this->optiondone = false;
+        this->lastoption.clear();
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif

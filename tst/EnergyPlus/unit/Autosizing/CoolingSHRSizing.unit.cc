@@ -49,8 +49,8 @@
 #include <gtest/gtest.h>
 
 #include <EnergyPlus/Autosizing/CoolingSHRSizing.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 
 namespace EnergyPlus {
 
@@ -87,14 +87,15 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
 
     // Test #1 - Zone Equipment, no autosizing, missing input data
     state->dataSize->DataFlowUsedForSizing = 0.5; // DataCapacityUsedForSizing not initialized
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizer.initializeWithinEP(
+        *this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType); // no sizing error since not autosized
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(0.85, sizedValue, 0.01); // default value on error
     EXPECT_FALSE(sizer.sizingDesRunThisZone);
     EXPECT_EQ(sizer.sizingString, "Gross Rated Sensible Heat Ratio");
-    sizer.autoSizedValue = 0.0;         // reset for next test
+    sizer.autoSizedValue = 0.0; // reset for next test
 
     // reset eio stream
     has_eio_output(true);
@@ -103,20 +104,21 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     printFlag = true;
     inputValue = 0.85;
     state->dataSize->DataCapacityUsedForSizing = 10000.0;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizer.initializeWithinEP(
+        *this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(0.85, sizedValue, 0.01); // hard-sized value
     Real64 RatedVolFlowPerRatedTotCap = state->dataSize->DataFlowUsedForSizing / state->dataSize->DataCapacityUsedForSizing;
     Real64 initialSHR = 0.431 + 6086.0 * RatedVolFlowPerRatedTotCap; // does not include impact of ValidateADP, which increases SHR
-    EXPECT_LT(initialSHR, sizedValue); // hard-sized value > autosized value
+    EXPECT_LT(initialSHR, sizedValue);                               // hard-sized value > autosized value
     EXPECT_FALSE(sizer.sizingDesRunThisZone);
-    sizer.autoSizedValue = 0.0;         // reset for next test
+    sizer.autoSizedValue = 0.0; // reset for next test
 
-    std::string eiooutput =
-        std::string("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n"
-            " Component Sizing Information, Coil:Cooling:DX:SingleSpeed, MyDXCoil, User-Specified Gross Rated Sensible Heat Ratio, 0.85000\n");
+    std::string eiooutput = std::string(
+        "! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n"
+        " Component Sizing Information, Coil:Cooling:DX:SingleSpeed, MyDXCoil, User-Specified Gross Rated Sensible Heat Ratio, 0.85000\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -131,7 +133,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     // do sizing
     state->dataSize->ZoneSizingInput.allocate(1);
     state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizer.initializeWithinEP(
+        *this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
@@ -139,14 +142,16 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
     sizedValue = 0.0;
 
-    eiooutput = std::string(" Component Sizing Information, Coil:Cooling:DX:SingleSpeed, MyDXCoil, Design Size Gross Rated Sensible Heat Ratio, 0.77630\n");
+    eiooutput =
+        std::string(" Component Sizing Information, Coil:Cooling:DX:SingleSpeed, MyDXCoil, Design Size Gross Rated Sensible Heat Ratio, 0.77630\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test #4 - Zone Equipment, repeat with autosized and no initialized DataCapacityUsedForSizing
     inputValue = DataSizing::AutoSize;
     state->dataSize->DataCapacityUsedForSizing = 0.0;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizer.initializeWithinEP(
+        *this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::ErrorType1, sizer.errorType);
     EXPECT_TRUE(errorsFound);
@@ -156,14 +161,16 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     // Test #5 - Zone Equipment, flow to capacity ratio high
     state->dataSize->DataCapacityUsedForSizing = 10000.0;
     state->dataSize->DataFlowUsedForSizing = 1.0;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizer.initializeWithinEP(
+        *this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType); // missing Data* globals and Plant data
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.800655, sizedValue, 0.000001); // includes impact of ValidateADP
-    initialSHR = 0.431 + 6086.0 * state->dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(state->dataHVACGlobal->DXCT); // does not include impact of ValidateADP, which increases SHR
-    EXPECT_LT(initialSHR, sizedValue); // includes impact of ValidateADP
-    sizer.autoSizedValue = 0.0; // reset for next test
+    initialSHR = 0.431 + 6086.0 * state->dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(
+                                      state->dataHVACGlobal->DXCT); // does not include impact of ValidateADP, which increases SHR
+    EXPECT_LT(initialSHR, sizedValue);                              // includes impact of ValidateADP
+    sizer.autoSizedValue = 0.0;                                     // reset for next test
 
     // Test #6 - Zone Equipment, flow to capacity ratio low
     state->dataSize->DataFlowUsedForSizing = 0.1;
@@ -171,15 +178,17 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizer.initializeWithinEP(
+        *this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
-    initialSHR = 0.431 + 6086.0 * state->dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(state->dataHVACGlobal->DXCT); // does not include impact of ValidateADP, which increases SHR
-    EXPECT_GT(initialSHR, sizedValue); // compares impact of ValidateADP
-    EXPECT_NEAR(0.676083, initialSHR, 0.000001); // does not include impact of ValidateADP
-    EXPECT_NEAR(0.675083, sizedValue, 0.000001); // includes impact of ValidateADP
-    sizer.autoSizedValue = 0.0; // reset for next test
+    initialSHR = 0.431 + 6086.0 * state->dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(
+                                      state->dataHVACGlobal->DXCT); // does not include impact of ValidateADP, which increases SHR
+    EXPECT_GT(initialSHR, sizedValue);                              // compares impact of ValidateADP
+    EXPECT_NEAR(0.676083, initialSHR, 0.000001);                    // does not include impact of ValidateADP
+    EXPECT_NEAR(0.675083, sizedValue, 0.000001);                    // includes impact of ValidateADP
+    sizer.autoSizedValue = 0.0;                                     // reset for next test
 
     // reset eio stream
     has_eio_output(true);
@@ -190,7 +199,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     inputValue = DataSizing::AutoSize;
     state->dataHVACGlobal->DXCT = DataHVACGlobals::DOASDXCoil;
     // do sizing
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizer.initializeWithinEP(
+        *this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
@@ -198,23 +208,26 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     initialSHR = 0.389 + 7684.0 * RatedVolFlowPerRatedTotCap;
     EXPECT_NEAR(0.61952, initialSHR, 0.000001); // does not include impact of ValidateADP
     EXPECT_NEAR(0.63152, sizedValue, 0.000001); // includes impact of ValidateADP
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;                 // reset for next test
     sizedValue = 0.0;
 
-    eiooutput = std::string(" Component Sizing Information, Coil:Cooling:DX:SingleSpeed, MyDXCoil, Design Size Gross Rated Sensible Heat Ratio, 0.63152\n");
+    eiooutput =
+        std::string(" Component Sizing Information, Coil:Cooling:DX:SingleSpeed, MyDXCoil, Design Size Gross Rated Sensible Heat Ratio, 0.63152\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test #8 - Zone Equipment, flow to capacity ratio high
     state->dataSize->DataFlowUsedForSizing = 1.0;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizer.initializeWithinEP(
+        *this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType); // missing Data* globals and Plant data
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.800798, sizedValue, 0.000001); // includes impact of ValidateADP
-    initialSHR = 0.431 + 6086.0 * state->dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(state->dataHVACGlobal->DXCT); // does not include impact of ValidateADP, which increases SHR
-    EXPECT_LT(initialSHR, sizedValue); // includes impact of ValidateADP
-    sizer.autoSizedValue = 0.0; // reset for next test
+    initialSHR = 0.431 + 6086.0 * state->dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(
+                                      state->dataHVACGlobal->DXCT); // does not include impact of ValidateADP, which increases SHR
+    EXPECT_LT(initialSHR, sizedValue);                              // includes impact of ValidateADP
+    sizer.autoSizedValue = 0.0;                                     // reset for next test
 
     // Test #9 - Zone Equipment, flow to capacity ratio low
     state->dataSize->DataFlowUsedForSizing = 0.1;
@@ -222,15 +235,17 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizer.initializeWithinEP(
+        *this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
-    initialSHR = 0.431 + 6086.0 * state->dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(state->dataHVACGlobal->DXCT); // does not include impact of ValidateADP, which increases SHR
-    EXPECT_LT(initialSHR, sizedValue); // compares impact of ValidateADP
-    EXPECT_NEAR(0.533062, initialSHR, 0.000001); // does not include impact of ValidateADP
-    EXPECT_NEAR(0.675861, sizedValue, 0.000001); // includes impact of ValidateADP
-    sizer.autoSizedValue = 0.0; // reset for next test
+    initialSHR = 0.431 + 6086.0 * state->dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(
+                                      state->dataHVACGlobal->DXCT); // does not include impact of ValidateADP, which increases SHR
+    EXPECT_LT(initialSHR, sizedValue);                              // compares impact of ValidateADP
+    EXPECT_NEAR(0.533062, initialSHR, 0.000001);                    // does not include impact of ValidateADP
+    EXPECT_NEAR(0.675861, sizedValue, 0.000001);                    // includes impact of ValidateADP
+    sizer.autoSizedValue = 0.0;                                     // reset for next test
 
     // reset eio stream
     has_eio_output(true);
@@ -251,12 +266,13 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     // do sizing
     sizer.wasAutoSized = false;
     printFlag = false;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizer.initializeWithinEP(
+        *this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(0.67, sizedValue, 0.001); // hard-sized value
-    sizer.autoSizedValue = 0.0;         // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test #11 - Airloop Equipment
@@ -273,7 +289,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     // do sizing
     sizer.wasAutoSized = false;
     printFlag = true;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizer.initializeWithinEP(
+        *this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
@@ -281,7 +298,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
-    eiooutput = std::string(" Component Sizing Information, Coil:Cooling:DX:SingleSpeed, MyDXCoil, Design Size Gross Rated Sensible Heat Ratio, 0.77630\n");
+    eiooutput =
+        std::string(" Component Sizing Information, Coil:Cooling:DX:SingleSpeed, MyDXCoil, Design Size Gross Rated Sensible Heat Ratio, 0.77630\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -293,7 +311,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     // do sizing
     sizer.wasAutoSized = false;
     printFlag = true;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizer.initializeWithinEP(
+        *this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
@@ -308,7 +327,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     // do sizing
     sizer.wasAutoSized = false;
     printFlag = true;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizer.initializeWithinEP(
+        *this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
@@ -330,7 +350,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
 
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizer.initializeWithinEP(
+        *this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
@@ -340,8 +361,9 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     EXPECT_FALSE(errorsFound);
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
-    eiooutput = std::string(" Component Sizing Information, Coil:Cooling:DX:SingleSpeed, MyDXCoil, Design Size Gross Rated Sensible Heat Ratio, 0.67508\n"
-                            " Component Sizing Information, Coil:Cooling:DX:SingleSpeed, MyDXCoil, User-Specified Gross Rated Sensible Heat Ratio, 0.52000\n");
+    eiooutput = std::string(
+        " Component Sizing Information, Coil:Cooling:DX:SingleSpeed, MyDXCoil, Design Size Gross Rated Sensible Heat Ratio, 0.67508\n"
+        " Component Sizing Information, Coil:Cooling:DX:SingleSpeed, MyDXCoil, User-Specified Gross Rated Sensible Heat Ratio, 0.52000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }
 

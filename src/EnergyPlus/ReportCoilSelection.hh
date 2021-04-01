@@ -230,7 +230,8 @@ public: // Creation
 public: // methods
     void finishCoilSummaryReportTable(EnergyPlusData &state);
 
-    void setCoilFinalSizes(EnergyPlusData &state, std::string const &coilName,    // user-defined name of the coil
+    void setCoilFinalSizes(EnergyPlusData &state,
+                           std::string const &coilName,    // user-defined name of the coil
                            std::string const &coilObjName, //  coil object name, e.g., Coil:Cooling:Water
                            Real64 const totGrossCap,       // total capacity [W]
                            Real64 const sensGrossCap,      // sensible capacity [W]
@@ -238,7 +239,8 @@ public: // methods
                            Real64 const waterFlowRate      // design or reference or rated water flow rate [m3/s]
     );
 
-    void setRatedCoilConditions(EnergyPlusData &state, std::string const &coilName,     // ! user-defined name of the coil
+    void setRatedCoilConditions(EnergyPlusData &state,
+                                std::string const &coilName,     // ! user-defined name of the coil
                                 std::string const &coilObjName,  //  coil object name, e.g., Coil:Cooling:Water
                                 Real64 const RatedCoilTotCap,    // ! rated coil total capacity [W]
                                 Real64 const RatedCoilSensCap,   // rated coil sensible capacity [W]
@@ -256,7 +258,8 @@ public: // methods
                                 Real64 const RatedCoilEff       // rated coil effectiveness
     );
 
-    void setCoilAirFlow(EnergyPlusData &state, std::string const &coilName, // user-defined name of the coil
+    void setCoilAirFlow(EnergyPlusData &state,
+                        std::string const &coilName, // user-defined name of the coil
                         std::string const &coilType, // idf input object class name of coil
                         Real64 const airVdot,        // air flow rate in m3/s
                         bool const isAutoSized       // true if air flow was autosized
@@ -352,7 +355,8 @@ public: // methods
                                 Real64 const DXFlowPerCapMaxRatio  // non dimensional ratio, capacity adjustment ratio max
     );
 
-    void setCoilWaterCoolingCapacity(EnergyPlusData &state, std::string const &coilName,  // user-defined name of the coil
+    void setCoilWaterCoolingCapacity(EnergyPlusData &state,
+                                     std::string const &coilName,  // user-defined name of the coil
                                      std::string const &coilType,  // idf input object class name of coil
                                      Real64 const totalCoolingCap, // {W} coil cooling capacity
                                      bool const isAutoSize,        // true if value was autosized
@@ -361,7 +365,8 @@ public: // methods
                                      int const dataWaterLoopNum    // plant loop structure index
     );
 
-    void setCoilWaterHeaterCapacityNodeNums(EnergyPlusData &state, std::string const &coilName,  // user-defined name of the coil
+    void setCoilWaterHeaterCapacityNodeNums(EnergyPlusData &state,
+                                            std::string const &coilName,  // user-defined name of the coil
                                             std::string const &coilType,  // idf input object class name of coil
                                             Real64 const totalHeatingCap, // {W} coil Heating capacity
                                             bool const isAutoSize,        // true if value was autosized
@@ -370,7 +375,8 @@ public: // methods
                                             int const dataWaterLoopNum    // plant loop structure index
     );
 
-    void setCoilWaterHeaterCapacityPltSizNum(EnergyPlusData &state, std::string const &coilName,  // user-defined name of the coil
+    void setCoilWaterHeaterCapacityPltSizNum(EnergyPlusData &state,
+                                             std::string const &coilName,  // user-defined name of the coil
                                              std::string const &coilType,  // idf input object class name of coil
                                              Real64 const totalHeatingCap, // {W} coil Heating capacity
                                              bool const isAutoSize,        // true if value was autosized
@@ -388,11 +394,13 @@ public: // methods
                    int const curZoneEqNum                  // zone equipment list index, if non-zero
     );
 
-    void setCoilReheatMultiplier(EnergyPlusData &state, std::string const &coilName, // user-defined name of the coil
+    void setCoilReheatMultiplier(EnergyPlusData &state,
+                                 std::string const &coilName, // user-defined name of the coil
                                  std::string const &coilType, // idf input object class name of coil
                                  Real64 const multiplierReheatLoad);
 
-    void setCoilSupplyFanInfo(EnergyPlusData &state, std::string const &coilName, // user-defined name of the coil
+    void setCoilSupplyFanInfo(EnergyPlusData &state,
+                              std::string const &coilName, // user-defined name of the coil
                               std::string const &coilType, // idf input object class name of coil
                               std::string const &fanName,
                               DataAirSystems::fanModelTypeEnum const &fanEnumType,
@@ -421,7 +429,8 @@ private: // methods
 
     void writeCoilSelectionOutput2(EnergyPlusData &state);
 
-    int getIndexForOrCreateDataObjFromCoilName(EnergyPlusData &state, std::string const &coilName, // user-defined name of the coil
+    int getIndexForOrCreateDataObjFromCoilName(EnergyPlusData &state,
+                                               std::string const &coilName, // user-defined name of the coil
                                                std::string const &coilType  // idf input object class name of coil
     );
 
@@ -433,7 +442,8 @@ public: // data
 
 void createCoilSelectionReportObj(EnergyPlusData &state);
 
-struct ReportCoilSelectionData : BaseGlobalStruct {
+struct ReportCoilSelectionData : BaseGlobalStruct
+{
 
     std::unique_ptr<ReportCoilSelection> coilSelectionReportObj;
 

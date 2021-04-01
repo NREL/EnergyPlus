@@ -67,7 +67,6 @@
 //#include <../third_party/ssc/shared/lib_pv_incidence_modifier.h>
 #include <../third_party/ssc/ssc/sscapi.h>
 
-
 namespace EnergyPlus {
 
 // Forward declarations
@@ -213,7 +212,8 @@ namespace PVWatts {
 
 } // namespace PVWatts
 
-struct PVWattsData : BaseGlobalStruct {
+struct PVWattsData : BaseGlobalStruct
+{
 
     std::map<int, PVWatts::PVWattsGenerator> PVWattsGenerators;
 

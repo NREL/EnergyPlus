@@ -67,8 +67,6 @@ namespace EvaporativeFluidCoolers {
     extern std::string const cEvapFluidCooler_SingleSpeed;
     extern std::string const cEvapFluidCooler_TwoSpeed;
 
-    extern int NumSimpleEvapFluidCoolers; // Number of similar evaporative fluid coolers
-
     enum struct EvapLoss
     {
         ByUserFactor,
@@ -258,7 +256,11 @@ namespace EvaporativeFluidCoolers {
 
         void getDesignCapacities(EnergyPlusData &state, const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         void InitEvapFluidCooler(EnergyPlusData &state);
 
@@ -282,19 +284,25 @@ namespace EvaporativeFluidCoolers {
     };
 
     // Object Data
-    extern Array1D<EvapFluidCoolerSpecs> SimpleEvapFluidCooler; // dimension to number of machines
 
     void GetEvapFluidCoolerInput(EnergyPlusData &state);
 
-    void clear_state();
-
 } // namespace EvaporativeFluidCoolers
 
-struct EvaporativeFluidCoolersData : BaseGlobalStruct {
+struct EvaporativeFluidCoolersData : BaseGlobalStruct
+{
+
+    bool GetEvapFluidCoolerInputFlag = true;
+    int NumSimpleEvapFluidCoolers = 0;                                            // Number of similar evaporative fluid coolers
+    Array1D<EvaporativeFluidCoolers::EvapFluidCoolerSpecs> SimpleEvapFluidCooler; // dimension to number of machines
+    std::unordered_map<std::string, std::string> UniqueSimpleEvapFluidCoolerNames;
 
     void clear_state() override
     {
-
+        GetEvapFluidCoolerInputFlag = true;
+        NumSimpleEvapFluidCoolers = 0;
+        SimpleEvapFluidCooler.clear();
+        UniqueSimpleEvapFluidCoolerNames.clear();
     }
 };
 

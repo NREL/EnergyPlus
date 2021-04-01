@@ -74,7 +74,8 @@ namespace DataWindowEquivalentLayer {
     // Gap information
     // Equivalent Layer Window Constructon
     // CFSLAYER: layer types
-    enum class LayerType {
+    enum class LayerType
+    {
         Unassigned,
         ltyNONE,   // unused / empty layer
         ltyGLAZE,  // glazing layer i.e, purely specular
@@ -84,7 +85,7 @@ namespace DataWindowEquivalentLayer {
         ltyVBVER,  // venetian blinds - vertical
         ltyINSCRN, // insect screen
         ltyROOM,   // indoor space and/or make no adjustment
-        ltyGZS    // glazing with spectral data (read from aux file)
+        ltyGZS     // glazing with spectral data (read from aux file)
     };
 
     // index for solar arrays
@@ -137,7 +138,7 @@ namespace DataWindowEquivalentLayer {
     {
         // Members
         std::string Name; // ID of layer
-        LayerType LTYPE;        // layer type (see ltyXXX above)
+        LayerType LTYPE;  // layer type (see ltyXXX above)
         int iGZS;         // re spectral glazing
         //   = GZSTbl idx of LTYPE=ltyGZS (spectral glazing)
         //   else 0
@@ -249,12 +250,14 @@ namespace DataWindowEquivalentLayer {
 
 } // namespace DataWindowEquivalentLayer
 
-struct WindowEquivLayerData : BaseGlobalStruct {
+struct WindowEquivLayerData : BaseGlobalStruct
+{
 
     // Defined CFSLayers and CFSs
     int TotWinEquivLayerConstructs = 0; // Number of constructions with Window equivalent Layer
 
-    DataWindowEquivalentLayer::CFSSWP SWP_ROOMBLK; // Solar reflectance, BEAM-BEAM, front | Solar reflectance, BEAM-BEAM, back | Solar transmittance, BEAM-BEAM, front | Solar
+    DataWindowEquivalentLayer::CFSSWP
+        SWP_ROOMBLK; // Solar reflectance, BEAM-BEAM, front | Solar reflectance, BEAM-BEAM, back | Solar transmittance, BEAM-BEAM, front | Solar
     // transmittance, BEAM-BEAM, back | Solar reflectance, BEAM-DIFFUSE, front | Solar reflectance, BEAM-DIFFUSE, back | Solar
     // transmittance, BEAM-DIFFUSE, front | Solar transmittance, BEAM-DIFFUSE, back | Solar reflectance, DIFFUSE-DIFFUSE, front |
     // Solar reflectance, DIFFUSE-DIFFUSE, back | Solar transmittance, DIFFUSE-DIFFUSE

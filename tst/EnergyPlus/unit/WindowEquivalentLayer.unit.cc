@@ -196,7 +196,8 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
     int EQLNum = 0;
     InitEquivalentLayerWindowCalculations(*state);
     EQLNum = state->dataConstruction->Construct(ConstrNum).EQLConsPtr;
-    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).L(state->dataWindowEquivLayer->CFS(EQLNum).VBLayerPtr).CNTRL, state->dataWindowEquivalentLayer->lscVBNOBM);
+    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).L(state->dataWindowEquivLayer->CFS(EQLNum).VBLayerPtr).CNTRL,
+              state->dataWindowEquivalentLayer->lscVBNOBM);
 }
 
 TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
@@ -1255,14 +1256,16 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
     EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).G(1).GTYPE, state->dataWindowEquivalentLayer->gtyOPENout);
     // zero solar absorbed on glazing layers or no solar input
     Source = 0.0;
-    ASHWAT_ThermalCalc(*state, state->dataWindowEquivLayer->CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(
+        *state, state->dataWindowEquivLayer->CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 308.610, 0.001);
     EXPECT_NEAR(T(2), 306.231, 0.001);
 
     // with solar absrobed on glazing layers
     Source(1) = 100.0; // outside glass layer
     Source(2) = 50.0;  // inside glass layer
-    ASHWAT_ThermalCalc(*state, state->dataWindowEquivLayer->CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(
+        *state, state->dataWindowEquivLayer->CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 313.886, 0.001);
     EXPECT_NEAR(T(2), 310.559, 0.001);
 }
@@ -1577,14 +1580,16 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
     EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).G(1).GTYPE, state->dataWindowEquivalentLayer->gtyOPENin);
     // zero solar absorbed on glazing layers or no solar input
     Source = 0.0;
-    ASHWAT_ThermalCalc(*state, state->dataWindowEquivLayer->CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(
+        *state, state->dataWindowEquivLayer->CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 307.054, 0.001);
     EXPECT_NEAR(T(2), 304.197, 0.001);
 
     // with solar absrobed on glazing layers
     Source(1) = 100.0; // outside glass layer
     Source(2) = 50.0;  // inside glass layer
-    ASHWAT_ThermalCalc(*state, state->dataWindowEquivLayer->CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(
+        *state, state->dataWindowEquivLayer->CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 314.666, 0.001);
     EXPECT_NEAR(T(2), 311.282, 0.001);
 }

@@ -78,16 +78,21 @@ namespace DataSystemVariables {
     // MODULE VARIABLE DECLARATIONS:
 
     // Shading methods
-    enum class ShadingMethod {PolygonClipping, PixelCounting, Scheduled, Imported};
+    enum class ShadingMethod
+    {
+        PolygonClipping,
+        PixelCounting,
+        Scheduled,
+        Imported
+    };
 
     // Functions
 
     void CheckForActualFileName(EnergyPlusData &state,
                                 std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
-                                std::string &foundFileName,             // Blank if not found.
-                                const std::string contextString = std::string()
-    );
+                                std::string &foundFileName,               // Blank if not found.
+                                const std::string contextString = std::string());
 
     void processEnvironmentVariables(EnergyPlusData &state);
 

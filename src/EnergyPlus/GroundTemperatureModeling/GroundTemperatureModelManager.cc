@@ -67,28 +67,8 @@ namespace EnergyPlus {
 
 namespace GroundTemperatureManager {
 
-    int const objectType_KusudaGroundTemp(1);
-    int const objectType_FiniteDiffGroundTemp(2);
-    int const objectType_SiteBuildingSurfaceGroundTemp(3);
-    int const objectType_SiteShallowGroundTemp(4);
-    int const objectType_SiteDeepGroundTemp(5);
-    int const objectType_SiteFCFactorMethodGroundTemp(6);
-    int const objectType_XingGroundTemp(7);
-
-    Array1D_string const CurrentModuleObjects(7,
-                                              {"Site:GroundTemperature:Undisturbed:KusudaAchenbach",
-                                               "Site:GroundTemperature:Undisturbed:FiniteDifference",
-                                               "Site:GroundTemperature:BuildingSurface",
-                                               "Site:GroundTemperature:Shallow",
-                                               "Site:GroundTemperature:Deep",
-                                               "Site:GroundTemperature:FCfactorMethod",
-                                               "Site:GroundTemperature:Undisturbed:Xing"});
-
-    std::vector<std::shared_ptr<BaseGroundTempsModel>> groundTempModels;
-
-    //******************************************************************************
-
-    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &objectType_str, std::string const &objectName)
+    std::shared_ptr<BaseGroundTempsModel>
+    GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &objectType_str, std::string const &objectName)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Matt Mitchell
@@ -102,6 +82,8 @@ namespace GroundTemperatureManager {
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int objectType(0);
+
+        auto &CurrentModuleObjects = state.dataGrndTempModelMgr->CurrentModuleObjects;
 
         std::string objectType_str_UPPERCase = UtilityRoutines::MakeUPPERCase(objectType_str);
 
@@ -125,17 +107,16 @@ namespace GroundTemperatureManager {
             ShowFatalError(state, "GetGroundTempsModelAndInit: Ground temperature object " + objectType_str + " not recognized.");
         }
 
-        int numGTMs = groundTempModels.size();
+        int numGTMs = state.dataGrndTempModelMgr->groundTempModels.size();
 
         // Check if this instance of this model has already been retrieved
         for (int i = 0; i < numGTMs; ++i) {
-            auto currentModel(groundTempModels[i]);
+            auto currentModel(state.dataGrndTempModelMgr->groundTempModels[i]);
             // Check if the type and name match
             if (objectType == currentModel->objectType && objectName == currentModel->objectName) {
-                return groundTempModels[i];
+                return state.dataGrndTempModelMgr->groundTempModels[i];
             }
         }
-
 
         // If not found, create new instance of the model
         if (objectType == objectType_KusudaGroundTemp) {
@@ -157,15 +138,6 @@ namespace GroundTemperatureManager {
             return nullptr;
         }
     }
-
-    //******************************************************************************
-
-    void clear_state()
-    {
-        groundTempModels.clear();
-    }
-
-    //******************************************************************************
 
 } // namespace GroundTemperatureManager
 

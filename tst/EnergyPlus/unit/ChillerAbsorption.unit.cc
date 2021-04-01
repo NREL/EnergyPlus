@@ -1804,7 +1804,8 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     // calc evap load
     Real64 CpFluid = 4179.0;
     Real64 EvapMassFlowRate = state->dataLoopNodes->Node(EvapInletNode).MassFlowRate;
-    AbsChillEvapLoad = EvapMassFlowRate * CpFluid * (state->dataLoopNodes->Node(EvapOutletNode).TempSetPoint - state->dataLoopNodes->Node(EvapInletNode).Temp);
+    AbsChillEvapLoad =
+        EvapMassFlowRate * CpFluid * (state->dataLoopNodes->Node(EvapOutletNode).TempSetPoint - state->dataLoopNodes->Node(EvapInletNode).Temp);
     thisChiller.NomCap = 2.0 * abs(AbsChillEvapLoad);
     // generator hot water mass flow rate is calculated proportional to evap mass flow rate for flow mode = LeavingSetPointModulated
     Real64 GenMassFlowRateTestResult =

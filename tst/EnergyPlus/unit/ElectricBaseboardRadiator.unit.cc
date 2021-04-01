@@ -268,15 +268,15 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
 
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
-    EXPECT_FALSE(errorsFound);                              // expect no errors
+    EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                        // expect no errors
+    EXPECT_FALSE(errorsFound);                                // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
-    EXPECT_FALSE(errorsFound);                         // expect no errors
+    EXPECT_FALSE(errorsFound);                                 // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
@@ -296,8 +296,8 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
     DataZoneEquipment::GetZoneEquipmentData(*state);
 
     ElectricBaseboardRadiator::GetElectricBaseboardInput(*state);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(1).ZonePtr, 1);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(2).ZonePtr, 2);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(1).ZonePtr, 1);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(2).ZonePtr, 2);
 }
 
 TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
@@ -559,15 +559,15 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
 
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
-    EXPECT_FALSE(errorsFound);                              // expect no errors
+    EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                        // expect no errors
+    EXPECT_FALSE(errorsFound);                                // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
-    EXPECT_FALSE(errorsFound);                         // expect no errors
+    EXPECT_FALSE(errorsFound);                                 // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
@@ -591,9 +591,9 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     // get electric baseboard inputs
     ElectricBaseboardRadiator::GetElectricBaseboardInput(*state);
 
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(1).ZonePtr, 1);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(2).ZonePtr, 2);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(3).ZonePtr, 3);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(1).ZonePtr, 1);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(2).ZonePtr, 2);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(3).ZonePtr, 3);
 
     state->dataSize->FinalZoneSizing.allocate(3);
     state->dataSize->ZoneEqSizing.allocate(3);
@@ -605,17 +605,17 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     FirstHVACIteration = true;
     state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
     state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
-        ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).HeatingCapMethod;
+        state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).HeatingCapMethod;
     state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
     // do electric baseboard sizing
     ElectricBaseboardRadiator::SizeElectricBaseboard(*state, BaseboardNum);
     // check user specified hardsized nominal capacity
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity, 1000.0);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 1000.0);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).ScaledHeatingCapacity, 1000.0);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).NominalCapacity, 1000.0);
     // check nominal capacity autosize
-    ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
+    state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
     ElectricBaseboardRadiator::SizeElectricBaseboard(*state, BaseboardNum);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 2000.0);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).NominalCapacity, 2000.0);
 
     BaseboardNum = 2;
     CntrlZoneNum = 2;
@@ -623,19 +623,19 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     FirstHVACIteration = true;
     state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
     state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
-        ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).HeatingCapMethod;
+        state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).HeatingCapMethod;
     state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
     state->dataHeatBal->Zone(CntrlZoneNum).FloorArea = 100.0;
     // do electric baseboard sizing
     ElectricBaseboardRadiator::SizeElectricBaseboard(*state, BaseboardNum);
     // check user specified hardsized nominal capacity
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity, 30.0);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 3000.0);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).ScaledHeatingCapacity, 30.0);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).NominalCapacity, 3000.0);
     // check nominal capacity autosize
-    ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
-    ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
+    state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
+    state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
     ElectricBaseboardRadiator::SizeElectricBaseboard(*state, BaseboardNum);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 2000.0);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).NominalCapacity, 2000.0);
 
     BaseboardNum = 3;
     CntrlZoneNum = 3;
@@ -643,19 +643,19 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     FirstHVACIteration = true;
     state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
     state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
-        ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).HeatingCapMethod;
+        state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).HeatingCapMethod;
     state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 3000.0;
     state->dataHeatBal->Zone(CntrlZoneNum).FloorArea = 100.0;
     // do electric baseboard sizing
     ElectricBaseboardRadiator::SizeElectricBaseboard(*state, BaseboardNum);
     // check user specified hardsized nominal capacity
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity, 0.50);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 1500.0);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).ScaledHeatingCapacity, 0.50);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).NominalCapacity, 1500.0);
     // check nominal capacity autosize
-    ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
-    ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
+    state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
+    state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
     ElectricBaseboardRadiator::SizeElectricBaseboard(*state, BaseboardNum);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 3000.0);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).NominalCapacity, 3000.0);
 }
 
 TEST_F(EnergyPlusFixture, RadConvElecBaseboard_UpdateElectricBaseboardOff)

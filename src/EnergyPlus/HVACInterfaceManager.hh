@@ -157,6 +157,7 @@ struct HVACInterfaceManagerData : BaseGlobalStruct
     Array1D_bool MyEnvrnFlag_TwoWayCommonPipe;
     bool OneTimeData_SingleCommonPipe = true;
     bool OneTimeData_TwoWayCommonPipe = true;
+    Array1D<Real64> TmpRealARR = Array1D<Real64>(DataConvergParams::ConvergLogStackDepth); // Tuned Made static
 
     void clear_state() override
     {

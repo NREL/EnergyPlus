@@ -63,11 +63,11 @@ struct EnergyPlusData;
 namespace PlantPressureSystem {
 
     void SimPressureDropSystem(EnergyPlusData &state,
-                               int LoopNum,                       // Plant Loop to update pressure information
-                               bool FirstHVACIteration,           // System flag
-                               DataPlant::iPressureCall CallType, // Enumerated call type
-                               Optional_int_const LoopSideNum = _,      // Loop side num for specific branch simulation
-                               Optional_int_const BranchNum = _         // Branch num for specific branch simulation
+                               int LoopNum,                        // Plant Loop to update pressure information
+                               bool FirstHVACIteration,            // System flag
+                               DataPlant::iPressureCall CallType,  // Enumerated call type
+                               Optional_int_const LoopSideNum = _, // Loop side num for specific branch simulation
+                               Optional_int_const BranchNum = _    // Branch num for specific branch simulation
     );
 
     void InitPressureDrop(EnergyPlusData &state, int LoopNum, bool FirstHVACIteration);
@@ -100,13 +100,14 @@ namespace PlantPressureSystem {
 
 } // namespace PlantPressureSystem
 
-struct PlantPressureSysData : BaseGlobalStruct {
+struct PlantPressureSysData : BaseGlobalStruct
+{
 
     bool InitPressureDropOneTimeInit = true;
     Array1D_bool LoopInit;
     Array1D_bool FullParallelBranchSetFound = Array1D<bool>(2);
     bool CommonPipeErrorEncountered = false;
-    int ErrorCounter = 0;   // For proper error handling
+    int ErrorCounter = 0; // For proper error handling
     int ZeroKWarningCounter = 0;
     int MaxIterWarningCounter = 0;
 
