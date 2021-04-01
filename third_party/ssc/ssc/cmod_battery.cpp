@@ -111,7 +111,7 @@ var_info vtab_battery_inputs[] = {
         { SSC_INPUT,        SSC_NUMBER,      "batt_minimum_modetime",                      "Minimum time at charge state",                            "min",     "",                     "BatteryCell",       "",                           "",                              "" },
 
         // lifetime inputs
-        { SSC_INPUT,		SSC_NUMBER,     "batt_life_model",                             "Battery life model specifier",                           "0/1",      "0=calendar/cycle,1=NMC", "BatteryCell",       "en_batt=1",                           "",                             "" },
+        { SSC_INPUT,		SSC_NUMBER,     "batt_life_model",                             "Battery life model specifier",                           "0/1",      "0=calendar/cycle,1=NMC", "BatteryCell",       "?=0",                           "",                             "" },
         { SSC_INPUT,		SSC_MATRIX,     "batt_lifetime_matrix",                        "Cycles vs capacity at different depths-of-discharge",    "",         "",                     "BatteryCell",       "en_batt=1&batt_life_model=0",                           "",                             "" },
         { SSC_INPUT,        SSC_NUMBER,     "batt_calendar_choice",                        "Calendar life degradation input option",                 "0/1/2",    "0=NoCalendarDegradation,1=LithiomIonModel,2=InputLossTable", "BatteryCell",       "en_batt=1&batt_life_model=0",                           "",                             "" },
         { SSC_INPUT,        SSC_MATRIX,     "batt_calendar_lifetime_matrix",               "Days vs capacity",                                       "",         "",                     "BatteryCell",       "en_batt=1&batt_life_model=0&batt_calendar_choice=2", "",                             "" },
@@ -320,12 +320,6 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
             batt_vars->batt_Vfull = vt.as_double("batt_Vfull");
             batt_vars->batt_Vexp = vt.as_double("batt_Vexp");
             batt_vars->batt_Vnom = vt.as_double("batt_Vnom");
-            //Voltage error checking
-            if (batt_vars->batt_voltage_choice==0 &&
-                ((batt_vars->batt_Vfull < batt_vars->batt_Vexp) ||
-                batt_vars->batt_Vexp < batt_vars->batt_Vnom)) {
-                throw exec_error("battery", "For the electrochemical battery voltage model, voltage inputs must meet the requirement Vfull > Vexp > Vnom.");
-            }
             batt_vars->batt_Qfull_flow = vt.as_double("batt_Qfull_flow");
             batt_vars->batt_Qfull = vt.as_double("batt_Qfull");
             batt_vars->batt_Qexp = vt.as_double("batt_Qexp");
@@ -563,6 +557,10 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
 
             // Battery lifetime
             batt_vars->batt_life_model = vt.as_integer("batt_life_model");
+
+            if (batt_vars->batt_life_model == 1 && batt_vars->batt_chem != 1)
+                throw exec_error("battery", "NMC life model (batt_life_model=1) can only be used with Li-Ion chemistries (batt_chem=1).");
+
             if (batt_vars->batt_life_model == 0) {
                 batt_vars->batt_calendar_choice = vt.as_integer("batt_calendar_choice");
                 batt_vars->batt_lifetime_matrix = vt.as_matrix("batt_lifetime_matrix");
@@ -800,12 +798,13 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
     capacity_t* capacity_model = 0;
     losses_t* losses_model = 0;
 
-    if ((chem == battery_params::LEAD_ACID || chem == battery_params::LITHIUM_ION) && batt_vars->batt_voltage_choice == voltage_params::MODEL)
+    if ((chem == battery_params::LEAD_ACID || chem == battery_params::LITHIUM_ION) && batt_vars->batt_voltage_choice == voltage_params::MODEL) {
         voltage_model = new voltage_dynamic_t(batt_vars->batt_computed_series, batt_vars->batt_computed_strings,
                                               batt_vars->batt_Vnom_default, batt_vars->batt_Vfull, batt_vars->batt_Vexp,
                                               batt_vars->batt_Vnom, batt_vars->batt_Qfull, batt_vars->batt_Qexp,
                                               batt_vars->batt_Qnom, batt_vars->batt_C_rate, batt_vars->batt_resistance,
                                               dt_hr);
+    }
     else if ((chem == battery_params::VANADIUM_REDOX) && batt_vars->batt_voltage_choice == voltage_params::MODEL)
         voltage_model = new voltage_vanadium_redox_t(batt_vars->batt_computed_series, batt_vars->batt_computed_strings,
                                                      batt_vars->batt_Vnom_default, batt_vars->batt_resistance,
@@ -833,7 +832,7 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
     }
     else {
         throw exec_error("battery", "Unrecognized `batt_life_model` option. Valid options are 0 for separate calendar & cycle models; "
-                                    "1 for NREL NMC life model.");
+                                    "1 for NMC (Smith 2017) life model.");
     }
 
     if (batt_vars->T_room.size() != nrec) {

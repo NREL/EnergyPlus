@@ -48,11 +48,11 @@
 #include "AirflowNetwork/Elements.hpp"
 #include "AirflowNetwork/Properties.hpp"
 
+#include "../../Data/EnergyPlusData.hh"
 #include "../../DataAirLoop.hh"
 #include "../../DataHVACGlobals.hh"
 #include "../../DataLoopNode.hh"
 #include "../../DataSurfaces.hh"
-#include "../../Data/EnergyPlusData.hh"
 
 namespace EnergyPlus {
 
@@ -84,11 +84,11 @@ namespace AirflowNetwork {
     // Sensible and latent exchange variable in air distribution system
 
     // Object Data
-    //Array1D<AirflowNetworkExchangeProp> AirflowNetworkExchangeData;
-    //Array1D<AirflowNetworkExchangeProp> AirflowNetworkMultiExchangeData;
-    //Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport;
-    //Array1D<AirflowNetworkNodeReportData> AirflowNetworkNodeReport;
-    //Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport1;
+    // Array1D<AirflowNetworkExchangeProp> AirflowNetworkExchangeData;
+    // Array1D<AirflowNetworkExchangeProp> AirflowNetworkMultiExchangeData;
+    // Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport;
+    // Array1D<AirflowNetworkNodeReportData> AirflowNetworkNodeReport;
+    // Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport1;
     // Array1D<ReferenceConditions> MultizoneSurfaceStdConditionsCrackData;
 
     static Real64 square(Real64 x)
@@ -150,7 +150,6 @@ namespace AirflowNetwork {
 
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
 
         // CompNum = state.dataAirflowNetwork->AirflowNetworkCompData(j).TypeNum;
         ed = roughness / hydraulicDiameter;
@@ -302,7 +301,6 @@ namespace AirflowNetwork {
 
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
 
         // CompNum = state.dataAirflowNetwork->AirflowNetworkCompData(j).TypeNum;
         ed = roughness / hydraulicDiameter;
@@ -587,7 +585,6 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-
         // Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
         Real64 RhozNorm = AIRDENSITY(state, 101325.0, 20.0, 0.0);
         Real64 VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
@@ -682,7 +679,6 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-
         // Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
         Real64 RhozNorm = AIRDENSITY(state, 101325.0, 20.0, 0.0);
         Real64 VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
@@ -763,7 +759,7 @@ namespace AirflowNetwork {
         using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::FanType_SimpleVAV;
-        using DataHVACGlobals::NumPrimaryAirSys;
+        auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -781,11 +777,11 @@ namespace AirflowNetwork {
 
         int NF(1);
 
-
         int AirLoopNum = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).AirLoopNum;
 
         if (FanTypeNum == FanType_SimpleOnOff) {
-            if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && state.dataLoopNodes->Node(InletNode).MassFlowRate == 0.0) {
+            if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
+                state.dataLoopNodes->Node(InletNode).MassFlowRate == 0.0) {
                 NF = GenericDuct(0.1, 0.001, LFLAG, PDROP, propN, propM, F, DF);
             } else if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
                        state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate > 0.0) {
@@ -793,8 +789,10 @@ namespace AirflowNetwork {
             } else {
                 F[0] = state.dataLoopNodes->Node(InletNode).MassFlowRate * Ctrl;
                 if (state.dataAirflowNetwork->MultiSpeedHPIndicator == 2) {
-                    F[0] = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate * state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio +
-                           state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate * (1.0 - state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio);
+                    F[0] = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate *
+                               state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio +
+                           state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate *
+                               (1.0 - state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio);
                 }
             }
         } else if (FanTypeNum == FanType_SimpleConstVolume) {
@@ -811,20 +809,29 @@ namespace AirflowNetwork {
             // Check VAV termals with a damper
             SumTermFlow = 0.0;
             SumFracSuppLeak = 0.0;
-            for (k = 1; k <= NetworkNumOfLinks; ++k) {
-                if (state.dataAirflowNetwork->AirflowNetworkLinkageData(k).VAVTermDamper && state.dataAirflowNetwork->AirflowNetworkLinkageData(k).AirLoopNum == AirLoopNum) {
-                    k1 = state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(k).NodeNums[0]).EPlusNodeNum;
+            for (k = 1; k <= state.dataAFNSolver->NetworkNumOfLinks; ++k) {
+                if (state.dataAirflowNetwork->AirflowNetworkLinkageData(k).VAVTermDamper &&
+                    state.dataAirflowNetwork->AirflowNetworkLinkageData(k).AirLoopNum == AirLoopNum) {
+                    k1 = state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(k).NodeNums[0])
+                             .EPlusNodeNum;
                     if (state.dataLoopNodes->Node(k1).MassFlowRate > 0.0) {
                         SumTermFlow += state.dataLoopNodes->Node(k1).MassFlowRate;
                     }
                 }
-                if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(k).CompNum).CompTypeNum == ComponentType::ELR) {
+                if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(k).CompNum).CompTypeNum ==
+                    ComponentType::ELR) {
                     // Calculate supply leak sensible losses
                     Node1 = state.dataAirflowNetwork->AirflowNetworkLinkageData(k).NodeNums[0];
                     Node2 = state.dataAirflowNetwork->AirflowNetworkLinkageData(k).NodeNums[1];
-                    if ((state.dataAirflowNetwork->AirflowNetworkNodeData(Node2).EPlusZoneNum > 0) && (state.dataAirflowNetwork->AirflowNetworkNodeData(Node1).EPlusNodeNum == 0) &&
+                    if ((state.dataAirflowNetwork->AirflowNetworkNodeData(Node2).EPlusZoneNum > 0) &&
+                        (state.dataAirflowNetwork->AirflowNetworkNodeData(Node1).EPlusNodeNum == 0) &&
                         (state.dataAirflowNetwork->AirflowNetworkNodeData(Node1).AirLoopNum == AirLoopNum)) {
-                        SumFracSuppLeak += state.dataAirflowNetwork->DisSysCompELRData(state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(k).CompNum).TypeNum).ELR;
+                        SumFracSuppLeak +=
+                            state.dataAirflowNetwork
+                                ->DisSysCompELRData(
+                                    state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(k).CompNum)
+                                        .TypeNum)
+                                .ELR;
                     }
                 }
             }
@@ -889,9 +896,8 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,5E14.6)");
 
-
         int NumCur = n;
-
+        auto &solver = state.dataAFNSolver->solver;
         if (solver.AFECTL(i) <= 0.0) {
             // Speed = 0; treat fan as resistance.
             generic_crack(FlowCoef, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
@@ -1019,7 +1025,6 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,5E14.6)");
 
-
         int NumCur = n;
 
         if (control <= 0.0) {
@@ -1033,7 +1038,7 @@ namespace AirflowNetwork {
             PRISE = -PDROP * (RhoAir / propN.density) / (TranRat * control);
         }
         // if (LIST >= 4) gio::write(Unit21, Format_901) << " fan:" << i << PDROP << PRISE << AFECTL(i) << DisSysCompDetFanData(CompNum).TranRat;
-        //if (LFLAG) {
+        // if (LFLAG) {
         //    // Initialization by linear approximation.
         //    F[0] = -Qfree * control * (1.0 - PRISE / Pshut);
         //    DPDF = -Pshut / Qfree;
@@ -1136,8 +1141,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-
-
+        auto &solver = state.dataAFNSolver->solver;
         C = solver.AFECTL(i);
         if (C < FlowMin) C = FlowMin;
         if (C > FlowMax) C = FlowMax;
@@ -1198,8 +1202,6 @@ namespace AirflowNetwork {
 
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
-
 
         C = control;
         if (C < FlowMin) C = FlowMin;
@@ -1266,7 +1268,6 @@ namespace AirflowNetwork {
 
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
 
         // Get component properties
         FlowCoef = ELR * FlowRate / propN.density * std::pow(RefPres, -FlowExpo);
@@ -1353,7 +1354,6 @@ namespace AirflowNetwork {
 
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
 
         // Get component properties
         FlowCoef = ELR * FlowRate / propN.density * std::pow(RefPres, -FlowExpo);
@@ -1507,7 +1507,6 @@ namespace AirflowNetwork {
         int Loc;
         int iNum;
 
-
         // Get component properties
         DifLim = 1.0e-4;
         Width = state.dataAirflowNetwork->MultizoneSurfaceData(IL).Width;
@@ -1523,9 +1522,10 @@ namespace AirflowNetwork {
                 HFact = HeightFac1 + (Fact - OpenFac1) / (OpenFac2 - OpenFac1) * (HeightFac2 - HeightFac1);
                 Cfact = DischCoeff1 + (Fact - OpenFac1) / (OpenFac2 - OpenFac1) * (DischCoeff2 - DischCoeff1);
             } else {
-                ShowFatalError(state,
+                ShowFatalError(
+                    state,
                     "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " +
-                    name);
+                        name);
             }
         }
 
@@ -1539,9 +1539,10 @@ namespace AirflowNetwork {
                 HFact = HeightFac2 + (Fact - OpenFac2) / (OpenFac3 - OpenFac2) * (HeightFac3 - HeightFac2);
                 Cfact = DischCoeff2 + (Fact - OpenFac2) / (OpenFac3 - OpenFac2) * (DischCoeff3 - DischCoeff2);
             } else {
-                ShowFatalError(state,
+                ShowFatalError(
+                    state,
                     "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " +
-                    name);
+                        name);
             }
         }
 
@@ -1559,15 +1560,16 @@ namespace AirflowNetwork {
                 HFact = HeightFac3 + (Fact - OpenFac3) / (OpenFac4 - OpenFac3) * (HeightFac4 - HeightFac3);
                 Cfact = DischCoeff3 + (Fact - OpenFac3) / (OpenFac4 - OpenFac3) * (DischCoeff4 - DischCoeff3);
             } else {
-                ShowFatalError(state,
+                ShowFatalError(
+                    state,
                     "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " +
-                    name);
+                        name);
             }
         }
 
         // calculate DpProfNew
         for (i = 1; i <= NrInt + 2; ++i) {
-            DpProfNew(i) = PDROP + DpProf(Loc + i) - DpL(IL, 1);
+            DpProfNew(i) = PDROP + state.dataAFNSolver->DpProf(Loc + i) - state.dataAFNSolver->DpL(IL, 1);
         }
 
         // Get opening data based on the opening factor
@@ -1598,7 +1600,8 @@ namespace AirflowNetwork {
         if (state.dataAirflowNetwork->MultizoneSurfaceData(IL).Multiplier > 1.0) Cs *= state.dataAirflowNetwork->MultizoneSurfaceData(IL).Multiplier;
         // Add window multiplier with window open
         if (Fact > 0.0) {
-            if (state.dataAirflowNetwork->MultizoneSurfaceData(IL).Multiplier > 1.0) ActLw *= state.dataAirflowNetwork->MultizoneSurfaceData(IL).Multiplier;
+            if (state.dataAirflowNetwork->MultizoneSurfaceData(IL).Multiplier > 1.0)
+                ActLw *= state.dataAirflowNetwork->MultizoneSurfaceData(IL).Multiplier;
         }
 
         // Add recurring warnings
@@ -1610,7 +1613,8 @@ namespace AirflowNetwork {
                     ShowContinueError(state, "The actual width is set to 1.0E-6 m.");
                     ShowContinueErrorTimeStamp(state, "Occurrence info:");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state, "The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name +
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   "The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name +
                                                        " is 0 error continues.",
                                                    WidthErrIndex,
                                                    ActLw,
@@ -1625,7 +1629,8 @@ namespace AirflowNetwork {
                     ShowContinueError(state, "The actual height is set to 1.0E-6 m.");
                     ShowContinueErrorTimeStamp(state, "Occurrence info:");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state, "The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name +
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   "The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name +
                                                        " is 0 error continues.",
                                                    HeightErrIndex,
                                                    ActLh,
@@ -1723,20 +1728,20 @@ namespace AirflowNetwork {
             for (i = 2; i <= NrInt + 1; ++i) {
                 if (DpProfNew(i) > 0) {
                     if (std::abs(DpProfNew(i)) <= DpZeroOffset) {
-                        dfmasum = std::sqrt(RhoProfF(Loc + i) * DpZeroOffset) / DpZeroOffset;
+                        dfmasum = std::sqrt(state.dataAFNSolver->RhoProfF(Loc + i) * DpZeroOffset) / DpZeroOffset;
                         fmasum = DpProfNew(i) * dfmasum;
                     } else {
-                        fmasum = std::sqrt(RhoProfF(Loc + i) * DpProfNew(i));
+                        fmasum = std::sqrt(state.dataAFNSolver->RhoProfF(Loc + i) * DpProfNew(i));
                         dfmasum = 0.5 * fmasum / DpProfNew(i);
                     }
                     fma12 += fmasum;
                     dp1fma12 += dfmasum;
                 } else {
                     if (std::abs(DpProfNew(i)) <= DpZeroOffset) {
-                        dfmasum = -std::sqrt(RhoProfT(Loc + i) * DpZeroOffset) / DpZeroOffset;
+                        dfmasum = -std::sqrt(state.dataAFNSolver->RhoProfT(Loc + i) * DpZeroOffset) / DpZeroOffset;
                         fmasum = DpProfNew(i) * dfmasum;
                     } else {
-                        fmasum = std::sqrt(-RhoProfT(Loc + i) * DpProfNew(i));
+                        fmasum = std::sqrt(-state.dataAFNSolver->RhoProfT(Loc + i) * DpProfNew(i));
                         dfmasum = 0.5 * fmasum / DpProfNew(i);
                     }
                     fma21 += fmasum;
@@ -1776,9 +1781,9 @@ namespace AirflowNetwork {
             // Calculation of massflow and its derivative
             for (i = 2; i <= NrInt + 1; ++i) {
                 if (DpProfNew(i) > 0) {
-                    rholink = RhoProfF(Loc + i);
+                    rholink = state.dataAFNSolver->RhoProfF(Loc + i);
                 } else {
-                    rholink = RhoProfT(Loc + i);
+                    rholink = state.dataAFNSolver->RhoProfT(Loc + i);
                 }
 
                 if ((EvalHghts(i) <= h2) || (EvalHghts(i) >= h4)) {
@@ -1833,9 +1838,9 @@ namespace AirflowNetwork {
                 for (i = 2; i <= NrInt + 1; ++i) {
                     rholink = 0.0;
                     if (DpProfNew(i) > 0) {
-                        rholink = RhoProfF(Loc + i);
+                        rholink = state.dataAFNSolver->RhoProfF(Loc + i);
                     } else {
-                        rholink = RhoProfT(Loc + i);
+                        rholink = state.dataAFNSolver->RhoProfT(Loc + i);
                     }
                     rholink /= NrInt;
                     rholink = 1.2;
@@ -1894,13 +1899,13 @@ namespace AirflowNetwork {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 DPMID; // pressure drop at mid-height of doorway.
         Real64 C;
-        Real64 DF0;   // derivative factor at the bottom of the door.
-        Real64 DFH;   // derivative factor at the top of the door.
-        Real64 DRHO;  // difference in air densities between rooms.
+        Real64 DF0;  // derivative factor at the bottom of the door.
+        Real64 DFH;  // derivative factor at the top of the door.
+        Real64 DRHO; // difference in air densities between rooms.
         Real64 GDRHO;
-        Real64 F0;    // flow factor at the bottom of the door.
-        Real64 FH;    // flow factor at the top of the door.
-        Real64 Y;     // height of neutral plane rel. to bottom of door (m).
+        Real64 F0; // flow factor at the bottom of the door.
+        Real64 FH; // flow factor at the top of the door.
+        Real64 Y;  // height of neutral plane rel. to bottom of door (m).
         Real64 coeff;
         Real64 Width;
         Real64 Height;
@@ -1911,7 +1916,6 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_900("(A5,9X,4E16.7)");
         // static gio::Fmt Format_903("(A5,3I3,4E16.7)");
-
 
         Width = state.dataAirflowNetwork->MultizoneSurfaceData(i).Width;
         Height = state.dataAirflowNetwork->MultizoneSurfaceData(i).Height;
@@ -1934,7 +1938,8 @@ namespace AirflowNetwork {
         if (state.dataAirflowNetwork->MultizoneSurfaceData(i).Multiplier > 1.0) coeff *= state.dataAirflowNetwork->MultizoneSurfaceData(i).Multiplier;
         // Add window multiplier with window open
         if (OpenFactor > 0.0) {
-            if (state.dataAirflowNetwork->MultizoneSurfaceData(i).Multiplier > 1.0) Width *= state.dataAirflowNetwork->MultizoneSurfaceData(i).Multiplier;
+            if (state.dataAirflowNetwork->MultizoneSurfaceData(i).Multiplier > 1.0)
+                Width *= state.dataAirflowNetwork->MultizoneSurfaceData(i).Multiplier;
         }
 
         DRHO = propN.density - propM.density;
@@ -2040,7 +2045,7 @@ namespace AirflowNetwork {
 
         int n = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[0];
         int m = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[1];
-
+        auto &solver = state.dataAFNSolver->solver;
 
         // Get component properties
         // A  = Cross section area [m2]
@@ -2050,7 +2055,7 @@ namespace AirflowNetwork {
             F[0] = std::sqrt(2.0 * propN.density) * A * std::sqrt(DP);
             DF[0] = 0.5 * F[0] / DP;
         } else {
-            for (k = 1; k <= NetworkNumOfLinks; ++k) {
+            for (k = 1; k <= state.dataAFNSolver->NetworkNumOfLinks; ++k) {
                 if (state.dataAirflowNetwork->AirflowNetworkLinkageData(k).NodeNums[1] == n) {
                     F[0] = solver.AFLOW(k);
                     break;
@@ -2104,7 +2109,6 @@ namespace AirflowNetwork {
 
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
 
         // Get component properties
         FlowCoef = ELA * DischCoeff * sqrt_2 * std::pow(RefDeltaP, 0.5 - FlowExpo);
@@ -2194,7 +2198,6 @@ namespace AirflowNetwork {
 
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
 
         // Get component properties
         FlowCoef = ELA * DischCoeff * sqrt_2 * std::pow(RefDeltaP, 0.5 - FlowExpo);
@@ -2295,7 +2298,6 @@ namespace AirflowNetwork {
 
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
 
         // Get component properties
         // ed = Rough / DisSysCompCoilData(CompNum).hydraulicDiameter;
@@ -2455,7 +2457,6 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-
         // Get component properties
         // ed = Rough / DisSysCompCoilData(CompNum).hydraulicDiameter;
         ed = Rough / hydraulicDiameter;
@@ -2599,7 +2600,6 @@ namespace AirflowNetwork {
 
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
 
         // Get component properties
         ed = Rough / hydraulicDiameter;
@@ -2765,7 +2765,6 @@ namespace AirflowNetwork {
         Real64 AA1;
         Real64 area;
 
-
         // Get component properties
         ed = Rough / hydraulicDiameter;
         area = pow_2(hydraulicDiameter) * DataGlobalConstants::Pi;
@@ -2912,7 +2911,6 @@ namespace AirflowNetwork {
         Real64 AA1;
         Real64 area;
 
-
         // Get component properties
         ed = Rough / hydraulicDiameter;
         area = pow_2(hydraulicDiameter) * DataGlobalConstants::Pi;
@@ -3044,7 +3042,6 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-
         if (state.dataLoopNodes->Node(InletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
             if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrlExhaust) {
@@ -3171,7 +3168,6 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-
         if (state.dataLoopNodes->Node(InletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
             if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrlExhaust) {
@@ -3289,7 +3285,6 @@ namespace AirflowNetwork {
         Real64 Cshape;     // Shape factor [dimensionless]
         Real64 OpenArea;   // Opening area [m2]
 
-
         // Get information on the horizontal opening
         RhozAver = (propN.density + propM.density) / 2.0;
         Width = state.dataAirflowNetwork->MultizoneSurfaceData(i).Width;
@@ -3300,7 +3295,8 @@ namespace AirflowNetwork {
         // Slope = MultizoneCompHorOpeningData(CompNum).Slope;
         // DischCoeff = MultizoneCompHorOpeningData(CompNum).DischCoeff;
         Cshape = 0.942 * Width / Height;
-        OpenArea = Width * Height * Fact * std::sin(Slope * DataGlobalConstants::Pi / 180.0) * (1.0 + std::cos(Slope * DataGlobalConstants::Pi / 180.0));
+        OpenArea =
+            Width * Height * Fact * std::sin(Slope * DataGlobalConstants::Pi / 180.0) * (1.0 + std::cos(Slope * DataGlobalConstants::Pi / 180.0));
         DH = 4.0 * (Width * Height) / 2.0 / (Width + Height) * Fact;
 
         // Check which zone is higher
@@ -3316,7 +3312,8 @@ namespace AirflowNetwork {
         BuoFlow = 0.0;
         dPBuoFlow = 0.0;
 
-        if (state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[0] > state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[1]) {
+        if (state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[0] >
+            state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[1]) {
             // Node N is upper zone
             if (propN.density > propM.density) {
                 BuoFlowMax = RhozAver * 0.055 * std::sqrt(9.81 * std::abs(propN.density - propM.density) * pow_5(DH) / RhozAver);
@@ -3408,14 +3405,14 @@ namespace AirflowNetwork {
         Real64 FL;
         Real64 FT;
 
-
         int AirLoopNum = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).AirLoopNum;
 
         if (state.dataLoopNodes->Node(InletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
             F[0] = state.dataLoopNodes->Node(InletNode).MassFlowRate;
             DF[0] = 0.0;
-            if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
+            if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
+                state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
                 F[0] = F[0] / state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
             return 1;
@@ -3525,7 +3522,6 @@ namespace AirflowNetwork {
         Real64 FL;
         Real64 FT;
 
-
         int AirLoopNum = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).AirLoopNum;
 
         if (state.dataLoopNodes->Node(OutletNode).MassFlowRate > VerySmallMassFlow) {
@@ -3535,7 +3531,8 @@ namespace AirflowNetwork {
                 F[0] = state.dataAirflowNetwork->ReliefMassFlowRate;
             } else {
                 F[0] = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
-                if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
+                if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
+                    state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
                     F[0] = F[0] / state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
                 }
             }
@@ -3608,17 +3605,6 @@ namespace AirflowNetwork {
             }
         }
         return 1;
-    }
-
-    void clear_state()
-    {
-        //AirflowNetworkExchangeData.deallocate();
-        //AirflowNetworkMultiExchangeData.deallocate();
-        //AirflowNetworkLinkReport.deallocate();
-        //AirflowNetworkNodeReport.deallocate();
-        //AirflowNetworkLinkReport1.deallocate();
-        lowerLimitErrIdx = 0;
-        upperLimitErrIdx = 0;
     }
 
 } // namespace AirflowNetwork

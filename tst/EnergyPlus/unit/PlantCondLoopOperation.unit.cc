@@ -65,10 +65,10 @@ class DistributePlantLoadTest : public EnergyPlusFixture
 {
 
 public:
-    static void SetUpTestCase()
-    {
-        EnergyPlusFixture::SetUpTestCase(); // Sets up the base fixture
-    }
+    //    static void SetUpTestCase()
+    //    {
+    //        EnergyPlusFixture::SetUpTestCase(); // Sets up the base fixture
+    //    }
     static void TearDownTestCase()
     {
     }
@@ -77,9 +77,9 @@ public:
     {
         EnergyPlusFixture::SetUp(); // Sets up individual test cases.
 
-                                    // unit test for plant equipment list load distribution
-                                    // set up one plantloop side with 1 branches, 12 components
-                                    // using 12 components here to test going beyond the old idd limit of 10 pieces of equipment
+        // unit test for plant equipment list load distribution
+        // set up one plantloop side with 1 branches, 12 components
+        // using 12 components here to test going beyond the old idd limit of 10 pieces of equipment
         state->dataPlnt->PlantLoop.allocate(1);
         state->dataPlnt->PlantLoop(1).OpScheme.allocate(1);
         state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList.allocate(1);
@@ -118,7 +118,6 @@ public:
     virtual void TearDown()
     {
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
-
     }
 };
 
@@ -215,8 +214,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
     EXPECT_EQ(thisBranch.Comp(12).MyLoad, 0.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
-
-    //Duplicate tests from engineering reference examples for Sequential
+    // Duplicate tests from engineering reference examples for Sequential
     state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
     thisBranch.Comp(1).MaxLoad = 40.0;
     thisBranch.Comp(1).MinLoad = 0.2 * 40.0;
@@ -340,7 +338,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
     EXPECT_EQ(thisBranch.Comp(5).MyLoad, 80.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
-    //Duplicate tests from engineering reference examples
+    // Duplicate tests from engineering reference examples
     state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
     thisBranch.Comp(1).MaxLoad = 40.0;
     thisBranch.Comp(1).MinLoad = 0.2 * 40.0;
@@ -402,7 +400,6 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(remainingLoopDemand, 60.0);
-
 }
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
@@ -418,7 +415,6 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
     thisBranch.Comp(4).MaxLoad = 50.0;
     thisBranch.Comp(4).MinLoad = 0.0;
     thisBranch.Comp(4).MyLoad = 0.0;
-
 
     // Loop demand 550W
     DistributePlantLoadTest::ResetLoads();
@@ -461,7 +457,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
     EXPECT_EQ(thisBranch.Comp(5).MyLoad, 96.25);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
-    //Duplicate tests from engineering reference examples
+    // Duplicate tests from engineering reference examples
     state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
     thisBranch.Comp(1).MaxLoad = 40.0;
     thisBranch.Comp(1).MinLoad = 0.2 * 40.0;
@@ -594,7 +590,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
     EXPECT_EQ(thisBranch.Comp(5).MyLoad, 80.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
-    //Duplicate tests from engineering reference examples
+    // Duplicate tests from engineering reference examples
     state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
     thisBranch.Comp(1).MaxLoad = 40.0;
     thisBranch.Comp(1).MinLoad = 0.2 * 40.0;
@@ -626,8 +622,8 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
     remainingLoopDemand = 0.0;
     loopDemand = 25.0;
     PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 25.0,0.1);
-    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 0.0,0.1);
+    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 25.0, 0.1);
+    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 0.0, 0.1);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
     // 50W
@@ -635,8 +631,8 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
     remainingLoopDemand = 0.0;
     loopDemand = 50.0;
     PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 14.29,0.1);
-    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 35.71,0.1);
+    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 14.29, 0.1);
+    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 35.71, 0.1);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
     // 100W
@@ -644,8 +640,8 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
     remainingLoopDemand = 0.0;
     loopDemand = 100.0;
     PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 28.57,0.1);
-    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 71.43,0.1);
+    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 28.57, 0.1);
+    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 71.43, 0.1);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
     // 150W
@@ -656,7 +652,6 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(remainingLoopDemand, 10.0);
-
 }
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
@@ -717,7 +712,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
     EXPECT_EQ(thisBranch.Comp(5).MyLoad, 0.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
-    //Duplicate tests from engineering reference examples
+    // Duplicate tests from engineering reference examples
     state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
     thisBranch.Comp(1).MaxLoad = 40.0;
     thisBranch.Comp(1).MinLoad = 0.2 * 40.0;
@@ -758,8 +753,8 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
     remainingLoopDemand = 0.0;
     loopDemand = 50.0;
     PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 14.3,0.1);
-    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 35.71,0.1);
+    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 14.3, 0.1);
+    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 35.71, 0.1);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
     // 100W
@@ -767,8 +762,8 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
     remainingLoopDemand = 0.0;
     loopDemand = 100.0;
     PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 28.6,0.1);
-    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 71.43,0.1);
+    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 28.6, 0.1);
+    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 71.43, 0.1);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
     // 150W
@@ -779,56 +774,56 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(remainingLoopDemand, 10.0);
-
 }
 
-TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp) {
+TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp)
+{
 
     std::string const idf_objects = delimited_string({
-      "PlantEquipmentOperation:ThermalEnergyStorage,",
-      "  TEST PLANTOP SCHEME,          !- Name",
-      "  Ice Thermal Storage On-peak,  !- On-Peak Schedule",
-      "  Ice Thermal Storage Charging,  !- Charging Availability Schedule",
-      "  7.00,                    !- Non-Charging Chilled Water Temperature {C}",
-      "  -5.00,                   !- Charging Chilled Water Temperature {C}",
-      "  Chiller:Electric:EIR,    !- Component 1 Object Type",
-      "  Chiller,                 !- Component 1 Name",
-      "  Primary CHW Loop Pump Water Outlet Node,  !- Component 1 Demand Calculation Node Name",
-      "  Chiller CHW Outlet Node, !- Component 1 Setpoint Node Name",
-      "  0.001351,                !- Component 1 Flow Rate {m3/s}",
-      "  Cooling,                 !- Component 1 Operation Type",
-      "  ThermalStorage:Ice:Detailed,  !- Component 2 Object Type",
-      "  Ice Thermal Storage,     !- Component 2 Name",
-      "  Chiller CHW Outlet Node, !- Component 2 Demand Calculation Node Name",
-      "  Ice Thermal Storage Water Outlet Node,  !- Component 2 Setpoint Node Name",
-      "  autosize,                !- Component 2 Flow Rate {m3/s}",
-      "  Cooling;                 !- Component 2 Operation Type",
-      "",
+        "PlantEquipmentOperation:ThermalEnergyStorage,",
+        "  TEST PLANTOP SCHEME,          !- Name",
+        "  Ice Thermal Storage On-peak,  !- On-Peak Schedule",
+        "  Ice Thermal Storage Charging,  !- Charging Availability Schedule",
+        "  7.00,                    !- Non-Charging Chilled Water Temperature {C}",
+        "  -5.00,                   !- Charging Chilled Water Temperature {C}",
+        "  Chiller:Electric:EIR,    !- Component 1 Object Type",
+        "  Chiller,                 !- Component 1 Name",
+        "  Primary CHW Loop Pump Water Outlet Node,  !- Component 1 Demand Calculation Node Name",
+        "  Chiller CHW Outlet Node, !- Component 1 Setpoint Node Name",
+        "  0.001351,                !- Component 1 Flow Rate {m3/s}",
+        "  Cooling,                 !- Component 1 Operation Type",
+        "  ThermalStorage:Ice:Detailed,  !- Component 2 Object Type",
+        "  Ice Thermal Storage,     !- Component 2 Name",
+        "  Chiller CHW Outlet Node, !- Component 2 Demand Calculation Node Name",
+        "  Ice Thermal Storage Water Outlet Node,  !- Component 2 Setpoint Node Name",
+        "  autosize,                !- Component 2 Flow Rate {m3/s}",
+        "  Cooling;                 !- Component 2 Operation Type",
+        "",
 
-      "Schedule:Compact,",
-      "  Ice Thermal Storage On-peak,  !- Name",
-      "  Fraction,                !- Schedule Type Limits Name",
-      "  Through: 12/31,          !- Field 1",
-      "  For: AllDays,            !- Field 2",
-      "  Until: 08:00,0,          !- Field 3",
-      "  Until: 18:00,1,          !- Field 4",
-      "  Until: 24:00,0;          !- Field 5",
+        "Schedule:Compact,",
+        "  Ice Thermal Storage On-peak,  !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 08:00,0,          !- Field 3",
+        "  Until: 18:00,1,          !- Field 4",
+        "  Until: 24:00,0;          !- Field 5",
 
-      "Schedule:Compact,",
-      "  Ice Thermal Storage Charging,  !- Name",
-      "  Fraction,                !- Schedule Type Limits Name",
-      "  Through: 12/31,          !- Field 1",
-      "  For: AllDays,            !- Field 2",
-      "  Until: 08:00,1,          !- Field 3",
-      "  Until: 18:00,0,          !- Field 4",
-      "  Until: 24:00,1;          !- Field 5",
+        "Schedule:Compact,",
+        "  Ice Thermal Storage Charging,  !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 08:00,1,          !- Field 3",
+        "  Until: 18:00,0,          !- Field 4",
+        "  Until: 24:00,1;          !- Field 5",
 
-      "ScheduleTypeLimits,",
-      "  Fraction,                !- Name",
-      "  0.0,                     !- Lower Limit Value",
-      "  1.0,                     !- Upper Limit Value",
-      "  CONTINUOUS,              !- Numeric Type",
-      "  Dimensionless;           !- Unit Type",
+        "ScheduleTypeLimits,",
+        "  Fraction,                !- Name",
+        "  0.0,                     !- Lower Limit Value",
+        "  1.0,                     !- Upper Limit Value",
+        "  CONTINUOUS,              !- Numeric Type",
+        "  Dimensionless;           !- Unit Type",
 
     });
 
@@ -854,7 +849,8 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp) {
     EXPECT_FALSE(ErrorsFound);
 
     std::string const error_string = delimited_string({
-        "   ** Warning ** Equipment Operation Mode was reset to 'DUAL' for Component 'ICE THERMAL STORAGE' in PlantEquipmentOperation:ThermalEnergyStorage='TEST PLANTOP SCHEME'.",
+        "   ** Warning ** Equipment Operation Mode was reset to 'DUAL' for Component 'ICE THERMAL STORAGE' in "
+        "PlantEquipmentOperation:ThermalEnergyStorage='TEST PLANTOP SCHEME'.",
         "   **   ~~~   ** Equipment Operation Mode can only be 'DUAL' for THERMALSTORAGE:ICE:DETAILED objects.",
     });
 
@@ -895,5 +891,4 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp) {
     // We should now alos have two TES SPMs created, and that's all of them
     EXPECT_EQ(state->dataSetPointManager->NumSchTESSetPtMgrs, 2);
     EXPECT_EQ(state->dataSetPointManager->NumAllSetPtMgrs, 2);
-
 }

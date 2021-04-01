@@ -97,7 +97,6 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs)
 
     // no error message from PerformancePrecisionTradeoffs objects
     EXPECT_TRUE(compare_err_stream("", true));
-
 }
 
 TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs_DirectSolution_Message)
@@ -128,15 +127,13 @@ TEST_F(EnergyPlusFixture, Simulationmanager_bool_to_string)
 
 TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
 {
-    DataStringGlobals::outputPerfLogFileName = "eplusout_perflog.csv";
+    state->dataStrGlobals->outputPerfLogFileName = "eplusout_perflog.csv";
 
     // start with no file
-    std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
+    std::remove(state->dataStrGlobals->outputPerfLogFileName.c_str());
 
     // make sure the static variables are cleared
     UtilityRoutines::appendPerfLog(*state, "RESET", "RESET");
-
-    DataStringGlobals::VerString = "EnergyPlus, Version 0.0.0-xxxx, August 14 1945";
 
     // call the function to test
     SimulationManager::writeIntialPerfLogValues(*state, "MODE193");
@@ -147,20 +144,20 @@ TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
     std::ifstream perfLogFile;
     std::stringstream perfLogStrSteam;
 
-    perfLogFile.open(DataStringGlobals::outputPerfLogFileName);
+    perfLogFile.open(state->dataStrGlobals->outputPerfLogFileName);
     perfLogStrSteam << perfLogFile.rdbuf();
     perfLogFile.close();
     std::string perfLogContents = perfLogStrSteam.str();
 
     std::string expectedContents = "Program, Version, TimeStamp,Use Coil Direct Solution,Zone Radiant Exchange Algorithm,"
-        "Override Mode,Number of Timesteps per Hour,Minimum Number of Warmup Days,SuppressAllBeginEnvironmentResets,Minimum System Timestep,MaxZoneTempDiff,MaxAllowedDelTemp,lastHeader,\n"
-        "EnergyPlus, Version 0.0.0-xxxx, August 14 1945,False,ScriptF,MODE193,0,1,False,1.0,0.30,2.0000E-003,lastValue,\n";
+                                   "Override Mode,Number of Timesteps per Hour,Minimum Number of Warmup "
+                                   "Days,SuppressAllBeginEnvironmentResets,Minimum System Timestep,MaxZoneTempDiff,MaxAllowedDelTemp,lastHeader,\n" +
+                                   state->dataStrGlobals->VerStringVar + ",False,ScriptF,MODE193,0,1,False,1.0,0.30,2.0000E-003,lastValue,\n";
 
     EXPECT_EQ(perfLogContents, expectedContents);
 
     // clean up the file
-    std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
-
+    std::remove(state->dataStrGlobals->outputPerfLogFileName.c_str());
 }
 
 TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
@@ -248,7 +245,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
             EXPECT_TRUE(compare_err_stream(expectedError, true));
         }
     }
-
 }
 
 TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_DefaultState)
@@ -410,11 +406,16 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)
     // This will throw a warning in InputProcessor since these aren't supported keys, so do not use assertions
     EXPECT_FALSE(process_idf(idf_objects, false));
     const std::string expected_warning = delimited_string({
-        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][0][key] - \"IgnoreSolarRadiation\" - Failed to match against any enum values.",
-        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][1][key] - \"IgnoreBeamRadiation\" - Failed to match against any enum values.",
-        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][2][key] - \"IgnoreDiffuseRadiation\" - Failed to match against any enum values.",
-        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][3][key] - \"DeveloperFlag\" - Failed to match against any enum values.",
-        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][4][key] - \"TimingFlag\" - Failed to match against any enum values.",
+        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][0][key] - \"IgnoreSolarRadiation\" - Failed to match against "
+        "any enum values.",
+        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][1][key] - \"IgnoreBeamRadiation\" - Failed to match against "
+        "any enum values.",
+        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][2][key] - \"IgnoreDiffuseRadiation\" - Failed to match "
+        "against any enum values.",
+        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][3][key] - \"DeveloperFlag\" - Failed to match against any "
+        "enum values.",
+        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][4][key] - \"TimingFlag\" - Failed to match against any enum "
+        "values.",
     });
     EXPECT_TRUE(compare_err_stream(expected_warning, true));
 
@@ -498,5 +499,4 @@ TEST_F(EnergyPlusFixture, SimulationManager_HVACSizingSimulationChoiceTest)
     EXPECT_TRUE(state->dataGlobal->DoHVACSizingSimulation);
     // get a default value
     EXPECT_EQ(state->dataGlobal->HVACSizingSimMaxIterations, 1);
-
 }

@@ -232,14 +232,14 @@ protected:
 
         cbvav.DXCoolCoilName = "MyDXCoolCoil";
         state->dataDXCoils->DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
-        HeatingCoils::HeatingCoil.allocate(1);
-        HeatingCoils::HeatingCoilNumericFields.allocate(1);
-        HeatingCoils::HeatingCoilNumericFields(1).FieldNames.allocate(20);
-        HeatingCoils::HeatingCoil(1).Name = "MyHeatingCoil";
-        HeatingCoils::HeatingCoil(1).HCoilType_Num = DataHVACGlobals::Coil_HeatingElectric;
-        HeatingCoils::NumHeatingCoils = 1;
-        HeatingCoils::ValidSourceType.dimension(HeatingCoils::NumHeatingCoils, false);
-        HeatingCoils::GetCoilsInputFlag = false;
+        state->dataHeatingCoils->HeatingCoil.allocate(1);
+        state->dataHeatingCoils->HeatingCoilNumericFields.allocate(1);
+        state->dataHeatingCoils->HeatingCoilNumericFields(1).FieldNames.allocate(20);
+        state->dataHeatingCoils->HeatingCoil(1).Name = "MyHeatingCoil";
+        state->dataHeatingCoils->HeatingCoil(1).HCoilType_Num = DataHVACGlobals::Coil_HeatingElectric;
+        state->dataHeatingCoils->NumHeatingCoils = 1;
+        state->dataHeatingCoils->ValidSourceType.dimension(state->dataHeatingCoils->NumHeatingCoils, false);
+        state->dataHeatingCoils->GetCoilsInputFlag = false;
         state->dataSize->UnitarySysEqSizing.allocate(1);
         cbvav.HeatCoilName = "MyHeatingCoil";
         cbvav.DXCoolCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
@@ -273,14 +273,14 @@ protected:
         cbvav.DXCoilInletNode = state->dataDXCoils->DXCoil(1).AirInNode;
         state->dataDXCoils->DXCoil(1).AirOutNode = 8;
         cbvav.DXCoilOutletNode = state->dataDXCoils->DXCoil(1).AirOutNode;
-        HeatingCoils::HeatingCoil(1).AirInletNodeNum = 8;
-        cbvav.HeatingCoilInletNode = HeatingCoils::HeatingCoil(1).AirInletNodeNum;
-        HeatingCoils::HeatingCoil(1).AirOutletNodeNum = 9;
-        HeatingCoils::HeatingCoil(1).TempSetPointNodeNum = 9;
-        cbvav.HeatingCoilOutletNode = HeatingCoils::HeatingCoil(1).AirOutletNodeNum;
-        HeatingCoils::HeatingCoil(1).NominalCapacity = 10000.0;
-        HeatingCoils::HeatingCoil(1).Efficiency = 1.0;
-        HeatingCoils::HeatingCoil(1).SchedPtr = -1;
+        state->dataHeatingCoils->HeatingCoil(1).AirInletNodeNum = 8;
+        cbvav.HeatingCoilInletNode = state->dataHeatingCoils->HeatingCoil(1).AirInletNodeNum;
+        state->dataHeatingCoils->HeatingCoil(1).AirOutletNodeNum = 9;
+        state->dataHeatingCoils->HeatingCoil(1).TempSetPointNodeNum = 9;
+        cbvav.HeatingCoilOutletNode = state->dataHeatingCoils->HeatingCoil(1).AirOutletNodeNum;
+        state->dataHeatingCoils->HeatingCoil(1).NominalCapacity = 10000.0;
+        state->dataHeatingCoils->HeatingCoil(1).Efficiency = 1.0;
+        state->dataHeatingCoils->HeatingCoil(1).SchedPtr = -1;
 
         cbvav.CBVAVBoxOutletNode.allocate(1);
         cbvav.CBVAVBoxOutletNode(1) = 11;
@@ -731,11 +731,11 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_AutoSize)
     cbvav.CoolOutAirVolFlow = DataSizing::AutoSize;
     cbvav.HeatOutAirVolFlow = DataSizing::AutoSize;
     cbvav.NoCoolHeatOutAirVolFlow = DataSizing::AutoSize;
-    HeatingCoils::HeatingCoil(1).NominalCapacity = DataSizing::AutoSize;
+    state->dataHeatingCoils->HeatingCoil(1).NominalCapacity = DataSizing::AutoSize;
     state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1) = DataSizing::AutoSize;
     state->dataDXCoils->DXCoil(1).RatedTotCap(1) = DataSizing::AutoSize;
 
-    cbvav.OpMode = DataHVACGlobals::CycFanCycCoil;   // must set one type of fan operating mode to initialize CalcSetPointTempTarget
+    cbvav.OpMode = DataHVACGlobals::CycFanCycCoil;           // must set one type of fan operating mode to initialize CalcSetPointTempTarget
     state->dataLoopNodes->Node(cbvav.AirInNode).Temp = 24.0; // initialize inlet node temp used to initialize CalcSetPointTempTarget
     cbvav.AirLoopNumber = 1;
     state->dataAirLoop->AirLoopFlow.allocate(cbvav.AirLoopNumber);
@@ -754,7 +754,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_AutoSize)
     // expect coils to size appropriately based on sizing inputs
     EXPECT_EQ(state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1), finalSysSizing.DesMainVolFlow);
     EXPECT_GT(state->dataDXCoils->DXCoil(1).RatedTotCap(1), 30000.0);
-    EXPECT_GT(HeatingCoils::HeatingCoil(1).NominalCapacity, 45000.0);
+    EXPECT_GT(state->dataHeatingCoils->HeatingCoil(1).NominalCapacity, 45000.0);
 }
 
 TEST_F(CBVAVSys, UnitaryBypassVAV_NoOASys)
@@ -912,7 +912,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_InternalOAMixer)
     // reduce load and check that outlet temp meets set point
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = -6000.0;  // load to cooling set point
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = -15000.0; // more load to heating set point
-    cbvav.changeOverTimer = -1.0; // reset timer so GetZoneLoads executes
+    cbvav.changeOverTimer = -1.0;                                                                         // reset timer so GetZoneLoads executes
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     Real64 FullOutput = 0.0;
     HVACUnitaryBypassVAV::CalcCBVAV(*state, cbvavNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
@@ -921,9 +921,10 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_InternalOAMixer)
     EXPECT_NEAR(cbvav.OutletTempSetPoint, 14.392, 0.001);
 
     // switch to heating load and check that outlet temp meets set point
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = 15000.0; // more capacity needed to get to cooling set point
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = 7000.0;  // load to heating set point
-    cbvav.changeOverTimer = -1.0;                                                                  // reset timer so GetZoneLoads executes
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) =
+        15000.0; // more capacity needed to get to cooling set point
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = 7000.0; // load to heating set point
+    cbvav.changeOverTimer = -1.0;                                                                       // reset timer so GetZoneLoads executes
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::HeatingMode);
     EXPECT_EQ(cbvav.NumZonesCooled, 0);
@@ -983,7 +984,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     // initialize cooling load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = -9000.0;  // load to cooling set point
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = -15000.0; // more load to heating set point
-    cbvav.changeOverTimer = -1.0; // reset timer so GetZoneLoads executes
+    cbvav.changeOverTimer = -1.0;                                                                         // reset timer so GetZoneLoads executes
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::CoolingMode);
     EXPECT_EQ(cbvav.NumZonesCooled, 1);
@@ -1001,15 +1002,17 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     state->dataLoopNodes->Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate = 0.3;
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     HVACUnitaryBypassVAV::ControlCBVAVOutput(*state, cbvavNum, FirstHVACIteration, PartLoadFrac, OnOffAirFlowRatio, HXUnitOn);
-    EXPECT_NEAR(state->dataLoopNodes->Node(cbvav.AirOutNode).MassFlowRate, state->dataLoopNodes->Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate, 0.000001);
-    EXPECT_NEAR(cbvav.OutletTempSetPoint, 9.56, 0.01);
     EXPECT_NEAR(
-        state->dataAirLoop->AirLoopFlow(cbvav.AirLoopNumber).BypassMassFlow, state->dataLoopNodes->Node(cbvav.PlenumMixerInletAirNode).MassFlowRate, 0.00001);
+        state->dataLoopNodes->Node(cbvav.AirOutNode).MassFlowRate, state->dataLoopNodes->Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate, 0.000001);
+    EXPECT_NEAR(cbvav.OutletTempSetPoint, 9.56, 0.01);
+    EXPECT_NEAR(state->dataAirLoop->AirLoopFlow(cbvav.AirLoopNumber).BypassMassFlow,
+                state->dataLoopNodes->Node(cbvav.PlenumMixerInletAirNode).MassFlowRate,
+                0.00001);
     EXPECT_NEAR(state->dataLoopNodes->Node(cbvav.PlenumMixerInletAirNode).MassFlowRate, 0.302, 0.001);
 
     // reduce load and check that outlet temp meets set point
     FirstHVACIteration = true;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = -7000.0; // load to cooling set point
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = -7000.0;  // load to cooling set point
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = -15000.0; // more load to heating set point
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     Real64 FullOutput = 0.0;
@@ -1023,19 +1026,23 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     state->dataLoopNodes->Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate = 0.3;
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     HVACUnitaryBypassVAV::ControlCBVAVOutput(*state, cbvavNum, FirstHVACIteration, PartLoadFrac, OnOffAirFlowRatio, HXUnitOn);
-    EXPECT_NEAR(state->dataLoopNodes->Node(cbvav.AirOutNode).MassFlowRate, state->dataLoopNodes->Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate, 0.000001);
-    EXPECT_NEAR(cbvav.OutletTempSetPoint, 12.771, 0.01);
     EXPECT_NEAR(
-        state->dataAirLoop->AirLoopFlow(cbvav.AirLoopNumber).BypassMassFlow, state->dataLoopNodes->Node(cbvav.PlenumMixerInletAirNode).MassFlowRate, 0.00001);
+        state->dataLoopNodes->Node(cbvav.AirOutNode).MassFlowRate, state->dataLoopNodes->Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate, 0.000001);
+    EXPECT_NEAR(cbvav.OutletTempSetPoint, 12.771, 0.01);
+    EXPECT_NEAR(state->dataAirLoop->AirLoopFlow(cbvav.AirLoopNumber).BypassMassFlow,
+                state->dataLoopNodes->Node(cbvav.PlenumMixerInletAirNode).MassFlowRate,
+                0.00001);
     EXPECT_NEAR(state->dataLoopNodes->Node(cbvav.PlenumMixerInletAirNode).MassFlowRate, 0.302, 0.001);
-    Real64 systemFlow = state->dataLoopNodes->Node(cbvav.PlenumMixerInletAirNode).MassFlowRate + state->dataLoopNodes->Node(cbvav.AirOutNode).MassFlowRate;
+    Real64 systemFlow =
+        state->dataLoopNodes->Node(cbvav.PlenumMixerInletAirNode).MassFlowRate + state->dataLoopNodes->Node(cbvav.AirOutNode).MassFlowRate;
     EXPECT_NEAR(systemFlow, cbvav.MaxCoolAirMassFlow, 0.0001);
 
     // switch to heating load and check that outlet temp meets set point
     FirstHVACIteration = true;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = 15000.0; // more capacity needed to get to cooling set point
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = 7000.0;  // load to heating set point
-    cbvav.changeOverTimer = -1.0;                                                                  // reset timer so GetZoneLoads executes
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) =
+        15000.0; // more capacity needed to get to cooling set point
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = 7000.0; // load to heating set point
+    cbvav.changeOverTimer = -1.0;                                                                       // reset timer so GetZoneLoads executes
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::HeatingMode);
     EXPECT_EQ(cbvav.NumZonesCooled, 0);
@@ -1054,10 +1061,12 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     state->dataLoopNodes->Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate = 0.2;
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     HVACUnitaryBypassVAV::ControlCBVAVOutput(*state, cbvavNum, FirstHVACIteration, PartLoadFrac, OnOffAirFlowRatio, HXUnitOn);
-    EXPECT_NEAR(state->dataLoopNodes->Node(cbvav.AirOutNode).MassFlowRate, state->dataLoopNodes->Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate, 0.000001);
-    EXPECT_NEAR(cbvav.OutletTempSetPoint, 35.228, 0.01);
     EXPECT_NEAR(
-        state->dataAirLoop->AirLoopFlow(cbvav.AirLoopNumber).BypassMassFlow, state->dataLoopNodes->Node(cbvav.PlenumMixerInletAirNode).MassFlowRate, 0.00001);
+        state->dataLoopNodes->Node(cbvav.AirOutNode).MassFlowRate, state->dataLoopNodes->Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate, 0.000001);
+    EXPECT_NEAR(cbvav.OutletTempSetPoint, 35.228, 0.01);
+    EXPECT_NEAR(state->dataAirLoop->AirLoopFlow(cbvav.AirLoopNumber).BypassMassFlow,
+                state->dataLoopNodes->Node(cbvav.PlenumMixerInletAirNode).MassFlowRate,
+                0.00001);
     EXPECT_NEAR(state->dataLoopNodes->Node(cbvav.PlenumMixerInletAirNode).MassFlowRate, 0.402, 0.001);
     systemFlow = state->dataLoopNodes->Node(cbvav.PlenumMixerInletAirNode).MassFlowRate + state->dataLoopNodes->Node(cbvav.AirOutNode).MassFlowRate;
     EXPECT_NEAR(systemFlow, cbvav.MaxHeatAirMassFlow, 0.0001);

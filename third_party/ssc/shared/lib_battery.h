@@ -62,8 +62,8 @@ struct thermal_params {
     double h;                    // [W/m2/K] - general heat transfer coefficient
     double resistance;                    // [Ohm] - internal resistance
 
+    bool en_cap_vs_temp;       // if true, no capacity degradation from temp and do not use cap_vs_temp
     util::matrix_t<double> cap_vs_temp;
-    bool analytical_model;       // if true, do not use cap_vs_temp
 
     enum OPTIONS {
         VALUE, SCHEDULE
@@ -119,12 +119,8 @@ protected:
     std::shared_ptr<thermal_params> params;
     std::shared_ptr<thermal_state> state;
 
-    double Ea_d0_1 = 4126.0;
-    double Ea_d0_2 = 9752000;
-    double Rug = 8.314;
-    double T_ref = 298.15;
-
 private:
+
     void initialize();
 
     friend class battery_t;
@@ -312,8 +308,6 @@ public:
     explicit battery_t(std::shared_ptr<battery_params> p);
 
     battery_t(const battery_t &battery);
-
-    battery_t &operator=(const battery_t& rhs);
 
     // replace by capacity
     void setupReplacements(double capacity);

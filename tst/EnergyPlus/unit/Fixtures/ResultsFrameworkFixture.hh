@@ -62,10 +62,10 @@ class ResultsFrameworkFixture : public EnergyPlusFixture
 protected:
     using json = nlohmann::json;
 
-    static void SetUpTestCase()
-    {
-        EnergyPlusFixture::SetUpTestCase(); // Sets up the base fixture
-    }
+    //    static void SetUpTestCase()
+    //    {
+    //        EnergyPlusFixture::SetUpTestCase(); // Sets up the base fixture
+    //    }
     static void TearDownTestCase()
     {
     }
@@ -80,7 +80,7 @@ protected:
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
     }
 
-    static std::string & convertToMonth(EnergyPlusData &state, std::string &datetime)
+    static std::string &convertToMonth(EnergyPlusData &state, std::string &datetime)
     {
         return ResultsFramework::CSVWriter::convertToMonth(state, datetime);
     }

@@ -407,8 +407,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_DOASDXCoilTest)
     ScheduleManager::ProcessScheduleInput(*state);
 
     HVACDXSystem::GetDXCoolingSystemInput(*state);
-    EXPECT_EQ(HVACDXSystem::DXCoolingSystem(1).Name, "DX COOLING COIL SYSTEM");
-    EXPECT_FALSE(HVACDXSystem::DXCoolingSystem(1).ISHundredPercentDOASDXCoil);
+    EXPECT_EQ(state->dataHVACDXSys->DXCoolingSystem(1).Name, "DX COOLING COIL SYSTEM");
+    EXPECT_FALSE(state->dataHVACDXSys->DXCoolingSystem(1).ISHundredPercentDOASDXCoil);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "VS DX COOLING COIL");
 }
 
@@ -530,10 +530,10 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     int ControlNode = 2; // same as outlet node number
 
     HVACDXSystem::GetDXCoolingSystemInput(*state);
-    EXPECT_EQ(HVACDXSystem::DXCoolingSystem(DXSystemNum).Name, "DX COOLING COIL SYSTEM");
-    EXPECT_FALSE(HVACDXSystem::DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil);
+    EXPECT_EQ(state->dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name, "DX COOLING COIL SYSTEM");
+    EXPECT_FALSE(state->dataHVACDXSys->DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXSystemNum).Name, "VS DX COOLING COIL");
-    EXPECT_EQ(2, HVACDXSystem::DXCoolingSystem(DXSystemNum).DXSystemControlNodeNum);
+    EXPECT_EQ(2, state->dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXSystemControlNodeNum);
 
     // set up outdoor environment
     state->dataEnvrn->OutDryBulbTemp = 35.0;
@@ -542,36 +542,36 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     state->dataEnvrn->OutWetBulbTemp = 27.0932;
 
     // set up inputs to test coil control
-    HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp = 18.0;
-    HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = 1.0;
+    state->dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp = 18.0;
+    state->dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = 1.0;
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataLoopNodes->Node(InletNode).MassFlowRate = 5.66336932 * state->dataEnvrn->StdRhoAir;
     state->dataLoopNodes->Node(InletNode).Temp = 24.0;
     state->dataLoopNodes->Node(InletNode).HumRat = 0.012143698;
     state->dataLoopNodes->Node(InletNode).Enthalpy = 55029.3778; // conditions at 65 % RH
-    state->dataLoopNodes->Node(ControlNode).TempSetPoint = HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp;
+    state->dataLoopNodes->Node(ControlNode).TempSetPoint = state->dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp;
     Real64 RHControlHumRat = 0.01119276; // humrat at 24C, 60% RH
     state->dataLoopNodes->Node(ControlNode).HumRatMax = RHControlHumRat;
 
     // test sensible control
     HVACDXSystem::ControlDXSystem(*state, DXSystemNum, FirstHVACIteration, HXUnitOn);
     // system meets temperature set point
-    EXPECT_NEAR(HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp, state->dataLoopNodes->Node(ControlNode).Temp, 0.00001);
+    EXPECT_NEAR(state->dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp, state->dataLoopNodes->Node(ControlNode).Temp, 0.00001);
     // system was not told to meet humidity ratio set point (since DesiredOutletHumRat = 1.0)
     EXPECT_GT(state->dataLoopNodes->Node(ControlNode).HumRat, state->dataLoopNodes->Node(ControlNode).HumRatMax);
     // sensible load met by compressor speed 3
-    EXPECT_EQ(3, HVACDXSystem::DXCoolingSystem(DXSystemNum).SpeedNum);
+    EXPECT_EQ(3, state->dataHVACDXSys->DXCoolingSystem(DXSystemNum).SpeedNum);
 
     // test latent control
-    HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = RHControlHumRat;
+    state->dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = RHControlHumRat;
     HVACDXSystem::ControlDXSystem(*state, DXSystemNum, FirstHVACIteration, HXUnitOn);
 
     // system over cools past temperature set point
-    EXPECT_GT(HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp, state->dataLoopNodes->Node(ControlNode).Temp);
+    EXPECT_GT(state->dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp, state->dataLoopNodes->Node(ControlNode).Temp);
     // system does meet humidity ratio set point
     EXPECT_NEAR(state->dataLoopNodes->Node(ControlNode).HumRat, state->dataLoopNodes->Node(ControlNode).HumRatMax, 0.0000001);
     // latent load needed to increase compressor speed to speed 4
-    EXPECT_EQ(4, HVACDXSystem::DXCoolingSystem(DXSystemNum).SpeedNum);
+    EXPECT_EQ(4, state->dataHVACDXSys->DXCoolingSystem(DXSystemNum).SpeedNum);
 }
 
 TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
@@ -699,20 +699,20 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     state->dataEnvrn->OutWetBulbTemp = 27.0932;
 
     // set up inputs to test coil control
-    HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp = 22.0;
+    state->dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp = 22.0;
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataLoopNodes->Node(InletNode).MassFlowRate = 1.396964 * state->dataEnvrn->StdRhoAir;
     state->dataLoopNodes->Node(InletNode).Temp = 24.0;
     state->dataLoopNodes->Node(InletNode).HumRat = 0.014; // high zone RH, about 75%
-    state->dataLoopNodes->Node(InletNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat); // 55029.3778; // conditions at 65 % RH
-    state->dataLoopNodes->Node(ControlNode).TempSetPoint = HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp;
+    state->dataLoopNodes->Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat); // 55029.3778; // conditions at 65 % RH
+    state->dataLoopNodes->Node(ControlNode).TempSetPoint = state->dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp;
 
     // test sensible control
     HVACDXSystem::ControlDXSystem(*state, DXSystemNum, FirstHVACIteration, HXUnitOn);
     Real64 SHR = state->dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state->dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 0.49605, 0.0001);
-    EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport); // latent degradation only works at low speed
+    EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport);             // latent degradation only works at low speed
     EXPECT_NEAR(0.199, state->dataVariableSpeedCoils->VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is low
 
     // add latent degradation model
@@ -720,15 +720,15 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     state->dataVariableSpeedCoils->VarSpeedCoil(1).Gamma_Rated = 1.5;
     HVACDXSystem::ControlDXSystem(*state, DXSystemNum, FirstHVACIteration, HXUnitOn);
     SHR = state->dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state->dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
-    EXPECT_NEAR(SHR, 1.0, 0.0001); // more sensible capacity so PLR should be lower
-    EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport); // latent degradation only works at low speed
+    EXPECT_NEAR(SHR, 1.0, 0.0001);                                                           // more sensible capacity so PLR should be lower
+    EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport);             // latent degradation only works at low speed
     EXPECT_NEAR(0.099, state->dataVariableSpeedCoils->VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is lower, latent capacity is 0
 
     // test more reasonable zone RH,about 50%
     state->dataLoopNodes->Node(InletNode).HumRat = 0.0092994;
-    state->dataLoopNodes->Node(InletNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat); // 55029.3778; // conditions at 65 % RH
-    state->dataLoopNodes->Node(ControlNode).TempSetPoint = HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp;
+    state->dataLoopNodes->Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat); // 55029.3778; // conditions at 65 % RH
+    state->dataLoopNodes->Node(ControlNode).TempSetPoint = state->dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp;
 
     // remove latent degradation model
     state->dataVariableSpeedCoils->VarSpeedCoil(1).Twet_Rated = 0.0;
@@ -737,7 +737,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     HVACDXSystem::ControlDXSystem(*state, DXSystemNum, FirstHVACIteration, HXUnitOn);
     SHR = state->dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state->dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 0.7624, 0.0001);
-    EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport); // latent degradation only works at low speed
+    EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport);             // latent degradation only works at low speed
     EXPECT_NEAR(0.143, state->dataVariableSpeedCoils->VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is low
 
     // add latent degradation model
@@ -745,8 +745,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     state->dataVariableSpeedCoils->VarSpeedCoil(1).Gamma_Rated = 1.5;
     HVACDXSystem::ControlDXSystem(*state, DXSystemNum, FirstHVACIteration, HXUnitOn);
     SHR = state->dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state->dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
-    EXPECT_NEAR(SHR, 1.0, 0.0001); // more sensible capacity so PLR should be lower
-    EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport); // latent degradation only works at low speed
+    EXPECT_NEAR(SHR, 1.0, 0.0001);                                                           // more sensible capacity so PLR should be lower
+    EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport);             // latent degradation only works at low speed
     EXPECT_NEAR(0.109, state->dataVariableSpeedCoils->VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is lower, latent capacity is 0
 }
 

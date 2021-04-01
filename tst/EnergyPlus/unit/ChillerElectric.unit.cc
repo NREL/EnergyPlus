@@ -156,7 +156,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
     bool RunFlag(true);
     Real64 MyLoad(-20000.0);
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
     auto &thisChiller = state->dataPlantChillers->ElectricChiller(1);
     thisChiller.initialize(*state, RunFlag, MyLoad);
     thisChiller.size(*state);
@@ -199,7 +199,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
-    DataHVACGlobals::TimeStepSys = 60;
+    state->dataHVACGlobal->TimeStepSys = 60;
 
     std::string const idf_objects = delimited_string({
         "  Chiller:Electric,",
@@ -283,7 +283,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     bool RunFlag(true);
     Real64 MyLoad(-20000.0);
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
     auto &thisChiller = state->dataPlantChillers->ElectricChiller(1);
     thisChiller.initialize(*state, RunFlag, MyLoad);
     thisChiller.size(*state);

@@ -167,7 +167,7 @@ public: // Creation
 		}
 	}
 
-	// Sticky Initializer Value Constructor
+	// Sticky CoeffInitializer Value Constructor
 	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
 	explicit
 	Array1D( Sticky< S > const & s ) :

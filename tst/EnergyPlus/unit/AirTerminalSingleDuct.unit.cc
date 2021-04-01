@@ -175,9 +175,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVReheat_GetInputTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataGlobal->NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
-    state->dataGlobal->MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
-    ProcessScheduleInput(*state); // read schedules
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ProcessScheduleInput(*state);               // read schedules
 
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -188,7 +188,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVReheat_GetInputTest)
 
     EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:Reheat", state->dataSingleDuct->sd_airterminal(1).SysType); // AT SD VAV Reheat Type
     EXPECT_EQ("REHEAT ZONE 1", state->dataSingleDuct->sd_airterminal(1).SysName);                                // AT SD VAV Reheat Name
-    EXPECT_GT(state->dataSingleDuct->sd_airterminal(1).ReheatControlNode, 0);                                    // none zero integer node index is expected
+    EXPECT_GT(state->dataSingleDuct->sd_airterminal(1).ReheatControlNode, 0); // none zero integer node index is expected
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuct4PipeInduction_GetInputTest)
@@ -305,9 +305,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuct4PipeInduction_GetInputTest)
 
     process_idf(idf_objects);
 
-    state->dataGlobal->NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
-    state->dataGlobal->MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
-    ProcessScheduleInput(*state); // read schedules
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ProcessScheduleInput(*state);               // read schedules
 
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -316,10 +316,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuct4PipeInduction_GetInputTest)
     GetZoneAirLoopEquipment(*state);
     GetIndUnits(*state);
 
-    EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction", IndUnit(1).UnitType); // AT SD VAV Reheat Type
-    EXPECT_EQ("SPACE1-1 FPIU", IndUnit(1).Name);                                               // AT SD VAV Reheat Name
-    EXPECT_GT(IndUnit(1).HWControlNode, 0);                                                    // none zero integer node index is expected
-    EXPECT_GT(IndUnit(1).CWControlNode, 0);                                                    // none zero integer node index is expected
+    EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction",
+              state->dataHVACSingleDuctInduc->IndUnit(1).UnitType);              // AT SD VAV Reheat Type
+    EXPECT_EQ("SPACE1-1 FPIU", state->dataHVACSingleDuctInduc->IndUnit(1).Name); // AT SD VAV Reheat Name
+    EXPECT_GT(state->dataHVACSingleDuctInduc->IndUnit(1).HWControlNode, 0);      // none zero integer node index is expected
+    EXPECT_GT(state->dataHVACSingleDuctInduc->IndUnit(1).CWControlNode, 0);      // none zero integer node index is expected
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVHeatCool_GetInputTest)
@@ -394,9 +395,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVHeatCool_GetInputTest)
 
     process_idf(idf_objects);
 
-    state->dataGlobal->NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
-    state->dataGlobal->MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
-    ProcessScheduleInput(*state); // read schedules
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ProcessScheduleInput(*state);               // read schedules
 
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -517,9 +518,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheatVarSpeedFan_GetInputTest
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataGlobal->NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
-    state->dataGlobal->MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
-    ProcessScheduleInput(*state); // read schedules
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ProcessScheduleInput(*state);               // read schedules
 
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -528,10 +529,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheatVarSpeedFan_GetInputTest
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
 
-    EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", state->dataSingleDuct->sd_airterminal(1).SysType); // AT SD VAV HeatCool Reheat Type
-    EXPECT_EQ("SPACE1-1 VAV REHEAT", state->dataSingleDuct->sd_airterminal(1).SysName);                                // AT SD VAV HeatCool Reheat Name
-    EXPECT_EQ("COIL:HEATING:WATER", state->dataSingleDuct->sd_airterminal(1).ReheatComp);                              // Reheat Coil Type
-    EXPECT_EQ("SPACE1-1 ZONE COIL", state->dataSingleDuct->sd_airterminal(1).ReheatName);                              // Reheat Coil Name
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan",
+              state->dataSingleDuct->sd_airterminal(1).SysType);                          // AT SD VAV HeatCool Reheat Type
+    EXPECT_EQ("SPACE1-1 VAV REHEAT", state->dataSingleDuct->sd_airterminal(1).SysName);   // AT SD VAV HeatCool Reheat Name
+    EXPECT_EQ("COIL:HEATING:WATER", state->dataSingleDuct->sd_airterminal(1).ReheatComp); // Reheat Coil Type
+    EXPECT_EQ("SPACE1-1 ZONE COIL", state->dataSingleDuct->sd_airterminal(1).ReheatName); // Reheat Coil Name
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
@@ -659,7 +661,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     // set zone air node properties
     state->dataLoopNodes->Node(ZoneAirNodeNum).Temp = 20.0;
     state->dataLoopNodes->Node(ZoneAirNodeNum).HumRat = 0.005;
-    state->dataLoopNodes->Node(ZoneAirNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(ZoneAirNodeNum).Temp, state->dataLoopNodes->Node(ZoneAirNodeNum).HumRat);
+    state->dataLoopNodes->Node(ZoneAirNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(ZoneAirNodeNum).Temp, state->dataLoopNodes->Node(ZoneAirNodeNum).HumRat);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
@@ -1064,11 +1067,13 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     // check inputs and calculated values for turndown fraction set to 1.0
     EXPECT_EQ(0.3, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
     EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
-    EXPECT_EQ(0.3, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes * state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
+    EXPECT_EQ(0.3,
+              state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes * state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.3, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMaxMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMinMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
-    EXPECT_EQ(SysMinMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
+    EXPECT_EQ(SysMinMassFlowRes,
+              state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMinMassFlowRes,
               state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes *
                   state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
@@ -1088,11 +1093,13 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     // check inputs and calculated values for turndown fraction set to 0.5
     EXPECT_EQ(0.3, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
     EXPECT_EQ(0.5, state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
-    EXPECT_EQ(0.15, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes * state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
+    EXPECT_EQ(0.15,
+              state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes * state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.15, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMaxMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMinMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
-    EXPECT_EQ(SysMinMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
+    EXPECT_EQ(SysMinMassFlowRes,
+              state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMinMassFlowRes,
               state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes *
                   state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
@@ -1234,8 +1241,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-     state->dataHeatBalFanSys->TempControlType.allocate(1);
-     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
@@ -1247,8 +1254,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     EXPECT_EQ("VAV REHEAT VS FAN AT", state->dataSingleDuct->sd_airterminal(SysNum).SysName);                               // VAV Reheat Name
     EXPECT_TRUE(state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchExist);                              // turndown schdule exists
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac, 1.0);                                   // initialized to 1.0
-    EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes, 0.1);                                        // input from VAV reheat air terminal
-    EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate, 1.0);                                        // input from VAV reheat air terminal
+    EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes, 0.1); // input from VAV reheat air terminal
+    EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate, 1.0); // input from VAV reheat air terminal
 
     // calculate mass flow rates
     Real64 SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.10 * 1.0; // min flow rate at 1.0 turndown fraction
@@ -1269,11 +1276,13 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     // check inputs and calculated values for turndown fraction set to 1.0
     EXPECT_EQ(0.1, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
     EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
-    EXPECT_EQ(0.1, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes * state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
+    EXPECT_EQ(0.1,
+              state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes * state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.1, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMaxMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMinMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
-    EXPECT_EQ(SysMinMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
+    EXPECT_EQ(SysMinMassFlowRes,
+              state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMinMassFlowRes,
               state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes *
                   state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
@@ -1293,11 +1302,13 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     // check inputs and calculated values for turndown fraction set to 0.5
     EXPECT_EQ(0.1, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
     EXPECT_EQ(0.5, state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
-    EXPECT_EQ(0.05, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes * state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
+    EXPECT_EQ(0.05,
+              state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes * state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.05, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMaxMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMinMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
-    EXPECT_EQ(SysMinMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
+    EXPECT_EQ(SysMinMassFlowRes,
+              state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMinMassFlowRes,
               state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes *
                   state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
@@ -1406,8 +1417,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-     state->dataHeatBalFanSys->TempControlType.allocate(1);
-     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
@@ -1419,8 +1430,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     EXPECT_EQ("VAV CBP GAS REHEAT AT", state->dataSingleDuct->sd_airterminal(SysNum).SysName);                         // VAV HeatCool Reheat Name
     EXPECT_TRUE(state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchExist);                         // turndown schdule exists
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac, 1.0);                              // initialized to 1.0
-    EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes, 0.2);                                   // input from VAV HeatCool reheat air terminal
-    EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate, 1.0);                                   // input from VAV HeatCool reheat air terminal
+    EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes, 0.2); // input from VAV HeatCool reheat air terminal
+    EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate, 1.0); // input from VAV HeatCool reheat air terminal
 
     // calculate mass flow rates
     Real64 SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.20 * 1.0; // min flow rate at 1.0 turndown fraction
@@ -1441,11 +1452,13 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     // check inputs and calculated values for turndown fraction set to 1.0
     EXPECT_EQ(0.2, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
     EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
-    EXPECT_EQ(0.2, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes * state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
+    EXPECT_EQ(0.2,
+              state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes * state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.2, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMaxMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMinMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
-    EXPECT_EQ(SysMinMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
+    EXPECT_EQ(SysMinMassFlowRes,
+              state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMinMassFlowRes,
               state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes *
                   state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
@@ -1465,11 +1478,13 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     // check inputs and calculated values for turndown fraction set to 0.5
     EXPECT_EQ(0.2, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
     EXPECT_EQ(0.5, state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
-    EXPECT_EQ(0.1, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes * state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
+    EXPECT_EQ(0.1,
+              state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes * state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.1, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMaxMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMinMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
-    EXPECT_EQ(SysMinMassFlowRes, state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
+    EXPECT_EQ(SysMinMassFlowRes,
+              state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMinMassFlowRes,
               state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax * state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes *
                   state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
@@ -1589,8 +1604,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-     state->dataHeatBalFanSys->TempControlType.allocate(1);
-     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
@@ -1709,8 +1724,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
         "     ,                          !- Part Load Fraction Correlation Curve Name",
         "     0;                         !- Parasitic Fuel Load {W}",
 
-
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
     // setup variables for VAV HeatCoolReheat
@@ -1734,8 +1748,8 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-     state->dataHeatBalFanSys->TempControlType.allocate(1);
-     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
@@ -1747,8 +1761,8 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     EXPECT_TRUE(compare_err_stream(""));
     // check VAV heatcool reheat air terminal inputs
     EXPECT_EQ("AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat", thisHeatCoolAT.SysType); // VAV HeatCool Reheat Type
-    EXPECT_EQ("VAV CBP GAS REHEAT AT", thisHeatCoolAT.SysName); // VAV HeatCool Reheat Name
-    EXPECT_EQ(thisHeatCoolAT.MaxAirVolFlowRate, 1.0); // input from VAV HeatCool reheat air terminal
+    EXPECT_EQ("VAV CBP GAS REHEAT AT", thisHeatCoolAT.SysName);                         // VAV HeatCool Reheat Name
+    EXPECT_EQ(thisHeatCoolAT.MaxAirVolFlowRate, 1.0);                                   // input from VAV HeatCool reheat air terminal
     ;
 
     int ZoneNodeNum = 1;

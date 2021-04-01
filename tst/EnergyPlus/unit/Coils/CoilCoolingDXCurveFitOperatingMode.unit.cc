@@ -49,28 +49,29 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "../Coils/CoilCoolingDXFixture.hh"
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
-#include "../Coils/CoilCoolingDXFixture.hh"
 
 using namespace EnergyPlus;
 
-TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitModeInput )
+TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitModeInput)
 {
     std::string idf_objects = this->getModeObjectString("mode1", 2);
-    EXPECT_TRUE(process_idf( idf_objects, false ));
+    EXPECT_TRUE(process_idf(idf_objects, false));
     CoilCoolingDXCurveFitOperatingMode thisMode(*state, "mode1");
     EXPECT_EQ("MODE1", thisMode.name);
     EXPECT_EQ("MODE1SPEED1", thisMode.speeds[0].name);
 }
 
-TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
+TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing)
+{
 
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     std::string idf_objects = delimited_string({
 
@@ -113,14 +114,13 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
         "  Coil Cooling DX Curve Fit Speed 1;      !- Speed Name 1",
     });
     idf_objects += this->getSpeedObjectString("Coil Cooling DX Curve Fit Speed 1");
-    EXPECT_TRUE(process_idf( idf_objects, false ));
+    EXPECT_TRUE(process_idf(idf_objects, false));
     CoilCoolingDXCurveFitOperatingMode thisMode(*state, "Coil Cooling DX Curve Fit Operating Mode 1");
     EXPECT_EQ(CoilCoolingDXCurveFitOperatingMode::CondenserType::EVAPCOOLED, thisMode.condenserType);
     EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedEvapAirFlowRate);
     EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedGrossTotalCap);
     EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedCondAirFlowRate);
     EXPECT_EQ(DataSizing::AutoSize, thisMode.nominalEvaporativePumpPower);
-
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->ZoneEqSizing.allocate(1);
@@ -149,7 +149,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
     thisMode.size(*state);
 
     // We need to commit, so that the ComponentSizes is actually written
-    EnergyPlus::sqlite->sqliteCommit();
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     EXPECT_EQ(ratedEvapAirFlowRate, thisMode.ratedEvapAirFlowRate);
     Real64 ratedGrossTotalCap = 18827.616766698276;
@@ -207,6 +207,5 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
         }
     }
 
-    EnergyPlus::sqlite->sqliteCommit();
-
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }

@@ -176,7 +176,6 @@ set(SRC
     DataGlobalConstants.cc
     DataGlobalConstants.hh
     DataGlobals.hh
-    DataHVACControllers.cc
     DataHVACControllers.hh
     DataHVACGlobals.cc
     DataHVACGlobals.hh
@@ -185,14 +184,12 @@ set(SRC
     DataHeatBalSurface.hh
     DataHeatBalance.cc
     DataHeatBalance.hh
-    DataIPShortCuts.cc
     DataIPShortCuts.hh
     DataLoopNode.hh
     DataMoistureBalance.hh
     DataMoistureBalanceEMPD.hh
     DataOutputs.cc
     DataOutputs.hh
-    DataPhotovoltaics.cc
     DataPhotovoltaics.hh
     DataPrecisionGlobals.hh
     DataReportingFlags.hh
@@ -217,7 +214,6 @@ set(SRC
     DataTimings.hh
     DataUCSDSharedData.hh
     DataVectorTypes.hh
-    DataViewFactorInformation.cc
     DataViewFactorInformation.hh
     DataWater.hh
     DataWindowEquivalentLayer.hh
@@ -516,6 +512,7 @@ set(SRC
     PoweredInductionUnits.hh
     Psychrometrics.cc
     Psychrometrics.hh
+    PsychCacheData.hh
     Pumps.cc
     Pumps.hh
     PurchasedAirManager.cc
@@ -569,8 +566,6 @@ set(SRC
     SplitterComponent.hh
     StandardRatings.cc
     StandardRatings.hh
-    StateManagement.cc
-    StateManagement.hh
     SteamBaseboardRadiator.cc
     SteamBaseboardRadiator.hh
     SteamCoils.cc

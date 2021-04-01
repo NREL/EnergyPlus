@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SurfaceOctree.hh>
 
 namespace EnergyPlus {
 
@@ -62,28 +63,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace HeatBalanceManager {
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern std::string CurrentModuleObject; // to assist in getting input
-
-    // Subroutine Specifications for the Heat Balance Module
-    // Driver Routines
-
-    // Input reader routines for the module
-
-    // Initialization routines for module
-
-    // Record Keeping/Utility Routines for Module
-
-    // Reporting routines for module
-
-    // Types
 
     struct WarmupConvergence
     {
@@ -105,18 +84,7 @@ namespace HeatBalanceManager {
         }
     };
 
-    // Object Data
-
-    // Functions
-
-    // Clears the global data in HeatBalanceManager.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
     void ManageHeatBalance(EnergyPlusData &state);
-
-    // Get Input Section of the Module
-    //******************************************************************************
 
     void GetHeatBalanceInput(EnergyPlusData &state);
 
@@ -159,24 +127,12 @@ namespace HeatBalanceManager {
                          Array1D_bool const &lAlphaFieldBlanks,
                          Array1D_string const &cAlphaFieldNames,
                          Array1D_string const &cNumericFieldNames, // Unused
-                         bool &ErrorsFound                        // If errors found in input
+                         bool &ErrorsFound                         // If errors found in input
     );
-
-    // End of Get Input subroutines for the HB Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
 
     void InitHeatBalance(EnergyPlusData &state);
 
     void AllocateHeatBalArrays(EnergyPlusData &state);
-
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Beginning of Record Keeping subroutines for the HB Module
-    // *****************************************************************************
 
     void RecKeepHeatBalance(EnergyPlusData &state);
 
@@ -186,15 +142,7 @@ namespace HeatBalanceManager {
 
     void UpdateWindowFaceTempsNonBSDFWin(EnergyPlusData &state);
 
-    //        End of Record Keeping subroutines for the HB Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the HB Module
-    // *****************************************************************************
-
     void ReportHeatBalance(EnergyPlusData &state);
-
-    //        End of Reporting subroutines for the HB Module
 
     void OpenShadingFile(EnergyPlusData &state);
 
@@ -240,8 +188,20 @@ namespace HeatBalanceManager {
 
 } // namespace HeatBalanceManager
 
-struct HeatBalanceMgrData : BaseGlobalStruct {
+struct HeatBalanceMgrData : BaseGlobalStruct
+{
 
+    bool ManageHeatBalanceGetInputFlag = true;
+    bool DoReport = false;
+    bool ChangeSet = true; // Toggle for checking storm windows
+    bool FirstWarmupWrite = true;
+    bool WarmupConvergenceWarning = false;
+    bool SizingWarmupConvergenceWarning = false;
+    bool ReportWarmupConvergenceFirstWarmupWrite = true;
+
+    std::string CurrentModuleObject; // to assist in getting input
+    std::unordered_map<std::string, std::string> UniqueMaterialNames;
+    std::unordered_map<std::string, std::string> UniqueConstructNames;
 
     // Real Variables for the Heat Balance Simulation
     // Variables used to determine warmup convergence
@@ -273,9 +233,22 @@ struct HeatBalanceMgrData : BaseGlobalStruct {
     int CountWarmupDayPoints; // Count of warmup timesteps (to achieve warmup)
 
     Array1D<HeatBalanceManager::WarmupConvergence> WarmupConvergenceValues;
+    SurfaceOctreeCube surfaceOctree;
 
     void clear_state() override
     {
+
+        ManageHeatBalanceGetInputFlag = true;
+        UniqueMaterialNames.clear();
+        UniqueConstructNames.clear();
+        DoReport = false;
+        ChangeSet = true;
+        FirstWarmupWrite = true;
+        WarmupConvergenceWarning = false;
+        SizingWarmupConvergenceWarning = false;
+        ReportWarmupConvergenceFirstWarmupWrite = true;
+
+        CurrentModuleObject = std::string();
         MaxCoolLoadPrevDay.clear();
         MaxCoolLoadZone.clear();
         MaxHeatLoadPrevDay.clear();
@@ -301,6 +274,7 @@ struct HeatBalanceMgrData : BaseGlobalStruct {
         CountWarmupDayPoints = int();
 
         WarmupConvergenceValues.clear();
+        surfaceOctree = SurfaceOctreeCube();
     }
 };
 

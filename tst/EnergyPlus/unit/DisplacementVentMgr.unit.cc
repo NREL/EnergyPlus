@@ -278,7 +278,7 @@ TEST_F(EnergyPlusFixture, DVThirdOrderFloorTempCalculation)
     Real64 const zoneMultiplier = 1;
     Real64 const airCap = 100;
 
-    Real64 temp = calculateThirdOrderFloorTemperature(tempHistoryTerm, HAT_floor, HA_floor, MCpT_Total, MCp_Total, occupiedTemp, nonAirSystemResponse,
-                                                      zoneMultiplier, airCap);
+    Real64 temp = calculateThirdOrderFloorTemperature(
+        tempHistoryTerm, HAT_floor, HA_floor, MCpT_Total, MCp_Total, occupiedTemp, nonAirSystemResponse, zoneMultiplier, airCap);
     EXPECT_NEAR(0.4799, temp, 0.0001);
 }

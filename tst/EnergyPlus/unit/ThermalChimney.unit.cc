@@ -1078,20 +1078,18 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    using namespace EnergyPlus::DataIPShortCuts;
-
-    lNumericFieldBlanks.allocate(1000);
-    lAlphaFieldBlanks.allocate(1000);
-    cAlphaFieldNames.allocate(1000);
-    cNumericFieldNames.allocate(1000);
-    cAlphaArgs.allocate(1000);
-    rNumericArgs.allocate(1000);
-    lNumericFieldBlanks = false;
-    lAlphaFieldBlanks = false;
-    cAlphaFieldNames = " ";
-    cNumericFieldNames = " ";
-    cAlphaArgs = " ";
-    rNumericArgs = 0.0;
+    state->dataIPShortCut->lNumericFieldBlanks.allocate(1000);
+    state->dataIPShortCut->lAlphaFieldBlanks.allocate(1000);
+    state->dataIPShortCut->cAlphaFieldNames.allocate(1000);
+    state->dataIPShortCut->cNumericFieldNames.allocate(1000);
+    state->dataIPShortCut->cAlphaArgs.allocate(1000);
+    state->dataIPShortCut->rNumericArgs.allocate(1000);
+    state->dataIPShortCut->lNumericFieldBlanks = false;
+    state->dataIPShortCut->lAlphaFieldBlanks = false;
+    state->dataIPShortCut->cAlphaFieldNames = " ";
+    state->dataIPShortCut->cNumericFieldNames = " ";
+    state->dataIPShortCut->cAlphaArgs = " ";
+    state->dataIPShortCut->rNumericArgs = 0.0;
 
     bool localErrorsFound = false;
     // Read objects
@@ -1151,5 +1149,4 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     state->dataThermalChimneys->ThermalChimneySys(1).EMSAirFlowRateValue = 0.01;
     ThermalChimney::CalcThermalChimney(*state);
     EXPECT_NEAR(state->dataThermalChimneys->ThermalChimneyReport(1).OverallTCVolumeFlow, 0.01, 0.0001);
-
 }
