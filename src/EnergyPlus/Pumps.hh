@@ -88,15 +88,20 @@ namespace Pumps {
     };
 
     extern std::string const cPump_VarSpeed;
-    extern int const Pump_VarSpeed;
     extern std::string const cPump_ConSpeed;
-    extern int const Pump_ConSpeed;
     extern std::string const cPump_Cond;
-    extern int const Pump_Cond;
     extern std::string const cPumpBank_VarSpeed;
-    extern int const PumpBank_VarSpeed;
     extern std::string const cPumpBank_ConSpeed;
-    extern int const PumpBank_ConSpeed;
+
+    enum class iPumpType :int {
+        Unassigned = 0,
+        VarSpeed = 101,
+        ConSpeed = 102,
+        Cond = 103,
+        Bank_VarSpeed = 104,
+        Bank_ConSpeed = 105
+    };
+
     extern Array1D_string const cPumpTypes;
 
     enum powerSizingMethodEnum
@@ -139,7 +144,7 @@ namespace Pumps {
         std::string Name;               // user identifier
         std::string PumpSchedule;       // Schedule to modify the design nominal capacity of the pump
         std::string PressureCurve_Name; // - placeholder for pump curve name
-        int PumpType;                   // pump type integer, based on local parameter values, used to identify
+        iPumpType PumpType;                   // pump type integer, based on local parameter values, used to identify
         // index in the cPumpTypes string array to do error reporting
         int TypeOf_Num;                              // pump type of number in reference to the dataplant values
         int LoopNum;                                 // loop where pump is located
@@ -202,7 +207,7 @@ namespace Pumps {
 
         // Default Constructor
         PumpSpecs()
-            : PumpType(0), TypeOf_Num(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), PumpControl(PumpControlType::Unassigned), PumpScheduleIndex(0), InletNodeNum(0), OutletNodeNum(0), SequencingScheme(PumpBankControlSeq::Unassigned), FluidIndex(0), NumPumpsInBank(0),
+            : PumpType(iPumpType::Unassigned), TypeOf_Num(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), PumpControl(PumpControlType::Unassigned), PumpScheduleIndex(0), InletNodeNum(0), OutletNodeNum(0), SequencingScheme(PumpBankControlSeq::Unassigned), FluidIndex(0), NumPumpsInBank(0),
               PowerErrIndex1(0), PowerErrIndex2(0), MinVolFlowRateFrac(0.0),
               NomVolFlowRate(0.0), NomVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0), EMSMassFlowOverrideOn(false), EMSMassFlowValue(0.0),
               NomSteamVolFlowRate(0.0), NomSteamVolFlowRateWasAutoSized(false), MinVolFlowRate(0.0), minVolFlowRateWasAutosized(false),

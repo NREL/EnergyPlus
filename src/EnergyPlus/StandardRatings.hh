@@ -89,9 +89,14 @@ namespace StandardRatings {
     // Std. AHRI AHRI 340/360 Dry-bulb Temp at reduced capacity, <= 0.444
 
     // Defrost control  (heat pump only)
-    extern int const Timed;                             // defrost cycle is timed
-    extern int const OnDemand;                          // defrost cycle occurs only when required
+    enum class HPdefrostControl : int {
+        Unassigned = 0,
+        Timed = 1,   // defrost cycle is timed
+        OnDemand = 2 // defrost cycle occurs only when required
+    };
+
     extern int const TotalNumOfStandardDHRs;            // Total number of standard design heating requirements
+
     extern Array1D_int const TotalNumOfTemperatureBins; // Total number of temperature
     // bins for a region
     extern Array1D<Real64> const StandardDesignHeatingRequirement;
@@ -144,15 +149,15 @@ namespace StandardRatings {
     // Functions
 
     void CalcChillerIPLV(EnergyPlusData &state,
-                         std::string const &ChillerName,             // Name of Chiller for which IPLV is calculated
-                         int const ChillerType,                      // Type of Chiller - EIR or Reformulated EIR
-                         Real64 const RefCap,                        // Reference capacity of chiller [W]
-                         Real64 const RefCOP,                        // Reference coefficient of performance [W/W]
-                         DataPlant::CondenserType const CondenserType,   // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
-                         int const CapFTempCurveIndex,               // Index for the total cooling capacity modifier curve
-                         int const EIRFTempCurveIndex,               // Index for the energy input ratio modifier curve
-                         int const EIRFPLRCurveIndex,                // Index for the EIR vs part-load ratio curve
-                         Real64 const MinUnloadRat,                  // Minimum unloading ratio
+                         std::string const &ChillerName,               // Name of Chiller for which IPLV is calculated
+                         int const ChillerType,                        // Type of Chiller - EIR or Reformulated EIR
+                         Real64 const RefCap,                          // Reference capacity of chiller [W]
+                         Real64 const RefCOP,                          // Reference coefficient of performance [W/W]
+                         DataPlant::CondenserType const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
+                         int const CapFTempCurveIndex,                 // Index for the total cooling capacity modifier curve
+                         int const EIRFTempCurveIndex,                 // Index for the energy input ratio modifier curve
+                         int const EIRFPLRCurveIndex,                  // Index for the EIR vs part-load ratio curve
+                         Real64 const MinUnloadRat,                    // Minimum unloading ratio
                          Real64 &IPLV,
                          Optional<Real64 const> EvapVolFlowRate,
                          Optional_int_const CondLoopNum,
@@ -202,7 +207,7 @@ namespace StandardRatings {
             _, // The outdoor temperature when the compressor is automatically turned //Autodesk:OPTIONAL Used without PRESENT check
         Optional_bool_const OATempCompressorOnOffBlank =
             _,                                 // Flag used to determine low temperature cut out factor //Autodesk:OPTIONAL Used without PRESENT check
-        Optional_int_const DefrostControl = _, // defrost control; 1=timed, 2=on-demand //Autodesk:OPTIONAL Used without PRESENT check
+        Optional<HPdefrostControl> DefrostControl = _, // defrost control; 1=timed, 2=on-demand //Autodesk:OPTIONAL Used without PRESENT check
         Optional_bool_const ASHRAE127StdRprt = _ // true if user wishes to report ASHRAE 127 standard ratings
     );
 
@@ -223,7 +228,7 @@ namespace StandardRatings {
         Optional<Real64 const> MinOATCompressor = _,        // Minimum OAT for heat pump compressor operation [C]
         Optional<Real64 const> OATempCompressorOn = _,      // The outdoor temperature when the compressor is automatically turned
         Optional_bool_const OATempCompressorOnOffBlank = _, // Flag used to determine low temperature cut out factor
-        Optional_int_const DefrostControl = _               // defrost control; 1=timed, 2=on-demand
+        Optional<HPdefrostControl> DefrostControl = _       // defrost control; 1=timed, 2=on-demand
     );
 
     void SingleSpeedDXCoolingCoilStandardRatings(
@@ -301,7 +306,7 @@ namespace StandardRatings {
         Optional<Real64 const> MinOATCompressor = _,               // Minimum OAT for heat pump compressor operation [C]
         Optional<Real64 const> OATempCompressorOn = _,             // The outdoor temperature when the compressor is automatically turned
         Optional_bool_const OATempCompressorOnOffBlank = _,        // Flag used to determine low temperature cut out factor
-        Optional_int_const DefrostControl = _                      // defrost control; 1=timed, 2=on-demand
+        Optional<HPdefrostControl> DefrostControl = _              // defrost control; 1=timed, 2=on-demand
     );
 
     void ReportDXCoilRating(EnergyPlusData &state,
