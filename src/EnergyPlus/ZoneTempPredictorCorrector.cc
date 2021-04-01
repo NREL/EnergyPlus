@@ -1348,16 +1348,6 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                         cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid range " +
                                             state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\"");
                         ShowContinueError(state, "..contains values outside of range [0,4].");
-                    ErrorsFound = true;
-                } else {
-                    // Check validity of control types.
-                    ValidScheduleControlType = CheckScheduleValueMinMax(
-                        state, state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ComfortSchedIndex, ">=", 0.0, "<=", 4.0);
-                    if (!ValidScheduleControlType) {
-                        ShowSevereError(state,
-                                        cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(5) + "=\"" +
-                                            cAlphaArgs(5) + "\"");
-                        ShowContinueError(state, "..contains values outside of range [0,4].");
                         ErrorsFound = true;
                     }
                 }
@@ -2285,7 +2275,6 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             }     // found thermostat referene
         }         // loop over NumOpTempControlledZones
     }             // NumOpTempControlledZones > 0
-                    }
 
     // Overcool dehumidificaton GetInput starts here
     cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TandHStat));
@@ -2387,40 +2376,6 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                             ShowSevereError(state,
                                             cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + " invalid values " +
                                                 state.dataIPShortCut->cAlphaFieldNames(5) + "=[" + state.dataIPShortCut->cAlphaArgs(5) + "\".");
-                            ShowContinueError(state, "..Values outside of range [0.0,3.0].");
-                        ErrorsFound = true;
-                    }
-
-                    // check validity of zone Overcool constant range
-                    if ((state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolConstRange < 0.0) &&
-                        (!(state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled))) {
-                        ShowSevereError(state,
-                                        format("{}={} invalid {}=[{:.2T}\" cannot be negative.",
-                                               cCurrentModuleObject,
-                                               cAlphaArgs(1),
-                                               cNumericFieldNames(1),
-                                               rNumericArgs(1)));
-                        ErrorsFound = true;
-                    }
-                    if ((state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolConstRange > 3.0) &&
-                        (!(state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled))) {
-                        ShowSevereError(state,
-                                        format("{}={} invalid {}=[{:.2T}\" cannot be > 3.0",
-                                               cCurrentModuleObject,
-                                               cAlphaArgs(1),
-                                               cNumericFieldNames(1),
-                                               rNumericArgs(1)));
-                        ErrorsFound = true;
-                    }
-
-                    // check zone Overcool range schedule min/max values.
-                    if (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled) {
-                        ValidZoneOvercoolRangeSched = CheckScheduleValueMinMax(
-                            state, state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolRangeSchedIndex, ">=", 0.0, "<=", 3.0);
-                        if (!ValidZoneOvercoolRangeSched) {
-                            ShowSevereError(state,
-                                            cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid values " + cAlphaFieldNames(5) + "=[" +
-                                                cAlphaArgs(5) + "\".");
                             ShowContinueError(state, "..Values outside of range [0.0,3.0].");
                             ErrorsFound = true;
                         }
