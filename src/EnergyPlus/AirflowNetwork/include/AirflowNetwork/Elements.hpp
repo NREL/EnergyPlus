@@ -1487,6 +1487,8 @@ namespace AirflowNetwork {
         Real64 TotalLat;
         Real64 SumMCp;
         Real64 SumMCpT;
+        Real64 SumMVCp;
+        Real64 SumMVCpT;
         Real64 SumMHr;
         Real64 SumMHrW;
         Real64 SumMMCp;
@@ -1503,7 +1505,8 @@ namespace AirflowNetwork {
         // Default Constructor
         AirflowNetworkExchangeProp()
             : MultiZoneSen(0.0), MultiZoneLat(0.0), LeakSen(0.0), LeakLat(0.0), CondSen(0.0), DiffLat(0.0), RadGain(0.0), TotalSen(0.0),
-              TotalLat(0.0), SumMCp(0.0), SumMCpT(0.0), SumMHr(0.0), SumMHrW(0.0), SumMMCp(0.0), SumMMCpT(0.0), SumMMHr(0.0), SumMMHrW(0.0),
+              TotalLat(0.0), SumMCp(0.0), SumMCpT(0.0), SumMVCp(0.0), SumMVCpT(0.0), SumMHr(0.0), SumMHrW(0.0), SumMMCp(0.0), SumMMCpT(0.0),
+              SumMMHr(0.0), SumMMHrW(0.0),
               SumMHrCO(0.0), SumMMHrCO(0.0), TotalCO2(0.0), SumMHrGC(0.0), SumMMHrGC(0.0), TotalGC(0.0)
         {
         }
