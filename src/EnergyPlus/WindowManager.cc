@@ -2357,7 +2357,7 @@ namespace WindowManager {
 
         } else { // regular window, not BSDF, not EQL Window
 
-            ConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(SurfNum);
+            ConstrNum = state.dataSurface->SurfWinActiveConstruction(SurfNum);
 
             // Added for thermochromic windows
             state.dataWindowManager->locTCFlag = (state.dataConstruction->Construct(ConstrNum).TCFlag == 1);
@@ -2519,7 +2519,7 @@ namespace WindowManager {
 
             IConst = ConstrNum;
             if (ANY_SHADE_SCREEN(ShadeFlag) || ANY_BLIND(ShadeFlag)) {
-                IConst = state.dataSurface->SurfWinActiveStormWinShadedConstr(SurfNum);
+                IConst = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
             }
             TotLay = state.dataConstruction->Construct(IConst).TotLayers;
             IGlass = 0;
@@ -3906,8 +3906,8 @@ namespace WindowManager {
 
             // Correct WinHeatGain for interior diffuse shortwave (solar and shortwave from lights) transmitted
             // back out window
-            ConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(SurfNum);
-            ConstrNumSh = state.dataSurface->SurfWinActiveStormWinShadedConstr(SurfNum);
+            ConstrNum = state.dataSurface->SurfWinActiveConstruction(SurfNum);
+            ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
 
             TransDiff = state.dataConstruction->Construct(ConstrNum).TransDiff; // Default value for TransDiff here
             if (NOT_SHADED(ShadeFlag)) {
@@ -4069,7 +4069,7 @@ namespace WindowManager {
         //               Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
         // DATA AirProps / 1.29, -0.4d-2, 2.41d-2, 7.6d-5, 1.73d-5, 1.0d-7, 0.72,   1.8d-3  /
 
-        ConstrNumSh = state.dataSurface->SurfWinActiveStormWinShadedConstr(SurfNum);
+        ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
         ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
         nglassfaces = 2 * state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers;
         TotGaps = state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers;

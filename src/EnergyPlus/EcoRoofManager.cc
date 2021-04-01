@@ -226,7 +226,7 @@ namespace EcoRoofManager {
                         // consistent with FASST TR-04-25 p. x (W' = 2.0)
         }
 
-        ConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(SurfNum);
+        ConstrNum = state.dataSurface->SurfWinActiveConstruction(SurfNum);
         RoughSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
         AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
         HMovInsul = 0.0;

@@ -1325,7 +1325,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataScheduleMgr->Schedule(3).CurrentValue = 1.5;
     state->dataScheduleMgr->Schedule(4).CurrentValue = 90.0;
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
-        state->dataSurface->SurfWinActiveStormWinConstr(SurfNum) = state->dataSurface->Surface(SurfNum).Construction;
+        state->dataSurface->SurfWinActiveConstruction(SurfNum) = state->dataSurface->Surface(SurfNum).Construction;
     }
 
     OutAirNodeManager::InitOutAirNodes(*state);
@@ -1892,7 +1892,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
-        state->dataSurface->SurfWinActiveStormWinConstr(SurfNum) = state->dataSurface->Surface(SurfNum).Construction;
+        state->dataSurface->SurfWinActiveConstruction(SurfNum) = state->dataSurface->Surface(SurfNum).Construction;
     }
 
     InitSurfaceHeatBalance(*state);
@@ -2471,7 +2471,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     InitSurfaceHeatBalance(*state);
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
         state->dataSurface->Surface(SurfNum).ExtConvCoeff = -1;
-        state->dataSurface->SurfWinActiveStormWinConstr(SurfNum) = state->dataSurface->Surface(SurfNum).Construction;
+        state->dataSurface->SurfWinActiveConstruction(SurfNum) = state->dataSurface->Surface(SurfNum).Construction;
     }
     // Test Additional Heat Source Calculation
     CalcHeatBalanceOutsideSurf(*state);

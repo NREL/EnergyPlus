@@ -1582,9 +1582,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinWindowModelType; // if set to WindowBSDFModel, then uses BSDF methods
     Array1D<Real64> SurfWinTDDPipeNum;      // Tubular daylighting device pipe number for TDD domes and diffusers
     Array1D<int> SurfWinStormWinConstr;                  // Construction with storm window (windows only)
-    Array1D<int> SurfWinActiveStormWinConstr;            // The currently active construction with storm window (windows only)
-    Array1D<int> SurfWinStormWinShadedConstr;            // Shaded construction with storm window (windows only)
-    Array1D<int> SurfWinActiveStormWinShadedConstr;      // The currently active shaded construction with storm window (windows only)
+    Array1D<int> SurfWinActiveConstruction;            // The currently active construction with storm window (windows only)
+    Array1D<int> SurfWinActiveShadedConstruction;      // The currently active shaded construction with storm window (windows only)
 
     bool AnyHeatBalanceInsideSourceTerm = false;  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
     bool AnyHeatBalanceOutsideSourceTerm = false; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
@@ -1855,9 +1854,8 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWinWindowModelType.deallocate();
         this->SurfWinTDDPipeNum.deallocate();
         this->SurfWinStormWinConstr.deallocate();
-        this->SurfWinActiveStormWinConstr.deallocate();
-        this->SurfWinStormWinShadedConstr.deallocate();
-        this->SurfWinActiveStormWinShadedConstr.deallocate();
+        this->SurfWinActiveConstruction.deallocate();
+        this->SurfWinActiveShadedConstruction.deallocate();
         this->AnyHeatBalanceInsideSourceTerm = false;
         this->AnyHeatBalanceOutsideSourceTerm = false;
         this->Surface.deallocate();

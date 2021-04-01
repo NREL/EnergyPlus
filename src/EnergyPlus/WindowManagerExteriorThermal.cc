@@ -272,7 +272,7 @@ namespace WindowManager {
         m_ShadePosition = ShadePosition::NoShade;
 
         if (ANY_SHADE_SCREEN(ShadeFlag) || ANY_BLIND(ShadeFlag)) {
-            m_ConstructionNumber = state.dataSurface->SurfWinActiveStormWinShadedConstr(t_SurfNum);
+            m_ConstructionNumber = state.dataSurface->SurfWinActiveShadedConstruction(t_SurfNum);
         }
 
         m_TotLay = getNumOfLayers(state);
@@ -325,7 +325,7 @@ namespace WindowManager {
         auto ConstrNum = m_Surface.Construction;
 
         if (ANY_SHADE_SCREEN(state.dataSurface->SurfWinShadingFlag(m_SurfNum)) || ANY_BLIND(state.dataSurface->SurfWinShadingFlag(m_SurfNum))) {
-            ConstrNum = state.dataSurface->SurfWinActiveStormWinShadedConstr(m_SurfNum);
+            ConstrNum = state.dataSurface->SurfWinActiveShadedConstruction(m_SurfNum);
         }
 
         auto &construction(state.dataConstruction->Construct(ConstrNum));

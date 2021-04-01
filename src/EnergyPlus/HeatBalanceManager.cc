@@ -5566,9 +5566,9 @@ namespace HeatBalanceManager {
         }
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
             if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) {
-                state.dataSurface->SurfWinActiveStormWinConstr(SurfNum) = state.dataSurface->SurfWinStormWinConstr(SurfNum);
+                state.dataSurface->SurfWinActiveConstruction(SurfNum) = state.dataSurface->SurfWinStormWinConstr(SurfNum);
             } else {
-                state.dataSurface->SurfWinActiveStormWinConstr(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+                state.dataSurface->SurfWinActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
             }
         }
 
