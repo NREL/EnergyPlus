@@ -1,0 +1,388 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<FUNCTIONS>
+	<!-- Below are the entries for the if97 saturation curve functions -->
+  <function>
+    <name>if97_tsatp</name>
+    <local_name>if97_tsatp</local_name>
+    <params>p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates saturated temperature [K] as a function of pressure, p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_psatt</name>
+    <local_name>if97_psatt</local_name>
+    <params>T</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates saturated pressure [Pa] as a function of temperature, T [K].</description>
+  </function>
+  <function>
+    <name>if97_tcrit</name>
+    <local_name>if97_tcrit</local_name>
+    <params>dummy</params>
+    <category>if97 (Water Properties)</category>
+    <description>Returns the saturated temperature [K] at the critial point. A dummy parameter must be provided (e.g. 0).</description>
+  </function>
+  <function>
+    <name>if97_ttrip</name>
+    <local_name>if97_ttrip</local_name>
+    <params>dummy</params>
+    <category>if97 (Water Properties)</category>
+    <description>Returns the saturated temperature [K] at the triple point. A dummy parameter must be provided (e.g. 0).</description>
+  </function>
+  <function>
+    <name>if97_pcrit</name>
+    <local_name>if97_pcrit</local_name>
+    <params>dummy</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates saturated pressure [Pa] at the critial point. A dummy parameter must be provided (e.g. 0).</description>
+  </function>
+  <function>
+    <name>if97_ptrip</name>
+    <local_name>if97_ptrip</local_name>
+    <params>dummy</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates saturated pressure [Pa] at the triple point. A dummy parameter must be provided (e.g. 0).</description>
+  </function>
+  <function>
+    <name>if97_t23</name>
+    <local_name>if97_t23</local_name>
+    <params>p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates Temperature [K] along the Region 2/3 boundary as a function of pressure, p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_p23</name>
+    <local_name>if97_p23</local_name>
+    <params>T</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates Pressure [Pa] along the Region 2/3 boundary as a function of temperature, T [K].</description>
+  </function>
+  <!-- Below are the entries for the basic if97 thermodynamic functions -->
+  <function>
+    <name>if97_vtp</name>
+    <local_name>if97_vtp</local_name>
+    <params>T,p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the specific volume [m³/kg] as a function of T [K] and p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_rhotp</name>
+    <local_name>if97_rhotp</local_name>
+    <params>T,p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the mass density [kg/m³] as a function of T [K] and p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_htp</name>
+    <local_name>if97_htp</local_name>
+    <params>T,p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the mass enthalpy [J/kg] as a function of T [K] and p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_utp</name>
+    <local_name>if97_utp</local_name>
+    <params>T,p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the mass internal energy [J/kg] as a function of T [K] and p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_stp</name>
+    <local_name>if97_stp</local_name>
+    <params>T,p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the mass entropy [J/kg-K] as a function of T [K] and p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_cptp</name>
+    <local_name>if97_cptp</local_name>
+    <params>T,p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the isobaric specific heat [J/kg-K] as a function of T [K] and p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_cvtp</name>
+    <local_name>if97_cvtp</local_name>
+    <params>T,p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the isochoric specific heat [J/kg-K] as a function of T [K] and p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_wtp</name>
+    <local_name>if97_wtp</local_name>
+    <params>T,p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the speed of sound [m/s] as a function of T [K] and p [Pa].</description>
+  </function>
+  <!-- Below are the entries for the thermodynamic if97 saturated liquid/vapor functions -->
+  <function>
+    <name>if97_vf</name>
+    <local_name>if97_vf</local_name>
+    <params>p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the saturated liquid specific volume [m³/kg] as a function of pressure, p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_vg</name>
+    <local_name>if97_vg</local_name>
+    <params>p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the saturated vapor specific volume [m³/kg] as a function of pressure, p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_rhof</name>
+    <local_name>if97_rhof</local_name>
+    <params>p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the saturated liquid density [kg/m³] as a function of pressure, p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_rhog</name>
+    <local_name>if97_rhog</local_name>
+    <params>p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the saturated vapor density [kg/m³] as a function of pressure, p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_hf</name>
+    <local_name>if97_hf</local_name>
+    <params>p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the saturated liquid enthalpy [J/kg] as a function of pressure, p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_hg</name>
+    <local_name>if97_hg</local_name>
+    <params>p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the saturated vapor enthalpy [J/kg] as a function of pressure, p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_uf</name>
+    <local_name>if97_uf</local_name>
+    <params>p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the saturated liquid internal energy [J/kg] as a function of pressure, p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_ug</name>
+    <local_name>if97_ug</local_name>
+    <params>p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the saturated vapor internal energy [J/kg] as a function of pressure, p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_sf</name>
+    <local_name>if97_sf</local_name>
+    <params>p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the saturated liquid entropy [J/kg-K] as a function of pressure, p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_sg</name>
+    <local_name>if97_sg</local_name>
+    <params>p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the saturated vapor entropy [J/kg-K] as a function of pressure, p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_cpf</name>
+    <local_name>if97_cpf</local_name>
+    <params>p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the saturated liquid isobaric specific heat [J/kg-K] as a function of pressure, p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_cpg</name>
+    <local_name>if97_cpg</local_name>
+    <params>p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the saturated vapor isobaric specific heat [J/kg-K] as a function of pressure, p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_cvf</name>
+    <local_name>if97_cvf</local_name>
+    <params>T,p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the saturated liquid isochoric specific heat [J/kg-K] as a function of pressure, p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_cvg</name>
+    <local_name>if97_cvg</local_name>
+    <params>p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the saturated vapor isochoric specific heat [J/kg-K] as a function of pressure, p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_wf</name>
+    <local_name>if97_wf</local_name>
+    <params>p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the saturated liquid speed of sound [m/s] as a function of pressure, p [Pa].</description>
+  </function>
+  <function>
+    <name>if97_wg</name>
+    <local_name>if97_wg</local_name>
+    <params>p</params>
+    <category>if97 (Water Properties)</category>
+    <description>Calculates the saturated vapor speed of sound [m/s] as a function of pressure, p [Pa].</description>
+  </function>
+    <!-- Below are the entries for the if97 transport functions -->
+    <function>
+        <name>if97_mutp</name>
+        <local_name>if97_mutp</local_name>
+        <params>T,p</params>
+        <category>if97 (Water Properties)</category>
+        <description>Calculates the viscosity [Pa-s] as a function of T [K] and p [Pa].</description>
+    </function>
+    <function>
+        <name>if97_muf</name>
+        <local_name>if97_muf</local_name>
+        <params>p</params>
+        <category>if97 (Water Properties)</category>
+        <description>Calculates the saturated liquid viscosity [Pa-s] as a function of pressure, p [Pa].</description>
+    </function>
+    <function>
+        <name>if97_mug</name>
+        <local_name>if97_mug</local_name>
+        <params>p</params>
+        <category>if97 (Water Properties)</category>
+        <description>Calculates the saturated vapor viscosity [Pa-s] as a function of pressure, p [Pa].</description>
+    </function>
+    <function>
+        <name>if97_ktp</name>
+        <local_name>if97_ktp</local_name>
+        <params>T,p</params>
+        <category>if97 (Water Properties)</category>
+        <description>Calculates the thermal conductivity [W/m-K] as a function of T [K] and p [Pa].</description>
+    </function>
+    <function>
+        <name>if97_kf</name>
+        <local_name>if97_kf</local_name>
+        <params>p</params>
+        <category>if97 (Water Properties)</category>
+        <description>Calculates the saturated liquid thermal conductivity [W/m-K] as a function of pressure, p [Pa].</description>
+    </function>
+    <function>
+        <name>if97_kg</name>
+        <local_name>if97_kg</local_name>
+        <params>p</params>
+        <category>if97 (Water Properties)</category>
+        <description>Calculates the saturated vapor thermal conductivity [W/m-K] as a function of pressure, p [Pa].</description>
+    </function>
+    <function>
+        <name>if97_sigma</name>
+        <local_name>if97_sigma</local_name>
+        <params>p</params>
+        <category>if97 (Water Properties)</category>
+        <description>Calculates the surface tension [N/m] as a function of temperature, T [K].</description>
+    </function>
+    <!-- Below are the entries for the backwards if97 functions -->
+    <function>
+        <name>if97_tph</name>
+        <local_name>if97_tph</local_name>
+        <params>p,h</params>
+        <category>if97 (Water Properties)</category>
+        <description>Calculates the temperature, T [K], as a function of p [Pa] and mass enthalpy, h, [J/kg].</description>
+    </function>
+    <function>
+      <name>if97_tps</name>
+      <local_name>if97_tps</local_name>
+      <params>p,s</params>
+      <category>if97 (Water Properties)</category>
+      <description>Calculates the temperature, T [K], as a function of p [Pa] and mass entropy, s, [J/kg-K].</description>
+    </function>
+    <function>
+        <name>if97_ths</name>
+        <local_name>if97_ths</local_name>
+        <params>h,s</params>
+        <category>if97 (Water Properties)</category>
+        <description>Calculates the temperature, T [K], as a function of mass enthalpy, h [J/kg], and mass entropy, s [J/kg-K].</description>
+    </function>
+    <function>
+        <name>if97_phs</name>
+        <local_name>if97_phs</local_name>
+        <params>h,s</params>
+        <category>if97 (Water Properties)</category>
+        <description>Calculates the pressure, p [Pa], as a function of mass enthalpy, h [J/kg], and mass entropy, s [J/kg-K].</description>
+    </function>
+    <!-- Below are the entries for if97 utility functions -->
+    <function>
+        <name>if97_getvers</name>
+        <local_name>if97_getvers</local_name>
+        <params>dummy</params>
+        <category>if97 (Water Properties)</category>
+        <description>Returns the version of the IF97 implementation code. Takes a "dummy" parameter that can be (0).</description>
+    </function>
+    <function>
+        <name>if97_xph</name>
+        <local_name>if97_xph</local_name>
+        <params>p,h</params>
+        <category>if97 (Water Properties)</category>
+        <description>Returns the steam quality, x, as a function of pressure, p [Pa], and mass enthalpy, h [J/kg].</description>
+    </function>
+    <function>
+        <name>if97_xps</name>
+        <local_name>if97_xps</local_name>
+        <params>p,s</params>
+        <category>if97 (Water Properties)</category>
+        <description>Returns the steam quality, x, as a function of pressure, p [Pa], and mass entropy, s [J/kg-K].</description>
+    </function>
+    <function>
+        <name>if97_xpu</name>
+        <local_name>if97_xpu</local_name>
+        <params>p,u</params>
+        <category>if97 (Water Properties)</category>
+        <description>Returns the steam quality, x, as a function of pressure, p [Pa], and mass internal energy, u [J/kg].</description>
+    </function>
+    <function>
+        <name>if97_xpv</name>
+        <local_name>if97_xpv</local_name>
+        <params>p,v</params>
+        <category>if97 (Water Properties)</category>
+        <description>Returns the steam quality, x, as a function of pressure, p [Pa], and specific volume, v [m³/kg].</description>
+    </function>
+    <function>
+        <name>if97_xprho</name>
+        <local_name>if97_xprho</local_name>
+        <params>p,rho</params>
+        <category>if97 (Water Properties)</category>
+        <description>Returns the steam quality, x, as a function of pressure, p [Pa], and mass density, rho [kg/m³].</description>
+    </function>
+    <function>
+        <name>if97_hpx</name>
+        <local_name>if97_hpx</local_name>
+        <params>p,x</params>
+        <category>if97 (Water Properties)</category>
+        <description>Returns the mass enthalpy, h [J/kg], as a function of pressure, p [Pa], and steam quality, x, within the vapor dome.</description>
+    </function>
+    <function>
+        <name>if97_spx</name>
+        <local_name>if97_spx</local_name>
+        <params>p,x</params>
+        <category>if97 (Water Properties)</category>
+        <description>Returns the mass entropy, s [J/kg-K], as a function of pressure, p [Pa], and steam quality, x, within the vapor dome.</description>
+    </function>
+    <function>
+        <name>if97_upx</name>
+        <local_name>if97_upx</local_name>
+        <params>p,x</params>
+        <category>if97 (Water Properties)</category>
+        <description>Returns the mass internal engergy, u [J/kg], as a function of pressure, p [Pa], and steam quality, x, within the vapor dome.</description>
+    </function>
+    <function>
+        <name>if97_vpx</name>
+        <local_name>if97_vpx</local_name>
+        <params>p,x</params>
+        <category>if97 (Water Properties)</category>
+        <description>Returns the specific volume, v [m³/kg], as a function of pressure, p [Pa], and steam quality, x, within the vapor dome.</description>
+    </function>
+    <function>
+        <name>if97_rhopx</name>
+        <local_name>if97_rhopx</local_name>
+        <params>p,x</params>
+        <category>if97 (Water Properties)</category>
+        <description>Returns the mass density, rho [kg/m³], as a function of pressure, p [Pa], and steam quality, x, within the vapor dome.</description>
+    </function>
+
+</FUNCTIONS>

@@ -1,0 +1,53 @@
+
+notifications:
+  email:
+    on_success: never
+    on_failure: change
+    
+language: 
+  - cpp
+
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      compiler: gcc
+    - os: linux
+      dist: trusty
+      compiler: clang
+    - os: osx
+      #osx_image: xcode8.3 #  Xcode 8.3   OS X 10.12
+    - os: linux 
+      dist: trusty
+      branches:
+        only:
+          - coverity_scan
+      addons:
+        coverity_scan:
+          project:
+            name: "CoolProp/IF97"
+            description: "Build submitted via Travis CI"
+          notification_email: jowr@ipu.dk
+          build_command_prepend: "cmake ."
+          build_command: "cmake --build . --target IF97"
+          branch_pattern: coverity_scan
+
+#branches:
+#  only:
+#    - master
+#    - release
+#    - coverity_scan
+#    - travis_integration
+#  # Build all branches
+#  #  - /.*/ 
+
+before_script:
+  - mkdir -p build && pushd build
+  - cmake .. -DCMAKE_BUILD_TYPE=Release
+  - popd
+script:     
+  - cmake --build build --config Release --target IF97
+
+env:
+  global:    
+   - secure: "kaM5suGoDly6sF/OJDKSTPXdVp7vyXTRIvB8jBeqqOaH0aSoBYyW0uuqcgg+lKyXrptbYnRyMfLAtDocjw5gko2IP7VwfbJ+rTpdYwZl7cqPzJ5EDTbGJTWkhC8i0/lc4yxIzI55LVgzKcshulbB09vD0CEtRJPQbn6jeGo+x5KVpg4ZvkSMVvUu2wrSXOFxst2m2yJDc+/tXYGs/Ca4jZGLQ1CR+yZr8yhGRr6fyyvt7WHxllcbqHSbvI3r3anyXzg8JWzO8lC+SfAWbCfSqPjxuHXIkh/uXs2JdJ9ZTYkdkHe4oFiSN45qUtqAMo8iKnKKi76pvaET9sb2dPt1WLZDU45ZYJHTGOmXUDHwVtH32fA4k+UXWaNgUJFdrZxw+smxqOQzb1jb33jwCL6dMswbA7LF4hUGY2xb+boSSZVyjzrCdxbwF6cXNTnZcrvBAggCnjYl8PIkW8ob7b8PU+xpvu1CBSdSCh7lHAdAqAowkqyguE/D0rOcX/+auh0D3cyBVrnB1mtM6VUys34fDxmjNZLdytgE85ahqEoeNsSVnWwTtegBi+rXA40WGazJy3nHuEKb9wt6B4OuCQSeUIFWGk/P/mEtVJMUBEBCcIhB6ecDx8yN2pW6p6wFr5tjEICJdq4gu+dZ7/eMdtkZXELK21tNIQSTA3mW4F0R5Qw="

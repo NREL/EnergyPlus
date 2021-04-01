@@ -227,6 +227,7 @@ target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Tarcog/include)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Viewer/include)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/ssc)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/CoolProp-IF97)
 set(SAM_SKIP_TOOLS ON FORCE)
 set(SAM_SKIP_TESTS ON FORCE)
 set(SAMAPI_EXPORT OFF FORCE)
