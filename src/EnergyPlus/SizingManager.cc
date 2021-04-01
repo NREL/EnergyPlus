@@ -676,6 +676,7 @@ namespace SizingManager {
                     PreDefTableEntry(pdchZnHtUserDesAirFlow, curName, FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow, 3);
                     PreDefTableEntry(pdchZnHtDesDay, curName, FinalZoneSizing(CtrlZoneNum).HeatDesDay);
                     PreDefTableEntry(pdchZnHtPkTime, curName, HeatPeakDateHrMin(CtrlZoneNum));
+                    // Peak values start
                     PreDefTableEntry(pdchZnHtPkTstatTemp, curName, TStatSetPtAtPk);
                     PreDefTableEntry(pdchZnHtPkIndTemp, curName, CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak);
                     PreDefTableEntry(pdchZnHtPkIndHum, curName, CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak, 5);

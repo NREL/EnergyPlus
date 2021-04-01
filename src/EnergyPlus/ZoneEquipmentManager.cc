@@ -659,6 +659,10 @@ namespace ZoneEquipmentManager {
                     CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatTstatTemp = ZoneThermostatSetPointLo(ActualZoneNum);
                 }
             } else {
+//                if (TempZoneThermostatSetPoint(ActualZoneNum) > 0.0) {
+//                    CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatTstatTemp = ZoneThermostatSetPointLo(
+//                            ActualZoneNum);
+//                }
                 CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolZoneRetTemp = RetTemp;
                 if (TempZoneThermostatSetPoint(ActualZoneNum) > 0.0) {
                     CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolTstatTemp = TempZoneThermostatSetPoint(ActualZoneNum);
@@ -1464,8 +1468,8 @@ namespace ZoneEquipmentManager {
                         ZoneSizThermSetPtLo(CtrlZoneNum) = ZoneThermostatSetPointLo(CtrlZoneNum);
                     }
                     ZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatSetPtSeq(TimeStepInDay) = ZoneThermostatSetPointLo(CtrlZoneNum);
-                    ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatTstatTempSeq(TimeStepInDay) =
-                        CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatTstatTemp;
+                    ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatTstatTempSeq(TimeStepInDay) = ZoneThermostatSetPointLo(CtrlZoneNum);
+                        //CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatTstatTemp;
                     ZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolSetPtSeq(TimeStepInDay) = ZoneThermostatSetPointHi(CtrlZoneNum);
                     ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolTstatTempSeq(TimeStepInDay) =
                         CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolTstatTemp;
@@ -1579,6 +1583,8 @@ namespace ZoneEquipmentManager {
                                 CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatFlowSeq(TimeStepIndex);
                             CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneTempAtHeatPeak =
                                 CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq(TimeStepIndex);
+                            CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatTstatTemp =
+                                    CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatTstatTempSeq(TimeStepIndex);
                             CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).OutTempAtHeatPeak =
                                 CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatOutTempSeq(TimeStepIndex);
                             CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneRetTempAtHeatPeak =
@@ -1654,6 +1660,7 @@ namespace ZoneEquipmentManager {
                         CalcFinalZoneSizing(CtrlZoneNum).HeatZoneHumRatSeq = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneHumRatSeq;
                         CalcFinalZoneSizing(CtrlZoneNum).HeatOutHumRatSeq = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatOutHumRatSeq;
                         CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneTempAtHeatPeak;
+                        CalcFinalZoneSizing(CtrlZoneNum).HeatTstatTemp = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatTstatTemp;
                         CalcFinalZoneSizing(CtrlZoneNum).OutTempAtHeatPeak = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).OutTempAtHeatPeak;
                         CalcFinalZoneSizing(CtrlZoneNum).ZoneRetTempAtHeatPeak = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneRetTempAtHeatPeak;
                         CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneHumRatAtHeatPeak;
@@ -1677,6 +1684,7 @@ namespace ZoneEquipmentManager {
                             CalcFinalZoneSizing(CtrlZoneNum).HeatZoneHumRatSeq = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneHumRatSeq;
                             CalcFinalZoneSizing(CtrlZoneNum).HeatOutHumRatSeq = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatOutHumRatSeq;
                             CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneTempAtHeatPeak;
+                            CalcFinalZoneSizing(CtrlZoneNum).HeatTstatTemp = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatTstatTemp;
                             CalcFinalZoneSizing(CtrlZoneNum).OutTempAtHeatPeak = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).OutTempAtHeatPeak;
                             CalcFinalZoneSizing(CtrlZoneNum).ZoneRetTempAtHeatPeak =
                                 CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneRetTempAtHeatPeak;
@@ -2018,6 +2026,7 @@ namespace ZoneEquipmentManager {
                     z.DesHeatLoad = c.DesHeatLoad;
                     z.DesHeatMassFlow = c.DesHeatMassFlow;
                     z.ZoneTempAtHeatPeak = c.ZoneTempAtHeatPeak;
+                    z.HeatTstatTemp = c.HeatTstatTemp;
                     z.OutTempAtHeatPeak = c.OutTempAtHeatPeak;
                     z.ZoneRetTempAtHeatPeak = c.ZoneRetTempAtHeatPeak;
                     z.ZoneHumRatAtHeatPeak = c.ZoneHumRatAtHeatPeak;
@@ -2054,6 +2063,7 @@ namespace ZoneEquipmentManager {
                     z.NonAirSysDesHeatLoad = c.DesHeatLoad;
                     z.DesHeatMassFlow = c.DesHeatMassFlow;
                     z.ZoneTempAtHeatPeak = c.ZoneTempAtHeatPeak;
+                    z.HeatTstatTemp = c.HeatTstatTemp;
                     z.OutTempAtHeatPeak = c.OutTempAtHeatPeak;
                     z.ZoneRetTempAtHeatPeak = c.ZoneRetTempAtHeatPeak;
                     z.ZoneHumRatAtHeatPeak = c.ZoneHumRatAtHeatPeak;
@@ -2486,6 +2496,8 @@ namespace ZoneEquipmentManager {
                             } else {
                                 FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak = *std::max_element(
                                     ZoneSizing(DDNumF, CtrlZoneNum).DesHeatSetPtSeq.begin(), ZoneSizing(DDNumF, CtrlZoneNum).DesHeatSetPtSeq.end());
+                                FinalZoneSizing(CtrlZoneNum).HeatTstatTemp = *std::max_element(
+                                        ZoneSizing(DDNumF, CtrlZoneNum).HeatTstatTempSeq.begin(), ZoneSizing(DDNumF, CtrlZoneNum).HeatTstatTempSeq.end());
                                 FinalZoneSizing(CtrlZoneNum).OutTempAtHeatPeak = *std::min_element(
                                     ZoneSizing(DDNumF, CtrlZoneNum).HeatOutTempSeq.begin(), ZoneSizing(DDNumF, CtrlZoneNum).HeatOutTempSeq.end());
                             }
@@ -2499,6 +2511,7 @@ namespace ZoneEquipmentManager {
                                 FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak = ZoneSizing(DDNumF, CtrlZoneNum).HeatDesHumRat;
                             }
                             CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak = FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak;
+                            CalcFinalZoneSizing(CtrlZoneNum).HeatTstatTemp = FinalZoneSizing(CtrlZoneNum).HeatTstatTemp;
                             CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak = FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak;
                             FinalZoneSizing(CtrlZoneNum).DesHeatCoilInTemp = FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak;
                             FinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRat = FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak;
