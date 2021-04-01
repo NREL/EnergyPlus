@@ -96,8 +96,6 @@ namespace StandardRatings {
         OnDemand = 2 // defrost cycle occurs only when required
     };
 
-    extern int const TotalNumOfStandardDHRs;            // Total number of standard design heating requirements
-
     extern Array1D_int const TotalNumOfTemperatureBins; // Total number of temperature
     // bins for a region
     extern Array1D<Real64> const StandardDesignHeatingRequirement;
@@ -122,7 +120,6 @@ namespace StandardRatings {
     extern Array1D<Real64> const RegionSixFracBinHoursAtOutdoorBinTemp;
 
     // Representative cooling season Outdoor air temperature bin from ANSI/AHRI 210/240-2008
-    extern int const NumOfOATempBins; // number of outdoor temperature bins for cooling season
     extern Array1D<Real64> const OutdoorBinTemperatureSEER;
     // Fractional bin hours for different bin temperatures for cooling, from ANSI/AHRI 210/240 - 2008
     extern Array1D<Real64> const CoolFracBinHoursAtOutdoorBinTemp;

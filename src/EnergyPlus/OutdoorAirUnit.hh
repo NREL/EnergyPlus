@@ -68,24 +68,22 @@ struct EnergyPlusData;
         // component types addressed by this module
         extern std::string const cMO_OutdoorAirUnit;
 
-        extern int const WaterCoil_Cooling;
-        extern int const SteamCoil_AirHeat;
-//        enum class CompType {
-//            Unassigned,
-//            WaterCoil_SimpleCool,
-//            WaterCoil_Cooling,
-//            WaterCoil_SimpleHeat,
-//            SteamCoil_AirHeat,
-//            WaterCoil_DetailedCool,
-//            WaterCoil_CoolingHXAsst,
-//            Coil_ElectricHeat,
-//            Coil_GasHeat,
-//            DXSystem,
-//            HeatXchngr,
-//            Desiccant,
-//            DXHeatPumpSystem,
-//            UnitarySystemModel
-//        };
+        enum class CompType : int {
+            Unassigned = 0,
+            WaterCoil_SimpleCool = 1,
+            WaterCoil_Cooling = 2,
+            WaterCoil_SimpleHeat = 3,
+            SteamCoil_AirHeat = 4,
+            WaterCoil_DetailedCool = 5,
+            WaterCoil_CoolingHXAsst = 6,
+            Coil_ElectricHeat = 7,
+            Coil_GasHeat = 8,
+            DXSystem = 9,
+            HeatXchngr = 10,
+            Desiccant = 11,
+            DXHeatPumpSystem = 12,
+            UnitarySystemModel = 13
+        };
 
         enum class Control {
             Unassigned, Neutral, Unconditioned, Temperature
@@ -117,7 +115,7 @@ struct EnergyPlusData;
             // Equipment List Data
             std::string ComponentName;
             std::string ComponentType;
-            int ComponentType_Num; // Parameterized Component Types this module can address
+            CompType ComponentType_Num; // Parameterized Component Types this module can address
             int ComponentIndex;    // Which one in list -- updated by routines called from here
             HVACSystemData *compPointer = nullptr;
             int CoilAirInletNode;
@@ -139,7 +137,7 @@ struct EnergyPlusData;
 
             // Default Constructor
             OAEquipList()
-                    : ComponentType_Num(0), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0),
+                    : ComponentType_Num(CompType::Unassigned), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0),
                       CoilWaterInletNode(0), CoilWaterOutletNode(0),
                       CoilPlantTypeOfNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), FluidIndex(0),
                       MaxVolWaterFlow(0.0), MaxWaterMassFlow(0.0),
