@@ -1353,7 +1353,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     // Check outlet conditions
     EXPECT_NEAR(state->dataLoopNodes->Node(22).Temp, 23.363295, 0.0001);
     EXPECT_NEAR(state->dataLoopNodes->Node(22).HumRat, 0.00796611, 0.0001);
-    EXPECT_NEAR(state->dataLoopNodes->Node(22).Enthalpy, 43748.243, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Enthalpy, 43748.243, 0.05);
     EXPECT_NEAR(state->dataHVACMultiSpdHP->MSHeatPump(2).CompPartLoadRatio, 0.1232, 0.0001);
 
     // Direct solution
@@ -1363,7 +1363,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     // Check outlet conditions
     EXPECT_NEAR(state->dataLoopNodes->Node(22).Temp, 23.363295, 0.0001);
     EXPECT_NEAR(state->dataLoopNodes->Node(22).HumRat, 0.00796611, 0.0001);
-    EXPECT_NEAR(state->dataLoopNodes->Node(22).Enthalpy, 43748.243, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Enthalpy, 43748.243, 0.05);
     EXPECT_NEAR(state->dataHVACMultiSpdHP->MSHeatPump(2).CompPartLoadRatio, 0.1232, 0.0001);
 
     QZnReq = -10000.00;
@@ -1372,14 +1372,14 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(state->dataLoopNodes->Node(22).Temp, 21.45298, 0.0001);
     EXPECT_NEAR(state->dataLoopNodes->Node(22).HumRat, 0.00792169, 0.0001);
-    EXPECT_NEAR(state->dataLoopNodes->Node(22).Enthalpy, 41691.15, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Enthalpy, 41691.15, 0.2);
     EXPECT_NEAR(state->dataHVACMultiSpdHP->MSHeatPump(2).CompPartLoadRatio, 0.285417, 0.0001);
 
     state->dataGlobal->DoCoilDirectSolutions = true;
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(state->dataLoopNodes->Node(22).Temp, 21.45298, 0.0001);
     EXPECT_NEAR(state->dataLoopNodes->Node(22).HumRat, 0.00792169, 0.0001);
-    EXPECT_NEAR(state->dataLoopNodes->Node(22).Enthalpy, 41691.15, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Enthalpy, 41691.15, 0.2);
     EXPECT_NEAR(state->dataHVACMultiSpdHP->MSHeatPump(2).CompPartLoadRatio, 0.285417, 0.0001);
 
     // Heating

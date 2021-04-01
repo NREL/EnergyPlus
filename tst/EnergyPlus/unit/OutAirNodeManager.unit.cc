@@ -101,6 +101,6 @@ TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
     InitOutAirNodes(*state);
 
     EXPECT_NEAR(14.6467, state->dataLoopNodes->Node(1).OutAirWetBulb, 0.0001);
-    EXPECT_NEAR(0.007253013, state->dataLoopNodes->Node(2).HumRat, 0.000001);
-    EXPECT_NEAR(0.006543816, state->dataLoopNodes->Node(3).HumRat, 0.000001);
+    EXPECT_NEAR(0.007253013, state->dataLoopNodes->Node(2).HumRat, 0.00001);
+    EXPECT_NEAR(0.006543816, state->dataLoopNodes->Node(3).HumRat, 0.00001);
 }
