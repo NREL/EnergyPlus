@@ -2000,8 +2000,12 @@ void ConstructionProps::setArraysBasedOnMaxSolidWinLayers(EnergyPlusData &state)
     this->BlAbsDiffSky.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
     this->AbsDiffBack.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
     this->BlAbsDiffBack.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-    this->AbsBeamCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-    this->AbsBeamBackCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+    this->AbsBeamCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->AbsBeamBackCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
+        this->AbsBeamCoef(Layer).allocate(DataSurfaces::MaxPolyCoeff);
+        this->AbsBeamBackCoef(Layer).allocate(DataSurfaces::MaxPolyCoeff);
+    }
 }
 
 } // namespace EnergyPlus::Construction

@@ -82,6 +82,7 @@ namespace DataSurfaces {
     // MODULE PARAMETER DEFINITIONS:
     constexpr int MaxSlatAngs(19);
     constexpr int MaxProfAngs(37);
+    constexpr int MaxPolyCoeff(6);
 
     // Parameters to indicate surface shape for use with the Surface
     // derived type (see below):

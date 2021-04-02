@@ -160,9 +160,9 @@ namespace Construction {
         Real64 AbsDiffBackShade;          // Diffuse back solar absorptance for shade
         Array1D<Real64> AbsDiffBackBlind; // Diffuse back solar absorptance for blind, vs. slat angle
         Real64 ShadeAbsorpThermal;        // Diffuse back thermal absorptance of shade
-        Array2D<Real64> AbsBeamCoef;      // Coefficients of incidence-angle polynomial for solar
+        Array1D<Array1D<Real64>> AbsBeamCoef;      // Coefficients of incidence-angle polynomial for solar
         // absorptance for each solid glazing layer
-        Array2D<Real64> AbsBeamBackCoef;  // As for AbsBeamCoef but for back-incident solar
+        Array1D<Array1D<Real64>> AbsBeamBackCoef;  // As for AbsBeamCoef but for back-incident solar
         Array1D<Real64> AbsBeamShadeCoef; // Coefficients of incidence-angle polynomial for solar
         // absorptance of shade
         Real64 TransDiff;                      // Diffuse solar transmittance, bare glass or shade on
