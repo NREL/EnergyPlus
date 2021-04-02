@@ -602,8 +602,38 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
 
     SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     EXPECT_LT(SysOutputProvided, 0.0);
+    // TU outlet is at set point = 20
     EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).Temp, thisTU.coilTempSetPoint, 0.01);
-    EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).Temp, 20.0, 0.01); // TU outlet is at set point = 20
+    EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).Temp, 20.0, 0.01);
+
+    // outdoor unit operation is within min/max operating limits
+    EXPECT_TRUE(state->dataHVACVarRefFlow->CoolingLoad(state->dataHVACVarRefFlow->NumVRFCond));
+    EXPECT_FALSE(state->dataHVACVarRefFlow->HeatingLoad(state->dataHVACVarRefFlow->NumVRFCond));
+    EXPECT_LE(state->dataHVACVarRefFlow->VRF(curSysNum).MinOATCooling,
+              state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp);
+    EXPECT_GE(state->dataHVACVarRefFlow->VRF(curSysNum).MaxOATCooling,
+              state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp);
+
+    // save and adjust operating limit to disable outdoor unit. Output should be 0.
+    Real64 saveMaxOATCooling = state->dataHVACVarRefFlow->VRF(curSysNum).MaxOATCooling;
+    state->dataHVACVarRefFlow->VRF(curSysNum).MaxOATCooling =
+        -1.0 + state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp;
+    InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    EXPECT_EQ(SysOutputProvided, 0.0);
+    // reset max operating limit
+    state->dataHVACVarRefFlow->VRF(curSysNum).MaxOATCooling = saveMaxOATCooling;
+
+    Real64 saveMinOATCooling = state->dataHVACVarRefFlow->VRF(curSysNum).MinOATCooling;
+    state->dataHVACVarRefFlow->VRF(curSysNum).MinOATCooling =
+       1.0 + state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp;
+    InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    EXPECT_EQ(SysOutputProvided, 0.0);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->CoolingLoad(state->dataHVACVarRefFlow->NumVRFCond));
+    EXPECT_FALSE(state->dataHVACVarRefFlow->HeatingLoad(state->dataHVACVarRefFlow->NumVRFCond));
+    // reset min operating limit
+    state->dataHVACVarRefFlow->VRF(curSysNum).MinOATCooling = saveMinOATCooling;
 
     tuInletNode.Temp = 18.0;
     tuInletNode.HumRat = 0.007;
@@ -626,6 +656,35 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     EXPECT_GT(SysOutputProvided, 0.0);                                                                      // TU provides heating
     EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).Temp, thisTU.coilTempSetPoint, 0.01); // TU outlet is at SP target
     EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).Temp, 20.0, 0.01);
+
+    // outdoor unit operation is within min/max operating limits
+    EXPECT_TRUE(state->dataHVACVarRefFlow->HeatingLoad(state->dataHVACVarRefFlow->NumVRFCond));
+    EXPECT_FALSE(state->dataHVACVarRefFlow->CoolingLoad(state->dataHVACVarRefFlow->NumVRFCond));
+    EXPECT_LE(state->dataHVACVarRefFlow->VRF(curSysNum).MinOATHeating,
+              state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp);
+    EXPECT_GE(state->dataHVACVarRefFlow->VRF(curSysNum).MaxOATHeating,
+              state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp);
+
+    // save and adjust operating limit to disable outdoor unit. Output should be 0.
+    Real64 saveMaxOATHeating = state->dataHVACVarRefFlow->VRF(curSysNum).MaxOATHeating;
+    state->dataHVACVarRefFlow->VRF(curSysNum).MaxOATHeating =
+        -1.0 + state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp;
+    InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    EXPECT_EQ(SysOutputProvided, 0.0);
+    // reset max operating limit
+    state->dataHVACVarRefFlow->VRF(curSysNum).MaxOATHeating = saveMaxOATHeating;
+
+    Real64 saveMinOATHeating = state->dataHVACVarRefFlow->VRF(curSysNum).MinOATHeating;
+    state->dataHVACVarRefFlow->VRF(curSysNum).MinOATHeating =
+        1.0 + state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp;
+    InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    EXPECT_EQ(SysOutputProvided, 0.0);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->CoolingLoad(state->dataHVACVarRefFlow->NumVRFCond));
+    EXPECT_FALSE(state->dataHVACVarRefFlow->HeatingLoad(state->dataHVACVarRefFlow->NumVRFCond));
+    // reset min operating limit
+    state->dataHVACVarRefFlow->VRF(curSysNum).MinOATHeating = saveMinOATHeating;
 
     // switch to load based control
     thisTU.isSetPointControlled = false;
