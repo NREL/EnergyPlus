@@ -49,7 +49,8 @@ float myxor(float x, float y)
 short int
 min( short int const a, short int const b )
 {
-	return ( b ^ ((a ^ b) & -(a < b)) );
+    //	return ( b ^ ((a ^ b) & -(a < b)) );
+    return a*(a<b) + b*(b<=a);
 }
 /*
 short int min(short int const x, short int const y)
@@ -62,7 +63,8 @@ inline
 int
 min( int const a, int const b )
 {
-	return ( b ^ ((a ^ b) & -(a < b)) );
+	//return ( b ^ ((a ^ b) & -(a < b)) );
+     return a*(a<b) + b*(b<=a);
 }
 /*
 int min(int const x, int const y)
@@ -75,7 +77,8 @@ inline
 long int
 min( long int const a, long int const b )
 {
-	return ( b ^ ((a ^ b) & -(a < b)) );
+	//return ( b ^ ((a ^ b) & -(a < b)) );
+    return a*(a<b) + b*(b<=a);
 }
 /*
 long int min(long int const x, long int const y)
@@ -88,7 +91,8 @@ inline
 unsigned short int
 min( unsigned short int const a, unsigned short int const b )
 {
-	return (b ^ ((a ^ b) & -(a < b)));
+	//return (b ^ ((a ^ b) & -(a < b)));
+    return a*(a<b) + b*(b<=a);
 }
 /*
 unsigned short int min(unsigned short int const x, unsigned short int const y)
@@ -101,7 +105,8 @@ inline
 unsigned int
 min( unsigned int const a, unsigned int const b )
 {
-	return ( b ^ ((a ^ b) & -(a < b)) );
+	//return ( b ^ ((a ^ b) & -(a < b)) );
+    return a*(a<b) + b*(b<=a);
 }
 /*
 unsigned int min(unsigned int const x, unsigned int const y)
@@ -114,7 +119,8 @@ inline
 unsigned long int
 min( unsigned long int const a, unsigned long int const b )
 {
-	return ( b ^ ((a ^ b) & -(a < b)) );
+	//return ( b ^ ((a ^ b) & -(a < b)) );
+    return a*(a<b) + b*(b<=a);
 }
 
 /*
@@ -130,7 +136,8 @@ inline
 float
 min( float const a, float const b )
 {
-	return ( a < b ? a : b );
+	//return ( a < b ? a : b );
+    return a*(a<b) + b*(b<=a);
 }
 /*
 float min(float const x, float const y)
@@ -145,7 +152,8 @@ inline
 double
 min( double const a, double const b )
 {
-	return ( a < b ? a : b );
+	//return ( a < b ? a : b );
+    return a*(a<b) + b*(b<=a);
 }
 /*
 double min(double const x, double const y)
@@ -160,7 +168,8 @@ double min(double const x, double const y)
 long double
 min( long double const a, long double const b )
 {
-	return ( a < b ? a : b );
+	//return ( a < b ? a : b );
+    return a*(a<b) + b*(b<=a);
 }
  
 /*
@@ -269,7 +278,8 @@ inline
 unsigned int
 min( unsigned int const a, unsigned int const b, unsigned int const c )
 {
-	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
+	//return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
+    return min(min(a,b),c);
 }
 
 /*
@@ -402,7 +412,8 @@ inline
 short int
 max( short int const a, short int const b )
 {
-	return ( a ^ ((a ^ b) & -(a < b)) );
+	//return ( a ^ ((a ^ b) & -(a < b)) );
+    return b*(a<b) + a*(b<=a);
 }
 /*
 short int max(short int const x, short int const y)
@@ -415,7 +426,8 @@ inline
 int
 max( int const a, int const b )
 {
-	return ( a ^ ((a ^ b) & -(a < b)) );
+	//return ( a ^ ((a ^ b) & -(a < b)) );
+    return b*(a<b) + a*(b<=a);
 }
 /*
  int max( int const x, int const y)
@@ -428,7 +440,8 @@ inline
 long int
 max( long int const a, long int const b )
 {
-	return ( a ^ ((a ^ b) & -(a < b)) );
+	//return ( a ^ ((a ^ b) & -(a < b)) );
+    return b*(a<b) + a*(b<=a);
 }
 /*
 long int max(long int const x, long int const y)
@@ -443,7 +456,8 @@ inline
 unsigned short int
 max( unsigned short int const a, unsigned short int const b )
 {
-    return ( a ^ ((a ^ b) & -(a < b)) );
+    //return ( a ^ ((a ^ b) & -(a < b)) );
+    return b*(a<b) + a*(b<=a);
 }
 /*
 unsigned short int max(unsigned short int const x, unsigned short int const y)
@@ -458,7 +472,8 @@ inline
 unsigned int
 max( unsigned int const a, unsigned int const b )
 {
-	return ( a^((a^b) & -(a<b)) );
+	//return ( a^((a^b) & -(a<b)) );
+    return b*(a<b) + a*(b<=a);
 }
 
 /*
@@ -473,7 +488,8 @@ inline
 unsigned long int
 max( unsigned long int const a, unsigned long int const b )
 {
-	return (a^((a^b) & -(a<b)));
+	//return (a^((a^b) & -(a<b)));
+    return b*(a<b) + a*(b<=a);
 }
 /*
 unsigned long int max(unsigned long int const x, unsigned long int const y)
@@ -487,7 +503,8 @@ unsigned long int max(unsigned long int const x, unsigned long int const y)
 float
 max( float const a, float const b )
 {
-	return ( a < b ? b : a );
+	//return ( a < b ? b : a );
+    return b*(a<b) + a*(b<=a);
 } 
 /*
 float max(float const x, float const y)
@@ -501,7 +518,8 @@ inline
 double
 max( double const a, double const b )
 {
-	return ( a < b ? b : a );
+	//return ( a < b ? b : a );
+    return b*(a<b) + a*(b<=a);
 }
 
 /*
@@ -517,7 +535,8 @@ inline
 long double
 max( long double const a, long double const b )
 {
-	return ( a < b ? b : a );
+	//return ( a < b ? b : a );
+    return b*(a<b) + a*(b<=a);
 } 
 /*
 long double max(long double const x, long double const y)
@@ -673,7 +692,8 @@ max( unsigned long int const a, unsigned long int const b, unsigned long int con
 float
 max( float const a, float const b, float const c )
 {
-	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
+	//return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
+    return max(max(a,b),c);
 }
 /*
 float max(float const x, float const y, float const z)
@@ -695,7 +715,8 @@ max( float const a, float const b, float const c, float const d, Ts const &... o
 double
 max( double const a, double const b, double const c )
 {
-	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
+	//return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
+    return max(max(a,b),c)
 }
 
 /*
@@ -720,7 +741,8 @@ inline
 long double
 max( long double const a, long double const b, long double const c )
 {
-	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
+	//return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
+    return max(max(a,b),c)
 }
 
 
@@ -746,7 +768,8 @@ inline
 T const &
 max( T const & a, T const & b, T const & c )
 {
-	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
+	//return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
+    return max(max(a,b),c)
 }
 
 
