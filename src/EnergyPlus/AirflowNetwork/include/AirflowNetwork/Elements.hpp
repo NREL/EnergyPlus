@@ -235,6 +235,7 @@ namespace AirflowNetwork {
     extern Real64 ExhaustFanMassFlowRate; // Exhaust fan flow rate used in PressureStat
     extern int PressureSetFlag;           // PressureSet flag
     extern Real64 ReliefMassFlowRate;     // OA Mixer relief node flow rate used in PressureStat
+    extern bool AFNDefaultControlFlag;    // Default simulation control flag
 
     // Types
 
