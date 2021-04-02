@@ -99,15 +99,16 @@ namespace DataOutputs {
         std::unique_ptr<RE2> case_insensitive_pattern;
     };
 
-
-
     // Outer map has a Key of Variable Name, and value is inner map of Key=KeyValue, Value=struct OutputReportingVariables
     // All of the string are considered as case insenstive (If we search for "ZONE MEAN AIR TEMPERATURE" it would find "Zone Mean Air Temperature")
-    extern std::unordered_map<std::string, std::unordered_map<std::string, OutputReportingVariables,
-                                                              UtilityRoutines::case_insensitive_hasher,
-                                                              UtilityRoutines::case_insensitive_comparator>,
-                               UtilityRoutines::case_insensitive_hasher,
-                               UtilityRoutines::case_insensitive_comparator> OutputVariablesForSimulation;
+    extern std::unordered_map<std::string,
+                              std::unordered_map<std::string,
+                                                 OutputReportingVariables,
+                                                 UtilityRoutines::case_insensitive_hasher,
+                                                 UtilityRoutines::case_insensitive_comparator>,
+                              UtilityRoutines::case_insensitive_hasher,
+                              UtilityRoutines::case_insensitive_comparator>
+        OutputVariablesForSimulation;
 
     // Functions
 
@@ -120,11 +121,11 @@ namespace DataOutputs {
 
 } // namespace DataOutputs
 
-struct OutputsData : BaseGlobalStruct {
+struct OutputsData : BaseGlobalStruct
+{
 
     void clear_state() override
     {
-
     }
 };
 

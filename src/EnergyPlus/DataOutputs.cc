@@ -162,11 +162,14 @@ namespace DataOutputs {
     int iTotalAutoCalculatableFields;    // number of fields that can be autocalculated
 
     // Object Data
-    std::unordered_map<std::string, std::unordered_map<std::string, OutputReportingVariables,
-                                                      UtilityRoutines::case_insensitive_hasher,
-                                                      UtilityRoutines::case_insensitive_comparator>,
+    std::unordered_map<std::string,
+                       std::unordered_map<std::string,
+                                          OutputReportingVariables,
+                                          UtilityRoutines::case_insensitive_hasher,
+                                          UtilityRoutines::case_insensitive_comparator>,
                        UtilityRoutines::case_insensitive_hasher,
-                       UtilityRoutines::case_insensitive_comparator> OutputVariablesForSimulation;
+                       UtilityRoutines::case_insensitive_comparator>
+        OutputVariablesForSimulation;
     // Functions
 
     OutputReportingVariables::OutputReportingVariables(EnergyPlusData &state, std::string const &KeyValue, std::string const &VariableName)

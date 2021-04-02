@@ -50,19 +50,17 @@
 
 namespace EnergyPlus::TARCOGParams {
 
-    // MODULE INFORMATION:
-    //       AUTHOR         Simon Vidanovic
-    //       DATE WRITTEN   June/22/2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+// MODULE INFORMATION:
+//       AUTHOR         Simon Vidanovic
+//       DATE WRITTEN   June/22/2010
+//       MODIFIED       na
+//       RE-ENGINEERED  na
 
-    //  Revision: 6.0.36  (June/22/2010)
-    //   - Initial setup, extracted from TARCOG.fi
-    //   - Moved Standards and MaxGas into GasParams module (gasses project)
+//  Revision: 6.0.36  (June/22/2010)
+//   - Initial setup, extracted from TARCOG.fi
+//   - Moved Standards and MaxGas into GasParams module (gasses project)
 
-    // PURPOSE OF THIS MODULE:
-    // Module which contains common TARCOG parameters and constants
+// PURPOSE OF THIS MODULE:
+// Module which contains common TARCOG parameters and constants
 
-
-
-} // namespace EnergyPlus
+} // namespace EnergyPlus::TARCOGParams
