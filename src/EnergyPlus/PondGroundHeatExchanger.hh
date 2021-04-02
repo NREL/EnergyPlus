@@ -65,8 +65,6 @@ struct EnergyPlusData;
 
 namespace PondGroundHeatExchanger {
 
-    extern int NumOfPondGHEs; // Number of pond ground heat exchangers
-
     struct PondGroundHeatExchangerData : PlantComponent
     {
         // Members
@@ -121,11 +119,13 @@ namespace PondGroundHeatExchanger {
         {
         }
 
-        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void
+        simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(
+            EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void InitPondGroundHeatExchanger(EnergyPlusData &state, bool FirstHVACIteration);
 
@@ -147,23 +147,24 @@ namespace PondGroundHeatExchanger {
         void UpdatePondGroundHeatExchanger(EnergyPlusData &state);
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
-
     };
-
-    // Object Data
-    extern Array1D<PondGroundHeatExchangerData> PondGHE;
-
-    void clear_state();
 
     void GetPondGroundHeatExchanger(EnergyPlusData &state);
 
 } // namespace PondGroundHeatExchanger
 
-struct PondGroundHeatExchangerData : BaseGlobalStruct {
+struct PondGroundHeatExchangerData : BaseGlobalStruct
+{
+
+    bool GetInputFlag = true;
+    int NumOfPondGHEs = 0;
+    Array1D<PondGroundHeatExchanger::PondGroundHeatExchangerData> PondGHE;
 
     void clear_state() override
     {
-
+        this->GetInputFlag = true;
+        this->NumOfPondGHEs = 0;
+        this->PondGHE.deallocate();
     }
 };
 

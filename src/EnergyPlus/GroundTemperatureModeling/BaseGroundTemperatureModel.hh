@@ -78,24 +78,26 @@ public:
     }
 
     // Virtual method for retrieving the ground temp
-    virtual Real64 getGroundTemp(EnergyPlusData& state) = 0;
+    virtual Real64 getGroundTemp(EnergyPlusData &state) = 0;
 
-    virtual Real64 getGroundTempAtTimeInSeconds(EnergyPlusData& state, Real64 const, Real64 const) = 0;
+    virtual Real64 getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const, Real64 const) = 0;
 
-    virtual Real64 getGroundTempAtTimeInMonths(EnergyPlusData& state, Real64 const, int const) = 0;
+    virtual Real64 getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const, int const) = 0;
 
 protected:
     static void write_ground_temps(InputOutputFile &os, const std::string &name, const Array1D<Real64> &data)
     {
         print(os,
-              "! <Site:GroundTemperature:{}>,Jan{{C}},Feb{{C}},Mar{{C}},Apr{{C}},May{{C}},Jun{{C}},Jul{{C}},Aug{{C}},Sep{{C}},Oct{{C}},Nov{{C}},Dec{{C}}\n", name);
+              "! "
+              "<Site:GroundTemperature:{}>,Jan{{C}},Feb{{C}},Mar{{C}},Apr{{C}},May{{C}},Jun{{C}},Jul{{C}},Aug{{C}},Sep{{C}},Oct{{C}},Nov{{C}},Dec{{C}"
+              "}\n",
+              name);
         print(os, " Site:GroundTemperature:{}", name);
         for (int i = 1; i <= 12; ++i) {
             print(os, ", {:6.2F}", data(i));
         }
         print(os, "\n");
     }
-
 };
 
 } // namespace EnergyPlus

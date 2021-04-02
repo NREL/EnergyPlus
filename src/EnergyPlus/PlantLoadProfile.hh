@@ -63,25 +63,10 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace PlantLoadProfile {
-    // Using/Aliasing
-
-    // Data
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumOfPlantProfile;
-
-    // SUBROUTINE SPECIFICATIONS:
-
-    // Types
 
     struct PlantProfileData : public PlantComponent
     {
-        virtual ~PlantProfileData()
-        {
-        }
+        virtual ~PlantProfileData() = default;
 
         // Members
         std::string Name;   // Name of Plant Load Profile object
@@ -114,43 +99,48 @@ namespace PlantLoadProfile {
 
         // Default Constructor
         PlantProfileData()
-            : WLoopNum(0), WLoopSideNum(0), WLoopBranchNum(0), WLoopCompNum(0), Init(true), InitSizing(true), InletNode(0), InletTemp(0.0),
-              OutletNode(0), OutletTemp(0.0), LoadSchedule(0), EMSOverridePower(false), EMSPowerValue(0.0), PeakVolFlowRate(0.0),
+            : TypeNum(0), WLoopNum(0), WLoopSideNum(0), WLoopBranchNum(0), WLoopCompNum(0), Init(true), InitSizing(true), InletNode(0),
+              InletTemp(0.0), OutletNode(0), OutletTemp(0.0), LoadSchedule(0), EMSOverridePower(false), EMSPowerValue(0.0), PeakVolFlowRate(0.0),
               FlowRateFracSchedule(0), VolFlowRate(0.0), MassFlowRate(0.0), EMSOverrideMassFlow(false), EMSMassFlowValue(0.0), Power(0.0),
               Energy(0.0), HeatingEnergy(0.0), CoolingEnergy(0.0), SetLoopIndexFlag(true)
         {
         }
 
         // Functions
-        static PlantComponent *factory(EnergyPlusData &state, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
         void InitPlantProfile(EnergyPlusData &state);
 
-        void UpdatePlantProfile();
+        void UpdatePlantProfile(EnergyPlusData &state) const;
 
-        void ReportPlantProfile();
+        void ReportPlantProfile(EnergyPlusData &state);
     };
-
-    // Object Data
-    extern Array1D<PlantProfileData> PlantProfile;
 
     // This could be static inside the class
     void GetPlantProfileInput(EnergyPlusData &state);
 
-    // As could this
-    void clear_state();
-
 } // namespace PlantLoadProfile
 
-struct PlantLoadProfileData : BaseGlobalStruct {
+struct PlantLoadProfileData : BaseGlobalStruct
+{
+
+    bool GetPlantLoadProfileInputFlag = true;
+    int NumOfPlantProfile = 0;
+    Array1D<PlantLoadProfile::PlantProfileData> PlantProfile;
 
     void clear_state() override
     {
-
+        this->GetPlantLoadProfileInputFlag = true;
+        this->NumOfPlantProfile = 0;
+        this->PlantProfile.deallocate();
     }
 };
 

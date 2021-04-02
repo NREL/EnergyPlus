@@ -403,9 +403,137 @@ It needs to be noted that the temperature effects on battery performance and bat
 
 Bindner H., Cronin T., Lundsager P., Manwell J.F., Abdulwahid U., and Baring-Gould I. 2005. Lifetime Modeling of Lead Acid Batteries. Riso National Laboratory, Roskilde, Denmark.
 
+\noindent
 Downing S. D. and Socie D. F. 1982.~ Simple rainflow counting algorithms, International Journal of Fatigue, 1982.
 
+\noindent
 Manwell J. F. and McGowan J. G. 1993. A lead acid battery storage model for hybrid energy systems, Solar Energy 50(5): 399- 405.
+
+\subsection{Electrical Storage – Lithium-Ion NMC Model with Capacity Degradation Estimation}
+
+The Lithium-Ion NMC Model (object: ElectricLoadCenter:Storage:LithiumIonNMC) comprises a performance model and a capacity degradation model. The performance model captures the dynamics of the voltage, charging and discharging power of the battery, and battery temperature, and the capacity degradation model  estimates the loss in maximum available capacity with calendar age, and use. The performance and capacity degradation models are imported from the shared library of the System Advisory Model (SAM). The models are intended to represent Lithium-ion batteries with NMC chemistry. A detailed description of the performance model can be obtained from (DiOrio, 2015), and the capacity degradation model from (Smith 2017). A brief description of the performance, and capacity degradation models are provided below. 
+
+\subsubsection{Voltage Model}
+ The SAM model strikes a balance between complexity and the computational requirements that would enable real-time control. The battery terminal voltage V is expressed as a function of the open circuit voltage $V_o$, the internal resistance $R_{int}$, the current $I$, the state of charge, and the battery capacity ($q_{max}$) as shown in the equation below.
+
+\begin{equation}
+ V=V_o-I\cdot R_{int}-K \left(\frac{q_{max}}{q_{max}-\int{I\cdot dt}}\right)+a\cdot e^{(-B \cdot I\cdot dt)}
+\label{Equation: Voltage}
+\end{equation}
+
+The expression $\int{Idt}$ is the amount of capacity removed and can be calculated from the following equation. 
+
+\begin{equation}
+\int{Idt} = q_{max} - q
+\label{Equation: charge_removed}
+\end{equation}
+The parameters $V_o$, $K$,$a$, and $B$ are dependent on battery chemistry and can be obtained from the manufacturer's voltage vs charge-removed curves. Default values are included in the Lithium-Ion NMC model with the parameter values obtained from   (Tremblay 2007). The voltage model does not incorporate temperature effects, but the impact of temperature is indirectly implemented through battery capacity which is coupled with the thermal model. 
+
+\subsubsection{Thermal Model}
+The thermal effects of the battery are important to model since they impact both the instantaneous available capacity, and also the rate of lifetime capacity degradation. An energy balance equation is used to model the battery temperature. The heat transfer between the battery and the room is depends on the temperature difference between them $T_{room}-T_{batt}$. In addition to the heat transfer between the room and battery, the battery generates its own heat due to internal resistance. The differential equation used to model the battery temperature is shown below. 
+
+\begin{equation}
+f(T_{batt}) = \frac{dT_{batt}}{dt}= \frac{hA(T_{room} - T_{batt}) + I^2R}{mC_p}
+\label{Equation: battery_temp_nmc}
+\end{equation}
+
+The SAM model uses the trapezoidal method to numerically step the temperature forward in time as described in the equation below. 
+
+\begin{equation}
+T_{batt,n+1} = T_{batt,n+1} = \frac{\Delta t}{2}\left[f(T_{batt,n+1} + f(T_{batt,n})\right] 
+\label{Equation: batt_temp_trapezoidal}
+\end{equation}
+The model outputs the bulk average temperature of the battery which is used in the computation of the maximum available capacity and lifetime capacity degradation. 
+
+\subsubsection{Capacity Model}
+The lithium ion capacity model updates the charge of the battery depending on the charging and discharging current. A positive value indicates charging and negative value of current indicates discharging. The updated capacity at each time-step is computed using the following equation. 
+\begin{equation}
+q = q - I\Delta t
+\label{Equation: capacity_update_nmc}
+\end{equation}
+
+The battery is only allowed to charge and discharge to the user defined maximum and minimum state of charge. Capacity relates to the battery energy through voltage as shown below. 
+
+\begin{equation}
+E = qV
+\label{Equation: energy_nmc}
+\end{equation}
+
+The power is related to battery energy and voltage as follows. 
+
+\begin{equation}
+P = IV = \frac{\Delta E}{\Delta t} = \frac{V \Delta q}{\Delta t}
+\label{Equation: power_nmc}
+\end{equation}
+
+\subsubsection{Capacity degradation}
+The  model  developed by Smith et.al in (Smith 2017) for the LithiumIon NMC battery is used to estimate capacity degradation. 
+The charge capacity degradation is modeled by taking into consideration two mechanisms: 1) the loss of cyclable Lithium due to formation of solid electrolyte interface (SEI) represented by $(Q_{max}^{Li})$, and 2) the mechanical damage of the negative electrode due to the charge/discharge cycles $(Q_{max}^{neg})$. The battery capacity degradation due to each of the mechanisms is briefly described below.
+
+The primary factor driving the formation of SEI is the calendar time $t$, but formation is accelerated by factors such as state of charge at which the battery is stored, the depth of discharge during cycling and the number of charge and discharge cycles. The battery charge capacity $(q_{max}^{Li})$ and its degradation due to the formation of SEI is shown in Equation~\ref{Equation: Q_li}. 
+
+\begin{equation}
+Q_{max}^{Li} = d_0 \left[b_0 - b_1t^{1/2} - b_2N - b_3\left(1-exp (\frac{-t}{\tau_{b_3}})\right)\right]
+\label{Equation: Q_li}
+\end{equation}
+
+where $t$ is the calendar time in days, $N$ is the total number of charge/discharge cycles over the battery's lifetime, and $\tau_{b_3}$ is an experimentally determined constant. Battery temperature affects the available maximum capacity at the current time instant as well as the rate of charge degradation. The parameter $d_0$ captures the effect of the former as shown in Equation~\ref{Equation: d0_computation}. 
+
+Equation~\ref{Equation: d0_computation}. 
+\begin{equation}
+\begin{split}
+d_0 = d_{0,ref} \cdot exp\left[\frac{E_{a,d_0,1}}{R_{ug}}\left(\frac{1}{T_{bat}} - \frac{1}{T_{ref}}\right) \right. \left. - \left(\frac{E_{a,d_0,2}}{R_{ug}}\right)^2 \left(\frac{1}{T_{bat}} - \frac{1}{T_{ref}}\right)^2 \right]
+\end{split}
+\label{Equation: d0_computation}
+\end{equation}
+
+The other parameters $b_1,b_2,$ and $b_3$  model the capacity degradation and are functions of battery temperature, state of charge, open circuit voltage, negative electrode voltage, and maximum depth of discharge. For example, the equation used to compute the parameter $b_1$ is in Equation~\ref{Equation: b1_computation}.
+\begin{equation}
+\begin{split}
+    b_1 = & b_{1,ref} \cdot exp\left(-\frac{E_{ab1}}{R_{ug}} \cdot \left(\frac{1}{T_{batt}} - \frac{1}{T_{ref}}\right) \right) \cdot
+exp\left(-\frac{\alpha_{ab1}\cdot F}{R_{ug}} \cdot \left(\frac{U_{neg}}{T_{batt}} - \frac{U_{ref}}{T_{ref}}\right) \right) \cdot  \\
+& exp\left(\gamma \cdot (DoD_{max})^{\beta_{b1}}\right) \\
+\end{split}
+\label{Equation: b1_computation}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+    b_2 = & b_{2,ref} \cdot exp\left(-\frac{E_{ab2}}{R_{ug}} \cdot \left(\frac{1}{T_{batt}} - \frac{1}{T_{ref}}\right) \right) \\
+\end{split}
+\label{Equation: b2_computation}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+    b_3 = & b_{3,ref} \cdot exp\left(-\frac{E_{ab3}}{R_{ug}} \cdot \left(\frac{1}{T_{batt}} - \frac{1}{T_{ref}}\right) \right) \cdot
+exp\left(-\frac{\alpha_{ab3}\cdot F}{R_{ug}} \cdot \left(\frac{V_{oc}}{T_{batt}} - \frac{V_{ref}}{T_{ref}}\right) \right) \cdot  \\
+& exp\left(1 + \theta \cdot (DoD_{max})\right) \\
+\end{split}
+\label{Equation: b3_computation}
+\end{equation}
+
+During the second half of the battery life cycle degradation is dominated by the charge discharge cycles. The battery capacity during this period is expressed as shown below.  
+\begin{equation}
+Q_{max}^{neg}=\sqrt{(c_0^2-2c_2 c_0 N)}                             
+\label{Equation: qmax_computation_a}
+\end{equation}
+As in the case with the calendar life degradation, the parameters $c_0$ and $c_2$ were determined experimentally. 
+
+The description of the model parameters, and constants can be found in (Smith, 2017), and the corresponding values can be found in (Mishra, 2020).
+
+\subsubsection{References}\label{references-022-b}
+
+N. DiOrio et al. Technoeconomic modeling of battery energy storage in SAM. Tech. rep. National Renewable Energy Lab. (NREL), Golden, CO (United States), 2015.
+
+\noindent
+K.  Smith  et  al.  “Life  prediction  model  for  grid-connected  Li-ion  batteryenergy  storage  system”.  In: 2017 American Control Conference (ACC). IEEE. 2017, pp. 4062–4068.
+
+\noindent
+O. Tremblay, L.-A. Dessaint, and A.-I. Dekkiche. “A generic battery modelfor the dynamic simulation of hybrid electric vehicles”. In: 2007 IEEE Vehicle Power and Propulsion Conference. Ieee. 2007, pp. 284–289.
+
+\noindent
+P. P. Mishra et al. “Analysis of degradation in residential battery energystorage systems for rate-based use-cases”. In: Applied Energy 264 (2020), p. 114632.
 
 \subsection{Electric Load Center Transformers}\label{electric-load-center-transformers}
 

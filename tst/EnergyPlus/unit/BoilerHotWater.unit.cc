@@ -82,13 +82,13 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
     state->dataBoilers->Boiler(1).VolFlowRateWasAutoSized = false;
 
     state->dataPlnt->PlantLoop.allocate(1);
-    DataSizing::PlantSizData.allocate(1);
+    state->dataSize->PlantSizData.allocate(1);
     // Hot Water Loop
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
-    DataSizing::PlantSizData(1).DeltaT = 10.0;
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 1.0;
+    state->dataSize->PlantSizData(1).DeltaT = 10.0;
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     // now call sizing routine
     state->dataBoilers->Boiler(1).SizeBoiler(*state);
@@ -110,7 +110,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
     EXPECT_NEAR(state->dataBoilers->Boiler(1).NomCap, 49376304.0, 1.0);
     // clear
     state->dataBoilers->Boiler.deallocate();
-    DataSizing::PlantSizData.deallocate();
+    state->dataSize->PlantSizData.deallocate();
     state->dataPlnt->PlantLoop.deallocate();
 }
 TEST_F(EnergyPlusFixture, Boiler_HotWaterAutoSizeTempTest)
@@ -127,13 +127,13 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterAutoSizeTempTest)
     state->dataBoilers->Boiler(1).VolFlowRateWasAutoSized = true;
 
     state->dataPlnt->PlantLoop.allocate(1);
-    DataSizing::PlantSizData.allocate(1);
+    state->dataSize->PlantSizData.allocate(1);
     // Hot Water Loop
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
-    DataSizing::PlantSizData(1).DeltaT = 10.0;
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 1.0;
+    state->dataSize->PlantSizData(1).DeltaT = 10.0;
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // calculate nominal capacity at 60.0 C hot water temperature
@@ -148,7 +148,8 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterAutoSizeTempTest)
                                                        state->dataPlnt->PlantLoop(state->dataBoilers->Boiler(1).LoopNum).FluidIndex,
                                                        "Boiler_HotWaterAutoSizeTempTest");
 
-    Real64 NomCapBoilerExpected = rho * PlantSizData(1).DesVolFlowRate * Cp * PlantSizData(1).DeltaT * state->dataBoilers->Boiler(1).SizFac;
+    Real64 NomCapBoilerExpected =
+        rho * state->dataSize->PlantSizData(1).DesVolFlowRate * Cp * state->dataSize->PlantSizData(1).DeltaT * state->dataBoilers->Boiler(1).SizFac;
 
     // now call sizing routine
     state->dataBoilers->Boiler(1).SizeBoiler(*state);
@@ -205,7 +206,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     std::string const idf_objects = delimited_string({
         "Boiler:HotWater,",
@@ -262,9 +263,9 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = thisBoiler.BoilerInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = thisBoiler.BoilerOutletNodeNum;
 
-    DataSizing::PlantSizData.allocate(1);
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.1;
-    DataSizing::PlantSizData(1).DeltaT = 10;
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.1;
+    state->dataSize->PlantSizData(1).DeltaT = 10;
 
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     state->dataPlnt->PlantFirstSizesOkayToReport = true;
@@ -280,6 +281,6 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
 
     // check boiler part load ratio and the resultant boiler efficiency
     EXPECT_NEAR(thisBoiler.BoilerPLR, 0.24, 0.01);
-    Real64 ExpectedBoilerEff = (0.5887682 + 0.7888184 * thisBoiler.BoilerPLR - 0.3862498 * pow(thisBoiler.BoilerPLR,2)) * thisBoiler.NomEffic;
-    EXPECT_NEAR(thisBoiler.BoilerEff, ExpectedBoilerEff,0.01);
+    Real64 ExpectedBoilerEff = (0.5887682 + 0.7888184 * thisBoiler.BoilerPLR - 0.3862498 * pow(thisBoiler.BoilerPLR, 2)) * thisBoiler.NomEffic;
+    EXPECT_NEAR(thisBoiler.BoilerEff, ExpectedBoilerEff, 0.01);
 }

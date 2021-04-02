@@ -81,11 +81,13 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlabAndBasementModelsIndexChecking)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    domains.resize(2);
+    state->dataPlantPipingSysMgr->domains.resize(2);
 
-    domains[0].groundTempModel = GetGroundTempModelAndInit(*state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1");
+    state->dataPlantPipingSysMgr->domains[0].groundTempModel =
+        GetGroundTempModelAndInit(*state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1");
 
-    domains[1].groundTempModel = GetGroundTempModelAndInit(*state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2");
+    state->dataPlantPipingSysMgr->domains[1].groundTempModel =
+        GetGroundTempModelAndInit(*state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2");
 
-    EXPECT_NE(domains[0].groundTempModel, domains[1].groundTempModel);
+    EXPECT_NE(state->dataPlantPipingSysMgr->domains[0].groundTempModel, state->dataPlantPipingSysMgr->domains[1].groundTempModel);
 }

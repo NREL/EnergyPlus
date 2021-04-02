@@ -81,15 +81,13 @@ namespace OutputReportTabularAnnual {
 
     void GatherAnnualResultsForTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTypeStep);
 
-    void ResetAnnualGathering();
+    void ResetAnnualGathering(EnergyPlusData &state);
 
     void WriteAnnualTables(EnergyPlusData &state);
 
-    void AddAnnualTableOfContents(std::ostream &);
+    void AddAnnualTableOfContents(EnergyPlusData &state, std::ostream &);
 
     AnnualFieldSet::AggregationKind stringToAggKind(EnergyPlusData &state, std::string inString);
-
-    void clear_state(); // for unit tests
 
     class AnnualTable
     {
@@ -122,7 +120,7 @@ namespace OutputReportTabularAnnual {
 
         void resetGathering();
 
-        void writeTable(EnergyPlusData &state, OutputReportTabular::iUnitsStyle unitsStyle);
+        void writeTable(EnergyPlusData &state, OutputReportTabular::iUnitsStyle unitsStyle, bool produceTabular_para, bool produceSQLite_para);
 
         void addTableOfContents(std::ostream &);
 
@@ -149,7 +147,7 @@ namespace OutputReportTabularAnnual {
 
         Real64 getSecondsInTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep);
 
-        void computeBinColumns(EnergyPlusData &state);
+        void computeBinColumns(EnergyPlusData &state, OutputReportTabular::iUnitsStyle const &unitsStyle_para);
 
         std::vector<std::string> setupAggString();
 
@@ -177,15 +175,16 @@ namespace OutputReportTabularAnnual {
 
     }; // class AnnualTable
 
-    extern std::vector<AnnualTable> annualTables;
-
 } // namespace OutputReportTabularAnnual
 
-struct OutputReportTabularAnnualData : BaseGlobalStruct {
+struct OutputReportTabularAnnualData : BaseGlobalStruct
+{
+
+    std::vector<OutputReportTabularAnnual::AnnualTable> annualTables;
 
     void clear_state() override
     {
-
+        this->annualTables.clear();
     }
 };
 

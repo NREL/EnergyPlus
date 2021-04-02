@@ -63,33 +63,16 @@ struct EnergyPlusData;
 
 namespace Humidifiers {
 
-    // Using/Aliasing
-
-    // Data
     // MODULE PARAMETER DEFINITIONS
-    extern int const Humidifier_Steam_Electric;
-    extern int const Humidifier_Steam_Gas;
-
-    extern Array1D_string const HumidifierType;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumHumidifiers;   // number of humidifiers of all types
-    extern int NumElecSteamHums; // number of electric steam humidifiers
-    extern int NumGasSteamHums;  // number of gas steam humidifiers
-    extern Array1D_bool CheckEquipName;
+    int constexpr Humidifier_Steam_Electric(1);
+    int constexpr Humidifier_Steam_Gas(2);
 
     // Humidifier normalized thermal efficiency curve types
-    extern int const Linear;
-    extern int const Quadratic;
-    extern int const Cubic;
-    extern int const FixedInletWaterTemperature;
-    extern int const VariableInletWaterTemperature;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Types
+    int constexpr Linear = 1;
+    int constexpr Quadratic = 2;
+    int constexpr Cubic = 3;
+    int constexpr FixedInletWaterTemperature = 1;
+    int constexpr VariableInletWaterTemperature = 2;
 
     class HumidifierData
     {
@@ -97,7 +80,7 @@ namespace Humidifiers {
     private:
     public:
         // Members
-        std::string Name; // unique name of component
+        std::string Name;           // unique name of component
         int HumType_Code;           // Pointer to Humidifier in list of humidifiers
         int EquipIndex;             // Pointer to Humidifier in list of humidifiers
         std::string Sched;          // name of availability schedule
@@ -148,8 +131,8 @@ namespace Humidifiers {
         // Default Constructor
         HumidifierData()
             : HumType_Code(0), EquipIndex(0), SchedPtr(0), NomCapVol(0.0), NomCap(0.0), NomPower(0.0), ThermalEffRated(1.0), CurMakeupWaterTemp(0.0),
-              EfficiencyCurvePtr(0), InletWaterTempOption(0), FanPower(0.0), StandbyPower(0.0), AirInNode(0), AirOutNode(0),
-              AirInTemp(0.0), AirInHumRat(0.0), AirInEnthalpy(0.0), AirInMassFlowRate(0.0), AirOutTemp(0.0), AirOutHumRat(0.0), AirOutEnthalpy(0.0),
+              EfficiencyCurvePtr(0), InletWaterTempOption(0), FanPower(0.0), StandbyPower(0.0), AirInNode(0), AirOutNode(0), AirInTemp(0.0),
+              AirInHumRat(0.0), AirInEnthalpy(0.0), AirInMassFlowRate(0.0), AirOutTemp(0.0), AirOutHumRat(0.0), AirOutEnthalpy(0.0),
               AirOutMassFlowRate(0.0), HumRatSet(0.0), WaterAdd(0.0), ElecUseEnergy(0.0), ElecUseRate(0.0), WaterCons(0.0), WaterConsRate(0.0),
               SuppliedByWaterSystem(false), WaterTankID(0), WaterTankDemandARRID(0), TankSupplyVdot(0.0), TankSupplyVol(0.0), StarvedSupplyVdot(0.0),
               StarvedSupplyVol(0.0), TankSupplyID(0), MySizeFlag(true), MyEnvrnFlag(true), MySetPointCheckFlag(true), ThermalEff(0.0),
@@ -161,7 +144,8 @@ namespace Humidifiers {
 
         void SizeHumidifier(EnergyPlusData &state); // number of the current humidifier being sized
 
-        void ControlHumidifier(EnergyPlusData &state, Real64 &WaterAddNeeded // moisture addition rate needed to meet minimum humidity ratio setpoint [kg/s]
+        void ControlHumidifier(EnergyPlusData &state,
+                               Real64 &WaterAddNeeded // moisture addition rate needed to meet minimum humidity ratio setpoint [kg/s]
         );
 
         void CalcElecSteamHumidifier(EnergyPlusData &state, Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
@@ -174,17 +158,8 @@ namespace Humidifiers {
 
         void UpdateHumidifier(EnergyPlusData &state); // number of the current humidifier being simulated
 
-        void ReportHumidifier(); // number of the current humidifier being simulated
+        void ReportHumidifier(EnergyPlusData &state); // number of the current humidifier being simulated
     };
-
-    // Object Data
-    extern Array1D<HumidifierData> Humidifier;
-
-    // Functions
-
-    // Clears the global data in Humidifiers.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
 
     void SimHumidifier(EnergyPlusData &state,
                        std::string const &CompName,   // name of the humidifier unit
@@ -194,22 +169,37 @@ namespace Humidifiers {
 
     void GetHumidifierInput(EnergyPlusData &state);
 
-    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &HumidifierName,
-        bool &ErrorsFound
-    );
+    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &HumidifierName, bool &ErrorsFound);
 
-    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &HumidifierName,
-        bool &ErrorsFound
-    );
+    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &HumidifierName, bool &ErrorsFound);
 
 } // namespace Humidifiers
 
 struct HumidifiersData : BaseGlobalStruct
 {
+    Array1D_string const HumidifierType = Array1D_string(2, {"Humidifier:Steam:Electric", "Humidifier:Steam:Gas"});
+    std::string const fluidNameSteam = "STEAM";
+    std::string const fluidNameWater = "WATER";
+
+    int NumHumidifiers = 0;   // number of humidifiers of all types
+    int NumElecSteamHums = 0; // number of electric steam humidifiers
+    int NumGasSteamHums = 0;  // number of electric steam humidifiers
+    Array1D_bool CheckEquipName;
+    bool GetInputFlag = true; // moved up from a static function variable
+
+    // Object Data
+    Array1D<Humidifiers::HumidifierData> Humidifier;
+    std::unordered_map<std::string, std::string> HumidifierUniqueNames;
 
     void clear_state() override
     {
-
+        this->NumHumidifiers = 0;
+        this->NumElecSteamHums = 0;
+        this->NumGasSteamHums = 0;
+        this->CheckEquipName.clear();
+        this->GetInputFlag = true;
+        this->Humidifier.clear();
+        this->HumidifierUniqueNames.clear();
     }
 };
 

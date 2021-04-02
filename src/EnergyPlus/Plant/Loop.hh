@@ -59,18 +59,24 @@ struct EnergyPlusData;
 namespace DataPlant {
 
     // "Both" is used as a special flag and is never assigned to the loop's TypeOfLoop member
-    enum class LoopType {Unassigned, Plant, Condenser, Both};
+    enum class LoopType
+    {
+        Unassigned,
+        Plant,
+        Condenser,
+        Both
+    };
 
     struct PlantLoopData
     {
         // Members
-        std::string Name;      // Name of the component list
-        std::string FluidName; // Name of the fluid specified for this loop
-        int FluidType;         // Type of fluid in the loop
-        int FluidIndex;        // Index for Fluid in FluidProperties
-        int MFErrIndex;        // for recurring mass flow errors
-        int MFErrIndex1;       // for recurring mass flow errors
-        int MFErrIndex2;       // for recurring mass flow errors
+        std::string Name;                      // Name of the component list
+        std::string FluidName;                 // Name of the fluid specified for this loop
+        DataLoopNode::NodeFluidType FluidType; // Type of fluid in the loop
+        int FluidIndex;                        // Index for Fluid in FluidProperties
+        int MFErrIndex;                        // for recurring mass flow errors
+        int MFErrIndex1;                       // for recurring mass flow errors
+        int MFErrIndex2;                       // for recurring mass flow errors
         // (see CheckPlantMixerSplitterConsistency)
         // Loop Operating Setpoints and Limits
         int TempSetPointNodeNum;         // Node Number for Loop Temp SP associated with SP manager
@@ -91,13 +97,13 @@ namespace DataPlant {
         bool EMSCtrl;
         Real64 EMSValue;
         // Loop Inlet and Outlet Nodes
-        Array1D<HalfLoopData> LoopSide;  // Half loop data (Demand side or Supply Side)
-        std::string OperationScheme;     // Operation scheme name for the loop
-        int NumOpSchemes;                // Number of items in list identified by "OpScheme"
-        Array1D<OperationData> OpScheme; // Operation scheme data
+        Array1D<HalfLoopData> LoopSide;                        // Half loop data (Demand side or Supply Side)
+        std::string OperationScheme;                           // Operation scheme name for the loop
+        int NumOpSchemes;                                      // Number of items in list identified by "OpScheme"
+        Array1D<OperationData> OpScheme;                       // Operation scheme data
         DataPlant::iLoadingScheme LoadDistribution;            // Load distribution scheme 1 for optimal, 2 for overloading
-        int PlantSizNum;                 // index to corresponding plant sizing data array
-        DataPlant::iLoopDemandCalcScheme LoopDemandCalcScheme;        // Load distribution scheme 1 SingleSetPoint,
+        int PlantSizNum;                                       // index to corresponding plant sizing data array
+        DataPlant::iLoopDemandCalcScheme LoopDemandCalcScheme; // Load distribution scheme 1 SingleSetPoint,
         // 2 DualSetPointwithDeadBand
         DataPlant::iCommonPipeType CommonPipeType;
         int EconPlantSideSensedNodeNum;
@@ -127,7 +133,7 @@ namespace DataPlant {
 
         // Default Constructor
         PlantLoopData()
-            : FluidType(0), FluidIndex(1), // default to water
+            : FluidType(DataLoopNode::NodeFluidType::blank), FluidIndex(1), // default to water
               MFErrIndex(0), MFErrIndex1(0), MFErrIndex2(0), TempSetPointNodeNum(0), MaxBranch(0), MinTemp(0.0), MaxTemp(0.0), MinTempErrIndex(0),
               MaxTempErrIndex(0), MinVolFlowRate(0.0), MaxVolFlowRate(0.0), MaxVolFlowRateWasAutoSized(false), MinMassFlowRate(0.0),
               MaxMassFlowRate(0.0), Volume(0.0), VolumeWasAutoSized(false), CirculationTime(2.0), Mass(0.0), EMSCtrl(false), EMSValue(0.0),
@@ -146,7 +152,6 @@ namespace DataPlant {
         void CheckLoopExitNode(EnergyPlusData &state, bool FirstHVACIteration);
 
         void CalcUnmetPlantDemand(EnergyPlusData &state);
-
     };
 } // namespace DataPlant
 } // namespace EnergyPlus
