@@ -146,8 +146,8 @@ namespace MundtSimMgr {
     //*****************************************************************************************
 
     void SetupMundtModel(EnergyPlusData &state,
-                         int ZoneNum, // index number for the specified zone
-                         bool &ErrorsFound  // true if problems setting up model
+                         int ZoneNum,      // index number for the specified zone
+                         bool &ErrorsFound // true if problems setting up model
     );
 
     //*****************************************************************************************
@@ -176,10 +176,11 @@ namespace MundtSimMgr {
 
 } // namespace MundtSimMgr
 
-struct MundtSimMgrData : BaseGlobalStruct {
+struct MundtSimMgrData : BaseGlobalStruct
+{
 
-    Array1D_int FloorSurfSetIDs;     // fixed variable for floors
-    Array1D_int TheseSurfIDs;        // temporary working variable
+    Array1D_int FloorSurfSetIDs;      // fixed variable for floors
+    Array1D_int TheseSurfIDs;         // temporary working variable
     int MundtCeilAirID = 0;           // air node index in AirDataManager
     int MundtFootAirID = 0;           // air node index in AirDataManager
     int SupplyNodeID = 0;             // air node index in AirDataManager
@@ -187,8 +188,8 @@ struct MundtSimMgrData : BaseGlobalStruct {
     int ReturnNodeID = 0;             // air node index in AirDataManager
     int NumRoomNodes = 0;             // number of nodes connected to walls
     int NumFloorSurfs = 0;            // total number of surfaces for floor
-    Array1D_int RoomNodeIDs;         // ids of the first NumRoomNode Air Nodes
-    Array1D_int ID1dSurf;            // numbers used to identify surfaces
+    Array1D_int RoomNodeIDs;          // ids of the first NumRoomNode Air Nodes
+    Array1D_int ID1dSurf;             // numbers used to identify surfaces
     int MundtZoneNum = 0;             // index of zones using Mundt model
     Real64 ZoneHeight = 0.0;          // zone height
     Real64 ZoneFloorArea = 0.0;       // zone floor area
@@ -204,7 +205,7 @@ struct MundtSimMgrData : BaseGlobalStruct {
     Array2D<MundtSimMgr::DefineLinearModelNode> LineNode;     // air nodes
     Array2D<MundtSimMgr::DefineSurfaceSettings> MundtAirSurf; // surfaces
     Array1D<MundtSimMgr::DefineSurfaceSettings> FloorSurf;    // floor
-    
+
     void clear_state() override
     {
         this->FloorSurfSetIDs.clear();   // fixed variable for floors

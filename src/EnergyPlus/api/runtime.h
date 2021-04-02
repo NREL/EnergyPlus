@@ -48,38 +48,38 @@
 #ifndef EnergyPlusAPIRuntime_h_INCLUDED
 #define EnergyPlusAPIRuntime_h_INCLUDED
 
-#include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/api/EnergyPlusAPI.h>
+#include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/api/state.h>
 
 #ifdef __cplusplus
 
 // if we are building this with C++ in mind, we can make use of these std::function based callback registration functions
 #include <functional>
-ENERGYPLUSLIB_API void callbackBeginNewEnvironment(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
-ENERGYPLUSLIB_API void callbackAfterNewEnvironmentWarmupComplete(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
-ENERGYPLUSLIB_API void callbackBeginZoneTimeStepBeforeInitHeatBalance(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
-ENERGYPLUSLIB_API void callbackBeginZoneTimeStepAfterInitHeatBalance(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
-ENERGYPLUSLIB_API void callbackBeginZoneTimestepBeforeSetCurrentWeather(EnergyPlusState state, std::function<void(EnergyPlusState)> const& f);
-ENERGYPLUSLIB_API void callbackBeginTimeStepBeforePredictor(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
-ENERGYPLUSLIB_API void callbackAfterPredictorBeforeHVACManagers(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
-ENERGYPLUSLIB_API void callbackAfterPredictorAfterHVACManagers(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
-ENERGYPLUSLIB_API void callbackInsideSystemIterationLoop(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
-ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepBeforeZoneReporting(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
-ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepAfterZoneReporting(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
-ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepBeforeHVACReporting(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
-ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepAfterHVACReporting(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
-ENERGYPLUSLIB_API void callbackEndOfZoneSizing(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
-ENERGYPLUSLIB_API void callbackEndOfSystemSizing(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
-ENERGYPLUSLIB_API void callbackEndOfAfterComponentGetInput(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
-ENERGYPLUSLIB_API void callbackUnitarySystemSizing(EnergyPlusState state, const std::function<void (EnergyPlusState)>& f);
-ENERGYPLUSLIB_API void registerStdOutCallback(EnergyPlusState state, std::function<void (const std::string &)>);
-ENERGYPLUSLIB_API void registerExternalHVACManager(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
-//ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackBeginNewEnvironment(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackAfterNewEnvironmentWarmupComplete(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackBeginZoneTimeStepBeforeInitHeatBalance(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackBeginZoneTimeStepAfterInitHeatBalance(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackBeginZoneTimestepBeforeSetCurrentWeather(EnergyPlusState state, std::function<void(EnergyPlusState)> const &f);
+ENERGYPLUSLIB_API void callbackBeginTimeStepBeforePredictor(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackAfterPredictorBeforeHVACManagers(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackAfterPredictorAfterHVACManagers(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackInsideSystemIterationLoop(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepBeforeZoneReporting(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepAfterZoneReporting(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepBeforeHVACReporting(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepAfterHVACReporting(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackEndOfZoneSizing(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackEndOfSystemSizing(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackEndOfAfterComponentGetInput(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackUnitarySystemSizing(EnergyPlusState state, const std::function<void(EnergyPlusState)> &f);
+ENERGYPLUSLIB_API void registerStdOutCallback(EnergyPlusState state, std::function<void(const std::string &)>);
+ENERGYPLUSLIB_API void registerExternalHVACManager(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
+// ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
 
 extern "C" {
 
-#endif  // __cplusplus
+#endif // __cplusplus
 
 /// \file runtime.h
 /// \brief This "runtime" API category provides access to link into a running simulation by providing callback functions.
@@ -145,7 +145,7 @@ ENERGYPLUSLIB_API void stopSimulation(EnergyPlusState state);
 ///         during Python Plugin applications.  In these applications, the user is still interfacing with EnergyPlus
 ///         as a black-box program and will rely on output messages primarily through EnergyPlus output files.  Using
 ///         this function to issue a message using standard EnergyPlus techniques will make the process familiar.
-ENERGYPLUSLIB_API void issueWarning(EnergyPlusState state, const char * message); // Issue the warning text to the err file
+ENERGYPLUSLIB_API void issueWarning(EnergyPlusState state, const char *message); // Issue the warning text to the err file
 /// \brief Asks EnergyPlus to issue a severe message to the error file.
 /// \details During an EnergyPlus simulation, if certain conditions arise, it may be useful to alert the user using
 ///          this function, which will issue a severe error note in the standard error file and continue the simulation.
@@ -161,7 +161,7 @@ ENERGYPLUSLIB_API void issueWarning(EnergyPlusState state, const char * message)
 ///         during Python Plugin applications.  In these applications, the user is still interfacing with EnergyPlus
 ///         as a black-box program and will rely on output messages primarily through EnergyPlus output files.  Using
 ///         this function to issue a message using standard EnergyPlus techniques will make the process familiar.
-ENERGYPLUSLIB_API void issueSevere(EnergyPlusState state, const char * message); // Issue the severe text to the err file
+ENERGYPLUSLIB_API void issueSevere(EnergyPlusState state, const char *message); // Issue the severe text to the err file
 /// \brief Asks EnergyPlus to issue a plain text message to the error file.
 /// \details During an EnergyPlus simulation, if certain conditions arise, it may be useful to send information to the
 ///          user with this function, either to provide standard information, or supplemental information to a previously
@@ -172,8 +172,7 @@ ENERGYPLUSLIB_API void issueSevere(EnergyPlusState state, const char * message);
 ///         during Python Plugin applications.  In these applications, the user is still interfacing with EnergyPlus
 ///         as a black-box program and will rely on output messages primarily through EnergyPlus output files.  Using
 ///         this function to issue a message using standard EnergyPlus techniques will make the process familiar.
-ENERGYPLUSLIB_API void issueText(EnergyPlusState state, const char * message); // Issue additional supporting text to the err file
-
+ENERGYPLUSLIB_API void issueText(EnergyPlusState state, const char *message); // Issue additional supporting text to the err file
 
 /// \brief Register a callback function to receive updates on simulation progress
 /// \details During an EnergyPlus simulation, the progress of the simulation will move from zero to one hundred percent.
@@ -196,8 +195,7 @@ ENERGYPLUSLIB_API void registerProgressCallback(EnergyPlusState state, void (*f)
 /// \remark This function has limited usefulness in Python Plugin applications, but is highly valuable for being able
 ///         to report messages during an API workflow simulation.
 /// \deprecated Note that in a future release, the callback function will be changed to also take a state argument.
-ENERGYPLUSLIB_API void registerStdOutCallback(EnergyPlusState state, void (*f)(const char * message));
-
+ENERGYPLUSLIB_API void registerStdOutCallback(EnergyPlusState state, void (*f)(const char *message));
 
 /// \brief Register a callback function to be called at the beginning of each new environment.
 /// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which

@@ -133,9 +133,6 @@ namespace FaultsManager {
     //      'FaultModel:DamperLeakage:ReturnAir           ', &
     //      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
-
-
-
     // SUBROUTINE SPECIFICATIONS:
 
     // Types
@@ -229,14 +226,15 @@ namespace FaultsManager {
 
         // Default Constructor
         FaultPropertiesFoulingCoil()
-            : FouledCoilName(""), FouledCoiledType(0), FouledCoilNum(0), FoulingInputMethod(0),
-              UAFouled(0.0), Rfw(0.0), Rfa(0.0), Aout(0.0), Aratio(0.0)
+            : FouledCoilName(""), FouledCoiledType(0), FouledCoilNum(0), FoulingInputMethod(0), UAFouled(0.0), Rfw(0.0), Rfa(0.0), Aout(0.0),
+              Aratio(0.0)
         {
         }
 
         // Destructor
         virtual ~FaultPropertiesFoulingCoil() = default;
-      public:
+
+    public:
         // Calculate the fouling thermal insulance factor (the reciprocal of a heat transfert coefficient) due to fouling in a coil
         // Real64 CalFaultyCoilFoulingFactor();
 
@@ -390,16 +388,18 @@ namespace FaultsManager {
 
     void CheckAndReadFaults(EnergyPlusData &state);
 
-    void SetFaultyCoilSATSensor(EnergyPlusData &state, std::string const &CompType, std::string const &CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex);
+    void SetFaultyCoilSATSensor(
+        EnergyPlusData &state, std::string const &CompType, std::string const &CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex);
 
 } // namespace FaultsManager
 
-struct FaultsManagerData : BaseGlobalStruct {
+struct FaultsManagerData : BaseGlobalStruct
+{
 
     bool RunFaultMgrOnceFlag = false; // True if CheckAndReadFaults is already done
     bool ErrorsFound = false;         // True if errors detected in input
 
-    bool AnyFaultsInModel = false;          // True if there are operational faults in the model
+    bool AnyFaultsInModel = false;       // True if there are operational faults in the model
     int NumFaults = 0;                   // Number of faults (include multiple faults of same type) in the model
     int NumFaultyEconomizer = 0;         // Total number of faults related with the economizer
     int NumFouledCoil = 0;               // Total number of fouled coils
@@ -453,7 +453,6 @@ struct FaultsManagerData : BaseGlobalStruct {
         FaultsCondenserSWTSensor.deallocate();
         FaultsTowerFouling.deallocate();
         FaultsCoilSATSensor.deallocate();
-
     }
 };
 

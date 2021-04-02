@@ -75,8 +75,7 @@ namespace EnergyPlus {
 
 namespace HVACFan {
 
-
-    int getFanObjectVectorIndex(       // lookup vector index for fan object name in object array EnergyPlus::HVACFan::fanObjs
+    int getFanObjectVectorIndex( // lookup vector index for fan object name in object array EnergyPlus::HVACFan::fanObjs
         EnergyPlusData &state,
         std::string const &objectName, // IDF name in input
         bool const ErrorCheck)
@@ -91,7 +90,8 @@ namespace HVACFan {
                 } else { // found duplicate
                     // TODO throw warning?
                     index = -1;
-                    ShowSevereError(state, "getFanObjectVectorIndex: Found duplicate Fan:SystemModel inputs of name =" + objectName + ". Check inputs");
+                    ShowSevereError(state,
+                                    "getFanObjectVectorIndex: Found duplicate Fan:SystemModel inputs of name =" + objectName + ". Check inputs");
                 }
             }
         }
@@ -106,7 +106,7 @@ namespace HVACFan {
         std::string const &objectName)
     {
 
-        int testNum = inputProcessor->getObjectItemNum(state, "Fan:SystemModel", objectName);
+        int testNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Fan:SystemModel", objectName);
         if (testNum > 0) {
             return true;
         } else {
@@ -208,9 +208,11 @@ namespace HVACFan {
             m_objEnvrnFlag = true;
         }
 
-        m_massFlowRateMaxAvail = min(state.dataLoopNodes->Node(outletNodeNum).MassFlowRateMax, state.dataLoopNodes->Node(inletNodeNum).MassFlowRateMaxAvail);
-        m_massFlowRateMinAvail = min(max(state.dataLoopNodes->Node(outletNodeNum).MassFlowRateMin, state.dataLoopNodes->Node(inletNodeNum).MassFlowRateMinAvail),
-                                     state.dataLoopNodes->Node(inletNodeNum).MassFlowRateMaxAvail);
+        m_massFlowRateMaxAvail =
+            min(state.dataLoopNodes->Node(outletNodeNum).MassFlowRateMax, state.dataLoopNodes->Node(inletNodeNum).MassFlowRateMaxAvail);
+        m_massFlowRateMinAvail =
+            min(max(state.dataLoopNodes->Node(outletNodeNum).MassFlowRateMin, state.dataLoopNodes->Node(inletNodeNum).MassFlowRateMinAvail),
+                state.dataLoopNodes->Node(inletNodeNum).MassFlowRateMaxAvail);
 
         // Load the node data in this section for the component simulation
         // First need to make sure that the MassFlowRate is between the max and min avail.
@@ -310,7 +312,8 @@ namespace HVACFan {
 
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwr, name, designElecPower);
         if (designAirVolFlowRate != 0.0) {
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwrPerFlow, name, designElecPower / designAirVolFlowRate);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchFanPwrPerFlow, name, designElecPower / designAirVolFlowRate);
         }
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorIn, name, m_motorInAirFrac);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEnergyIndex, name, m_designPointFEI);
@@ -320,7 +323,8 @@ namespace HVACFan {
         m_objSizingFlag = false;
     }
 
-    Real64 FanSystem::report_fei(EnergyPlusData &state, Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir)
+    Real64 FanSystem::report_fei(
+        EnergyPlusData &state, Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir)
     {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the Fan Energy Index
@@ -390,8 +394,8 @@ namespace HVACFan {
         Array1D<Real64> numericArgs;
         Array1D_string numericFieldNames;
         Array1D_bool isNumericFieldBlank;
-        int objectNum = inputProcessor->getObjectItemNum(state, locCurrentModuleObject, objectName);
-        inputProcessor->getObjectDefMaxArgs(state, locCurrentModuleObject, numTotFields, numAlphas, numNums);
+        int objectNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, locCurrentModuleObject, objectName);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, locCurrentModuleObject, numTotFields, numAlphas, numNums);
         if (numAlphas > 0) {
             alphaArgs.allocate(numAlphas);
             alphaFieldNames.allocate(numAlphas);
@@ -403,18 +407,18 @@ namespace HVACFan {
             isNumericFieldBlank.allocate(numNums);
         }
 
-        inputProcessor->getObjectItem(state,
-                                      locCurrentModuleObject,
-                                      objectNum,
-                                      alphaArgs,
-                                      numAlphas,
-                                      numericArgs,
-                                      numNums,
-                                      IOStat,
-                                      isNumericFieldBlank,
-                                      isAlphaFieldBlank,
-                                      alphaFieldNames,
-                                      numericFieldNames);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 locCurrentModuleObject,
+                                                                 objectNum,
+                                                                 alphaArgs,
+                                                                 numAlphas,
+                                                                 numericArgs,
+                                                                 numNums,
+                                                                 IOStat,
+                                                                 isNumericFieldBlank,
+                                                                 isAlphaFieldBlank,
+                                                                 alphaFieldNames,
+                                                                 numericFieldNames);
 
         name = alphaArgs(1);
         // TODO how to check for unique names across objects during get input?
@@ -430,7 +434,8 @@ namespace HVACFan {
                 errorsFound = true;
             }
         }
-        inletNodeNum = NodeInputManager::GetOnlySingleNode(state, alphaArgs(3),
+        inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                           alphaArgs(3),
                                                            errorsFound,
                                                            locCurrentModuleObject,
                                                            alphaArgs(1),
@@ -438,7 +443,8 @@ namespace HVACFan {
                                                            DataLoopNode::NodeConnectionType::Inlet,
                                                            1,
                                                            DataLoopNode::ObjectIsNotParent);
-        outletNodeNum = NodeInputManager::GetOnlySingleNode(state, alphaArgs(4),
+        outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                            alphaArgs(4),
                                                             errorsFound,
                                                             locCurrentModuleObject,
                                                             alphaArgs(1),
@@ -571,7 +577,8 @@ namespace HVACFan {
             }
             if (increasingOrderError) {
                 ShowSevereError(state, routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Fan with Discrete speed control and multiple speed levels does not have input with flow fractions arranged in "
+                ShowContinueError(state,
+                                  "Fan with Discrete speed control and multiple speed levels does not have input with flow fractions arranged in "
                                   "increasing order.");
                 errorsFound = true;
             }
@@ -588,7 +595,8 @@ namespace HVACFan {
             if (foundMissingPowerFraction) {
                 // field set input does not match number of speeds, throw warning
                 ShowSevereError(state, routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state,
+                ShowContinueError(
+                    state,
                     "Fan with Discrete speed control does not have input for power fraction at all speed levels and does not have a power curve.");
                 errorsFound = true;
             }
@@ -601,7 +609,8 @@ namespace HVACFan {
         SetupOutputVariable(state, "Fan Electricity Rate", OutputProcessor::Unit::W, m_fanPower, "System", "Average", name);
         SetupOutputVariable(state, "Fan Rise in Air Temperature", OutputProcessor::Unit::deltaC, m_deltaTemp, "System", "Average", name);
         SetupOutputVariable(state, "Fan Heat Gain to Air", OutputProcessor::Unit::W, m_powerLossToAir, "System", "Average", name);
-        SetupOutputVariable(state, "Fan Electricity Energy",
+        SetupOutputVariable(state,
+                            "Fan Electricity Energy",
                             OutputProcessor::Unit::J,
                             m_fanEnergy,
                             "System",
@@ -614,7 +623,8 @@ namespace HVACFan {
                             "System");
         SetupOutputVariable(state, "Fan Air Mass Flow Rate", OutputProcessor::Unit::kg_s, m_outletAirMassFlowRate, "System", "Average", name);
         if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds == 1) {
-            SetupOutputVariable(state, "Fan Runtime Fraction", OutputProcessor::Unit::None, m_fanRunTimeFractionAtSpeed[0], "System", "Average", name);
+            SetupOutputVariable(
+                state, "Fan Runtime Fraction", OutputProcessor::Unit::None, m_fanRunTimeFractionAtSpeed[0], "System", "Average", name);
         } else if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1) {
             for (auto speedLoop = 0; speedLoop < m_numSpeeds; ++speedLoop) {
                 SetupOutputVariable(state,
@@ -634,12 +644,13 @@ namespace HVACFan {
             SetupEMSActuator(state, "Fan", name, "Fan Pressure Rise", "[Pa]", m_eMSFanPressureOverrideOn, m_eMSFanPressureValue);
             SetupEMSInternalVariable(state, "Fan Nominal Total Efficiency", name, "[fraction]", m_fanTotalEff);
             SetupEMSActuator(state, "Fan", name, "Fan Total Efficiency", "[fraction]", m_eMSFanEffOverrideOn, m_eMSFanEffValue);
-            SetupEMSActuator(state, "Fan", name, "Fan Autosized Air Flow Rate", "[m3/s]", m_maxAirFlowRateEMSOverrideOn, m_maxAirFlowRateEMSOverrideValue);
+            SetupEMSActuator(
+                state, "Fan", name, "Fan Autosized Air Flow Rate", "[m3/s]", m_maxAirFlowRateEMSOverrideOn, m_maxAirFlowRateEMSOverrideValue);
         }
 
         if (m_heatLossesDestination == ThermalLossDestination::zoneGains) {
-            SetupZoneInternalGain(state,
-                m_zoneNum, "Fan:SystemModel", name, DataHeatBalance::IntGainTypeOf_FanSystemModel, &m_qdotConvZone, nullptr, &m_qdotRadZone);
+            SetupZoneInternalGain(
+                state, m_zoneNum, "Fan:SystemModel", name, DataHeatBalance::IntGainTypeOf_FanSystemModel, &m_qdotConvZone, nullptr, &m_qdotRadZone);
         }
 
         alphaArgs.deallocate();
@@ -732,26 +743,28 @@ namespace HVACFan {
         Real64 localFaultMaxAirMassFlow = 0.0;
         bool faultActive = false;
         Real64 localFaultPressureRise = 0.0;
-        if (m_faultyFilterFlag && (state.dataFaultsMgr->NumFaultyAirFilter > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
-            state.dataGlobal->DoWeathSim && (!m_eMSMaxMassFlowOverrideOn) && (!m_eMSFanPressureOverrideOn)) {
+        if (m_faultyFilterFlag && (state.dataFaultsMgr->NumFaultyAirFilter > 0) && (!state.dataGlobal->WarmupFlag) &&
+            (!state.dataGlobal->DoingSizing) && state.dataGlobal->DoWeathSim && (!m_eMSMaxMassFlowOverrideOn) && (!m_eMSFanPressureOverrideOn)) {
             if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).AvaiSchedPtr) > 0) {
                 faultActive = true;
                 Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec]
-                FanDesignFlowRateDec = Fans::CalFaultyFanAirFlowReduction(state,
+                FanDesignFlowRateDec = Fans::CalFaultyFanAirFlowReduction(
+                    state,
                     name,
                     designAirVolFlowRate,
                     deltaPress,
-                    (ScheduleManager::GetCurrentScheduleValue(state,
-                         state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterPressFracSchePtr) -
+                    (ScheduleManager::GetCurrentScheduleValue(
+                         state, state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterPressFracSchePtr) -
                      1) *
                         deltaPress,
                     state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterFanCurvePtr);
 
                 localFaultMaxAirMassFlow = m_maxAirMassFlowRate - FanDesignFlowRateDec * m_rhoAirStdInit;
 
-                localFaultPressureRise = ScheduleManager::GetCurrentScheduleValue(state,
-                                             state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterPressFracSchePtr) *
-                                         deltaPress;
+                localFaultPressureRise =
+                    ScheduleManager::GetCurrentScheduleValue(
+                        state, state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterPressFracSchePtr) *
+                    deltaPress;
             }
         }
 
@@ -804,7 +817,8 @@ namespace HVACFan {
                         state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
                     }
                     if (state.dataHVACGlobal->OnOffFanPartLoadFraction < 0.7) {
-                        state.dataHVACGlobal->OnOffFanPartLoadFraction = 0.7; // a warning message is already issued from the DX coils or gas heating coil
+                        state.dataHVACGlobal->OnOffFanPartLoadFraction =
+                            0.7; // a warning message is already issued from the DX coils or gas heating coil
                     }
                     if (localUseFlowRatiosAndRunTimeFracs) {
                         // Use flow ratios and runtimefractions pass from parent (allows fan to cycle at a specified speed)

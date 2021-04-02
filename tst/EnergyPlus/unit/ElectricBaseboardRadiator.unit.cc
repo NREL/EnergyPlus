@@ -268,15 +268,15 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
 
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
-    EXPECT_FALSE(errorsFound);                              // expect no errors
+    EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                        // expect no errors
+    EXPECT_FALSE(errorsFound);                                // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
-    EXPECT_FALSE(errorsFound);                         // expect no errors
+    EXPECT_FALSE(errorsFound);                                 // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
@@ -559,15 +559,15 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
 
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
-    EXPECT_FALSE(errorsFound);                              // expect no errors
+    EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                        // expect no errors
+    EXPECT_FALSE(errorsFound);                                // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
-    EXPECT_FALSE(errorsFound);                         // expect no errors
+    EXPECT_FALSE(errorsFound);                                 // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);

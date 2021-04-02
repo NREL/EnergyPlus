@@ -146,7 +146,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     std::string const idf_objects = delimited_string({
         "Chiller:Electric:EIR,",
@@ -297,7 +297,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);

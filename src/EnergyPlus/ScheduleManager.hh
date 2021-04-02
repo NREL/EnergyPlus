@@ -75,7 +75,8 @@ namespace ScheduleManager {
 
     int const MaxDayTypes(12);
 
-    enum class SchedType :int {
+    enum class SchedType : int
+    {
         Unassigned = 0,
         ScheduleInput_year = 1,
         ScheduleInput_compact = 2,
@@ -164,8 +165,8 @@ namespace ScheduleManager {
 
         // Default Constructor
         ScheduleData()
-            : ScheduleTypePtr(0), WeekSchedulePointer(366, 0), Used(false), MaxMinSet(false), MaxValue(0.0), MinValue(0.0),
-              CurrentValue(0.0), EMSActuatedOn(false), EMSValue(0.0)
+            : ScheduleTypePtr(0), WeekSchedulePointer(366, 0), Used(false), MaxMinSet(false), MaxValue(0.0), MinValue(0.0), CurrentValue(0.0),
+              EMSActuatedOn(false), EMSValue(0.0)
         {
         }
     };
@@ -337,7 +338,6 @@ struct ScheduleManagerData : BaseGlobalStruct
     std::unordered_map<std::string, std::string> UniqueWeekScheduleNames;
     std::unordered_map<std::string, std::string> UniqueScheduleNames;
 
-
     // Integer Variables for the Module
     int NumScheduleTypes = 0;
     int NumDaySchedules = 0;
@@ -348,7 +348,6 @@ struct ScheduleManagerData : BaseGlobalStruct
     bool ScheduleInputProcessed = false; // This is false until the Schedule Input has been processed.
     bool ScheduleDSTSFileWarningIssued = false;
     bool ScheduleFileShadingProcessed = false; // This is false unless there is a Schedule:File:Shading object.
-
 
     // Object Data
     Array1D<ScheduleManager::ScheduleTypeData> ScheduleType; // Allowed Schedule Types

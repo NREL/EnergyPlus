@@ -54,6 +54,8 @@
 // here in this one file.  Basically, when a header inclusion is removed from EnergyPlusData.hh, put it here.
 
 // these are needed so that we don't have incomplete types when we manage the EnergyPlusData instance
+#include <AirflowNetwork/Properties.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/Autosizing/Base.hh>
@@ -156,6 +158,7 @@
 #include <EnergyPlus/GeneratorFuelSupply.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
+#include <EnergyPlus/GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
@@ -193,6 +196,9 @@
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/ICEngineElectricGenerator.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
@@ -238,6 +244,7 @@
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/PondGroundHeatExchanger.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
+#include <EnergyPlus/PsychCacheData.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>

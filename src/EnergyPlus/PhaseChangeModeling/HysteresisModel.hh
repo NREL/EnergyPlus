@@ -138,7 +138,8 @@ namespace HysteresisPhaseChange {
 
 } // namespace HysteresisPhaseChange
 
-struct HysteresisPhaseChangeData : BaseGlobalStruct {
+struct HysteresisPhaseChangeData : BaseGlobalStruct
+{
 
     bool getHysteresisModels = true;
     int numHysteresisModels = 0;

@@ -140,7 +140,8 @@ TEST_F(EnergyPlusFixture, HVACControllers_ResetHumidityRatioCtrlVarType)
     ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);
 
     // ControllerProps always expects the control variable type to be "HumidityRatio"
-    state->dataHVACControllers->ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(*state, state->dataHVACControllers->ControllerProps(1).SensedNode);
+    state->dataHVACControllers->ControllerProps(1).HumRatCntrlType =
+        GetHumidityRatioVariableType(*state, state->dataHVACControllers->ControllerProps(1).SensedNode);
     ASSERT_EQ(iCtrlVarType::HumRat, state->dataHVACControllers->ControllerProps(1).HumRatCntrlType);
 
     ASSERT_EQ(state->dataHVACControllers->ControllerProps.size(), 1u);
@@ -212,7 +213,8 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
     ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);
 
     // ControllerProps expects the control variable type to be "MaximumHumididtyRatio"
-    state->dataHVACControllers->ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(*state, state->dataHVACControllers->ControllerProps(1).SensedNode);
+    state->dataHVACControllers->ControllerProps(1).HumRatCntrlType =
+        GetHumidityRatioVariableType(*state, state->dataHVACControllers->ControllerProps(1).SensedNode);
     ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataHVACControllers->ControllerProps(1).HumRatCntrlType);
 
     // test index for air loop controllers
@@ -355,12 +357,13 @@ TEST_F(EnergyPlusFixture, HVACControllers_SchSetPointMgrsOrderTest)
     // this was a bug waiting to happen, iTemperature is declared as its own int const in HVACControllers.hh
     // and it just happened to have the same value as the iCtrlVarType_Temperature int const in SetPointManager.hh
     // changing it to iCtrlVarType::Temp
-    ASSERT_EQ(iCtrlVarType::Temp, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);           // is "Temperature"
+    ASSERT_EQ(iCtrlVarType::Temp, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);      // is "Temperature"
     ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataSetPointManager->AllSetPtMgr(2).CtrlTypeMode); // is "MaximumHumidityRatio"
 
     GetControllerInput(*state);
     // check ControllerProps control variable is set to "MaximumHumidityRatio"
-    state->dataHVACControllers->ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(*state, state->dataHVACControllers->ControllerProps(1).SensedNode);
+    state->dataHVACControllers->ControllerProps(1).HumRatCntrlType =
+        GetHumidityRatioVariableType(*state, state->dataHVACControllers->ControllerProps(1).SensedNode);
     ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataHVACControllers->ControllerProps(1).HumRatCntrlType); // MaximumHumidityRatio
 }
 

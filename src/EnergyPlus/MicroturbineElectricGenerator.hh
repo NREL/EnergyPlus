@@ -194,7 +194,11 @@ namespace MicroturbineElectricGenerator {
         {
         }
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         void getDesignCapacities(EnergyPlusData &state,
                                  [[maybe_unused]] const PlantLocation &calledFromLocation,
@@ -223,7 +227,8 @@ namespace MicroturbineElectricGenerator {
 
 } // namespace MicroturbineElectricGenerator
 
-struct MicroturbineElectricGeneratorData : BaseGlobalStruct {
+struct MicroturbineElectricGeneratorData : BaseGlobalStruct
+{
 
     int NumMTGenerators = 0;
     bool GetMTInput = true;

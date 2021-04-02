@@ -170,7 +170,8 @@ namespace PlantCondLoopOperation {
 
     void SetupPlantEMSActuators(EnergyPlusData &state);
 
-    void ActivateEMSControls(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag);
+    void ActivateEMSControls(
+        EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag);
 
     void AdjustChangeInLoadByEMSControls(EnergyPlusData &state,
                                          int const LoopNum,
@@ -182,7 +183,8 @@ namespace PlantCondLoopOperation {
 
 } // namespace PlantCondLoopOperation
 
-struct PlantCondLoopOperationData : BaseGlobalStruct {
+struct PlantCondLoopOperationData : BaseGlobalStruct
+{
 
     bool GetPlantOpInput = true;
     bool InitLoadDistributionOneTimeFlag = true;
@@ -191,7 +193,7 @@ struct PlantCondLoopOperationData : BaseGlobalStruct {
     Array1D_string EquipListsNameList;
     Array1D<DataPlant::LoopType> EquipListsTypeList;
     Array1D_int EquipListsIndexList;
-    bool lDummy = false;  // for User-defined component load dispatch
+    bool lDummy = false; // for User-defined component load dispatch
     void clear_state() override
     {
         this->GetPlantOpInput = true;

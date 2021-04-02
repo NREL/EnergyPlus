@@ -303,8 +303,8 @@ TEST_F(EnergyPlusFixture, MicroCHPTest_InitGeneratorDynamics)
     bool FirstHVACIteration = true;
     bool InitLoopEquip = true;
     bool GetCompSizFac = false;
-    dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (MicroCHP1.compPtr)->InitMicroCHPNoNormalizeGenerators(*state);
-    dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (MicroCHP2.compPtr)->InitMicroCHPNoNormalizeGenerators(*state);
+    dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct *>(MicroCHP1.compPtr)->InitMicroCHPNoNormalizeGenerators(*state);
+    dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct *>(MicroCHP2.compPtr)->InitMicroCHPNoNormalizeGenerators(*state);
     MicroCHP1.simulate(*state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
     MicroCHP2.simulate(*state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
     EXPECT_EQ(state->dataGenerator->GeneratorDynamics(1).Name, MicroCHP1.Name);

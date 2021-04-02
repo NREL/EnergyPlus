@@ -136,7 +136,8 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                     if (this->dataDesInletAirHumRat > 0.0 && this->dataAirFlowUsedForSizing > 0.0) {
                         Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->dataDesInletAirHumRat);
                         fanDeltaT = FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing);
-                        this->setDataDesAccountForFanHeat(state, false); // used in CoolingCapacitySizing calculations to avoid double counting fan heat
+                        this->setDataDesAccountForFanHeat(state,
+                                                          false); // used in CoolingCapacitySizing calculations to avoid double counting fan heat
                     }
                 }
                 this->autoSizedValue -= fanDeltaT;
@@ -149,7 +150,8 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                     if (this->dataDesInletAirHumRat > 0.0 && this->dataAirFlowUsedForSizing > 0.0) {
                         Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->dataDesInletAirHumRat);
                         fanDeltaT = FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing);
-                        this->setDataDesAccountForFanHeat(state, false); // used in CoolingCapacitySizing calculations to avoid double counting fan heat
+                        this->setDataDesAccountForFanHeat(state,
+                                                          false); // used in CoolingCapacitySizing calculations to avoid double counting fan heat
                     }
                 }
                 this->autoSizedValue -= fanDeltaT;

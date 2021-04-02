@@ -45,7 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
 // Google Test Headers
 #include <gtest/gtest.h>
 
@@ -197,7 +196,6 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
     Real64 draw = 0.025;
     state->dataWaterData->WaterStorage(TankNum).VdotRequestDemand(1) = draw / (state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
 
-
     // First call, should bring predicted volume above the ValveOnCapacity
     WaterManager::ManageWater(*state);
     calcVolume -= draw;
@@ -223,7 +221,6 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
     EXPECT_DOUBLE_EQ(calcVolume, state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume);
     EXPECT_DOUBLE_EQ(1.985, calcVolume);
     EXPECT_TRUE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
-
 
     WaterManager::UpdateWaterManager(*state);
 
@@ -256,6 +253,4 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
     EXPECT_FALSE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
 
     WaterManager::UpdateWaterManager(*state);
-
-
 }

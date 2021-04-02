@@ -312,7 +312,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(4250.0, sizedValue, 0.01);
-    sizer.autoSizedValue = 0.0;        // reset for next test
+    sizer.autoSizedValue = 0.0;             // reset for next test
     state->dataSize->DataCoolCoilCap = 0.0; // reset for next test
 
     state->dataSize->ZoneEqSizing(1).HeatingCapacity = true;
@@ -651,7 +651,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_HeatingEmpirical), "MyDXCoil", printFlag, routineName);
+    sizer.initializeWithinEP(
+        *this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_HeatingEmpirical), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
