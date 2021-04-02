@@ -71,7 +71,7 @@ namespace DataOutputs {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    extern int const NumMonthlyReports;
+    int constexpr NumMonthlyReports = 63;
     extern Array1D_string const MonthlyNamedReports;
 
     // DERIVED TYPE DEFINITIONS:

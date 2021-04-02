@@ -83,7 +83,6 @@ namespace DataOutputs {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    int const NumMonthlyReports(63);
     Array1D_string const MonthlyNamedReports(NumMonthlyReports,
                                              {"ZONECOOLINGSUMMARYMONTHLY",
                                               "ZONEHEATINGSUMMARYMONTHLY",

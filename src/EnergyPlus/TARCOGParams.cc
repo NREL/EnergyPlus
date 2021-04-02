@@ -63,7 +63,6 @@ namespace EnergyPlus::TARCOGParams {
     // PURPOSE OF THIS MODULE:
     // Module which contains common TARCOG parameters and constants
 
-    int const YES_SupportPillar(1);
 
 
 } // namespace EnergyPlus

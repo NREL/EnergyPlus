@@ -85,7 +85,7 @@ namespace EnergyPlus::TARCOGParams {
         CSM_WithSDThickness = 3
     };
 
-    extern int const YES_SupportPillar;
+    int constexpr YES_SupportPillar = 1;
 
     // Deflection parameters
     enum class DeflectionCalculation : int {

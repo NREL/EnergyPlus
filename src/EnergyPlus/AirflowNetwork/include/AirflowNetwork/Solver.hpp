@@ -171,7 +171,7 @@ namespace AirflowNetwork {
     extern int NetworkNumOfLinks;
     extern int NetworkNumOfNodes;
 
-    extern int const NrInt; // Number of intervals for a large opening
+    int constexpr NrInt = 20; // Number of intervals for a large opening
 
     // Large opening variables
     extern Array1D<Real64> DpProf;   // Differential pressure profile for Large Openings [Pa]

@@ -91,7 +91,6 @@ namespace AirflowNetwork {
     // Data
     int NetworkNumOfLinks(0);
     int NetworkNumOfNodes(0);
-    int const NrInt(20); // Number of intervals for a large opening
 
     // Common block AFEDAT
     Array1D<Real64> AFECTL;
