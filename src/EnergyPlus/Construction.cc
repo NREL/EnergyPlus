@@ -2002,9 +2002,25 @@ void ConstructionProps::setArraysBasedOnMaxSolidWinLayers(EnergyPlusData &state)
     this->BlAbsDiffBack.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
     this->AbsBeamCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
     this->AbsBeamBackCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->tBareSolCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->tBareVisCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->rfBareSolCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->rfBareVisCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->rbBareSolCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->rbBareVisCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->afBareSolCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->abBareSolCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
     for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
         this->AbsBeamCoef(Layer).allocate(DataSurfaces::MaxPolyCoeff);
         this->AbsBeamBackCoef(Layer).allocate(DataSurfaces::MaxPolyCoeff);
+        this->tBareSolCoef(Layer).dimension(DataSurfaces::MaxPolyCoeff, 0.0);
+        this->tBareVisCoef(Layer).dimension(DataSurfaces::MaxPolyCoeff, 0.0);
+        this->rfBareSolCoef(Layer).dimension(DataSurfaces::MaxPolyCoeff, 0.0);
+        this->rfBareVisCoef(Layer).dimension(DataSurfaces::MaxPolyCoeff, 0.0);
+        this->rbBareSolCoef(Layer).dimension(DataSurfaces::MaxPolyCoeff, 0.0);
+        this->rbBareVisCoef(Layer).dimension(DataSurfaces::MaxPolyCoeff, 0.0);
+        this->afBareSolCoef(Layer).dimension(DataSurfaces::MaxPolyCoeff, 0.0);
+        this->abBareSolCoef(Layer).dimension(DataSurfaces::MaxPolyCoeff, 0.0);
     }
 }
 

@@ -212,16 +212,8 @@ namespace General {
                               Real64 SlatThickness   // Slat thickness (m)
     );
 
-    Real64 POLYF(Real64 X,         // Cosine of angle of incidence
-                 Array1A<Real64> A // Polynomial coefficients
-    );
-
     Real64 POLYF(Real64 X,               // Cosine of angle of incidence
-                 Array1<Real64> const &A // Polynomial coefficients
-    );
-
-    Real64 POLYF(Real64 X,                // Cosine of angle of incidence
-                 Array1S<Real64> const &A // Polynomial coefficients
+                 Array1D<Real64> const &A // Polynomial coefficients
     );
 
     std::string &strip_trailing_zeros(std::string &InputString);

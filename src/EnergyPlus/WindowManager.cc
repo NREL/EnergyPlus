@@ -714,49 +714,49 @@ namespace WindowManager {
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).tBareSolCoef(_, IGlass));
+                             state.dataConstruction->Construct(ConstrNum).tBareSolCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              tBareVisPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).tBareVisCoef(_, IGlass));
+                             state.dataConstruction->Construct(ConstrNum).tBareVisCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              rfBareSolPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).rfBareSolCoef(_, IGlass));
+                             state.dataConstruction->Construct(ConstrNum).rfBareSolCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              rfBareVisPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).rfBareVisCoef(_, IGlass));
+                             state.dataConstruction->Construct(ConstrNum).rfBareVisCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              rbBareSolPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).rbBareSolCoef(_, IGlass));
+                             state.dataConstruction->Construct(ConstrNum).rbBareSolCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              rbBareVisPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).rbBareVisCoef(_, IGlass));
+                             state.dataConstruction->Construct(ConstrNum).rbBareVisCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              afBareSolPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).afBareSolCoef(_, IGlass));
+                             state.dataConstruction->Construct(ConstrNum).afBareSolCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              abBareSolPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).abBareSolCoef(_, IGlass));
+                             state.dataConstruction->Construct(ConstrNum).abBareSolCoef(IGlass));
                 }
             }
 
@@ -1496,7 +1496,7 @@ namespace WindowManager {
                          6,
                          1,
                          TotalIPhi,
-                         state.dataConstruction->Construct(ConstrNum).ReflSolBeamBackCoef({1, 6}));
+                         state.dataConstruction->Construct(ConstrNum).ReflSolBeamBackCoef);
                 W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                          state.dataWindowManager->tvisPhi,
                          6,

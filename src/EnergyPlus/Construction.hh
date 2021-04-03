@@ -186,14 +186,14 @@ namespace Construction {
         Array1D<Real64> ReflSolBeamFrontCoef; // Coeffs of incidence-angle polynomial for beam sol front refl,
         // bare glass or shade on
         Array1D<Real64> ReflSolBeamBackCoef; // Like ReflSolBeamFrontCoef, but for back-incident beam solar
-        Array2D<Real64> tBareSolCoef;        // Isolated glass solar transmittance coeffs of inc. angle polynomial
-        Array2D<Real64> tBareVisCoef;        // Isolated glass visible transmittance coeffs of inc. angle polynomial
-        Array2D<Real64> rfBareSolCoef;       // Isolated glass front solar reflectance coeffs of inc. angle polynomial
-        Array2D<Real64> rfBareVisCoef;       // Isolated glass front visible reflectance coeffs of inc. angle polynomial
-        Array2D<Real64> rbBareSolCoef;       // Isolated glass back solar reflectance coeffs of inc. angle polynomial
-        Array2D<Real64> rbBareVisCoef;       // Isolated glass back visible reflectance coeffs of inc. angle polynomial
-        Array2D<Real64> afBareSolCoef;       // Isolated glass front solar absorptance coeffs of inc. angle polynomial
-        Array2D<Real64> abBareSolCoef;       // Isolated glass back solar absorptance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> tBareSolCoef;        // Isolated glass solar transmittance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> tBareVisCoef;        // Isolated glass visible transmittance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> rfBareSolCoef;       // Isolated glass front solar reflectance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> rfBareVisCoef;       // Isolated glass front visible reflectance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> rbBareSolCoef;       // Isolated glass back solar reflectance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> rbBareVisCoef;       // Isolated glass back visible reflectance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> afBareSolCoef;       // Isolated glass front solar absorptance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> abBareSolCoef;       // Isolated glass back solar absorptance coeffs of inc. angle polynomial
         Array1D<Real64> tBareSolDiff;        // Isolated glass diffuse solar transmittance
         Array1D<Real64> tBareVisDiff;        // Isolated glass diffuse visible transmittance
         Array1D<Real64> rfBareSolDiff;       // Isolated glass diffuse solar front reflectance
@@ -287,8 +287,7 @@ namespace Construction {
               ReflectSolDiffBack(0.0), BlReflectSolDiffBack(DataSurfaces::MaxSlatAngs, 0.0), ReflectSolDiffFront(0.0),
               BlReflectSolDiffFront(DataSurfaces::MaxSlatAngs, 0.0), ReflectVisDiffBack(0.0), BlReflectVisDiffBack(DataSurfaces::MaxSlatAngs, 0.0),
               ReflectVisDiffFront(0.0), BlReflectVisDiffFront(DataSurfaces::MaxSlatAngs, 0.0), TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0),
-              ReflSolBeamFrontCoef(6, 0.0), ReflSolBeamBackCoef(6, 0.0), tBareSolCoef(6, 5, 0.0), tBareVisCoef(6, 5, 0.0), rfBareSolCoef(6, 5, 0.0),
-              rfBareVisCoef(6, 5, 0.0), rbBareSolCoef(6, 5, 0.0), rbBareVisCoef(6, 5, 0.0), afBareSolCoef(6, 5, 0.0), abBareSolCoef(6, 5, 0.0),
+              ReflSolBeamFrontCoef(6, 0.0), ReflSolBeamBackCoef(6, 0.0),
               tBareSolDiff(5, 0.0), tBareVisDiff(5, 0.0), rfBareSolDiff(5, 0.0), rfBareVisDiff(5, 0.0), rbBareSolDiff(5, 0.0), rbBareVisDiff(5, 0.0),
               afBareSolDiff(5, 0.0), abBareSolDiff(5, 0.0), FromWindow5DataFile(false), W5FileMullionWidth(0.0), W5FileMullionOrientation(0),
               W5FileGlazingSysWidth(0.0), W5FileGlazingSysHeight(0.0), SummerSHGC(0.0), VisTransNorm(0.0), SolTransNorm(0.0),

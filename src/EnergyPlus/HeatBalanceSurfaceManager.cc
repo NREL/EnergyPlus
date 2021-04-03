@@ -3023,7 +3023,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) = 0.0;
                             for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
                                 state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) =
-                                    AbsDiffWin(Lay) * (SkySolarInc + GndSolarInc) + state.dataSurface->SurfWinA(Lay, SurfNum) * BeamSolar;
+                                    AbsDiffWin(Lay) * (SkySolarInc + GndSolarInc) + state.dataSurface->SurfWinA(SurfNum, Lay) * BeamSolar;
                                 // SurfWinA is from InteriorSolarDistribution
                                 if (ANY_BLIND(ShadeFlag)) {
                                     int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
@@ -3051,7 +3051,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                         state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) =
                                             SkySolarInc * (0.5 * ACosTlt * AbsDiffGlassLayGnd + (1.0 - 0.5 * ACosTlt) * AbsDiffGlassLaySky) +
                                             GndSolarInc * ((1.0 - 0.5 * ACosTlt) * AbsDiffGlassLayGnd + 0.5 * ACosTlt * AbsDiffGlassLaySky) +
-                                            state.dataSurface->SurfWinA(Lay, SurfNum) * BeamSolar;
+                                            state.dataSurface->SurfWinA(SurfNum, Lay) * BeamSolar;
                                     }
                                 }
                                 // Total solar absorbed in solid layer (W), for reporting
@@ -3070,7 +3070,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             //   inExtWindowModel->isExternalLibraryModel() ) {
                             //   TotSolidLay = Construct( ConstrNum ).TotSolidLayers;
                             //   for ( Lay = 1; Lay <= TotSolidLay; ++Lay ) {
-                            //     QRadSWwinAbs( Lay, SurfNum ) = SurfWinA( Lay, SurfNum ) *
+                            //     QRadSWwinAbs( Lay, SurfNum ) = SurfWinA(SurfNum, Lay) *
                             //       ( QRadSWOutIncident( SurfNum ) + QS( Surface( SurfNum ).Zone ) );
                             //   }
                         } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
@@ -3086,10 +3086,10 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
                             for (int Lay = 1; Lay <= TotSolidLay; ++Lay) {
                                 if (SurfSolAbs != 0) {
-                                    state.dataSurface->SurfWinA(Lay, SurfNum) =
+                                    state.dataSurface->SurfWinA(SurfNum, Lay) =
                                         GetCurrentScheduleValue(state, state.dataSurface->FenLayAbsSSG(SurfSolAbs).SchedPtrs(Lay));
                                     // ABWin(Lay) = SurfWinA(SurfNum,Lay)
-                                    state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) = state.dataSurface->SurfWinA(Lay, SurfNum);
+                                    state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) = state.dataSurface->SurfWinA(SurfNum, Lay);
                                 } else {
                                     // Several notes about this equation.  First part is accounting for duffuse solar radiation for the ground
                                     // and from the sky.  Second item (SurfWinA(SurfNum,Lay) * BeamSolar) is accounting for absorbed solar
@@ -3099,7 +3099,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) =
                                         state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.State(CurrentState).WinSkyFtAbs(Lay) * SkySolarInc +
                                         state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.State(CurrentState).WinSkyGndAbs(Lay) * GndSolarInc +
-                                        state.dataSurface->SurfWinA(Lay, SurfNum) * BeamSolar +
+                                        state.dataSurface->SurfWinA(SurfNum, Lay) * BeamSolar +
                                         state.dataSurface->SurfWinACFOverlap(Lay, SurfNum) * BeamSolar;
                                 }
                                 // Total solar absorbed in solid layer (W), for reporting
@@ -3125,7 +3125,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 //     include light, ...
                                 AbsDiffWin(Lay) = state.dataConstruction->Construct(ConstrNum).AbsDiffFrontEQL(Lay);
                                 state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) =
-                                    state.dataSurface->SurfWinA(Lay, SurfNum) * BeamSolar + AbsDiffWin(Lay) * (SkySolarInc + GndSolarInc);
+                                    state.dataSurface->SurfWinA(SurfNum, Lay) * BeamSolar + AbsDiffWin(Lay) * (SkySolarInc + GndSolarInc);
 
                                 // Total solar absorbed in solid layer (W), for reporting
                                 state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum) =
@@ -3156,7 +3156,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 Real64 AbWinDiff = aLayer->getAbsorptanceLayer(Lay, Side::Front, ScatteringSimple::Diffuse, Theta, Phi);
 
                                 state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) =
-                                    AbWinDiff * (SkySolarInc + GndSolarInc) + state.dataSurface->SurfWinA(Lay, SurfNum) * BeamSolar;
+                                    AbWinDiff * (SkySolarInc + GndSolarInc) + state.dataSurface->SurfWinA(SurfNum, Lay) * BeamSolar;
 
                                 // Total solar absorbed in solid layer (W), for reporting
                                 state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum) =
@@ -3433,7 +3433,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
             for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
                 AbsDiffWin(Lay) = state.dataConstruction->Construct(ConstrNum).AbsDiff(Lay);
                 state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) = AbsDiffWin(Lay) * (currSkySolarInc(SurfNum) + currGndSolarInc(SurfNum)) +
-                                                                       state.dataSurface->SurfWinA(Lay, SurfNum) * currBeamSolar(SurfNum);
+                                                                       state.dataSurface->SurfWinA(SurfNum, Lay) * currBeamSolar(SurfNum);
                 state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum) =
                     state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
                 state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) += state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum);
