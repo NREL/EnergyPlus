@@ -846,10 +846,10 @@ void AllocateModuleArrays(EnergyPlusData &state)
     state.dataHeatBal->SurfWinBSDFBeamPhiRep.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBal->SurfWinQRadSWwinAbsTot.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-    state.dataHeatBal->SurfWinQRadSWwinAbsLayer.dimension(state.dataHeatBal->MaxSolidWinLayers, state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBal->SurfWinQRadSWwinAbsLayer.dimension(state.dataSurface->TotSurfaces, state.dataHeatBal->MaxSolidWinLayers, 0.0);
 
-    state.dataHeatBal->SurfWinFenLaySurfTempFront.dimension(state.dataHeatBal->MaxSolidWinLayers, state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBal->SurfWinFenLaySurfTempBack.dimension(state.dataHeatBal->MaxSolidWinLayers, state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBal->SurfWinFenLaySurfTempFront.dimension(state.dataSurface->TotSurfaces, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+    state.dataHeatBal->SurfWinFenLaySurfTempBack.dimension(state.dataSurface->TotSurfaces, state.dataHeatBal->MaxSolidWinLayers, 0.0);
 
     state.dataHeatBal->SurfWinSWwinAbsTotalReport.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBal->SurfInitialDifSolInAbsReport.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -1222,7 +1222,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
                         SetupOutputVariable(state,
                                             format("Surface Window Total Absorbed Shortwave Radiation Rate Layer {}", I),
                                             OutputProcessor::Unit::W,
-                                            state.dataHeatBal->SurfWinQRadSWwinAbsLayer(I, SurfLoop),
+                                            state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfLoop, I),
                                             "Zone",
                                             "Average",
                                             state.dataSurface->Surface(SurfLoop).Name);
@@ -1231,7 +1231,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
                         SetupOutputVariable(state,
                                             format("Surface Window Front Face Temperature Layer {}", I),
                                             OutputProcessor::Unit::C,
-                                            state.dataHeatBal->SurfWinFenLaySurfTempFront(I, SurfLoop),
+                                            state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfLoop, I),
                                             "Zone",
                                             "Average",
                                             state.dataSurface->Surface(SurfLoop).Name);
@@ -1240,7 +1240,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
                         SetupOutputVariable(state,
                                             format("Surface Window Back Face Temperature Layer {}", I),
                                             OutputProcessor::Unit::C,
-                                            state.dataHeatBal->SurfWinFenLaySurfTempBack(I, SurfLoop),
+                                            state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfLoop, I),
                                             "Zone",
                                             "Average",
                                             state.dataSurface->Surface(SurfLoop).Name);
@@ -8076,7 +8076,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                     // CFDirBoverlap is energy transmitted for current basis beam.  It is important to note that
                                                     // AWinOverlap array needs to contain flux and not absorbed energy because later in the code
                                                     // this will be multiplied with window area
-                                                    state.dataSurface->SurfWinACFOverlap(Lay, BackSurfaceNumber) +=
+                                                    state.dataSurface->SurfWinACFOverlap(BackSurfaceNumber, Lay) +=
                                                         state.dataConstruction->Construct(ConstrNumBack).BSDFInput.Layer(Lay).BkAbs(bestBackTrn, 1) *
                                                         CFDirBoverlap(IBack, CurTrnDir) / state.dataSurface->Surface(BackSurfaceNumber).Area;
                                                     // END IF
@@ -8658,13 +8658,13 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
                         // is becuase BeamSolarRad is direct normal radiation (looking at the Sun) while QRadSWOutIncident
                         // is normal to window incidence. Since BSDF coefficients are taking into account angle of incidence,
                         // BeamSolarRad should be used in this case
-                        state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) =
+                        state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) =
                             cplxState.WinSkyFtAbs(Lay) * state.dataSurface->SurfSkySolarInc(SurfNum2) +
                             cplxState.WinSkyGndAbs(Lay) * state.dataSurface->SurfGndSolarInc(SurfNum2) +
                             state.dataSurface->SurfWinA(SurfNum, Lay) * state.dataEnvrn->BeamSolarRad +
-                            state.dataSurface->SurfWinACFOverlap(Lay, SurfNum) * state.dataEnvrn->BeamSolarRad;
-                        state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum) =
-                            state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) * state.dataSurface->Surface(SurfNum).Area;
+                            state.dataSurface->SurfWinACFOverlap(SurfNum, Lay) * state.dataEnvrn->BeamSolarRad;
+                        state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay) =
+                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) * state.dataSurface->Surface(SurfNum).Area;
                         state.dataSurface->SurfWinADiffFront(SurfNum, Lay) = cplxState.WinSkyGndAbs(Lay);
                     }
                 } else {
@@ -8680,16 +8680,15 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
                             AbWinBeam * CosInc * SunLitFract *
                             state.dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(state.dataGlobal->HourOfDay);
                         state.dataSurface->SurfWinADiffFront(SurfNum, Lay) = AbWinDiffFront;
-//                        state.dataSurface->SurfWinADiffBack(SurfNum, Lay) = AbWinDiffBack;
 
                         // Simon: Same not as for BSDF. Normal solar radiation should be taken here because angle of
                         // incidence is already taken into account
                         auto absBeam = state.dataSurface->SurfWinA(SurfNum, Lay) * state.dataEnvrn->BeamSolarRad;
                         auto absDiff = state.dataSurface->SurfWinADiffFront(SurfNum, Lay) *
                                        (state.dataSurface->SurfSkySolarInc(SurfNum2) + state.dataSurface->SurfGndSolarInc(SurfNum2));
-                        state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) = (absBeam + absDiff);
-                        state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum) =
-                            state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) * state.dataSurface->Surface(SurfNum).Area;
+                        state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) = (absBeam + absDiff);
+                        state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay) =
+                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) * state.dataSurface->Surface(SurfNum).Area;
                     }
                 }
             }
@@ -11812,7 +11811,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                                 DifSolarAbsW += WinDifSolLayAbsW;
 
                                 // Accumulate diffuse solar absorbed from the inside by each window glass layer [W/m2] for heat balance calcs
-                                state.dataHeatBal->SurfWinInitialDifSolwinAbs(IGlass, HeatTransSurfNum) += WinDifSolLayAbsW * per_HTSurfaceArea;
+                                state.dataHeatBal->SurfWinInitialDifSolwinAbs(HeatTransSurfNum, IGlass) += WinDifSolLayAbsW * per_HTSurfaceArea;
                             }
 
                             // Calc diffuse solar reflected back to zone
@@ -11892,7 +11891,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                                 DifSolarAbsW += WinDifSolLayAbsW;
 
                                 // Accumulate diffuse solar absorbed from the inside by each window glass layer [W/m2] for heat balance calcs
-                                state.dataHeatBal->SurfWinInitialDifSolwinAbs(IGlass, HeatTransSurfNum) += WinDifSolLayAbsW * per_HTSurfaceArea;
+                                state.dataHeatBal->SurfWinInitialDifSolwinAbs(HeatTransSurfNum, IGlass) += WinDifSolLayAbsW * per_HTSurfaceArea;
                             }
 
                             // Calc diffuse solar reflected back to zone
@@ -11946,7 +11945,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                                 DifSolarAbsW += WinDifSolLayAbsW;
 
                                 // Accumulate diffuse solar absorbed from the inside by each window glass layer [W/m2] for heat balance calcs
-                                state.dataHeatBal->SurfWinInitialDifSolwinAbs(IGlass, HeatTransSurfNum) += WinDifSolLayAbsW * per_HTSurfaceArea;
+                                state.dataHeatBal->SurfWinInitialDifSolwinAbs(HeatTransSurfNum, IGlass) += WinDifSolLayAbsW * per_HTSurfaceArea;
                             }
 
                             // Next calc diffuse solar reflected back to zone from window with shade or blind on
@@ -12023,7 +12022,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                             DifSolarAbsW += WinDifSolLayAbsW;
 
                             // Accumulate diffuse solar absorbed from the inside by each window layer [W/m2] for heat balance calcs
-                            state.dataHeatBal->SurfWinInitialDifSolwinAbs(Lay, HeatTransSurfNum) += WinDifSolLayAbsW * per_HTSurfaceArea;
+                            state.dataHeatBal->SurfWinInitialDifSolwinAbs(HeatTransSurfNum, Lay) += WinDifSolLayAbsW * per_HTSurfaceArea;
 
                             // ASHWAT equivalent layer model may require not the individual layer absorption but the flux
                             // InitialDifSolwinEQL(HeatTransSurfNum) = WinDifSolar(DifTransSurfNum)* ViewFactor
@@ -12326,7 +12325,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(
                     DifSolarAbsW += WinDifSolLayAbsW;
 
                     // Accumulate diffuse solar absorbed from the inside by each window glass layer [W/m2] for heat balance calcs
-                    state.dataHeatBal->SurfWinInitialDifSolwinAbs(IGlass, HeatTransSurfNum) +=
+                    state.dataHeatBal->SurfWinInitialDifSolwinAbs(HeatTransSurfNum, IGlass) +=
                         (WinDifSolLayAbsW / state.dataSurface->Surface(HeatTransSurfNum).Area);
                 }
                 // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
@@ -12396,7 +12395,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(
                     DifSolarAbsW += WinDifSolLayAbsW;
 
                     // Accumulate diffuse solar absorbed from the inside by each window glass layer [W/m2] for heat balance calcs
-                    state.dataHeatBal->SurfWinInitialDifSolwinAbs(IGlass, HeatTransSurfNum) +=
+                    state.dataHeatBal->SurfWinInitialDifSolwinAbs(HeatTransSurfNum, IGlass) +=
                         (WinDifSolLayAbsW / state.dataSurface->Surface(HeatTransSurfNum).Area);
                 }
                 // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
@@ -12457,7 +12456,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(
                     DifSolarAbsW += WinDifSolLayAbsW;
 
                     // Accumulate diffuse solar absorbed from the inside by each window glass layer [W/m2] for heat balance calcs
-                    state.dataHeatBal->SurfWinInitialDifSolwinAbs(IGlass, HeatTransSurfNum) +=
+                    state.dataHeatBal->SurfWinInitialDifSolwinAbs(HeatTransSurfNum, IGlass) +=
                         (WinDifSolLayAbsW / state.dataSurface->Surface(HeatTransSurfNum).Area);
                 }
                 // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy

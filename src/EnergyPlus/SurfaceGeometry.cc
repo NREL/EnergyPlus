@@ -890,8 +890,7 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfSkyDiffReflFacGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
         state.dataSurface->SurfWinA.dimension( state.dataSurface->TotSurfaces, CFSMAXNL + 1,0.0);
         state.dataSurface->SurfWinADiffFront.dimension(state.dataSurface->TotSurfaces, CFSMAXNL + 1, 0.0);
-        state.dataSurface->SurfWinADiffBack.dimension(state.dataSurface->TotSurfaces, CFSMAXNL + 1, 0.0);
-        state.dataSurface->SurfWinACFOverlap.dimension(state.dataHeatBal->MaxSolidWinLayers, state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfWinACFOverlap.dimension(state.dataSurface->TotSurfaces, state.dataHeatBal->MaxSolidWinLayers, 0.0);
     }
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input

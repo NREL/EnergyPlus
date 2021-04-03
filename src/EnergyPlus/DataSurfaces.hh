@@ -1344,7 +1344,6 @@ struct SurfacesData : BaseGlobalStruct
 
     // Time step value of factor for diffuse absorbed in window layers
     Array2D<Real64> SurfWinADiffFront;
-    Array2D<Real64> SurfWinADiffBack;
 
     Array2D<Real64> SurfWinACFOverlap; // Time step value of factor for beam
     // absorbed in window glass layers which comes from other windows
@@ -1655,7 +1654,6 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfSkyDiffReflFacGnd.deallocate();
         this->SurfWinA.deallocate();
         this->SurfWinADiffFront.deallocate();
-        this->SurfWinADiffBack.deallocate();
         this->SurfWinACFOverlap.deallocate();
         this->AirSkyRadSplit.deallocate();
         this->SUNCOSHR = Array2D<Real64>(24, 3, 0.0);
