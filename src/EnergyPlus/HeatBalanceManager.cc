@@ -155,34 +155,6 @@ namespace HeatBalanceManager {
 
     Array1D_string const PassFail(2, {"Fail", "Pass"});
 
-<<<<<<< HEAD
-    // Subroutine Specifications for the Heat Balance Module
-    // Driver Routines
-
-    // Input reader routines for the module
-
-    // Initialization routines for module
-
-    // Record Keeping/Utility Routines for Module
-
-    // Reporting routines for module
-
-    // Object Data
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
-    // Functions
-
-    // Clears the global data in HeatBalanceManager.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        surfaceOctree = SurfaceOctreeCube(); // somewhere_else
-    }
-
-=======
->>>>>>> develop
     void ManageHeatBalance(EnergyPlusData &state)
     {
 
@@ -233,15 +205,9 @@ namespace HeatBalanceManager {
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
             //   if in the future surfaces are altered after this point
-<<<<<<< HEAD
-            if (state.dataSurface->TotSurfaces >= DaylightingManager::octreeCrossover) {     // Octree can be active
-                if (inputProcessor->getNumObjectsFound(state, "Daylighting:Controls") > 0) { // Daylighting is active
-                    surfaceOctree.init(state.dataSurface->Surface);                          // Set up surface octree
-=======
             if (state.dataSurface->TotSurfaces >= DaylightingManager::octreeCrossover) {                                // Octree can be active
                 if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Daylighting:Controls") > 0) { // Daylighting is active
                     state.dataHeatBalMgr->surfaceOctree.init(state.dataSurface->Surface);                               // Set up surface octree
->>>>>>> develop
                 }
             }
 
@@ -423,16 +389,6 @@ namespace HeatBalanceManager {
         for (ONum = 1; ONum <= NumConstrObjects; ++ONum) {
             NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ConstrObjects(ONum));
             for (Loop = 1; Loop <= NumObjects; ++Loop) {
-<<<<<<< HEAD
-                inputProcessor->getObjectItem(state,
-                                              ConstrObjects(ONum),
-                                              Loop,
-                                              state.dataIPShortCut->cAlphaArgs,
-                                              NumAlphas,
-                                              state.dataIPShortCut->rNumericArgs,
-                                              NumNumbers,
-                                              Status);
-=======
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          ConstrObjects(ONum),
                                                                          Loop,
@@ -441,7 +397,6 @@ namespace HeatBalanceManager {
                                                                          state.dataIPShortCut->rNumericArgs,
                                                                          NumNumbers,
                                                                          Status);
->>>>>>> develop
                 if (ONum == 5) {
                     CNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataConstruction->Construct);
                 } else {
@@ -705,11 +660,7 @@ namespace HeatBalanceManager {
                                 format("{}{}: {} value invalid, [{:.3R}]",
                                        RoutineName,
                                        state.dataHeatBalMgr->CurrentModuleObject,
-<<<<<<< HEAD
-                                       state.dataIPShortCut->cNumericFieldNames(2),
-=======
                                        state.dataIPShortCut->cNumericFieldNames(3),
->>>>>>> develop
                                        state.dataHeatBal->TempConvergTol));
                 ErrorsFound = true;
             }
@@ -1223,20 +1174,6 @@ namespace HeatBalanceManager {
         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
 
         if (NumObjects > 0) {
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          1,
-                                          AlphaName,
-                                          NumAlpha,
-                                          BuildingNumbers,
-                                          NumNumber,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      1,
@@ -1249,7 +1186,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (NumAlpha > 0) {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
@@ -1562,30 +1498,6 @@ namespace HeatBalanceManager {
 
         std::string RoutineName("GetMaterialData: ");
 
-<<<<<<< HEAD
-        RegMat = inputProcessor->getNumObjectsFound(state, "Material");
-        RegRMat = inputProcessor->getNumObjectsFound(state, "Material:NoMass");
-        IRTMat = inputProcessor->getNumObjectsFound(state, "Material:InfraredTransparent");
-        AirMat = inputProcessor->getNumObjectsFound(state, "Material:AirGap");
-        state.dataHeatBal->W5GlsMat = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Glazing");
-        state.dataHeatBal->W5GlsMatAlt = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Glazing:RefractionExtinctionMethod");
-        state.dataHeatBal->W5GasMat = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gas");
-        state.dataHeatBal->W5GasMatMixture = inputProcessor->getNumObjectsFound(state, "WindowMaterial:GasMixture");
-        state.dataHeatBal->TotShades = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Shade");
-        state.dataHeatBal->TotComplexShades = inputProcessor->getNumObjectsFound(state, "WindowMaterial:ComplexShade");
-        state.dataHeatBal->TotComplexGaps = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gap");
-        state.dataHeatBal->TotScreens = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Screen");
-        state.dataHeatBal->TotBlinds = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Blind");
-        EcoRoofMat = inputProcessor->getNumObjectsFound(state, "Material:RoofVegetation");
-        state.dataHeatBal->TotSimpleWindow = inputProcessor->getNumObjectsFound(state, "WindowMaterial:SimpleGlazingSystem");
-
-        state.dataHeatBal->W5GlsMatEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Glazing:EquivalentLayer");
-        state.dataHeatBal->TotShadesEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Shade:EquivalentLayer");
-        state.dataHeatBal->TotDrapesEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Drape:EquivalentLayer");
-        state.dataHeatBal->TotBlindsEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Blind:EquivalentLayer");
-        state.dataHeatBal->TotScreensEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Screen:EquivalentLayer");
-        state.dataHeatBal->W5GapMatEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gap:EquivalentLayer");
-=======
         RegMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Material");
         RegRMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Material:NoMass");
         IRTMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Material:InfraredTransparent");
@@ -1615,7 +1527,6 @@ namespace HeatBalanceManager {
         state.dataHeatBal->TotScreensEQL =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Screen:EquivalentLayer");
         state.dataHeatBal->W5GapMatEQL = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gap:EquivalentLayer");
->>>>>>> develop
 
         state.dataHeatBal->TotMaterials =
             RegMat + RegRMat + AirMat + state.dataHeatBal->W5GlsMat + state.dataHeatBal->W5GlsMatAlt + state.dataHeatBal->W5GasMat +
@@ -1624,13 +1535,8 @@ namespace HeatBalanceManager {
             state.dataHeatBal->W5GlsMatEQL + state.dataHeatBal->TotShadesEQL + state.dataHeatBal->TotDrapesEQL + state.dataHeatBal->TotBlindsEQL +
             state.dataHeatBal->TotScreensEQL + state.dataHeatBal->W5GapMatEQL;
 
-<<<<<<< HEAD
-        TotFfactorConstructs = inputProcessor->getNumObjectsFound(state, "Construction:FfactorGroundFloor");
-        TotCfactorConstructs = inputProcessor->getNumObjectsFound(state, "Construction:CfactorUndergroundWall");
-=======
         TotFfactorConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:FfactorGroundFloor");
         TotCfactorConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:CfactorUndergroundWall");
->>>>>>> develop
 
         if (TotFfactorConstructs > 0) {
             state.dataHeatBal->NoFfactorConstructionsUsed = false;
@@ -1658,20 +1564,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= RegMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          MaterialNames,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -1684,7 +1576,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -1762,20 +1653,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= RegRMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          MaterialNames,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -1788,7 +1665,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -1853,20 +1729,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= AirMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          MaterialNames,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -1879,7 +1741,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -1907,20 +1768,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= IRTMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          MaterialNames,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -1933,7 +1780,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -1969,20 +1815,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->W5GlsMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          MaterialNames,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -1995,7 +1827,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -2452,20 +2283,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->W5GlsMatAlt; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          MaterialNames,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -2478,7 +2295,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -2561,20 +2377,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->W5GlsMatEQL; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          MaterialNames,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -2587,7 +2389,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -2669,20 +2470,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->W5GasMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          MaterialNames,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -2695,7 +2482,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -2803,20 +2589,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->W5GapMatEQL; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          MaterialNames,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -2829,7 +2601,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -2946,20 +2717,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->W5GasMatMixture; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          state.dataIPShortCut->cAlphaArgs,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -2972,7 +2729,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          state.dataIPShortCut->cAlphaArgs(1),
@@ -3045,20 +2801,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->TotShades; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          MaterialNames,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -3071,7 +2813,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -3146,20 +2887,6 @@ namespace HeatBalanceManager {
             MaterialProps = 0;
 
             // Call Input Get routine to retrieve material data
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          MaterialNames,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -3172,7 +2899,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -3252,20 +2978,6 @@ namespace HeatBalanceManager {
             MaterialProps = 0;
 
             // Call Input Get routine to retrieve material data
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          MaterialNames,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -3278,7 +2990,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -3354,20 +3065,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->TotScreens; ++Loop) {
 
             // Call GetObjectItem routine to retrieve material data
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          MaterialNames,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -3380,7 +3077,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -3564,20 +3260,6 @@ namespace HeatBalanceManager {
             MaterialProps = 0;
 
             // Call GetObjectItem routine to retrieve material data
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          MaterialNames,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -3590,7 +3272,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -3725,20 +3406,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->TotBlinds; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          MaterialNames,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -3751,7 +3418,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -4035,20 +3701,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->TotBlindsEQL; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          MaterialNames,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -4061,7 +3713,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -4231,20 +3882,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= EcoRoofMat; ++Loop) {
             // Call Input Get Routine to retrieve material data from ecoroof
 
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          MaterialNames,
-                                          MaterialNumAlpha,
-                                          MaterialProps,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -4257,7 +3894,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -4347,20 +3983,6 @@ namespace HeatBalanceManager {
 
             for (Loop = 1; Loop <= state.dataHeatBal->TotTCGlazings; ++Loop) {
                 // Get each TCGlazings from the input processor
-<<<<<<< HEAD
-                inputProcessor->getObjectItem(state,
-                                              state.dataHeatBalMgr->CurrentModuleObject,
-                                              Loop,
-                                              state.dataIPShortCut->cAlphaArgs,
-                                              MaterialNumAlpha,
-                                              state.dataIPShortCut->rNumericArgs,
-                                              MaterialNumProp,
-                                              IOStat,
-                                              state.dataIPShortCut->lNumericFieldBlanks,
-                                              state.dataIPShortCut->lAlphaFieldBlanks,
-                                              state.dataIPShortCut->cAlphaFieldNames,
-                                              state.dataIPShortCut->cNumericFieldNames);
-=======
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          state.dataHeatBalMgr->CurrentModuleObject,
                                                                          Loop,
@@ -4373,7 +3995,6 @@ namespace HeatBalanceManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
 
                 if (UtilityRoutines::IsNameEmpty(
                         state, state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) {
@@ -4438,20 +4059,6 @@ namespace HeatBalanceManager {
         cCurrentModuleObject = "WindowMaterial:SimpleGlazingSystem";
         for (Loop = 1; Loop <= state.dataHeatBal->TotSimpleWindow; ++Loop) {
 
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
-                                          Loop,
-                                          state.dataIPShortCut->cAlphaArgs,
-                                          MaterialNumAlpha,
-                                          state.dataIPShortCut->rNumericArgs,
-                                          MaterialNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Loop,
@@ -4464,7 +4071,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          state.dataIPShortCut->cAlphaArgs(1),
@@ -4906,20 +4512,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= TotRegConstructs; ++Loop) { // Loop through all constructs in the input...
 
             // Get the object names for each construction from the input processor
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          ConstructAlphas,
-                                          ConstructNumAlpha,
-                                          DummyProps,
-                                          DummyNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -4932,7 +4524,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueConstructNames,
                                                          ConstructAlphas(0),
@@ -5127,20 +4718,6 @@ namespace HeatBalanceManager {
              ++Loop) { // Loop through all constructs with Window EquivalentLayer ...
 
             // Get the object names for each construction from the input processor
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          ConstructAlphas,
-                                          ConstructNumAlpha,
-                                          DummyProps,
-                                          DummyNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -5153,7 +4730,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueConstructNames,
                                                          ConstructAlphas(0),
@@ -8015,20 +7591,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= TotFfactorConstructs; ++Loop) {
 
             // Get the object names for each construction from the input processor
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          ConstructAlphas,
-                                          ConstructNumAlpha,
-                                          DummyProps,
-                                          DummyNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -8041,7 +7603,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueConstructNames,
                                                          ConstructAlphas(1),
@@ -8129,20 +7690,6 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= TotCfactorConstructs; ++Loop) { // Loop through all constructs defined with Ffactor method
 
             // Get the object names for each construction from the input processor
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          state.dataHeatBalMgr->CurrentModuleObject,
-                                          Loop,
-                                          ConstructAlphas,
-                                          ConstructNumAlpha,
-                                          DummyProps,
-                                          DummyNumProp,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
@@ -8155,7 +7702,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueConstructNames,
                                                          ConstructAlphas(1),
@@ -9051,20 +8597,6 @@ namespace HeatBalanceManager {
         state.dataHeatBal->W7MaterialGaps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         // ALLOCATE(DeflectionState(W7DeflectionStates))
         for (Loop = 1; Loop <= state.dataHeatBal->W7MaterialGaps; ++Loop) {
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
-                                          Loop,
-                                          state.dataIPShortCut->cAlphaArgs,
-                                          NumAlphas,
-                                          state.dataIPShortCut->rNumericArgs,
-                                          NumNumbers,
-                                          IOStatus,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Loop,
@@ -9077,7 +8609,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          state.dataIPShortCut->cAlphaArgs(1),
@@ -9346,13 +8877,8 @@ namespace HeatBalanceManager {
                                          state.dataIPShortCut->rNumericArgs(10)));
             }
 
-<<<<<<< HEAD
             if (state.dataHeatBal->ComplexShade(Loop).LayerType == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ ||
                 state.dataHeatBal->ComplexShade(Loop).LayerType == TARCOGParams::TARCOGLayerType::VENETBLIND_VERT) {
-=======
-            if (state.dataHeatBal->ComplexShade(Loop).LayerType == csVenetianHorizontal ||
-                state.dataHeatBal->ComplexShade(Loop).LayerType == csVenetianVertical) {
->>>>>>> develop
                 if (state.dataIPShortCut->rNumericArgs(11) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(state,
@@ -9631,20 +9157,6 @@ namespace HeatBalanceManager {
 
         state.dataBSDFWindow->FirstBSDF = ConstrNum + 1; // Location of first BSDF construction input (They will be consecutive)
         for (Loop = 1; Loop <= state.dataBSDFWindow->TotComplexFenStates; ++Loop) {
-<<<<<<< HEAD
-            inputProcessor->getObjectItem(state,
-                                          locCurrentModuleObject,
-                                          Loop,
-                                          locAlphaArgs,
-                                          NumAlphas,
-                                          locNumericArgs,
-                                          NumNumbers,
-                                          IOStatus,
-                                          locNumericFieldBlanks,
-                                          _,
-                                          locAlphaFieldNames,
-                                          locNumericFieldNames);
-=======
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      locCurrentModuleObject,
                                                                      Loop,
@@ -9657,7 +9169,6 @@ namespace HeatBalanceManager {
                                                                      _,
                                                                      locAlphaFieldNames,
                                                                      locNumericFieldNames);
->>>>>>> develop
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueConstructNames,
                                                          locAlphaArgs(1),
