@@ -221,7 +221,7 @@ namespace General {
         } else {
             return X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
         }
-    };
+    }
 
     std::string &strip_trailing_zeros(std::string &InputString);
 
