@@ -75,10 +75,6 @@ namespace HVACVariableRefrigerantFlow {
     constexpr int ReverseCycle(1); // uses reverse cycle defrost strategy
     constexpr int Resistive(2);    // uses electric resistance heater for defrost
 
-    // Defrost control
-    constexpr int Timed(1);    // defrost cycle is timed
-    constexpr int OnDemand(2); // defrost cycle occurs only when required
-
     // Thermostat Priority Control Type
     enum class iThermostatCtrlType
     {
