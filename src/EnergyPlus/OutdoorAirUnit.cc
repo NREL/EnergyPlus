@@ -651,11 +651,7 @@ namespace OutdoorAirUnit {
                 ListNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(
                     state, CurrentModuleObjects(CurrentObject::EqList), ComponentListName);
                 if (ListNum > 0) {
-<<<<<<< HEAD
-                    inputProcessor->getObjectItem(
-=======
                     state.dataInputProcessing->inputProcessor->getObjectItem(
->>>>>>> develop
                         state, CurrentModuleObjects(CurrentObject::EqList), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
                     NumInList = (NumAlphas - 1) / 2; // potential problem if puts in type but not name
                     if (mod(NumAlphas - 1, 2) != 0) ++NumInList;
@@ -1368,11 +1364,7 @@ namespace OutdoorAirUnit {
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).BranchNum,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CompNum);
                     }
-<<<<<<< HEAD
                     if (OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilPlantTypeOfNum == static_cast<int>(CompType::WaterCoil_CoolingHXAsst)) {
-=======
-                    if (OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilPlantTypeOfNum == WaterCoil_CoolingHXAsst) {
->>>>>>> develop
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow =
                             WaterCoils::GetCoilMaxWaterFlowRate(state,
                                                                 OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentType,
