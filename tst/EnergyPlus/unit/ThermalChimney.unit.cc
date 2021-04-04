@@ -1149,5 +1149,4 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     state->dataThermalChimneys->ThermalChimneySys(1).EMSAirFlowRateValue = 0.01;
     ThermalChimney::CalcThermalChimney(*state);
     EXPECT_NEAR(state->dataThermalChimneys->ThermalChimneyReport(1).OverallTCVolumeFlow, 0.01, 0.0001);
-
 }

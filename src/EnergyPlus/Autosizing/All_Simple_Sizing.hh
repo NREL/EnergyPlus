@@ -80,8 +80,10 @@ struct MaxHeaterOutletTempSizer : BaseSizer
     Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
 };
 
-struct ZoneCoolingLoadSizer: BaseSizer {
-    ZoneCoolingLoadSizer() {
+struct ZoneCoolingLoadSizer : BaseSizer
+{
+    ZoneCoolingLoadSizer()
+    {
         this->sizingType = AutoSizingType::ZoneCoolingLoadSizing;
         this->sizingString = "Zone Cooling Sensible Load [W]";
     }
@@ -90,8 +92,10 @@ struct ZoneCoolingLoadSizer: BaseSizer {
     Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
 };
 
-struct ZoneHeatingLoadSizer: BaseSizer {
-    ZoneHeatingLoadSizer() {
+struct ZoneHeatingLoadSizer : BaseSizer
+{
+    ZoneHeatingLoadSizer()
+    {
         this->sizingType = AutoSizingType::ZoneHeatingLoadSizing;
         this->sizingString = "Zone Heating Sensible Load [W]";
     }
@@ -124,8 +128,10 @@ struct ASHRAEMaxSATHeatingSizer : BaseSizer
     Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
 };
 
-struct DesiccantDehumidifierBFPerfDataFaceVelocitySizer: BaseSizer {
-    DesiccantDehumidifierBFPerfDataFaceVelocitySizer() {
+struct DesiccantDehumidifierBFPerfDataFaceVelocitySizer : BaseSizer
+{
+    DesiccantDehumidifierBFPerfDataFaceVelocitySizer()
+    {
         this->sizingType = AutoSizingType::DesiccantDehumidifierBFPerfDataFaceVelocitySizing;
         this->sizingString = "Nominal Air Face Velocity [m/s]";
     }

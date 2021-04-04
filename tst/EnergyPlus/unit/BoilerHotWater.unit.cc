@@ -148,7 +148,8 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterAutoSizeTempTest)
                                                        state->dataPlnt->PlantLoop(state->dataBoilers->Boiler(1).LoopNum).FluidIndex,
                                                        "Boiler_HotWaterAutoSizeTempTest");
 
-    Real64 NomCapBoilerExpected = rho * state->dataSize->PlantSizData(1).DesVolFlowRate * Cp * state->dataSize->PlantSizData(1).DeltaT * state->dataBoilers->Boiler(1).SizFac;
+    Real64 NomCapBoilerExpected =
+        rho * state->dataSize->PlantSizData(1).DesVolFlowRate * Cp * state->dataSize->PlantSizData(1).DeltaT * state->dataBoilers->Boiler(1).SizFac;
 
     // now call sizing routine
     state->dataBoilers->Boiler(1).SizeBoiler(*state);
@@ -205,7 +206,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     std::string const idf_objects = delimited_string({
         "Boiler:HotWater,",
@@ -280,6 +281,6 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
 
     // check boiler part load ratio and the resultant boiler efficiency
     EXPECT_NEAR(thisBoiler.BoilerPLR, 0.24, 0.01);
-    Real64 ExpectedBoilerEff = (0.5887682 + 0.7888184 * thisBoiler.BoilerPLR - 0.3862498 * pow(thisBoiler.BoilerPLR,2)) * thisBoiler.NomEffic;
-    EXPECT_NEAR(thisBoiler.BoilerEff, ExpectedBoilerEff,0.01);
+    Real64 ExpectedBoilerEff = (0.5887682 + 0.7888184 * thisBoiler.BoilerPLR - 0.3862498 * pow(thisBoiler.BoilerPLR, 2)) * thisBoiler.NomEffic;
+    EXPECT_NEAR(thisBoiler.BoilerEff, ExpectedBoilerEff, 0.01);
 }

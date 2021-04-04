@@ -76,7 +76,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
     // Reads input and creates instance of Kusuda ground temps model
 
     // USE STATEMENTS:
-        using namespace GroundTemperatureManager;
+    using namespace GroundTemperatureManager;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -90,20 +90,23 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
     std::shared_ptr<KusudaGroundTempsModel> thisModel(new KusudaGroundTempsModel());
 
     std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(objectType_KusudaGroundTemp);
-    int numCurrModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
-        inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
+        state.dataInputProcessing->inputProcessor->getObjectItem(
+            state, cCurrentModuleObject, modelNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
 
         if (objectName == state.dataIPShortCut->cAlphaArgs(1)) {
 
             // Read input into object here
             thisModel->objectName = state.dataIPShortCut->cAlphaArgs(1);
             thisModel->objectType = objectType;
-            thisModel->groundThermalDiffisivity = state.dataIPShortCut->rNumericArgs(1) / (state.dataIPShortCut->rNumericArgs(2) * state.dataIPShortCut->rNumericArgs(3));
+            thisModel->groundThermalDiffisivity =
+                state.dataIPShortCut->rNumericArgs(1) / (state.dataIPShortCut->rNumericArgs(2) * state.dataIPShortCut->rNumericArgs(3));
 
-            bool useGroundTempDataForKusuda = state.dataIPShortCut->rNumericArgs(4) || state.dataIPShortCut->rNumericArgs(5) || state.dataIPShortCut->rNumericArgs(6);
+            bool useGroundTempDataForKusuda =
+                state.dataIPShortCut->rNumericArgs(4) || state.dataIPShortCut->rNumericArgs(5) || state.dataIPShortCut->rNumericArgs(6);
 
             if (useGroundTempDataForKusuda) {
                 // Use Kusuda Parameters
@@ -170,7 +173,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
 
 //******************************************************************************
 
-Real64 KusudaGroundTempsModel::getGroundTemp(EnergyPlusData& state)
+Real64 KusudaGroundTempsModel::getGroundTemp(EnergyPlusData &state)
 {
     // AUTHOR         Matt Mitchell
     // DATE WRITTEN   June 2015
@@ -193,7 +196,8 @@ Real64 KusudaGroundTempsModel::getGroundTemp(EnergyPlusData& state)
     secsInYear = DataGlobalConstants::SecsInDay * state.dataWeatherManager->NumDaysInYear;
 
     term1 = -depth * std::sqrt(DataGlobalConstants::Pi / (secsInYear * groundThermalDiffisivity));
-    term2 = (2 * DataGlobalConstants::Pi / secsInYear) * (simTimeInSeconds - phaseShiftInSecs - (depth / 2) * std::sqrt(secsInYear / (DataGlobalConstants::Pi * groundThermalDiffisivity)));
+    term2 = (2 * DataGlobalConstants::Pi / secsInYear) *
+            (simTimeInSeconds - phaseShiftInSecs - (depth / 2) * std::sqrt(secsInYear / (DataGlobalConstants::Pi * groundThermalDiffisivity)));
 
     retVal = aveGroundTemp - aveGroundTempAmplitude * std::exp(term1) * std::cos(term2);
 
@@ -202,7 +206,7 @@ Real64 KusudaGroundTempsModel::getGroundTemp(EnergyPlusData& state)
 
 //******************************************************************************
 
-Real64 KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData& state, Real64 const _depth, Real64 const _seconds)
+Real64 KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const _depth, Real64 const _seconds)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -231,7 +235,7 @@ Real64 KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData& stat
 
 //******************************************************************************
 
-Real64 KusudaGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData& state, Real64 const _depth, int const _month)
+Real64 KusudaGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const _depth, int const _month)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell

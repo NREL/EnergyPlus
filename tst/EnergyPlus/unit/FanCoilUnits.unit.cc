@@ -101,4548 +101,4655 @@ using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::WaterCoils;
 
 namespace EnergyPlus {
-    TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
-    {
-
-        int FanCoilNum(1);
-        int ZoneNum(1);
-        bool FirstHVACIteration(false);
-        bool ErrorsFound(false);
-        Real64 PartLoadRatio(1.0);
-        Real64 SpeedRatio(0.0);
-        Real64 QZnReq(0.0);
-        Real64 HotWaterMassFlowRate(0.0);
-        Real64 ColdWaterMassFlowRate(0.0);
-        Real64 QUnitOut(0.0);
-        Real64 AirMassFlow(0.0);
-        Real64 MaxAirMassFlow(0.0);
-
-        state->dataEnvrn->OutBaroPress = 101325.0;
-        state->dataEnvrn->StdRhoAir = 1.20;
-        state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        state->dataGlobalNames->NumCoils = 0;
-        state->dataGlobal->NumOfTimeStepInHour = 1;
-        state->dataGlobal->TimeStep = 1;
-        state->dataGlobal->MinutesPerTimeStep = 60;
-
-        InitializePsychRoutines();
-
-        std::string const idf_objects = delimited_string({
-            "	Zone,",
-            "	EAST ZONE, !- Name",
-            "	0, !- Direction of Relative North { deg }",
-            "	0, !- X Origin { m }",
-            "	0, !- Y Origin { m }",
-            "	0, !- Z Origin { m }",
-            "	1, !- Type",
-            "	1, !- Multiplier",
-            "	autocalculate, !- Ceiling Height { m }",
-            "	autocalculate; !- Volume { m3 }",
-            "	ZoneHVAC:EquipmentConnections,",
-            "	EAST ZONE, !- Zone Name",
-            "	Zone1Equipment, !- Zone Conditioning Equipment List Name",
-            "	Zone1Inlets, !- Zone Air Inlet Node or NodeList Name",
-            "	Zone1Exhausts, !- Zone Air Exhaust Node or NodeList Name",
-            "	Zone 1 Node, !- Zone Air Node Name",
-            "	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
-            "	ZoneHVAC:EquipmentList,",
-            "	Zone1Equipment, !- Name",
-            "   SequentialLoad,          !- Load Distribution Scheme",
-            "	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
-            "	Zone1FanCoil, !- Zone Equipment 1 Name",
-            "	1, !- Zone Equipment 1 Cooling Sequence",
-            "	1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
-            "   NodeList,",
-            "	Zone1Inlets, !- Name",
-            "	Zone1FanCoilAirOutletNode;  !- Node 1 Name",
-            "	NodeList,",
-            "	Zone1Exhausts, !- Name",
-            "	Zone1FanCoilAirInletNode; !- Node 1 Name",
-            "	OutdoorAir:NodeList,",
-            "	Zone1FanCoilOAInNode;    !- Node or NodeList Name 1",
-            "	OutdoorAir:Mixer,",
-            "	Zone1FanCoilOAMixer, !- Name",
-            "	Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
-            "	Zone1FanCoilOAInNode, !- Outdoor Air Stream Node Name",
-            "	Zone1FanCoilExhNode, !- Relief Air Stream Node Name",
-            "	Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
-            "	Schedule:Constant,",
-            "	FanAndCoilAvailSched, !- Name",
-            "	FRACTION, !- Schedule Type",
-            "	1;        !- TimeStep Value",
-            "	ScheduleTypeLimits,",
-            "	Fraction, !- Name",
-            "	0.0, !- Lower Limit Value",
-            "	1.0, !- Upper Limit Value",
-            "	CONTINUOUS;              !- Numeric Type",
-            "   Fan:OnOff,",
-            "	Zone1FanCoilFan, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	0.5, !- Fan Total Efficiency",
-            "	75.0, !- Pressure Rise { Pa }",
-            "	0.6, !- Maximum Flow Rate { m3 / s }",
-            "	0.9, !- Motor Efficiency",
-            "	1.0, !- Motor In Airstream Fraction",
-            "	Zone1FanCoilOAMixerOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilFanOutletNode, !- Air Outlet Node Name",
-            "	, !- Fan Power Ratio Function of Speed Ratio Curve Name",
-            "	;                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name	",
-            "	Coil:Cooling:Water,",
-            "	Zone1FanCoilCoolingCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Namev",
-            "	0.0002, !- Design Water Flow Rate { m3 / s }",
-            "	0.5000, !- Design Air Flow Rate { m3 / s }",
-            "	7.22,   !- Design Inlet Water Temperature { Cv }",
-            "	24.340, !- Design Inlet Air Temperature { C }",
-            "	14.000, !- Design Outlet Air Temperature { C }",
-            "	0.0095, !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "	0.0090, !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "	Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
-            "	Zone1FanCoilChWOutletNode, !- Water Outlet Node Name",
-            "	Zone1FanCoilFanOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
-            "	SimpleAnalysis, !- Type of Analysis",
-            "	CrossFlow;               !- Heat Exchanger Configuration",
-            "	Coil:Heating:Water,",
-            "   Zone1FanCoilHeatingCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	150.0,   !- U - Factor Times Area Value { W / K }",
-            "	0.00014, !- Maximum Water Flow Rate { m3 / s }",
-            "	Zone1FanCoilHWInletNode, !- Water Inlet Node Name",
-            "	Zone1FanCoilHWOutletNode, !- Water Outlet Node Name",
-            "	Zone1FanCoilCCOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "	UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
-            "	autosize, !- Rated Capacity { W }",
-            "	82.2, !- Rated Inlet Water Temperature { C }",
-            "	16.6, !- Rated Inlet Air Temperature { C }",
-            "	71.1, !- Rated Outlet Water Temperature { C }",
-            "	32.2, !- Rated Outlet Air Temperature { C }",
-            "	;     !- Rated Ratio for Air and Water Convection",
-            "	ZoneHVAC:FourPipeFanCoil,",
-            "	Zone1FanCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	MultiSpeedFan, !- Capacity Control Method",
-            "	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
-            "	0.3, !- Low Speed Supply Air Flow Ratio",
-            "	0.6, !- Medium Speed Supply Air Flow Ratio",
-            "	0.0, !- Maximum Outdoor Air Flow Rate { m3 / s }",
-            "	FanAndCoilAvailSched, !- Outdoor Air Schedule Name",
-            "	Zone1FanCoilAirInletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "	OutdoorAir:Mixer, !- Outdoor Air Mixer Object Type",
-            "	Zone1FanCoilOAMixer, !- Outdoor Air Mixer Name",
-            "	Fan:OnOff, !- Supply Air Fan Object Type",
-            "	Zone1FanCoilFan, !- Supply Air Fan Name",
-            "	Coil:Cooling:Water, !- Cooling Coil Object Type",
-            "	Zone1FanCoilCoolingCoil, !- Cooling Coil Name",
-            "	0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
-            "	0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
-            "	0.001, !- Cooling Convergence Tolerance",
-            "	Coil:Heating:Water, !- Heating Coil Object Type",
-            "	Zone1FanCoilHeatingCoil, !- Heating Coil Name",
-            "	0.00014, !- Maximum Hot Water Flow Rate { m3 / s }",
-            "	0.0, !- Minimum Hot Water Flow Rate { m3 / s }",
-            "	0.001; !- Heating Convergence Tolerance",
-
-            });
-
-        ASSERT_TRUE(process_idf(idf_objects));
-
-        GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
-
-        GetZoneEquipmentData(*state);
-        ProcessScheduleInput(*state);
-        state->dataScheduleMgr->ScheduleInputProcessed = true;
-        GetFanInput(*state);
-        EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
-
-        GetFanCoilUnits(*state);
-        EXPECT_EQ("MULTISPEEDFAN", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
-        EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
-        EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
-        EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
-        EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
-
-        state->dataPlnt->TotNumLoops = 2;
-        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-
-        AirMassFlow = 0.60;
-        MaxAirMassFlow = 0.60;
-        // heating load only
-        ColdWaterMassFlowRate = 0.0;
-        HotWaterMassFlowRate = 1.0;
-
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
-
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
-
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
-
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMinAvail = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMax = MaxAirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
-
-        state->dataFanCoilUnits->FanCoil(1).OutAirMassFlow = 0.0;
-        state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
-
-        state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-        state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
-
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
-
-        state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
-        state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
-        state->dataWaterCoils->WaterCoil(2).UACoilInternal = 2010.0;
-        state->dataWaterCoils->WaterCoil(2).TotCoilOutsideSurfArea = 50.0;
-
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
-
-        state->dataWaterCoils->WaterCoil(2).InletWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(2).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).Temp = 6.0;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
-
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = 60.0;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
-
-        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-            auto &loop(state->dataPlnt->PlantLoop(l));
-            loop.LoopSide.allocate(2);
-            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
-            loopside.TotalBranches = 1;
-            loopside.Branch.allocate(1);
-            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
-            loopsidebranch.TotalComponents = 1;
-            loopsidebranch.Comp.allocate(1);
-        }
-
-        state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopBranchNum = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopCompNum = 1;
-
-        state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 2;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
-
-        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
-        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
-        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
-        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-
-        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
-        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
-        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-
-        state->dataFanCoilUnits->CoolingLoad = false;
-        state->dataFanCoilUnits->HeatingLoad = true;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
-        state->dataFanCoilUnits->FanCoil(1).SpeedFanSel = 2;
-        QUnitOut = 0.0;
-        QZnReq = 4000.0;
-
-        state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        state->dataGlobal->DoingSizing = true;
-
-        state->dataFans->LocalTurnFansOff = false;
-        state->dataFans->LocalTurnFansOn = true;
-
-        state->dataEnvrn->Month = 1;
-        state->dataEnvrn->DayOfMonth = 21;
-        state->dataGlobal->HourOfDay = 1;
-        state->dataEnvrn->DSTIndicator = 0;
-        state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 0;
-        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-        UpdateScheduleValues(*state);
-
-        CalcMultiStage4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut);
-
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
-
-        state->dataGlobal->DoingSizing = false;
-
-        state->dataPlnt->PlantLoop.deallocate();
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
-        state->dataFanCoilUnits->FanCoil.deallocate();
-        state->dataLoopNodes->Node.deallocate();
-        state->dataWaterCoils->WaterCoil.deallocate();
-        state->dataZoneEquip->ZoneEquipConfig.deallocate();
-        state->dataHeatBal->Zone.deallocate();
-    }
-    TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
-    {
-
-        int FanCoilNum(1);
-        int ZoneNum(1);
-        bool FirstHVACIteration(false);
-        bool ErrorsFound(false);
-        Real64 PartLoadRatio(1.0);
-        Real64 SpeedRatio(0.0);
-        Real64 QZnReq(0.0);
-        Real64 HotWaterMassFlowRate(0.0);
-        Real64 ColdWaterMassFlowRate(0.0);
-        Real64 QUnitOut(0.0);
-        Real64 AirMassFlow(0.0);
-        Real64 MaxAirMassFlow(0.0);
-
-        state->dataEnvrn->OutBaroPress = 101325.0;
-        state->dataEnvrn->StdRhoAir = 1.20;
-        state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        state->dataGlobalNames->NumCoils = 0;
-        state->dataGlobal->NumOfTimeStepInHour = 1;
-        state->dataGlobal->TimeStep = 1;
-        state->dataGlobal->MinutesPerTimeStep = 60;
-
-        InitializePsychRoutines();
-
-        std::string const idf_objects = delimited_string({
-            "	Zone,",
-            "	EAST ZONE, !- Name",
-            "	0, !- Direction of Relative North { deg }",
-            "	0, !- X Origin { m }",
-            "	0, !- Y Origin { m }",
-            "	0, !- Z Origin { m }",
-            "	1, !- Type",
-            "	1, !- Multiplier",
-            "	autocalculate, !- Ceiling Height { m }",
-            "	autocalculate; !- Volume { m3 }",
-            "	ZoneHVAC:EquipmentConnections,",
-            "	EAST ZONE, !- Zone Name",
-            "	Zone1Equipment, !- Zone Conditioning Equipment List Name",
-            "	Zone1Inlets, !- Zone Air Inlet Node or NodeList Name",
-            "	Zone1Exhausts, !- Zone Air Exhaust Node or NodeList Name",
-            "	Zone 1 Node, !- Zone Air Node Name",
-            "	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
-            "	ZoneHVAC:EquipmentList,",
-            "	Zone1Equipment, !- Name",
-            "   SequentialLoad,          !- Load Distribution Scheme",
-            "	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
-            "	Zone1FanCoil, !- Zone Equipment 1 Name",
-            "	1, !- Zone Equipment 1 Cooling Sequence",
-            "	1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
-            "   NodeList,",
-            "	Zone1Inlets, !- Name",
-            "	Zone1FanCoilAirOutletNode;  !- Node 1 Name",
-            "	NodeList,",
-            "	Zone1Exhausts, !- Name",
-            "	Zone1FanCoilAirInletNode; !- Node 1 Name",
-            "	OutdoorAir:NodeList,",
-            "	Zone1FanCoilOAInNode;    !- Node or NodeList Name 1",
-            "	OutdoorAir:Mixer,",
-            "	Zone1FanCoilOAMixer, !- Name",
-            "	Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
-            "	Zone1FanCoilOAInNode, !- Outdoor Air Stream Node Name",
-            "	Zone1FanCoilExhNode, !- Relief Air Stream Node Name",
-            "	Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
-            "	Schedule:Compact,",
-            "	FanAndCoilAvailSched, !- Name",
-            "	Fraction, !- Schedule Type Limits Name",
-            "	Through: 12/31, !- Field 1",
-            "	For: AllDays, !- Field 2",
-            "	Until: 24:00, 1.0;        !- Field 3",
-            "	ScheduleTypeLimits,",
-            "	Fraction, !- Name",
-            "	0.0, !- Lower Limit Value",
-            "	1.0, !- Upper Limit Value",
-            "	CONTINUOUS;              !- Numeric Type",
-            "   Fan:OnOff,",
-            "	Zone1FanCoilFan, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	0.5, !- Fan Total Efficiency",
-            "	75.0, !- Pressure Rise { Pa }",
-            "	0.6, !- Maximum Flow Rate { m3 / s }",
-            "	0.9, !- Motor Efficiency",
-            "	1.0, !- Motor In Airstream Fraction",
-            "	Zone1FanCoilOAMixerOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilFanOutletNode, !- Air Outlet Node Name",
-            "	, !- Fan Power Ratio Function of Speed Ratio Curve Name",
-            "	;                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name	",
-            "	Coil:Cooling:Water,",
-            "	Zone1FanCoilCoolingCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Namev",
-            "	0.0002, !- Design Water Flow Rate { m3 / s }",
-            "	0.5000, !- Design Air Flow Rate { m3 / s }",
-            "	7.22,   !- Design Inlet Water Temperature { Cv }",
-            "	24.340, !- Design Inlet Air Temperature { C }",
-            "	14.000, !- Design Outlet Air Temperature { C }",
-            "	0.0095, !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "	0.0090, !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "	Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
-            "	Zone1FanCoilChWOutletNode, !- Water Outlet Node Name",
-            "	Zone1FanCoilFanOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
-            "	SimpleAnalysis, !- Type of Analysis",
-            "	CrossFlow;               !- Heat Exchanger Configuration",
-            "	Coil:Heating:Water,",
-            "   Zone1FanCoilHeatingCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	150.0,   !- U - Factor Times Area Value { W / K }",
-            "	0.00014, !- Maximum Water Flow Rate { m3 / s }",
-            "	Zone1FanCoilHWInletNode, !- Water Inlet Node Name",
-            "	Zone1FanCoilHWOutletNode, !- Water Outlet Node Name",
-            "	Zone1FanCoilCCOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "	UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
-            "	autosize, !- Rated Capacity { W }",
-            "	82.2, !- Rated Inlet Water Temperature { C }",
-            "	16.6, !- Rated Inlet Air Temperature { C }",
-            "	71.1, !- Rated Outlet Water Temperature { C }",
-            "	32.2, !- Rated Outlet Air Temperature { C }",
-            "	;     !- Rated Ratio for Air and Water Convection",
-            "	ZoneHVAC:FourPipeFanCoil,",
-            "	Zone1FanCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	MultiSpeedFan, !- Capacity Control Method",
-            "	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
-            "	0.3, !- Low Speed Supply Air Flow Ratio",
-            "	0.6, !- Medium Speed Supply Air Flow Ratio",
-            "	0.1, !- Maximum Outdoor Air Flow Rate { m3 / s }",
-            "	FanAndCoilAvailSched, !- Outdoor Air Schedule Name",
-            "	Zone1FanCoilAirInletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "	OutdoorAir:Mixer, !- Outdoor Air Mixer Object Type",
-            "	Zone1FanCoilOAMixer, !- Outdoor Air Mixer Name",
-            "	Fan:OnOff, !- Supply Air Fan Object Type",
-            "	Zone1FanCoilFan, !- Supply Air Fan Name",
-            "	Coil:Cooling:Water, !- Cooling Coil Object Type",
-            "	Zone1FanCoilCoolingCoil, !- Cooling Coil Name",
-            "	0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
-            "	0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
-            "	0.001, !- Cooling Convergence Tolerance",
-            "	Coil:Heating:Water, !- Heating Coil Object Type",
-            "	Zone1FanCoilHeatingCoil, !- Heating Coil Name",
-            "	0.00014, !- Maximum Hot Water Flow Rate { m3 / s }",
-            "	0.0, !- Minimum Hot Water Flow Rate { m3 / s }",
-            "	0.001; !- Heating Convergence Tolerance",
-
-            });
-
-        ASSERT_TRUE(process_idf(idf_objects));
-
-        GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
-
-        GetZoneEquipmentData(*state);
-        ProcessScheduleInput(*state);
-        state->dataScheduleMgr->ScheduleInputProcessed = true;
-        GetFanInput(*state);
-        EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
-
-        GetFanCoilUnits(*state);
-        EXPECT_EQ("MULTISPEEDFAN", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
-        EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
-        EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
-        EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
-        EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
-
-        state->dataPlnt->TotNumLoops = 2;
-        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-
-        AirMassFlow = 0.60;
-        MaxAirMassFlow = 0.60;
-
-        // cooling load only
-        HotWaterMassFlowRate = 0.0;
-        ColdWaterMassFlowRate = 1.0;
-
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
-
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 24.0;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
-
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 30.0;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 53000;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
-
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMinAvail = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMax = MaxAirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
-
-        state->dataFanCoilUnits->FanCoil(1).OutAirMassFlow = 0.0;
-        state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
-
-        state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-        state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
-
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
-
-        state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
-        state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
-        state->dataWaterCoils->WaterCoil(2).UACoilInternal = 2010.0;
-        state->dataWaterCoils->WaterCoil(2).TotCoilOutsideSurfArea = 50.0;
-
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
-
-        state->dataWaterCoils->WaterCoil(2).InletWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(2).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).Temp = 6.0;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
-
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = 60.0;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
-
-        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-            auto &loop(state->dataPlnt->PlantLoop(l));
-            loop.LoopSide.allocate(2);
-            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
-            loopside.TotalBranches = 1;
-            loopside.Branch.allocate(1);
-            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
-            loopsidebranch.TotalComponents = 1;
-            loopsidebranch.Comp.allocate(1);
-        }
-
-        state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopBranchNum = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopCompNum = 1;
-
-        state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 2;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
-
-        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
-        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
-        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
-        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-
-        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
-        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
-        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-
-        state->dataFanCoilUnits->HeatingLoad = false;
-        state->dataFanCoilUnits->CoolingLoad = true;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.00;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
-        state->dataFanCoilUnits->FanCoil(1).SpeedFanSel = 2;
-        QUnitOut = 0.0;
-        QZnReq = -4000.0;
-
-        state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        state->dataGlobal->DoingSizing = true;
-
-        state->dataFans->LocalTurnFansOff = false;
-        state->dataFans->LocalTurnFansOn = true;
-
-        state->dataEnvrn->Month = 1;
-        state->dataEnvrn->DayOfMonth = 21;
-        state->dataGlobal->HourOfDay = 1;
-        state->dataEnvrn->DSTIndicator = 0;
-        state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 0;
-        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-        UpdateScheduleValues(*state);
-
-        CalcMultiStage4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut);
-
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
-
-        state->dataGlobal->DoingSizing = false;
-        state->dataPlnt->PlantLoop.deallocate();
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
-        state->dataFanCoilUnits->FanCoil.deallocate();
-        state->dataLoopNodes->Node.deallocate();
-        state->dataWaterCoils->WaterCoil.deallocate();
-        state->dataZoneEquip->ZoneEquipConfig.deallocate();
-        state->dataHeatBal->Zone.deallocate();
-    }
-    TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
-    {
-
-        int FanCoilNum(1);
-        int ZoneNum(1);
-        int ControlledZoneNum(1);
-        bool FirstHVACIteration(true);
-        bool ErrorsFound(false);
-        Real64 QZnReq(0.0);
-        Real64 HotWaterMassFlowRate(0.0);
-        Real64 ColdWaterMassFlowRate(0.0);
-        Real64 QUnitOut(0.0);
-        Real64 AirMassFlow(0.0);
-        Real64 MaxAirMassFlow(0.0);
-        Real64 LatOutputProvided(0.0);
-
-        state->dataEnvrn->OutBaroPress = 101325.0;
-        state->dataEnvrn->StdRhoAir = 1.20;
-        state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        state->dataGlobalNames->NumCoils = 0;
-        state->dataGlobal->NumOfTimeStepInHour = 1;
-        state->dataGlobal->TimeStep = 1;
-        state->dataGlobal->MinutesPerTimeStep = 60;
-
-        InitializePsychRoutines();
-
-        std::string const idf_objects = delimited_string({
-            "	Zone,",
-            "	EAST ZONE, !- Name",
-            "	0, !- Direction of Relative North { deg }",
-            "	0, !- X Origin { m }",
-            "	0, !- Y Origin { m }",
-            "	0, !- Z Origin { m }",
-            "	1, !- Type",
-            "	1, !- Multiplier",
-            "	autocalculate, !- Ceiling Height { m }",
-            "	autocalculate; !- Volume { m3 }",
-            "	ZoneHVAC:EquipmentConnections,",
-            "	EAST ZONE, !- Zone Name",
-            "	Zone1Equipment, !- Zone Conditioning Equipment List Name",
-            "	Zone1Inlets, !- Zone Air Inlet Node or NodeList Name",
-            "	Zone1Exhausts, !- Zone Air Exhaust Node or NodeList Name",
-            "	Zone 1 Node, !- Zone Air Node Name",
-            "	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
-            "	ZoneHVAC:EquipmentList,",
-            "	Zone1Equipment, !- Name",
-            "   SequentialLoad,          !- Load Distribution Scheme",
-            "	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
-            "	Zone1FanCoil, !- Zone Equipment 1 Name",
-            "	1, !- Zone Equipment 1 Cooling Sequence",
-            "	1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
-            "   NodeList,",
-            "	Zone1Inlets, !- Name",
-            "	Zone1FanCoilAirOutletNode;  !- Node 1 Name",
-            "	NodeList,",
-            "	Zone1Exhausts, !- Name",
-            "	Zone1FanCoilAirInletNode; !- Node 1 Name",
-            "	OutdoorAir:NodeList,",
-            "	Zone1FanCoilOAInNode;    !- Node or NodeList Name 1",
-            "	OutdoorAir:Mixer,",
-            "	Zone1FanCoilOAMixer, !- Name",
-            "	Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
-            "	Zone1FanCoilOAInNode, !- Outdoor Air Stream Node Name",
-            "	Zone1FanCoilExhNode, !- Relief Air Stream Node Name",
-            "	Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
-            "	Schedule:Constant,",
-            "	FanAndCoilAvailSched, !- Name",
-            "	FRACTION, !- Schedule Type",
-            "	1;        !- TimeStep Value",
-            "	ScheduleTypeLimits,",
-            "	Fraction, !- Name",
-            "	0.0, !- Lower Limit Value",
-            "	1.0, !- Upper Limit Value",
-            "	CONTINUOUS;              !- Numeric Type",
-            "   Fan:OnOff,",
-            "	Zone1FanCoilFan, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	0.5, !- Fan Total Efficiency",
-            "	75.0, !- Pressure Rise { Pa }",
-            "	0.6, !- Maximum Flow Rate { m3 / s }",
-            "	0.9, !- Motor Efficiency",
-            "	1.0, !- Motor In Airstream Fraction",
-            "	Zone1FanCoilOAMixerOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilFanOutletNode, !- Air Outlet Node Name",
-            "	, !- Fan Power Ratio Function of Speed Ratio Curve Name",
-            "	;                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name	",
-            "	Coil:Cooling:Water,",
-            "	Zone1FanCoilCoolingCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Namev",
-            "	0.0002, !- Design Water Flow Rate { m3 / s }",
-            "	0.5000, !- Design Air Flow Rate { m3 / s }",
-            "	7.22,   !- Design Inlet Water Temperature { Cv }",
-            "	24.340, !- Design Inlet Air Temperature { C }",
-            "	14.000, !- Design Outlet Air Temperature { C }",
-            "	0.0095, !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "	0.0090, !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "	Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
-            "	Zone1FanCoilChWOutletNode, !- Water Outlet Node Name",
-            "	Zone1FanCoilFanOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
-            "	SimpleAnalysis, !- Type of Analysis",
-            "	CrossFlow;               !- Heat Exchanger Configuration",
-            "	Coil:Heating:Water,",
-            "   Zone1FanCoilHeatingCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	150.0,   !- U - Factor Times Area Value { W / K }",
-            "	0.00014, !- Maximum Water Flow Rate { m3 / s }",
-            "	Zone1FanCoilHWInletNode, !- Water Inlet Node Name",
-            "	Zone1FanCoilHWOutletNode, !- Water Outlet Node Name",
-            "	Zone1FanCoilCCOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "	UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
-            "	autosize, !- Rated Capacity { W }",
-            "	82.2, !- Rated Inlet Water Temperature { C }",
-            "	16.6, !- Rated Inlet Air Temperature { C }",
-            "	71.1, !- Rated Outlet Water Temperature { C }",
-            "	32.2, !- Rated Outlet Air Temperature { C }",
-            "	;     !- Rated Ratio for Air and Water Convection",
-            "	ZoneHVAC:FourPipeFanCoil,",
-            "	Zone1FanCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	ConstantFanVariableFlow, !- Capacity Control Method",
-            "	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
-            "	0.3, !- Low Speed Supply Air Flow Ratio",
-            "	0.6, !- Medium Speed Supply Air Flow Ratio",
-            "	0.0, !- Maximum Outdoor Air Flow Rate { m3 / s }",
-            "	FanAndCoilAvailSched, !- Outdoor Air Schedule Name",
-            "	Zone1FanCoilAirInletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "	OutdoorAir:Mixer, !- Outdoor Air Mixer Object Type",
-            "	Zone1FanCoilOAMixer, !- Outdoor Air Mixer Name",
-            "	Fan:OnOff, !- Supply Air Fan Object Type",
-            "	Zone1FanCoilFan, !- Supply Air Fan Name",
-            "	Coil:Cooling:Water, !- Cooling Coil Object Type",
-            "	Zone1FanCoilCoolingCoil, !- Cooling Coil Name",
-            "	0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
-            "	0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
-            "	0.001, !- Cooling Convergence Tolerance",
-            "	Coil:Heating:Water, !- Heating Coil Object Type",
-            "	Zone1FanCoilHeatingCoil, !- Heating Coil Name",
-            "	0.00014, !- Maximum Hot Water Flow Rate { m3 / s }",
-            "	0.0, !- Minimum Hot Water Flow Rate { m3 / s }",
-            "	0.001; !- Heating Convergence Tolerance",
-
-            });
-
-        ASSERT_TRUE(process_idf(idf_objects));
-
-        GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
-
-        GetZoneEquipmentData(*state);
-        ProcessScheduleInput(*state);
-        state->dataScheduleMgr->ScheduleInputProcessed = true;
-        GetFanInput(*state);
-        EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
-
-        GetFanCoilUnits(*state);
-        EXPECT_EQ("CONSTANTFANVARIABLEFLOW", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
-        EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
-        EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
-        EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
-        EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
-
-        state->dataPlnt->TotNumLoops = 2;
-        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-
-        AirMassFlow = 0.60;
-        MaxAirMassFlow = 0.60;
-        // heating load only
-        ColdWaterMassFlowRate = 0.0;
-        HotWaterMassFlowRate = 0.14;
-
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
-
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
-
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
-
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMinAvail = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMax = MaxAirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
-
-        state->dataFanCoilUnits->FanCoil(1).OutAirMassFlow = 0.0;
-        state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
-        state->dataFanCoilUnits->FanCoil(1).MaxCoolCoilFluidFlow = 0.14;
-        state->dataFanCoilUnits->FanCoil(1).MaxHeatCoilFluidFlow = 0.14;
-
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMax = 0.14;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRateMax = 0.14;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
-
-        state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-        state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
-
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
-
-        state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
-        state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
-        state->dataWaterCoils->WaterCoil(2).UACoilInternal = 2010.0;
-        state->dataWaterCoils->WaterCoil(2).TotCoilOutsideSurfArea = 50.0;
-
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
-
-        state->dataWaterCoils->WaterCoil(2).InletWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(2).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).Temp = 6.0;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
-
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = 60.0;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
-
-        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-            auto &loop(state->dataPlnt->PlantLoop(l));
-            loop.LoopSide.allocate(2);
-            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
-            loopside.TotalBranches = 1;
-            loopside.Branch.allocate(1);
-            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
-            loopsidebranch.TotalComponents = 1;
-            loopsidebranch.Comp.allocate(1);
-        }
-
-        state->dataHeatBalFanSys->TempControlType.allocate(1);
-        state->dataHeatBalFanSys->TempControlType(1) = 4;
-
-        state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopBranchNum = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopCompNum = 1;
-
-        state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 2;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
-
-        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
-        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
-        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
-        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
-
-        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
-        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
-        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
-
-        state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopNum = 2;
-        state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopNum = 1;
-        state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopSide = 1;
-        state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopSide = 1;
-        state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-        state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
-        state->dataFanCoilUnits->FanCoil(1).CoolCoilBranchNum = 1;
-        state->dataFanCoilUnits->FanCoil(1).CoolCoilCompNum = 1;
-        state->dataFanCoilUnits->FanCoil(1).HeatCoilBranchNum = 1;
-        state->dataFanCoilUnits->FanCoil(1).HeatCoilCompNum = 1;
-
-        state->dataFanCoilUnits->CoolingLoad = false;
-        state->dataFanCoilUnits->HeatingLoad = true;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 8000.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
-        state->dataFanCoilUnits->FanCoil(1).SpeedFanSel = 2;
-        QUnitOut = 0.0;
-        QZnReq = 4000.0;
-
-        state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        state->dataGlobal->DoingSizing = true;
-
-        state->dataFans->LocalTurnFansOff = false;
-        state->dataFans->LocalTurnFansOn = true;
-
-        state->dataEnvrn->Month = 1;
-        state->dataEnvrn->DayOfMonth = 21;
-        state->dataGlobal->HourOfDay = 1;
-        state->dataEnvrn->DSTIndicator = 0;
-        state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 0;
-        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-        UpdateScheduleValues(*state);
-
-        // Normal heating simulation for fan coil with constant fan, variable water flow
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
-        FirstHVACIteration = false;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRate = 0.2;
-        // Simulate with flow lock on and locked flow > demand flow; bypass extra flow
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        EXPECT_NEAR(55.31, state->dataLoopNodes->Node(10).Temp, 0.1);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
-        // heating simulation with flow lock on and locked flow < flow required for load; use locked flow
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRate = 0.05;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
-        EXPECT_NEAR(3780.0, QUnitOut, 5.0);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
-        // normal heating, no flow lock, heating capacity exceeded
-        QZnReq = 5000.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.00;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
-        EXPECT_NEAR(4420.0, QUnitOut, 5.0);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
-
-        // Coil Off Capacity Test #1 - low heating load, no flow lock, setting QUnitOutNoHC when flow lock = 0
-        QZnReq = 80.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 80.00;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
-        // FC hits the 80 W target load
-        EXPECT_NEAR(80.0, QUnitOut, 1.0);
-        EXPECT_NEAR(75.0, state->dataFanCoilUnits->FanCoil(1).QUnitOutNoHC, 1.0);
-        // water mass flow rate needed to provide output of 80 W (including 75 W coil off capacity)
-        EXPECT_NEAR(0.0000315, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode).MassFlowRate, 0.000001);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
-
-        // Coil Off Capacity Test #2 - lock plant flow after previous call
-        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 25.0; // change inlet air condition so off capacity will change to see if QUnitOutNoHC remains fixed
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 39000;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
-        // FC does not hit the 80 W target load since flow is locked at a low value
-        EXPECT_NEAR(52.0, QUnitOut, 1.0);
-        // off coil capacity is same as just prior to flow being locked
-        EXPECT_NEAR(75.0, state->dataFanCoilUnits->FanCoil(1).QUnitOutNoHC, 1.0);
-        // same water flow rate as before
-        EXPECT_NEAR(0.0000315, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode).MassFlowRate, 0.000001);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
-
-        // Coil Off Capacity Test #3 - unlock plant flow to ensure that water flow rate would have been different had flow not been locked
-        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
-        // FC hits the 80 W target load
-        EXPECT_NEAR(80.0, QUnitOut, 1.0);
-        // actual coil off output when inlet air temp = 25 C and h = 39000 J/kg
-        EXPECT_NEAR(48.0, state->dataFanCoilUnits->FanCoil(1).QUnitOutNoHC, 1.0); // interesting that this is very different for a heating system (from Coil Off Capacity Test #1)
-                                                         // water flow rate had to increase to get to 80 W since coil off capacity was much different at -1752 W
-        EXPECT_NEAR(0.000219, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode).MassFlowRate, 0.000001);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
+TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
+{
+
+    int FanCoilNum(1);
+    int ZoneNum(1);
+    bool FirstHVACIteration(false);
+    bool ErrorsFound(false);
+    Real64 PartLoadRatio(1.0);
+    Real64 SpeedRatio(0.0);
+    Real64 QZnReq(0.0);
+    Real64 HotWaterMassFlowRate(0.0);
+    Real64 ColdWaterMassFlowRate(0.0);
+    Real64 QUnitOut(0.0);
+    Real64 AirMassFlow(0.0);
+    Real64 MaxAirMassFlow(0.0);
+
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataWaterCoils->GetWaterCoilsInputFlag = true;
+    state->dataGlobalNames->NumCoils = 0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+
+    InitializePsychRoutines(*state);
+
+    std::string const idf_objects = delimited_string({
+        "	Zone,",
+        "	EAST ZONE, !- Name",
+        "	0, !- Direction of Relative North { deg }",
+        "	0, !- X Origin { m }",
+        "	0, !- Y Origin { m }",
+        "	0, !- Z Origin { m }",
+        "	1, !- Type",
+        "	1, !- Multiplier",
+        "	autocalculate, !- Ceiling Height { m }",
+        "	autocalculate; !- Volume { m3 }",
+        "	ZoneHVAC:EquipmentConnections,",
+        "	EAST ZONE, !- Zone Name",
+        "	Zone1Equipment, !- Zone Conditioning Equipment List Name",
+        "	Zone1Inlets, !- Zone Air Inlet Node or NodeList Name",
+        "	Zone1Exhausts, !- Zone Air Exhaust Node or NodeList Name",
+        "	Zone 1 Node, !- Zone Air Node Name",
+        "	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
+        "	ZoneHVAC:EquipmentList,",
+        "	Zone1Equipment, !- Name",
+        "   SequentialLoad,          !- Load Distribution Scheme",
+        "	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
+        "	Zone1FanCoil, !- Zone Equipment 1 Name",
+        "	1, !- Zone Equipment 1 Cooling Sequence",
+        "	1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+        "   NodeList,",
+        "	Zone1Inlets, !- Name",
+        "	Zone1FanCoilAirOutletNode;  !- Node 1 Name",
+        "	NodeList,",
+        "	Zone1Exhausts, !- Name",
+        "	Zone1FanCoilAirInletNode; !- Node 1 Name",
+        "	OutdoorAir:NodeList,",
+        "	Zone1FanCoilOAInNode;    !- Node or NodeList Name 1",
+        "	OutdoorAir:Mixer,",
+        "	Zone1FanCoilOAMixer, !- Name",
+        "	Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
+        "	Zone1FanCoilOAInNode, !- Outdoor Air Stream Node Name",
+        "	Zone1FanCoilExhNode, !- Relief Air Stream Node Name",
+        "	Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
+        "	Schedule:Constant,",
+        "	FanAndCoilAvailSched, !- Name",
+        "	FRACTION, !- Schedule Type",
+        "	1;        !- TimeStep Value",
+        "	ScheduleTypeLimits,",
+        "	Fraction, !- Name",
+        "	0.0, !- Lower Limit Value",
+        "	1.0, !- Upper Limit Value",
+        "	CONTINUOUS;              !- Numeric Type",
+        "   Fan:OnOff,",
+        "	Zone1FanCoilFan, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	0.5, !- Fan Total Efficiency",
+        "	75.0, !- Pressure Rise { Pa }",
+        "	0.6, !- Maximum Flow Rate { m3 / s }",
+        "	0.9, !- Motor Efficiency",
+        "	1.0, !- Motor In Airstream Fraction",
+        "	Zone1FanCoilOAMixerOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilFanOutletNode, !- Air Outlet Node Name",
+        "	, !- Fan Power Ratio Function of Speed Ratio Curve Name",
+        "	;                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name	",
+        "	Coil:Cooling:Water,",
+        "	Zone1FanCoilCoolingCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Namev",
+        "	0.0002, !- Design Water Flow Rate { m3 / s }",
+        "	0.5000, !- Design Air Flow Rate { m3 / s }",
+        "	7.22,   !- Design Inlet Water Temperature { Cv }",
+        "	24.340, !- Design Inlet Air Temperature { C }",
+        "	14.000, !- Design Outlet Air Temperature { C }",
+        "	0.0095, !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	0.0090, !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
+        "	Zone1FanCoilChWOutletNode, !- Water Outlet Node Name",
+        "	Zone1FanCoilFanOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
+        "	SimpleAnalysis, !- Type of Analysis",
+        "	CrossFlow;               !- Heat Exchanger Configuration",
+        "	Coil:Heating:Water,",
+        "   Zone1FanCoilHeatingCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	150.0,   !- U - Factor Times Area Value { W / K }",
+        "	0.00014, !- Maximum Water Flow Rate { m3 / s }",
+        "	Zone1FanCoilHWInletNode, !- Water Inlet Node Name",
+        "	Zone1FanCoilHWOutletNode, !- Water Outlet Node Name",
+        "	Zone1FanCoilCCOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "	UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
+        "	autosize, !- Rated Capacity { W }",
+        "	82.2, !- Rated Inlet Water Temperature { C }",
+        "	16.6, !- Rated Inlet Air Temperature { C }",
+        "	71.1, !- Rated Outlet Water Temperature { C }",
+        "	32.2, !- Rated Outlet Air Temperature { C }",
+        "	;     !- Rated Ratio for Air and Water Convection",
+        "	ZoneHVAC:FourPipeFanCoil,",
+        "	Zone1FanCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	MultiSpeedFan, !- Capacity Control Method",
+        "	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
+        "	0.3, !- Low Speed Supply Air Flow Ratio",
+        "	0.6, !- Medium Speed Supply Air Flow Ratio",
+        "	0.0, !- Maximum Outdoor Air Flow Rate { m3 / s }",
+        "	FanAndCoilAvailSched, !- Outdoor Air Schedule Name",
+        "	Zone1FanCoilAirInletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "	OutdoorAir:Mixer, !- Outdoor Air Mixer Object Type",
+        "	Zone1FanCoilOAMixer, !- Outdoor Air Mixer Name",
+        "	Fan:OnOff, !- Supply Air Fan Object Type",
+        "	Zone1FanCoilFan, !- Supply Air Fan Name",
+        "	Coil:Cooling:Water, !- Cooling Coil Object Type",
+        "	Zone1FanCoilCoolingCoil, !- Cooling Coil Name",
+        "	0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
+        "	0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
+        "	0.001, !- Cooling Convergence Tolerance",
+        "	Coil:Heating:Water, !- Heating Coil Object Type",
+        "	Zone1FanCoilHeatingCoil, !- Heating Coil Name",
+        "	0.00014, !- Maximum Hot Water Flow Rate { m3 / s }",
+        "	0.0, !- Minimum Hot Water Flow Rate { m3 / s }",
+        "	0.001; !- Heating Convergence Tolerance",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
+
+    GetZoneEquipmentData(*state);
+    ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    GetFanInput(*state);
+    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
+
+    GetFanCoilUnits(*state);
+    EXPECT_EQ("MULTISPEEDFAN", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
+    EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
+    EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
+    EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
+    EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
+
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+
+    AirMassFlow = 0.60;
+    MaxAirMassFlow = 0.60;
+    // heating load only
+    ColdWaterMassFlowRate = 0.0;
+    HotWaterMassFlowRate = 1.0;
+
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat =
+        PsyWFnTdbH(*state,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
+
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat =
+        PsyWFnTdbH(*state,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
+
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMinAvail = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMax = MaxAirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
+
+    state->dataFanCoilUnits->FanCoil(1).OutAirMassFlow = 0.0;
+    state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
+
+    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
+    state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
+    state->dataWaterCoils->WaterCoil(2).UACoilInternal = 2010.0;
+    state->dataWaterCoils->WaterCoil(2).TotCoilOutsideSurfArea = 50.0;
+
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    state->dataWaterCoils->WaterCoil(2).InletWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(2).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).Temp = 6.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = 60.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
+
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
     }
 
-    TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
-    {
+    state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopCompNum = 1;
 
-        int FanCoilNum(1);
-        int ZoneNum(1);
-        int ControlledZoneNum(1);
-        bool FirstHVACIteration(true);
-        bool ErrorsFound(false);
-        Real64 QZnReq(0.0);
-        Real64 HotWaterMassFlowRate(0.0);
-        Real64 ColdWaterMassFlowRate(0.0);
-        Real64 QUnitOut(0.0);
-        Real64 AirMassFlow(0.0);
-        Real64 MaxAirMassFlow(0.0);
-        Real64 LatOutputProvided(0.0);
+    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 2;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        state->dataEnvrn->OutBaroPress = 101325.0;
-        state->dataEnvrn->StdRhoAir = 1.20;
-        state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        state->dataGlobalNames->NumCoils = 0;
-        state->dataGlobal->NumOfTimeStepInHour = 1;
-        state->dataGlobal->TimeStep = 1;
-        state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+    state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
 
-        InitializePsychRoutines();
+    state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
 
-        std::string const idf_objects = delimited_string({
-            "	Zone,",
-            "	EAST ZONE, !- Name",
-            "	0, !- Direction of Relative North { deg }",
-            "	0, !- X Origin { m }",
-            "	0, !- Y Origin { m }",
-            "	0, !- Z Origin { m }",
-            "	1, !- Type",
-            "	1, !- Multiplier",
-            "	autocalculate, !- Ceiling Height { m }",
-            "	autocalculate; !- Volume { m3 }",
-            "	ZoneHVAC:EquipmentConnections,",
-            "	EAST ZONE, !- Zone Name",
-            "	Zone1Equipment, !- Zone Conditioning Equipment List Name",
-            "	Zone1Inlets, !- Zone Air Inlet Node or NodeList Name",
-            "	Zone1Exhausts, !- Zone Air Exhaust Node or NodeList Name",
-            "	Zone 1 Node, !- Zone Air Node Name",
-            "	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
-            "	ZoneHVAC:EquipmentList,",
-            "	Zone1Equipment, !- Name",
-            "   SequentialLoad,          !- Load Distribution Scheme",
-            "	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
-            "	Zone1FanCoil, !- Zone Equipment 1 Name",
-            "	1, !- Zone Equipment 1 Cooling Sequence",
-            "	1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
-            "   NodeList,",
-            "	Zone1Inlets, !- Name",
-            "	Zone1FanCoilAirOutletNode;  !- Node 1 Name",
-            "	NodeList,",
-            "	Zone1Exhausts, !- Name",
-            "	Zone1FanCoilAirInletNode; !- Node 1 Name",
-            "	OutdoorAir:NodeList,",
-            "	Zone1FanCoilOAInNode;    !- Node or NodeList Name 1",
-            "	OutdoorAir:Mixer,",
-            "	Zone1FanCoilOAMixer, !- Name",
-            "	Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
-            "	Zone1FanCoilOAInNode, !- Outdoor Air Stream Node Name",
-            "	Zone1FanCoilExhNode, !- Relief Air Stream Node Name",
-            "	Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
-            "	Schedule:Constant,",
-            "	FanAndCoilAvailSched, !- Name",
-            "	FRACTION, !- Schedule Type",
-            "	1;        !- TimeStep Value",
-            "	ScheduleTypeLimits,",
-            "	Fraction, !- Name",
-            "	0.0, !- Lower Limit Value",
-            "	1.0, !- Upper Limit Value",
-            "	CONTINUOUS;              !- Numeric Type",
-            "	Fan:OnOff,",
-            "	Zone1FanCoilFan, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	0.5, !- Fan Total Efficiency",
-            "	75.0, !- Pressure Rise { Pa }",
-            "	0.6, !- Maximum Flow Rate { m3 / s }",
-            "	0.9, !- Motor Efficiency",
-            "	1.0, !- Motor In Airstream Fraction",
-            "	Zone1FanCoilOAMixerOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilFanOutletNode, !- Air Outlet Node Name",
-            "	, !- Fan Power Ratio Function of Speed Ratio Curve Name",
-            "	;                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name	",
-            "	Coil:Cooling:Water,",
-            "	Zone1FanCoilCoolingCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Namev",
-            "	0.0002, !- Design Water Flow Rate { m3 / s }",
-            "	0.5000, !- Design Air Flow Rate { m3 / s }",
-            "	7.22,   !- Design Inlet Water Temperature { Cv }",
-            "	24.340, !- Design Inlet Air Temperature { C }",
-            "	14.000, !- Design Outlet Air Temperature { C }",
-            "	0.0095, !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "	0.0090, !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "	Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
-            "	Zone1FanCoilChWOutletNode, !- Water Outlet Node Name",
-            "	Zone1FanCoilFanOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
-            "	SimpleAnalysis, !- Type of Analysis",
-            "	CrossFlow;               !- Heat Exchanger Configuration",
-            "	Coil:Heating:Electric,",
-            "   Zone1FanCoilHeatingCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	0.9,   !- Efficiency",
-            "	4500., !- Nominal Capacity",
-            "	Zone1FanCoilCCOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilAirOutletNode; !- Air Outlet Node Name",
-            "	ZoneHVAC:FourPipeFanCoil,",
-            "	Zone1FanCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	ConstantFanVariableFlow, !- Capacity Control Method",
-            "	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
-            "	0.3, !- Low Speed Supply Air Flow Ratio",
-            "	0.6, !- Medium Speed Supply Air Flow Ratio",
-            "	0.0, !- Maximum Outdoor Air Flow Rate { m3 / s }",
-            "	FanAndCoilAvailSched, !- Outdoor Air Schedule Name",
-            "	Zone1FanCoilAirInletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "	OutdoorAir:Mixer, !- Outdoor Air Mixer Object Type",
-            "	Zone1FanCoilOAMixer, !- Outdoor Air Mixer Name",
-            "	Fan:OnOff, !- Supply Air Fan Object Type",
-            "	Zone1FanCoilFan, !- Supply Air Fan Name",
-            "	Coil:Cooling:Water, !- Cooling Coil Object Type",
-            "	Zone1FanCoilCoolingCoil, !- Cooling Coil Name",
-            "	0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
-            "	0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
-            "	0.001, !- Cooling Convergence Tolerance",
-            "	Coil:Heating:Electric, !- Heating Coil Object Type",
-            "	Zone1FanCoilHeatingCoil, !- Heating Coil Name",
-            "	0.00014, !- Maximum Hot Water Flow Rate { m3 / s }",
-            "	0.0, !- Minimum Hot Water Flow Rate { m3 / s }",
-            "	0.001; !- Heating Convergence Tolerance",
+    state->dataFanCoilUnits->CoolingLoad = false;
+    state->dataFanCoilUnits->HeatingLoad = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+    state->dataFanCoilUnits->FanCoil(1).SpeedFanSel = 2;
+    QUnitOut = 0.0;
+    QZnReq = 4000.0;
 
-            });
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
+    state->dataGlobal->DoingSizing = true;
 
-        ASSERT_TRUE(process_idf(idf_objects));
+    state->dataFans->LocalTurnFansOff = false;
+    state->dataFans->LocalTurnFansOn = true;
 
-        GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    UpdateScheduleValues(*state);
 
-        GetZoneEquipmentData(*state);
-        ProcessScheduleInput(*state);
-        state->dataScheduleMgr->ScheduleInputProcessed = true;
-        GetFanInput(*state);
-        EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
+    CalcMultiStage4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut);
 
-        GetFanCoilUnits(*state);
-        EXPECT_EQ("CONSTANTFANVARIABLEFLOW", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
-        EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
-        EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
-        EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
-        EXPECT_EQ("COIL:HEATING:ELECTRIC", state->dataFanCoilUnits->FanCoil(1).HCoilType);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
-        state->dataPlnt->TotNumLoops = 1;
-        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    state->dataGlobal->DoingSizing = false;
 
-        AirMassFlow = 0.60;
-        MaxAirMassFlow = 0.60;
-        // heating load only
-        ColdWaterMassFlowRate = 0.0;
-        HotWaterMassFlowRate = 0.14;
+    state->dataPlnt->PlantLoop.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
+    state->dataFanCoilUnits->FanCoil.deallocate();
+    state->dataLoopNodes->Node.deallocate();
+    state->dataWaterCoils->WaterCoil.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+}
+TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
+{
 
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+    int FanCoilNum(1);
+    int ZoneNum(1);
+    bool FirstHVACIteration(false);
+    bool ErrorsFound(false);
+    Real64 PartLoadRatio(1.0);
+    Real64 SpeedRatio(0.0);
+    Real64 QZnReq(0.0);
+    Real64 HotWaterMassFlowRate(0.0);
+    Real64 ColdWaterMassFlowRate(0.0);
+    Real64 QUnitOut(0.0);
+    Real64 AirMassFlow(0.0);
+    Real64 MaxAirMassFlow(0.0);
 
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataWaterCoils->GetWaterCoilsInputFlag = true;
+    state->dataGlobalNames->NumCoils = 0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
 
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
+    InitializePsychRoutines(*state);
 
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMinAvail = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMax = MaxAirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
+    std::string const idf_objects = delimited_string({
+        "	Zone,",
+        "	EAST ZONE, !- Name",
+        "	0, !- Direction of Relative North { deg }",
+        "	0, !- X Origin { m }",
+        "	0, !- Y Origin { m }",
+        "	0, !- Z Origin { m }",
+        "	1, !- Type",
+        "	1, !- Multiplier",
+        "	autocalculate, !- Ceiling Height { m }",
+        "	autocalculate; !- Volume { m3 }",
+        "	ZoneHVAC:EquipmentConnections,",
+        "	EAST ZONE, !- Zone Name",
+        "	Zone1Equipment, !- Zone Conditioning Equipment List Name",
+        "	Zone1Inlets, !- Zone Air Inlet Node or NodeList Name",
+        "	Zone1Exhausts, !- Zone Air Exhaust Node or NodeList Name",
+        "	Zone 1 Node, !- Zone Air Node Name",
+        "	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
+        "	ZoneHVAC:EquipmentList,",
+        "	Zone1Equipment, !- Name",
+        "   SequentialLoad,          !- Load Distribution Scheme",
+        "	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
+        "	Zone1FanCoil, !- Zone Equipment 1 Name",
+        "	1, !- Zone Equipment 1 Cooling Sequence",
+        "	1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+        "   NodeList,",
+        "	Zone1Inlets, !- Name",
+        "	Zone1FanCoilAirOutletNode;  !- Node 1 Name",
+        "	NodeList,",
+        "	Zone1Exhausts, !- Name",
+        "	Zone1FanCoilAirInletNode; !- Node 1 Name",
+        "	OutdoorAir:NodeList,",
+        "	Zone1FanCoilOAInNode;    !- Node or NodeList Name 1",
+        "	OutdoorAir:Mixer,",
+        "	Zone1FanCoilOAMixer, !- Name",
+        "	Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
+        "	Zone1FanCoilOAInNode, !- Outdoor Air Stream Node Name",
+        "	Zone1FanCoilExhNode, !- Relief Air Stream Node Name",
+        "	Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
+        "	Schedule:Compact,",
+        "	FanAndCoilAvailSched, !- Name",
+        "	Fraction, !- Schedule Type Limits Name",
+        "	Through: 12/31, !- Field 1",
+        "	For: AllDays, !- Field 2",
+        "	Until: 24:00, 1.0;        !- Field 3",
+        "	ScheduleTypeLimits,",
+        "	Fraction, !- Name",
+        "	0.0, !- Lower Limit Value",
+        "	1.0, !- Upper Limit Value",
+        "	CONTINUOUS;              !- Numeric Type",
+        "   Fan:OnOff,",
+        "	Zone1FanCoilFan, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	0.5, !- Fan Total Efficiency",
+        "	75.0, !- Pressure Rise { Pa }",
+        "	0.6, !- Maximum Flow Rate { m3 / s }",
+        "	0.9, !- Motor Efficiency",
+        "	1.0, !- Motor In Airstream Fraction",
+        "	Zone1FanCoilOAMixerOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilFanOutletNode, !- Air Outlet Node Name",
+        "	, !- Fan Power Ratio Function of Speed Ratio Curve Name",
+        "	;                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name	",
+        "	Coil:Cooling:Water,",
+        "	Zone1FanCoilCoolingCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Namev",
+        "	0.0002, !- Design Water Flow Rate { m3 / s }",
+        "	0.5000, !- Design Air Flow Rate { m3 / s }",
+        "	7.22,   !- Design Inlet Water Temperature { Cv }",
+        "	24.340, !- Design Inlet Air Temperature { C }",
+        "	14.000, !- Design Outlet Air Temperature { C }",
+        "	0.0095, !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	0.0090, !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
+        "	Zone1FanCoilChWOutletNode, !- Water Outlet Node Name",
+        "	Zone1FanCoilFanOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
+        "	SimpleAnalysis, !- Type of Analysis",
+        "	CrossFlow;               !- Heat Exchanger Configuration",
+        "	Coil:Heating:Water,",
+        "   Zone1FanCoilHeatingCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	150.0,   !- U - Factor Times Area Value { W / K }",
+        "	0.00014, !- Maximum Water Flow Rate { m3 / s }",
+        "	Zone1FanCoilHWInletNode, !- Water Inlet Node Name",
+        "	Zone1FanCoilHWOutletNode, !- Water Outlet Node Name",
+        "	Zone1FanCoilCCOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "	UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
+        "	autosize, !- Rated Capacity { W }",
+        "	82.2, !- Rated Inlet Water Temperature { C }",
+        "	16.6, !- Rated Inlet Air Temperature { C }",
+        "	71.1, !- Rated Outlet Water Temperature { C }",
+        "	32.2, !- Rated Outlet Air Temperature { C }",
+        "	;     !- Rated Ratio for Air and Water Convection",
+        "	ZoneHVAC:FourPipeFanCoil,",
+        "	Zone1FanCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	MultiSpeedFan, !- Capacity Control Method",
+        "	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
+        "	0.3, !- Low Speed Supply Air Flow Ratio",
+        "	0.6, !- Medium Speed Supply Air Flow Ratio",
+        "	0.1, !- Maximum Outdoor Air Flow Rate { m3 / s }",
+        "	FanAndCoilAvailSched, !- Outdoor Air Schedule Name",
+        "	Zone1FanCoilAirInletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "	OutdoorAir:Mixer, !- Outdoor Air Mixer Object Type",
+        "	Zone1FanCoilOAMixer, !- Outdoor Air Mixer Name",
+        "	Fan:OnOff, !- Supply Air Fan Object Type",
+        "	Zone1FanCoilFan, !- Supply Air Fan Name",
+        "	Coil:Cooling:Water, !- Cooling Coil Object Type",
+        "	Zone1FanCoilCoolingCoil, !- Cooling Coil Name",
+        "	0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
+        "	0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
+        "	0.001, !- Cooling Convergence Tolerance",
+        "	Coil:Heating:Water, !- Heating Coil Object Type",
+        "	Zone1FanCoilHeatingCoil, !- Heating Coil Name",
+        "	0.00014, !- Maximum Hot Water Flow Rate { m3 / s }",
+        "	0.0, !- Minimum Hot Water Flow Rate { m3 / s }",
+        "	0.001; !- Heating Convergence Tolerance",
 
-        state->dataFanCoilUnits->FanCoil(1).OutAirMassFlow = 0.0;
-        state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
-        state->dataFanCoilUnits->FanCoil(1).MaxCoolCoilFluidFlow = 0.14;
-        state->dataFanCoilUnits->FanCoil(1).MaxHeatCoilFluidFlow = 0.14;
+    });
 
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMax = 0.14;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
+    ASSERT_TRUE(process_idf(idf_objects));
 
-        state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-        state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
 
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    GetZoneEquipmentData(*state);
+    ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    GetFanInput(*state);
+    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
 
-        state->dataWaterCoils->WaterCoil(1).UACoilTotal = 470.0;
-        state->dataWaterCoils->WaterCoil(1).UACoilExternal = 611.0;
-        state->dataWaterCoils->WaterCoil(1).UACoilInternal = 2010.0;
-        state->dataWaterCoils->WaterCoil(1).TotCoilOutsideSurfArea = 50.0;
+    GetFanCoilUnits(*state);
+    EXPECT_EQ("MULTISPEEDFAN", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
+    EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
+    EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
+    EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
+    EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
 
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
-        state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = 6.0;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    AirMassFlow = 0.60;
+    MaxAirMassFlow = 0.60;
 
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    // cooling load only
+    HotWaterMassFlowRate = 0.0;
+    ColdWaterMassFlowRate = 1.0;
 
-        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-            auto &loop(state->dataPlnt->PlantLoop(l));
-            loop.LoopSide.allocate(2);
-            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
-            loopside.TotalBranches = 1;
-            loopside.Branch.allocate(1);
-            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
-            loopsidebranch.TotalComponents = 1;
-            loopsidebranch.Comp.allocate(1);
-        }
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        state->dataHeatBalFanSys->TempControlType.allocate(1);
-        state->dataHeatBalFanSys->TempControlType(1) = 4;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 24.0;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat =
+        PsyWFnTdbH(*state,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 30.0;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 53000;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat =
+        PsyWFnTdbH(*state,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
-        state->dataPlnt->PlantLoop(1).Name = "ChilledWaterLoop";
-        state->dataPlnt->PlantLoop(1).FluidName = "ChilledWater";
-        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMinAvail = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMax = MaxAirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
 
-        state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopNum = 1;
-        state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopNum = 0;
-        state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopSide = 1;
-        state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopSide = 0;
-        state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidOutletNodeNum = 0;
-        state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-        state->dataFanCoilUnits->FanCoil(1).CoolCoilBranchNum = 1;
-        state->dataFanCoilUnits->FanCoil(1).CoolCoilCompNum = 1;
-        state->dataFanCoilUnits->FanCoil(1).HeatCoilBranchNum = 0;
-        state->dataFanCoilUnits->FanCoil(1).HeatCoilCompNum = 0;
+    state->dataFanCoilUnits->FanCoil(1).OutAirMassFlow = 0.0;
+    state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
 
-        state->dataFanCoilUnits->CoolingLoad = false;
-        state->dataFanCoilUnits->HeatingLoad = true;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 8000.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
-        state->dataFanCoilUnits->FanCoil(1).SpeedFanSel = 2;
-        QUnitOut = 0.0;
-        QZnReq = 4000.0;
+    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
 
-        state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        state->dataGlobal->DoingSizing = true;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        state->dataFans->LocalTurnFansOff = false;
-        state->dataFans->LocalTurnFansOn = true;
+    state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
+    state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
+    state->dataWaterCoils->WaterCoil(2).UACoilInternal = 2010.0;
+    state->dataWaterCoils->WaterCoil(2).TotCoilOutsideSurfArea = 50.0;
 
-        state->dataEnvrn->Month = 1;
-        state->dataEnvrn->DayOfMonth = 21;
-        state->dataGlobal->HourOfDay = 1;
-        state->dataEnvrn->DSTIndicator = 0;
-        state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 0;
-        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-        UpdateScheduleValues(*state);
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        // Normal heating simulation for fan coil with constant fan, electric heating
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
-        // normal heating, heating capacity exceeded
-        QZnReq = 5000.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.00;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
-        EXPECT_NEAR(4575.0, QUnitOut, 5.0);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
+    state->dataWaterCoils->WaterCoil(2).InletWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(2).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).Temp = 6.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
 
-        state->dataGlobal->DoingSizing = false;
-        state->dataPlnt->PlantLoop.deallocate();
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
-        state->dataFanCoilUnits->FanCoil.deallocate();
-        state->dataLoopNodes->Node.deallocate();
-        state->dataWaterCoils->WaterCoil.deallocate();
-        state->dataZoneEquip->ZoneEquipConfig.deallocate();
-        state->dataHeatBal->Zone.deallocate();
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = 60.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
+
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
     }
 
-    TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
-    {
+    state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopCompNum = 1;
 
-        int FanCoilNum(1);
-        int ZoneNum(1);
-        int ControlledZoneNum(1);
-        bool FirstHVACIteration(true);
-        bool ErrorsFound(false);
-        Real64 QZnReq(0.0);
-        Real64 HotWaterMassFlowRate(0.0);
-        Real64 ColdWaterMassFlowRate(0.0);
-        Real64 QUnitOut(0.0);
-        Real64 AirMassFlow(0.0);
-        Real64 MaxAirMassFlow(0.0);
-        Real64 LatOutputProvided(0.0);
+    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 2;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        state->dataEnvrn->OutBaroPress = 101325.0;
-        state->dataEnvrn->StdRhoAir = 1.20;
-        state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        state->dataGlobalNames->NumCoils = 0;
-        state->dataGlobal->NumOfTimeStepInHour = 1;
-        state->dataGlobal->TimeStep = 1;
-        state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+    state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
 
-        InitializePsychRoutines();
+    state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
 
-        std::string const idf_objects = delimited_string({
-            "	Zone,",
-            "	EAST ZONE, !- Name",
-            "	0, !- Direction of Relative North { deg }",
-            "	0, !- X Origin { m }",
-            "	0, !- Y Origin { m }",
-            "	0, !- Z Origin { m }",
-            "	1, !- Type",
-            "	1, !- Multiplier",
-            "	autocalculate, !- Ceiling Height { m }",
-            "	autocalculate; !- Volume { m3 }",
-            "	ZoneHVAC:EquipmentConnections,",
-            "	EAST ZONE, !- Zone Name",
-            "	Zone1Equipment, !- Zone Conditioning Equipment List Name",
-            "	Zone1Inlets, !- Zone Air Inlet Node or NodeList Name",
-            "	Zone1Exhausts, !- Zone Air Exhaust Node or NodeList Name",
-            "	Zone 1 Node, !- Zone Air Node Name",
-            "	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
-            "	ZoneHVAC:EquipmentList,",
-            "	Zone1Equipment, !- Name",
-            "   SequentialLoad,          !- Load Distribution Scheme",
-            "	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
-            "	Zone1FanCoil, !- Zone Equipment 1 Name",
-            "	1, !- Zone Equipment 1 Cooling Sequence",
-            "	1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
-            "   NodeList,",
-            "	Zone1Inlets, !- Name",
-            "	Zone1FanCoilAirOutletNode;  !- Node 1 Name",
-            "	NodeList,",
-            "	Zone1Exhausts, !- Name",
-            "	Zone1FanCoilAirInletNode; !- Node 1 Name",
-            "	OutdoorAir:NodeList,",
-            "	Zone1FanCoilOAInNode;    !- Node or NodeList Name 1",
-            "	OutdoorAir:Mixer,",
-            "	Zone1FanCoilOAMixer, !- Name",
-            "	Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
-            "	Zone1FanCoilOAInNode, !- Outdoor Air Stream Node Name",
-            "	Zone1FanCoilExhNode, !- Relief Air Stream Node Name",
-            "	Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
-            "	Schedule:Compact,",
-            "	FanAndCoilAvailSched, !- Name",
-            "	Fraction, !- Schedule Type Limits Name",
-            "	Through: 12/31, !- Field 1",
-            "	For: AllDays, !- Field 2",
-            "	Until: 24:00, 1.0;        !- Field 3",
-            "	ScheduleTypeLimits,",
-            "	Fraction, !- Name",
-            "	0.0, !- Lower Limit Value",
-            "	1.0, !- Upper Limit Value",
-            "	CONTINUOUS;              !- Numeric Type",
-            "   Fan:OnOff,",
-            "	Zone1FanCoilFan, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	0.5, !- Fan Total Efficiency",
-            "	75.0, !- Pressure Rise { Pa }",
-            "	0.6, !- Maximum Flow Rate { m3 / s }",
-            "	0.9, !- Motor Efficiency",
-            "	1.0, !- Motor In Airstream Fraction",
-            "	Zone1FanCoilOAMixerOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilFanOutletNode, !- Air Outlet Node Name",
-            "	, !- Fan Power Ratio Function of Speed Ratio Curve Name",
-            "	;                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name	",
-            "	Coil:Cooling:Water,",
-            "	Zone1FanCoilCoolingCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Namev",
-            "	0.0002, !- Design Water Flow Rate { m3 / s }",
-            "	0.5000, !- Design Air Flow Rate { m3 / s }",
-            "	7.22,   !- Design Inlet Water Temperature { Cv }",
-            "	24.340, !- Design Inlet Air Temperature { C }",
-            "	14.000, !- Design Outlet Air Temperature { C }",
-            "	0.0095, !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "	0.0090, !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "	Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
-            "	Zone1FanCoilChWOutletNode, !- Water Outlet Node Name",
-            "	Zone1FanCoilFanOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
-            "	SimpleAnalysis, !- Type of Analysis",
-            "	CrossFlow;               !- Heat Exchanger Configuration",
-            "	Coil:Heating:Water,",
-            "   Zone1FanCoilHeatingCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	150.0,   !- U - Factor Times Area Value { W / K }",
-            "	0.00014, !- Maximum Water Flow Rate { m3 / s }",
-            "	Zone1FanCoilHWInletNode, !- Water Inlet Node Name",
-            "	Zone1FanCoilHWOutletNode, !- Water Outlet Node Name",
-            "	Zone1FanCoilCCOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "	UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
-            "	autosize, !- Rated Capacity { W }",
-            "	82.2, !- Rated Inlet Water Temperature { C }",
-            "	16.6, !- Rated Inlet Air Temperature { C }",
-            "	71.1, !- Rated Outlet Water Temperature { C }",
-            "	32.2, !- Rated Outlet Air Temperature { C }",
-            "	;     !- Rated Ratio for Air and Water Convection",
-            "	ZoneHVAC:FourPipeFanCoil,",
-            "	Zone1FanCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	ConstantFanVariableFlow, !- Capacity Control Method",
-            "	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
-            "	0.3, !- Low Speed Supply Air Flow Ratio",
-            "	0.6, !- Medium Speed Supply Air Flow Ratio",
-            "	0.1, !- Maximum Outdoor Air Flow Rate { m3 / s }",
-            "	FanAndCoilAvailSched, !- Outdoor Air Schedule Name",
-            "	Zone1FanCoilAirInletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "	OutdoorAir:Mixer, !- Outdoor Air Mixer Object Type",
-            "	Zone1FanCoilOAMixer, !- Outdoor Air Mixer Name",
-            "	Fan:OnOff, !- Supply Air Fan Object Type",
-            "	Zone1FanCoilFan, !- Supply Air Fan Name",
-            "	Coil:Cooling:Water, !- Cooling Coil Object Type",
-            "	Zone1FanCoilCoolingCoil, !- Cooling Coil Name",
-            "	0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
-            "	0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
-            "	0.001, !- Cooling Convergence Tolerance",
-            "	Coil:Heating:Water, !- Heating Coil Object Type",
-            "	Zone1FanCoilHeatingCoil, !- Heating Coil Name",
-            "	0.00014, !- Maximum Hot Water Flow Rate { m3 / s }",
-            "	0.0, !- Minimum Hot Water Flow Rate { m3 / s }",
-            "	0.001; !- Heating Convergence Tolerance",
+    state->dataFanCoilUnits->HeatingLoad = false;
+    state->dataFanCoilUnits->CoolingLoad = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.00;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+    state->dataFanCoilUnits->FanCoil(1).SpeedFanSel = 2;
+    QUnitOut = 0.0;
+    QZnReq = -4000.0;
 
-            });
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
+    state->dataGlobal->DoingSizing = true;
 
-        ASSERT_TRUE(process_idf(idf_objects));
+    state->dataFans->LocalTurnFansOff = false;
+    state->dataFans->LocalTurnFansOn = true;
 
-        GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    UpdateScheduleValues(*state);
 
-        GetZoneEquipmentData(*state);
-        ProcessScheduleInput(*state);
-        state->dataScheduleMgr->ScheduleInputProcessed = true;
-        GetFanInput(*state);
-        EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
+    CalcMultiStage4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut);
 
-        GetFanCoilUnits(*state);
-        EXPECT_EQ("CONSTANTFANVARIABLEFLOW", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
-        EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
-        EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
-        EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
-        EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
-        state->dataPlnt->TotNumLoops = 2;
-        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    state->dataGlobal->DoingSizing = false;
+    state->dataPlnt->PlantLoop.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
+    state->dataFanCoilUnits->FanCoil.deallocate();
+    state->dataLoopNodes->Node.deallocate();
+    state->dataWaterCoils->WaterCoil.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+}
+TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
+{
 
-        AirMassFlow = 0.60;
-        MaxAirMassFlow = 0.60;
+    int FanCoilNum(1);
+    int ZoneNum(1);
+    int ControlledZoneNum(1);
+    bool FirstHVACIteration(true);
+    bool ErrorsFound(false);
+    Real64 QZnReq(0.0);
+    Real64 HotWaterMassFlowRate(0.0);
+    Real64 ColdWaterMassFlowRate(0.0);
+    Real64 QUnitOut(0.0);
+    Real64 AirMassFlow(0.0);
+    Real64 MaxAirMassFlow(0.0);
+    Real64 LatOutputProvided(0.0);
 
-        // cooling load only
-        HotWaterMassFlowRate = 0.0;
-        ColdWaterMassFlowRate = 0.14;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataWaterCoils->GetWaterCoilsInputFlag = true;
+    state->dataGlobalNames->NumCoils = 0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
 
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+    InitializePsychRoutines(*state);
 
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 24.0;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
+    std::string const idf_objects = delimited_string({
+        "	Zone,",
+        "	EAST ZONE, !- Name",
+        "	0, !- Direction of Relative North { deg }",
+        "	0, !- X Origin { m }",
+        "	0, !- Y Origin { m }",
+        "	0, !- Z Origin { m }",
+        "	1, !- Type",
+        "	1, !- Multiplier",
+        "	autocalculate, !- Ceiling Height { m }",
+        "	autocalculate; !- Volume { m3 }",
+        "	ZoneHVAC:EquipmentConnections,",
+        "	EAST ZONE, !- Zone Name",
+        "	Zone1Equipment, !- Zone Conditioning Equipment List Name",
+        "	Zone1Inlets, !- Zone Air Inlet Node or NodeList Name",
+        "	Zone1Exhausts, !- Zone Air Exhaust Node or NodeList Name",
+        "	Zone 1 Node, !- Zone Air Node Name",
+        "	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
+        "	ZoneHVAC:EquipmentList,",
+        "	Zone1Equipment, !- Name",
+        "   SequentialLoad,          !- Load Distribution Scheme",
+        "	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
+        "	Zone1FanCoil, !- Zone Equipment 1 Name",
+        "	1, !- Zone Equipment 1 Cooling Sequence",
+        "	1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+        "   NodeList,",
+        "	Zone1Inlets, !- Name",
+        "	Zone1FanCoilAirOutletNode;  !- Node 1 Name",
+        "	NodeList,",
+        "	Zone1Exhausts, !- Name",
+        "	Zone1FanCoilAirInletNode; !- Node 1 Name",
+        "	OutdoorAir:NodeList,",
+        "	Zone1FanCoilOAInNode;    !- Node or NodeList Name 1",
+        "	OutdoorAir:Mixer,",
+        "	Zone1FanCoilOAMixer, !- Name",
+        "	Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
+        "	Zone1FanCoilOAInNode, !- Outdoor Air Stream Node Name",
+        "	Zone1FanCoilExhNode, !- Relief Air Stream Node Name",
+        "	Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
+        "	Schedule:Constant,",
+        "	FanAndCoilAvailSched, !- Name",
+        "	FRACTION, !- Schedule Type",
+        "	1;        !- TimeStep Value",
+        "	ScheduleTypeLimits,",
+        "	Fraction, !- Name",
+        "	0.0, !- Lower Limit Value",
+        "	1.0, !- Upper Limit Value",
+        "	CONTINUOUS;              !- Numeric Type",
+        "   Fan:OnOff,",
+        "	Zone1FanCoilFan, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	0.5, !- Fan Total Efficiency",
+        "	75.0, !- Pressure Rise { Pa }",
+        "	0.6, !- Maximum Flow Rate { m3 / s }",
+        "	0.9, !- Motor Efficiency",
+        "	1.0, !- Motor In Airstream Fraction",
+        "	Zone1FanCoilOAMixerOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilFanOutletNode, !- Air Outlet Node Name",
+        "	, !- Fan Power Ratio Function of Speed Ratio Curve Name",
+        "	;                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name	",
+        "	Coil:Cooling:Water,",
+        "	Zone1FanCoilCoolingCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Namev",
+        "	0.0002, !- Design Water Flow Rate { m3 / s }",
+        "	0.5000, !- Design Air Flow Rate { m3 / s }",
+        "	7.22,   !- Design Inlet Water Temperature { Cv }",
+        "	24.340, !- Design Inlet Air Temperature { C }",
+        "	14.000, !- Design Outlet Air Temperature { C }",
+        "	0.0095, !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	0.0090, !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
+        "	Zone1FanCoilChWOutletNode, !- Water Outlet Node Name",
+        "	Zone1FanCoilFanOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
+        "	SimpleAnalysis, !- Type of Analysis",
+        "	CrossFlow;               !- Heat Exchanger Configuration",
+        "	Coil:Heating:Water,",
+        "   Zone1FanCoilHeatingCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	150.0,   !- U - Factor Times Area Value { W / K }",
+        "	0.00014, !- Maximum Water Flow Rate { m3 / s }",
+        "	Zone1FanCoilHWInletNode, !- Water Inlet Node Name",
+        "	Zone1FanCoilHWOutletNode, !- Water Outlet Node Name",
+        "	Zone1FanCoilCCOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "	UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
+        "	autosize, !- Rated Capacity { W }",
+        "	82.2, !- Rated Inlet Water Temperature { C }",
+        "	16.6, !- Rated Inlet Air Temperature { C }",
+        "	71.1, !- Rated Outlet Water Temperature { C }",
+        "	32.2, !- Rated Outlet Air Temperature { C }",
+        "	;     !- Rated Ratio for Air and Water Convection",
+        "	ZoneHVAC:FourPipeFanCoil,",
+        "	Zone1FanCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	ConstantFanVariableFlow, !- Capacity Control Method",
+        "	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
+        "	0.3, !- Low Speed Supply Air Flow Ratio",
+        "	0.6, !- Medium Speed Supply Air Flow Ratio",
+        "	0.0, !- Maximum Outdoor Air Flow Rate { m3 / s }",
+        "	FanAndCoilAvailSched, !- Outdoor Air Schedule Name",
+        "	Zone1FanCoilAirInletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "	OutdoorAir:Mixer, !- Outdoor Air Mixer Object Type",
+        "	Zone1FanCoilOAMixer, !- Outdoor Air Mixer Name",
+        "	Fan:OnOff, !- Supply Air Fan Object Type",
+        "	Zone1FanCoilFan, !- Supply Air Fan Name",
+        "	Coil:Cooling:Water, !- Cooling Coil Object Type",
+        "	Zone1FanCoilCoolingCoil, !- Cooling Coil Name",
+        "	0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
+        "	0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
+        "	0.001, !- Cooling Convergence Tolerance",
+        "	Coil:Heating:Water, !- Heating Coil Object Type",
+        "	Zone1FanCoilHeatingCoil, !- Heating Coil Name",
+        "	0.00014, !- Maximum Hot Water Flow Rate { m3 / s }",
+        "	0.0, !- Minimum Hot Water Flow Rate { m3 / s }",
+        "	0.001; !- Heating Convergence Tolerance",
 
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 30.0;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 53000;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
+    });
 
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMinAvail = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMax = MaxAirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
+    ASSERT_TRUE(process_idf(idf_objects));
 
-        state->dataFanCoilUnits->FanCoil(1).OutAirMassFlow = 0.0;
-        state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
-        state->dataFanCoilUnits->FanCoil(1).MaxCoolCoilFluidFlow = 0.14;
-        state->dataFanCoilUnits->FanCoil(1).MaxHeatCoilFluidFlow = 0.14;
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
 
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMax = 0.14;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRateMax = 0.14;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
+    GetZoneEquipmentData(*state);
+    ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    GetFanInput(*state);
+    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
 
-        state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-        state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+    GetFanCoilUnits(*state);
+    EXPECT_EQ("CONSTANTFANVARIABLEFLOW", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
+    EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
+    EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
+    EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
+    EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
 
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
-        state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
-        state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
-        state->dataWaterCoils->WaterCoil(2).UACoilInternal = 2010.0;
-        state->dataWaterCoils->WaterCoil(2).TotCoilOutsideSurfArea = 50.0;
+    AirMassFlow = 0.60;
+    MaxAirMassFlow = 0.60;
+    // heating load only
+    ColdWaterMassFlowRate = 0.0;
+    HotWaterMassFlowRate = 0.14;
 
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        state->dataWaterCoils->WaterCoil(2).InletWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(2).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).Temp = 6.0;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat =
+        PsyWFnTdbH(*state,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat =
+        PsyWFnTdbH(*state,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = 60.0;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMinAvail = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMax = MaxAirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
 
-        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-            auto &loop(state->dataPlnt->PlantLoop(l));
-            loop.LoopSide.allocate(2);
-            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
-            loopside.TotalBranches = 1;
-            loopside.Branch.allocate(1);
-            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
-            loopsidebranch.TotalComponents = 1;
-            loopsidebranch.Comp.allocate(1);
-        }
+    state->dataFanCoilUnits->FanCoil(1).OutAirMassFlow = 0.0;
+    state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
+    state->dataFanCoilUnits->FanCoil(1).MaxCoolCoilFluidFlow = 0.14;
+    state->dataFanCoilUnits->FanCoil(1).MaxHeatCoilFluidFlow = 0.14;
 
-        state->dataHeatBalFanSys->TempControlType.allocate(1);
-        state->dataHeatBalFanSys->TempControlType(1) = 4;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMax = 0.14;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRateMax = 0.14;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
 
-        state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopBranchNum = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopCompNum = 1;
+    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
 
-        state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 2;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
-        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
-        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
-        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
+    state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
+    state->dataWaterCoils->WaterCoil(2).UACoilInternal = 2010.0;
+    state->dataWaterCoils->WaterCoil(2).TotCoilOutsideSurfArea = 50.0;
 
-        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
-        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
-        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopNum = 2;
-        state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopNum = 1;
-        state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopSide = 1;
-        state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopSide = 1;
-        state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-        state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
-        state->dataFanCoilUnits->FanCoil(1).CoolCoilBranchNum = 1;
-        state->dataFanCoilUnits->FanCoil(1).CoolCoilCompNum = 1;
-        state->dataFanCoilUnits->FanCoil(1).HeatCoilBranchNum = 1;
-        state->dataFanCoilUnits->FanCoil(1).HeatCoilCompNum = 1;
+    state->dataWaterCoils->WaterCoil(2).InletWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(2).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).Temp = 6.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
 
-        state->dataFanCoilUnits->HeatingLoad = false;
-        state->dataFanCoilUnits->CoolingLoad = true;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.00;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -8000.0;
-        state->dataFanCoilUnits->FanCoil(1).SpeedFanSel = 2;
-        QUnitOut = 0.0;
-        QZnReq = -4000.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        state->dataGlobal->DoingSizing = true;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = 60.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        state->dataFans->LocalTurnFansOff = false;
-        state->dataFans->LocalTurnFansOn = true;
-
-        state->dataEnvrn->Month = 1;
-        state->dataEnvrn->DayOfMonth = 21;
-        state->dataGlobal->HourOfDay = 1;
-        state->dataEnvrn->DSTIndicator = 0;
-        state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 0;
-        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-        UpdateScheduleValues(*state);
-        // normal cooling simulation for constant fan variable flow fan coil
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
-
-        FirstHVACIteration = false;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRate = 0.2;
-        // cooling simulation with flow lock on and locked flow > flow that meets load; bypass extra flow
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        EXPECT_NEAR(10.86, state->dataLoopNodes->Node(13).Temp, 0.1);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
-
-        // cooling simulation with flow lock on and locked flow < flow required for load; use locked flow
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRate = 0.05;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
-        EXPECT_NEAR(-3000.0, QUnitOut, 5.0);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
-
-        // normal cooling, no flow lock, cooling capacity exceeded
-        QZnReq = -5000.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.00;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
-        EXPECT_NEAR(-4420.0, QUnitOut, 5.0);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
     }
 
-    TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
-    {
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = 4;
 
-        int FanCoilNum(1);
-        int ZoneNum(1);
-        bool FirstHVACIteration(false);
-        bool ErrorsFound(false);
-        Real64 QZnReq(0.0);
-        Real64 HotWaterMassFlowRate(0.0);
-        Real64 ColdWaterMassFlowRate(0.0);
-        Real64 QUnitOut(0.0);
-        Real64 QLatOut(0.0);
-        Real64 AirMassFlow(0.0);
-        Real64 MaxAirMassFlow(0.0);
+    state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopCompNum = 1;
 
-        state->dataEnvrn->OutBaroPress = 101325.0;
-        state->dataEnvrn->StdRhoAir = 1.20;
-        state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        state->dataGlobalNames->NumCoils = 0;
-        state->dataGlobal->NumOfTimeStepInHour = 1;
-        state->dataGlobal->TimeStep = 1;
-        state->dataGlobal->MinutesPerTimeStep = 60;
-        state->dataSize->CurZoneEqNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 2;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        InitializePsychRoutines();
+    state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+    state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
 
-        std::string const idf_objects = delimited_string({
-            "	Zone,",
-            "	EAST ZONE, !- Name",
-            "	0, !- Direction of Relative North { deg }",
-            "	0, !- X Origin { m }",
-            "	0, !- Y Origin { m }",
-            "	0, !- Z Origin { m }",
-            "	1, !- Type",
-            "	1, !- Multiplier",
-            "	autocalculate, !- Ceiling Height { m }",
-            "	autocalculate; !- Volume { m3 }",
-            "	ZoneHVAC:EquipmentConnections,",
-            "	EAST ZONE, !- Zone Name",
-            "	Zone1Equipment, !- Zone Conditioning Equipment List Name",
-            "	Zone1Inlets, !- Zone Air Inlet Node or NodeList Name",
-            "	Zone1Exhausts, !- Zone Air Exhaust Node or NodeList Name",
-            "	Zone 1 Node, !- Zone Air Node Name",
-            "	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
-            "	ZoneHVAC:EquipmentList,",
-            "	Zone1Equipment, !- Name",
-            "   SequentialLoad,          !- Load Distribution Scheme",
-            "	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
-            "	Zone1FanCoil, !- Zone Equipment 1 Name",
-            "	1, !- Zone Equipment 1 Cooling Sequence",
-            "	1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
-            "   NodeList,",
-            "	Zone1Inlets, !- Name",
-            "	Zone1FanCoilAirOutletNode;  !- Node 1 Name",
-            "	NodeList,",
-            "	Zone1Exhausts, !- Name",
-            "	Zone1FanCoilAirInletNode; !- Node 1 Name",
-            "	OutdoorAir:NodeList,",
-            "	Zone1FanCoilOAInNode;    !- Node or NodeList Name 1",
-            "	OutdoorAir:Mixer,",
-            "	Zone1FanCoilOAMixer, !- Name",
-            "	Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
-            "	Zone1FanCoilOAInNode, !- Outdoor Air Stream Node Name",
-            "	Zone1FanCoilExhNode, !- Relief Air Stream Node Name",
-            "	Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
-            "	Schedule:Constant,",
-            "	FanAndCoilAvailSched, !- Name",
-            "	FRACTION, !- Schedule Type",
-            "	1;        !- TimeStep Value",
-            "	ScheduleTypeLimits,",
-            "	Fraction, !- Name",
-            "	0.0, !- Lower Limit Value",
-            "	1.0, !- Upper Limit Value",
-            "	CONTINUOUS;              !- Numeric Type",
-            "   Fan:OnOff,",
-            "	Zone1FanCoilFan, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	0.5, !- Fan Total Efficiency",
-            "	75.0, !- Pressure Rise { Pa }",
-            "	0.6, !- Maximum Flow Rate { m3 / s }",
-            "	0.9, !- Motor Efficiency",
-            "	1.0, !- Motor In Airstream Fraction",
-            "	Zone1FanCoilOAMixerOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilFanOutletNode, !- Air Outlet Node Name",
-            "	, !- Fan Power Ratio Function of Speed Ratio Curve Name",
-            "	;                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name	",
-            "	Coil:Cooling:Water,",
-            "	Zone1FanCoilCoolingCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Namev",
-            "	0.0002, !- Design Water Flow Rate { m3 / s }",
-            "	0.5000, !- Design Air Flow Rate { m3 / s }",
-            "	7.22,   !- Design Inlet Water Temperature { Cv }",
-            "	24.340, !- Design Inlet Air Temperature { C }",
-            "	14.000, !- Design Outlet Air Temperature { C }",
-            "	0.0095, !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "	0.0090, !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "	Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
-            "	Zone1FanCoilChWOutletNode, !- Water Outlet Node Name",
-            "	Zone1FanCoilFanOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
-            "	SimpleAnalysis, !- Type of Analysis",
-            "	CrossFlow;               !- Heat Exchanger Configuration",
-            "	Coil:Heating:Water,",
-            "   Zone1FanCoilHeatingCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	150.0,   !- U - Factor Times Area Value { W / K }",
-            "	0.00014, !- Maximum Water Flow Rate { m3 / s }",
-            "	Zone1FanCoilHWInletNode, !- Water Inlet Node Name",
-            "	Zone1FanCoilHWOutletNode, !- Water Outlet Node Name",
-            "	Zone1FanCoilCCOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "	UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
-            "	autosize, !- Rated Capacity { W }",
-            "	82.2, !- Rated Inlet Water Temperature { C }",
-            "	16.6, !- Rated Inlet Air Temperature { C }",
-            "	71.1, !- Rated Outlet Water Temperature { C }",
-            "	32.2, !- Rated Outlet Air Temperature { C }",
-            "	;     !- Rated Ratio for Air and Water Convection",
-            "	ZoneHVAC:FourPipeFanCoil,",
-            "	Zone1FanCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	ASHRAE90VariableFan, !- Capacity Control Method",
-            "	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
-            "	0.3, !- Low Speed Supply Air Flow Ratio",
-            "	0.6, !- Medium Speed Supply Air Flow Ratio",
-            "	0.0, !- Maximum Outdoor Air Flow Rate { m3 / s }",
-            "	FanAndCoilAvailSched, !- Outdoor Air Schedule Name",
-            "	Zone1FanCoilAirInletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "	OutdoorAir:Mixer, !- Outdoor Air Mixer Object Type",
-            "	Zone1FanCoilOAMixer, !- Outdoor Air Mixer Name",
-            "	Fan:OnOff, !- Supply Air Fan Object Type",
-            "	Zone1FanCoilFan, !- Supply Air Fan Name",
-            "	Coil:Cooling:Water, !- Cooling Coil Object Type",
-            "	Zone1FanCoilCoolingCoil, !- Cooling Coil Name",
-            "	0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
-            "	0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
-            "	0.001, !- Cooling Convergence Tolerance",
-            "	Coil:Heating:Water, !- Heating Coil Object Type",
-            "	Zone1FanCoilHeatingCoil, !- Heating Coil Name",
-            "	0.00014, !- Maximum Hot Water Flow Rate { m3 / s }",
-            "	0.0, !- Minimum Hot Water Flow Rate { m3 / s }",
-            "	0.001, !- Heating Convergence Tolerance",
-            "	, !- Availability Manager List Name",
-            "	, !- Design Specification ZoneHVAC Sizing Object Name",
-            "	, !- Supply Air Fan Operating Mode Schedule Name",
-            "	16.0, !- Minimum Supply Air Temperature in Cooling Mode",
-            "	28.0; !- Maximum Supply Air Temperature in Heating Mode",
+    state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
 
-            });
+    state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopNum = 2;
+    state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopNum = 1;
+    state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopSide = 1;
+    state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopSide = 1;
+    state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+    state->dataFanCoilUnits->FanCoil(1).CoolCoilBranchNum = 1;
+    state->dataFanCoilUnits->FanCoil(1).CoolCoilCompNum = 1;
+    state->dataFanCoilUnits->FanCoil(1).HeatCoilBranchNum = 1;
+    state->dataFanCoilUnits->FanCoil(1).HeatCoilCompNum = 1;
 
-        ASSERT_TRUE(process_idf(idf_objects));
+    state->dataFanCoilUnits->CoolingLoad = false;
+    state->dataFanCoilUnits->HeatingLoad = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 8000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+    state->dataFanCoilUnits->FanCoil(1).SpeedFanSel = 2;
+    QUnitOut = 0.0;
+    QZnReq = 4000.0;
 
-        GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
+    state->dataGlobal->DoingSizing = true;
 
-        GetZoneEquipmentData(*state);
-        ProcessScheduleInput(*state);
-        state->dataScheduleMgr->ScheduleInputProcessed = true;
-        GetFanInput(*state);
-        EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
+    state->dataFans->LocalTurnFansOff = false;
+    state->dataFans->LocalTurnFansOn = true;
 
-        GetFanCoilUnits(*state);
-        EXPECT_EQ("ASHRAE90VARIABLEFAN", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
-        EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
-        EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
-        EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
-        EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    UpdateScheduleValues(*state);
 
-        state->dataPlnt->TotNumLoops = 2;
-        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    // Normal heating simulation for fan coil with constant fan, variable water flow
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
+    FirstHVACIteration = false;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRate = 0.2;
+    // Simulate with flow lock on and locked flow > demand flow; bypass extra flow
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    EXPECT_NEAR(55.31, state->dataLoopNodes->Node(10).Temp, 0.1);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
+    // heating simulation with flow lock on and locked flow < flow required for load; use locked flow
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRate = 0.05;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    EXPECT_NEAR(3780.0, QUnitOut, 5.0);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
+    // normal heating, no flow lock, heating capacity exceeded
+    QZnReq = 5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.00;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    EXPECT_NEAR(4420.0, QUnitOut, 5.0);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
-        AirMassFlow = 0.60;
-        MaxAirMassFlow = 0.60;
-        // heating load only
-        ColdWaterMassFlowRate = 0.0;
-        HotWaterMassFlowRate = 1.0;
+    // Coil Off Capacity Test #1 - low heating load, no flow lock, setting QUnitOutNoHC when flow lock = 0
+    QZnReq = 80.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 80.00;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    // FC hits the 80 W target load
+    EXPECT_NEAR(80.0, QUnitOut, 1.0);
+    EXPECT_NEAR(75.0, state->dataFanCoilUnits->FanCoil(1).QUnitOutNoHC, 1.0);
+    // water mass flow rate needed to provide output of 80 W (including 75 W coil off capacity)
+    EXPECT_NEAR(0.0000315, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode).MassFlowRate, 0.000001);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+    // Coil Off Capacity Test #2 - lock plant flow after previous call
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp =
+        25.0; // change inlet air condition so off capacity will change to see if QUnitOutNoHC remains fixed
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 39000;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    // FC does not hit the 80 W target load since flow is locked at a low value
+    EXPECT_NEAR(52.0, QUnitOut, 1.0);
+    // off coil capacity is same as just prior to flow being locked
+    EXPECT_NEAR(75.0, state->dataFanCoilUnits->FanCoil(1).QUnitOutNoHC, 1.0);
+    // same water flow rate as before
+    EXPECT_NEAR(0.0000315, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode).MassFlowRate, 0.000001);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
+    // Coil Off Capacity Test #3 - unlock plant flow to ensure that water flow rate would have been different had flow not been locked
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    // FC hits the 80 W target load
+    EXPECT_NEAR(80.0, QUnitOut, 1.0);
+    // actual coil off output when inlet air temp = 25 C and h = 39000 J/kg
+    EXPECT_NEAR(48.0,
+                state->dataFanCoilUnits->FanCoil(1).QUnitOutNoHC,
+                1.0); // interesting that this is very different for a heating system (from Coil Off Capacity Test #1)
+                      // water flow rate had to increase to get to 80 W since coil off capacity was much different at -1752 W
+    EXPECT_NEAR(0.000219, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode).MassFlowRate, 0.000001);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
+}
 
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
+TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
+{
 
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMinAvail = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMax = MaxAirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
+    int FanCoilNum(1);
+    int ZoneNum(1);
+    int ControlledZoneNum(1);
+    bool FirstHVACIteration(true);
+    bool ErrorsFound(false);
+    Real64 QZnReq(0.0);
+    Real64 HotWaterMassFlowRate(0.0);
+    Real64 ColdWaterMassFlowRate(0.0);
+    Real64 QUnitOut(0.0);
+    Real64 AirMassFlow(0.0);
+    Real64 MaxAirMassFlow(0.0);
+    Real64 LatOutputProvided(0.0);
 
-        state->dataFanCoilUnits->FanCoil(1).OutAirMassFlow = 0.0;
-        state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).NodeNumOfControlledZone).Temp = 22.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataWaterCoils->GetWaterCoilsInputFlag = true;
+    state->dataGlobalNames->NumCoils = 0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
 
-        state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-        state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+    InitializePsychRoutines(*state);
 
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    std::string const idf_objects = delimited_string({
+        "	Zone,",
+        "	EAST ZONE, !- Name",
+        "	0, !- Direction of Relative North { deg }",
+        "	0, !- X Origin { m }",
+        "	0, !- Y Origin { m }",
+        "	0, !- Z Origin { m }",
+        "	1, !- Type",
+        "	1, !- Multiplier",
+        "	autocalculate, !- Ceiling Height { m }",
+        "	autocalculate; !- Volume { m3 }",
+        "	ZoneHVAC:EquipmentConnections,",
+        "	EAST ZONE, !- Zone Name",
+        "	Zone1Equipment, !- Zone Conditioning Equipment List Name",
+        "	Zone1Inlets, !- Zone Air Inlet Node or NodeList Name",
+        "	Zone1Exhausts, !- Zone Air Exhaust Node or NodeList Name",
+        "	Zone 1 Node, !- Zone Air Node Name",
+        "	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
+        "	ZoneHVAC:EquipmentList,",
+        "	Zone1Equipment, !- Name",
+        "   SequentialLoad,          !- Load Distribution Scheme",
+        "	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
+        "	Zone1FanCoil, !- Zone Equipment 1 Name",
+        "	1, !- Zone Equipment 1 Cooling Sequence",
+        "	1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+        "   NodeList,",
+        "	Zone1Inlets, !- Name",
+        "	Zone1FanCoilAirOutletNode;  !- Node 1 Name",
+        "	NodeList,",
+        "	Zone1Exhausts, !- Name",
+        "	Zone1FanCoilAirInletNode; !- Node 1 Name",
+        "	OutdoorAir:NodeList,",
+        "	Zone1FanCoilOAInNode;    !- Node or NodeList Name 1",
+        "	OutdoorAir:Mixer,",
+        "	Zone1FanCoilOAMixer, !- Name",
+        "	Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
+        "	Zone1FanCoilOAInNode, !- Outdoor Air Stream Node Name",
+        "	Zone1FanCoilExhNode, !- Relief Air Stream Node Name",
+        "	Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
+        "	Schedule:Constant,",
+        "	FanAndCoilAvailSched, !- Name",
+        "	FRACTION, !- Schedule Type",
+        "	1;        !- TimeStep Value",
+        "	ScheduleTypeLimits,",
+        "	Fraction, !- Name",
+        "	0.0, !- Lower Limit Value",
+        "	1.0, !- Upper Limit Value",
+        "	CONTINUOUS;              !- Numeric Type",
+        "	Fan:OnOff,",
+        "	Zone1FanCoilFan, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	0.5, !- Fan Total Efficiency",
+        "	75.0, !- Pressure Rise { Pa }",
+        "	0.6, !- Maximum Flow Rate { m3 / s }",
+        "	0.9, !- Motor Efficiency",
+        "	1.0, !- Motor In Airstream Fraction",
+        "	Zone1FanCoilOAMixerOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilFanOutletNode, !- Air Outlet Node Name",
+        "	, !- Fan Power Ratio Function of Speed Ratio Curve Name",
+        "	;                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name	",
+        "	Coil:Cooling:Water,",
+        "	Zone1FanCoilCoolingCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Namev",
+        "	0.0002, !- Design Water Flow Rate { m3 / s }",
+        "	0.5000, !- Design Air Flow Rate { m3 / s }",
+        "	7.22,   !- Design Inlet Water Temperature { Cv }",
+        "	24.340, !- Design Inlet Air Temperature { C }",
+        "	14.000, !- Design Outlet Air Temperature { C }",
+        "	0.0095, !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	0.0090, !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
+        "	Zone1FanCoilChWOutletNode, !- Water Outlet Node Name",
+        "	Zone1FanCoilFanOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
+        "	SimpleAnalysis, !- Type of Analysis",
+        "	CrossFlow;               !- Heat Exchanger Configuration",
+        "	Coil:Heating:Electric,",
+        "   Zone1FanCoilHeatingCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	0.9,   !- Efficiency",
+        "	4500., !- Nominal Capacity",
+        "	Zone1FanCoilCCOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilAirOutletNode; !- Air Outlet Node Name",
+        "	ZoneHVAC:FourPipeFanCoil,",
+        "	Zone1FanCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	ConstantFanVariableFlow, !- Capacity Control Method",
+        "	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
+        "	0.3, !- Low Speed Supply Air Flow Ratio",
+        "	0.6, !- Medium Speed Supply Air Flow Ratio",
+        "	0.0, !- Maximum Outdoor Air Flow Rate { m3 / s }",
+        "	FanAndCoilAvailSched, !- Outdoor Air Schedule Name",
+        "	Zone1FanCoilAirInletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "	OutdoorAir:Mixer, !- Outdoor Air Mixer Object Type",
+        "	Zone1FanCoilOAMixer, !- Outdoor Air Mixer Name",
+        "	Fan:OnOff, !- Supply Air Fan Object Type",
+        "	Zone1FanCoilFan, !- Supply Air Fan Name",
+        "	Coil:Cooling:Water, !- Cooling Coil Object Type",
+        "	Zone1FanCoilCoolingCoil, !- Cooling Coil Name",
+        "	0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
+        "	0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
+        "	0.001, !- Cooling Convergence Tolerance",
+        "	Coil:Heating:Electric, !- Heating Coil Object Type",
+        "	Zone1FanCoilHeatingCoil, !- Heating Coil Name",
+        "	0.00014, !- Maximum Hot Water Flow Rate { m3 / s }",
+        "	0.0, !- Minimum Hot Water Flow Rate { m3 / s }",
+        "	0.001; !- Heating Convergence Tolerance",
 
-        state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
-        state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
-        state->dataWaterCoils->WaterCoil(2).UACoilInternal = 2010.0;
-        state->dataWaterCoils->WaterCoil(2).TotCoilOutsideSurfArea = 50.0;
+    });
 
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    ASSERT_TRUE(process_idf(idf_objects));
 
-        state->dataWaterCoils->WaterCoil(2).InletWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(2).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).Temp = 6.0;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
 
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    GetZoneEquipmentData(*state);
+    ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    GetFanInput(*state);
+    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
 
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = 60.0;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
+    GetFanCoilUnits(*state);
+    EXPECT_EQ("CONSTANTFANVARIABLEFLOW", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
+    EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
+    EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
+    EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
+    EXPECT_EQ("COIL:HEATING:ELECTRIC", state->dataFanCoilUnits->FanCoil(1).HCoilType);
 
-        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-            auto &loop(state->dataPlnt->PlantLoop(l));
-            loop.LoopSide.allocate(2);
-            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
-            loopside.TotalBranches = 1;
-            loopside.Branch.allocate(1);
-            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
-            loopsidebranch.TotalComponents = 1;
-            loopsidebranch.Comp.allocate(1);
-        }
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
-        state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopBranchNum = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopCompNum = 1;
+    AirMassFlow = 0.60;
+    MaxAirMassFlow = 0.60;
+    // heating load only
+    ColdWaterMassFlowRate = 0.0;
+    HotWaterMassFlowRate = 0.14;
 
-        state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 2;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
-        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
-        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
-        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat =
+        PsyWFnTdbH(*state,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
-        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
-        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat =
+        PsyWFnTdbH(*state,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
-        state->dataFanCoilUnits->CoolingLoad = false;
-        state->dataFanCoilUnits->HeatingLoad = true;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 5000.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
-        state->dataFanCoilUnits->FanCoil(1).SpeedFanSel = 2;
-        QUnitOut = 0.0;
-        QLatOut = 0.0;
-        QZnReq = 4000.0;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMinAvail = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMax = MaxAirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
 
-        state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        state->dataGlobal->DoingSizing = true;
+    state->dataFanCoilUnits->FanCoil(1).OutAirMassFlow = 0.0;
+    state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
+    state->dataFanCoilUnits->FanCoil(1).MaxCoolCoilFluidFlow = 0.14;
+    state->dataFanCoilUnits->FanCoil(1).MaxHeatCoilFluidFlow = 0.14;
 
-        state->dataFans->LocalTurnFansOff = false;
-        state->dataFans->LocalTurnFansOn = true;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMax = 0.14;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
 
-        state->dataEnvrn->Month = 1;
-        state->dataEnvrn->DayOfMonth = 21;
-        state->dataGlobal->HourOfDay = 1;
-        state->dataEnvrn->DSTIndicator = 0;
-        state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 0;
-        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-        UpdateScheduleValues(*state);
+    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
 
-        state->dataSize->ZoneEqSizing.allocate(1);
-        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
-        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
-        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
-        state->dataHeatBalFanSys->TempControlType.allocate(1);
-        state->dataHeatBalFanSys->TempControlType(1) = 4;
-        state->dataSize->ZoneSizingRunDone = true;
-        state->dataSize->FinalZoneSizing.allocate(1);
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.5;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.5;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 30.0;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTemp = 20.0;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolLoad = 4000.0;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatLoad = 4000.0;
-        state->dataEnvrn->StdRhoAir = 1.2;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        state->dataGlobal->BeginEnvrnFlag = true;
-        InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    state->dataWaterCoils->WaterCoil(1).UACoilTotal = 470.0;
+    state->dataWaterCoils->WaterCoil(1).UACoilExternal = 611.0;
+    state->dataWaterCoils->WaterCoil(1).UACoilInternal = 2010.0;
+    state->dataWaterCoils->WaterCoil(1).TotCoilOutsideSurfArea = 50.0;
 
-        // expect full flow and meet capacity
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow, 0.0000000001);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        // expect minimum flow and meet capacity
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
-        QZnReq = 1000.0;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow * state->dataFanCoilUnits->FanCoil(1).LowSpeedRatio, 0.0000000001);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
+    state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = 6.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
 
-        // expect modulated flow and meet capacity
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
-        QZnReq = 2500.0;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        EXPECT_GT(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow * state->dataFanCoilUnits->FanCoil(1).LowSpeedRatio);
-        EXPECT_LT(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        // expect full flow and meet capacity
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -5000.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
-        QZnReq = -4000.0;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow, 0.0000000001);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
-
-        // expect full flow and meet capacity
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -5000.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4255.0;
-        QZnReq = -4255.0;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow, 0.0000000001);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
-
-        // expect minimum flow and meet capacity
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
-        QZnReq = -1000.0;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow * state->dataFanCoilUnits->FanCoil(1).LowSpeedRatio, 0.0000000001);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
-
-        // expect modulated flow and meet capacity
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
-        QZnReq = -2500.0;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        EXPECT_GT(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow * state->dataFanCoilUnits->FanCoil(1).LowSpeedRatio);
-        EXPECT_LT(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow);
-        // expect inlet and outlet node air mass flow rates are equal
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate, state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
-
-        state->dataGlobal->DoingSizing = false;
-
-        state->dataPlnt->PlantLoop.deallocate();
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
-        state->dataFanCoilUnits->FanCoil.deallocate();
-        state->dataLoopNodes->Node.deallocate();
-        state->dataWaterCoils->WaterCoil.deallocate();
-        state->dataZoneEquip->ZoneEquipConfig.deallocate();
-        state->dataHeatBal->Zone.deallocate();
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
     }
 
-    Real64 ResidualFancoil(EnergyPlusData &state, Real64 const mdot,
-        Array1<Real64> const &Par // Function parameters
-    )
-    {
-        int FanCoilNum = 1;
-        int ControlledZoneNum = 1;
-        bool FirstHVACIteration = false;
-        Real64 QUnitOut;
-        Real64 QZnReq = Par(1);
-        Real64 Residual;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = 4;
 
-        state.dataLoopNodes->Node(12).MassFlowRate = mdot;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
+    state->dataPlnt->PlantLoop(1).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "ChilledWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
 
-        Residual = (QUnitOut - QZnReq) / QZnReq;
+    state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopNum = 1;
+    state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopNum = 0;
+    state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopSide = 1;
+    state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopSide = 0;
+    state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidOutletNodeNum = 0;
+    state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    state->dataFanCoilUnits->FanCoil(1).CoolCoilBranchNum = 1;
+    state->dataFanCoilUnits->FanCoil(1).CoolCoilCompNum = 1;
+    state->dataFanCoilUnits->FanCoil(1).HeatCoilBranchNum = 0;
+    state->dataFanCoilUnits->FanCoil(1).HeatCoilCompNum = 0;
 
-        return Residual;
+    state->dataFanCoilUnits->CoolingLoad = false;
+    state->dataFanCoilUnits->HeatingLoad = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 8000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+    state->dataFanCoilUnits->FanCoil(1).SpeedFanSel = 2;
+    QUnitOut = 0.0;
+    QZnReq = 4000.0;
+
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
+    state->dataGlobal->DoingSizing = true;
+
+    state->dataFans->LocalTurnFansOff = false;
+    state->dataFans->LocalTurnFansOn = true;
+
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    UpdateScheduleValues(*state);
+
+    // Normal heating simulation for fan coil with constant fan, electric heating
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
+    // normal heating, heating capacity exceeded
+    QZnReq = 5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.00;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    EXPECT_NEAR(4575.0, QUnitOut, 5.0);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
+
+    state->dataGlobal->DoingSizing = false;
+    state->dataPlnt->PlantLoop.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
+    state->dataFanCoilUnits->FanCoil.deallocate();
+    state->dataLoopNodes->Node.deallocate();
+    state->dataWaterCoils->WaterCoil.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+}
+
+TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
+{
+
+    int FanCoilNum(1);
+    int ZoneNum(1);
+    int ControlledZoneNum(1);
+    bool FirstHVACIteration(true);
+    bool ErrorsFound(false);
+    Real64 QZnReq(0.0);
+    Real64 HotWaterMassFlowRate(0.0);
+    Real64 ColdWaterMassFlowRate(0.0);
+    Real64 QUnitOut(0.0);
+    Real64 AirMassFlow(0.0);
+    Real64 MaxAirMassFlow(0.0);
+    Real64 LatOutputProvided(0.0);
+
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataWaterCoils->GetWaterCoilsInputFlag = true;
+    state->dataGlobalNames->NumCoils = 0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+
+    InitializePsychRoutines(*state);
+
+    std::string const idf_objects = delimited_string({
+        "	Zone,",
+        "	EAST ZONE, !- Name",
+        "	0, !- Direction of Relative North { deg }",
+        "	0, !- X Origin { m }",
+        "	0, !- Y Origin { m }",
+        "	0, !- Z Origin { m }",
+        "	1, !- Type",
+        "	1, !- Multiplier",
+        "	autocalculate, !- Ceiling Height { m }",
+        "	autocalculate; !- Volume { m3 }",
+        "	ZoneHVAC:EquipmentConnections,",
+        "	EAST ZONE, !- Zone Name",
+        "	Zone1Equipment, !- Zone Conditioning Equipment List Name",
+        "	Zone1Inlets, !- Zone Air Inlet Node or NodeList Name",
+        "	Zone1Exhausts, !- Zone Air Exhaust Node or NodeList Name",
+        "	Zone 1 Node, !- Zone Air Node Name",
+        "	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
+        "	ZoneHVAC:EquipmentList,",
+        "	Zone1Equipment, !- Name",
+        "   SequentialLoad,          !- Load Distribution Scheme",
+        "	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
+        "	Zone1FanCoil, !- Zone Equipment 1 Name",
+        "	1, !- Zone Equipment 1 Cooling Sequence",
+        "	1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+        "   NodeList,",
+        "	Zone1Inlets, !- Name",
+        "	Zone1FanCoilAirOutletNode;  !- Node 1 Name",
+        "	NodeList,",
+        "	Zone1Exhausts, !- Name",
+        "	Zone1FanCoilAirInletNode; !- Node 1 Name",
+        "	OutdoorAir:NodeList,",
+        "	Zone1FanCoilOAInNode;    !- Node or NodeList Name 1",
+        "	OutdoorAir:Mixer,",
+        "	Zone1FanCoilOAMixer, !- Name",
+        "	Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
+        "	Zone1FanCoilOAInNode, !- Outdoor Air Stream Node Name",
+        "	Zone1FanCoilExhNode, !- Relief Air Stream Node Name",
+        "	Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
+        "	Schedule:Compact,",
+        "	FanAndCoilAvailSched, !- Name",
+        "	Fraction, !- Schedule Type Limits Name",
+        "	Through: 12/31, !- Field 1",
+        "	For: AllDays, !- Field 2",
+        "	Until: 24:00, 1.0;        !- Field 3",
+        "	ScheduleTypeLimits,",
+        "	Fraction, !- Name",
+        "	0.0, !- Lower Limit Value",
+        "	1.0, !- Upper Limit Value",
+        "	CONTINUOUS;              !- Numeric Type",
+        "   Fan:OnOff,",
+        "	Zone1FanCoilFan, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	0.5, !- Fan Total Efficiency",
+        "	75.0, !- Pressure Rise { Pa }",
+        "	0.6, !- Maximum Flow Rate { m3 / s }",
+        "	0.9, !- Motor Efficiency",
+        "	1.0, !- Motor In Airstream Fraction",
+        "	Zone1FanCoilOAMixerOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilFanOutletNode, !- Air Outlet Node Name",
+        "	, !- Fan Power Ratio Function of Speed Ratio Curve Name",
+        "	;                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name	",
+        "	Coil:Cooling:Water,",
+        "	Zone1FanCoilCoolingCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Namev",
+        "	0.0002, !- Design Water Flow Rate { m3 / s }",
+        "	0.5000, !- Design Air Flow Rate { m3 / s }",
+        "	7.22,   !- Design Inlet Water Temperature { Cv }",
+        "	24.340, !- Design Inlet Air Temperature { C }",
+        "	14.000, !- Design Outlet Air Temperature { C }",
+        "	0.0095, !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	0.0090, !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
+        "	Zone1FanCoilChWOutletNode, !- Water Outlet Node Name",
+        "	Zone1FanCoilFanOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
+        "	SimpleAnalysis, !- Type of Analysis",
+        "	CrossFlow;               !- Heat Exchanger Configuration",
+        "	Coil:Heating:Water,",
+        "   Zone1FanCoilHeatingCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	150.0,   !- U - Factor Times Area Value { W / K }",
+        "	0.00014, !- Maximum Water Flow Rate { m3 / s }",
+        "	Zone1FanCoilHWInletNode, !- Water Inlet Node Name",
+        "	Zone1FanCoilHWOutletNode, !- Water Outlet Node Name",
+        "	Zone1FanCoilCCOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "	UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
+        "	autosize, !- Rated Capacity { W }",
+        "	82.2, !- Rated Inlet Water Temperature { C }",
+        "	16.6, !- Rated Inlet Air Temperature { C }",
+        "	71.1, !- Rated Outlet Water Temperature { C }",
+        "	32.2, !- Rated Outlet Air Temperature { C }",
+        "	;     !- Rated Ratio for Air and Water Convection",
+        "	ZoneHVAC:FourPipeFanCoil,",
+        "	Zone1FanCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	ConstantFanVariableFlow, !- Capacity Control Method",
+        "	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
+        "	0.3, !- Low Speed Supply Air Flow Ratio",
+        "	0.6, !- Medium Speed Supply Air Flow Ratio",
+        "	0.1, !- Maximum Outdoor Air Flow Rate { m3 / s }",
+        "	FanAndCoilAvailSched, !- Outdoor Air Schedule Name",
+        "	Zone1FanCoilAirInletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "	OutdoorAir:Mixer, !- Outdoor Air Mixer Object Type",
+        "	Zone1FanCoilOAMixer, !- Outdoor Air Mixer Name",
+        "	Fan:OnOff, !- Supply Air Fan Object Type",
+        "	Zone1FanCoilFan, !- Supply Air Fan Name",
+        "	Coil:Cooling:Water, !- Cooling Coil Object Type",
+        "	Zone1FanCoilCoolingCoil, !- Cooling Coil Name",
+        "	0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
+        "	0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
+        "	0.001, !- Cooling Convergence Tolerance",
+        "	Coil:Heating:Water, !- Heating Coil Object Type",
+        "	Zone1FanCoilHeatingCoil, !- Heating Coil Name",
+        "	0.00014, !- Maximum Hot Water Flow Rate { m3 / s }",
+        "	0.0, !- Minimum Hot Water Flow Rate { m3 / s }",
+        "	0.001; !- Heating Convergence Tolerance",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
+
+    GetZoneEquipmentData(*state);
+    ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    GetFanInput(*state);
+    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
+
+    GetFanCoilUnits(*state);
+    EXPECT_EQ("CONSTANTFANVARIABLEFLOW", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
+    EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
+    EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
+    EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
+    EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
+
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+
+    AirMassFlow = 0.60;
+    MaxAirMassFlow = 0.60;
+
+    // cooling load only
+    HotWaterMassFlowRate = 0.0;
+    ColdWaterMassFlowRate = 0.14;
+
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 24.0;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat =
+        PsyWFnTdbH(*state,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
+
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 30.0;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 53000;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat =
+        PsyWFnTdbH(*state,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
+
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMinAvail = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMax = MaxAirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
+
+    state->dataFanCoilUnits->FanCoil(1).OutAirMassFlow = 0.0;
+    state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
+    state->dataFanCoilUnits->FanCoil(1).MaxCoolCoilFluidFlow = 0.14;
+    state->dataFanCoilUnits->FanCoil(1).MaxHeatCoilFluidFlow = 0.14;
+
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMax = 0.14;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRateMax = 0.14;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
+
+    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
+    state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
+    state->dataWaterCoils->WaterCoil(2).UACoilInternal = 2010.0;
+    state->dataWaterCoils->WaterCoil(2).TotCoilOutsideSurfArea = 50.0;
+
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    state->dataWaterCoils->WaterCoil(2).InletWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(2).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).Temp = 6.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = 60.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
+
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
     }
 
-    TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
-    {
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = 4;
 
-        using General::SolveRoot;
-        using TempSolveRoot::SolveRoot;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopCompNum = 1;
 
-        int FanCoilNum(1);
-        bool FirstHVACIteration(false);
-        bool ErrorsFound(false);
-        Real64 QZnReq(-1000.0);
-        state->dataPlnt->TotNumLoops = 2;
-        state->dataEnvrn->OutBaroPress = 101325.0;
-        state->dataEnvrn->StdRhoAir = 1.20;
-        state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        state->dataGlobalNames->NumCoils = 0;
-        state->dataGlobal->NumOfTimeStepInHour = 1;
-        state->dataGlobal->TimeStep = 1;
-        state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 2;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        InitializePsychRoutines();
+    state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+    state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
 
-        std::string const idf_objects = delimited_string({
-            " Zone, EAST ZONE, 0, 0, 0, 0, 1, 1, autocalculate, autocalculate;",
-            " ZoneHVAC:EquipmentConnections, EAST ZONE, Zone1Equipment, Zone1Inlets, Zone1Exhausts, Zone 1 Node, Zone 1 Outlet Node;",
-            " ZoneHVAC:EquipmentList, Zone1Equipment, SequentialLoad, ZoneHVAC:FourPipeFanCoil, Zone1FanCoil, 1, 1;",
-            " OutdoorAir:NodeList, Zone1FCOAIn;",
-            " OutdoorAir:Mixer, Zone1FanCoilOAMixer, Zone1OAMixOut, Zone1FCOAIn, Zone1FCExh, Zone1FCAirIn;",
-            " Fan:ConstantVolume, Zone1FanCoilFan, FCAvailSch, 0.5, 75.0, 0.6, 0.9, 1.0, Zone1OAMixOut, Zone1FCFanOut;",
-            " Schedule:Constant, FCAvailSch, FRACTION, 1;",
-            " ScheduleTypeLimits, Fraction, 0.0, 1.0, CONTINUOUS;",
-            " NodeList, Zone1Inlets, Zone1FCAirOut;",
-            " NodeList, Zone1Exhausts, Zone1FCAirIn;",
-            " Coil:Cooling:Water, Zone1FCCoolCoil, FCAvailSch, 0.0002, 0.5, 7.22, 24.34, 14.0, 0.0095, 0.009, Zone1FCChWIn, Zone1FCChWOut, "
-            "Zone1FCFanOut, Zone1FCCCOut, SimpleAnalysis, CrossFlow;",
-            " Coil:Heating:Water, Zone1FanCoilHeatingCoil, FCAvailSch, 150.0, 0.00014, Zone1FCHWIn, Zone1FCHWOut, Zone1FCCCOut, Zone1FCAirOut, "
-            "UFactorTimesAreaAndDesignWaterFlowRate, autosize, 82.2, 16.6, 71.1, 32.2, ;",
+    state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
 
-            " ZoneHVAC:FourPipeFanCoil,",
-            "  Zone1FanCoil, !- Name",
-            "  FCAvailSch, !- Availability Schedule Name",
-            "  MultiSpeedFan, !- Capacity Control Method",
-            "  0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
-            "  0.3, !- Low Speed Supply Air Flow Ratio",
-            "  0.6, !- Medium Speed Supply Air Flow Ratio",
-            "  0.0, !- Maximum Outdoor Air Flow Rate { m3 / s }",
-            "  FCAvailSch, !- Outdoor Air Schedule Name",
-            "  Zone1FCAirIn, !- Air Inlet Node Name",
-            "  Zone1FCAirOut, !- Air Outlet Node Name",
-            "  OutdoorAir:Mixer, !- Outdoor Air Mixer Object Type",
-            "  Zone1FanCoilOAMixer, !- Outdoor Air Mixer Name",
-            "  Fan:ConstantVolume, !- Supply Air Fan Object Type",
-            "  Zone1FanCoilFan, !- Supply Air Fan Name",
-            "  Coil:Cooling:Water, !- Cooling Coil Object Type",
-            "  Zone1FCCoolCoil, !- Cooling Coil Name",
-            "  0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
-            "  0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
-            "  0.001, !- Cooling Convergence Tolerance",
-            "  Coil:Heating:Water, !- Heating Coil Object Type",
-            "  Zone1FanCoilHeatingCoil, !- Heating Coil Name",
-            "  0.00014, !- Maximum Hot Water Flow Rate { m3 / s }",
-            "  0.0, !- Minimum Hot Water Flow Rate { m3 / s }",
-            "  0.001; !- Heating Convergence Tolerance",
+    state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopNum = 2;
+    state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopNum = 1;
+    state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopSide = 1;
+    state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopSide = 1;
+    state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+    state->dataFanCoilUnits->FanCoil(1).CoolCoilBranchNum = 1;
+    state->dataFanCoilUnits->FanCoil(1).CoolCoilCompNum = 1;
+    state->dataFanCoilUnits->FanCoil(1).HeatCoilBranchNum = 1;
+    state->dataFanCoilUnits->FanCoil(1).HeatCoilCompNum = 1;
 
-            });
+    state->dataFanCoilUnits->HeatingLoad = false;
+    state->dataFanCoilUnits->CoolingLoad = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.00;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -8000.0;
+    state->dataFanCoilUnits->FanCoil(1).SpeedFanSel = 2;
+    QUnitOut = 0.0;
+    QZnReq = -4000.0;
 
-        ASSERT_TRUE(process_idf(idf_objects));
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
+    state->dataGlobal->DoingSizing = true;
 
-        // OutputProcessor::TimeValue.allocate(2);
+    state->dataFans->LocalTurnFansOff = false;
+    state->dataFans->LocalTurnFansOn = true;
 
-        GetZoneData(*state, ErrorsFound);
-        GetZoneEquipmentData(*state);
-        ProcessScheduleInput(*state);
-        state->dataScheduleMgr->ScheduleInputProcessed = true;
-        SetPredefinedTables(*state);
-        GetFanInput(*state);
-        GetFanCoilUnits(*state);
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    UpdateScheduleValues(*state);
+    // normal cooling simulation for constant fan variable flow fan coil
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
-        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-            auto &loop(state->dataPlnt->PlantLoop(l));
-            loop.LoopSide.allocate(2);
-            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
-            loopside.TotalBranches = 1;
-            loopside.Branch.allocate(1);
-            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
-            loopsidebranch.TotalComponents = 1;
-            loopsidebranch.Comp.allocate(1);
-        }
+    FirstHVACIteration = false;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRate = 0.2;
+    // cooling simulation with flow lock on and locked flow > flow that meets load; bypass extra flow
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    EXPECT_NEAR(10.86, state->dataLoopNodes->Node(13).Temp, 0.1);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
-        state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopBranchNum = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopCompNum = 1;
+    // cooling simulation with flow lock on and locked flow < flow required for load; use locked flow
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRate = 0.05;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    EXPECT_NEAR(-3000.0, QUnitOut, 5.0);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
-        state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 2;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
+    // normal cooling, no flow lock, cooling capacity exceeded
+    QZnReq = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.00;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    EXPECT_NEAR(-4420.0, QUnitOut, 5.0);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
+}
 
-        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
-        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
-        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
-        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
+{
 
-        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
-        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
-        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    int FanCoilNum(1);
+    int ZoneNum(1);
+    bool FirstHVACIteration(false);
+    bool ErrorsFound(false);
+    Real64 QZnReq(0.0);
+    Real64 HotWaterMassFlowRate(0.0);
+    Real64 ColdWaterMassFlowRate(0.0);
+    Real64 QUnitOut(0.0);
+    Real64 QLatOut(0.0);
+    Real64 AirMassFlow(0.0);
+    Real64 MaxAirMassFlow(0.0);
 
-        bool CoolingLoad = true;
-        bool HeatingLoad = false;
-        int ControlledZoneNum = 1;
-        Real64 MinWaterFlow = 0.0;
-        Real64 MaxWaterFlow = 1.5;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).Temp = 24.0;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).HumRat = 0.00946;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).Enthalpy = 48228.946;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).MassFlowRate = 0.719999999;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).MassFlowRateMax = 0.719999999;
-        state->dataLoopNodes->Node(6).MassFlowRateMaxAvail = 0.72;
-        state->dataLoopNodes->Node(5).MassFlowRateMaxAvail = 0.72;
-        state->dataFanCoilUnits->FanCoil(FanCoilNum).CCoilName_Index = 2;
-        state->dataGlobal->BeginEnvrnFlag = true;
-        state->dataEnvrn->DayOfYear_Schedule = 1;
-        state->dataEnvrn->DayOfWeek = 2;
-        state->dataGlobal->HourOfDay = 1;
-        ProcessScheduleInput(*state);
-        UpdateScheduleValues(*state);
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataWaterCoils->GetWaterCoilsInputFlag = true;
+    state->dataGlobalNames->NumCoils = 0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataSize->CurZoneEqNum = 1;
 
-        // fan coil can hit maximum iterations while trying to find the water mass flow rate to meet the load. In this case RegulaFalsi will return -1.
-        // When this happens, this routine will find tighter limits on min/max water flow rate passed to RegulaFalsi
-        // This routine is only called when RegulaFalsi returns -1
+    InitializePsychRoutines(*state);
 
-        // example usage of function
-        // if( SolFlag == -1 ) {
-        // tighten limits on water flow rate to see if this allows convergence
-        //	CoolingLoad = true;
-        //	HeatingLoad = false;
-        //	TightenWaterFlowLimits(*state,  FanCoilNum, CoolingLoad, HeatingLoad, FanCoil( FanCoilNum ).CoolCoilFluidInletNode, ControlledZoneNum,
-        // FirstHVACIteration,
-        // QZnReq, MinWaterFlow, MaxWaterFlow );
+    std::string const idf_objects = delimited_string({
+        "	Zone,",
+        "	EAST ZONE, !- Name",
+        "	0, !- Direction of Relative North { deg }",
+        "	0, !- X Origin { m }",
+        "	0, !- Y Origin { m }",
+        "	0, !- Z Origin { m }",
+        "	1, !- Type",
+        "	1, !- Multiplier",
+        "	autocalculate, !- Ceiling Height { m }",
+        "	autocalculate; !- Volume { m3 }",
+        "	ZoneHVAC:EquipmentConnections,",
+        "	EAST ZONE, !- Zone Name",
+        "	Zone1Equipment, !- Zone Conditioning Equipment List Name",
+        "	Zone1Inlets, !- Zone Air Inlet Node or NodeList Name",
+        "	Zone1Exhausts, !- Zone Air Exhaust Node or NodeList Name",
+        "	Zone 1 Node, !- Zone Air Node Name",
+        "	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
+        "	ZoneHVAC:EquipmentList,",
+        "	Zone1Equipment, !- Name",
+        "   SequentialLoad,          !- Load Distribution Scheme",
+        "	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
+        "	Zone1FanCoil, !- Zone Equipment 1 Name",
+        "	1, !- Zone Equipment 1 Cooling Sequence",
+        "	1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+        "   NodeList,",
+        "	Zone1Inlets, !- Name",
+        "	Zone1FanCoilAirOutletNode;  !- Node 1 Name",
+        "	NodeList,",
+        "	Zone1Exhausts, !- Name",
+        "	Zone1FanCoilAirInletNode; !- Node 1 Name",
+        "	OutdoorAir:NodeList,",
+        "	Zone1FanCoilOAInNode;    !- Node or NodeList Name 1",
+        "	OutdoorAir:Mixer,",
+        "	Zone1FanCoilOAMixer, !- Name",
+        "	Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
+        "	Zone1FanCoilOAInNode, !- Outdoor Air Stream Node Name",
+        "	Zone1FanCoilExhNode, !- Relief Air Stream Node Name",
+        "	Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
+        "	Schedule:Constant,",
+        "	FanAndCoilAvailSched, !- Name",
+        "	FRACTION, !- Schedule Type",
+        "	1;        !- TimeStep Value",
+        "	ScheduleTypeLimits,",
+        "	Fraction, !- Name",
+        "	0.0, !- Lower Limit Value",
+        "	1.0, !- Upper Limit Value",
+        "	CONTINUOUS;              !- Numeric Type",
+        "   Fan:OnOff,",
+        "	Zone1FanCoilFan, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	0.5, !- Fan Total Efficiency",
+        "	75.0, !- Pressure Rise { Pa }",
+        "	0.6, !- Maximum Flow Rate { m3 / s }",
+        "	0.9, !- Motor Efficiency",
+        "	1.0, !- Motor In Airstream Fraction",
+        "	Zone1FanCoilOAMixerOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilFanOutletNode, !- Air Outlet Node Name",
+        "	, !- Fan Power Ratio Function of Speed Ratio Curve Name",
+        "	;                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name	",
+        "	Coil:Cooling:Water,",
+        "	Zone1FanCoilCoolingCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Namev",
+        "	0.0002, !- Design Water Flow Rate { m3 / s }",
+        "	0.5000, !- Design Air Flow Rate { m3 / s }",
+        "	7.22,   !- Design Inlet Water Temperature { Cv }",
+        "	24.340, !- Design Inlet Air Temperature { C }",
+        "	14.000, !- Design Outlet Air Temperature { C }",
+        "	0.0095, !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	0.0090, !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
+        "	Zone1FanCoilChWOutletNode, !- Water Outlet Node Name",
+        "	Zone1FanCoilFanOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
+        "	SimpleAnalysis, !- Type of Analysis",
+        "	CrossFlow;               !- Heat Exchanger Configuration",
+        "	Coil:Heating:Water,",
+        "   Zone1FanCoilHeatingCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	150.0,   !- U - Factor Times Area Value { W / K }",
+        "	0.00014, !- Maximum Water Flow Rate { m3 / s }",
+        "	Zone1FanCoilHWInletNode, !- Water Inlet Node Name",
+        "	Zone1FanCoilHWOutletNode, !- Water Outlet Node Name",
+        "	Zone1FanCoilCCOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "	UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
+        "	autosize, !- Rated Capacity { W }",
+        "	82.2, !- Rated Inlet Water Temperature { C }",
+        "	16.6, !- Rated Inlet Air Temperature { C }",
+        "	71.1, !- Rated Outlet Water Temperature { C }",
+        "	32.2, !- Rated Outlet Air Temperature { C }",
+        "	;     !- Rated Ratio for Air and Water Convection",
+        "	ZoneHVAC:FourPipeFanCoil,",
+        "	Zone1FanCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	ASHRAE90VariableFan, !- Capacity Control Method",
+        "	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
+        "	0.3, !- Low Speed Supply Air Flow Ratio",
+        "	0.6, !- Medium Speed Supply Air Flow Ratio",
+        "	0.0, !- Maximum Outdoor Air Flow Rate { m3 / s }",
+        "	FanAndCoilAvailSched, !- Outdoor Air Schedule Name",
+        "	Zone1FanCoilAirInletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "	OutdoorAir:Mixer, !- Outdoor Air Mixer Object Type",
+        "	Zone1FanCoilOAMixer, !- Outdoor Air Mixer Name",
+        "	Fan:OnOff, !- Supply Air Fan Object Type",
+        "	Zone1FanCoilFan, !- Supply Air Fan Name",
+        "	Coil:Cooling:Water, !- Cooling Coil Object Type",
+        "	Zone1FanCoilCoolingCoil, !- Cooling Coil Name",
+        "	0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
+        "	0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
+        "	0.001, !- Cooling Convergence Tolerance",
+        "	Coil:Heating:Water, !- Heating Coil Object Type",
+        "	Zone1FanCoilHeatingCoil, !- Heating Coil Name",
+        "	0.00014, !- Maximum Hot Water Flow Rate { m3 / s }",
+        "	0.0, !- Minimum Hot Water Flow Rate { m3 / s }",
+        "	0.001, !- Heating Convergence Tolerance",
+        "	, !- Availability Manager List Name",
+        "	, !- Design Specification ZoneHVAC Sizing Object Name",
+        "	, !- Supply Air Fan Operating Mode Schedule Name",
+        "	16.0, !- Minimum Supply Air Temperature in Cooling Mode",
+        "	28.0; !- Maximum Supply Air Temperature in Heating Mode",
 
-        // run once to set up fan coil data
-        TightenWaterFlowLimits(*state, FanCoilNum,
-            CoolingLoad,
-            HeatingLoad,
-            state->dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode,
-            ControlledZoneNum,
-            FirstHVACIteration,
-            QZnReq,
-            MinWaterFlow,
-            MaxWaterFlow);
+    });
 
-        // full output of fan coil is around -7178 W, MaxWaterFlow should remain at 1.5 and MinWaterFlow should be set to 0.15
-        MinWaterFlow = 0.0;
-        MaxWaterFlow = 1.5;
-        QZnReq = -8000.0;
-        TightenWaterFlowLimits(*state, FanCoilNum,
-            CoolingLoad,
-            HeatingLoad,
-            state->dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode,
-            ControlledZoneNum,
-            FirstHVACIteration,
-            QZnReq,
-            MinWaterFlow,
-            MaxWaterFlow);
-        EXPECT_NEAR(MinWaterFlow, 0.15, 0.0000001);
-        EXPECT_NEAR(MaxWaterFlow, 1.50, 0.0000001);
+    ASSERT_TRUE(process_idf(idf_objects));
 
-        // lower output (using 10% of max water flow rate) of fan coil is around -715 W, MaxWaterFlow should be 10% of 1.5 = 0.15 and MinWaterFlow should
-        // be 1% = 0.015
-        MinWaterFlow = 0.0;
-        MaxWaterFlow = 1.5;
-        QZnReq = -800.0;
-        TightenWaterFlowLimits(*state, FanCoilNum,
-            CoolingLoad,
-            HeatingLoad,
-            state->dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode,
-            ControlledZoneNum,
-            FirstHVACIteration,
-            QZnReq,
-            MinWaterFlow,
-            MaxWaterFlow);
-        EXPECT_NEAR(MinWaterFlow, 0.015, 0.0000001);
-        EXPECT_NEAR(MaxWaterFlow, 0.150, 0.0000001);
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
 
-        // lower output of fan coil is around 30 W (fan heat is overtaking cooling output), MaxWaterFlow should be 1% of 1.5 = 0.015 and MinWaterFlow
-        // should be 0.1% = 0.0015
-        MinWaterFlow = 0.0;
-        MaxWaterFlow = 1.5;
-        QZnReq = -10.0;
-        TightenWaterFlowLimits(*state, FanCoilNum,
-            CoolingLoad,
-            HeatingLoad,
-            state->dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode,
-            ControlledZoneNum,
-            FirstHVACIteration,
-            QZnReq,
-            MinWaterFlow,
-            MaxWaterFlow);
-        EXPECT_NEAR(MinWaterFlow, 0.0015, 0.0000001);
-        EXPECT_NEAR(MaxWaterFlow, 0.0150, 0.0000001);
+    GetZoneEquipmentData(*state);
+    ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    GetFanInput(*state);
+    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
 
-        // lower output of fan coil is around 105 W, MaxWaterFlow should be 0.1% of 1.5 = 0.0015 and MinWaterFlow should be 0.01% = 0.00015
-        MinWaterFlow = 0.0;
-        MaxWaterFlow = 1.5;
-        QZnReq = 40.0;
-        TightenWaterFlowLimits(*state, FanCoilNum,
-            CoolingLoad,
-            HeatingLoad,
-            state->dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode,
-            ControlledZoneNum,
-            FirstHVACIteration,
-            QZnReq,
-            MinWaterFlow,
-            MaxWaterFlow);
-        EXPECT_NEAR(MinWaterFlow, 0.00015, 0.0000001);
-        EXPECT_NEAR(MaxWaterFlow, 0.00150, 0.0000001);
+    GetFanCoilUnits(*state);
+    EXPECT_EQ("ASHRAE90VARIABLEFAN", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
+    EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
+    EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
+    EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
+    EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
 
-        // lower output of fan coil is around 112 W, MaxWaterFlow should be 0.01% of 1.5 = 0.00015 and MinWaterFlow should be 0.01% = 0.000015
-        MinWaterFlow = 0.0;
-        MaxWaterFlow = 1.5;
-        QZnReq = 110.0;
-        TightenWaterFlowLimits(*state, FanCoilNum,
-            CoolingLoad,
-            HeatingLoad,
-            state->dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode,
-            ControlledZoneNum,
-            FirstHVACIteration,
-            QZnReq,
-            MinWaterFlow,
-            MaxWaterFlow);
-        EXPECT_NEAR(MinWaterFlow, 0.000015, 0.0000001);
-        EXPECT_NEAR(MaxWaterFlow, 0.000150, 0.0000001);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
-        // lower output of fan coil is around 112 W, MaxWaterFlow should be 0.001% of 1.5 = 0.000015 and MinWaterFlow should remian at 0.0
-        MinWaterFlow = 0.0;
-        MaxWaterFlow = 1.5;
-        QZnReq = 120.0;
-        TightenWaterFlowLimits(*state, FanCoilNum,
-            CoolingLoad,
-            HeatingLoad,
-            state->dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode,
-            ControlledZoneNum,
-            FirstHVACIteration,
-            QZnReq,
-            MinWaterFlow,
-            MaxWaterFlow);
-        EXPECT_NEAR(MinWaterFlow, 0.000000, 0.0000001);
-        EXPECT_NEAR(MaxWaterFlow, 0.000015, 0.0000001);
+    AirMassFlow = 0.60;
+    MaxAirMassFlow = 0.60;
+    // heating load only
+    ColdWaterMassFlowRate = 0.0;
+    HotWaterMassFlowRate = 1.0;
 
-        MinWaterFlow = 0.0;
-        MaxWaterFlow = 1.5;
-        Real64 ErrorToler = 0.00001;
-        int MaxIte = 4;
-        int SolFla;
-        Real64 mdot;
-        Real64 minFlow;
-        Real64 maxFlow;
-        Array1D<Real64> Par(2); // Function parameters
-        Par(1) = -1000.0;
-        Par(2) = 0.0;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        TempSolveRoot::SolveRoot(*state, ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, MinWaterFlow, MaxWaterFlow, Par, 2, minFlow, maxFlow);
-        EXPECT_EQ(-1, SolFla);
-        EXPECT_NEAR(minFlow, 0.0, 0.0000001);
-        EXPECT_NEAR(maxFlow, 0.09375, 0.0000001);
-        MaxIte = 20;
-        state->dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
-        TempSolveRoot::SolveRoot(*state, ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, minFlow, maxFlow, Par);
-        EXPECT_EQ(3, SolFla);
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat =
+        PsyWFnTdbH(*state,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
+
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat =
+        PsyWFnTdbH(*state,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
+
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMinAvail = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMax = MaxAirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
+
+    state->dataFanCoilUnits->FanCoil(1).OutAirMassFlow = 0.0;
+    state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).NodeNumOfControlledZone).Temp = 22.0;
+
+    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
+    state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
+    state->dataWaterCoils->WaterCoil(2).UACoilInternal = 2010.0;
+    state->dataWaterCoils->WaterCoil(2).TotCoilOutsideSurfArea = 50.0;
+
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    state->dataWaterCoils->WaterCoil(2).InletWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(2).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).Temp = 6.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = 60.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
+
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
     }
 
-    TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
-    {
+    state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopCompNum = 1;
 
-        int FanCoilNum(1);
-        int ZoneNum(1);
-        bool FirstHVACIteration(false);
-        bool ErrorsFound(false);
-        Real64 QZnReq(0.0);
-        Real64 HotWaterMassFlowRate(0.0);
-        Real64 ColdWaterMassFlowRate(0.0);
-        Real64 QUnitOut(0.0);
-        Real64 QLatOut(0.0);
-        Real64 AirMassFlow(0.0);
-        Real64 MaxAirMassFlow(0.0);
+    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 2;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        state->dataEnvrn->OutBaroPress = 101325.0;
-        state->dataEnvrn->StdRhoAir = 1.20;
-        state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        state->dataGlobalNames->NumCoils = 0;
-        state->dataGlobal->NumOfTimeStepInHour = 1;
-        state->dataGlobal->TimeStep = 1;
-        state->dataGlobal->MinutesPerTimeStep = 60;
-        state->dataSize->CurZoneEqNum = 1;
+    state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+    state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
 
-        InitializePsychRoutines();
+    state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
 
-        std::string const idf_objects = delimited_string({
-            "	Zone,",
-            "	EAST ZONE, !- Name",
-            "	0, !- Direction of Relative North { deg }",
-            "	0, !- X Origin { m }",
-            "	0, !- Y Origin { m }",
-            "	0, !- Z Origin { m }",
-            "	1, !- Type",
-            "	1, !- Multiplier",
-            "	autocalculate, !- Ceiling Height { m }",
-            "	autocalculate; !- Volume { m3 }",
+    state->dataFanCoilUnits->CoolingLoad = false;
+    state->dataFanCoilUnits->HeatingLoad = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+    state->dataFanCoilUnits->FanCoil(1).SpeedFanSel = 2;
+    QUnitOut = 0.0;
+    QLatOut = 0.0;
+    QZnReq = 4000.0;
 
-            "	ZoneHVAC:EquipmentConnections,",
-            "	EAST ZONE, !- Zone Name",
-            "	Zone1Equipment, !- Zone Conditioning Equipment List Name",
-            "	Zone1Inlets, !- Zone Air Inlet Node or NodeList Name",
-            "	Zone1Exhausts, !- Zone Air Exhaust Node or NodeList Name",
-            "	Zone 1 Node, !- Zone Air Node Name",
-            "	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
+    state->dataGlobal->DoingSizing = true;
 
-            "	ZoneHVAC:EquipmentList,",
-            "	Zone1Equipment, !- Name",
-            "   SequentialLoad,          !- Load Distribution Scheme",
-            "	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
-            "	Zone1FanCoil, !- Zone Equipment 1 Name",
-            "	1, !- Zone Equipment 1 Cooling Sequence",
-            "	1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+    state->dataFans->LocalTurnFansOff = false;
+    state->dataFans->LocalTurnFansOn = true;
 
-            "   NodeList,",
-            "	Zone1Inlets, !- Name",
-            "	Zone1FanCoilAirOutletNode;  !- Node 1 Name",
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    UpdateScheduleValues(*state);
 
-            "	NodeList,",
-            "	Zone1Exhausts, !- Name",
-            "	Zone1FanCoilAirInletNode; !- Node 1 Name",
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = 4;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.5;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.5;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 30.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTemp = 20.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolLoad = 4000.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatLoad = 4000.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
 
-            "	OutdoorAir:NodeList,",
-            "	Zone1FanCoilOAInNode;    !- Node or NodeList Name 1",
+    state->dataGlobal->BeginEnvrnFlag = true;
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
 
-            "	OutdoorAir:Mixer,",
-            "	Zone1FanCoilOAMixer, !- Name",
-            "	Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
-            "	Zone1FanCoilOAInNode, !- Outdoor Air Stream Node Name",
-            "	Zone1FanCoilExhNode, !- Relief Air Stream Node Name",
-            "	Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
+    // expect full flow and meet capacity
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow, 0.0000000001);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
-            "	Schedule:Constant,",
-            "	FanAndCoilAvailSched, !- Name",
-            "	FRACTION, !- Schedule Type",
-            "	1;        !- TimeStep Value",
+    // expect minimum flow and meet capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
+    QZnReq = 1000.0;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate,
+                state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow * state->dataFanCoilUnits->FanCoil(1).LowSpeedRatio,
+                0.0000000001);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
-            "	ScheduleTypeLimits,",
-            "	Fraction, !- Name",
-            "	0.0, !- Lower Limit Value",
-            "	1.0, !- Upper Limit Value",
-            "	CONTINUOUS;              !- Numeric Type",
+    // expect modulated flow and meet capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
+    QZnReq = 2500.0;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    EXPECT_GT(state->dataLoopNodes->Node(1).MassFlowRate,
+              state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow * state->dataFanCoilUnits->FanCoil(1).LowSpeedRatio);
+    EXPECT_LT(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
-            "   Fan:OnOff,",
-            "	Zone1FanCoilFan, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	0.5, !- Fan Total Efficiency",
-            "	75.0, !- Pressure Rise { Pa }",
-            "	0.6, !- Maximum Flow Rate { m3 / s }",
-            "	0.9, !- Motor Efficiency",
-            "	1.0, !- Motor In Airstream Fraction",
-            "	Zone1FanCoilOAMixerOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilFanOutletNode, !- Air Outlet Node Name",
-            "	, !- Fan Power Ratio Function of Speed Ratio Curve Name",
-            "	;                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name	",
+    // expect full flow and meet capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
+    QZnReq = -4000.0;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow, 0.0000000001);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
-            "	Coil:Cooling:Water,",
-            "	Zone1FanCoilCoolingCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Namev",
-            "	0.0002, !- Design Water Flow Rate { m3 / s }",
-            "	0.5000, !- Design Air Flow Rate { m3 / s }",
-            "	7.22,   !- Design Inlet Water Temperature { Cv }",
-            "	24.340, !- Design Inlet Air Temperature { C }",
-            "	14.000, !- Design Outlet Air Temperature { C }",
-            "	0.0095, !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "	0.0090, !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "	Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
-            "	Zone1FanCoilChWOutletNode, !- Water Outlet Node Name",
-            "	Zone1FanCoilFanOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
-            "	SimpleAnalysis, !- Type of Analysis",
-            "	CrossFlow;               !- Heat Exchanger Configuration",
+    // expect full flow and meet capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4255.0;
+    QZnReq = -4255.0;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow, 0.0000000001);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
-            "	Coil:Heating:Water,",
-            "   Zone1FanCoilHeatingCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	150.0,   !- U - Factor Times Area Value { W / K }",
-            "	0.00014, !- Maximum Water Flow Rate { m3 / s }",
-            "	Zone1FanCoilHWInletNode, !- Water Inlet Node Name",
-            "	Zone1FanCoilHWOutletNode, !- Water Outlet Node Name",
-            "	Zone1FanCoilCCOutletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "	UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
-            "	autosize, !- Rated Capacity { W }",
-            "	82.2, !- Rated Inlet Water Temperature { C }",
-            "	16.6, !- Rated Inlet Air Temperature { C }",
-            "	71.1, !- Rated Outlet Water Temperature { C }",
-            "	32.2, !- Rated Outlet Air Temperature { C }",
-            "	;     !- Rated Ratio for Air and Water Convection",
+    // expect minimum flow and meet capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
+    QZnReq = -1000.0;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate,
+                state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow * state->dataFanCoilUnits->FanCoil(1).LowSpeedRatio,
+                0.0000000001);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
-            "	ZoneHVAC:FourPipeFanCoil,",
-            "	Zone1FanCoil, !- Name",
-            "	FanAndCoilAvailSched, !- Availability Schedule Name",
-            "	CyclingFan,           !- Capacity Control Method",
-            "	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
-            "	0.3, !- Low Speed Supply Air Flow Ratio",
-            "	0.6, !- Medium Speed Supply Air Flow Ratio",
-            "	0.0, !- Maximum Outdoor Air Flow Rate { m3 / s }",
-            "	FanAndCoilAvailSched, !- Outdoor Air Schedule Name",
-            "	Zone1FanCoilAirInletNode, !- Air Inlet Node Name",
-            "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "	OutdoorAir:Mixer, !- Outdoor Air Mixer Object Type",
-            "	Zone1FanCoilOAMixer, !- Outdoor Air Mixer Name",
-            "	Fan:OnOff, !- Supply Air Fan Object Type",
-            "	Zone1FanCoilFan, !- Supply Air Fan Name",
-            "	Coil:Cooling:Water, !- Cooling Coil Object Type",
-            "	Zone1FanCoilCoolingCoil, !- Cooling Coil Name",
-            "	0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
-            "	0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
-            "	0.001, !- Cooling Convergence Tolerance",
-            "	Coil:Heating:Water, !- Heating Coil Object Type",
-            "	Zone1FanCoilHeatingCoil, !- Heating Coil Name",
-            "	0.00014, !- Maximum Hot Water Flow Rate { m3 / s }",
-            "	0.0, !- Minimum Hot Water Flow Rate { m3 / s }",
-            "	0.001; !- Heating Convergence Tolerance",
+    // expect modulated flow and meet capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
+    QZnReq = -2500.0;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    EXPECT_GT(state->dataLoopNodes->Node(1).MassFlowRate,
+              state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow * state->dataFanCoilUnits->FanCoil(1).LowSpeedRatio);
+    EXPECT_LT(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow);
+    // expect inlet and outlet node air mass flow rates are equal
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
+              state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
-            });
+    state->dataGlobal->DoingSizing = false;
 
-        ASSERT_TRUE(process_idf(idf_objects));
+    state->dataPlnt->PlantLoop.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
+    state->dataFanCoilUnits->FanCoil.deallocate();
+    state->dataLoopNodes->Node.deallocate();
+    state->dataWaterCoils->WaterCoil.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+}
 
-        GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
+Real64 ResidualFancoil(EnergyPlusData &state,
+                       Real64 const mdot,
+                       Array1<Real64> const &Par // Function parameters
+)
+{
+    int FanCoilNum = 1;
+    int ControlledZoneNum = 1;
+    bool FirstHVACIteration = false;
+    Real64 QUnitOut;
+    Real64 QZnReq = Par(1);
+    Real64 Residual;
 
-        GetZoneEquipmentData(*state);
-        ProcessScheduleInput(*state);
-        state->dataScheduleMgr->ScheduleInputProcessed = true;
-        GetFanInput(*state);
-        EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
+    state.dataLoopNodes->Node(12).MassFlowRate = mdot;
 
-        GetFanCoilUnits(*state);
-        EXPECT_EQ("CYCLINGFAN", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
-        EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
-        EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
-        EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
-        EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
+    Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
 
-        state->dataPlnt->TotNumLoops = 2;
-        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    Residual = (QUnitOut - QZnReq) / QZnReq;
 
-        AirMassFlow = 0.60;
-        MaxAirMassFlow = 0.60;
-        // heating load only
-        ColdWaterMassFlowRate = 0.0;
-        HotWaterMassFlowRate = 1.0;
+    return Residual;
+}
 
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
+{
 
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
+    using General::SolveRoot;
+    using TempSolveRoot::SolveRoot;
 
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
-        state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
+    int FanCoilNum(1);
+    bool FirstHVACIteration(false);
+    bool ErrorsFound(false);
+    Real64 QZnReq(-1000.0);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataWaterCoils->GetWaterCoilsInputFlag = true;
+    state->dataGlobalNames->NumCoils = 0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
 
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMinAvail = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMax = MaxAirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
+    InitializePsychRoutines(*state);
 
-        state->dataFanCoilUnits->FanCoil(1).OutAirMassFlow = 0.0;
-        state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
-        state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
+    std::string const idf_objects = delimited_string({
+        " Zone, EAST ZONE, 0, 0, 0, 0, 1, 1, autocalculate, autocalculate;",
+        " ZoneHVAC:EquipmentConnections, EAST ZONE, Zone1Equipment, Zone1Inlets, Zone1Exhausts, Zone 1 Node, Zone 1 Outlet Node;",
+        " ZoneHVAC:EquipmentList, Zone1Equipment, SequentialLoad, ZoneHVAC:FourPipeFanCoil, Zone1FanCoil, 1, 1;",
+        " OutdoorAir:NodeList, Zone1FCOAIn;",
+        " OutdoorAir:Mixer, Zone1FanCoilOAMixer, Zone1OAMixOut, Zone1FCOAIn, Zone1FCExh, Zone1FCAirIn;",
+        " Fan:ConstantVolume, Zone1FanCoilFan, FCAvailSch, 0.5, 75.0, 0.6, 0.9, 1.0, Zone1OAMixOut, Zone1FCFanOut;",
+        " Schedule:Constant, FCAvailSch, FRACTION, 1;",
+        " ScheduleTypeLimits, Fraction, 0.0, 1.0, CONTINUOUS;",
+        " NodeList, Zone1Inlets, Zone1FCAirOut;",
+        " NodeList, Zone1Exhausts, Zone1FCAirIn;",
+        " Coil:Cooling:Water, Zone1FCCoolCoil, FCAvailSch, 0.0002, 0.5, 7.22, 24.34, 14.0, 0.0095, 0.009, Zone1FCChWIn, Zone1FCChWOut, "
+        "Zone1FCFanOut, Zone1FCCCOut, SimpleAnalysis, CrossFlow;",
+        " Coil:Heating:Water, Zone1FanCoilHeatingCoil, FCAvailSch, 150.0, 0.00014, Zone1FCHWIn, Zone1FCHWOut, Zone1FCCCOut, Zone1FCAirOut, "
+        "UFactorTimesAreaAndDesignWaterFlowRate, autosize, 82.2, 16.6, 71.1, 32.2, ;",
 
-        state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-        state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+        " ZoneHVAC:FourPipeFanCoil,",
+        "  Zone1FanCoil, !- Name",
+        "  FCAvailSch, !- Availability Schedule Name",
+        "  MultiSpeedFan, !- Capacity Control Method",
+        "  0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
+        "  0.3, !- Low Speed Supply Air Flow Ratio",
+        "  0.6, !- Medium Speed Supply Air Flow Ratio",
+        "  0.0, !- Maximum Outdoor Air Flow Rate { m3 / s }",
+        "  FCAvailSch, !- Outdoor Air Schedule Name",
+        "  Zone1FCAirIn, !- Air Inlet Node Name",
+        "  Zone1FCAirOut, !- Air Outlet Node Name",
+        "  OutdoorAir:Mixer, !- Outdoor Air Mixer Object Type",
+        "  Zone1FanCoilOAMixer, !- Outdoor Air Mixer Name",
+        "  Fan:ConstantVolume, !- Supply Air Fan Object Type",
+        "  Zone1FanCoilFan, !- Supply Air Fan Name",
+        "  Coil:Cooling:Water, !- Cooling Coil Object Type",
+        "  Zone1FCCoolCoil, !- Cooling Coil Name",
+        "  0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
+        "  0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
+        "  0.001, !- Cooling Convergence Tolerance",
+        "  Coil:Heating:Water, !- Heating Coil Object Type",
+        "  Zone1FanCoilHeatingCoil, !- Heating Coil Name",
+        "  0.00014, !- Maximum Hot Water Flow Rate { m3 / s }",
+        "  0.0, !- Minimum Hot Water Flow Rate { m3 / s }",
+        "  0.001; !- Heating Convergence Tolerance",
 
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    });
 
-        state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
-        state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
-        state->dataWaterCoils->WaterCoil(2).UACoilInternal = 2010.0;
-        state->dataWaterCoils->WaterCoil(2).TotCoilOutsideSurfArea = 50.0;
+    ASSERT_TRUE(process_idf(idf_objects));
 
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    // OutputProcessor::TimeValue.allocate(2);
 
-        state->dataWaterCoils->WaterCoil(2).InletWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(2).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).Temp = 6.0;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    GetZoneData(*state, ErrorsFound);
+    GetZoneEquipmentData(*state);
+    ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    SetPredefinedTables(*state);
+    GetFanInput(*state);
+    GetFanCoilUnits(*state);
 
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
-
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = 60.0;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
-        state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
-
-        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-            auto &loop(state->dataPlnt->PlantLoop(l));
-            loop.LoopSide.allocate(2);
-            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
-            loopside.TotalBranches = 1;
-            loopside.Branch.allocate(1);
-            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
-            loopsidebranch.TotalComponents = 1;
-            loopsidebranch.Comp.allocate(1);
-        }
-
-        state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopBranchNum = 1;
-        state->dataWaterCoils->WaterCoil(2).WaterLoopCompNum = 1;
-
-        state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 2;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-        state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
-
-        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
-        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
-        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
-        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
-
-        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
-        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
-        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-
-        state->dataFanCoilUnits->CoolingLoad = false;
-        state->dataFanCoilUnits->HeatingLoad = true;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 4000.0;
-        state->dataFanCoilUnits->FanCoil(1).SpeedFanSel = 2;
-        QUnitOut = 0.0;
-        QLatOut = 0.0;
-        QZnReq = 4000.0;
-
-        state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        state->dataGlobal->DoingSizing = true;
-
-        state->dataFans->LocalTurnFansOff = false;
-        state->dataFans->LocalTurnFansOn = true;
-
-        state->dataEnvrn->Month = 1;
-        state->dataEnvrn->DayOfMonth = 21;
-        state->dataGlobal->HourOfDay = 1;
-        state->dataEnvrn->DSTIndicator = 0;
-        state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 0;
-        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-        UpdateScheduleValues(*state);
-
-        state->dataSize->ZoneEqSizing.allocate(1);
-        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
-        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
-        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
-        state->dataHeatBalFanSys->TempControlType.allocate(1);
-        state->dataHeatBalFanSys->TempControlType(1) = 4;
-        state->dataSize->ZoneSizingRunDone = true;
-        state->dataSize->FinalZoneSizing.allocate(1);
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.5;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.5;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 30.0;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTemp = 20.0;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolLoad = 4000.0;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatLoad = 4000.0;
-        state->dataEnvrn->StdRhoAir = 1.2;
-
-        state->dataGlobal->BeginEnvrnFlag = true;
-        InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        // expect fan speed 3 and near full air and water flow and meet capacity
-        EXPECT_EQ(3, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
-        EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.95);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        // cycling fan proportional to PLR and fan speed ratio (is 1 here)
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).PLR * state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow, 0.0000000001);
-
-        // expect minimum flow and meet capacity
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
-        QZnReq = 1000.0;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        // expect fan speed 1 and moderate air and water flow and meet capacity
-        EXPECT_EQ(1, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
-        EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.6);
-        EXPECT_LT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.65);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        // cycling fan proportional to PLR and fan speed ratio (is 0.3 here)
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).PLR * state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow * state->dataFanCoilUnits->FanCoil(1).LowSpeedRatio, 0.0000000001);
-
-        // expect modulated flow and meet capacity
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2500.0;
-        QZnReq = 2500.0;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        // expect fan speed 2 and moderate air and water flow and meet capacity
-        EXPECT_EQ(2, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
-        EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.8);
-        EXPECT_LT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.85);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        // cycling fan proportional to PLR and fan speed ratio (is 0.6 here)
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).PLR * state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow * state->dataFanCoilUnits->FanCoil(1).MedSpeedRatio, 0.0000000001);
-
-        // expect full flow and meet capacity
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -4000.0;
-        QZnReq = -4000.0;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        // expect fan speed 3 and near full air and water flow and meet capacity
-        EXPECT_EQ(3, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
-        EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.9);
-        EXPECT_LT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.95);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        // cycling fan proportional to PLR and fan speed ratio (is 1 here)
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).PLR * state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow, 0.0000000001);
-
-        // expect minimum flow and meet capacity
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.0;
-        QZnReq = -1000.0;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        // expect fan speed 1 and moderate air and water flow and meet capacity
-        EXPECT_EQ(1, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
-        EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.5);
-        EXPECT_LT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.55);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        // cycling fan proportional to PLR and fan speed ratio (is 0.3 here)
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).PLR * state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow * state->dataFanCoilUnits->FanCoil(1).LowSpeedRatio, 0.0000000001);
-
-        // expect modulated flow and meet capacity
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -2500.0;
-        QZnReq = -2500.0;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        // expect fan speed 2 and moderate air and water flow and meet capacity
-        EXPECT_EQ(2, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
-        EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.75);
-        EXPECT_LT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.8);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).PLR * state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow * state->dataFanCoilUnits->FanCoil(1).MedSpeedRatio, 0.0000000001);
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
     }
 
-    TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
-    {
+    state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopCompNum = 1;
 
-        int FanCoilNum(1);
-        int ZoneNum(1);
-        bool FirstHVACIteration(false);
-        bool ErrorsFound(false);
-        Real64 QZnReq(0.0);
-        Real64 HotWaterMassFlowRate(0.0);
-        Real64 ColdWaterMassFlowRate(0.0);
-        Real64 QUnitOut(0.0);
-        Real64 QLatOut(0.0);
-        Real64 AirMassFlow(0.0);
-        Real64 MaxAirMassFlow(0.0);
+    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 2;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        state->dataEnvrn->OutBaroPress = 101325.0;
-        state->dataEnvrn->StdRhoAir = 1.20;
-        state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        state->dataGlobalNames->NumCoils = 0;
-        state->dataGlobal->NumOfTimeStepInHour = 1;
-        state->dataGlobal->TimeStep = 1;
-        state->dataGlobal->MinutesPerTimeStep = 60;
-        state->dataSize->CurZoneEqNum = 1;
+    state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+    state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
 
-        InitializePsychRoutines();
+    state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
 
-        std::string const idf_objects = delimited_string({
-            "	Zone,",
-            "	EAST ZONE,     !- Name",
-            "	0,             !- Direction of Relative North { deg }",
-            "	0,             !- X Origin { m }",
-            "	0,             !- Y Origin { m }",
-            "	0,             !- Z Origin { m }",
-            "	1,             !- Type",
-            "	1,             !- Multiplier",
-            "	autocalculate, !- Ceiling Height { m }",
-            "	autocalculate; !- Volume { m3 }",
+    bool CoolingLoad = true;
+    bool HeatingLoad = false;
+    int ControlledZoneNum = 1;
+    Real64 MinWaterFlow = 0.0;
+    Real64 MaxWaterFlow = 1.5;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).Temp = 24.0;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).HumRat = 0.00946;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).Enthalpy = 48228.946;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).MassFlowRate = 0.719999999;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).MassFlowRateMax = 0.719999999;
+    state->dataLoopNodes->Node(6).MassFlowRateMaxAvail = 0.72;
+    state->dataLoopNodes->Node(5).MassFlowRateMaxAvail = 0.72;
+    state->dataFanCoilUnits->FanCoil(FanCoilNum).CCoilName_Index = 2;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataEnvrn->DayOfYear_Schedule = 1;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataGlobal->HourOfDay = 1;
+    ProcessScheduleInput(*state);
+    UpdateScheduleValues(*state);
 
-            "	ZoneHVAC:EquipmentConnections,",
-            "	EAST ZONE,          !- Zone Name",
-            "	Zone1Equipment,     !- Zone Conditioning Equipment List Name",
-            "	Zone1Inlets,        !- Zone Air Inlet Node or NodeList Name",
-            "	Zone1Exhausts,      !- Zone Air Exhaust Node or NodeList Name",
-            "	Zone 1 Node,        !- Zone Air Node Name",
-            "	Zone 1 Outlet Node; !- Zone Return Air Node Name",
+    // fan coil can hit maximum iterations while trying to find the water mass flow rate to meet the load. In this case RegulaFalsi will return -1.
+    // When this happens, this routine will find tighter limits on min/max water flow rate passed to RegulaFalsi
+    // This routine is only called when RegulaFalsi returns -1
 
-            "	ZoneHVAC:EquipmentList,",
-            "	Zone1Equipment,           !- Name",
-            "   SequentialLoad,           !- Load Distribution Scheme",
-            "	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
-            "	Zone1FanCoil,             !- Zone Equipment 1 Name",
-            "	1,                        !- Zone Equipment 1 Cooling Sequence",
-            "	1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
+    // example usage of function
+    // if( SolFlag == -1 ) {
+    // tighten limits on water flow rate to see if this allows convergence
+    //	CoolingLoad = true;
+    //	HeatingLoad = false;
+    //	TightenWaterFlowLimits(*state,  FanCoilNum, CoolingLoad, HeatingLoad, FanCoil( FanCoilNum ).CoolCoilFluidInletNode, ControlledZoneNum,
+    // FirstHVACIteration,
+    // QZnReq, MinWaterFlow, MaxWaterFlow );
 
-            "   NodeList,",
-            "	Zone1Inlets,              !- Name",
-            "	Zone1FanCoilAirOutletNode;!- Node 1 Name",
+    // run once to set up fan coil data
+    TightenWaterFlowLimits(*state,
+                           FanCoilNum,
+                           CoolingLoad,
+                           HeatingLoad,
+                           state->dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode,
+                           ControlledZoneNum,
+                           FirstHVACIteration,
+                           QZnReq,
+                           MinWaterFlow,
+                           MaxWaterFlow);
 
-            "	NodeList,",
-            "	Zone1Exhausts,            !- Name",
-            "	Zone1FanCoilAirInletNode; !- Node 1 Name",
+    // full output of fan coil is around -7178 W, MaxWaterFlow should remain at 1.5 and MinWaterFlow should be set to 0.15
+    MinWaterFlow = 0.0;
+    MaxWaterFlow = 1.5;
+    QZnReq = -8000.0;
+    TightenWaterFlowLimits(*state,
+                           FanCoilNum,
+                           CoolingLoad,
+                           HeatingLoad,
+                           state->dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode,
+                           ControlledZoneNum,
+                           FirstHVACIteration,
+                           QZnReq,
+                           MinWaterFlow,
+                           MaxWaterFlow);
+    EXPECT_NEAR(MinWaterFlow, 0.15, 0.0000001);
+    EXPECT_NEAR(MaxWaterFlow, 1.50, 0.0000001);
 
-            "	OutdoorAir:NodeList,",
-            "	Zone1FanCoilOAInNode;     !- Node or NodeList Name 1",
+    // lower output (using 10% of max water flow rate) of fan coil is around -715 W, MaxWaterFlow should be 10% of 1.5 = 0.15 and MinWaterFlow should
+    // be 1% = 0.015
+    MinWaterFlow = 0.0;
+    MaxWaterFlow = 1.5;
+    QZnReq = -800.0;
+    TightenWaterFlowLimits(*state,
+                           FanCoilNum,
+                           CoolingLoad,
+                           HeatingLoad,
+                           state->dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode,
+                           ControlledZoneNum,
+                           FirstHVACIteration,
+                           QZnReq,
+                           MinWaterFlow,
+                           MaxWaterFlow);
+    EXPECT_NEAR(MinWaterFlow, 0.015, 0.0000001);
+    EXPECT_NEAR(MaxWaterFlow, 0.150, 0.0000001);
 
-            "	OutdoorAir:Mixer,",
-            "	Zone1FanCoilOAMixer,      !- Name",
-            "	Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
-            "	Zone1FanCoilOAInNode,     !- Outdoor Air Stream Node Name",
-            "	Zone1FanCoilExhNode,      !- Relief Air Stream Node Name",
-            "	Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
+    // lower output of fan coil is around 30 W (fan heat is overtaking cooling output), MaxWaterFlow should be 1% of 1.5 = 0.015 and MinWaterFlow
+    // should be 0.1% = 0.0015
+    MinWaterFlow = 0.0;
+    MaxWaterFlow = 1.5;
+    QZnReq = -10.0;
+    TightenWaterFlowLimits(*state,
+                           FanCoilNum,
+                           CoolingLoad,
+                           HeatingLoad,
+                           state->dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode,
+                           ControlledZoneNum,
+                           FirstHVACIteration,
+                           QZnReq,
+                           MinWaterFlow,
+                           MaxWaterFlow);
+    EXPECT_NEAR(MinWaterFlow, 0.0015, 0.0000001);
+    EXPECT_NEAR(MaxWaterFlow, 0.0150, 0.0000001);
 
-            "	Schedule:Constant,",
-            "	FanAndCoilAvailSched,     !- Name",
-            "	FRACTION,                 !- Schedule Type",
-            "	1;                        !- TimeStep Value",
+    // lower output of fan coil is around 105 W, MaxWaterFlow should be 0.1% of 1.5 = 0.0015 and MinWaterFlow should be 0.01% = 0.00015
+    MinWaterFlow = 0.0;
+    MaxWaterFlow = 1.5;
+    QZnReq = 40.0;
+    TightenWaterFlowLimits(*state,
+                           FanCoilNum,
+                           CoolingLoad,
+                           HeatingLoad,
+                           state->dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode,
+                           ControlledZoneNum,
+                           FirstHVACIteration,
+                           QZnReq,
+                           MinWaterFlow,
+                           MaxWaterFlow);
+    EXPECT_NEAR(MinWaterFlow, 0.00015, 0.0000001);
+    EXPECT_NEAR(MaxWaterFlow, 0.00150, 0.0000001);
 
-            "	ScheduleTypeLimits,",
-            "	Fraction,                 !- Name",
-            "	0.0,                      !- Lower Limit Value",
-            "	1.0,                      !- Upper Limit Value",
-            "	CONTINUOUS;               !- Numeric Type",
+    // lower output of fan coil is around 112 W, MaxWaterFlow should be 0.01% of 1.5 = 0.00015 and MinWaterFlow should be 0.01% = 0.000015
+    MinWaterFlow = 0.0;
+    MaxWaterFlow = 1.5;
+    QZnReq = 110.0;
+    TightenWaterFlowLimits(*state,
+                           FanCoilNum,
+                           CoolingLoad,
+                           HeatingLoad,
+                           state->dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode,
+                           ControlledZoneNum,
+                           FirstHVACIteration,
+                           QZnReq,
+                           MinWaterFlow,
+                           MaxWaterFlow);
+    EXPECT_NEAR(MinWaterFlow, 0.000015, 0.0000001);
+    EXPECT_NEAR(MaxWaterFlow, 0.000150, 0.0000001);
 
-            "    Fan:SystemModel,",
-            "      Zone1FanCoilFan,         !- Name",
-            "      FanAndCoilAvailSched,    !- Availability Schedule Name",
-            "      Zone1FanCoilOAMixerOutletNode,  !- Air Inlet Node Name",
-            "      Zone1FanCoilFanOutletNode,  !- Air Outlet Node Name",
-            "      0.6,                     !- Design Maximum Air Flow Rate {m3/s}",
-            "      Discrete,                !- Speed Control Method",
-            "      0.0,                     !- Electric Power Minimum Flow Rate Fraction",
-            "      75,                      !- Design Pressure Rise {Pa}",
-            "      0.9,                     !- Motor Efficiency",
-            "      1,                       !- Motor In Air Stream Fraction",
-            "      ,                        !- Design Electric Power Consumption {W}",
-            "      TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
-            "      ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
-            "      ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
-            "      0.5,                     !- Fan Total Efficiency",
-            "      ,                        !- Electric Power Function of Flow Fraction Curve Name",
-            "      ,                        !- Night Ventilation Mode Pressure Rise {Pa}",
-            "      ,                        !- Night Ventilation Mode Flow Fraction",
-            "      ,                        !- Motor Loss Zone Name",
-            "      ,                        !- Motor Loss Radiative Fraction",
-            "      General,                 !- End-Use Subcategory",
-            "      1,                       !- Number of Speeds",
-            "      1.0,                     !- Speed 1 Flow Fraction",
-            "      1.0;                     !- Speed 1 Electric Power Fraction",
+    // lower output of fan coil is around 112 W, MaxWaterFlow should be 0.001% of 1.5 = 0.000015 and MinWaterFlow should remian at 0.0
+    MinWaterFlow = 0.0;
+    MaxWaterFlow = 1.5;
+    QZnReq = 120.0;
+    TightenWaterFlowLimits(*state,
+                           FanCoilNum,
+                           CoolingLoad,
+                           HeatingLoad,
+                           state->dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode,
+                           ControlledZoneNum,
+                           FirstHVACIteration,
+                           QZnReq,
+                           MinWaterFlow,
+                           MaxWaterFlow);
+    EXPECT_NEAR(MinWaterFlow, 0.000000, 0.0000001);
+    EXPECT_NEAR(MaxWaterFlow, 0.000015, 0.0000001);
 
-            "	Coil:Cooling:Water,",
-            "	Zone1FanCoilCoolingCoil,  !- Name",
-            "	FanAndCoilAvailSched,     !- Availability Schedule Namev",
-            "	0.0002,                   !- Design Water Flow Rate { m3 / s }",
-            "	0.5000,                   !- Design Air Flow Rate { m3 / s }",
-            "	7.22,                     !- Design Inlet Water Temperature { Cv }",
-            "	24.340,                   !- Design Inlet Air Temperature { C }",
-            "	14.000,                   !- Design Outlet Air Temperature { C }",
-            "	0.0095,                   !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "	0.0090,                   !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "	Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
-            "	Zone1FanCoilChWOutletNode,!- Water Outlet Node Name",
-            "	Zone1FanCoilFanOutletNode,!- Air Inlet Node Name",
-            "	Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
-            "	SimpleAnalysis,           !- Type of Analysis",
-            "	CrossFlow;                !- Heat Exchanger Configuration",
+    MinWaterFlow = 0.0;
+    MaxWaterFlow = 1.5;
+    Real64 ErrorToler = 0.00001;
+    int MaxIte = 4;
+    int SolFla;
+    Real64 mdot;
+    Real64 minFlow;
+    Real64 maxFlow;
+    Array1D<Real64> Par(2); // Function parameters
+    Par(1) = -1000.0;
+    Par(2) = 0.0;
 
-            "	Coil:Heating:Water,",
-            "   Zone1FanCoilHeatingCoil,   !- Name",
-            "	FanAndCoilAvailSched,      !- Availability Schedule Name",
-            "	150.0,                     !- U - Factor Times Area Value { W / K }",
-            "	0.00014,                   !- Maximum Water Flow Rate { m3 / s }",
-            "	Zone1FanCoilHWInletNode,   !- Water Inlet Node Name",
-            "	Zone1FanCoilHWOutletNode,  !- Water Outlet Node Name",
-            "	Zone1FanCoilCCOutletNode,  !- Air Inlet Node Name",
-            "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "	UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
-            "	autosize,                  !- Rated Capacity { W }",
-            "	82.2,                      !- Rated Inlet Water Temperature { C }",
-            "	16.6,                      !- Rated Inlet Air Temperature { C }",
-            "	71.1,                      !- Rated Outlet Water Temperature { C }",
-            "	32.2,                      !- Rated Outlet Air Temperature { C }",
-            "	;                          !- Rated Ratio for Air and Water Convection",
+    TempSolveRoot::SolveRoot(*state, ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, MinWaterFlow, MaxWaterFlow, Par, 2, minFlow, maxFlow);
+    EXPECT_EQ(-1, SolFla);
+    EXPECT_NEAR(minFlow, 0.0, 0.0000001);
+    EXPECT_NEAR(maxFlow, 0.09375, 0.0000001);
+    MaxIte = 20;
+    state->dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+    TempSolveRoot::SolveRoot(*state, ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, minFlow, maxFlow, Par);
+    EXPECT_EQ(3, SolFla);
+}
 
-            "	ZoneHVAC:FourPipeFanCoil,",
-            "	Zone1FanCoil,              !- Name",
-            "	FanAndCoilAvailSched,      !- Availability Schedule Name",
-            "	CyclingFan,                !- Capacity Control Method",
-            "	0.5,                       !- Maximum Supply Air Flow Rate { m3 / s }",
-            "	0.3,                       !- Low Speed Supply Air Flow Ratio",
-            "	0.6,                       !- Medium Speed Supply Air Flow Ratio",
-            "	0.0,                       !- Maximum Outdoor Air Flow Rate { m3 / s }",
-            "	FanAndCoilAvailSched,      !- Outdoor Air Schedule Name",
-            "	Zone1FanCoilAirInletNode,  !- Air Inlet Node Name",
-            "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "	OutdoorAir:Mixer,          !- Outdoor Air Mixer Object Type",
-            "	Zone1FanCoilOAMixer,       !- Outdoor Air Mixer Name",
-            "	Fan:SystemModel,           !- Supply Air Fan Object Type",
-            "	Zone1FanCoilFan,           !- Supply Air Fan Name",
-            "	Coil:Cooling:Water,        !- Cooling Coil Object Type",
-            "	Zone1FanCoilCoolingCoil,   !- Cooling Coil Name",
-            "	0.00014,                   !- Maximum Cold Water Flow Rate { m3 / s }",
-            "	0.0,                       !- Minimum Cold Water Flow Rate { m3 / s }",
-            "	0.001,                     !- Cooling Convergence Tolerance",
-            "	Coil:Heating:Water,        !- Heating Coil Object Type",
-            "	Zone1FanCoilHeatingCoil,   !- Heating Coil Name",
-            "	0.00014,                   !- Maximum Hot Water Flow Rate { m3 / s }",
-            "	0.0,                       !- Minimum Hot Water Flow Rate { m3 / s }",
-            "	0.001;                     !- Heating Convergence Tolerance",
+TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
+{
 
-            });
+    int FanCoilNum(1);
+    int ZoneNum(1);
+    bool FirstHVACIteration(false);
+    bool ErrorsFound(false);
+    Real64 QZnReq(0.0);
+    Real64 HotWaterMassFlowRate(0.0);
+    Real64 ColdWaterMassFlowRate(0.0);
+    Real64 QUnitOut(0.0);
+    Real64 QLatOut(0.0);
+    Real64 AirMassFlow(0.0);
+    Real64 MaxAirMassFlow(0.0);
 
-        ASSERT_TRUE(process_idf(idf_objects));
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataWaterCoils->GetWaterCoilsInputFlag = true;
+    state->dataGlobalNames->NumCoils = 0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataSize->CurZoneEqNum = 1;
 
-        GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
+    InitializePsychRoutines(*state);
 
-        GetZoneEquipmentData(*state);
-        ProcessScheduleInput(*state);
-        state->dataScheduleMgr->ScheduleInputProcessed = true;
+    std::string const idf_objects = delimited_string({
+        "	Zone,",
+        "	EAST ZONE, !- Name",
+        "	0, !- Direction of Relative North { deg }",
+        "	0, !- X Origin { m }",
+        "	0, !- Y Origin { m }",
+        "	0, !- Z Origin { m }",
+        "	1, !- Type",
+        "	1, !- Multiplier",
+        "	autocalculate, !- Ceiling Height { m }",
+        "	autocalculate; !- Volume { m3 }",
 
-        GetFanCoilUnits(*state);
+        "	ZoneHVAC:EquipmentConnections,",
+        "	EAST ZONE, !- Zone Name",
+        "	Zone1Equipment, !- Zone Conditioning Equipment List Name",
+        "	Zone1Inlets, !- Zone Air Inlet Node or NodeList Name",
+        "	Zone1Exhausts, !- Zone Air Exhaust Node or NodeList Name",
+        "	Zone 1 Node, !- Zone Air Node Name",
+        "	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 
-        auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
+        "	ZoneHVAC:EquipmentList,",
+        "	Zone1Equipment, !- Name",
+        "   SequentialLoad,          !- Load Distribution Scheme",
+        "	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
+        "	Zone1FanCoil, !- Zone Equipment 1 Name",
+        "	1, !- Zone Equipment 1 Cooling Sequence",
+        "	1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
 
-        EXPECT_EQ("CYCLINGFAN", thisFanCoil.CapCtrlMeth);
-        EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
-        EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
-        EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
-        EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.HCoilType);
-        EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
+        "   NodeList,",
+        "	Zone1Inlets, !- Name",
+        "	Zone1FanCoilAirOutletNode;  !- Node 1 Name",
 
-        state->dataPlnt->TotNumLoops = 2;
-        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+        "	NodeList,",
+        "	Zone1Exhausts, !- Name",
+        "	Zone1FanCoilAirInletNode; !- Node 1 Name",
 
-        AirMassFlow = 0.60;
-        MaxAirMassFlow = 0.60;
-        ColdWaterMassFlowRate = 1.0;
-        HotWaterMassFlowRate = 1.0;
+        "	OutdoorAir:NodeList,",
+        "	Zone1FanCoilOAInNode;    !- Node or NodeList Name 1",
 
-        thisFanCoil.OutAirMassFlow = 0.0;
-        thisFanCoil.MaxAirMassFlow = MaxAirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.OutsideAirNode).MassFlowRateMax = 0.0;
+        "	OutdoorAir:Mixer,",
+        "	Zone1FanCoilOAMixer, !- Name",
+        "	Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
+        "	Zone1FanCoilOAInNode, !- Outdoor Air Stream Node Name",
+        "	Zone1FanCoilExhNode, !- Relief Air Stream Node Name",
+        "	Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
 
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMinAvail = AirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMax = MaxAirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
+        "	Schedule:Constant,",
+        "	FanAndCoilAvailSched, !- Name",
+        "	FRACTION, !- Schedule Type",
+        "	1;        !- TimeStep Value",
 
-        // outside air mixer
-        auto &MixerOA(state->dataMixedAir->OAMixer(1));
-        state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
-        state->dataLoopNodes->Node(MixerOA.RetNode).Temp = 22.0;
-        state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy = 36000;
-        state->dataLoopNodes->Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.RetNode).Temp, state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy);
-        state->dataLoopNodes->Node(MixerOA.InletNode).Temp = 10.0;
-        state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy = 18000;
-        state->dataLoopNodes->Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.InletNode).Temp, state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy);
+        "	ScheduleTypeLimits,",
+        "	Fraction, !- Name",
+        "	0.0, !- Lower Limit Value",
+        "	1.0, !- Upper Limit Value",
+        "	CONTINUOUS;              !- Numeric Type",
 
-        // chilled water coil
-        auto &CWCoil(state->dataWaterCoils->WaterCoil(2));
-        CWCoil.UACoilTotal = 470.0;
-        CWCoil.UACoilExternal = 611.0;
-        CWCoil.UACoilInternal = 2010.0;
-        CWCoil.TotCoilOutsideSurfArea = 50.0;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
-        CWCoil.InletWaterMassFlowRate = ColdWaterMassFlowRate;
-        CWCoil.MaxWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
-        state->dataLoopNodes->Node(CWCoil.WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-        CWCoil.WaterLoopNum = 1;
-        CWCoil.WaterLoopSide = 1;
-        CWCoil.WaterLoopBranchNum = 1;
-        CWCoil.WaterLoopCompNum = 1;
+        "   Fan:OnOff,",
+        "	Zone1FanCoilFan, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	0.5, !- Fan Total Efficiency",
+        "	75.0, !- Pressure Rise { Pa }",
+        "	0.6, !- Maximum Flow Rate { m3 / s }",
+        "	0.9, !- Motor Efficiency",
+        "	1.0, !- Motor In Airstream Fraction",
+        "	Zone1FanCoilOAMixerOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilFanOutletNode, !- Air Outlet Node Name",
+        "	, !- Fan Power Ratio Function of Speed Ratio Curve Name",
+        "	;                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name	",
 
-        // hot water coil
-        auto &HWCoil(state->dataWaterCoils->WaterCoil(1));
-        HWCoil.InletWaterMassFlowRate = HotWaterMassFlowRate;
-        HWCoil.MaxWaterMassFlowRate = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(HWCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(HWCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
-        state->dataLoopNodes->Node(HWCoil.WaterInletNodeNum).Temp = 60.0;
-        state->dataLoopNodes->Node(HWCoil.WaterInletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(HWCoil.WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(HWCoil.WaterOutletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-        state->dataLoopNodes->Node(HWCoil.WaterOutletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
-        HWCoil.WaterLoopNum = 2;
-        HWCoil.WaterLoopSide = 1;
-        HWCoil.WaterLoopBranchNum = 1;
-        HWCoil.WaterLoopCompNum = 1;
+        "	Coil:Cooling:Water,",
+        "	Zone1FanCoilCoolingCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Namev",
+        "	0.0002, !- Design Water Flow Rate { m3 / s }",
+        "	0.5000, !- Design Air Flow Rate { m3 / s }",
+        "	7.22,   !- Design Inlet Water Temperature { Cv }",
+        "	24.340, !- Design Inlet Air Temperature { C }",
+        "	14.000, !- Design Outlet Air Temperature { C }",
+        "	0.0095, !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	0.0090, !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
+        "	Zone1FanCoilChWOutletNode, !- Water Outlet Node Name",
+        "	Zone1FanCoilFanOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
+        "	SimpleAnalysis, !- Type of Analysis",
+        "	CrossFlow;               !- Heat Exchanger Configuration",
 
-        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-            auto &loop(state->dataPlnt->PlantLoop(l));
-            loop.LoopSide.allocate(2);
-            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
-            loopside.TotalBranches = 1;
-            loopside.Branch.allocate(1);
-            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
-            loopsidebranch.TotalComponents = 1;
-            loopsidebranch.Comp.allocate(1);
-        }
-        // chilled water plant loop
-        auto &CWLoop(state->dataPlnt->PlantLoop(2));
-        CWLoop.Name = "ChilledWaterLoop";
-        CWLoop.FluidName = "ChilledWater";
-        CWLoop.FluidIndex = 1;
-        CWLoop.FluidName = "WATER";
-        CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
-        CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
-        CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
-        CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
-        // hot water plant loop
-        auto &HWLoop(state->dataPlnt->PlantLoop(1));
-        HWLoop.Name = "HotWaterLoop";
-        HWLoop.FluidName = "HotWater";
-        HWLoop.FluidIndex = 1;
-        HWLoop.FluidName = "WATER";
-        HWLoop.LoopSide(1).Branch(1).Comp(1).Name = HWCoil.Name;
-        HWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
-        HWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = HWCoil.WaterInletNodeNum;
-        HWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = HWCoil.WaterOutletNodeNum;
+        "	Coil:Heating:Water,",
+        "   Zone1FanCoilHeatingCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	150.0,   !- U - Factor Times Area Value { W / K }",
+        "	0.00014, !- Maximum Water Flow Rate { m3 / s }",
+        "	Zone1FanCoilHWInletNode, !- Water Inlet Node Name",
+        "	Zone1FanCoilHWOutletNode, !- Water Outlet Node Name",
+        "	Zone1FanCoilCCOutletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "	UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
+        "	autosize, !- Rated Capacity { W }",
+        "	82.2, !- Rated Inlet Water Temperature { C }",
+        "	16.6, !- Rated Inlet Air Temperature { C }",
+        "	71.1, !- Rated Outlet Water Temperature { C }",
+        "	32.2, !- Rated Outlet Air Temperature { C }",
+        "	;     !- Rated Ratio for Air and Water Convection",
 
-        // heating mode tests
-        state->dataFanCoilUnits->CoolingLoad = false;
-        state->dataFanCoilUnits->HeatingLoad = true;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 4000.0;
-        thisFanCoil.SpeedFanSel = 2;
-        QUnitOut = 0.0;
-        QLatOut = 0.0;
-        QZnReq = 4000.0;
+        "	ZoneHVAC:FourPipeFanCoil,",
+        "	Zone1FanCoil, !- Name",
+        "	FanAndCoilAvailSched, !- Availability Schedule Name",
+        "	CyclingFan,           !- Capacity Control Method",
+        "	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
+        "	0.3, !- Low Speed Supply Air Flow Ratio",
+        "	0.6, !- Medium Speed Supply Air Flow Ratio",
+        "	0.0, !- Maximum Outdoor Air Flow Rate { m3 / s }",
+        "	FanAndCoilAvailSched, !- Outdoor Air Schedule Name",
+        "	Zone1FanCoilAirInletNode, !- Air Inlet Node Name",
+        "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "	OutdoorAir:Mixer, !- Outdoor Air Mixer Object Type",
+        "	Zone1FanCoilOAMixer, !- Outdoor Air Mixer Name",
+        "	Fan:OnOff, !- Supply Air Fan Object Type",
+        "	Zone1FanCoilFan, !- Supply Air Fan Name",
+        "	Coil:Cooling:Water, !- Cooling Coil Object Type",
+        "	Zone1FanCoilCoolingCoil, !- Cooling Coil Name",
+        "	0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
+        "	0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
+        "	0.001, !- Cooling Convergence Tolerance",
+        "	Coil:Heating:Water, !- Heating Coil Object Type",
+        "	Zone1FanCoilHeatingCoil, !- Heating Coil Name",
+        "	0.00014, !- Maximum Hot Water Flow Rate { m3 / s }",
+        "	0.0, !- Minimum Hot Water Flow Rate { m3 / s }",
+        "	0.001; !- Heating Convergence Tolerance",
 
-        state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        state->dataGlobal->DoingSizing = true;
+    });
 
-        state->dataFans->LocalTurnFansOff = false;
-        state->dataFans->LocalTurnFansOn = true;
+    ASSERT_TRUE(process_idf(idf_objects));
 
-        state->dataEnvrn->Month = 1;
-        state->dataEnvrn->DayOfMonth = 21;
-        state->dataGlobal->HourOfDay = 1;
-        state->dataEnvrn->DSTIndicator = 0;
-        state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 0;
-        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-        UpdateScheduleValues(*state);
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
 
-        state->dataSize->ZoneEqSizing.allocate(1);
-        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
-        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
-        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
-        state->dataHeatBalFanSys->TempControlType.allocate(1);
-        state->dataHeatBalFanSys->TempControlType(1) = 4;
-        state->dataSize->ZoneSizingRunDone = true;
-        state->dataSize->FinalZoneSizing.allocate(1);
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.5;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.5;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 30.0;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTemp = 20.0;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolLoad = 4000.0;
-        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatLoad = 4000.0;
-        state->dataEnvrn->StdRhoAir = 1.2;
+    GetZoneEquipmentData(*state);
+    ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    GetFanInput(*state);
+    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
 
-        state->dataGlobal->BeginEnvrnFlag = true;
-        InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        // expect fan speed 3 and near full air and water flow and meet capacity
-        EXPECT_EQ(thisFanCoil.SpeedFanSel, 3);
-        EXPECT_NEAR(thisFanCoil.PLR, 0.961, 0.001);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        // cycling fan proportional to PLR and fan speed ratio
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow, 0.0000000001);
-        // expect minimum flow and meet capacity
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
-        QZnReq = 1000.0;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        // expect fan speed 1 and moderate air and water flow and meet capacity
-        EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
-        EXPECT_NEAR(thisFanCoil.PLR, 0.632, 0.001);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        // cycling fan proportional to PLR and fan speed ratio
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio, 0.0000000001);
-        // expect modulated flow and meet capacity
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2500.0;
-        QZnReq = 2500.0;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        // expect fan speed 2 and moderate air and water flow and meet capacity
-        EXPECT_EQ(thisFanCoil.SpeedFanSel, 2);
-        EXPECT_NEAR(thisFanCoil.PLR, 0.850, 0.001);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        // cycling fan proportional to PLR and fan speed ratio
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.MedSpeedRatio, 0.0000000001);
+    GetFanCoilUnits(*state);
+    EXPECT_EQ("CYCLINGFAN", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
+    EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
+    EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
+    EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
+    EXPECT_EQ("COIL:HEATING:WATER", state->dataFanCoilUnits->FanCoil(1).HCoilType);
 
-        // cooling mode tests
-        // expect full flow and meet capacity
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -4000.0;
-        QZnReq = -4000.0;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        // expect fan speed 3 and near full air and water flow and meet capacity
-        EXPECT_EQ(3, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
-        EXPECT_NEAR(state->dataFanCoilUnits->FanCoil(1).PLR, 0.950, 0.001);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        // cycling fan proportional to PLR and fan speed ratio
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow, 0.0000000001);
-        // expect minimum flow and meet capacity
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.0;
-        QZnReq = -1000.0;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        // expect fan speed 1 and moderate air and water flow and meet capacity
-        EXPECT_EQ(1, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
-        EXPECT_NEAR(state->dataFanCoilUnits->FanCoil(1).PLR, 0.501, 0.001);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        // cycling fan proportional to PLR and fan speed ratio
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio, 0.0000000001);
-        // expect modulated flow and meet capacity
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -2500.0;
-        QZnReq = -2500.0;
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        // expect fan speed 2 and moderate air and water flow and meet capacity
-        EXPECT_EQ(2, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
-        EXPECT_NEAR(state->dataFanCoilUnits->FanCoil(1).PLR, 0.756, 0.001);
-        EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.MedSpeedRatio, 0.0000000001);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+
+    AirMassFlow = 0.60;
+    MaxAirMassFlow = 0.60;
+    // heating load only
+    ColdWaterMassFlowRate = 0.0;
+    HotWaterMassFlowRate = 1.0;
+
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat =
+        PsyWFnTdbH(*state,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
+
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+    state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat =
+        PsyWFnTdbH(*state,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Temp,
+                   state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
+
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMinAvail = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMax = MaxAirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
+
+    state->dataFanCoilUnits->FanCoil(1).OutAirMassFlow = 0.0;
+    state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
+    state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
+
+    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
+    state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
+    state->dataWaterCoils->WaterCoil(2).UACoilInternal = 2010.0;
+    state->dataWaterCoils->WaterCoil(2).TotCoilOutsideSurfArea = 50.0;
+
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    state->dataWaterCoils->WaterCoil(2).InletWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(2).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).Temp = 6.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = 60.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
+    state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
+
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
     }
 
-    TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanCyclingFanMode)
-    {
+    state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopCompNum = 1;
 
-        int FanCoilNum(1);
-        int ZoneNum(1);
-        bool FirstHVACIteration(false);
-        bool ErrorsFound(false);
-        Real64 QZnReq(0.0);
-        Real64 ColdWaterMassFlowRate(0.0);
-        Real64 QUnitOut(0.0);
-        Real64 QLatOut(0.0);
-        Real64 AirMassFlow(0.0);
-        Real64 MaxAirMassFlow(0.0);
+    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 2;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        state->dataEnvrn->OutBaroPress = 101325.0;
-        state->dataEnvrn->StdRhoAir = 1.20;
-        state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        state->dataGlobalNames->NumCoils = 0;
-        state->dataGlobal->NumOfTimeStepInHour = 1;
-        state->dataGlobal->TimeStep = 1;
-        state->dataGlobal->MinutesPerTimeStep = 60;
-        state->dataSize->CurZoneEqNum = 1;
+    state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+    state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
 
-        InitializePsychRoutines();
+    state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
 
-        std::string const idf_objects = delimited_string({
-            " Zone,",
-            "  EAST ZONE,     !- Name",
-            "  0,             !- Direction of Relative North { deg }",
-            "  0,             !- X Origin { m }",
-            "  0,             !- Y Origin { m }",
-            "  0,             !- Z Origin { m }",
-            "  1,             !- Type",
-            "  1,             !- Multiplier",
-            "  autocalculate, !- Ceiling Height { m }",
-            "  autocalculate; !- Volume { m3 }",
+    state->dataFanCoilUnits->CoolingLoad = false;
+    state->dataFanCoilUnits->HeatingLoad = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 4000.0;
+    state->dataFanCoilUnits->FanCoil(1).SpeedFanSel = 2;
+    QUnitOut = 0.0;
+    QLatOut = 0.0;
+    QZnReq = 4000.0;
 
-            " ZoneHVAC:EquipmentConnections,",
-            "  EAST ZONE,          !- Zone Name",
-            "  Zone1Equipment,     !- Zone Conditioning Equipment List Name",
-            "  Zone1Inlets,        !- Zone Air Inlet Node or NodeList Name",
-            "  Zone1Exhausts,      !- Zone Air Exhaust Node or NodeList Name",
-            "  Zone 1 Node,        !- Zone Air Node Name",
-            "  Zone 1 Outlet Node; !- Zone Return Air Node Name",
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
+    state->dataGlobal->DoingSizing = true;
 
-            " ZoneHVAC:EquipmentList,",
-            "  Zone1Equipment,           !- Name",
-            "  SequentialLoad,           !- Load Distribution Scheme",
-            "  ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
-            "  Zone1FanCoil,             !- Zone Equipment 1 Name",
-            "  1,                        !- Zone Equipment 1 Cooling Sequence",
-            "  1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
+    state->dataFans->LocalTurnFansOff = false;
+    state->dataFans->LocalTurnFansOn = true;
 
-            " NodeList,",
-            "  Zone1Inlets,              !- Name",
-            "  Zone1FanCoilAirOutletNode;!- Node 1 Name",
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    UpdateScheduleValues(*state);
 
-            " NodeList,",
-            "  Zone1Exhausts,            !- Name",
-            "  Zone1FanCoilAirInletNode; !- Node 1 Name",
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = 4;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.5;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.5;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 30.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTemp = 20.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolLoad = 4000.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatLoad = 4000.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
 
-            " OutdoorAir:NodeList,",
-            "  Zone1FanCoilOAInNode;     !- Node or NodeList Name 1",
+    state->dataGlobal->BeginEnvrnFlag = true;
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    // expect fan speed 3 and near full air and water flow and meet capacity
+    EXPECT_EQ(3, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
+    EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.95);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    // cycling fan proportional to PLR and fan speed ratio (is 1 here)
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate,
+                state->dataFanCoilUnits->FanCoil(1).PLR * state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow,
+                0.0000000001);
 
-            " OutdoorAir:Mixer,",
-            "  Zone1FanCoilOAMixer,      !- Name",
-            "  Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
-            "  Zone1FanCoilOAInNode,     !- Outdoor Air Stream Node Name",
-            "  Zone1FanCoilExhNode,      !- Relief Air Stream Node Name",
-            "  Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
+    // expect minimum flow and meet capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
+    QZnReq = 1000.0;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    // expect fan speed 1 and moderate air and water flow and meet capacity
+    EXPECT_EQ(1, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
+    EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.6);
+    EXPECT_LT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.65);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    // cycling fan proportional to PLR and fan speed ratio (is 0.3 here)
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate,
+                state->dataFanCoilUnits->FanCoil(1).PLR * state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow *
+                    state->dataFanCoilUnits->FanCoil(1).LowSpeedRatio,
+                0.0000000001);
 
-            " Schedule:Constant,",
-            "  FanAndCoilAvailSched,     !- Name",
-            "  FRACTION,                 !- Schedule Type",
-            "  1;                        !- TimeStep Value",
+    // expect modulated flow and meet capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2500.0;
+    QZnReq = 2500.0;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    // expect fan speed 2 and moderate air and water flow and meet capacity
+    EXPECT_EQ(2, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
+    EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.8);
+    EXPECT_LT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.85);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    // cycling fan proportional to PLR and fan speed ratio (is 0.6 here)
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate,
+                state->dataFanCoilUnits->FanCoil(1).PLR * state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow *
+                    state->dataFanCoilUnits->FanCoil(1).MedSpeedRatio,
+                0.0000000001);
 
-            " ScheduleTypeLimits,",
-            "  Fraction,                 !- Name",
-            "  0.0,                      !- Lower Limit Value",
-            "  1.0,                      !- Upper Limit Value",
-            "  CONTINUOUS;               !- Numeric Type",
+    // expect full flow and meet capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -4000.0;
+    QZnReq = -4000.0;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    // expect fan speed 3 and near full air and water flow and meet capacity
+    EXPECT_EQ(3, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
+    EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.9);
+    EXPECT_LT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.95);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    // cycling fan proportional to PLR and fan speed ratio (is 1 here)
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate,
+                state->dataFanCoilUnits->FanCoil(1).PLR * state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow,
+                0.0000000001);
 
-            " Fan:SystemModel,",
-            "  Zone1FanCoilFan,         !- Name",
-            "  FanAndCoilAvailSched,    !- Availability Schedule Name",
-            "  Zone1FanCoilOAMixerOutletNode,  !- Air Inlet Node Name",
-            "  Zone1FanCoilFanOutletNode,  !- Air Outlet Node Name",
-            "  0.5,                     !- Design Maximum Air Flow Rate {m3/s}",
-            "  Discrete,                !- Speed Control Method",
-            "  0.0,                     !- Electric Power Minimum Flow Rate Fraction",
-            "  75,                      !- Design Pressure Rise {Pa}",
-            "  0.9,                     !- Motor Efficiency",
-            "  1,                       !- Motor In Air Stream Fraction",
-            "  ,                        !- Design Electric Power Consumption {W}",
-            "  TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
-            "  ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
-            "  ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
-            "  0.5,                     !- Fan Total Efficiency",
-            "  ,                        !- Electric Power Function of Flow Fraction Curve Name",
-            "  ,                        !- Night Ventilation Mode Pressure Rise {Pa}",
-            "  ,                        !- Night Ventilation Mode Flow Fraction",
-            "  ,                        !- Motor Loss Zone Name",
-            "  ,                        !- Motor Loss Radiative Fraction",
-            "  General,                 !- End-Use Subcategory",
-            "  1,                       !- Number of Speeds",
-            "  1.0,                     !- Speed 1 Flow Fraction",
-            "  1.0;                     !- Speed 1 Electric Power Fraction",
+    // expect minimum flow and meet capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.0;
+    QZnReq = -1000.0;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    // expect fan speed 1 and moderate air and water flow and meet capacity
+    EXPECT_EQ(1, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
+    EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.5);
+    EXPECT_LT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.55);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    // cycling fan proportional to PLR and fan speed ratio (is 0.3 here)
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate,
+                state->dataFanCoilUnits->FanCoil(1).PLR * state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow *
+                    state->dataFanCoilUnits->FanCoil(1).LowSpeedRatio,
+                0.0000000001);
 
-            " Coil:Cooling:Water,",
-            "  Zone1FanCoilCoolingCoil,  !- Name",
-            "  FanAndCoilAvailSched,     !- Availability Schedule Namev",
-            "  0.0002,                   !- Design Water Flow Rate { m3 / s }",
-            "  0.5000,                   !- Design Air Flow Rate { m3 / s }",
-            "  7.22,                     !- Design Inlet Water Temperature { Cv }",
-            "  24.340,                   !- Design Inlet Air Temperature { C }",
-            "  14.000,                   !- Design Outlet Air Temperature { C }",
-            "  0.0095,                   !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "  0.0090,                   !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "  Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
-            "  Zone1FanCoilChWOutletNode,!- Water Outlet Node Name",
-            "  Zone1FanCoilFanOutletNode,!- Air Inlet Node Name",
-            "  Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
-            "  SimpleAnalysis,           !- Type of Analysis",
-            "  CrossFlow;                !- Heat Exchanger Configuration",
+    // expect modulated flow and meet capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -2500.0;
+    QZnReq = -2500.0;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    // expect fan speed 2 and moderate air and water flow and meet capacity
+    EXPECT_EQ(2, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
+    EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.75);
+    EXPECT_LT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.8);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate,
+                state->dataFanCoilUnits->FanCoil(1).PLR * state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow *
+                    state->dataFanCoilUnits->FanCoil(1).MedSpeedRatio,
+                0.0000000001);
+}
 
-            " Coil:Heating:Electric,",
-            "  Zone1FanCoilHeatingCoil,   !- Name",
-            "  FanAndCoilAvailSched,      !- Availability Schedule Name",
-            "  1,                         !- Efficiency",
-            "  10000.0,                    !- Nominal Capacity {W}",
-            "  Zone1FanCoilCCOutletNode,  !- Air Inlet Node Name",
-            "  Zone1FanCoilAirOutletNode; !- Air Outlet Node Name",
+TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
+{
 
-            " ZoneHVAC:FourPipeFanCoil,",
-            "  Zone1FanCoil,              !- Name",
-            "  FanAndCoilAvailSched,      !- Availability Schedule Name",
-            "  MultiSpeedFan,             !- Capacity Control Method",
-            "  0.5,                       !- Maximum Supply Air Flow Rate { m3 / s }",
-            "  0.3,                       !- Low Speed Supply Air Flow Ratio",
-            "  0.6,                       !- Medium Speed Supply Air Flow Ratio",
-            "  0.0,                       !- Maximum Outdoor Air Flow Rate { m3 / s }",
-            "  FanAndCoilAvailSched,      !- Outdoor Air Schedule Name",
-            "  Zone1FanCoilAirInletNode,  !- Air Inlet Node Name",
-            "  Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "  OutdoorAir:Mixer,          !- Outdoor Air Mixer Object Type",
-            "  Zone1FanCoilOAMixer,       !- Outdoor Air Mixer Name",
-            "  Fan:SystemModel,           !- Supply Air Fan Object Type",
-            "  Zone1FanCoilFan,           !- Supply Air Fan Name",
-            "  Coil:Cooling:Water,        !- Cooling Coil Object Type",
-            "  Zone1FanCoilCoolingCoil,   !- Cooling Coil Name",
-            "  0.00014,                   !- Maximum Cold Water Flow Rate { m3 / s }",
-            "  0.0,                       !- Minimum Cold Water Flow Rate { m3 / s }",
-            "  0.001,                     !- Cooling Convergence Tolerance",
-            "  Coil:Heating:Electric,     !- Heating Coil Object Type",
-            "  Zone1FanCoilHeatingCoil,   !- Heating Coil Name",
-            "  0.0,                       !- Maximum Hot Water Flow Rate { m3 / s }",
-            "  0.0,                       !- Minimum Hot Water Flow Rate { m3 / s }",
-            "  0.001,                     !- Heating Convergence Tolerance",
-            "  ,                          !- Availability Manager List Name",
-            "  ,                          !- Design Specification ZoneHVAC Sizing Object Name",
-            "  CyclingFanOperatingSch;    !- Supply Air Fan Operating Mode Schedule Name",
+    int FanCoilNum(1);
+    int ZoneNum(1);
+    bool FirstHVACIteration(false);
+    bool ErrorsFound(false);
+    Real64 QZnReq(0.0);
+    Real64 HotWaterMassFlowRate(0.0);
+    Real64 ColdWaterMassFlowRate(0.0);
+    Real64 QUnitOut(0.0);
+    Real64 QLatOut(0.0);
+    Real64 AirMassFlow(0.0);
+    Real64 MaxAirMassFlow(0.0);
 
-            " Schedule:Constant,",
-            "  CyclingFanOperatingSch,    !- Name",
-            "  FRACTION,                  !- Schedule Type",
-            "  0;                         !- TimeStep Value",
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataWaterCoils->GetWaterCoilsInputFlag = true;
+    state->dataGlobalNames->NumCoils = 0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataSize->CurZoneEqNum = 1;
 
-            });
+    InitializePsychRoutines(*state);
 
-        ASSERT_TRUE(process_idf(idf_objects));
+    std::string const idf_objects = delimited_string({
+        "	Zone,",
+        "	EAST ZONE,     !- Name",
+        "	0,             !- Direction of Relative North { deg }",
+        "	0,             !- X Origin { m }",
+        "	0,             !- Y Origin { m }",
+        "	0,             !- Z Origin { m }",
+        "	1,             !- Type",
+        "	1,             !- Multiplier",
+        "	autocalculate, !- Ceiling Height { m }",
+        "	autocalculate; !- Volume { m3 }",
 
-        GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
-        GetZoneEquipmentData(*state);
-        ProcessScheduleInput(*state);
-        state->dataScheduleMgr->ScheduleInputProcessed = true;
-        GetFanCoilUnits(*state);
-        auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
-        EXPECT_EQ("MULTISPEEDFAN", thisFanCoil.CapCtrlMeth);
-        EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
-        EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
-        EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
-        EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
-        EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
+        "	ZoneHVAC:EquipmentConnections,",
+        "	EAST ZONE,          !- Zone Name",
+        "	Zone1Equipment,     !- Zone Conditioning Equipment List Name",
+        "	Zone1Inlets,        !- Zone Air Inlet Node or NodeList Name",
+        "	Zone1Exhausts,      !- Zone Air Exhaust Node or NodeList Name",
+        "	Zone 1 Node,        !- Zone Air Node Name",
+        "	Zone 1 Outlet Node; !- Zone Return Air Node Name",
 
-        state->dataPlnt->TotNumLoops = 1;
-        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-        AirMassFlow = 0.60;
-        MaxAirMassFlow = 0.60;
-        ColdWaterMassFlowRate = 1.0;
-        thisFanCoil.OutAirMassFlow = 0.0;
-        thisFanCoil.MaxAirMassFlow = MaxAirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.OutsideAirNode).MassFlowRateMax = 0.0;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMinAvail = AirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMax = MaxAirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
-        // outside air mixer
-        auto &MixerOA(state->dataMixedAir->OAMixer(1));
-        state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
-        state->dataLoopNodes->Node(MixerOA.RetNode).Temp = 22.0;
-        state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy = 36000;
-        state->dataLoopNodes->Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.RetNode).Temp, state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy);
-        state->dataLoopNodes->Node(MixerOA.InletNode).Temp = 10.0;
-        state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy = 18000;
-        state->dataLoopNodes->Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.InletNode).Temp, state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy);
-        // chilled water coil
-        auto &CWCoil(state->dataWaterCoils->WaterCoil(1));
-        CWCoil.UACoilTotal = 470.0;
-        CWCoil.UACoilExternal = 611.0;
-        CWCoil.UACoilInternal = 2010.0;
-        CWCoil.TotCoilOutsideSurfArea = 50.0;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
-        CWCoil.InletWaterMassFlowRate = ColdWaterMassFlowRate;
-        CWCoil.MaxWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
-        state->dataLoopNodes->Node(CWCoil.WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-        CWCoil.WaterLoopNum = 1;
-        CWCoil.WaterLoopSide = 1;
-        CWCoil.WaterLoopBranchNum = 1;
-        CWCoil.WaterLoopCompNum = 1;
-        // electric heating coil
-        auto &eHCoil(state->dataHeatingCoils->HeatingCoil(1));
-        state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+        "	ZoneHVAC:EquipmentList,",
+        "	Zone1Equipment,           !- Name",
+        "   SequentialLoad,           !- Load Distribution Scheme",
+        "	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
+        "	Zone1FanCoil,             !- Zone Equipment 1 Name",
+        "	1,                        !- Zone Equipment 1 Cooling Sequence",
+        "	1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
 
-        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-            auto &loop(state->dataPlnt->PlantLoop(l));
-            loop.LoopSide.allocate(2);
-            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
-            loopside.TotalBranches = 1;
-            loopside.Branch.allocate(1);
-            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
-            loopsidebranch.TotalComponents = 1;
-            loopsidebranch.Comp.allocate(1);
-        }
-        // chilled water plant loop
-        auto &CWLoop(state->dataPlnt->PlantLoop(1));
-        CWLoop.Name = "ChilledWaterLoop";
-        CWLoop.FluidName = "ChilledWater";
-        CWLoop.FluidIndex = 1;
-        CWLoop.FluidName = "WATER";
-        CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
-        CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
-        CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
-        CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
+        "   NodeList,",
+        "	Zone1Inlets,              !- Name",
+        "	Zone1FanCoilAirOutletNode;!- Node 1 Name",
 
-        state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        state->dataGlobal->DoingSizing = true;
-        state->dataFans->LocalTurnFansOff = false;
-        state->dataFans->LocalTurnFansOn = true;
-        // heating mode tests
-        state->dataFanCoilUnits->CoolingLoad = false;
-        state->dataFanCoilUnits->HeatingLoad = true;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-        auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
+        "	NodeList,",
+        "	Zone1Exhausts,            !- Name",
+        "	Zone1FanCoilAirInletNode; !- Node 1 Name",
 
-        state->dataEnvrn->StdRhoAir = 1.2;
-        state->dataEnvrn->Month = 1;
-        state->dataEnvrn->DayOfMonth = 21;
-        state->dataGlobal->HourOfDay = 1;
-        state->dataEnvrn->DSTIndicator = 0;
-        state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 0;
-        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-        UpdateScheduleValues(*state);
-        state->dataSize->ZoneEqSizing.allocate(1);
-        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
-        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
-        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
-        state->dataHeatBalFanSys->TempControlType.allocate(1);
-        state->dataHeatBalFanSys->TempControlType(1) = 4;
-        state->dataSize->ZoneSizingRunDone = true;
-        state->dataSize->FinalZoneSizing.allocate(1);
-        auto &fZoneSizing(state->dataSize->FinalZoneSizing(1));
-        fZoneSizing.DesCoolVolFlow = 0.5;
-        fZoneSizing.DesHeatVolFlow = 0.5;
-        fZoneSizing.DesCoolCoilInTemp = 30.0;
-        fZoneSizing.DesCoolCoilInHumRat = 0.01;
-        fZoneSizing.DesHeatCoilInTemp = 20.0;
-        fZoneSizing.DesHeatCoilInHumRat = 0.005;
-        fZoneSizing.DesCoolLoad = 10000.0;
-        fZoneSizing.DesHeatLoad = 10000.0;
-        thisFanCoil.DesignHeatingCapacity = 10000.0;
+        "	OutdoorAir:NodeList,",
+        "	Zone1FanCoilOAInNode;     !- Node or NodeList Name 1",
 
-        // test 1: fancoil unit cycling on/off at speed 1
-        zSysEDemand.RemainingOutputReqToCoolSP = 2000.0;
-        zSysEDemand.RemainingOutputReqToHeatSP = 2000.0;
-        zSysEDemand.RemainingOutputRequired = 2000.0;
-        QZnReq = 2000.0;
-        QUnitOut = 0.0;
-        QLatOut = 0.0;
-        state->dataGlobal->BeginEnvrnFlag = true;
-        InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        Real64 expectedAirFlowRate = thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio;
-        // expect fan speed 1 and fan and coil cycling to meet load
-        EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
-        EXPECT_EQ(thisFanCoil.SpeedRatio, 0.0);
-        EXPECT_NEAR(thisFanCoil.PLR, 0.662, 0.001);
-        EXPECT_NEAR(QZnReq, QUnitOut, 1.0);
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, expectedAirFlowRate, 0.000001);
+        "	OutdoorAir:Mixer,",
+        "	Zone1FanCoilOAMixer,      !- Name",
+        "	Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
+        "	Zone1FanCoilOAInNode,     !- Outdoor Air Stream Node Name",
+        "	Zone1FanCoilExhNode,      !- Relief Air Stream Node Name",
+        "	Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
 
-        // test 2: fancoil cycling between speed levels 1 and 2
-        zSysEDemand.RemainingOutputReqToCoolSP = 4000.0;
-        zSysEDemand.RemainingOutputReqToHeatSP = 4000.0;
-        zSysEDemand.RemainingOutputRequired = 4000.0;
-        QZnReq = 4000.0;
-        QUnitOut = 0.0;
-        QLatOut = 0.0;
-        InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.LowSpeedRatio * thisFanCoil.MaxAirMassFlow) +
-            thisFanCoil.SpeedRatio * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow);
-        // expect fan speed 2 and fan and fancoil cycling b/n speed 1 and 2
-        EXPECT_EQ(thisFanCoil.SpeedFanSel, 2);
-        EXPECT_NEAR(thisFanCoil.PLR, 1.0, 0.001);
-        EXPECT_NEAR( thisFanCoil.SpeedRatio, 0.323, 0.001 );
-        EXPECT_NEAR(QZnReq, QUnitOut, 1.0);
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, expectedAirFlowRate, 0.000001);
+        "	Schedule:Constant,",
+        "	FanAndCoilAvailSched,     !- Name",
+        "	FRACTION,                 !- Schedule Type",
+        "	1;                        !- TimeStep Value",
 
-        // test 3: fancoil cycling between speed levels 2 and 3
-        zSysEDemand.RemainingOutputReqToCoolSP = 8000.0;
-        zSysEDemand.RemainingOutputReqToHeatSP = 8000.0;
-        zSysEDemand.RemainingOutputRequired = 8000.0;
-        QZnReq = 8000.0;
-        QUnitOut = 0.0;
-        QLatOut = 0.0;
-        InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow) +
-            thisFanCoil.SpeedRatio * (1.0 * thisFanCoil.MaxAirMassFlow);
-        // expect fan speed 3 and fan and fancoil cycling b/n speed 2 and 3
-        EXPECT_EQ(thisFanCoil.SpeedFanSel, 3);
-        EXPECT_NEAR(thisFanCoil.PLR, 1.0, 0.001);
-        EXPECT_NEAR(thisFanCoil.SpeedRatio, 0.485, 0.001);
-        EXPECT_NEAR(QZnReq, QUnitOut, 1.0);
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate,expectedAirFlowRate, 0.000001);
+        "	ScheduleTypeLimits,",
+        "	Fraction,                 !- Name",
+        "	0.0,                      !- Lower Limit Value",
+        "	1.0,                      !- Upper Limit Value",
+        "	CONTINUOUS;               !- Numeric Type",
 
-        // test 4: expect fancoil to run at maximum speed / full capacity
-        zSysEDemand.RemainingOutputReqToCoolSP = 10200.0;
-        zSysEDemand.RemainingOutputReqToHeatSP = 10200.0;
-        zSysEDemand.RemainingOutputRequired = 10200;
-        QZnReq = 10200;
-        QUnitOut = 0.0;
-        QLatOut = 0.0;
-        InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        expectedAirFlowRate = thisFanCoil.MaxAirMassFlow;
-        // expect fan speed 3 and fancoil running at max speed
-        EXPECT_EQ(thisFanCoil.SpeedFanSel, 3);
-        EXPECT_NEAR(thisFanCoil.PLR, 1.0, 0.001);
-        EXPECT_NEAR(thisFanCoil.SpeedRatio, 1.0, 0.001);
-        EXPECT_NEAR(10075.0, QUnitOut, 1.0);
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, expectedAirFlowRate, 0.000001);
+        "    Fan:SystemModel,",
+        "      Zone1FanCoilFan,         !- Name",
+        "      FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "      Zone1FanCoilOAMixerOutletNode,  !- Air Inlet Node Name",
+        "      Zone1FanCoilFanOutletNode,  !- Air Outlet Node Name",
+        "      0.6,                     !- Design Maximum Air Flow Rate {m3/s}",
+        "      Discrete,                !- Speed Control Method",
+        "      0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "      75,                      !- Design Pressure Rise {Pa}",
+        "      0.9,                     !- Motor Efficiency",
+        "      1,                       !- Motor In Air Stream Fraction",
+        "      ,                        !- Design Electric Power Consumption {W}",
+        "      TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "      ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "      ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "      0.5,                     !- Fan Total Efficiency",
+        "      ,                        !- Electric Power Function of Flow Fraction Curve Name",
+        "      ,                        !- Night Ventilation Mode Pressure Rise {Pa}",
+        "      ,                        !- Night Ventilation Mode Flow Fraction",
+        "      ,                        !- Motor Loss Zone Name",
+        "      ,                        !- Motor Loss Radiative Fraction",
+        "      General,                 !- End-Use Subcategory",
+        "      1,                       !- Number of Speeds",
+        "      1.0,                     !- Speed 1 Flow Fraction",
+        "      1.0;                     !- Speed 1 Electric Power Fraction",
+
+        "	Coil:Cooling:Water,",
+        "	Zone1FanCoilCoolingCoil,  !- Name",
+        "	FanAndCoilAvailSched,     !- Availability Schedule Namev",
+        "	0.0002,                   !- Design Water Flow Rate { m3 / s }",
+        "	0.5000,                   !- Design Air Flow Rate { m3 / s }",
+        "	7.22,                     !- Design Inlet Water Temperature { Cv }",
+        "	24.340,                   !- Design Inlet Air Temperature { C }",
+        "	14.000,                   !- Design Outlet Air Temperature { C }",
+        "	0.0095,                   !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	0.0090,                   !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
+        "	Zone1FanCoilChWOutletNode,!- Water Outlet Node Name",
+        "	Zone1FanCoilFanOutletNode,!- Air Inlet Node Name",
+        "	Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
+        "	SimpleAnalysis,           !- Type of Analysis",
+        "	CrossFlow;                !- Heat Exchanger Configuration",
+
+        "	Coil:Heating:Water,",
+        "   Zone1FanCoilHeatingCoil,   !- Name",
+        "	FanAndCoilAvailSched,      !- Availability Schedule Name",
+        "	150.0,                     !- U - Factor Times Area Value { W / K }",
+        "	0.00014,                   !- Maximum Water Flow Rate { m3 / s }",
+        "	Zone1FanCoilHWInletNode,   !- Water Inlet Node Name",
+        "	Zone1FanCoilHWOutletNode,  !- Water Outlet Node Name",
+        "	Zone1FanCoilCCOutletNode,  !- Air Inlet Node Name",
+        "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "	UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
+        "	autosize,                  !- Rated Capacity { W }",
+        "	82.2,                      !- Rated Inlet Water Temperature { C }",
+        "	16.6,                      !- Rated Inlet Air Temperature { C }",
+        "	71.1,                      !- Rated Outlet Water Temperature { C }",
+        "	32.2,                      !- Rated Outlet Air Temperature { C }",
+        "	;                          !- Rated Ratio for Air and Water Convection",
+
+        "	ZoneHVAC:FourPipeFanCoil,",
+        "	Zone1FanCoil,              !- Name",
+        "	FanAndCoilAvailSched,      !- Availability Schedule Name",
+        "	CyclingFan,                !- Capacity Control Method",
+        "	0.5,                       !- Maximum Supply Air Flow Rate { m3 / s }",
+        "	0.3,                       !- Low Speed Supply Air Flow Ratio",
+        "	0.6,                       !- Medium Speed Supply Air Flow Ratio",
+        "	0.0,                       !- Maximum Outdoor Air Flow Rate { m3 / s }",
+        "	FanAndCoilAvailSched,      !- Outdoor Air Schedule Name",
+        "	Zone1FanCoilAirInletNode,  !- Air Inlet Node Name",
+        "	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "	OutdoorAir:Mixer,          !- Outdoor Air Mixer Object Type",
+        "	Zone1FanCoilOAMixer,       !- Outdoor Air Mixer Name",
+        "	Fan:SystemModel,           !- Supply Air Fan Object Type",
+        "	Zone1FanCoilFan,           !- Supply Air Fan Name",
+        "	Coil:Cooling:Water,        !- Cooling Coil Object Type",
+        "	Zone1FanCoilCoolingCoil,   !- Cooling Coil Name",
+        "	0.00014,                   !- Maximum Cold Water Flow Rate { m3 / s }",
+        "	0.0,                       !- Minimum Cold Water Flow Rate { m3 / s }",
+        "	0.001,                     !- Cooling Convergence Tolerance",
+        "	Coil:Heating:Water,        !- Heating Coil Object Type",
+        "	Zone1FanCoilHeatingCoil,   !- Heating Coil Name",
+        "	0.00014,                   !- Maximum Hot Water Flow Rate { m3 / s }",
+        "	0.0,                       !- Minimum Hot Water Flow Rate { m3 / s }",
+        "	0.001;                     !- Heating Convergence Tolerance",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
+
+    GetZoneEquipmentData(*state);
+    ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+
+    GetFanCoilUnits(*state);
+
+    auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
+
+    EXPECT_EQ("CYCLINGFAN", thisFanCoil.CapCtrlMeth);
+    EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
+    EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
+    EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
+    EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.HCoilType);
+    EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
+
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+
+    AirMassFlow = 0.60;
+    MaxAirMassFlow = 0.60;
+    ColdWaterMassFlowRate = 1.0;
+    HotWaterMassFlowRate = 1.0;
+
+    thisFanCoil.OutAirMassFlow = 0.0;
+    thisFanCoil.MaxAirMassFlow = MaxAirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.OutsideAirNode).MassFlowRateMax = 0.0;
+
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMinAvail = AirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMax = MaxAirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
+
+    // outside air mixer
+    auto &MixerOA(state->dataMixedAir->OAMixer(1));
+    state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
+    state->dataLoopNodes->Node(MixerOA.RetNode).Temp = 22.0;
+    state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy = 36000;
+    state->dataLoopNodes->Node(MixerOA.RetNode).HumRat =
+        PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.RetNode).Temp, state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy);
+    state->dataLoopNodes->Node(MixerOA.InletNode).Temp = 10.0;
+    state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy = 18000;
+    state->dataLoopNodes->Node(MixerOA.InletNode).HumRat =
+        PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.InletNode).Temp, state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy);
+
+    // chilled water coil
+    auto &CWCoil(state->dataWaterCoils->WaterCoil(2));
+    CWCoil.UACoilTotal = 470.0;
+    CWCoil.UACoilExternal = 611.0;
+    CWCoil.UACoilInternal = 2010.0;
+    CWCoil.TotCoilOutsideSurfArea = 50.0;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    CWCoil.InletWaterMassFlowRate = ColdWaterMassFlowRate;
+    CWCoil.MaxWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
+    state->dataLoopNodes->Node(CWCoil.WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    CWCoil.WaterLoopNum = 1;
+    CWCoil.WaterLoopSide = 1;
+    CWCoil.WaterLoopBranchNum = 1;
+    CWCoil.WaterLoopCompNum = 1;
+
+    // hot water coil
+    auto &HWCoil(state->dataWaterCoils->WaterCoil(1));
+    HWCoil.InletWaterMassFlowRate = HotWaterMassFlowRate;
+    HWCoil.MaxWaterMassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(HWCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(HWCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataLoopNodes->Node(HWCoil.WaterInletNodeNum).Temp = 60.0;
+    state->dataLoopNodes->Node(HWCoil.WaterInletNodeNum).MassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(HWCoil.WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(HWCoil.WaterOutletNodeNum).MassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(HWCoil.WaterOutletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    HWCoil.WaterLoopNum = 2;
+    HWCoil.WaterLoopSide = 1;
+    HWCoil.WaterLoopBranchNum = 1;
+    HWCoil.WaterLoopCompNum = 1;
+
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
     }
+    // chilled water plant loop
+    auto &CWLoop(state->dataPlnt->PlantLoop(2));
+    CWLoop.Name = "ChilledWaterLoop";
+    CWLoop.FluidName = "ChilledWater";
+    CWLoop.FluidIndex = 1;
+    CWLoop.FluidName = "WATER";
+    CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
+    // hot water plant loop
+    auto &HWLoop(state->dataPlnt->PlantLoop(1));
+    HWLoop.Name = "HotWaterLoop";
+    HWLoop.FluidName = "HotWater";
+    HWLoop.FluidIndex = 1;
+    HWLoop.FluidName = "WATER";
+    HWLoop.LoopSide(1).Branch(1).Comp(1).Name = HWCoil.Name;
+    HWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
+    HWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = HWCoil.WaterInletNodeNum;
+    HWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = HWCoil.WaterOutletNodeNum;
 
-    TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanContFanMode)
-    {
+    // heating mode tests
+    state->dataFanCoilUnits->CoolingLoad = false;
+    state->dataFanCoilUnits->HeatingLoad = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 4000.0;
+    thisFanCoil.SpeedFanSel = 2;
+    QUnitOut = 0.0;
+    QLatOut = 0.0;
+    QZnReq = 4000.0;
 
-        int FanCoilNum(1);
-        int ZoneNum(1);
-        bool FirstHVACIteration(false);
-        bool ErrorsFound(false);
-        Real64 QZnReq(0.0);
-        Real64 ColdWaterMassFlowRate(0.0);
-        Real64 QUnitOut(0.0);
-        Real64 QLatOut(0.0);
-        Real64 AirMassFlow(0.0);
-        Real64 MaxAirMassFlow(0.0);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
+    state->dataGlobal->DoingSizing = true;
 
-        state->dataEnvrn->OutBaroPress = 101325.0;
-        state->dataEnvrn->StdRhoAir = 1.20;
-        state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        state->dataGlobalNames->NumCoils = 0;
-        state->dataGlobal->NumOfTimeStepInHour = 1;
-        state->dataGlobal->TimeStep = 1;
-        state->dataGlobal->MinutesPerTimeStep = 60;
-        state->dataSize->CurZoneEqNum = 1;
+    state->dataFans->LocalTurnFansOff = false;
+    state->dataFans->LocalTurnFansOn = true;
 
-        InitializePsychRoutines();
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    UpdateScheduleValues(*state);
 
-        std::string const idf_objects = delimited_string({
-            " Zone,",
-            "  EAST ZONE,     !- Name",
-            "  0,             !- Direction of Relative North { deg }",
-            "  0,             !- X Origin { m }",
-            "  0,             !- Y Origin { m }",
-            "  0,             !- Z Origin { m }",
-            "  1,             !- Type",
-            "  1,             !- Multiplier",
-            "  autocalculate, !- Ceiling Height { m }",
-            "  autocalculate; !- Volume { m3 }",
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = 4;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.5;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.5;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 30.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTemp = 20.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolLoad = 4000.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatLoad = 4000.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
 
-            " ZoneHVAC:EquipmentConnections,",
-            "  EAST ZONE,          !- Zone Name",
-            "  Zone1Equipment,     !- Zone Conditioning Equipment List Name",
-            "  Zone1Inlets,        !- Zone Air Inlet Node or NodeList Name",
-            "  Zone1Exhausts,      !- Zone Air Exhaust Node or NodeList Name",
-            "  Zone 1 Node,        !- Zone Air Node Name",
-            "  Zone 1 Outlet Node; !- Zone Return Air Node Name",
+    state->dataGlobal->BeginEnvrnFlag = true;
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    // expect fan speed 3 and near full air and water flow and meet capacity
+    EXPECT_EQ(thisFanCoil.SpeedFanSel, 3);
+    EXPECT_NEAR(thisFanCoil.PLR, 0.961, 0.001);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    // cycling fan proportional to PLR and fan speed ratio
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow, 0.0000000001);
+    // expect minimum flow and meet capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
+    QZnReq = 1000.0;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    // expect fan speed 1 and moderate air and water flow and meet capacity
+    EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
+    EXPECT_NEAR(thisFanCoil.PLR, 0.632, 0.001);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    // cycling fan proportional to PLR and fan speed ratio
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio, 0.0000000001);
+    // expect modulated flow and meet capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2500.0;
+    QZnReq = 2500.0;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    // expect fan speed 2 and moderate air and water flow and meet capacity
+    EXPECT_EQ(thisFanCoil.SpeedFanSel, 2);
+    EXPECT_NEAR(thisFanCoil.PLR, 0.850, 0.001);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    // cycling fan proportional to PLR and fan speed ratio
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.MedSpeedRatio, 0.0000000001);
 
-            " ZoneHVAC:EquipmentList,",
-            "  Zone1Equipment,           !- Name",
-            "  SequentialLoad,           !- Load Distribution Scheme",
-            "  ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
-            "  Zone1FanCoil,             !- Zone Equipment 1 Name",
-            "  1,                        !- Zone Equipment 1 Cooling Sequence",
-            "  1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
+    // cooling mode tests
+    // expect full flow and meet capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -4000.0;
+    QZnReq = -4000.0;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    // expect fan speed 3 and near full air and water flow and meet capacity
+    EXPECT_EQ(3, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
+    EXPECT_NEAR(state->dataFanCoilUnits->FanCoil(1).PLR, 0.950, 0.001);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    // cycling fan proportional to PLR and fan speed ratio
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow, 0.0000000001);
+    // expect minimum flow and meet capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.0;
+    QZnReq = -1000.0;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    // expect fan speed 1 and moderate air and water flow and meet capacity
+    EXPECT_EQ(1, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
+    EXPECT_NEAR(state->dataFanCoilUnits->FanCoil(1).PLR, 0.501, 0.001);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    // cycling fan proportional to PLR and fan speed ratio
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio, 0.0000000001);
+    // expect modulated flow and meet capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -2500.0;
+    QZnReq = -2500.0;
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    // expect fan speed 2 and moderate air and water flow and meet capacity
+    EXPECT_EQ(2, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
+    EXPECT_NEAR(state->dataFanCoilUnits->FanCoil(1).PLR, 0.756, 0.001);
+    EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.MedSpeedRatio, 0.0000000001);
+}
 
-            " NodeList,",
-            "  Zone1Inlets,              !- Name",
-            "  Zone1FanCoilAirOutletNode;!- Node 1 Name",
+TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanCyclingFanMode)
+{
 
-            " NodeList,",
-            "  Zone1Exhausts,            !- Name",
-            "  Zone1FanCoilAirInletNode; !- Node 1 Name",
+    int FanCoilNum(1);
+    int ZoneNum(1);
+    bool FirstHVACIteration(false);
+    bool ErrorsFound(false);
+    Real64 QZnReq(0.0);
+    Real64 ColdWaterMassFlowRate(0.0);
+    Real64 QUnitOut(0.0);
+    Real64 QLatOut(0.0);
+    Real64 AirMassFlow(0.0);
+    Real64 MaxAirMassFlow(0.0);
 
-            " OutdoorAir:NodeList,",
-            "  Zone1FanCoilOAInNode;     !- Node or NodeList Name 1",
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataWaterCoils->GetWaterCoilsInputFlag = true;
+    state->dataGlobalNames->NumCoils = 0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataSize->CurZoneEqNum = 1;
 
-            " OutdoorAir:Mixer,",
-            "  Zone1FanCoilOAMixer,      !- Name",
-            "  Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
-            "  Zone1FanCoilOAInNode,     !- Outdoor Air Stream Node Name",
-            "  Zone1FanCoilExhNode,      !- Relief Air Stream Node Name",
-            "  Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
+    InitializePsychRoutines(*state);
 
-            " Schedule:Constant,",
-            "  FanAndCoilAvailSched,     !- Name",
-            "  FRACTION,                 !- Schedule Type",
-            "  1;                        !- TimeStep Value",
+    std::string const idf_objects = delimited_string({
+        " Zone,",
+        "  EAST ZONE,     !- Name",
+        "  0,             !- Direction of Relative North { deg }",
+        "  0,             !- X Origin { m }",
+        "  0,             !- Y Origin { m }",
+        "  0,             !- Z Origin { m }",
+        "  1,             !- Type",
+        "  1,             !- Multiplier",
+        "  autocalculate, !- Ceiling Height { m }",
+        "  autocalculate; !- Volume { m3 }",
 
-            " ScheduleTypeLimits,",
-            "  Fraction,                 !- Name",
-            "  0.0,                      !- Lower Limit Value",
-            "  1.0,                      !- Upper Limit Value",
-            "  CONTINUOUS;               !- Numeric Type",
+        " ZoneHVAC:EquipmentConnections,",
+        "  EAST ZONE,          !- Zone Name",
+        "  Zone1Equipment,     !- Zone Conditioning Equipment List Name",
+        "  Zone1Inlets,        !- Zone Air Inlet Node or NodeList Name",
+        "  Zone1Exhausts,      !- Zone Air Exhaust Node or NodeList Name",
+        "  Zone 1 Node,        !- Zone Air Node Name",
+        "  Zone 1 Outlet Node; !- Zone Return Air Node Name",
 
-            " Fan:SystemModel,",
-            "  Zone1FanCoilFan,         !- Name",
-            "  FanAndCoilAvailSched,    !- Availability Schedule Name",
-            "  Zone1FanCoilOAMixerOutletNode,  !- Air Inlet Node Name",
-            "  Zone1FanCoilFanOutletNode,  !- Air Outlet Node Name",
-            "  0.5,                     !- Design Maximum Air Flow Rate {m3/s}",
-            "  Discrete,                !- Speed Control Method",
-            "  0.0,                     !- Electric Power Minimum Flow Rate Fraction",
-            "  75,                      !- Design Pressure Rise {Pa}",
-            "  0.9,                     !- Motor Efficiency",
-            "  1,                       !- Motor In Air Stream Fraction",
-            "  ,                        !- Design Electric Power Consumption {W}",
-            "  TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
-            "  ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
-            "  ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
-            "  0.5,                     !- Fan Total Efficiency",
-            "  ,                        !- Electric Power Function of Flow Fraction Curve Name",
-            "  ,                        !- Night Ventilation Mode Pressure Rise {Pa}",
-            "  ,                        !- Night Ventilation Mode Flow Fraction",
-            "  ,                        !- Motor Loss Zone Name",
-            "  ,                        !- Motor Loss Radiative Fraction",
-            "  General,                 !- End-Use Subcategory",
-            "  1,                       !- Number of Speeds",
-            "  1.0,                     !- Speed 1 Flow Fraction",
-            "  1.0;                     !- Speed 1 Electric Power Fraction",
+        " ZoneHVAC:EquipmentList,",
+        "  Zone1Equipment,           !- Name",
+        "  SequentialLoad,           !- Load Distribution Scheme",
+        "  ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
+        "  Zone1FanCoil,             !- Zone Equipment 1 Name",
+        "  1,                        !- Zone Equipment 1 Cooling Sequence",
+        "  1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
 
-            " Coil:Cooling:Water,",
-            "  Zone1FanCoilCoolingCoil,  !- Name",
-            "  FanAndCoilAvailSched,     !- Availability Schedule Namev",
-            "  0.0002,                   !- Design Water Flow Rate { m3 / s }",
-            "  0.5000,                   !- Design Air Flow Rate { m3 / s }",
-            "  7.22,                     !- Design Inlet Water Temperature { Cv }",
-            "  24.340,                   !- Design Inlet Air Temperature { C }",
-            "  14.000,                   !- Design Outlet Air Temperature { C }",
-            "  0.0095,                   !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "  0.0090,                   !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "  Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
-            "  Zone1FanCoilChWOutletNode,!- Water Outlet Node Name",
-            "  Zone1FanCoilFanOutletNode,!- Air Inlet Node Name",
-            "  Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
-            "  SimpleAnalysis,           !- Type of Analysis",
-            "  CrossFlow;                !- Heat Exchanger Configuration",
+        " NodeList,",
+        "  Zone1Inlets,              !- Name",
+        "  Zone1FanCoilAirOutletNode;!- Node 1 Name",
 
-            " Coil:Heating:Electric,",
-            "  Zone1FanCoilHeatingCoil,   !- Name",
-            "  FanAndCoilAvailSched,      !- Availability Schedule Name",
-            "  1,                         !- Efficiency",
-            "  10000.0,                    !- Nominal Capacity {W}",
-            "  Zone1FanCoilCCOutletNode,  !- Air Inlet Node Name",
-            "  Zone1FanCoilAirOutletNode; !- Air Outlet Node Name",
+        " NodeList,",
+        "  Zone1Exhausts,            !- Name",
+        "  Zone1FanCoilAirInletNode; !- Node 1 Name",
 
-            " ZoneHVAC:FourPipeFanCoil,",
-            "  Zone1FanCoil,              !- Name",
-            "  FanAndCoilAvailSched,      !- Availability Schedule Name",
-            "  MultiSpeedFan,             !- Capacity Control Method",
-            "  0.5,                       !- Maximum Supply Air Flow Rate { m3 / s }",
-            "  0.3,                       !- Low Speed Supply Air Flow Ratio",
-            "  0.6,                       !- Medium Speed Supply Air Flow Ratio",
-            "  0.0,                       !- Maximum Outdoor Air Flow Rate { m3 / s }",
-            "  FanAndCoilAvailSched,      !- Outdoor Air Schedule Name",
-            "  Zone1FanCoilAirInletNode,  !- Air Inlet Node Name",
-            "  Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "  OutdoorAir:Mixer,          !- Outdoor Air Mixer Object Type",
-            "  Zone1FanCoilOAMixer,       !- Outdoor Air Mixer Name",
-            "  Fan:SystemModel,           !- Supply Air Fan Object Type",
-            "  Zone1FanCoilFan,           !- Supply Air Fan Name",
-            "  Coil:Cooling:Water,        !- Cooling Coil Object Type",
-            "  Zone1FanCoilCoolingCoil,   !- Cooling Coil Name",
-            "  0.00014,                   !- Maximum Cold Water Flow Rate { m3 / s }",
-            "  0.0,                       !- Minimum Cold Water Flow Rate { m3 / s }",
-            "  0.001,                     !- Cooling Convergence Tolerance",
-            "  Coil:Heating:Electric,     !- Heating Coil Object Type",
-            "  Zone1FanCoilHeatingCoil,   !- Heating Coil Name",
-            "  0.0,                       !- Maximum Hot Water Flow Rate { m3 / s }",
-            "  0.0,                       !- Minimum Hot Water Flow Rate { m3 / s }",
-            "  0.001,                     !- Heating Convergence Tolerance",
-            "  ,                          !- Availability Manager List Name",
-            "  ,                          !- Design Specification ZoneHVAC Sizing Object Name",
-            "  ContsFanOperatingSch;      !- Supply Air Fan Operating Mode Schedule Name",
+        " OutdoorAir:NodeList,",
+        "  Zone1FanCoilOAInNode;     !- Node or NodeList Name 1",
 
-            " Schedule:Constant,",
-            "  ContsFanOperatingSch,      !- Name",
-            "  FRACTION,                  !- Schedule Type",
-            "  1;                         !- TimeStep Value",
+        " OutdoorAir:Mixer,",
+        "  Zone1FanCoilOAMixer,      !- Name",
+        "  Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
+        "  Zone1FanCoilOAInNode,     !- Outdoor Air Stream Node Name",
+        "  Zone1FanCoilExhNode,      !- Relief Air Stream Node Name",
+        "  Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
 
-            });
+        " Schedule:Constant,",
+        "  FanAndCoilAvailSched,     !- Name",
+        "  FRACTION,                 !- Schedule Type",
+        "  1;                        !- TimeStep Value",
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        " ScheduleTypeLimits,",
+        "  Fraction,                 !- Name",
+        "  0.0,                      !- Lower Limit Value",
+        "  1.0,                      !- Upper Limit Value",
+        "  CONTINUOUS;               !- Numeric Type",
 
-        GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
-        GetZoneEquipmentData(*state);
-        ProcessScheduleInput(*state);
-        state->dataScheduleMgr->ScheduleInputProcessed = true;
-        GetFanCoilUnits(*state);
-        auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
-        EXPECT_EQ("MULTISPEEDFAN", thisFanCoil.CapCtrlMeth);
-        EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
-        EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
-        EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
-        EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
-        EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
+        " Fan:SystemModel,",
+        "  Zone1FanCoilFan,         !- Name",
+        "  FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "  Zone1FanCoilOAMixerOutletNode,  !- Air Inlet Node Name",
+        "  Zone1FanCoilFanOutletNode,  !- Air Outlet Node Name",
+        "  0.5,                     !- Design Maximum Air Flow Rate {m3/s}",
+        "  Discrete,                !- Speed Control Method",
+        "  0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "  75,                      !- Design Pressure Rise {Pa}",
+        "  0.9,                     !- Motor Efficiency",
+        "  1,                       !- Motor In Air Stream Fraction",
+        "  ,                        !- Design Electric Power Consumption {W}",
+        "  TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "  ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "  ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "  0.5,                     !- Fan Total Efficiency",
+        "  ,                        !- Electric Power Function of Flow Fraction Curve Name",
+        "  ,                        !- Night Ventilation Mode Pressure Rise {Pa}",
+        "  ,                        !- Night Ventilation Mode Flow Fraction",
+        "  ,                        !- Motor Loss Zone Name",
+        "  ,                        !- Motor Loss Radiative Fraction",
+        "  General,                 !- End-Use Subcategory",
+        "  1,                       !- Number of Speeds",
+        "  1.0,                     !- Speed 1 Flow Fraction",
+        "  1.0;                     !- Speed 1 Electric Power Fraction",
 
-        state->dataPlnt->TotNumLoops = 1;
-        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-        AirMassFlow = 0.60;
-        MaxAirMassFlow = 0.60;
-        ColdWaterMassFlowRate = 1.0;
-        thisFanCoil.OutAirMassFlow = 0.0;
-        thisFanCoil.MaxAirMassFlow = MaxAirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.OutsideAirNode).MassFlowRateMax = 0.0;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMinAvail = AirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMax = MaxAirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
-        // outside air mixer
-        auto &MixerOA(state->dataMixedAir->OAMixer(1));
-        state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
-        state->dataLoopNodes->Node(MixerOA.RetNode).Temp = 22.0;
-        state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy = 36000;
-        state->dataLoopNodes->Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.RetNode).Temp, state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy);
-        state->dataLoopNodes->Node(MixerOA.InletNode).Temp = 10.0;
-        state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy = 18000;
-        state->dataLoopNodes->Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.InletNode).Temp, state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy);
-        // chilled water coil
-        auto &CWCoil(state->dataWaterCoils->WaterCoil(1));
-        CWCoil.UACoilTotal = 470.0;
-        CWCoil.UACoilExternal = 611.0;
-        CWCoil.UACoilInternal = 2010.0;
-        CWCoil.TotCoilOutsideSurfArea = 50.0;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
-        CWCoil.InletWaterMassFlowRate = ColdWaterMassFlowRate;
-        CWCoil.MaxWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
-        state->dataLoopNodes->Node(CWCoil.WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-        CWCoil.WaterLoopNum = 1;
-        CWCoil.WaterLoopSide = 1;
-        CWCoil.WaterLoopBranchNum = 1;
-        CWCoil.WaterLoopCompNum = 1;
-        // electric heating coil
-        auto &eHCoil(state->dataHeatingCoils->HeatingCoil(1));
-        state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+        " Coil:Cooling:Water,",
+        "  Zone1FanCoilCoolingCoil,  !- Name",
+        "  FanAndCoilAvailSched,     !- Availability Schedule Namev",
+        "  0.0002,                   !- Design Water Flow Rate { m3 / s }",
+        "  0.5000,                   !- Design Air Flow Rate { m3 / s }",
+        "  7.22,                     !- Design Inlet Water Temperature { Cv }",
+        "  24.340,                   !- Design Inlet Air Temperature { C }",
+        "  14.000,                   !- Design Outlet Air Temperature { C }",
+        "  0.0095,                   !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "  0.0090,                   !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "  Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
+        "  Zone1FanCoilChWOutletNode,!- Water Outlet Node Name",
+        "  Zone1FanCoilFanOutletNode,!- Air Inlet Node Name",
+        "  Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
+        "  SimpleAnalysis,           !- Type of Analysis",
+        "  CrossFlow;                !- Heat Exchanger Configuration",
 
-        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-            auto &loop(state->dataPlnt->PlantLoop(l));
-            loop.LoopSide.allocate(2);
-            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
-            loopside.TotalBranches = 1;
-            loopside.Branch.allocate(1);
-            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
-            loopsidebranch.TotalComponents = 1;
-            loopsidebranch.Comp.allocate(1);
-        }
-        // chilled water plant loop
-        auto &CWLoop(state->dataPlnt->PlantLoop(1));
-        CWLoop.Name = "ChilledWaterLoop";
-        CWLoop.FluidName = "ChilledWater";
-        CWLoop.FluidIndex = 1;
-        CWLoop.FluidName = "WATER";
-        CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
-        CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
-        CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
-        CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
+        " Coil:Heating:Electric,",
+        "  Zone1FanCoilHeatingCoil,   !- Name",
+        "  FanAndCoilAvailSched,      !- Availability Schedule Name",
+        "  1,                         !- Efficiency",
+        "  10000.0,                    !- Nominal Capacity {W}",
+        "  Zone1FanCoilCCOutletNode,  !- Air Inlet Node Name",
+        "  Zone1FanCoilAirOutletNode; !- Air Outlet Node Name",
 
-        state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        state->dataGlobal->DoingSizing = true;
-        state->dataFans->LocalTurnFansOff = false;
-        state->dataFans->LocalTurnFansOn = true;
-        // heating mode tests
-        state->dataFanCoilUnits->CoolingLoad = false;
-        state->dataFanCoilUnits->HeatingLoad = true;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-        auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
+        " ZoneHVAC:FourPipeFanCoil,",
+        "  Zone1FanCoil,              !- Name",
+        "  FanAndCoilAvailSched,      !- Availability Schedule Name",
+        "  MultiSpeedFan,             !- Capacity Control Method",
+        "  0.5,                       !- Maximum Supply Air Flow Rate { m3 / s }",
+        "  0.3,                       !- Low Speed Supply Air Flow Ratio",
+        "  0.6,                       !- Medium Speed Supply Air Flow Ratio",
+        "  0.0,                       !- Maximum Outdoor Air Flow Rate { m3 / s }",
+        "  FanAndCoilAvailSched,      !- Outdoor Air Schedule Name",
+        "  Zone1FanCoilAirInletNode,  !- Air Inlet Node Name",
+        "  Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "  OutdoorAir:Mixer,          !- Outdoor Air Mixer Object Type",
+        "  Zone1FanCoilOAMixer,       !- Outdoor Air Mixer Name",
+        "  Fan:SystemModel,           !- Supply Air Fan Object Type",
+        "  Zone1FanCoilFan,           !- Supply Air Fan Name",
+        "  Coil:Cooling:Water,        !- Cooling Coil Object Type",
+        "  Zone1FanCoilCoolingCoil,   !- Cooling Coil Name",
+        "  0.00014,                   !- Maximum Cold Water Flow Rate { m3 / s }",
+        "  0.0,                       !- Minimum Cold Water Flow Rate { m3 / s }",
+        "  0.001,                     !- Cooling Convergence Tolerance",
+        "  Coil:Heating:Electric,     !- Heating Coil Object Type",
+        "  Zone1FanCoilHeatingCoil,   !- Heating Coil Name",
+        "  0.0,                       !- Maximum Hot Water Flow Rate { m3 / s }",
+        "  0.0,                       !- Minimum Hot Water Flow Rate { m3 / s }",
+        "  0.001,                     !- Heating Convergence Tolerance",
+        "  ,                          !- Availability Manager List Name",
+        "  ,                          !- Design Specification ZoneHVAC Sizing Object Name",
+        "  CyclingFanOperatingSch;    !- Supply Air Fan Operating Mode Schedule Name",
 
-        state->dataEnvrn->StdRhoAir = 1.2;
-        state->dataEnvrn->Month = 1;
-        state->dataEnvrn->DayOfMonth = 21;
-        state->dataGlobal->HourOfDay = 1;
-        state->dataEnvrn->DSTIndicator = 0;
-        state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 0;
-        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-        UpdateScheduleValues(*state);
-        state->dataSize->ZoneEqSizing.allocate(1);
-        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
-        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
-        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
-        state->dataHeatBalFanSys->TempControlType.allocate(1);
-        state->dataHeatBalFanSys->TempControlType(1) = 4;
-        state->dataSize->ZoneSizingRunDone = true;
-        state->dataSize->FinalZoneSizing.allocate(1);
-        auto &fZoneSizing(state->dataSize->FinalZoneSizing(1));
-        fZoneSizing.DesCoolVolFlow = 0.5;
-        fZoneSizing.DesHeatVolFlow = 0.5;
-        fZoneSizing.DesCoolCoilInTemp = 30.0;
-        fZoneSizing.DesCoolCoilInHumRat = 0.01;
-        fZoneSizing.DesHeatCoilInTemp = 20.0;
-        fZoneSizing.DesHeatCoilInHumRat = 0.005;
-        fZoneSizing.DesCoolLoad = 10000.0;
-        fZoneSizing.DesHeatLoad = 10000.0;
-        thisFanCoil.DesignHeatingCapacity = 10000.0;
+        " Schedule:Constant,",
+        "  CyclingFanOperatingSch,    !- Name",
+        "  FRACTION,                  !- Schedule Type",
+        "  0;                         !- TimeStep Value",
 
-        // test 1: fancoil unit cycling on/off at speed 1
-        zSysEDemand.RemainingOutputReqToCoolSP = 2000.0;
-        zSysEDemand.RemainingOutputReqToHeatSP = 2000.0;
-        zSysEDemand.RemainingOutputRequired = 2000.0;
-        QZnReq = 2000.0;
-        QUnitOut = 0.0;
-        QLatOut = 0.0;
-        state->dataGlobal->BeginEnvrnFlag = true;
-        InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        Real64 expectedAirFlowRate = thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio;
-        // expect fan speed 1, fan runs continuously and only heating coil cycle on/off to meet load
-        EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
-        EXPECT_EQ(thisFanCoil.SpeedRatio, 0.0);
-        EXPECT_NEAR(thisFanCoil.PLR, 0.659, 0.001);
-        EXPECT_NEAR(QZnReq, QUnitOut, 1.0);
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, expectedAirFlowRate, 0.000001);
+    });
 
-        // test 2: fancoil cycling between speed levels 1 and 2
-        zSysEDemand.RemainingOutputReqToCoolSP = 4000.0;
-        zSysEDemand.RemainingOutputReqToHeatSP = 4000.0;
-        zSysEDemand.RemainingOutputRequired = 4000.0;
-        QZnReq = 4000.0;
-        QUnitOut = 0.0;
-        QLatOut = 0.0;
-        InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.LowSpeedRatio * thisFanCoil.MaxAirMassFlow) +
-            thisFanCoil.SpeedRatio * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow);
-        // expect fan speed 2 and fan and fancoil cycling b/n speed 1 and 2
-        EXPECT_EQ(thisFanCoil.SpeedFanSel, 2);
-        EXPECT_NEAR(thisFanCoil.PLR, 1.0, 0.001);
-        EXPECT_NEAR(thisFanCoil.SpeedRatio, 0.323, 0.001);
-        EXPECT_NEAR(QZnReq, QUnitOut, 1.0);
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, expectedAirFlowRate, 0.000001);
+    ASSERT_TRUE(process_idf(idf_objects));
 
-        // test 3: fancoil cycling between speed levels 2 and 3
-        zSysEDemand.RemainingOutputReqToCoolSP = 8000.0;
-        zSysEDemand.RemainingOutputReqToHeatSP = 8000.0;
-        zSysEDemand.RemainingOutputRequired = 8000.0;
-        QZnReq = 8000.0;
-        QUnitOut = 0.0;
-        QLatOut = 0.0;
-        InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow) +
-            thisFanCoil.SpeedRatio * (1.0 * thisFanCoil.MaxAirMassFlow);
-        // expect fan speed 3 and fan and fancoil cycling b/n speed 2 and 3
-        EXPECT_EQ(thisFanCoil.SpeedFanSel, 3);
-        EXPECT_NEAR(thisFanCoil.PLR, 1.0, 0.001);
-        EXPECT_NEAR(thisFanCoil.SpeedRatio, 0.485, 0.001);
-        EXPECT_NEAR(QZnReq, QUnitOut, 1.0);
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate,expectedAirFlowRate, 0.000001);
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
+    GetZoneEquipmentData(*state);
+    ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    GetFanCoilUnits(*state);
+    auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
+    EXPECT_EQ("MULTISPEEDFAN", thisFanCoil.CapCtrlMeth);
+    EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
+    EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
+    EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
+    EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
+    EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
-        // test 4: expect fancoil to run at maximum speed / full capacity
-        zSysEDemand.RemainingOutputReqToCoolSP = 10200.0;
-        zSysEDemand.RemainingOutputReqToHeatSP = 10200.0;
-        zSysEDemand.RemainingOutputRequired = 10200;
-        QZnReq = 10200;
-        QUnitOut = 0.0;
-        QLatOut = 0.0;
-        InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        expectedAirFlowRate = thisFanCoil.MaxAirMassFlow;
-        // expect fan speed 3 and fancoil running at max speed
-        EXPECT_EQ(thisFanCoil.SpeedFanSel, 3);
-        EXPECT_NEAR(thisFanCoil.PLR, 1.0, 0.001);
-        EXPECT_NEAR(thisFanCoil.SpeedRatio, 1.0, 0.001);
-        EXPECT_NEAR(10075.0, QUnitOut, 1.0);
-        EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, expectedAirFlowRate, 0.000001);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    AirMassFlow = 0.60;
+    MaxAirMassFlow = 0.60;
+    ColdWaterMassFlowRate = 1.0;
+    thisFanCoil.OutAirMassFlow = 0.0;
+    thisFanCoil.MaxAirMassFlow = MaxAirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.OutsideAirNode).MassFlowRateMax = 0.0;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMinAvail = AirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMax = MaxAirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
+    // outside air mixer
+    auto &MixerOA(state->dataMixedAir->OAMixer(1));
+    state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
+    state->dataLoopNodes->Node(MixerOA.RetNode).Temp = 22.0;
+    state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy = 36000;
+    state->dataLoopNodes->Node(MixerOA.RetNode).HumRat =
+        PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.RetNode).Temp, state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy);
+    state->dataLoopNodes->Node(MixerOA.InletNode).Temp = 10.0;
+    state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy = 18000;
+    state->dataLoopNodes->Node(MixerOA.InletNode).HumRat =
+        PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.InletNode).Temp, state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy);
+    // chilled water coil
+    auto &CWCoil(state->dataWaterCoils->WaterCoil(1));
+    CWCoil.UACoilTotal = 470.0;
+    CWCoil.UACoilExternal = 611.0;
+    CWCoil.UACoilInternal = 2010.0;
+    CWCoil.TotCoilOutsideSurfArea = 50.0;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    CWCoil.InletWaterMassFlowRate = ColdWaterMassFlowRate;
+    CWCoil.MaxWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
+    state->dataLoopNodes->Node(CWCoil.WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    CWCoil.WaterLoopNum = 1;
+    CWCoil.WaterLoopSide = 1;
+    CWCoil.WaterLoopBranchNum = 1;
+    CWCoil.WaterLoopCompNum = 1;
+    // electric heating coil
+    auto &eHCoil(state->dataHeatingCoils->HeatingCoil(1));
+    state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
     }
+    // chilled water plant loop
+    auto &CWLoop(state->dataPlnt->PlantLoop(1));
+    CWLoop.Name = "ChilledWaterLoop";
+    CWLoop.FluidName = "ChilledWater";
+    CWLoop.FluidIndex = 1;
+    CWLoop.FluidName = "WATER";
+    CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
 
-    TEST_F(EnergyPlusFixture, FanCoil_CalcFanCoilElecHeatCoilPLRResidual)
-    {
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
+    state->dataGlobal->DoingSizing = true;
+    state->dataFans->LocalTurnFansOff = false;
+    state->dataFans->LocalTurnFansOn = true;
+    // heating mode tests
+    state->dataFanCoilUnits->CoolingLoad = false;
+    state->dataFanCoilUnits->HeatingLoad = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
 
-        int FanCoilNum(1);
-        int ZoneNum(1);
-        bool FirstHVACIteration(false);
-        bool ErrorsFound(false);
-        Real64 QZnReq(0.0);
-        Real64 ColdWaterMassFlowRate(0.0);
-        Real64 QUnitOut(0.0);
-        Real64 QLatOut(0.0);
-        Real64 AirMassFlow(0.0);
-        Real64 MaxAirMassFlow(0.0);
+    state->dataEnvrn->StdRhoAir = 1.2;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    UpdateScheduleValues(*state);
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = 4;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    auto &fZoneSizing(state->dataSize->FinalZoneSizing(1));
+    fZoneSizing.DesCoolVolFlow = 0.5;
+    fZoneSizing.DesHeatVolFlow = 0.5;
+    fZoneSizing.DesCoolCoilInTemp = 30.0;
+    fZoneSizing.DesCoolCoilInHumRat = 0.01;
+    fZoneSizing.DesHeatCoilInTemp = 20.0;
+    fZoneSizing.DesHeatCoilInHumRat = 0.005;
+    fZoneSizing.DesCoolLoad = 10000.0;
+    fZoneSizing.DesHeatLoad = 10000.0;
+    thisFanCoil.DesignHeatingCapacity = 10000.0;
 
-        state->dataEnvrn->OutBaroPress = 101325.0;
-        state->dataEnvrn->StdRhoAir = 1.20;
-        state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        state->dataGlobalNames->NumCoils = 0;
-        state->dataGlobal->NumOfTimeStepInHour = 1;
-        state->dataGlobal->TimeStep = 1;
-        state->dataGlobal->MinutesPerTimeStep = 60;
-        state->dataSize->CurZoneEqNum = 1;
+    // test 1: fancoil unit cycling on/off at speed 1
+    zSysEDemand.RemainingOutputReqToCoolSP = 2000.0;
+    zSysEDemand.RemainingOutputReqToHeatSP = 2000.0;
+    zSysEDemand.RemainingOutputRequired = 2000.0;
+    QZnReq = 2000.0;
+    QUnitOut = 0.0;
+    QLatOut = 0.0;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Real64 expectedAirFlowRate = thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio;
+    // expect fan speed 1 and fan and coil cycling to meet load
+    EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
+    EXPECT_EQ(thisFanCoil.SpeedRatio, 0.0);
+    EXPECT_NEAR(thisFanCoil.PLR, 0.662, 0.001);
+    EXPECT_NEAR(QZnReq, QUnitOut, 1.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, expectedAirFlowRate, 0.000001);
 
-        InitializePsychRoutines();
+    // test 2: fancoil cycling between speed levels 1 and 2
+    zSysEDemand.RemainingOutputReqToCoolSP = 4000.0;
+    zSysEDemand.RemainingOutputReqToHeatSP = 4000.0;
+    zSysEDemand.RemainingOutputRequired = 4000.0;
+    QZnReq = 4000.0;
+    QUnitOut = 0.0;
+    QLatOut = 0.0;
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.LowSpeedRatio * thisFanCoil.MaxAirMassFlow) +
+                          thisFanCoil.SpeedRatio * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow);
+    // expect fan speed 2 and fan and fancoil cycling b/n speed 1 and 2
+    EXPECT_EQ(thisFanCoil.SpeedFanSel, 2);
+    EXPECT_NEAR(thisFanCoil.PLR, 1.0, 0.001);
+    EXPECT_NEAR(thisFanCoil.SpeedRatio, 0.323, 0.001);
+    EXPECT_NEAR(QZnReq, QUnitOut, 1.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, expectedAirFlowRate, 0.000001);
 
-        std::string const idf_objects = delimited_string({
-            " Zone,",
-            "  EAST ZONE,     !- Name",
-            "  0,             !- Direction of Relative North { deg }",
-            "  0,             !- X Origin { m }",
-            "  0,             !- Y Origin { m }",
-            "  0,             !- Z Origin { m }",
-            "  1,             !- Type",
-            "  1,             !- Multiplier",
-            "  autocalculate, !- Ceiling Height { m }",
-            "  autocalculate; !- Volume { m3 }",
+    // test 3: fancoil cycling between speed levels 2 and 3
+    zSysEDemand.RemainingOutputReqToCoolSP = 8000.0;
+    zSysEDemand.RemainingOutputReqToHeatSP = 8000.0;
+    zSysEDemand.RemainingOutputRequired = 8000.0;
+    QZnReq = 8000.0;
+    QUnitOut = 0.0;
+    QLatOut = 0.0;
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow) +
+                          thisFanCoil.SpeedRatio * (1.0 * thisFanCoil.MaxAirMassFlow);
+    // expect fan speed 3 and fan and fancoil cycling b/n speed 2 and 3
+    EXPECT_EQ(thisFanCoil.SpeedFanSel, 3);
+    EXPECT_NEAR(thisFanCoil.PLR, 1.0, 0.001);
+    EXPECT_NEAR(thisFanCoil.SpeedRatio, 0.485, 0.001);
+    EXPECT_NEAR(QZnReq, QUnitOut, 1.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, expectedAirFlowRate, 0.000001);
 
-            " ZoneHVAC:EquipmentConnections,",
-            "  EAST ZONE,          !- Zone Name",
-            "  Zone1Equipment,     !- Zone Conditioning Equipment List Name",
-            "  Zone1Inlets,        !- Zone Air Inlet Node or NodeList Name",
-            "  Zone1Exhausts,      !- Zone Air Exhaust Node or NodeList Name",
-            "  Zone 1 Node,        !- Zone Air Node Name",
-            "  Zone 1 Outlet Node; !- Zone Return Air Node Name",
+    // test 4: expect fancoil to run at maximum speed / full capacity
+    zSysEDemand.RemainingOutputReqToCoolSP = 10200.0;
+    zSysEDemand.RemainingOutputReqToHeatSP = 10200.0;
+    zSysEDemand.RemainingOutputRequired = 10200;
+    QZnReq = 10200;
+    QUnitOut = 0.0;
+    QLatOut = 0.0;
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    expectedAirFlowRate = thisFanCoil.MaxAirMassFlow;
+    // expect fan speed 3 and fancoil running at max speed
+    EXPECT_EQ(thisFanCoil.SpeedFanSel, 3);
+    EXPECT_NEAR(thisFanCoil.PLR, 1.0, 0.001);
+    EXPECT_NEAR(thisFanCoil.SpeedRatio, 1.0, 0.001);
+    EXPECT_NEAR(10075.0, QUnitOut, 1.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, expectedAirFlowRate, 0.000001);
+}
 
-            " ZoneHVAC:EquipmentList,",
-            "  Zone1Equipment,           !- Name",
-            "  SequentialLoad,           !- Load Distribution Scheme",
-            "  ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
-            "  Zone1FanCoil,             !- Zone Equipment 1 Name",
-            "  1,                        !- Zone Equipment 1 Cooling Sequence",
-            "  1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
+TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanContFanMode)
+{
 
-            " NodeList,",
-            "  Zone1Inlets,              !- Name",
-            "  Zone1FanCoilAirOutletNode;!- Node 1 Name",
+    int FanCoilNum(1);
+    int ZoneNum(1);
+    bool FirstHVACIteration(false);
+    bool ErrorsFound(false);
+    Real64 QZnReq(0.0);
+    Real64 ColdWaterMassFlowRate(0.0);
+    Real64 QUnitOut(0.0);
+    Real64 QLatOut(0.0);
+    Real64 AirMassFlow(0.0);
+    Real64 MaxAirMassFlow(0.0);
 
-            " NodeList,",
-            "  Zone1Exhausts,            !- Name",
-            "  Zone1FanCoilAirInletNode; !- Node 1 Name",
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataWaterCoils->GetWaterCoilsInputFlag = true;
+    state->dataGlobalNames->NumCoils = 0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataSize->CurZoneEqNum = 1;
 
-            " OutdoorAir:NodeList,",
-            "  Zone1FanCoilOAInNode;     !- Node or NodeList Name 1",
+    InitializePsychRoutines(*state);
 
-            " OutdoorAir:Mixer,",
-            "  Zone1FanCoilOAMixer,      !- Name",
-            "  Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
-            "  Zone1FanCoilOAInNode,     !- Outdoor Air Stream Node Name",
-            "  Zone1FanCoilExhNode,      !- Relief Air Stream Node Name",
-            "  Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
+    std::string const idf_objects = delimited_string({
+        " Zone,",
+        "  EAST ZONE,     !- Name",
+        "  0,             !- Direction of Relative North { deg }",
+        "  0,             !- X Origin { m }",
+        "  0,             !- Y Origin { m }",
+        "  0,             !- Z Origin { m }",
+        "  1,             !- Type",
+        "  1,             !- Multiplier",
+        "  autocalculate, !- Ceiling Height { m }",
+        "  autocalculate; !- Volume { m3 }",
 
-            " Schedule:Constant,",
-            "  FanAndCoilAvailSched,     !- Name",
-            "  FRACTION,                 !- Schedule Type",
-            "  1;                        !- TimeStep Value",
+        " ZoneHVAC:EquipmentConnections,",
+        "  EAST ZONE,          !- Zone Name",
+        "  Zone1Equipment,     !- Zone Conditioning Equipment List Name",
+        "  Zone1Inlets,        !- Zone Air Inlet Node or NodeList Name",
+        "  Zone1Exhausts,      !- Zone Air Exhaust Node or NodeList Name",
+        "  Zone 1 Node,        !- Zone Air Node Name",
+        "  Zone 1 Outlet Node; !- Zone Return Air Node Name",
 
-            " ScheduleTypeLimits,",
-            "  Fraction,                 !- Name",
-            "  0.0,                      !- Lower Limit Value",
-            "  1.0,                      !- Upper Limit Value",
-            "  CONTINUOUS;               !- Numeric Type",
+        " ZoneHVAC:EquipmentList,",
+        "  Zone1Equipment,           !- Name",
+        "  SequentialLoad,           !- Load Distribution Scheme",
+        "  ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
+        "  Zone1FanCoil,             !- Zone Equipment 1 Name",
+        "  1,                        !- Zone Equipment 1 Cooling Sequence",
+        "  1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
 
-            " Fan:SystemModel,",
-            "  Zone1FanCoilFan,         !- Name",
-            "  FanAndCoilAvailSched,    !- Availability Schedule Name",
-            "  Zone1FanCoilOAMixerOutletNode,  !- Air Inlet Node Name",
-            "  Zone1FanCoilFanOutletNode,  !- Air Outlet Node Name",
-            "  0.5,                     !- Design Maximum Air Flow Rate {m3/s}",
-            "  Discrete,                !- Speed Control Method",
-            "  0.0,                     !- Electric Power Minimum Flow Rate Fraction",
-            "  75,                      !- Design Pressure Rise {Pa}",
-            "  0.9,                     !- Motor Efficiency",
-            "  1,                       !- Motor In Air Stream Fraction",
-            "  ,                        !- Design Electric Power Consumption {W}",
-            "  TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
-            "  ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
-            "  ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
-            "  0.5,                     !- Fan Total Efficiency",
-            "  ,                        !- Electric Power Function of Flow Fraction Curve Name",
-            "  ,                        !- Night Ventilation Mode Pressure Rise {Pa}",
-            "  ,                        !- Night Ventilation Mode Flow Fraction",
-            "  ,                        !- Motor Loss Zone Name",
-            "  ,                        !- Motor Loss Radiative Fraction",
-            "  General,                 !- End-Use Subcategory",
-            "  1,                       !- Number of Speeds",
-            "  1.0,                     !- Speed 1 Flow Fraction",
-            "  1.0;                     !- Speed 1 Electric Power Fraction",
+        " NodeList,",
+        "  Zone1Inlets,              !- Name",
+        "  Zone1FanCoilAirOutletNode;!- Node 1 Name",
 
-            " Coil:Cooling:Water,",
-            "  Zone1FanCoilCoolingCoil,  !- Name",
-            "  FanAndCoilAvailSched,     !- Availability Schedule Namev",
-            "  0.0002,                   !- Design Water Flow Rate { m3 / s }",
-            "  0.5000,                   !- Design Air Flow Rate { m3 / s }",
-            "  7.22,                     !- Design Inlet Water Temperature { Cv }",
-            "  24.340,                   !- Design Inlet Air Temperature { C }",
-            "  14.000,                   !- Design Outlet Air Temperature { C }",
-            "  0.0095,                   !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "  0.0090,                   !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "  Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
-            "  Zone1FanCoilChWOutletNode,!- Water Outlet Node Name",
-            "  Zone1FanCoilFanOutletNode,!- Air Inlet Node Name",
-            "  Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
-            "  SimpleAnalysis,           !- Type of Analysis",
-            "  CrossFlow;                !- Heat Exchanger Configuration",
+        " NodeList,",
+        "  Zone1Exhausts,            !- Name",
+        "  Zone1FanCoilAirInletNode; !- Node 1 Name",
 
-            " Coil:Heating:Electric,",
-            "  Zone1FanCoilHeatingCoil,   !- Name",
-            "  FanAndCoilAvailSched,      !- Availability Schedule Name",
-            "  1,                         !- Efficiency",
-            "  10000.0,                    !- Nominal Capacity {W}",
-            "  Zone1FanCoilCCOutletNode,  !- Air Inlet Node Name",
-            "  Zone1FanCoilAirOutletNode; !- Air Outlet Node Name",
+        " OutdoorAir:NodeList,",
+        "  Zone1FanCoilOAInNode;     !- Node or NodeList Name 1",
 
-            " ZoneHVAC:FourPipeFanCoil,",
-            "  Zone1FanCoil,              !- Name",
-            "  FanAndCoilAvailSched,      !- Availability Schedule Name",
-            "  MultiSpeedFan,             !- Capacity Control Method",
-            "  0.5,                       !- Maximum Supply Air Flow Rate { m3 / s }",
-            "  0.3,                       !- Low Speed Supply Air Flow Ratio",
-            "  0.6,                       !- Medium Speed Supply Air Flow Ratio",
-            "  0.0,                       !- Maximum Outdoor Air Flow Rate { m3 / s }",
-            "  FanAndCoilAvailSched,      !- Outdoor Air Schedule Name",
-            "  Zone1FanCoilAirInletNode,  !- Air Inlet Node Name",
-            "  Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
-            "  OutdoorAir:Mixer,          !- Outdoor Air Mixer Object Type",
-            "  Zone1FanCoilOAMixer,       !- Outdoor Air Mixer Name",
-            "  Fan:SystemModel,           !- Supply Air Fan Object Type",
-            "  Zone1FanCoilFan,           !- Supply Air Fan Name",
-            "  Coil:Cooling:Water,        !- Cooling Coil Object Type",
-            "  Zone1FanCoilCoolingCoil,   !- Cooling Coil Name",
-            "  0.00014,                   !- Maximum Cold Water Flow Rate { m3 / s }",
-            "  0.0,                       !- Minimum Cold Water Flow Rate { m3 / s }",
-            "  0.001,                     !- Cooling Convergence Tolerance",
-            "  Coil:Heating:Electric,     !- Heating Coil Object Type",
-            "  Zone1FanCoilHeatingCoil,   !- Heating Coil Name",
-            "  0.0,                       !- Maximum Hot Water Flow Rate { m3 / s }",
-            "  0.0,                       !- Minimum Hot Water Flow Rate { m3 / s }",
-            "  0.001,                     !- Heating Convergence Tolerance",
-            "  ,                          !- Availability Manager List Name",
-            "  ,                          !- Design Specification ZoneHVAC Sizing Object Name",
-            "  ContsFanOperatingSch;      !- Supply Air Fan Operating Mode Schedule Name",
+        " OutdoorAir:Mixer,",
+        "  Zone1FanCoilOAMixer,      !- Name",
+        "  Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
+        "  Zone1FanCoilOAInNode,     !- Outdoor Air Stream Node Name",
+        "  Zone1FanCoilExhNode,      !- Relief Air Stream Node Name",
+        "  Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
 
-            " Schedule:Constant,",
-            "  ContsFanOperatingSch,      !- Name",
-            "  FRACTION,                  !- Schedule Type",
-            "  1;                         !- TimeStep Value",
+        " Schedule:Constant,",
+        "  FanAndCoilAvailSched,     !- Name",
+        "  FRACTION,                 !- Schedule Type",
+        "  1;                        !- TimeStep Value",
 
-            });
+        " ScheduleTypeLimits,",
+        "  Fraction,                 !- Name",
+        "  0.0,                      !- Lower Limit Value",
+        "  1.0,                      !- Upper Limit Value",
+        "  CONTINUOUS;               !- Numeric Type",
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        " Fan:SystemModel,",
+        "  Zone1FanCoilFan,         !- Name",
+        "  FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "  Zone1FanCoilOAMixerOutletNode,  !- Air Inlet Node Name",
+        "  Zone1FanCoilFanOutletNode,  !- Air Outlet Node Name",
+        "  0.5,                     !- Design Maximum Air Flow Rate {m3/s}",
+        "  Discrete,                !- Speed Control Method",
+        "  0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "  75,                      !- Design Pressure Rise {Pa}",
+        "  0.9,                     !- Motor Efficiency",
+        "  1,                       !- Motor In Air Stream Fraction",
+        "  ,                        !- Design Electric Power Consumption {W}",
+        "  TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "  ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "  ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "  0.5,                     !- Fan Total Efficiency",
+        "  ,                        !- Electric Power Function of Flow Fraction Curve Name",
+        "  ,                        !- Night Ventilation Mode Pressure Rise {Pa}",
+        "  ,                        !- Night Ventilation Mode Flow Fraction",
+        "  ,                        !- Motor Loss Zone Name",
+        "  ,                        !- Motor Loss Radiative Fraction",
+        "  General,                 !- End-Use Subcategory",
+        "  1,                       !- Number of Speeds",
+        "  1.0,                     !- Speed 1 Flow Fraction",
+        "  1.0;                     !- Speed 1 Electric Power Fraction",
 
-        GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
-        GetZoneEquipmentData(*state);
-        ProcessScheduleInput(*state);
-        state->dataScheduleMgr->ScheduleInputProcessed = true;
-        GetFanCoilUnits(*state);
-        auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
-        EXPECT_EQ("MULTISPEEDFAN", thisFanCoil.CapCtrlMeth);
-        EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
-        EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
-        EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
-        EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
-        EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
+        " Coil:Cooling:Water,",
+        "  Zone1FanCoilCoolingCoil,  !- Name",
+        "  FanAndCoilAvailSched,     !- Availability Schedule Namev",
+        "  0.0002,                   !- Design Water Flow Rate { m3 / s }",
+        "  0.5000,                   !- Design Air Flow Rate { m3 / s }",
+        "  7.22,                     !- Design Inlet Water Temperature { Cv }",
+        "  24.340,                   !- Design Inlet Air Temperature { C }",
+        "  14.000,                   !- Design Outlet Air Temperature { C }",
+        "  0.0095,                   !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "  0.0090,                   !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "  Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
+        "  Zone1FanCoilChWOutletNode,!- Water Outlet Node Name",
+        "  Zone1FanCoilFanOutletNode,!- Air Inlet Node Name",
+        "  Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
+        "  SimpleAnalysis,           !- Type of Analysis",
+        "  CrossFlow;                !- Heat Exchanger Configuration",
 
-        state->dataPlnt->TotNumLoops = 1;
-        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-        AirMassFlow = 0.60;
-        MaxAirMassFlow = 0.60;
-        ColdWaterMassFlowRate = 1.0;
-        thisFanCoil.OutAirMassFlow = 0.0;
-        thisFanCoil.MaxAirMassFlow = MaxAirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.OutsideAirNode).MassFlowRateMax = 0.0;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMinAvail = AirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMax = MaxAirMassFlow;
-        state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
-        // outside air mixer
-        auto &MixerOA(state->dataMixedAir->OAMixer(1));
-        state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
-        state->dataLoopNodes->Node(MixerOA.RetNode).Temp = 22.0;
-        state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy = 36000;
-        state->dataLoopNodes->Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.RetNode).Temp, state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy);
-        state->dataLoopNodes->Node(MixerOA.InletNode).Temp = 10.0;
-        state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy = 18000;
-        state->dataLoopNodes->Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.InletNode).Temp, state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy);
-        // chilled water coil
-        auto &CWCoil(state->dataWaterCoils->WaterCoil(1));
-        CWCoil.UACoilTotal = 470.0;
-        CWCoil.UACoilExternal = 611.0;
-        CWCoil.UACoilInternal = 2010.0;
-        CWCoil.TotCoilOutsideSurfArea = 50.0;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMin = AirMassFlow;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
-        CWCoil.InletWaterMassFlowRate = ColdWaterMassFlowRate;
-        CWCoil.MaxWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
-        state->dataLoopNodes->Node(CWCoil.WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-        CWCoil.WaterLoopNum = 1;
-        CWCoil.WaterLoopSide = 1;
-        CWCoil.WaterLoopBranchNum = 1;
-        CWCoil.WaterLoopCompNum = 1;
-        // electric heating coil
-        auto &eHCoil(state->dataHeatingCoils->HeatingCoil(1));
-        state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+        " Coil:Heating:Electric,",
+        "  Zone1FanCoilHeatingCoil,   !- Name",
+        "  FanAndCoilAvailSched,      !- Availability Schedule Name",
+        "  1,                         !- Efficiency",
+        "  10000.0,                    !- Nominal Capacity {W}",
+        "  Zone1FanCoilCCOutletNode,  !- Air Inlet Node Name",
+        "  Zone1FanCoilAirOutletNode; !- Air Outlet Node Name",
 
-        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-            auto &loop(state->dataPlnt->PlantLoop(l));
-            loop.LoopSide.allocate(2);
-            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
-            loopside.TotalBranches = 1;
-            loopside.Branch.allocate(1);
-            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
-            loopsidebranch.TotalComponents = 1;
-            loopsidebranch.Comp.allocate(1);
-        }
-        // chilled water plant loop
-        auto &CWLoop(state->dataPlnt->PlantLoop(1));
-        CWLoop.Name = "ChilledWaterLoop";
-        CWLoop.FluidName = "ChilledWater";
-        CWLoop.FluidIndex = 1;
-        CWLoop.FluidName = "WATER";
-        CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
-        CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
-        CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
-        CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
+        " ZoneHVAC:FourPipeFanCoil,",
+        "  Zone1FanCoil,              !- Name",
+        "  FanAndCoilAvailSched,      !- Availability Schedule Name",
+        "  MultiSpeedFan,             !- Capacity Control Method",
+        "  0.5,                       !- Maximum Supply Air Flow Rate { m3 / s }",
+        "  0.3,                       !- Low Speed Supply Air Flow Ratio",
+        "  0.6,                       !- Medium Speed Supply Air Flow Ratio",
+        "  0.0,                       !- Maximum Outdoor Air Flow Rate { m3 / s }",
+        "  FanAndCoilAvailSched,      !- Outdoor Air Schedule Name",
+        "  Zone1FanCoilAirInletNode,  !- Air Inlet Node Name",
+        "  Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "  OutdoorAir:Mixer,          !- Outdoor Air Mixer Object Type",
+        "  Zone1FanCoilOAMixer,       !- Outdoor Air Mixer Name",
+        "  Fan:SystemModel,           !- Supply Air Fan Object Type",
+        "  Zone1FanCoilFan,           !- Supply Air Fan Name",
+        "  Coil:Cooling:Water,        !- Cooling Coil Object Type",
+        "  Zone1FanCoilCoolingCoil,   !- Cooling Coil Name",
+        "  0.00014,                   !- Maximum Cold Water Flow Rate { m3 / s }",
+        "  0.0,                       !- Minimum Cold Water Flow Rate { m3 / s }",
+        "  0.001,                     !- Cooling Convergence Tolerance",
+        "  Coil:Heating:Electric,     !- Heating Coil Object Type",
+        "  Zone1FanCoilHeatingCoil,   !- Heating Coil Name",
+        "  0.0,                       !- Maximum Hot Water Flow Rate { m3 / s }",
+        "  0.0,                       !- Minimum Hot Water Flow Rate { m3 / s }",
+        "  0.001,                     !- Heating Convergence Tolerance",
+        "  ,                          !- Availability Manager List Name",
+        "  ,                          !- Design Specification ZoneHVAC Sizing Object Name",
+        "  ContsFanOperatingSch;      !- Supply Air Fan Operating Mode Schedule Name",
 
-        state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        state->dataGlobal->DoingSizing = true;
-        state->dataFans->LocalTurnFansOff = false;
-        state->dataFans->LocalTurnFansOn = true;
-        // heating mode tests
-        state->dataFanCoilUnits->CoolingLoad = false;
-        state->dataFanCoilUnits->HeatingLoad = true;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-        auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
+        " Schedule:Constant,",
+        "  ContsFanOperatingSch,      !- Name",
+        "  FRACTION,                  !- Schedule Type",
+        "  1;                         !- TimeStep Value",
 
-        state->dataEnvrn->StdRhoAir = 1.2;
-        state->dataEnvrn->Month = 1;
-        state->dataEnvrn->DayOfMonth = 21;
-        state->dataGlobal->HourOfDay = 1;
-        state->dataEnvrn->DSTIndicator = 0;
-        state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 0;
-        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-        UpdateScheduleValues(*state);
-        state->dataSize->ZoneEqSizing.allocate(1);
-        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
-        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
-        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
-        state->dataHeatBalFanSys->TempControlType.allocate(1);
-        state->dataHeatBalFanSys->TempControlType(1) = 4;
-        state->dataSize->ZoneSizingRunDone = true;
-        state->dataSize->FinalZoneSizing.allocate(1);
-        auto &fZoneSizing(state->dataSize->FinalZoneSizing(1));
-        fZoneSizing.DesCoolVolFlow = 0.5;
-        fZoneSizing.DesHeatVolFlow = 0.5;
-        fZoneSizing.DesCoolCoilInTemp = 30.0;
-        fZoneSizing.DesCoolCoilInHumRat = 0.01;
-        fZoneSizing.DesHeatCoilInTemp = 20.0;
-        fZoneSizing.DesHeatCoilInHumRat = 0.005;
-        fZoneSizing.DesCoolLoad = 10000.0;
-        fZoneSizing.DesHeatLoad = 10000.0;
-        thisFanCoil.DesignHeatingCapacity = 10000.0;
+    });
 
-        // test 1: fancoil unit cycling on/off at speed 1
-        zSysEDemand.RemainingOutputReqToCoolSP = 2000.0;
-        zSysEDemand.RemainingOutputReqToHeatSP = 2000.0;
-        zSysEDemand.RemainingOutputRequired = 2000.0;
-        int InletNode = thisFanCoil.AirInNode;
-        Real64 QUnitOutMaxLS = 0.0; // low speed maximum output
+    ASSERT_TRUE(process_idf(idf_objects));
 
-        InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
+    GetZoneEquipmentData(*state);
+    ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    GetFanCoilUnits(*state);
+    auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
+    EXPECT_EQ("MULTISPEEDFAN", thisFanCoil.CapCtrlMeth);
+    EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
+    EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
+    EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
+    EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
+    EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
-        state->dataFanCoilUnits->FanCoil(FanCoilNum).SpeedFanSel = 1;
-        state->dataFanCoilUnits->FanCoil(FanCoilNum).SpeedFanRatSel = state->dataFanCoilUnits->FanCoil(FanCoilNum).LowSpeedRatio;
-        state->dataFanCoilUnits->FanFlowRatio = state->dataFanCoilUnits->FanCoil(FanCoilNum).SpeedFanRatSel;
-        AirMassFlow = state->dataFanCoilUnits->FanCoil(FanCoilNum).LowSpeedRatio * state->dataFanCoilUnits->FanCoil(FanCoilNum).MaxAirMassFlow;
-        state->dataLoopNodes->Node(InletNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(InletNode).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
-        state->dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = AirMassFlow;
-        Calc4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMaxLS, _, 1.0);
-        EXPECT_NEAR(QUnitOutMaxLS, 3022.5, 1.0);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    AirMassFlow = 0.60;
+    MaxAirMassFlow = 0.60;
+    ColdWaterMassFlowRate = 1.0;
+    thisFanCoil.OutAirMassFlow = 0.0;
+    thisFanCoil.MaxAirMassFlow = MaxAirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.OutsideAirNode).MassFlowRateMax = 0.0;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMinAvail = AirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMax = MaxAirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
+    // outside air mixer
+    auto &MixerOA(state->dataMixedAir->OAMixer(1));
+    state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
+    state->dataLoopNodes->Node(MixerOA.RetNode).Temp = 22.0;
+    state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy = 36000;
+    state->dataLoopNodes->Node(MixerOA.RetNode).HumRat =
+        PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.RetNode).Temp, state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy);
+    state->dataLoopNodes->Node(MixerOA.InletNode).Temp = 10.0;
+    state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy = 18000;
+    state->dataLoopNodes->Node(MixerOA.InletNode).HumRat =
+        PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.InletNode).Temp, state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy);
+    // chilled water coil
+    auto &CWCoil(state->dataWaterCoils->WaterCoil(1));
+    CWCoil.UACoilTotal = 470.0;
+    CWCoil.UACoilExternal = 611.0;
+    CWCoil.UACoilInternal = 2010.0;
+    CWCoil.TotCoilOutsideSurfArea = 50.0;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    CWCoil.InletWaterMassFlowRate = ColdWaterMassFlowRate;
+    CWCoil.MaxWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
+    state->dataLoopNodes->Node(CWCoil.WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    CWCoil.WaterLoopNum = 1;
+    CWCoil.WaterLoopSide = 1;
+    CWCoil.WaterLoopBranchNum = 1;
+    CWCoil.WaterLoopCompNum = 1;
+    // electric heating coil
+    auto &eHCoil(state->dataHeatingCoils->HeatingCoil(1));
+    state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        int MaxIter = 10;
-        int SolFlag = 0;
-        Array1D<Real64> Par(5);
-        Real64 CyclingRatio = 1.0;
-        // test 1: fan runs continuously at low speed and
-        // only heating coil cycles On/Off to meet load
-        QZnReq = 2000.0;
-        Par(1) = double(FanCoilNum);
-        Par(2) = 0.0;
-        if (FirstHVACIteration) Par(2) = 1.0;
-        Par(3) = ZoneNum;
-        Par(4) = QZnReq;
-        Par(5) = double(state->dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode);
-        TempSolveRoot::SolveRoot(*state, 0.001, MaxIter, SolFlag, CyclingRatio, CalcFanCoilHeatCoilPLRResidual, 0.0, 1.0, Par);
-        Real64 expectedAirFlowRate = thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio;
-        EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
-        EXPECT_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, expectedAirFlowRate);
-        EXPECT_NEAR(CyclingRatio, 0.659, 0.001);
-        // test 2: fan runs continuously at low speed and only
-        // the heating coil cycles on/off to meet reduced load
-        zSysEDemand.RemainingOutputReqToCoolSP = 1000.0;
-        zSysEDemand.RemainingOutputReqToHeatSP = 1000.0;
-        zSysEDemand.RemainingOutputRequired = 1000.0;
-        QZnReq = 1000.0;
-        Par(1) = double(FanCoilNum);
-        Par(2) = 0.0;
-        if (FirstHVACIteration) Par(2) = 1.0;
-        Par(3) = ZoneNum;
-        Par(4) = QZnReq;
-        Par(5) = double(state->dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode);
-        TempSolveRoot::SolveRoot(*state, 0.001, MaxIter, SolFlag, CyclingRatio, CalcFanCoilHeatCoilPLRResidual, 0.0, 1.0, Par);
-        expectedAirFlowRate = thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio;
-        EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
-        EXPECT_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, expectedAirFlowRate);
-        EXPECT_NEAR(CyclingRatio, 0.326, 0.001);
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
     }
+    // chilled water plant loop
+    auto &CWLoop(state->dataPlnt->PlantLoop(1));
+    CWLoop.Name = "ChilledWaterLoop";
+    CWLoop.FluidName = "ChilledWater";
+    CWLoop.FluidIndex = 1;
+    CWLoop.FluidName = "WATER";
+    CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
 
-    TEST_F(EnergyPlusFixture, FanCoil_ElectricHeatingCoilASHRAE90VariableFan)
-    {
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
+    state->dataGlobal->DoingSizing = true;
+    state->dataFans->LocalTurnFansOff = false;
+    state->dataFans->LocalTurnFansOn = true;
+    // heating mode tests
+    state->dataFanCoilUnits->CoolingLoad = false;
+    state->dataFanCoilUnits->HeatingLoad = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
 
-        int FanCoilNum(1);
-        int ZoneNum(1);
-        bool FirstHVACIteration(false);
-        bool ErrorsFound(false);
-        Real64 QZnReq(0.0);
-        Real64 ColdWaterMassFlowRate(0.0);
-        Real64 QUnitOut(0.0);
-        Real64 QLatOut(0.0);
-        Real64 AirMassFlow(0.0);
-        Real64 MaxAirMassFlow(0.0);
+    state->dataEnvrn->StdRhoAir = 1.2;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    UpdateScheduleValues(*state);
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = 4;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    auto &fZoneSizing(state->dataSize->FinalZoneSizing(1));
+    fZoneSizing.DesCoolVolFlow = 0.5;
+    fZoneSizing.DesHeatVolFlow = 0.5;
+    fZoneSizing.DesCoolCoilInTemp = 30.0;
+    fZoneSizing.DesCoolCoilInHumRat = 0.01;
+    fZoneSizing.DesHeatCoilInTemp = 20.0;
+    fZoneSizing.DesHeatCoilInHumRat = 0.005;
+    fZoneSizing.DesCoolLoad = 10000.0;
+    fZoneSizing.DesHeatLoad = 10000.0;
+    thisFanCoil.DesignHeatingCapacity = 10000.0;
 
-        std::string const idf_objects = delimited_string({
-            " Zone,",
-            "  WEST ZONE,                 !- Name",
-            "  0,                         !- Direction of Relative North { deg }",
-            "  0,                         !- X Origin { m }",
-            "  0,                         !- Y Origin { m }",
-            "  0,                         !- Z Origin { m }",
-            "  1,                         !- Type",
-            "  1,                         !- Multiplier",
-            "  autocalculate,             !- Ceiling Height { m }",
-            "  autocalculate;             !- Volume { m3 }",
+    // test 1: fancoil unit cycling on/off at speed 1
+    zSysEDemand.RemainingOutputReqToCoolSP = 2000.0;
+    zSysEDemand.RemainingOutputReqToHeatSP = 2000.0;
+    zSysEDemand.RemainingOutputRequired = 2000.0;
+    QZnReq = 2000.0;
+    QUnitOut = 0.0;
+    QLatOut = 0.0;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Real64 expectedAirFlowRate = thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio;
+    // expect fan speed 1, fan runs continuously and only heating coil cycle on/off to meet load
+    EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
+    EXPECT_EQ(thisFanCoil.SpeedRatio, 0.0);
+    EXPECT_NEAR(thisFanCoil.PLR, 0.659, 0.001);
+    EXPECT_NEAR(QZnReq, QUnitOut, 1.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, expectedAirFlowRate, 0.000001);
 
-            " ZoneHVAC:EquipmentConnections,",
-            "  WEST ZONE,                 !- Zone Name",
-            "  ZoneEquipment,             !- Zone Conditioning Equipment List Name",
-            "  FanCoilAirOutletNode,      !- Zone Air Inlet Node or NodeList Name",
-            "  FanCoilAirInletNode,       !- Zone Air Exhaust Node or NodeList Name",
-            "  Zone Air Node,             !- Zone Air Node Name",
-            "  Zone Air Outlet Node;      !- Zone Return Air Node Name",
+    // test 2: fancoil cycling between speed levels 1 and 2
+    zSysEDemand.RemainingOutputReqToCoolSP = 4000.0;
+    zSysEDemand.RemainingOutputReqToHeatSP = 4000.0;
+    zSysEDemand.RemainingOutputRequired = 4000.0;
+    QZnReq = 4000.0;
+    QUnitOut = 0.0;
+    QLatOut = 0.0;
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.LowSpeedRatio * thisFanCoil.MaxAirMassFlow) +
+                          thisFanCoil.SpeedRatio * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow);
+    // expect fan speed 2 and fan and fancoil cycling b/n speed 1 and 2
+    EXPECT_EQ(thisFanCoil.SpeedFanSel, 2);
+    EXPECT_NEAR(thisFanCoil.PLR, 1.0, 0.001);
+    EXPECT_NEAR(thisFanCoil.SpeedRatio, 0.323, 0.001);
+    EXPECT_NEAR(QZnReq, QUnitOut, 1.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, expectedAirFlowRate, 0.000001);
 
-            " ZoneHVAC:EquipmentList,",
-            "  ZoneEquipment,             !- Name",
-            "  SequentialLoad,            !- Load Distribution Scheme",
-            "  ZoneHVAC:FourPipeFanCoil,  !- Zone Equipment 1 Object Type",
-            "  ZoneFanCoil,               !- Zone Equipment 1 Name",
-            "  1,                         !- Zone Equipment 1 Cooling Sequence",
-            "  1;                         !- Zone Equipment 1 Heating or No - Load Sequence",
+    // test 3: fancoil cycling between speed levels 2 and 3
+    zSysEDemand.RemainingOutputReqToCoolSP = 8000.0;
+    zSysEDemand.RemainingOutputReqToHeatSP = 8000.0;
+    zSysEDemand.RemainingOutputRequired = 8000.0;
+    QZnReq = 8000.0;
+    QUnitOut = 0.0;
+    QLatOut = 0.0;
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow) +
+                          thisFanCoil.SpeedRatio * (1.0 * thisFanCoil.MaxAirMassFlow);
+    // expect fan speed 3 and fan and fancoil cycling b/n speed 2 and 3
+    EXPECT_EQ(thisFanCoil.SpeedFanSel, 3);
+    EXPECT_NEAR(thisFanCoil.PLR, 1.0, 0.001);
+    EXPECT_NEAR(thisFanCoil.SpeedRatio, 0.485, 0.001);
+    EXPECT_NEAR(QZnReq, QUnitOut, 1.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, expectedAirFlowRate, 0.000001);
 
-            " ZoneHVAC:FourPipeFanCoil,",
-            "  ZoneFanCoil,               !- Name",
-            "  FanAndCoilAvailSched,      !- Availability Schedule Name",
-            "  ASHRAE90VariableFan,       !- Capacity Control Method",
-            "  0.5,                       !- Maximum Supply Air Flow Rate { m3 / s }",
-            "  0.3,                       !- Low Speed Supply Air Flow Ratio",
-            "  0.6,                       !- Medium Speed Supply Air Flow Ratio",
-            "  0.0,                       !- Maximum Outdoor Air Flow Rate { m3 / s }",
-            "  FanAndCoilAvailSched,      !- Outdoor Air Schedule Name",
-            "  FanCoilAirInletNode,       !- Air Inlet Node Name",
-            "  FanCoilAirOutletNode,      !- Air Outlet Node Name",
-            "  OutdoorAir:Mixer,          !- Outdoor Air Mixer Object Type",
-            "  FanCoilOAMixer,            !- Outdoor Air Mixer Name",
-            "  Fan:OnOff,                 !- Supply Air Fan Object Type",
-            "  FanCoilFan,                !- Supply Air Fan Name",
-            "  Coil:Cooling:Water,        !- Cooling Coil Object Type",
-            "  FanCoilCoolingCoil,        !- Cooling Coil Name",
-            "  0.00014,                   !- Maximum Cold Water Flow Rate { m3 / s }",
-            "  0.0,                       !- Minimum Cold Water Flow Rate { m3 / s }",
-            "  0.001,                     !- Cooling Convergence Tolerance",
-            "  Coil:Heating:Electric,     !- Heating Coil Object Type",
-            "  FanCoilElecHeatingCoil,    !- Heating Coil Name",
-            "  0.0,                       !- Maximum Hot Water Flow Rate { m3 / s }",
-            "  0.0,                       !- Minimum Hot Water Flow Rate { m3 / s }",
-            "  0.001,                     !- Heating Convergence Tolerance",
-            "  ,                          !- Availability Manager List Name",
-            "  ;                          !- Design Specification ZoneHVAC Sizing Object Name",
+    // test 4: expect fancoil to run at maximum speed / full capacity
+    zSysEDemand.RemainingOutputReqToCoolSP = 10200.0;
+    zSysEDemand.RemainingOutputReqToHeatSP = 10200.0;
+    zSysEDemand.RemainingOutputRequired = 10200;
+    QZnReq = 10200;
+    QUnitOut = 0.0;
+    QLatOut = 0.0;
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    expectedAirFlowRate = thisFanCoil.MaxAirMassFlow;
+    // expect fan speed 3 and fancoil running at max speed
+    EXPECT_EQ(thisFanCoil.SpeedFanSel, 3);
+    EXPECT_NEAR(thisFanCoil.PLR, 1.0, 0.001);
+    EXPECT_NEAR(thisFanCoil.SpeedRatio, 1.0, 0.001);
+    EXPECT_NEAR(10075.0, QUnitOut, 1.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, expectedAirFlowRate, 0.000001);
+}
 
-            " OutdoorAir:NodeList,",
-            "  FanCoilOAInNode;           !- Node or NodeList Name 1",
+TEST_F(EnergyPlusFixture, FanCoil_CalcFanCoilElecHeatCoilPLRResidual)
+{
 
-            " OutdoorAir:Mixer,",
-            "  FanCoilOAMixer,            !- Name",
-            "  FanCoilOAMixerOutletNode,  !- Mixed Air Node Name",
-            "  FanCoilOAInNode,           !- Outdoor Air Stream Node Name",
-            "  FanCoilExhNode,            !- Relief Air Stream Node Name",
-            "  FanCoilAirInletNode;       !- Return Air Stream Node Name",
+    int FanCoilNum(1);
+    int ZoneNum(1);
+    bool FirstHVACIteration(false);
+    bool ErrorsFound(false);
+    Real64 QZnReq(0.0);
+    Real64 ColdWaterMassFlowRate(0.0);
+    Real64 QUnitOut(0.0);
+    Real64 QLatOut(0.0);
+    Real64 AirMassFlow(0.0);
+    Real64 MaxAirMassFlow(0.0);
 
-            " Fan:OnOff,",
-            "  FanCoilFan,                !- Name",
-            "  FanAndCoilAvailSched,      !- Availability Schedule Name",
-            "  0.5,                       !- Fan Total Efficiency",
-            "  75,                        !- Design Pressure Rise {Pa}",
-            "  0.5,                       !- Maximum Air Flow Rate {m3/s}",
-            "  0.9,                       !- Motor Efficiency",
-            "  1,                         !- Motor In Air Stream Fraction",
-            "  FanCoilOAMixerOutletNode,  !- Air Inlet Node Name",
-            "  FanCoilFanOutletNode;      !- Air Outlet Node Name",
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataWaterCoils->GetWaterCoilsInputFlag = true;
+    state->dataGlobalNames->NumCoils = 0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataSize->CurZoneEqNum = 1;
 
-            " Coil:Cooling:Water,",
-            "  FanCoilCoolingCoil,        !- Name",
-            "  FanAndCoilAvailSched,      !- Availability Schedule Namev",
-            "  0.0002,                    !- Design Water Flow Rate { m3 / s }",
-            "  0.5000,                    !- Design Air Flow Rate { m3 / s }",
-            "  7.22,                      !- Design Inlet Water Temperature { Cv }",
-            "  24.340,                    !- Design Inlet Air Temperature { C }",
-            "  14.000,                    !- Design Outlet Air Temperature { C }",
-            "  0.0095,                    !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "  0.0090,                    !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
-            "  FanCoilChWInletNode,       !- Water Inlet Node Name",
-            "  FanCoilChWOutletNode,      !- Water Outlet Node Name",
-            "  FanCoilFanOutletNode,      !- Air Inlet Node Name",
-            "  FanCoilCCOutletNode,       !- Air Outlet Node Name",
-            "  SimpleAnalysis,            !- Type of Analysis",
-            "  CrossFlow;                 !- Heat Exchanger Configuration",
+    InitializePsychRoutines(*state);
 
-            " Coil:Heating:Electric,",
-            "  FanCoilElecHeatingCoil,    !- Name",
-            "  FanAndCoilAvailSched,      !- Availability Schedule Name",
-            "  1,                         !- Efficiency",
-            "  6000.0,                    !- Nominal Capacity {W}",
-            "  FanCoilCCOutletNode,       !- Air Inlet Node Name",
-            "  FanCoilAirOutletNode;      !- Air Outlet Node Name",
+    std::string const idf_objects = delimited_string({
+        " Zone,",
+        "  EAST ZONE,     !- Name",
+        "  0,             !- Direction of Relative North { deg }",
+        "  0,             !- X Origin { m }",
+        "  0,             !- Y Origin { m }",
+        "  0,             !- Z Origin { m }",
+        "  1,             !- Type",
+        "  1,             !- Multiplier",
+        "  autocalculate, !- Ceiling Height { m }",
+        "  autocalculate; !- Volume { m3 }",
 
-            " Schedule:Constant,",
-            "  FanAndCoilAvailSched,      !- Name",
-            "  FRACTION,                  !- Schedule Type",
-            "  1;                         !- TimeStep Value",
+        " ZoneHVAC:EquipmentConnections,",
+        "  EAST ZONE,          !- Zone Name",
+        "  Zone1Equipment,     !- Zone Conditioning Equipment List Name",
+        "  Zone1Inlets,        !- Zone Air Inlet Node or NodeList Name",
+        "  Zone1Exhausts,      !- Zone Air Exhaust Node or NodeList Name",
+        "  Zone 1 Node,        !- Zone Air Node Name",
+        "  Zone 1 Outlet Node; !- Zone Return Air Node Name",
 
-            " ScheduleTypeLimits,",
-            "  Fraction,                  !- Name",
-            "  0.0,                       !- Lower Limit Value",
-            "  1.0,                       !- Upper Limit Value",
-            "  CONTINUOUS;                !- Numeric Type",
-            });
+        " ZoneHVAC:EquipmentList,",
+        "  Zone1Equipment,           !- Name",
+        "  SequentialLoad,           !- Load Distribution Scheme",
+        "  ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
+        "  Zone1FanCoil,             !- Zone Equipment 1 Name",
+        "  1,                        !- Zone Equipment 1 Cooling Sequence",
+        "  1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        " NodeList,",
+        "  Zone1Inlets,              !- Name",
+        "  Zone1FanCoilAirOutletNode;!- Node 1 Name",
 
-        state->dataEnvrn->OutBaroPress = 101325.0;
-        state->dataEnvrn->StdRhoAir = 1.20;
-        state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        //NumCoils = 0;
-        state->dataGlobal->NumOfTimeStepInHour = 1;
-        state->dataGlobal->TimeStep = 1;
-        state->dataGlobal->MinutesPerTimeStep = 60;
-        state->dataSize->CurZoneEqNum = 1;
-        InitializePsychRoutines();
+        " NodeList,",
+        "  Zone1Exhausts,            !- Name",
+        "  Zone1FanCoilAirInletNode; !- Node 1 Name",
 
-        GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);
-        GetZoneEquipmentData(*state);
-        ProcessScheduleInput(*state);
-        state->dataScheduleMgr->ScheduleInputProcessed = true;
-        GetFanCoilUnits(*state);
-        auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
-        EXPECT_EQ("ASHRAE90VARIABLEFAN", thisFanCoil.CapCtrlMeth);
-        EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
-        EXPECT_EQ("FAN:ONOFF", thisFanCoil.FanType);
-        EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
-        EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
+        " OutdoorAir:NodeList,",
+        "  Zone1FanCoilOAInNode;     !- Node or NodeList Name 1",
 
-        state->dataPlnt->TotNumLoops = 1;
-        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-        AirMassFlow = 0.60;
-        MaxAirMassFlow = 0.60;
-        ColdWaterMassFlowRate = 1.0;
-        thisFanCoil.OutAirMassFlow = 0.0;
-        thisFanCoil.MaxAirMassFlow = MaxAirMassFlow;
-        // outside air mixer
-        auto &MixerOA(state->dataMixedAir->OAMixer(1));
-        state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
-        state->dataLoopNodes->Node(MixerOA.RetNode).Temp = 20.0;
-        state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy = 36000;
-        state->dataLoopNodes->Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.RetNode).Temp, state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy);
-        state->dataLoopNodes->Node(MixerOA.InletNode).Temp = 10.0;
-        state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy = 18000;
-        state->dataLoopNodes->Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.InletNode).Temp, state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy);
-        // chilled water coil
-        auto &CWCoil(state->dataWaterCoils->WaterCoil(1));
-        CWCoil.UACoilTotal = 470.0;
-        CWCoil.UACoilExternal = 611.0;
-        CWCoil.UACoilInternal = 2010.0;
-        CWCoil.TotCoilOutsideSurfArea = 50.0;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMax = AirMassFlow;
-        state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
-        CWCoil.InletWaterMassFlowRate = ColdWaterMassFlowRate;
-        CWCoil.MaxWaterMassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
-        state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
-        CWCoil.WaterLoopNum = 1;
-        CWCoil.WaterLoopSide = 1;
-        CWCoil.WaterLoopBranchNum = 1;
-        CWCoil.WaterLoopCompNum = 1;
-        // electric heating coil
-        auto &eHCoil(state->dataHeatingCoils->HeatingCoil(1));
-        state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
-        state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+        " OutdoorAir:Mixer,",
+        "  Zone1FanCoilOAMixer,      !- Name",
+        "  Zone1FanCoilOAMixerOutletNode, !- Mixed Air Node Name",
+        "  Zone1FanCoilOAInNode,     !- Outdoor Air Stream Node Name",
+        "  Zone1FanCoilExhNode,      !- Relief Air Stream Node Name",
+        "  Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
 
-        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-            auto &loop(state->dataPlnt->PlantLoop(l));
-            loop.LoopSide.allocate(2);
-            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
-            loopside.TotalBranches = 1;
-            loopside.Branch.allocate(1);
-            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
-            loopsidebranch.TotalComponents = 1;
-            loopsidebranch.Comp.allocate(1);
-        }
-        // chilled water plant loop
-        auto &CWLoop(state->dataPlnt->PlantLoop(1));
-        CWLoop.Name = "ChilledWaterLoop";
-        CWLoop.FluidName = "ChilledWater";
-        CWLoop.FluidIndex = 1;
-        CWLoop.FluidName = "WATER";
-        CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
-        CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
-        CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
-        CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
+        " Schedule:Constant,",
+        "  FanAndCoilAvailSched,     !- Name",
+        "  FRACTION,                 !- Schedule Type",
+        "  1;                        !- TimeStep Value",
 
-        state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
-        state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        state->dataGlobal->DoingSizing = true;
-        state->dataFans->LocalTurnFansOff = false;
-        state->dataFans->LocalTurnFansOn = true;
-        // heating mode tests
-        state->dataFanCoilUnits->CoolingLoad = false;
-        state->dataFanCoilUnits->HeatingLoad = true;
-        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-        auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
+        " ScheduleTypeLimits,",
+        "  Fraction,                 !- Name",
+        "  0.0,                      !- Lower Limit Value",
+        "  1.0,                      !- Upper Limit Value",
+        "  CONTINUOUS;               !- Numeric Type",
 
-        state->dataEnvrn->Month = 1;
-        state->dataEnvrn->DayOfMonth = 21;
-        state->dataGlobal->HourOfDay = 1;
-        state->dataEnvrn->DSTIndicator = 0;
-        state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 0;
-        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-        UpdateScheduleValues(*state);
-        state->dataSize->ZoneEqSizing.allocate(1);
-        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
-        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
-        state->dataHeatBalFanSys->TempControlType.allocate(1);
-        state->dataHeatBalFanSys->TempControlType(1) = 4;
-        state->dataSize->ZoneSizingRunDone = true;
-        state->dataGlobal->SysSizingCalc = true;
-        thisFanCoil.DesignHeatingCapacity = 6000.0;
+        " Fan:SystemModel,",
+        "  Zone1FanCoilFan,         !- Name",
+        "  FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "  Zone1FanCoilOAMixerOutletNode,  !- Air Inlet Node Name",
+        "  Zone1FanCoilFanOutletNode,  !- Air Outlet Node Name",
+        "  0.5,                     !- Design Maximum Air Flow Rate {m3/s}",
+        "  Discrete,                !- Speed Control Method",
+        "  0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "  75,                      !- Design Pressure Rise {Pa}",
+        "  0.9,                     !- Motor Efficiency",
+        "  1,                       !- Motor In Air Stream Fraction",
+        "  ,                        !- Design Electric Power Consumption {W}",
+        "  TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "  ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "  ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "  0.5,                     !- Fan Total Efficiency",
+        "  ,                        !- Electric Power Function of Flow Fraction Curve Name",
+        "  ,                        !- Night Ventilation Mode Pressure Rise {Pa}",
+        "  ,                        !- Night Ventilation Mode Flow Fraction",
+        "  ,                        !- Motor Loss Zone Name",
+        "  ,                        !- Motor Loss Radiative Fraction",
+        "  General,                 !- End-Use Subcategory",
+        "  1,                       !- Number of Speeds",
+        "  1.0,                     !- Speed 1 Flow Fraction",
+        "  1.0;                     !- Speed 1 Electric Power Fraction",
 
-        // test 1: load larger than fancoil full capacity
-        zSysEDemand.RemainingOutputReqToCoolSP = 10000.0;
-        zSysEDemand.RemainingOutputReqToHeatSP = 10000.0;
-        zSysEDemand.RemainingOutputRequired = 10000.0;
-        QZnReq = 10000.0;
-        QUnitOut = 0.0;
-        QLatOut = 0.0;
-        state->dataGlobal->BeginEnvrnFlag = true;
-        InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        // expect output full capacity
-        EXPECT_EQ(state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate, thisFanCoil.MaxAirMassFlow);
-        EXPECT_EQ(thisFanCoil.PLR, 1.0);
-        EXPECT_NEAR(6075.0, QUnitOut, 1.0);
+        " Coil:Cooling:Water,",
+        "  Zone1FanCoilCoolingCoil,  !- Name",
+        "  FanAndCoilAvailSched,     !- Availability Schedule Namev",
+        "  0.0002,                   !- Design Water Flow Rate { m3 / s }",
+        "  0.5000,                   !- Design Air Flow Rate { m3 / s }",
+        "  7.22,                     !- Design Inlet Water Temperature { Cv }",
+        "  24.340,                   !- Design Inlet Air Temperature { C }",
+        "  14.000,                   !- Design Outlet Air Temperature { C }",
+        "  0.0095,                   !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "  0.0090,                   !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "  Zone1FanCoilChWInletNode, !- Water Inlet Node Name",
+        "  Zone1FanCoilChWOutletNode,!- Water Outlet Node Name",
+        "  Zone1FanCoilFanOutletNode,!- Air Inlet Node Name",
+        "  Zone1FanCoilCCOutletNode, !- Air Outlet Node Name",
+        "  SimpleAnalysis,           !- Type of Analysis",
+        "  CrossFlow;                !- Heat Exchanger Configuration",
 
-        // test 2: load smaller than fancoil full capacity
-        zSysEDemand.RemainingOutputReqToCoolSP = 3000.0;
-        zSysEDemand.RemainingOutputReqToHeatSP = 3000.0;
-        zSysEDemand.RemainingOutputRequired = 3000.0;
-        QZnReq = 3000.0;
-        QUnitOut = 0.0;
-        QLatOut = 0.0;
-        state->dataGlobal->BeginEnvrnFlag = true;
-        InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-        Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        // expect part load operation with about 3000W output
-        EXPECT_NEAR(state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate, thisFanCoil.MaxAirMassFlow, 0.00001);
-        EXPECT_NEAR(thisFanCoil.PLR, 0.487, 0.001);
-        EXPECT_NEAR(3000.0, QUnitOut, 1.0);
+        " Coil:Heating:Electric,",
+        "  Zone1FanCoilHeatingCoil,   !- Name",
+        "  FanAndCoilAvailSched,      !- Availability Schedule Name",
+        "  1,                         !- Efficiency",
+        "  10000.0,                    !- Nominal Capacity {W}",
+        "  Zone1FanCoilCCOutletNode,  !- Air Inlet Node Name",
+        "  Zone1FanCoilAirOutletNode; !- Air Outlet Node Name",
+
+        " ZoneHVAC:FourPipeFanCoil,",
+        "  Zone1FanCoil,              !- Name",
+        "  FanAndCoilAvailSched,      !- Availability Schedule Name",
+        "  MultiSpeedFan,             !- Capacity Control Method",
+        "  0.5,                       !- Maximum Supply Air Flow Rate { m3 / s }",
+        "  0.3,                       !- Low Speed Supply Air Flow Ratio",
+        "  0.6,                       !- Medium Speed Supply Air Flow Ratio",
+        "  0.0,                       !- Maximum Outdoor Air Flow Rate { m3 / s }",
+        "  FanAndCoilAvailSched,      !- Outdoor Air Schedule Name",
+        "  Zone1FanCoilAirInletNode,  !- Air Inlet Node Name",
+        "  Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
+        "  OutdoorAir:Mixer,          !- Outdoor Air Mixer Object Type",
+        "  Zone1FanCoilOAMixer,       !- Outdoor Air Mixer Name",
+        "  Fan:SystemModel,           !- Supply Air Fan Object Type",
+        "  Zone1FanCoilFan,           !- Supply Air Fan Name",
+        "  Coil:Cooling:Water,        !- Cooling Coil Object Type",
+        "  Zone1FanCoilCoolingCoil,   !- Cooling Coil Name",
+        "  0.00014,                   !- Maximum Cold Water Flow Rate { m3 / s }",
+        "  0.0,                       !- Minimum Cold Water Flow Rate { m3 / s }",
+        "  0.001,                     !- Cooling Convergence Tolerance",
+        "  Coil:Heating:Electric,     !- Heating Coil Object Type",
+        "  Zone1FanCoilHeatingCoil,   !- Heating Coil Name",
+        "  0.0,                       !- Maximum Hot Water Flow Rate { m3 / s }",
+        "  0.0,                       !- Minimum Hot Water Flow Rate { m3 / s }",
+        "  0.001,                     !- Heating Convergence Tolerance",
+        "  ,                          !- Availability Manager List Name",
+        "  ,                          !- Design Specification ZoneHVAC Sizing Object Name",
+        "  ContsFanOperatingSch;      !- Supply Air Fan Operating Mode Schedule Name",
+
+        " Schedule:Constant,",
+        "  ContsFanOperatingSch,      !- Name",
+        "  FRACTION,                  !- Schedule Type",
+        "  1;                         !- TimeStep Value",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
+    GetZoneEquipmentData(*state);
+    ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    GetFanCoilUnits(*state);
+    auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
+    EXPECT_EQ("MULTISPEEDFAN", thisFanCoil.CapCtrlMeth);
+    EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
+    EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
+    EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
+    EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
+    EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
+
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    AirMassFlow = 0.60;
+    MaxAirMassFlow = 0.60;
+    ColdWaterMassFlowRate = 1.0;
+    thisFanCoil.OutAirMassFlow = 0.0;
+    thisFanCoil.MaxAirMassFlow = MaxAirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.OutsideAirNode).MassFlowRateMax = 0.0;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMinAvail = AirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMax = MaxAirMassFlow;
+    state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
+    // outside air mixer
+    auto &MixerOA(state->dataMixedAir->OAMixer(1));
+    state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
+    state->dataLoopNodes->Node(MixerOA.RetNode).Temp = 22.0;
+    state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy = 36000;
+    state->dataLoopNodes->Node(MixerOA.RetNode).HumRat =
+        PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.RetNode).Temp, state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy);
+    state->dataLoopNodes->Node(MixerOA.InletNode).Temp = 10.0;
+    state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy = 18000;
+    state->dataLoopNodes->Node(MixerOA.InletNode).HumRat =
+        PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.InletNode).Temp, state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy);
+    // chilled water coil
+    auto &CWCoil(state->dataWaterCoils->WaterCoil(1));
+    CWCoil.UACoilTotal = 470.0;
+    CWCoil.UACoilExternal = 611.0;
+    CWCoil.UACoilInternal = 2010.0;
+    CWCoil.TotCoilOutsideSurfArea = 50.0;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    CWCoil.InletWaterMassFlowRate = ColdWaterMassFlowRate;
+    CWCoil.MaxWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
+    state->dataLoopNodes->Node(CWCoil.WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    CWCoil.WaterLoopNum = 1;
+    CWCoil.WaterLoopSide = 1;
+    CWCoil.WaterLoopBranchNum = 1;
+    CWCoil.WaterLoopCompNum = 1;
+    // electric heating coil
+    auto &eHCoil(state->dataHeatingCoils->HeatingCoil(1));
+    state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
     }
+    // chilled water plant loop
+    auto &CWLoop(state->dataPlnt->PlantLoop(1));
+    CWLoop.Name = "ChilledWaterLoop";
+    CWLoop.FluidName = "ChilledWater";
+    CWLoop.FluidIndex = 1;
+    CWLoop.FluidName = "WATER";
+    CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
+
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
+    state->dataGlobal->DoingSizing = true;
+    state->dataFans->LocalTurnFansOff = false;
+    state->dataFans->LocalTurnFansOn = true;
+    // heating mode tests
+    state->dataFanCoilUnits->CoolingLoad = false;
+    state->dataFanCoilUnits->HeatingLoad = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
+
+    state->dataEnvrn->StdRhoAir = 1.2;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    UpdateScheduleValues(*state);
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = 4;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    auto &fZoneSizing(state->dataSize->FinalZoneSizing(1));
+    fZoneSizing.DesCoolVolFlow = 0.5;
+    fZoneSizing.DesHeatVolFlow = 0.5;
+    fZoneSizing.DesCoolCoilInTemp = 30.0;
+    fZoneSizing.DesCoolCoilInHumRat = 0.01;
+    fZoneSizing.DesHeatCoilInTemp = 20.0;
+    fZoneSizing.DesHeatCoilInHumRat = 0.005;
+    fZoneSizing.DesCoolLoad = 10000.0;
+    fZoneSizing.DesHeatLoad = 10000.0;
+    thisFanCoil.DesignHeatingCapacity = 10000.0;
+
+    // test 1: fancoil unit cycling on/off at speed 1
+    zSysEDemand.RemainingOutputReqToCoolSP = 2000.0;
+    zSysEDemand.RemainingOutputReqToHeatSP = 2000.0;
+    zSysEDemand.RemainingOutputRequired = 2000.0;
+    int InletNode = thisFanCoil.AirInNode;
+    Real64 QUnitOutMaxLS = 0.0; // low speed maximum output
+
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+
+    state->dataFanCoilUnits->FanCoil(FanCoilNum).SpeedFanSel = 1;
+    state->dataFanCoilUnits->FanCoil(FanCoilNum).SpeedFanRatSel = state->dataFanCoilUnits->FanCoil(FanCoilNum).LowSpeedRatio;
+    state->dataFanCoilUnits->FanFlowRatio = state->dataFanCoilUnits->FanCoil(FanCoilNum).SpeedFanRatSel;
+    AirMassFlow = state->dataFanCoilUnits->FanCoil(FanCoilNum).LowSpeedRatio * state->dataFanCoilUnits->FanCoil(FanCoilNum).MaxAirMassFlow;
+    state->dataLoopNodes->Node(InletNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(InletNode).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = AirMassFlow;
+    Calc4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMaxLS, _, 1.0);
+    EXPECT_NEAR(QUnitOutMaxLS, 3022.5, 1.0);
+
+    int MaxIter = 10;
+    int SolFlag = 0;
+    Array1D<Real64> Par(5);
+    Real64 CyclingRatio = 1.0;
+    // test 1: fan runs continuously at low speed and
+    // only heating coil cycles On/Off to meet load
+    QZnReq = 2000.0;
+    Par(1) = double(FanCoilNum);
+    Par(2) = 0.0;
+    if (FirstHVACIteration) Par(2) = 1.0;
+    Par(3) = ZoneNum;
+    Par(4) = QZnReq;
+    Par(5) = double(state->dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode);
+    TempSolveRoot::SolveRoot(*state, 0.001, MaxIter, SolFlag, CyclingRatio, CalcFanCoilHeatCoilPLRResidual, 0.0, 1.0, Par);
+    Real64 expectedAirFlowRate = thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio;
+    EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
+    EXPECT_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, expectedAirFlowRate);
+    EXPECT_NEAR(CyclingRatio, 0.659, 0.001);
+    // test 2: fan runs continuously at low speed and only
+    // the heating coil cycles on/off to meet reduced load
+    zSysEDemand.RemainingOutputReqToCoolSP = 1000.0;
+    zSysEDemand.RemainingOutputReqToHeatSP = 1000.0;
+    zSysEDemand.RemainingOutputRequired = 1000.0;
+    QZnReq = 1000.0;
+    Par(1) = double(FanCoilNum);
+    Par(2) = 0.0;
+    if (FirstHVACIteration) Par(2) = 1.0;
+    Par(3) = ZoneNum;
+    Par(4) = QZnReq;
+    Par(5) = double(state->dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode);
+    TempSolveRoot::SolveRoot(*state, 0.001, MaxIter, SolFlag, CyclingRatio, CalcFanCoilHeatCoilPLRResidual, 0.0, 1.0, Par);
+    expectedAirFlowRate = thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio;
+    EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
+    EXPECT_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, expectedAirFlowRate);
+    EXPECT_NEAR(CyclingRatio, 0.326, 0.001);
+}
+
+TEST_F(EnergyPlusFixture, FanCoil_ElectricHeatingCoilASHRAE90VariableFan)
+{
+
+    int FanCoilNum(1);
+    int ZoneNum(1);
+    bool FirstHVACIteration(false);
+    bool ErrorsFound(false);
+    Real64 QZnReq(0.0);
+    Real64 ColdWaterMassFlowRate(0.0);
+    Real64 QUnitOut(0.0);
+    Real64 QLatOut(0.0);
+    Real64 AirMassFlow(0.0);
+    Real64 MaxAirMassFlow(0.0);
+
+    std::string const idf_objects = delimited_string({
+        " Zone,",
+        "  WEST ZONE,                 !- Name",
+        "  0,                         !- Direction of Relative North { deg }",
+        "  0,                         !- X Origin { m }",
+        "  0,                         !- Y Origin { m }",
+        "  0,                         !- Z Origin { m }",
+        "  1,                         !- Type",
+        "  1,                         !- Multiplier",
+        "  autocalculate,             !- Ceiling Height { m }",
+        "  autocalculate;             !- Volume { m3 }",
+
+        " ZoneHVAC:EquipmentConnections,",
+        "  WEST ZONE,                 !- Zone Name",
+        "  ZoneEquipment,             !- Zone Conditioning Equipment List Name",
+        "  FanCoilAirOutletNode,      !- Zone Air Inlet Node or NodeList Name",
+        "  FanCoilAirInletNode,       !- Zone Air Exhaust Node or NodeList Name",
+        "  Zone Air Node,             !- Zone Air Node Name",
+        "  Zone Air Outlet Node;      !- Zone Return Air Node Name",
+
+        " ZoneHVAC:EquipmentList,",
+        "  ZoneEquipment,             !- Name",
+        "  SequentialLoad,            !- Load Distribution Scheme",
+        "  ZoneHVAC:FourPipeFanCoil,  !- Zone Equipment 1 Object Type",
+        "  ZoneFanCoil,               !- Zone Equipment 1 Name",
+        "  1,                         !- Zone Equipment 1 Cooling Sequence",
+        "  1;                         !- Zone Equipment 1 Heating or No - Load Sequence",
+
+        " ZoneHVAC:FourPipeFanCoil,",
+        "  ZoneFanCoil,               !- Name",
+        "  FanAndCoilAvailSched,      !- Availability Schedule Name",
+        "  ASHRAE90VariableFan,       !- Capacity Control Method",
+        "  0.5,                       !- Maximum Supply Air Flow Rate { m3 / s }",
+        "  0.3,                       !- Low Speed Supply Air Flow Ratio",
+        "  0.6,                       !- Medium Speed Supply Air Flow Ratio",
+        "  0.0,                       !- Maximum Outdoor Air Flow Rate { m3 / s }",
+        "  FanAndCoilAvailSched,      !- Outdoor Air Schedule Name",
+        "  FanCoilAirInletNode,       !- Air Inlet Node Name",
+        "  FanCoilAirOutletNode,      !- Air Outlet Node Name",
+        "  OutdoorAir:Mixer,          !- Outdoor Air Mixer Object Type",
+        "  FanCoilOAMixer,            !- Outdoor Air Mixer Name",
+        "  Fan:OnOff,                 !- Supply Air Fan Object Type",
+        "  FanCoilFan,                !- Supply Air Fan Name",
+        "  Coil:Cooling:Water,        !- Cooling Coil Object Type",
+        "  FanCoilCoolingCoil,        !- Cooling Coil Name",
+        "  0.00014,                   !- Maximum Cold Water Flow Rate { m3 / s }",
+        "  0.0,                       !- Minimum Cold Water Flow Rate { m3 / s }",
+        "  0.001,                     !- Cooling Convergence Tolerance",
+        "  Coil:Heating:Electric,     !- Heating Coil Object Type",
+        "  FanCoilElecHeatingCoil,    !- Heating Coil Name",
+        "  0.0,                       !- Maximum Hot Water Flow Rate { m3 / s }",
+        "  0.0,                       !- Minimum Hot Water Flow Rate { m3 / s }",
+        "  0.001,                     !- Heating Convergence Tolerance",
+        "  ,                          !- Availability Manager List Name",
+        "  ;                          !- Design Specification ZoneHVAC Sizing Object Name",
+
+        " OutdoorAir:NodeList,",
+        "  FanCoilOAInNode;           !- Node or NodeList Name 1",
+
+        " OutdoorAir:Mixer,",
+        "  FanCoilOAMixer,            !- Name",
+        "  FanCoilOAMixerOutletNode,  !- Mixed Air Node Name",
+        "  FanCoilOAInNode,           !- Outdoor Air Stream Node Name",
+        "  FanCoilExhNode,            !- Relief Air Stream Node Name",
+        "  FanCoilAirInletNode;       !- Return Air Stream Node Name",
+
+        " Fan:OnOff,",
+        "  FanCoilFan,                !- Name",
+        "  FanAndCoilAvailSched,      !- Availability Schedule Name",
+        "  0.5,                       !- Fan Total Efficiency",
+        "  75,                        !- Design Pressure Rise {Pa}",
+        "  0.5,                       !- Maximum Air Flow Rate {m3/s}",
+        "  0.9,                       !- Motor Efficiency",
+        "  1,                         !- Motor In Air Stream Fraction",
+        "  FanCoilOAMixerOutletNode,  !- Air Inlet Node Name",
+        "  FanCoilFanOutletNode;      !- Air Outlet Node Name",
+
+        " Coil:Cooling:Water,",
+        "  FanCoilCoolingCoil,        !- Name",
+        "  FanAndCoilAvailSched,      !- Availability Schedule Namev",
+        "  0.0002,                    !- Design Water Flow Rate { m3 / s }",
+        "  0.5000,                    !- Design Air Flow Rate { m3 / s }",
+        "  7.22,                      !- Design Inlet Water Temperature { Cv }",
+        "  24.340,                    !- Design Inlet Air Temperature { C }",
+        "  14.000,                    !- Design Outlet Air Temperature { C }",
+        "  0.0095,                    !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "  0.0090,                    !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "  FanCoilChWInletNode,       !- Water Inlet Node Name",
+        "  FanCoilChWOutletNode,      !- Water Outlet Node Name",
+        "  FanCoilFanOutletNode,      !- Air Inlet Node Name",
+        "  FanCoilCCOutletNode,       !- Air Outlet Node Name",
+        "  SimpleAnalysis,            !- Type of Analysis",
+        "  CrossFlow;                 !- Heat Exchanger Configuration",
+
+        " Coil:Heating:Electric,",
+        "  FanCoilElecHeatingCoil,    !- Name",
+        "  FanAndCoilAvailSched,      !- Availability Schedule Name",
+        "  1,                         !- Efficiency",
+        "  6000.0,                    !- Nominal Capacity {W}",
+        "  FanCoilCCOutletNode,       !- Air Inlet Node Name",
+        "  FanCoilAirOutletNode;      !- Air Outlet Node Name",
+
+        " Schedule:Constant,",
+        "  FanAndCoilAvailSched,      !- Name",
+        "  FRACTION,                  !- Schedule Type",
+        "  1;                         !- TimeStep Value",
+
+        " ScheduleTypeLimits,",
+        "  Fraction,                  !- Name",
+        "  0.0,                       !- Lower Limit Value",
+        "  1.0,                       !- Upper Limit Value",
+        "  CONTINUOUS;                !- Numeric Type",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataWaterCoils->GetWaterCoilsInputFlag = true;
+    // NumCoils = 0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataSize->CurZoneEqNum = 1;
+    InitializePsychRoutines(*state);
+
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);
+    GetZoneEquipmentData(*state);
+    ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    GetFanCoilUnits(*state);
+    auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
+    EXPECT_EQ("ASHRAE90VARIABLEFAN", thisFanCoil.CapCtrlMeth);
+    EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
+    EXPECT_EQ("FAN:ONOFF", thisFanCoil.FanType);
+    EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
+    EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
+
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    AirMassFlow = 0.60;
+    MaxAirMassFlow = 0.60;
+    ColdWaterMassFlowRate = 1.0;
+    thisFanCoil.OutAirMassFlow = 0.0;
+    thisFanCoil.MaxAirMassFlow = MaxAirMassFlow;
+    // outside air mixer
+    auto &MixerOA(state->dataMixedAir->OAMixer(1));
+    state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
+    state->dataLoopNodes->Node(MixerOA.RetNode).Temp = 20.0;
+    state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy = 36000;
+    state->dataLoopNodes->Node(MixerOA.RetNode).HumRat =
+        PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.RetNode).Temp, state->dataLoopNodes->Node(MixerOA.RetNode).Enthalpy);
+    state->dataLoopNodes->Node(MixerOA.InletNode).Temp = 10.0;
+    state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy = 18000;
+    state->dataLoopNodes->Node(MixerOA.InletNode).HumRat =
+        PsyWFnTdbH(*state, state->dataLoopNodes->Node(MixerOA.InletNode).Temp, state->dataLoopNodes->Node(MixerOA.InletNode).Enthalpy);
+    // chilled water coil
+    auto &CWCoil(state->dataWaterCoils->WaterCoil(1));
+    CWCoil.UACoilTotal = 470.0;
+    CWCoil.UACoilExternal = 611.0;
+    CWCoil.UACoilInternal = 2010.0;
+    CWCoil.TotCoilOutsideSurfArea = 50.0;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(CWCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    CWCoil.InletWaterMassFlowRate = ColdWaterMassFlowRate;
+    CWCoil.MaxWaterMassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
+    CWCoil.WaterLoopNum = 1;
+    CWCoil.WaterLoopSide = 1;
+    CWCoil.WaterLoopBranchNum = 1;
+    CWCoil.WaterLoopCompNum = 1;
+    // electric heating coil
+    auto &eHCoil(state->dataHeatingCoils->HeatingCoil(1));
+    state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
+    }
+    // chilled water plant loop
+    auto &CWLoop(state->dataPlnt->PlantLoop(1));
+    CWLoop.Name = "ChilledWaterLoop";
+    CWLoop.FluidName = "ChilledWater";
+    CWLoop.FluidIndex = 1;
+    CWLoop.FluidName = "WATER";
+    CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
+
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
+    state->dataGlobal->DoingSizing = true;
+    state->dataFans->LocalTurnFansOff = false;
+    state->dataFans->LocalTurnFansOn = true;
+    // heating mode tests
+    state->dataFanCoilUnits->CoolingLoad = false;
+    state->dataFanCoilUnits->HeatingLoad = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
+
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    UpdateScheduleValues(*state);
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = 4;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataGlobal->SysSizingCalc = true;
+    thisFanCoil.DesignHeatingCapacity = 6000.0;
+
+    // test 1: load larger than fancoil full capacity
+    zSysEDemand.RemainingOutputReqToCoolSP = 10000.0;
+    zSysEDemand.RemainingOutputReqToHeatSP = 10000.0;
+    zSysEDemand.RemainingOutputRequired = 10000.0;
+    QZnReq = 10000.0;
+    QUnitOut = 0.0;
+    QLatOut = 0.0;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    // expect output full capacity
+    EXPECT_EQ(state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate, thisFanCoil.MaxAirMassFlow);
+    EXPECT_EQ(thisFanCoil.PLR, 1.0);
+    EXPECT_NEAR(6075.0, QUnitOut, 1.0);
+
+    // test 2: load smaller than fancoil full capacity
+    zSysEDemand.RemainingOutputReqToCoolSP = 3000.0;
+    zSysEDemand.RemainingOutputReqToHeatSP = 3000.0;
+    zSysEDemand.RemainingOutputRequired = 3000.0;
+    QZnReq = 3000.0;
+    QUnitOut = 0.0;
+    QLatOut = 0.0;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    // expect part load operation with about 3000W output
+    EXPECT_NEAR(state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate, thisFanCoil.MaxAirMassFlow, 0.00001);
+    EXPECT_NEAR(thisFanCoil.PLR, 0.487, 0.001);
+    EXPECT_NEAR(3000.0, QUnitOut, 1.0);
+}
 
 } // namespace EnergyPlus

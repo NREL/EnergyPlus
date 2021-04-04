@@ -109,8 +109,8 @@ namespace DataZoneControls {
         bool HeatModeLast;
         bool CoolModeLastSave;
         bool HeatModeLastSave;
-        bool CoolOffFlag;  // Cooling off flag
-        bool HeatOffFlag;  // Heating off flag
+        bool CoolOffFlag; // Cooling off flag
+        bool HeatOffFlag; // Heating off flag
 
         // Default Constructor
         ZoneTempControls()

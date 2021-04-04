@@ -124,7 +124,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
 
     bool ErrorsFound(false);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -254,27 +254,39 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     state->dataHeatBal->Zone(1).FloorArea = 96.48;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.21081;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
     state->dataSize->CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
     state->dataSize->CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlowMin =
-        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2,
-            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac);
+        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow,
+            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2,
+            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow *
+                state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac);
     EXPECT_DOUBLE_EQ(state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea, 0.0);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow, 0.0);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac, 0.22);
     EXPECT_NEAR(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2, 0.0, 0.000001);
     EXPECT_NEAR(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlowMin, 0.22 * 0.21081, 0.000001);
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2 =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlowMax =
-        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2,
-            max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
+        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow,
+            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2,
+            max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow,
+                state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
                 state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow, 0.0);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac, 0.4);
@@ -304,7 +316,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
 
     bool ErrorsFound(false);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -434,27 +446,39 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     state->dataHeatBal->Zone(1).FloorArea = 96.48;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.21081;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
     state->dataSize->CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
     state->dataSize->CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlowMin =
-        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2,
-            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac);
+        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow,
+            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2,
+            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow *
+                state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac);
     EXPECT_DOUBLE_EQ(state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea, 0.000762);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow, 0.0);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac, 0.2);
     EXPECT_NEAR(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2, .07351776, 0.000001);
     EXPECT_NEAR(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlowMin, .07351776, 0.000001);
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2 =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlowMax =
-        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2,
-            max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
+        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow,
+            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2,
+            max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow,
+                state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
                 state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow, 0.1415762);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac, 0.3);
@@ -484,7 +508,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
 
     bool ErrorsFound(false);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -615,27 +639,39 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum).DesHeatVolFlow = 0.11341;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.21081;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
     state->dataSize->CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
     state->dataSize->CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlowMin =
-        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2,
-            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac);
+        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow,
+            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2,
+            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow *
+                state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac);
     EXPECT_DOUBLE_EQ(state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea, 0.000762);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow, 0.0);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac, 0.18);
     EXPECT_NEAR(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2, .07351776, 0.000001);
     EXPECT_NEAR(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlowMin, .07351776, 0.000001);
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2 =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlowMax =
-        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2,
-            max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
+        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow,
+            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2,
+            max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow,
+                state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
                 state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow, 0.11);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac, 0.0);
@@ -665,7 +701,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
 
     bool ErrorsFound(false);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -814,7 +850,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
 
     bool ErrorsFound(false);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -944,27 +980,39 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     state->dataHeatBal->Zone(1).FloorArea = 96.48;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.21081;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
     state->dataSize->CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
     state->dataSize->CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlowMin =
-        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2,
-            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac);
+        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow,
+            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2,
+            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow *
+                state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac);
     EXPECT_DOUBLE_EQ(state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea, 0.000762);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow, 0.0);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac, 0.2);
     EXPECT_NEAR(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2, .07351776, 0.000001);
     EXPECT_NEAR(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlowMin, .07351776, 0.000001);
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2 =
+        state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlowMax =
-        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2,
-            max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
+        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow,
+            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2,
+            max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow,
+                state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
                 state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow, 0.08);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac, 0.0);

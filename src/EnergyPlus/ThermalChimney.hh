@@ -137,7 +137,8 @@ namespace ThermalChimney {
     //*****************************************************************************************
 
 } // namespace ThermalChimney
-struct ThermalChimneysData : BaseGlobalStruct {
+struct ThermalChimneysData : BaseGlobalStruct
+{
 
     bool ThermalChimneyGetInputFlag = true;
     int TotThermalChimney = 0; // Total ThermalChimney Statements in input

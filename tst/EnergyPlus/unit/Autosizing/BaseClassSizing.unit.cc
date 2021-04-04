@@ -50,8 +50,8 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-#include "AutosizingFixture.hh"
 #include "../Fixtures/SQLiteFixture.hh"
+#include "AutosizingFixture.hh"
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
@@ -286,7 +286,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     state->dataSize->NumSysSizInput = 1;
 
     state->dataEnvrn->StdBaroPress = 101325.0;
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     state->dataSize->DataFlowUsedForSizing = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesCoolVolFlow;
     // Need this to prevent crash in Sizers
@@ -313,7 +313,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     // confirm that sizing data is saved for use by parent object
     EXPECT_NEAR(state->dataSize->DataCoilSizingAirInTemp, 28.0, 0.0000001);
     EXPECT_NEAR(state->dataSize->DataCoilSizingAirInHumRat, 0.0075, 0.0000001);
-    EXPECT_NEAR(state->dataSize->DataCoilSizingAirOutTemp,12.0, 0.0000001);
+    EXPECT_NEAR(state->dataSize->DataCoilSizingAirOutTemp, 12.0, 0.0000001);
     EXPECT_NEAR(state->dataSize->DataCoilSizingAirOutHumRat, 0.0075, 0.0000001);
     EXPECT_NEAR(state->dataSize->DataCoilSizingFanCoolLoad, 0.0, 0.0000001);
     EXPECT_NEAR(state->dataSize->DataCoilSizingCapFT, 1.0, 0.0000001);
@@ -405,7 +405,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurOASysNum = 0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _, _, _);                         // triggers sizing call
+    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _, _, _);                 // triggers sizing call
     Real64 locFanSizeVdot = state->dataHVACFan->fanObjs[0]->designAirVolFlowRate; // get function
     Real64 locDesignHeatGain1 = state->dataHVACFan->fanObjs[0]->getFanDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain1, 100.0, 0.1);
@@ -413,14 +413,14 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     fanName = "TEST FAN 2";
     state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
     state->dataHVACFan->fanObjs[1]->simulate(*state, _, _, _, _);                      // triggers sizing call
-    locFanSizeVdot = state->dataHVACFan->fanObjs[1]->designAirVolFlowRate;     // get function
+    locFanSizeVdot = state->dataHVACFan->fanObjs[1]->designAirVolFlowRate;             // get function
     Real64 locDesignHeatGain2 = state->dataHVACFan->fanObjs[1]->getFanDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain2, 200.0, 0.1);
 
     fanName = "TEST FAN 3";
     state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
     state->dataEnvrn->StdRhoAir = 1.2;
-    state->dataHVACFan->fanObjs[2]->simulate(*state, _, _, _, _);                  // triggers sizing call
+    state->dataHVACFan->fanObjs[2]->simulate(*state, _, _, _, _);          // triggers sizing call
     locFanSizeVdot = state->dataHVACFan->fanObjs[2]->designAirVolFlowRate; // get function
     Real64 locDesignHeatGain3 = state->dataHVACFan->fanObjs[2]->getFanDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain3, 400.0, 0.1);
@@ -463,7 +463,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     state->dataSize->NumSysSizInput = 1;
 
     state->dataEnvrn->StdBaroPress = 101325.0;
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     state->dataSize->DataFlowUsedForSizing = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesCoolVolFlow;
     // Need this to prevent crash in Sizers
@@ -558,7 +558,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
 
     state->dataSize->ZoneSizingRunDone = true;
     state->dataEnvrn->StdBaroPress = 101325.0;
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Need this to prevent crash in Sizers
     state->dataSize->ZoneEqSizing.allocate(1);
@@ -589,7 +589,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
     CompName = "Chilled Water Cooling Coil";
     SizingResult = DataSizing::AutoSize;
     state->dataEnvrn->StdRhoAir = 1.18;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMassFlow = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * state->dataEnvrn->StdRhoAir;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMassFlow =
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * state->dataEnvrn->StdRhoAir;
     state->dataSize->DataIsDXCoil = false;
 
     // chilled water cooling coil capacity sizing
@@ -620,7 +621,7 @@ TEST_F(SQLiteFixture, BaseSizer_SQLiteRecordReportSizerOutputTest)
     // get the sqlite output
     // query the sqLite
     auto result = queryResult("SELECT * FROM ComponentSizes;", "ComponentSizes");
-    EnergyPlus::sqlite->sqliteCommit();
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
     // check that there are two sizing result records
     ASSERT_EQ(2ul, result.size());
     std::vector<std::string> testResult0{"1", "BOILER:HOTWATER", "RESIDENTIAL BOILER ELECTRIC", "Design Size Nominal Capacity", "105977.98934", "W"};

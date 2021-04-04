@@ -53,14 +53,14 @@
 
 namespace EnergyPlus::DataPrecisionGlobals {
 
-    constexpr Real64 constant_zero = 0.0;
-    constexpr Real64 constant_one = 1.0;
-    constexpr Real64 constant_minusone = -1.0;
-    constexpr Real64 constant_twenty = 20.0;
-    constexpr Real64 constant_pointfive = 0.5;
-    constexpr Real64 EXP_LowerLimit = -20.0; // In IVF=2.061153622438558d-009 - used 20 because it's already used in other parts of the code
-    constexpr Real64 EXP_UpperLimit = 40.0; // In IVF=2.353852668370200d+017
+constexpr Real64 constant_zero = 0.0;
+constexpr Real64 constant_one = 1.0;
+constexpr Real64 constant_minusone = -1.0;
+constexpr Real64 constant_twenty = 20.0;
+constexpr Real64 constant_pointfive = 0.5;
+constexpr Real64 EXP_LowerLimit = -20.0; // In IVF=2.061153622438558d-009 - used 20 because it's already used in other parts of the code
+constexpr Real64 EXP_UpperLimit = 40.0;  // In IVF=2.353852668370200d+017
 
-} // namespace DataPrecisionGlobals
+} // namespace EnergyPlus::DataPrecisionGlobals
 
 #endif

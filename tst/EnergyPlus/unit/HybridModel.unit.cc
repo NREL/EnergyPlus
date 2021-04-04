@@ -389,7 +389,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBalFanSys->PreviousMeasuredHumRat2(1) = 0.002489048;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat3(1) = 0.002480404;
     state->dataHybridModel->HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr = 1;
-    state->dataScheduleMgr->Schedule(state->dataHybridModel->HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue = 0.002506251487737;
+    state->dataScheduleMgr->Schedule(state->dataHybridModel->HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue =
+        0.002506251487737;
 
     CorrectZoneHumRat(*state, 1);
     EXPECT_NEAR(4, state->dataHeatBal->Zone(1).NumOccHM, 0.1);

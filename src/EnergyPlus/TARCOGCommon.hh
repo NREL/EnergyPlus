@@ -75,9 +75,9 @@ namespace TARCOGCommon {
                      Array1D<Real64> const &qv,    // Heat flow from ventilation [W/m2]
                      Array1D<Real64> const &hcv,   // Convective heat flow coefficient due to ventilation
                      Array1D<Real64> &hcgapMod,    // Modified heat flow coefficient for gap
-                     int nlayer,             // Number of layers
-                     Real64 edgeGlCorrFac    // Edge of glass correction factor
-                         );
+                     int nlayer,                   // Number of layers
+                     Real64 edgeGlCorrFac          // Edge of glass correction factor
+    );
 
     void matrixQBalance(int nlayer,
                         Array2<Real64> &a,
@@ -106,7 +106,7 @@ namespace TARCOGCommon {
 
     Real64 pos(Real64 x);
 
-}
+} // namespace TARCOGCommon
 
 struct TARCOGCommonData : BaseGlobalStruct
 {

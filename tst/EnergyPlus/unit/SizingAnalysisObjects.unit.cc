@@ -131,12 +131,11 @@ protected:
         state->dataPlnt->PlantLoop(1).VolumeWasAutoSized = true;
 
         SetPredefinedTables(*state);
-
     }
 
     void TearDown() override
     {
-        EnergyPlus::EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
+        EnergyPlus::EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
     };
 
 public:
@@ -223,7 +222,13 @@ TEST_F(SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
     int numTimeStepsInHour(4);
     LogVal = lowLogVal;
     ZoneTimestepObject tmpztStepStamp1( // call constructor
-        state->dataGlobal->KindOfSim, Envrn, state->dataGlobal->DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
+        state->dataGlobal->KindOfSim,
+        Envrn,
+        state->dataGlobal->DayOfSim,
+        HourofDay,
+        timeStp,
+        timeStepDuration,
+        numTimeStepsInHour);
     TestLogObj.FillZoneStep(tmpztStepStamp1);
 
     // fill second step log with zone step data
@@ -231,21 +236,39 @@ TEST_F(SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
     timeStp = 2;
     LogVal = midLogVal;
     ZoneTimestepObject tmpztStepStamp2( // call constructor
-        state->dataGlobal->KindOfSim, Envrn, state->dataGlobal->DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
+        state->dataGlobal->KindOfSim,
+        Envrn,
+        state->dataGlobal->DayOfSim,
+        HourofDay,
+        timeStp,
+        timeStepDuration,
+        numTimeStepsInHour);
     TestLogObj.FillZoneStep(tmpztStepStamp2);
 
     // fill third step log with zone step data
     timeStp = 3;
     LogVal = midLogVal;
     ZoneTimestepObject tmpztStepStamp3( // call constructor
-        state->dataGlobal->KindOfSim, Envrn, state->dataGlobal->DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
+        state->dataGlobal->KindOfSim,
+        Envrn,
+        state->dataGlobal->DayOfSim,
+        HourofDay,
+        timeStp,
+        timeStepDuration,
+        numTimeStepsInHour);
     TestLogObj.FillZoneStep(tmpztStepStamp3);
 
     // fill fourth step log with zone step data
     timeStp = 4;
     LogVal = hiLogVal;
     ZoneTimestepObject tmpztStepStamp4( // call constructor
-        state->dataGlobal->KindOfSim, Envrn, state->dataGlobal->DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
+        state->dataGlobal->KindOfSim,
+        Envrn,
+        state->dataGlobal->DayOfSim,
+        HourofDay,
+        timeStp,
+        timeStepDuration,
+        numTimeStepsInHour);
     TestLogObj.FillZoneStep(tmpztStepStamp4);
 
     // now check that the correct values were stored in the right spot
@@ -294,7 +317,13 @@ TEST_F(SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour)
     for (int hr = 1; hr <= 24; ++hr) {
         HourofDay = hr;
         ZoneTimestepObject tmpztStepStamp1( // call constructor
-            state->dataGlobal->KindOfSim, Envrn, state->dataGlobal->DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
+            state->dataGlobal->KindOfSim,
+            Envrn,
+            state->dataGlobal->DayOfSim,
+            HourofDay,
+            timeStp,
+            timeStepDuration,
+            numTimeStepsInHour);
         TestLogObj.FillZoneStep(tmpztStepStamp1);
     }
 
@@ -303,7 +332,13 @@ TEST_F(SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour)
     for (int hr = 1; hr <= 24; ++hr) {
         HourofDay = hr;
         ZoneTimestepObject tmpztStepStamp1( // call constructor
-            state->dataGlobal->KindOfSim, Envrn, state->dataGlobal->DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
+            state->dataGlobal->KindOfSim,
+            Envrn,
+            state->dataGlobal->DayOfSim,
+            HourofDay,
+            timeStp,
+            timeStepDuration,
+            numTimeStepsInHour);
         TestLogObj.FillZoneStep(tmpztStepStamp1);
     }
 
@@ -347,7 +382,13 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest)
     int numTimeStepsInHour(4);
 
     ZoneTimestepObject tmpztStepStamp1( // call constructor
-        state->dataGlobal->KindOfSim, Envrn, state->dataGlobal->DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
+        state->dataGlobal->KindOfSim,
+        Envrn,
+        state->dataGlobal->DayOfSim,
+        HourofDay,
+        timeStp,
+        timeStepDuration,
+        numTimeStepsInHour);
     LogVal = 1.5; // kg/s
     tmpztStepStamp1.runningAvgDataValue = 1.5;
     sizingLoggerFrameObj.logObjs[logIndex].FillZoneStep(tmpztStepStamp1);
@@ -407,20 +448,34 @@ TEST_F(SizingAnalysisObjectsTest, DISABLED_LoggingSubStep4stepPerHour)
         for (int timeStp = 1; timeStp <= 4; ++timeStp) {              // 15 minute zone timestep
             for (int subTimeStp = 1; subTimeStp <= 5; ++subTimeStp) { // 5 system substeps, so 3 minute system timestep
                 Real64 const minutesPerHour(60.0);
-                ZoneTimestepObject tmpztStepStamp(state->dataGlobal->KindOfSim, Envrn, state->dataGlobal->DayOfSim, HourofDay, timeStp, zoneTimeStepDuration,
+                ZoneTimestepObject tmpztStepStamp(state->dataGlobal->KindOfSim,
+                                                  Envrn,
+                                                  state->dataGlobal->DayOfSim,
+                                                  HourofDay,
+                                                  timeStp,
+                                                  zoneTimeStepDuration,
                                                   numTimeStepsInHour); // call constructor
                 SystemTimestepObject tmpSysStepStamp;
-                tmpSysStepStamp.CurMinuteEnd = (timeStp - 1) * (minutesPerHour * zoneTimeStepDuration) +
-                                               (subTimeStp) * (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
+                tmpSysStepStamp.CurMinuteEnd =
+                    (timeStp - 1) * (minutesPerHour * zoneTimeStepDuration) +
+                    (subTimeStp) * (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) *
+                        minutesPerHour;
                 if (tmpSysStepStamp.CurMinuteEnd == 0.0) {
                     tmpSysStepStamp.CurMinuteEnd = minutesPerHour;
                 }
-                tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
+                tmpSysStepStamp.CurMinuteStart =
+                    tmpSysStepStamp.CurMinuteEnd -
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
                 tmpSysStepStamp.TimeStepDuration = *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
                 TestLogObj.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
             }
 
-            ZoneTimestepObject tmpztStepStamp1(state->dataGlobal->KindOfSim, Envrn, state->dataGlobal->DayOfSim, HourofDay, timeStp, zoneTimeStepDuration,
+            ZoneTimestepObject tmpztStepStamp1(state->dataGlobal->KindOfSim,
+                                               Envrn,
+                                               state->dataGlobal->DayOfSim,
+                                               HourofDay,
+                                               timeStp,
+                                               zoneTimeStepDuration,
                                                numTimeStepsInHour); // call constructor
             TestLogObj.FillZoneStep(tmpztStepStamp1);
         }
@@ -433,20 +488,34 @@ TEST_F(SizingAnalysisObjectsTest, DISABLED_LoggingSubStep4stepPerHour)
         for (int timeStp = 1; timeStp <= 4; ++timeStp) {              // 15 minute zone timestep
             for (int subTimeStp = 1; subTimeStp <= 5; ++subTimeStp) { // 5 system substeps, so 3 minute system timestep
                 Real64 const minutesPerHour(60.0);
-                ZoneTimestepObject tmpztStepStamp(state->dataGlobal->KindOfSim, Envrn, state->dataGlobal->DayOfSim, HourofDay, timeStp, zoneTimeStepDuration,
+                ZoneTimestepObject tmpztStepStamp(state->dataGlobal->KindOfSim,
+                                                  Envrn,
+                                                  state->dataGlobal->DayOfSim,
+                                                  HourofDay,
+                                                  timeStp,
+                                                  zoneTimeStepDuration,
                                                   numTimeStepsInHour); // call constructor
                 SystemTimestepObject tmpSysStepStamp;
-                tmpSysStepStamp.CurMinuteEnd = (timeStp - 1) * (minutesPerHour * zoneTimeStepDuration) +
-                                               (subTimeStp) * (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
+                tmpSysStepStamp.CurMinuteEnd =
+                    (timeStp - 1) * (minutesPerHour * zoneTimeStepDuration) +
+                    (subTimeStp) * (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) *
+                        minutesPerHour;
                 if (tmpSysStepStamp.CurMinuteEnd == 0.0) {
                     tmpSysStepStamp.CurMinuteEnd = minutesPerHour;
                 }
-                tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
+                tmpSysStepStamp.CurMinuteStart =
+                    tmpSysStepStamp.CurMinuteEnd -
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
                 tmpSysStepStamp.TimeStepDuration = *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
                 TestLogObj.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
             }
 
-            ZoneTimestepObject tmpztStepStamp1(state->dataGlobal->KindOfSim, Envrn, state->dataGlobal->DayOfSim, HourofDay, timeStp, zoneTimeStepDuration,
+            ZoneTimestepObject tmpztStepStamp1(state->dataGlobal->KindOfSim,
+                                               Envrn,
+                                               state->dataGlobal->DayOfSim,
+                                               HourofDay,
+                                               timeStp,
+                                               zoneTimeStepDuration,
                                                numTimeStepsInHour); // call constructor
             TestLogObj.FillZoneStep(tmpztStepStamp1);
         }
@@ -501,7 +570,13 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTestNullMassFlowRateTim
     int numTimeStepsInHour(4);
 
     ZoneTimestepObject tmpztStepStamp1( // call full constructor
-        state->dataGlobal->KindOfSim, Envrn, state->dataGlobal->DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
+        state->dataGlobal->KindOfSim,
+        Envrn,
+        state->dataGlobal->DayOfSim,
+        HourofDay,
+        timeStp,
+        timeStepDuration,
+        numTimeStepsInHour);
     LogVal = 1.5; // kg/s
     tmpztStepStamp1.runningAvgDataValue = 1.5;
     sizingLoggerFrameObj.logObjs[logIndex].FillZoneStep(tmpztStepStamp1);

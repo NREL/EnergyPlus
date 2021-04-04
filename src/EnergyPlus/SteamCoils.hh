@@ -146,7 +146,8 @@ namespace SteamCoils {
         }
     };
 
-    void SimulateSteamCoilComponents(EnergyPlusData &state, std::string const &CompName,
+    void SimulateSteamCoilComponents(EnergyPlusData &state,
+                                     std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64 const> QCoilReq = _, // coil load to be met
@@ -233,7 +234,8 @@ namespace SteamCoils {
                                bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilCapacity([[maybe_unused]] EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity([[maybe_unused]] EnergyPlusData &state,
+                           std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     );
@@ -267,7 +269,8 @@ namespace SteamCoils {
 
 } // namespace SteamCoils
 
-struct SteamCoilsData : BaseGlobalStruct {
+struct SteamCoilsData : BaseGlobalStruct
+{
 
     int const SteamCoil_AirHeating = 2;
     int const TemperatureSetPointControl = 1;

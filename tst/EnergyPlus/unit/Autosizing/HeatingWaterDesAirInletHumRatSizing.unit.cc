@@ -103,9 +103,9 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_NEAR(0.009, sizedValue, 0.001); // hard-sized value
     sizer.autoSizedValue = 0.0;            // reset for next test
 
-    eiooutput =
-        std::string("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n"
-                    " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Design Inlet Air Humidity Ratio [kgWater/kgDryAir], 9.00000E-003\n");
+    eiooutput = std::string("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n"
+                            " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Design Inlet Air Humidity Ratio "
+                            "[kgWater/kgDryAir], 9.00000E-003\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -151,8 +151,8 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.008, sizedValue, 0.0001);
 
-    eiooutput =
-        std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Design Inlet Air Humidity Ratio [kgWater/kgDryAir], 8.00000E-003\n");
+    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Design Inlet Air Humidity Ratio "
+                            "[kgWater/kgDryAir], 8.00000E-003\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -265,7 +265,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     // Test 11 - Zone Equipment w/ AT Mixer at 20% of design flow
     state->dataSize->ZoneEqSizing(1).ATMixerHeatPriHumRat = 0.001;
     state->dataSize->ZoneEqSizing(1).ATMixerVolFlow = 0.002 / state->dataEnvrn->StdRhoAir; // AT mass flow smaller than DesCoolMassFlow by factor of 5
-    Real64 mixedHumRat2 = 0.8 * 0.007 + 0.2 * 0.001;                                 // 80% of ZoneHumRatAtCoolPeak, 20% of AT Mixer mass flow
+    Real64 mixedHumRat2 = 0.8 * 0.007 + 0.2 * 0.001;                                       // 80% of ZoneHumRatAtCoolPeak, 20% of AT Mixer mass flow
 
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -349,8 +349,8 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
-    eiooutput =
-        std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Design Inlet Air Humidity Ratio [kgWater/kgDryAir], 6.00000E-003\n");
+    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Design Inlet Air Humidity Ratio "
+                            "[kgWater/kgDryAir], 6.00000E-003\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -444,9 +444,10 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_FALSE(errorsFound);
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
-    eiooutput =
-        std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Design Inlet Air Humidity Ratio [kgWater/kgDryAir], 3.60000E-003\n"
-                    " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Design Inlet Air Humidity Ratio [kgWater/kgDryAir], 6.65000E-003\n");
+    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Design Inlet Air Humidity Ratio "
+                            "[kgWater/kgDryAir], 3.60000E-003\n"
+                            " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Design Inlet Air Humidity Ratio "
+                            "[kgWater/kgDryAir], 6.65000E-003\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }
 

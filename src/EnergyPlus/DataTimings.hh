@@ -72,7 +72,10 @@ namespace DataTimings {
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    int constexpr MaxTimingStringLength () { return 250 ;} // string length for timing string array
+    int constexpr MaxTimingStringLength()
+    {
+        return 250;
+    } // string length for timing string array
 
     // Following for calls to routines
 
@@ -113,7 +116,8 @@ namespace DataTimings {
 
 } // namespace DataTimings
 
-struct DataTimingsData : BaseGlobalStruct {
+struct DataTimingsData : BaseGlobalStruct
+{
 
     int NumTimingElements = 0;
     int MaxTimingElements = 0;
@@ -151,7 +155,8 @@ struct DataTimingsData : BaseGlobalStruct {
     int NumCalcScriptF_Calls = 0;
 #endif
 
-    void clear_state() override {
+    void clear_state() override
+    {
         this->NumTimingElements = 0;
         this->MaxTimingElements = 0;
         this->dailyWeatherTime = 0.0;

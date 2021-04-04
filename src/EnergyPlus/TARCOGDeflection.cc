@@ -72,7 +72,11 @@ namespace EnergyPlus::TARCOGDeflection {
 using namespace TARCOGParams;
 using namespace TARCOGCommon;
 
+<<<<<<< HEAD
 void PanesDeflection(DeflectionCalculation const DeflectionStandard,
+=======
+void PanesDeflection(int const DeflectionStandard,
+>>>>>>> develop
                      Real64 const W,
                      Real64 const H,
                      int const nlayer,
@@ -112,7 +116,11 @@ void PanesDeflection(DeflectionCalculation const DeflectionStandard,
     for (int i = 1; i <= nlayer; ++i) {
         DCoeff(i) = YoungsMod(i) * pow_3(PaneThickness(i)) / (12 * (1 - pow_2(PoissonsRat(i))));
     }
+<<<<<<< HEAD
     if (DeflectionStandard == DeflectionCalculation::TEMPERATURE) {
+=======
+    if (DeflectionStandard == DEFLECTION_CALC_TEMPERATURE) {
+>>>>>>> develop
         DeflectionTemperatures(nlayer,
                                W,
                                H,
@@ -127,7 +135,11 @@ void PanesDeflection(DeflectionCalculation const DeflectionStandard,
                                LayerDeflection,
                                nperr,
                                ErrorMessage);
+<<<<<<< HEAD
     } else if (DeflectionStandard == DeflectionCalculation::GAP_WIDTHS) {
+=======
+    } else if (DeflectionStandard == DEFLECTION_CALC_GAP_WIDTHS) {
+>>>>>>> develop
         DeflectionWidths(nlayer, W, H, DCoeff, NonDeflectedGapWidth, DeflectedGapWidthMax, DeflectedGapWidthMean, LayerDeflection);
     } else { // including NO_DEFLECTION_CALCULATION
         return;

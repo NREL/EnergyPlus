@@ -49,8 +49,8 @@
 #include <gtest/gtest.h>
 
 #include <EnergyPlus/Autosizing/CoolingWaterNumofTubesPerRowSizing.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 
 namespace EnergyPlus {
 
@@ -217,7 +217,7 @@ TEST_F(AutoSizingFixture, CoolingWaterNumofTubesPerRowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(4.0, sizedValue, 0.01); // uses a mass flow rate for sizing
-    sizer.autoSizedValue = 0.0;          // reset for next test
+    sizer.autoSizedValue = 0.0;         // reset for next test
 
     // reset eio stream
     has_eio_output(true);

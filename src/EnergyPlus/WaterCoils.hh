@@ -588,26 +588,26 @@ struct WaterCoilsData : BaseGlobalStruct
     Array1D<WaterCoils::WaterCoilEquipConditions> WaterCoil;
     Array1D<WaterCoils::WaterCoilNumericFieldData> WaterCoilNumericFields;
 
-    Real64 TOutNew = 0.0;        // reset outlet air temperature for Coil:Cooling:Water
-    Real64 WOutNew = 0.0;        // reset outlet air humidity ratio for Coil:Cooling:Water
+    Real64 TOutNew = 0.0;            // reset outlet air temperature for Coil:Cooling:Water
+    Real64 WOutNew = 0.0;            // reset outlet air humidity ratio for Coil:Cooling:Water
     Array1D<Real64> DesCpAir;        // CpAir at Design Inlet Air Temp
     Array1D<Real64> DesUARangeCheck; // Value for range check based on Design Inlet Air Humidity Ratio
     Array1D_bool MyEnvrnFlag;
     Array1D_bool MyCoilReportFlag;
     Array1D_bool PlantLoopScanFlag;
     Array1D<Real64> CoefSeries = Array1D<Real64>(5); // Tuned Changed to static: High call count: Set before use
-    Array1D<Real64> Par = Array1D<Real64> (4); // Tuned Changed to static: High call count: Set before use
-    bool NoSatCurveIntersect = false; // TRUE if failed to find apparatus dew-point
-    bool BelowInletWaterTemp = false; // TRUE if apparatus dew-point below design inlet water temperature
-    bool CBFTooLarge = false;         // TRUE if the coil bypass factor is unrealistically large
-    bool NoExitCondReset = false;     // TRUE if exit condition reset is not to be done
-    Real64 RatedLatentCapacity = 0.0; // latent cooling capacity at the rating point [W]
-    Real64 RatedSHR = 0.0;            // sensible heat ratio at the rating point
-    Real64 CapacitanceWater = 0.0;    // capacitance of the water stream [W/K]
-    Real64 CMin = 0.0;                // minimum capacitance of 2 streams [W/K]
-    Real64 CoilEffectiveness = 0.0;   // effectiveness of the coil (rated)
-    Real64 SurfaceArea = 0.0;         // heat exchanger surface area, [m2]
-    Real64 UATotal = 0.0;             // heat exchanger UA total, [W/C]
+    Array1D<Real64> Par = Array1D<Real64>(4);        // Tuned Changed to static: High call count: Set before use
+    bool NoSatCurveIntersect = false;                // TRUE if failed to find apparatus dew-point
+    bool BelowInletWaterTemp = false;                // TRUE if apparatus dew-point below design inlet water temperature
+    bool CBFTooLarge = false;                        // TRUE if the coil bypass factor is unrealistically large
+    bool NoExitCondReset = false;                    // TRUE if exit condition reset is not to be done
+    Real64 RatedLatentCapacity = 0.0;                // latent cooling capacity at the rating point [W]
+    Real64 RatedSHR = 0.0;                           // sensible heat ratio at the rating point
+    Real64 CapacitanceWater = 0.0;                   // capacitance of the water stream [W/K]
+    Real64 CMin = 0.0;                               // minimum capacitance of 2 streams [W/K]
+    Real64 CoilEffectiveness = 0.0;                  // effectiveness of the coil (rated)
+    Real64 SurfaceArea = 0.0;                        // heat exchanger surface area, [m2]
+    Real64 UATotal = 0.0;                            // heat exchanger UA total, [W/C]
     Array1D_bool RptCoilHeaderFlag = Array1D_bool(2, true);
     Array2D<Real64> OrderedPair = Array2D<Real64>(WaterCoils::MaxOrderedPairs, 2);
     Array2D<Real64> OrdPairSum = Array2D<Real64>(10, 2);
@@ -636,7 +636,7 @@ struct WaterCoilsData : BaseGlobalStruct
         this->MyCoilReportFlag.deallocate();
         this->PlantLoopScanFlag.deallocate();
         this->CoefSeries = Array1D<Real64>(5);
-        this->Par = Array1D<Real64> (4);
+        this->Par = Array1D<Real64>(4);
         this->NoSatCurveIntersect = false;
         this->BelowInletWaterTemp = false;
         this->CBFTooLarge = false;
@@ -652,7 +652,6 @@ struct WaterCoilsData : BaseGlobalStruct
         this->OrderedPair = Array2D<Real64>(WaterCoils::MaxOrderedPairs, 2);
         this->OrdPairSum = Array2D<Real64>(10, 2);
         this->OrdPairSumMatrix = Array2D<Real64>(10, 10);
-
     }
 
     // Default Constructor

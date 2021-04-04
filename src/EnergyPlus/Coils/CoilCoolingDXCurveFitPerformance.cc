@@ -64,7 +64,8 @@
 
 using namespace EnergyPlus;
 
-void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data)
+void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state,
+                                                                const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data)
 {
     static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
@@ -94,8 +95,8 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
     }
     if (this->evapCondBasinHeatSchedulIndex == 0) {
         ShowSevereError(state, routineName + this->object_name + "=\"" + this->name + "\", invalid");
-        ShowContinueError(state, "...Evaporative Condenser Basin Heater Operating Schedule Name=\"" + input_data.basin_heater_operating_schedule_name +
-                          "\".");
+        ShowContinueError(
+            state, "...Evaporative Condenser Basin Heater Operating Schedule Name=\"" + input_data.basin_heater_operating_schedule_name + "\".");
         errorsFound = true;
     }
 
@@ -131,7 +132,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
 
 CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::EnergyPlusData &state, const std::string &name_to_find)
 {
-    int numPerformances = inputProcessor->getNumObjectsFound(state, CoilCoolingDXCurveFitPerformance::object_name);
+    int numPerformances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CoilCoolingDXCurveFitPerformance::object_name);
     if (numPerformances <= 0) {
         // error
     }
@@ -140,8 +141,16 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::E
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        inputProcessor->getObjectItem(
-            state, CoilCoolingDXCurveFitPerformance::object_name, perfNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus, _, state.dataIPShortCut->lAlphaFieldBlanks);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 CoilCoolingDXCurveFitPerformance::object_name,
+                                                                 perfNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 _,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks);
         if (!UtilityRoutines::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
             continue;
         }
@@ -180,7 +189,8 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::E
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &state, const DataLoopNode::NodeData &inletNode,
+void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &state,
+                                                const DataLoopNode::NodeData &inletNode,
                                                 DataLoopNode::NodeData &outletNode,
                                                 int useAlternateMode,
                                                 Real64 &PLR,
@@ -399,7 +409,8 @@ void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlus::EnergyPlusData &sta
     currentMode.CalcOperatingMode(state, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
 }
 
-void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::EnergyPlusData& state) {
+void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::EnergyPlusData &state)
+{
 
     // for now this will provide standard ratings for the coil at the normal mode at speed N
     // future iterations will extend the inputs to give the user the flexibility to select different standards to
@@ -408,21 +419,21 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
     int const NumOfReducedCap(4); // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 TotCapFlowModFac(0.0);          // Total capacity modifier f(actual flow vs rated flow) for each speed [-]
-    Real64 EIRFlowModFac(0.0);             // EIR modifier f(actual supply air flow vs rated flow) for each speed [-]
-    Real64 TotCapTempModFac(0.0);          // Total capacity modifier (function of entering wetbulb, outside drybulb) [-]
-    Real64 EIRTempModFac(0.0);             // EIR modifier (function of entering wetbulb, outside drybulb) [-]
-    Real64 TotCoolingCapAHRI(0.0);         // Total Cooling Coil capacity (gross) at AHRI test conditions [W]
-    Real64 NetCoolingCapAHRI(0.0);         // Net Cooling Coil capacity at AHRI TestB conditions, accounting for fan heat [W]
-    Real64 TotalElecPower(0.0);            // Net power consumption (Cond Fan+Compressor+Indoor Fan) at AHRI test conditions [W]
-    Real64 TotalElecPowerRated(0.0);       // Net power consumption (Cond Fan+Compressor+Indoor Fan) at Rated test conditions [W]
-    Real64 EIR(0.0);                       // Energy Efficiency Ratio at AHRI test conditions for SEER [-]
-    Real64 PartLoadFactor(0.0);            // Part load factor, accounts for thermal lag at compressor startup [-]
-    Real64 EERReduced(0.0);                // EER at reduced capacity test conditions (100%, 75%, 50%, and 25%)
-    Real64 ElecPowerReducedCap(0.0);       // Net power consumption (Cond Fan+Compressor) at reduced test condition [W]
-    Real64 NetCoolingCapReduced(0.0);      // Net Cooling Coil capacity at reduced conditions, accounting for supply fan heat [W]
-    Real64 LoadFactor(0.0);                // Fractional "on" time for last stage at the desired reduced capacity, (dimensionless)
-    Real64 DegradationCoeff(0.0);          // Degradation coeficient, (dimenssionless)
+    Real64 TotCapFlowModFac(0.0);                 // Total capacity modifier f(actual flow vs rated flow) for each speed [-]
+    Real64 EIRFlowModFac(0.0);                    // EIR modifier f(actual supply air flow vs rated flow) for each speed [-]
+    Real64 TotCapTempModFac(0.0);                 // Total capacity modifier (function of entering wetbulb, outside drybulb) [-]
+    Real64 EIRTempModFac(0.0);                    // EIR modifier (function of entering wetbulb, outside drybulb) [-]
+    Real64 TotCoolingCapAHRI(0.0);                // Total Cooling Coil capacity (gross) at AHRI test conditions [W]
+    Real64 NetCoolingCapAHRI(0.0);                // Net Cooling Coil capacity at AHRI TestB conditions, accounting for fan heat [W]
+    Real64 TotalElecPower(0.0);                   // Net power consumption (Cond Fan+Compressor+Indoor Fan) at AHRI test conditions [W]
+    Real64 TotalElecPowerRated(0.0);              // Net power consumption (Cond Fan+Compressor+Indoor Fan) at Rated test conditions [W]
+    Real64 EIR(0.0);                              // Energy Efficiency Ratio at AHRI test conditions for SEER [-]
+    Real64 PartLoadFactor(0.0);                   // Part load factor, accounts for thermal lag at compressor startup [-]
+    Real64 EERReduced(0.0);                       // EER at reduced capacity test conditions (100%, 75%, 50%, and 25%)
+    Real64 ElecPowerReducedCap(0.0);              // Net power consumption (Cond Fan+Compressor) at reduced test condition [W]
+    Real64 NetCoolingCapReduced(0.0);             // Net Cooling Coil capacity at reduced conditions, accounting for supply fan heat [W]
+    Real64 LoadFactor(0.0);                       // Fractional "on" time for last stage at the desired reduced capacity, (dimensionless)
+    Real64 DegradationCoeff(0.0);                 // Degradation coeficient, (dimenssionless)
     Real64 OutdoorUnitInletAirDryBulbTempReduced; // Outdoor unit entering air dry-bulb temperature at reduced capacity [C]
     int RedCapNum;                                // Integer counter for reduced capacity
 
@@ -433,18 +444,18 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
     // indoor air circulating fan. Used if user doesn't enter a specific value.
     Real64 const DefaultFanPowerPerEvapAirFlowRate(773.3); // 365 W/1000 scfm or 773.3 W/(m3/s).
     // AHRI Standard 210/240-2008 Performance Test Conditions for Unitary Air-to-Air Air-Conditioning and Heat Pump Equipment
-    Real64 const CoolingCoilInletAirWetBulbTempRated(19.44); // 19.44C (67F)  Tests A and B
-    Real64 const OutdoorUnitInletAirDryBulbTemp(27.78);      // 27.78C (82F)  Test B (for SEER)
-    Real64 const OutdoorUnitInletAirDryBulbTempRated(35.0);  // 35.00C (95F)  Test A (rated capacity)
-    Real64 const AirMassFlowRatioRated(1.0);                 // AHRI test is at the design flow rate so AirMassFlowRatio is 1.0
+    Real64 const CoolingCoilInletAirWetBulbTempRated(19.44);      // 19.44C (67F)  Tests A and B
+    Real64 const OutdoorUnitInletAirDryBulbTemp(27.78);           // 27.78C (82F)  Test B (for SEER)
+    Real64 const OutdoorUnitInletAirDryBulbTempRated(35.0);       // 35.00C (95F)  Test A (rated capacity)
+    Real64 const AirMassFlowRatioRated(1.0);                      // AHRI test is at the design flow rate so AirMassFlowRatio is 1.0
     Real64 const PLRforSEER(0.5);                                 // Part-load ratio for SEER calculation (single speed DX cooling coils)
     Array1D<Real64> const ReducedPLR(4, {1.0, 0.75, 0.50, 0.25}); // Reduced Capacity part-load conditions
     Array1D<Real64> const IEERWeightingFactor(4, {0.020, 0.617, 0.238, 0.125}); // EER Weighting factors (IEER)
     Real64 const OADBTempLowReducedCapacityTest(18.3);                          // Outdoor air dry-bulb temp in degrees C (65F)
 
     // some conveniences
-    auto & mode = this->normalMode;
-    auto & speed = mode.speeds.back();
+    auto &mode = this->normalMode;
+    auto &speed = mode.speeds.back();
 
     Real64 FanPowerPerEvapAirFlowRate = DefaultFanPowerPerEvapAirFlowRate;
     if (speed.rated_evap_fan_power_per_volume_flow_rate > 0.0) {
@@ -478,8 +489,10 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
 
         // EER calculations:
         // Calculate the net cooling capacity at the rated conditions (19.44C WB and 35.0C DB )
-        TotCapTempModFac = CurveManager::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
-        this->standardRatingCoolingCapacity = mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
+        TotCapTempModFac =
+            CurveManager::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
+        this->standardRatingCoolingCapacity =
+            mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
         // Calculate Energy Efficiency Ratio (EER) at (19.44C WB and 35.0C DB ), ANSI/AHRI Std. 340/360
         EIRTempModFac = CurveManager::CurveValue(state, speed.indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
         if (speed.ratedCOP > 0.0) {
@@ -488,7 +501,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
         } else {
             EIR = 0.0;
         }
-        TotalElecPowerRated = EIR * (mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac) + FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
+        TotalElecPowerRated =
+            EIR * (mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac) + FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
         if (TotalElecPowerRated > 0.0) {
             this->standardRatingEER = this->standardRatingCoolingCapacity / TotalElecPowerRated;
         } else {
@@ -498,8 +512,10 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
         // IEER calculations:
         this->standardRatingIEER = 0.0;
         // Calculate the net cooling capacity at the rated conditions (19.44C WB and 35.0C DB )
-        TotCapTempModFac = CurveManager::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
-        this->standardRatingCoolingCapacity = mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
+        TotCapTempModFac =
+            CurveManager::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
+        this->standardRatingCoolingCapacity =
+            mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
         for (RedCapNum = 1; RedCapNum <= NumOfReducedCap; ++RedCapNum) {
             // get the outdoor air dry bulb temperature for the reduced capacity test conditions
             if (ReducedPLR(RedCapNum) > 0.444) {
@@ -507,9 +523,12 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
             } else {
                 OutdoorUnitInletAirDryBulbTempReduced = OADBTempLowReducedCapacityTest;
             }
-            TotCapTempModFac = CurveManager::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempReduced);
-            NetCoolingCapReduced = mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
-            EIRTempModFac = CurveManager::CurveValue(state, speed.indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempReduced);
+            TotCapTempModFac =
+                CurveManager::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempReduced);
+            NetCoolingCapReduced =
+                mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
+            EIRTempModFac =
+                CurveManager::CurveValue(state, speed.indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempReduced);
             if (speed.ratedCOP > 0.0) {
                 EIR = EIRTempModFac * EIRFlowModFac / speed.ratedCOP;
             } else {
@@ -523,16 +542,17 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
             DegradationCoeff = 1.130 - 0.130 * LoadFactor;
             ElecPowerReducedCap = DegradationCoeff * EIR * (mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac);
             EERReduced =
-                    (LoadFactor * NetCoolingCapReduced) / (LoadFactor * ElecPowerReducedCap + FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate);
+                (LoadFactor * NetCoolingCapReduced) / (LoadFactor * ElecPowerReducedCap + FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate);
             this->standardRatingIEER += IEERWeightingFactor(RedCapNum) * EERReduced;
         }
 
     } else {
-        ShowSevereError(state, "Standard Ratings: Coil:Cooling:DX " + this->name +  // TODO: Use dynamic COIL TYPE and COIL INSTANCE name later
-                        " has zero rated total cooling capacity. Standard ratings cannot be calculated.");
+        ShowSevereError(state,
+                        "Standard Ratings: Coil:Cooling:DX " + this->name + // TODO: Use dynamic COIL TYPE and COIL INSTANCE name later
+                            " has zero rated total cooling capacity. Standard ratings cannot be calculated.");
     }
 }
-void CoilCoolingDXCurveFitPerformance::setOperMode(EnergyPlusData &state, CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode)
+void CoilCoolingDXCurveFitPerformance::setOperMode(EnergyPlus::EnergyPlusData &state, CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode)
 {
     // set parent mode for each speed
     int numSpeeds;

@@ -212,7 +212,8 @@ namespace TarcogShading {
 
 } // namespace TarcogShading
 
-struct TarcogShadingData : BaseGlobalStruct {
+struct TarcogShadingData : BaseGlobalStruct
+{
 
     Array1D<Real64> frct1 = Array1D<Real64>(TARCOGGassesParams::maxgas);
     Array1D<Real64> frct2 = Array1D<Real64>(TARCOGGassesParams::maxgas);

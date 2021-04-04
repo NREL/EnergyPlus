@@ -53,11 +53,11 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
-#include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/DataLoopNode.hh>
 
 namespace EnergyPlus {
 
@@ -2778,18 +2778,40 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
     Real64 SSInletTemp = 24.0;
     Real64 InletAirPressure = 101320.0;
 
-    VariableSpeedCoils::CalcTotCapSHR_VSWSHP(*state, LSInletDBTemp, LSInletHumRat, LSInletEnth, LSInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio,
-                                             LSMassFlowRate, CBFSpeed, MSRatedTotCap, MSCapFTemp, MSCapAirFFlow, MSCapWaterFFlow, 0.0, 0, 0, 0,
-                                             QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SSInletTemp, InletAirPressure, 0.0, 1,
+    VariableSpeedCoils::CalcTotCapSHR_VSWSHP(*state,
+                                             LSInletDBTemp,
+                                             LSInletHumRat,
+                                             LSInletEnth,
+                                             LSInletWBTemp,
+                                             AirMassFlowRatio,
+                                             WaterMassFlowRatio,
+                                             LSMassFlowRate,
+                                             CBFSpeed,
+                                             MSRatedTotCap,
+                                             MSCapFTemp,
+                                             MSCapAirFFlow,
+                                             MSCapWaterFFlow,
+                                             0.0,
+                                             0,
+                                             0,
+                                             0,
+                                             QLoadTotal1,
+                                             QLoadTotal2,
+                                             QLoadTotal,
+                                             SHR,
+                                             SSInletTemp,
+                                             InletAirPressure,
+                                             0.0,
+                                             1,
                                              state->dataVariableSpeedCoils->VarSpeedCoil(1).capModFacTotal);
 
     // same calculations as in CalcTotCapSHR_VSWSHP (except CapFTemp term is 1 so no need to add that calc here)
-    Real64 hDelta = MSRatedTotCap / LSMassFlowRate;                      // Change in air enthalpy across the cooling coil [J/kg]
-    Real64 hADP = LSInletEnth - hDelta / (1.0 - CBFSpeed);               // Apparatus dew point enthalpy [J/kg]
-    Real64 tADP = Psychrometrics::PsyTsatFnHPb(*state, hADP, InletAirPressure);  // Apparatus dew point temperature [C]
-    Real64 wADP = Psychrometrics::PsyWFnTdbH(*state, tADP, hADP);                // Apparatus dew point humidity ratio [kg/kg]
-    Real64 hTinwADP = Psychrometrics::PsyHFnTdbW(LSInletDBTemp, wADP);   // Enthalpy at inlet dry-bulb and wADP [J/kg]
-    Real64 SHRCalc = min((hTinwADP - hADP) / (LSInletEnth - hADP), 1.0); // temporary calculated value of SHR
+    Real64 hDelta = MSRatedTotCap / LSMassFlowRate;                             // Change in air enthalpy across the cooling coil [J/kg]
+    Real64 hADP = LSInletEnth - hDelta / (1.0 - CBFSpeed);                      // Apparatus dew point enthalpy [J/kg]
+    Real64 tADP = Psychrometrics::PsyTsatFnHPb(*state, hADP, InletAirPressure); // Apparatus dew point temperature [C]
+    Real64 wADP = Psychrometrics::PsyWFnTdbH(*state, tADP, hADP);               // Apparatus dew point humidity ratio [kg/kg]
+    Real64 hTinwADP = Psychrometrics::PsyHFnTdbW(LSInletDBTemp, wADP);          // Enthalpy at inlet dry-bulb and wADP [J/kg]
+    Real64 SHRCalc = min((hTinwADP - hADP) / (LSInletEnth - hADP), 1.0);        // temporary calculated value of SHR
 
     // expect SHR to be < 1
     EXPECT_NEAR(SHR, 0.5275102, 0.000001);
@@ -2898,7 +2920,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
         "Curve:Quadratic,",
         "    PLF Curve, 0.85, 0.8333, 0.0, 0.0, 0.3, 0.85, 1.0, Dimensionless, Dimensionless;",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
     // get coil inputs
@@ -2927,8 +2949,17 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     Real64 FanDelayTime(0.0);
 
     // run coil init
-    VariableSpeedCoils::InitVarSpeedCoil(
-        *state, DXCoilNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+    VariableSpeedCoils::InitVarSpeedCoil(*state,
+                                         DXCoilNum,
+                                         MaxONOFFCyclesperHour,
+                                         HPTimeConstant,
+                                         FanDelayTime,
+                                         SensLoad,
+                                         LatentLoad,
+                                         CyclingScheme,
+                                         OnOffAirFlowRatio,
+                                         SpeedRatio,
+                                         SpeedCal);
     // set coil inlet condition
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp = 24.0;
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat = 0.009;
@@ -2946,9 +2977,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
         *state, DXCoilNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
     ;
     // check coil outlet and inlet air conditions match
-    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp, state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp);
-    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat, state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat);
-    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirEnthalpy, state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp,
+              state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat,
+              state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirEnthalpy,
+              state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy);
     ;
     // test 2: compressor is On and PLR > 0
     CompOp = 1;

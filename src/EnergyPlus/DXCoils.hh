@@ -72,26 +72,26 @@ namespace DXCoils {
     using DataHVACGlobals::DryBulbIndicator;
 
     // Defrost strategy (heat pump only)
-    constexpr int ReverseCycle(1);      // uses reverse cycle defrost strategy
-    constexpr int Resistive(2);         // uses electric resistance heater for defrost
+    constexpr int ReverseCycle(1); // uses reverse cycle defrost strategy
+    constexpr int Resistive(2);    // uses electric resistance heater for defrost
 
     // Defrost control  (heat pump only)
-    constexpr int Timed(1);             // defrost cycle is timed
-    constexpr int OnDemand(2);          // defrost cycle occurs only when required
+    constexpr int Timed(1);    // defrost cycle is timed
+    constexpr int OnDemand(2); // defrost cycle occurs only when required
 
     // Compressor operation
-    constexpr int On(1);                // normal compressor operation
-    constexpr int Off(0);               // signal DXCoil that compressor shouldn't run
+    constexpr int On(1);  // normal compressor operation
+    constexpr int Off(0); // signal DXCoil that compressor shouldn't run
 
-    constexpr Real64 RatedInletAirTemp(26.6667);            // 26.6667C or 80F
-    constexpr Real64 RatedInletWetBulbTemp(19.4444);        // 19.44 or 67F
-    constexpr Real64 RatedInletAirHumRat(0.0111847);        // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
-    constexpr Real64 RatedOutdoorAirTemp(35.0);             // 35 C or 95F
-    constexpr Real64 RatedInletAirTempHeat(21.1111);        // 21.11C or 70F
-    constexpr Real64 RatedOutdoorAirTempHeat(8.3333);       // 8.33 C or 47F
-    constexpr Real64 RatedOutdoorWetBulbTempHeat(6.1111);   // 6.11 C or 43F
-    constexpr Real64 RatedInletWetBulbTempHeat(15.5556);    // 15.55 or 60F
-    constexpr Real64 DryCoilOutletHumRatioMin(0.00001);     // dry coil outlet minimum hum ratio kgWater/kgDryAir
+    constexpr Real64 RatedInletAirTemp(26.6667);          // 26.6667C or 80F
+    constexpr Real64 RatedInletWetBulbTemp(19.4444);      // 19.44 or 67F
+    constexpr Real64 RatedInletAirHumRat(0.0111847);      // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    constexpr Real64 RatedOutdoorAirTemp(35.0);           // 35 C or 95F
+    constexpr Real64 RatedInletAirTempHeat(21.1111);      // 21.11C or 70F
+    constexpr Real64 RatedOutdoorAirTempHeat(8.3333);     // 8.33 C or 47F
+    constexpr Real64 RatedOutdoorWetBulbTempHeat(6.1111); // 6.11 C or 43F
+    constexpr Real64 RatedInletWetBulbTempHeat(15.5556);  // 15.55 or 60F
+    constexpr Real64 DryCoilOutletHumRatioMin(0.00001);   // dry coil outlet minimum hum ratio kgWater/kgDryAir
 
     // Multimode DX Coil
     constexpr int MaxCapacityStages(2);                               // Maximum number of capacity stages supported
@@ -99,12 +99,14 @@ namespace DXCoils {
     constexpr int MaxModes(MaxCapacityStages *(MaxDehumidModes + 1)); // Maximum number of performance modes
 
     // Water Systems
-    enum class iCondensate {
-        Discarded,          // default mode where water is "lost"
-        ToTank,             // collect coil condensate from air and store in water storage tank
+    enum class iCondensate
+    {
+        Discarded, // default mode where water is "lost"
+        ToTank,    // collect coil condensate from air and store in water storage tank
     };
 
-    enum class iWaterSupply {
+    enum class iWaterSupply
+    {
         FromMains,
         FromTank,
     };
@@ -335,11 +337,11 @@ namespace DXCoils {
         std::string HighAmbBuffer1; // holds warning message until next iteration (only prints 1 message/iteration)
         std::string HighAmbBuffer2; // holds warning message until next iteration (only prints 1 message/iteration)
         // begin variables for Water System interactions
-        iWaterSupply EvapWaterSupplyMode;         // where does water come from
-        std::string EvapWaterSupplyName; // name of water source e.g. water storage tank
+        iWaterSupply EvapWaterSupplyMode; // where does water come from
+        std::string EvapWaterSupplyName;  // name of water source e.g. water storage tank
         int EvapWaterSupTankID;
         int EvapWaterTankDemandARRID;
-        iCondensate CondensateCollectMode;         // where does water come from
+        iCondensate CondensateCollectMode; // where does water come from
         std::string CondensateCollectName; // name of water source e.g. water storage tank
         int CondensateTankID;
         int CondensateTankSupplyARRID;
@@ -350,29 +352,29 @@ namespace DXCoils {
         Real64 CurrentEndTimeLast; // end time of time step for last simulation time step
         Real64 TimeStepSysLast;    // last system time step (used to check for downshifting)
         // for multispeed DX coil type
-        std::string FuelType;                       // Fuel type string
-        DataGlobalConstants::ResourceType FuelTypeNum;  // Fuel type number
-        int NumOfSpeeds;                            // Number of speeds
-        bool PLRImpact;                             // Part load fraction applied to Speed Number > 1
-        bool LatentImpact;                          // Latent degradation applied to Speed Number > 1
-        Array1D_int MSErrIndex;                     // index flag for num speeds/recurring messages
-        Array1D<Real64> MSRatedTotCap;              // Rated cooling capacity for MS heat pump [W]
-        Array1D<Real64> MSRatedTotCapDes;           // Autosized Gross total cooling capacity at rated conditions [watts]
-        Array1D<Real64> MSRatedSHR;                 // Rated SHR for MS heat pump [dimensionless]
-        Array1D<Real64> MSRatedCOP;                 // Rated COP for MS heat pump [dimensionless]
-        Array1D<Real64> MSRatedAirVolFlowRate;      // Air volume flow rate through unit at rated conditions [m3/s]
-        Array1D<Real64> MSRatedAirMassFlowRate;     // Air mass flow rate through unit at rated conditions [m3/s]
-        Array1D<Real64> MSRatedCBF;                 // rated coil bypass factor
-        Array1D_int MSCCapFTemp;                    // index of total cooling capacity modifier curve
-        Array1D_int MSCCapFFlow;                    // index of total cooling capacity modifier curve
-        Array1D_int MSEIRFTemp;                     // index of energy input ratio modifier curve as a function of temperature
-        Array1D_int MSEIRFFlow;                     // index of energy input ratio modifier curve as a function of flow fraction
-        Array1D_int MSPLFFPLR;                      // index of part load factor as a function of part load ratio
-        Array1D_int MSWasteHeat;                    // index of waste heat as a function of temperature
-        Array1D<Real64> MSWasteHeatFrac;            // Waste heat fraction
-        Array1D<Real64> MSEvapCondEffect;           // effectiveness of the evaporatively cooled condenser
-        Array1D<Real64> MSEvapCondAirFlow;          // Air flow rate through the evap condenser for water use calcs [m3/s]
-        Array1D<Real64> MSEvapCondPumpElecNomPower; // Nominal power input to the evap condenser
+        std::string FuelType;                          // Fuel type string
+        DataGlobalConstants::ResourceType FuelTypeNum; // Fuel type number
+        int NumOfSpeeds;                               // Number of speeds
+        bool PLRImpact;                                // Part load fraction applied to Speed Number > 1
+        bool LatentImpact;                             // Latent degradation applied to Speed Number > 1
+        Array1D_int MSErrIndex;                        // index flag for num speeds/recurring messages
+        Array1D<Real64> MSRatedTotCap;                 // Rated cooling capacity for MS heat pump [W]
+        Array1D<Real64> MSRatedTotCapDes;              // Autosized Gross total cooling capacity at rated conditions [watts]
+        Array1D<Real64> MSRatedSHR;                    // Rated SHR for MS heat pump [dimensionless]
+        Array1D<Real64> MSRatedCOP;                    // Rated COP for MS heat pump [dimensionless]
+        Array1D<Real64> MSRatedAirVolFlowRate;         // Air volume flow rate through unit at rated conditions [m3/s]
+        Array1D<Real64> MSRatedAirMassFlowRate;        // Air mass flow rate through unit at rated conditions [m3/s]
+        Array1D<Real64> MSRatedCBF;                    // rated coil bypass factor
+        Array1D_int MSCCapFTemp;                       // index of total cooling capacity modifier curve
+        Array1D_int MSCCapFFlow;                       // index of total cooling capacity modifier curve
+        Array1D_int MSEIRFTemp;                        // index of energy input ratio modifier curve as a function of temperature
+        Array1D_int MSEIRFFlow;                        // index of energy input ratio modifier curve as a function of flow fraction
+        Array1D_int MSPLFFPLR;                         // index of part load factor as a function of part load ratio
+        Array1D_int MSWasteHeat;                       // index of waste heat as a function of temperature
+        Array1D<Real64> MSWasteHeatFrac;               // Waste heat fraction
+        Array1D<Real64> MSEvapCondEffect;              // effectiveness of the evaporatively cooled condenser
+        Array1D<Real64> MSEvapCondAirFlow;             // Air flow rate through the evap condenser for water use calcs [m3/s]
+        Array1D<Real64> MSEvapCondPumpElecNomPower;    // Nominal power input to the evap condenser
         // water circulation pump
         Array1D<Real64> MSTwet_Rated; // Nominal time for condensate to begin leaving the coil's
         // condensate drain line (sec)
@@ -490,15 +492,14 @@ namespace DXCoils {
               CondPumpHeatInCapacity(false), CondPumpPowerInCOP(false), LowTempLast(0.0), HighTempLast(0.0), ErrIndex1(0), ErrIndex2(0), ErrIndex3(0),
               ErrIndex4(0), LowAmbErrIndex(0), HighAmbErrIndex(0), PLFErrIndex(0), PLRErrIndex(0), PrintLowAmbMessage(false),
               PrintHighAmbMessage(false), EvapWaterSupplyMode(iWaterSupply::FromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
-              CondensateCollectMode(iCondensate::Discarded), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0),
-              CurrentEndTimeLast(0.0), TimeStepSysLast(0.0), FuelTypeNum(DataGlobalConstants::ResourceType::None), NumOfSpeeds(0), PLRImpact(false),
-              LatentImpact(false), MSFuelWasteHeat(0.0),
-              MSHPHeatRecActive(false), MSHPDesignSpecIndex(0), CoolingCoilPresent(true), HeatingCoilPresent(true), ISHundredPercentDOASDXCoil(false),
-              SHRFTemp(MaxModes, 0), SHRFTempErrorIndex(0), SHRFFlow(MaxModes, 0), SHRFFlowErrorIndex(0), SHRFTemp2(0), SHRFFlow2(0),
-              UserSHRCurveExists(false), ASHRAE127StdRprt(false), SecZonePtr(0), SecCoilSHRFT(0), SecCoilSHRFF(0), SecCoilAirFlow(0.0),
-              SecCoilAirFlowScalingFactor(1.0), SecCoilRatedSHR(1.0), SecCoilSHR(1.0), EvapInletWetBulb(0.0), SecCoilSensibleHeatGainRate(0.0),
-              SecCoilTotalHeatRemovalRate(0.0), SecCoilSensibleHeatRemovalRate(0.0), SecCoilLatentHeatRemovalRate(0.0),
-              IsSecondaryDXCoilInZone(false), IsDXCoilInZone(false), CompressorPartLoadRatio(0.0),
+              CondensateCollectMode(iCondensate::Discarded), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0),
+              CondensateVol(0.0), CurrentEndTimeLast(0.0), TimeStepSysLast(0.0), FuelTypeNum(DataGlobalConstants::ResourceType::None), NumOfSpeeds(0),
+              PLRImpact(false), LatentImpact(false), MSFuelWasteHeat(0.0), MSHPHeatRecActive(false), MSHPDesignSpecIndex(0), CoolingCoilPresent(true),
+              HeatingCoilPresent(true), ISHundredPercentDOASDXCoil(false), SHRFTemp(MaxModes, 0), SHRFTempErrorIndex(0), SHRFFlow(MaxModes, 0),
+              SHRFFlowErrorIndex(0), SHRFTemp2(0), SHRFFlow2(0), UserSHRCurveExists(false), ASHRAE127StdRprt(false), SecZonePtr(0), SecCoilSHRFT(0),
+              SecCoilSHRFF(0), SecCoilAirFlow(0.0), SecCoilAirFlowScalingFactor(1.0), SecCoilRatedSHR(1.0), SecCoilSHR(1.0), EvapInletWetBulb(0.0),
+              SecCoilSensibleHeatGainRate(0.0), SecCoilTotalHeatRemovalRate(0.0), SecCoilSensibleHeatRemovalRate(0.0),
+              SecCoilLatentHeatRemovalRate(0.0), IsSecondaryDXCoilInZone(false), IsDXCoilInZone(false), CompressorPartLoadRatio(0.0),
               // MSSecCoilSHRFT( 0 ),
               // MSSecCoilSHRFF( 0 ),
               // MSSecCoilAirFlow( 0.0 ),
@@ -536,7 +537,8 @@ namespace DXCoils {
 
     // Functions
 
-    void SimDXCoil(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
+    void SimDXCoil(EnergyPlusData &state,
+                   std::string const &CompName,   // name of the fan coil unit
                    int const CompOp,              // compressor operation; 1=on, 0=off
                    bool const FirstHVACIteration, // True when first HVAC iteration
                    int &CompIndex,
@@ -548,7 +550,8 @@ namespace DXCoils {
                    Optional<Real64 const> CompCyclingRatio = _            // cycling ratio of VRF condenser connected to this TU
     );
 
-    void SimDXCoilMultiSpeed(EnergyPlusData &state, std::string const &CompName, // name of the fan coil unit
+    void SimDXCoilMultiSpeed(EnergyPlusData &state,
+                             std::string const &CompName, // name of the fan coil unit
                              Real64 const SpeedRatio,     // = (CompressorSpeed - CompressorSpeedMin) /
                              Real64 const CycRatio,       // cycling part load ratio for variable speed
                              int &CompIndex,
@@ -558,7 +561,8 @@ namespace DXCoils {
                              Optional_int_const SingleMode = _ // Single mode operation Yes/No; 1=Yes, 0=No
     );
 
-    void SimDXCoilMultiMode(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
+    void SimDXCoilMultiMode(EnergyPlusData &state,
+                            std::string const &CompName,   // name of the fan coil unit
                             int const CompOp,              // compressor operation; 1=on, 0=off !unused1208
                             bool const FirstHVACIteration, // true if first hvac iteration
                             Real64 const PartLoadRatio,    // part load ratio
@@ -702,24 +706,28 @@ namespace DXCoils {
 
     void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum);
 
-    void GetFanIndexForTwoSpeedCoil(EnergyPlusData &state, int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum);
+    void GetFanIndexForTwoSpeedCoil(
+        EnergyPlusData &state, int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum);
 
-    Real64 CalcTwoSpeedDXCoilIEERResidual(EnergyPlusData &state, Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 CalcTwoSpeedDXCoilIEERResidual(EnergyPlusData &state,
+                                          Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                           Array1D<Real64> const &Par          // par(1) = DX coil number
     );
 
     // ======================  Utility routines ======================================
 
-    void GetDXCoilIndex(EnergyPlusData &state, std::string const &DXCoilName,
+    void GetDXCoilIndex(EnergyPlusData &state,
+                        std::string const &DXCoilName,
                         int &DXCoilIndex,
                         bool &ErrorsFound,
                         Optional_string_const ThisObjectType,
                         Optional_bool_const SuppressWarning);
 
-    std::string
-    GetDXCoilName(EnergyPlusData &state, int &DXCoilIndex, bool &ErrorsFound, Optional_string_const ThisObjectType, Optional_bool_const SuppressWarning);
+    std::string GetDXCoilName(
+        EnergyPlusData &state, int &DXCoilIndex, bool &ErrorsFound, Optional_string_const ThisObjectType, Optional_bool_const SuppressWarning);
 
-    Real64 GetCoilCapacity(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(EnergyPlusData &state,
+                           std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     );
@@ -748,24 +756,26 @@ namespace DXCoils {
                                          bool &ErrorsFound    // set to true if problem
     );
 
-    int GetCoilInletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &state,
+                         std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilOutletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &state,
+                          std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
 
     int getCoilInNodeIndex(EnergyPlusData &state,
-                           int const &CoilIndex,       // coil index
-                           bool &ErrorsFound           // set to true if problem
+                           int const &CoilIndex, // coil index
+                           bool &ErrorsFound     // set to true if problem
     );
 
     int getCoilOutNodeIndex(EnergyPlusData &state,
-                            int const &CoilIndex,      // coil index
-                            bool &ErrorsFound          // set to true if problem
+                            int const &CoilIndex, // coil index
+                            bool &ErrorsFound     // set to true if problem
     );
 
     int GetCoilCondenserInletNode(EnergyPlusData &state,
@@ -810,7 +820,8 @@ namespace DXCoils {
                                  bool &ErrorsFound    // set to true if problem
     );
 
-    void SetDXCoolingCoilData(EnergyPlusData &state, int const DXCoilNum,                        // Number of DX Cooling Coil
+    void SetDXCoolingCoilData(EnergyPlusData &state,
+                              int const DXCoilNum,                        // Number of DX Cooling Coil
                               bool &ErrorsFound,                          // Set to true if certain errors found
                               Optional_int HeatingCoilPLFCurvePTR = _,    // Parameter equivalent of heating coil PLR curve index
                               Optional_int CondenserType = _,             // Parameter equivalent of condenser type parameter
@@ -949,7 +960,8 @@ namespace DXCoils {
 
 } // namespace DXCoils
 
-struct DXCoilsData : BaseGlobalStruct {
+struct DXCoilsData : BaseGlobalStruct
+{
 
     bool GetCoilsInputFlag = true; // First time, input is "gotten"
     bool MyOneTimeFlag = true;     // One time flag used to allocate MyEnvrnFlag and MySizeFlag
@@ -985,8 +997,8 @@ struct DXCoilsData : BaseGlobalStruct {
     Array1D<DXCoils::DXCoilData> DXCoil;
     Array1D<DXCoils::DXCoilNumericFieldData> DXCoilNumericFields;
 
-    Array1D_bool MyEnvrnFlag;   // One time environment flag
-    Array1D_bool MySizeFlag;    // One time sizing flag
+    Array1D_bool MyEnvrnFlag; // One time environment flag
+    Array1D_bool MySizeFlag;  // One time sizing flag
     Real64 CurrentEndTime = 0.0;
     Real64 CalcVRFCoolingCoil_FluidTCtrlCurrentEndTime = 0.0;
     Real64 CalcVRFCoolingCoilCurrentEndTime = 0.0;
@@ -998,7 +1010,7 @@ struct DXCoilsData : BaseGlobalStruct {
     Real64 EIRTempModFac = 0.0;      // EIR modifier (function of entering wetbulb, outside drybulb) [-]
     Real64 EIRFlowModFac = 0.0;      // EIR modifier (function of actual supply air flow vs rated flow) [-]
     Real64 TempDryBulb_Leaving_Apoint = 0.0;
-    
+
     void clear_state() override
     {
         this->GetCoilsInputFlag = true;

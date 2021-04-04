@@ -61,25 +61,27 @@ namespace EnergyPlus {
 
 namespace TARCOGOutput {
 
-    struct Files {
-      std::string DBGD;
-      bool WriteDebugOutput{false};
+    struct Files
+    {
+        std::string DBGD;
+        bool WriteDebugOutput{false};
 
-      std::string WINCogFileName{"test.w7"};
-      InputOutputFile WINCogFile{WINCogFileName};
+        std::string WINCogFileName{"test.w7"};
+        InputOutputFile WINCogFile{WINCogFileName};
 
-     // Intermediate debug files
-      std::string TarcogIterationsFileName{"TarcogIterations.dbg"};
-      InputOutputFile TarcogIterationsFile{TarcogIterationsFileName};
+        // Intermediate debug files
+        std::string TarcogIterationsFileName{"TarcogIterations.dbg"};
+        InputOutputFile TarcogIterationsFile{TarcogIterationsFileName};
 
-      std::string IterationCSVName{"IterationResults.csv"};
-      InputOutputFile IterationCSVFile{IterationCSVName};
+        std::string IterationCSVName{"IterationResults.csv"};
+        InputOutputFile IterationCSVFile{IterationCSVName};
 
-      std::string DebugOutputFileName{"Tarcog.dbg"};
-      InputOutputFile DebugOutputFile{DebugOutputFileName};
+        std::string DebugOutputFileName{"Tarcog.dbg"};
+        InputOutputFile DebugOutputFile{DebugOutputFileName};
     };
 
-    void WriteInputArguments(EnergyPlusData &state, InputOutputFile &InArgumentsFile,
+    void WriteInputArguments(EnergyPlusData &state,
+                             InputOutputFile &InArgumentsFile,
                              const std::string &DBGD,
                              Real64 tout,
                              Real64 tind,
@@ -219,7 +221,8 @@ namespace TARCOGOutput {
                           const Array1D<Real64> &hs,
                           int &nperr);
 
-    void WriteTARCOGInputFile(EnergyPlusData &state, Files &files,
+    void WriteTARCOGInputFile(EnergyPlusData &state,
+                              Files &files,
                               std::string const &VerNum,
                               Real64 tout,
                               Real64 tind,
@@ -295,7 +298,8 @@ namespace TARCOGOutput {
 
 } // namespace TARCOGOutput
 
-struct TARCOGOutputData : BaseGlobalStruct {
+struct TARCOGOutputData : BaseGlobalStruct
+{
     int winID = 0;
     int iguID = 0;
 

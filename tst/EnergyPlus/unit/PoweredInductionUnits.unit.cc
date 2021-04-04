@@ -446,7 +446,8 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     // From inputs
     Real64 SecMaxMassFlow = state->dataPowerInductionUnits->PIU(SysNum).MaxTotAirMassFlow;
     Real64 PriMaxMassFlow = state->dataPowerInductionUnits->PIU(SysNum).MaxPriAirMassFlow;
-    Real64 PriMinMassFlow = state->dataPowerInductionUnits->PIU(SysNum).MaxPriAirMassFlow * state->dataPowerInductionUnits->PIU(SysNum).MinPriAirFlowFrac;
+    Real64 PriMinMassFlow =
+        state->dataPowerInductionUnits->PIU(SysNum).MaxPriAirMassFlow * state->dataPowerInductionUnits->PIU(SysNum).MinPriAirFlowFrac;
     Real64 SecMassFlowAtPrimMin = state->dataPowerInductionUnits->PIU(SysNum).MaxTotAirMassFlow - PriMinMassFlow;
     Real64 SecMassFlowAtPrimMax = state->dataPowerInductionUnits->PIU(SysNum).MaxTotAirMassFlow - PriMaxMassFlow;
 
@@ -543,9 +544,9 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
 }
 
-
 // cf: https://github.com/NREL/EnergyPlus/issues/7183
-TEST_F(EnergyPlusFixture, PIUArrayOutOfBounds) {
+TEST_F(EnergyPlusFixture, PIUArrayOutOfBounds)
+{
 
     state->dataPowerInductionUnits->NumSeriesPIUs = 1;
     state->dataPowerInductionUnits->NumPIUs = 1;
@@ -592,7 +593,6 @@ TEST_F(EnergyPlusFixture, PIUArrayOutOfBounds) {
     PoweredInductionUnits::SizePIU(*state, PIUNum);
 
     EXPECT_TRUE(compare_err_stream(""));
-
 }
 
 TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
@@ -666,7 +666,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
         "    SPACE2-1 Zone Coil Air In Node,  !- Air Inlet Node Name",
         "    SPACE2-1 In Node;        !- Air Outlet Node Name",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -736,13 +736,15 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     // set heating zone and AT unit inlet conditions
     state->dataLoopNodes->Node(ZoneNodeNum).Temp = 20.0;
     state->dataLoopNodes->Node(ZoneNodeNum).HumRat = 0.005;
-    state->dataLoopNodes->Node(ZoneNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(ZoneNodeNum).Temp, state->dataLoopNodes->Node(ZoneNodeNum).HumRat);
+    state->dataLoopNodes->Node(ZoneNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(ZoneNodeNum).Temp, state->dataLoopNodes->Node(ZoneNodeNum).HumRat);
     state->dataLoopNodes->Node(SecNodeNum).Temp = state->dataLoopNodes->Node(ZoneNodeNum).Temp;
     state->dataLoopNodes->Node(SecNodeNum).HumRat = state->dataLoopNodes->Node(ZoneNodeNum).HumRat;
     state->dataLoopNodes->Node(SecNodeNum).Enthalpy = state->dataLoopNodes->Node(ZoneNodeNum).Enthalpy;
     state->dataLoopNodes->Node(PriNodeNum).Temp = 5.0;
     state->dataLoopNodes->Node(PriNodeNum).HumRat = 0.006;
-    state->dataLoopNodes->Node(PriNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(PriNodeNum).Temp, state->dataLoopNodes->Node(PriNodeNum).HumRat);
+    state->dataLoopNodes->Node(PriNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(PriNodeNum).Temp, state->dataLoopNodes->Node(PriNodeNum).HumRat);
 
     // test 1:  Heating load, at 0.0 primary air flow rate
     state->dataLoopNodes->Node(PriNodeNum).MassFlowRate = 0.0;
@@ -770,13 +772,15 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     // set cooling zone and AT unit inlet conditions
     state->dataLoopNodes->Node(ZoneNodeNum).Temp = 24.0;
     state->dataLoopNodes->Node(ZoneNodeNum).HumRat = 0.0080;
-    state->dataLoopNodes->Node(ZoneNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(ZoneNodeNum).Temp, state->dataLoopNodes->Node(ZoneNodeNum).HumRat);
+    state->dataLoopNodes->Node(ZoneNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(ZoneNodeNum).Temp, state->dataLoopNodes->Node(ZoneNodeNum).HumRat);
     state->dataLoopNodes->Node(SecNodeNum).Temp = state->dataLoopNodes->Node(ZoneNodeNum).Temp;
     state->dataLoopNodes->Node(SecNodeNum).HumRat = state->dataLoopNodes->Node(ZoneNodeNum).HumRat;
     state->dataLoopNodes->Node(SecNodeNum).Enthalpy = state->dataLoopNodes->Node(ZoneNodeNum).Enthalpy;
     state->dataLoopNodes->Node(PriNodeNum).Temp = 15.0;
     state->dataLoopNodes->Node(PriNodeNum).HumRat = 0.0075;
-    state->dataLoopNodes->Node(PriNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(PriNodeNum).Temp, state->dataLoopNodes->Node(PriNodeNum).HumRat);
+    state->dataLoopNodes->Node(PriNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(PriNodeNum).Temp, state->dataLoopNodes->Node(PriNodeNum).HumRat);
 
     state->dataLoopNodes->Node(PriNodeNum).MassFlowRate = PriMaxMassFlow;
     state->dataLoopNodes->Node(PriNodeNum).MassFlowRateMaxAvail = PriMaxMassFlow;

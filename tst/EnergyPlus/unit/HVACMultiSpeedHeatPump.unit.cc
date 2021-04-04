@@ -1248,7 +1248,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     ProcessScheduleInput(*state);
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
-    EXPECT_FALSE(ErrorsFound);                    // zones are specified in the idf snippet
+    EXPECT_FALSE(ErrorsFound);                            // zones are specified in the idf snippet
 
     // Get Zone Equipment Configuration data
     DataZoneEquipment::GetZoneEquipmentData(*state);
@@ -1287,12 +1287,18 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).SequencedOutputRequiredToCoolingSP.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).SequencedOutputRequiredToHeatingSP.allocate(1);
 
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequired(1) = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).SequencedOutputRequired(1) = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).RemainingOutputRequired;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).SequencedOutputRequiredToCoolingSP(1) = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).OutputRequiredToCoolingSP;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).SequencedOutputRequiredToHeatingSP(1) = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).OutputRequiredToHeatingSP;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequired(1) =
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) =
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) =
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).SequencedOutputRequired(1) =
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).RemainingOutputRequired;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).SequencedOutputRequiredToCoolingSP(1) =
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).OutputRequiredToCoolingSP;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).SequencedOutputRequiredToHeatingSP(1) =
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).OutputRequiredToHeatingSP;
 
     HVACMultiSpeedHeatPump::GetMSHeatPumpInput(*state);
 
@@ -1421,19 +1427,20 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
     HVACMultiSpeedHeatPump::MSHPHeatRecovery(*state, 1);
 
     // outlet temp should equal inlet temp since mass flow rate = 0
-    Real64 calculatedOutletTemp =
-        state->dataLoopNodes->Node(HeatRecInNode).Temp + state->dataHVACGlobal->MSHPWasteHeat / (state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate * 4181.0);
+    Real64 calculatedOutletTemp = state->dataLoopNodes->Node(HeatRecInNode).Temp +
+                                  state->dataHVACGlobal->MSHPWasteHeat / (state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate * 4181.0);
     EXPECT_DOUBLE_EQ(0.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryRate);
     EXPECT_DOUBLE_EQ(50.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryInletTemp);
     EXPECT_DOUBLE_EQ(50.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryOutletTemp);
     EXPECT_DOUBLE_EQ(0.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryMassFlowRate);
 
-    state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate = 0.1; // initialize flow rate and test heat recovery result using 1 kW heat transfer to fluid
+    state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate =
+        0.1; // initialize flow rate and test heat recovery result using 1 kW heat transfer to fluid
     HVACMultiSpeedHeatPump::MSHPHeatRecovery(*state, 1);
 
     // outlet temp should equal temperature rise due to 1 kW of heat input at 0.1 kg/s
-    calculatedOutletTemp =
-        state->dataLoopNodes->Node(HeatRecInNode).Temp + state->dataHVACGlobal->MSHPWasteHeat / (state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate * 4181.0);
+    calculatedOutletTemp = state->dataLoopNodes->Node(HeatRecInNode).Temp +
+                           state->dataHVACGlobal->MSHPWasteHeat / (state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate * 4181.0);
     EXPECT_DOUBLE_EQ(1000.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryRate);
     EXPECT_DOUBLE_EQ(50.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryInletTemp);
     EXPECT_DOUBLE_EQ(calculatedOutletTemp, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryOutletTemp);
@@ -1449,7 +1456,8 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
     EXPECT_DOUBLE_EQ(80.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryOutletTemp);
     EXPECT_DOUBLE_EQ(0.1, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryMassFlowRate);
     Real64 QHeatRecovery =
-        state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate * 4181.0 * (state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryOutletTemp - state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryInletTemp);
+        state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate * 4181.0 *
+        (state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryOutletTemp - state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryInletTemp);
     EXPECT_DOUBLE_EQ(QHeatRecovery, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryRate);
     EXPECT_DOUBLE_EQ(12543.0, QHeatRecovery);
 }

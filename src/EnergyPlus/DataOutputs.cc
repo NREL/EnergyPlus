@@ -49,24 +49,121 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
+namespace EnergyPlus::DataOutputs {
 
-namespace DataOutputs {
+// Module containing the data and routines dealing with prescanning for
+// requested output variables to limit the number being processed in OutputProcessor
+// Also any input counts (such as autosize counts/records that are used
+// by later program modules.
 
-    // Module containing the data and routines dealing with prescanning for
-    // requested output variables to limit the number being processed in OutputProcessor
-    // Also any input counts (such as autosize counts/records that are used
-    // by later program modules.
+// MODULE INFORMATION:
+//       AUTHOR         Linda Lawrie
+//       DATE WRITTEN   July 2010
+//       MODIFIED       April 2011; to include autosize counts
+//       RE-ENGINEERED  na
 
-    // MODULE INFORMATION:
+// PURPOSE OF THIS MODULE:
+// The module contains structure for output variables that are used in a small number of modules.
+
+// MODULE PARAMETER DEFINITIONS:
+Array1D_string const MonthlyNamedReports(NumMonthlyReports,
+                                         {"ZONECOOLINGSUMMARYMONTHLY",
+                                          "ZONEHEATINGSUMMARYMONTHLY",
+                                          "ZONEELECTRICSUMMARYMONTHLY",
+                                          "SPACEGAINSMONTHLY",
+                                          "PEAKSPACEGAINSMONTHLY",
+                                          "SPACEGAINCOMPONENTSATCOOLINGPEAKMONTHLY",
+                                          "ENERGYCONSUMPTIONELECTRICITYNATURALGASMONTHLY",
+                                          "ENERGYCONSUMPTIONELECTRICITYGENERATEDPROPANEMONTHLY",
+                                          "ENERGYCONSUMPTIONDIESELFUELOILMONTHLY",
+                                          "ENERGYCONSUMPTIONDISTRICTHEATINGCOOLINGMONTHLY",
+                                          "ENERGYCONSUMPTIONCOALGASOLINEMONTHLY",
+                                          "ENERGYCONSUMPTIONOTHERFUELSMONTHLY",
+                                          "ENDUSEENERGYCONSUMPTIONELECTRICITYMONTHLY",
+                                          "ENDUSEENERGYCONSUMPTIONNATURALGASMONTHLY",
+                                          "ENDUSEENERGYCONSUMPTIONDIESELMONTHLY",
+                                          "ENDUSEENERGYCONSUMPTIONFUELOILMONTHLY",
+                                          "ENDUSEENERGYCONSUMPTIONCOALMONTHLY",
+                                          "ENDUSEENERGYCONSUMPTIONPROPANEMONTHLY",
+                                          "ENDUSEENERGYCONSUMPTIONGASOLINEMONTHLY",
+                                          "ENDUSEENERGYCONSUMPTIONOTHERFUELSMONTHLY",
+                                          "PEAKENERGYENDUSEELECTRICITYPART1MONTHLY",
+                                          "PEAKENERGYENDUSEELECTRICITYPART2MONTHLY",
+                                          "ELECTRICCOMPONENTSOFPEAKDEMANDMONTHLY",
+                                          "PEAKENERGYENDUSENATURALGASMONTHLY",
+                                          "PEAKENERGYENDUSEDIESELMONTHLY",
+                                          "PEAKENERGYENDUSEFUELOILMONTHLY",
+                                          "PEAKENERGYENDUSECOALMONTHLY",
+                                          "PEAKENERGYENDUSEPROPANEMONTHLY",
+                                          "PEAKENERGYENDUSEGASOLINEMONTHLY",
+                                          "PEAKENERGYENDUSEOTHERFUELSMONTHLY",
+                                          "SETPOINTSNOTMETWITHTEMPERATURESMONTHLY",
+                                          "COMFORTREPORTSIMPLE55MONTHLY",
+                                          "UNGLAZEDTRANSPIREDSOLARCOLLECTORSUMMARYMONTHLY",
+                                          "OCCUPANTCOMFORTDATASUMMARYMONTHLY",
+                                          "CHILLERREPORTMONTHLY",
+                                          "TOWERREPORTMONTHLY",
+                                          "BOILERREPORTMONTHLY",
+                                          "DXREPORTMONTHLY",
+                                          "WINDOWREPORTMONTHLY",
+                                          "WINDOWENERGYREPORTMONTHLY",
+                                          "WINDOWZONESUMMARYMONTHLY",
+                                          "WINDOWENERGYZONESUMMARYMONTHLY",
+                                          "AVERAGEOUTDOORCONDITIONSMONTHLY",
+                                          "OUTDOORCONDITIONSMAXIMUMDRYBULBMONTHLY",
+                                          "OUTDOORCONDITIONSMINIMUMDRYBULBMONTHLY",
+                                          "OUTDOORCONDITIONSMAXIMUMWETBULBMONTHLY",
+                                          "OUTDOORCONDITIONSMAXIMUMDEWPOINTMONTHLY",
+                                          "OUTDOORGROUNDCONDITIONSMONTHLY",
+                                          "WINDOWACREPORTMONTHLY",
+                                          "WATERHEATERREPORTMONTHLY",
+                                          "GENERATORREPORTMONTHLY",
+                                          "DAYLIGHTINGREPORTMONTHLY",
+                                          "COILREPORTMONTHLY",
+                                          "PLANTLOOPDEMANDREPORTMONTHLY",
+                                          "FANREPORTMONTHLY",
+                                          "PUMPREPORTMONTHLY",
+                                          "CONDLOOPDEMANDREPORTMONTHLY",
+                                          "ZONETEMPERATUREOSCILLATIONREPORTMONTHLY",
+                                          "AIRLOOPSYSTEMENERGYANDWATERUSEMONTHLY",
+                                          "AIRLOOPSYSTEMCOMPONENTLOADSMONTHLY",
+                                          "AIRLOOPSYSTEMCOMPONENTENERGYUSEMONTHLY",
+                                          "MECHANICALVENTILATIONLOADSMONTHLY",
+                                          "HEATEMISSIONSREPORTMONTHLY"});
+
+OutputReportingVariables::OutputReportingVariables(EnergyPlusData &state, std::string const &KeyValue, std::string const &VariableName)
+    : key(KeyValue), variableName(VariableName)
+{
+    if (KeyValue == "*") return;
+    for (auto const &c : KeyValue) {
+        if (c == ' ' || c == '_' || std::isalnum(c)) continue;
+        is_simple_string = false;
+        break;
+    }
+    if (is_simple_string) return;
+    pattern = new RE2(KeyValue);
+    case_insensitive_pattern = new RE2("(?i)" + KeyValue);
+    if (!pattern->ok()) {
+        ShowSevereError(state, "Regular expression \"" + KeyValue + "\" for variable name \"" + VariableName + "\" in input file is incorrect");
+        ShowContinueError(state, pattern->error());
+        ShowFatalError(state, "Error found in regular expression. Previous error(s) cause program termination.");
+    }
+}
+
+bool FindItemInVariableList(EnergyPlusData &state, std::string const &KeyedValue, std::string const &VariableName)
+{
+
+    // FUNCTION INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   July 2010
-    //       MODIFIED       April 2011; to include autosize counts
+    //       MODIFIED       December 2016
     //       RE-ENGINEERED  na
 
+<<<<<<< HEAD
     // PURPOSE OF THIS MODULE:
     // The module contains structure for output variables that are used in a small number of modules.
 
@@ -190,58 +287,32 @@ namespace DataOutputs {
             ShowFatalError(state, "Error found in regular expression. Previous error(s) cause program termination.");
         }
     }
+=======
+    // PURPOSE OF THIS FUNCTION:
+    // This function looks up a key and variable name value and determines if they are
+    // in the list of required variables for a simulation.
+>>>>>>> develop
 
-    // Clears the global data in DataOutputs.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        MaxConsideredOutputVariables = 0;
-        NumConsideredOutputVariables = 0;
-        iNumberOfRecords = int();
-        iNumberOfDefaultedFields = int();
-        iTotalFieldsWithDefaults = int();
-        iNumberOfAutoSizedFields = int();
-        iTotalAutoSizableFields = int();
-        iNumberOfAutoCalcedFields = int();
-        iTotalAutoCalculatableFields = int();
-        OutputVariablesForSimulation.clear();
-    }
+    auto const found_variable = state.dataOutput->OutputVariablesForSimulation.find(VariableName);
+    if (found_variable == state.dataOutput->OutputVariablesForSimulation.end()) return false;
 
-    bool FindItemInVariableList(std::string const &KeyedValue, std::string const &VariableName)
-    {
+    auto found_key = found_variable->second.find(KeyedValue);
+    if (found_key != found_variable->second.end()) return true;
 
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   July 2010
-        //       MODIFIED       December 2016
-        //       RE-ENGINEERED  na
+    found_key = found_variable->second.find("*");
+    if (found_key != found_variable->second.end()) return true;
 
-        // PURPOSE OF THIS FUNCTION:
-        // This function looks up a key and variable name value and determines if they are
-        // in the list of required variables for a simulation.
-
-        auto const found_variable = OutputVariablesForSimulation.find(VariableName);
-        if (found_variable == OutputVariablesForSimulation.end()) return false;
-
-        auto found_key = found_variable->second.find(KeyedValue);
-        if (found_key != found_variable->second.end()) return true;
-
-        found_key = found_variable->second.find("*");
-        if (found_key != found_variable->second.end()) return true;
-
-        for (auto it = found_variable->second.begin(); it != found_variable->second.end(); ++it) {
-            if (equali(KeyedValue, it->second.key)) return true;
-            if (it->second.is_simple_string) continue;
-            if ((it->second.pattern != nullptr && RE2::FullMatch(KeyedValue, *it->second.pattern)) || // match against regex as written
-                (it->second.case_insensitive_pattern != nullptr &&
-                 RE2::FullMatch(KeyedValue, *it->second.case_insensitive_pattern)) // attempt case-insensitive regex comparison
-            ) {
-                return true;
-            }
+    for (auto it = found_variable->second.begin(); it != found_variable->second.end(); ++it) {
+        if (equali(KeyedValue, it->second.key)) return true;
+        if (it->second.is_simple_string) continue;
+        if ((it->second.pattern != nullptr && RE2::FullMatch(KeyedValue, *it->second.pattern)) || // match against regex as written
+            (it->second.case_insensitive_pattern != nullptr &&
+             RE2::FullMatch(KeyedValue, *it->second.case_insensitive_pattern)) // attempt case-insensitive regex comparison
+        ) {
+            return true;
         }
-        return false;
     }
+    return false;
+}
 
-} // namespace DataOutputs
-
-} // namespace EnergyPlus
+} // namespace EnergyPlus::DataOutputs

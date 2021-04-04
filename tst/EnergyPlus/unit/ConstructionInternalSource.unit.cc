@@ -89,5 +89,5 @@ TEST_F(EnergyPlusFixture, ConstructionInternalSource)
 
     GetConstructData(*state, errorsFound);
 
-    EXPECT_NEAR(0.1524,  state->dataConstruction->Construct(1).ThicknessPerpend, 0.0001);
+    EXPECT_NEAR(0.1524, state->dataConstruction->Construct(1).ThicknessPerpend, 0.0001);
 }
