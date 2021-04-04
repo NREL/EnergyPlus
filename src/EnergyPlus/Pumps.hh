@@ -210,7 +210,6 @@ namespace Pumps {
 
         // Default Constructor
         PumpSpecs()
-<<<<<<< HEAD
             : PumpType(iPumpType::Unassigned), TypeOf_Num(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
               PumpControl(PumpControlType::Unassigned), PumpScheduleIndex(0), InletNodeNum(0), OutletNodeNum(0),
               SequencingScheme(PumpBankControlSeq::Unassigned), FluidIndex(0), NumPumpsInBank(0), PowerErrIndex1(0), PowerErrIndex2(0),
@@ -220,16 +219,6 @@ namespace Pumps {
               NomPowerUse(0.0), NomPowerUseWasAutoSized(false), powerSizingMethod(sizePowerPerFlowPerPressure),
               powerPerFlowScalingFactor(348701.1),            // 22 W/gpm
               powerPerFlowPerPressureScalingFactor(1 / 0.78), // legacy impeller efficiency
-=======
-            : PumpType(0), TypeOf_Num(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), PumpControl(PumpControlType::Unassigned),
-              PumpScheduleIndex(0), InletNodeNum(0), OutletNodeNum(0), SequencingScheme(PumpBankControlSeq::Unassigned), FluidIndex(0),
-              NumPumpsInBank(0), PowerErrIndex1(0), PowerErrIndex2(0), MinVolFlowRateFrac(0.0), NomVolFlowRate(0.0),
-              NomVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0), EMSMassFlowOverrideOn(false), EMSMassFlowValue(0.0), NomSteamVolFlowRate(0.0),
-              NomSteamVolFlowRateWasAutoSized(false), MinVolFlowRate(0.0), minVolFlowRateWasAutosized(false), MassFlowRateMin(0.0), NomPumpHead(0.0),
-              EMSPressureOverrideOn(false), EMSPressureOverrideValue(0.0), NomPowerUse(0.0), NomPowerUseWasAutoSized(false),
-              powerSizingMethod(sizePowerPerFlowPerPressure), powerPerFlowScalingFactor(348701.1), // 22 W/gpm
-              powerPerFlowPerPressureScalingFactor(1 / 0.78),                                      // legacy impeller efficiency
->>>>>>> develop
               MotorEffic(0.0), PumpEffic(0.0), FracMotorLossToFluid(0.0), Energy(0.0), Power(0.0), PartLoadCoef(4, 0.0), PressureCurve_Index(0),
               PumpMassFlowRateMaxRPM(0.0), PumpMassFlowRateMinRPM(0.0), MinPhiValue(0.0), MaxPhiValue(0.0), ImpellerDiameter(0.0), RotSpeed_RPM(0.0),
               RotSpeed(0.0), PumpInitFlag(true), PumpOneTimeFlag(true), CheckEquipName(true), HasVFD(false), OneTimePressureWarning(true),
