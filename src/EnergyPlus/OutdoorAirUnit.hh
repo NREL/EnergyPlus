@@ -68,7 +68,6 @@ namespace OutdoorAirUnit {
     // component types addressed by this module
     extern std::string const cMO_OutdoorAirUnit;
 
-<<<<<<< HEAD
     enum class CompType : int
     {
         Unassigned = 0,
@@ -86,26 +85,6 @@ namespace OutdoorAirUnit {
         DXHeatPumpSystem = 12,
         UnitarySystemModel = 13
     };
-=======
-    extern int const WaterCoil_Cooling;
-    extern int const SteamCoil_AirHeat;
-    //        enum class CompType {
-    //            Unassigned,
-    //            WaterCoil_SimpleCool,
-    //            WaterCoil_Cooling,
-    //            WaterCoil_SimpleHeat,
-    //            SteamCoil_AirHeat,
-    //            WaterCoil_DetailedCool,
-    //            WaterCoil_CoolingHXAsst,
-    //            Coil_ElectricHeat,
-    //            Coil_GasHeat,
-    //            DXSystem,
-    //            HeatXchngr,
-    //            Desiccant,
-    //            DXHeatPumpSystem,
-    //            UnitarySystemModel
-    //        };
->>>>>>> develop
 
     enum class Control
     {
@@ -146,13 +125,8 @@ namespace OutdoorAirUnit {
         // Equipment List Data
         std::string ComponentName;
         std::string ComponentType;
-<<<<<<< HEAD
         CompType ComponentType_Num; // Parameterized Component Types this module can address
         int ComponentIndex;         // Which one in list -- updated by routines called from here
-=======
-        int ComponentType_Num; // Parameterized Component Types this module can address
-        int ComponentIndex;    // Which one in list -- updated by routines called from here
->>>>>>> develop
         HVACSystemData *compPointer = nullptr;
         int CoilAirInletNode;
         int CoilAirOutletNode;
@@ -173,15 +147,9 @@ namespace OutdoorAirUnit {
 
         // Default Constructor
         OAEquipList()
-<<<<<<< HEAD
             : ComponentType_Num(CompType::Unassigned), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0), CoilWaterInletNode(0),
               CoilWaterOutletNode(0), CoilPlantTypeOfNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), FluidIndex(0),
               MaxVolWaterFlow(0.0), MaxWaterMassFlow(0.0), MinVolWaterFlow(0.0), MinWaterMassFlow(0.0), FirstPass(true)
-=======
-            : ComponentType_Num(0), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0), CoilWaterInletNode(0), CoilWaterOutletNode(0),
-              CoilPlantTypeOfNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), FluidIndex(0), MaxVolWaterFlow(0.0), MaxWaterMassFlow(0.0),
-              MinVolWaterFlow(0.0), MinWaterMassFlow(0.0), FirstPass(true)
->>>>>>> develop
         {
         }
     };
