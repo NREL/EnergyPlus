@@ -811,22 +811,6 @@ void GetDXCoils(EnergyPlusData &state)
     Real64 CurveInput;  // index used for testing PLF curve output
 
     // find number of each type of DX coil and calculate the total number
-<<<<<<< HEAD
-    state.dataDXCoils->NumDoe2DXCoils = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:SingleSpeed");
-    state.dataDXCoils->NumDXHeatingCoils = inputProcessor->getNumObjectsFound(state, "Coil:Heating:DX:SingleSpeed");
-    state.dataDXCoils->NumDXMulSpeedCoils = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:TwoSpeed");
-    state.dataDXCoils->NumDXMulModeCoils = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:TwoStageWithHumidityControlMode");
-    state.dataDXCoils->NumDXHeatPumpWaterHeaterPumpedCoils =
-        inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterPumped));
-    state.dataDXCoils->NumDXHeatPumpWaterHeaterWrappedCoils =
-        inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterWrapped));
-    state.dataDXCoils->NumDXMulSpeedCoolCoils = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:MultiSpeed");
-    state.dataDXCoils->NumDXMulSpeedHeatCoils = inputProcessor->getNumObjectsFound(state, "Coil:Heating:DX:MultiSpeed");
-    state.dataDXCoils->NumVRFCoolingCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_Cooling));
-    state.dataDXCoils->NumVRFHeatingCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_Heating));
-    state.dataDXCoils->NumVRFCoolingFluidTCtrlCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Cooling));
-    state.dataDXCoils->NumVRFHeatingFluidTCtrlCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Heating));
-=======
     state.dataDXCoils->NumDoe2DXCoils = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:SingleSpeed");
     state.dataDXCoils->NumDXHeatingCoils = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:DX:SingleSpeed");
     state.dataDXCoils->NumDXMulSpeedCoils = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:TwoSpeed");
@@ -844,7 +828,6 @@ void GetDXCoils(EnergyPlusData &state)
         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Cooling));
     state.dataDXCoils->NumVRFHeatingFluidTCtrlCoils =
         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Heating));
->>>>>>> develop
 
     state.dataDXCoils->NumDXCoils = state.dataDXCoils->NumDoe2DXCoils + state.dataDXCoils->NumDXHeatingCoils + state.dataDXCoils->NumDXMulSpeedCoils +
                                     state.dataDXCoils->NumDXMulModeCoils + state.dataDXCoils->NumDXHeatPumpWaterHeaterPumpedCoils +
@@ -854,45 +837,6 @@ void GetDXCoils(EnergyPlusData &state)
                                     state.dataDXCoils->NumVRFHeatingFluidTCtrlCoils;
 
     // Determine max number of alpha and numeric arguments for all objects being read, in order to allocate local arrays
-<<<<<<< HEAD
-    inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:DX:SingleSpeed", TotalArgs, NumAlphas, NumNumbers);
-    MaxNumbers = NumNumbers;
-    MaxAlphas = NumAlphas;
-    inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:DX:SingleSpeed", TotalArgs, NumAlphas, NumNumbers);
-    MaxNumbers = max(MaxNumbers, NumNumbers);
-    MaxAlphas = max(MaxAlphas, NumAlphas);
-    inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:DX:TwoSpeed", TotalArgs, NumAlphas, NumNumbers);
-    MaxNumbers = max(MaxNumbers, NumNumbers);
-    MaxAlphas = max(MaxAlphas, NumAlphas);
-    inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:DX:TwoStageWithHumidityControlMode", TotalArgs, NumAlphas, NumNumbers);
-    MaxNumbers = max(MaxNumbers, NumNumbers);
-    MaxAlphas = max(MaxAlphas, NumAlphas);
-    inputProcessor->getObjectDefMaxArgs(state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterPumped), TotalArgs, NumAlphas, NumNumbers);
-    MaxNumbers = max(MaxNumbers, NumNumbers);
-    MaxAlphas = max(MaxAlphas, NumAlphas);
-    inputProcessor->getObjectDefMaxArgs(state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterWrapped), TotalArgs, NumAlphas, NumNumbers);
-    MaxNumbers = max(MaxNumbers, NumNumbers);
-    MaxAlphas = max(MaxAlphas, NumAlphas);
-    inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:DX:MultiSpeed", TotalArgs, NumAlphas, NumNumbers);
-    MaxNumbers = max(MaxNumbers, NumNumbers);
-    MaxAlphas = max(MaxAlphas, NumAlphas);
-    inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:DX:MultiSpeed", TotalArgs, NumAlphas, NumNumbers);
-    MaxNumbers = max(MaxNumbers, NumNumbers);
-    MaxAlphas = max(MaxAlphas, NumAlphas);
-    inputProcessor->getObjectDefMaxArgs(state, cAllCoilTypes(CoilVRF_Cooling), TotalArgs, NumAlphas, NumNumbers);
-    MaxNumbers = max(MaxNumbers, NumNumbers);
-    MaxAlphas = max(MaxAlphas, NumAlphas);
-    inputProcessor->getObjectDefMaxArgs(state, cAllCoilTypes(CoilVRF_Heating), TotalArgs, NumAlphas, NumNumbers);
-    MaxNumbers = max(MaxNumbers, NumNumbers);
-    MaxAlphas = max(MaxAlphas, NumAlphas);
-    inputProcessor->getObjectDefMaxArgs(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Cooling), TotalArgs, NumAlphas, NumNumbers);
-    MaxNumbers = max(MaxNumbers, NumNumbers);
-    MaxAlphas = max(MaxAlphas, NumAlphas);
-    inputProcessor->getObjectDefMaxArgs(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Heating), TotalArgs, NumAlphas, NumNumbers);
-    MaxNumbers = max(MaxNumbers, NumNumbers);
-    MaxAlphas = max(MaxAlphas, NumAlphas);
-    inputProcessor->getObjectDefMaxArgs(state, "CoilPerformance:DX:Cooling", TotalArgs, NumAlphas, NumNumbers);
-=======
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:DX:SingleSpeed", TotalArgs, NumAlphas, NumNumbers);
     MaxNumbers = NumNumbers;
     MaxAlphas = NumAlphas;
@@ -935,7 +879,6 @@ void GetDXCoils(EnergyPlusData &state)
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "CoilPerformance:DX:Cooling", TotalArgs, NumAlphas, NumNumbers);
->>>>>>> develop
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -989,20 +932,6 @@ void GetDXCoils(EnergyPlusData &state)
     CurrentModuleObject = "Coil:Cooling:DX:SingleSpeed";
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumDoe2DXCoils; ++DXCoilIndex) {
 
-<<<<<<< HEAD
-        inputProcessor->getObjectItem(state,
-                                      CurrentModuleObject,
-                                      DXCoilIndex,
-                                      Alphas,
-                                      NumAlphas,
-                                      Numbers,
-                                      NumNumbers,
-                                      IOStatus,
-                                      lNumericBlanks,
-                                      lAlphaBlanks,
-                                      cAlphaFields,
-                                      cNumericFields);
-=======
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  DXCoilIndex,
@@ -1015,7 +944,6 @@ void GetDXCoils(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
->>>>>>> develop
 
         ++DXCoilNum;
         // allocate single performance mode for numeric field strings used for sizing routine
@@ -1491,20 +1419,6 @@ void GetDXCoils(EnergyPlusData &state)
     CurrentModuleObject = "Coil:Cooling:DX:TwoStageWithHumidityControlMode";
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumDXMulModeCoils; ++DXCoilIndex) {
 
-<<<<<<< HEAD
-        inputProcessor->getObjectItem(state,
-                                      CurrentModuleObject,
-                                      DXCoilIndex,
-                                      Alphas,
-                                      NumAlphas,
-                                      Numbers,
-                                      NumNumbers,
-                                      IOStatus,
-                                      lNumericBlanks,
-                                      lAlphaBlanks,
-                                      cAlphaFields,
-                                      cNumericFields);
-=======
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  DXCoilIndex,
@@ -1517,7 +1431,6 @@ void GetDXCoils(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
->>>>>>> develop
 
         ++DXCoilNum;
         UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
@@ -1627,23 +1540,6 @@ void GetDXCoils(EnergyPlusData &state)
                     }
                     state.dataDXCoils->DXCoil(DXCoilNum).CoilPerformanceName(PerfModeNum) = PerfObjectName;
                     // Get for CoilPerformance object
-<<<<<<< HEAD
-                    PerfObjectNum = inputProcessor->getObjectItemNum(state, PerfObjectType, PerfObjectName);
-                    if (PerfObjectNum > 0) {
-
-                        inputProcessor->getObjectItem(state,
-                                                      PerfObjectType,
-                                                      PerfObjectNum,
-                                                      Alphas2,
-                                                      NumAlphas2,
-                                                      Numbers2,
-                                                      NumNumbers2,
-                                                      IOStatus,
-                                                      lNumericBlanks2,
-                                                      lAlphaBlanks2,
-                                                      cAlphaFields2,
-                                                      cNumericFields2);
-=======
                     PerfObjectNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, PerfObjectType, PerfObjectName);
                     if (PerfObjectNum > 0) {
 
@@ -1659,7 +1555,6 @@ void GetDXCoils(EnergyPlusData &state)
                                                                                  lAlphaBlanks2,
                                                                                  cAlphaFields2,
                                                                                  cNumericFields2);
->>>>>>> develop
 
                         // allocate performance mode numeric field strings used for sizing routine
                         state.dataDXCoils->DXCoilNumericFields(DXCoilNum)
@@ -2094,20 +1989,6 @@ void GetDXCoils(EnergyPlusData &state)
 
         ++DXCoilNum;
 
-<<<<<<< HEAD
-        inputProcessor->getObjectItem(state,
-                                      CurrentModuleObject,
-                                      DXCoilIndex,
-                                      Alphas,
-                                      NumAlphas,
-                                      Numbers,
-                                      NumNumbers,
-                                      IOStatus,
-                                      lNumericBlanks,
-                                      lAlphaBlanks,
-                                      cAlphaFields,
-                                      cNumericFields);
-=======
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  DXCoilIndex,
@@ -2120,7 +2001,6 @@ void GetDXCoils(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
->>>>>>> develop
 
         // allocate single performance mode for numeric field strings used for sizing routine
         state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
@@ -2414,17 +2294,11 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-<<<<<<< HEAD
         if (UtilityRoutines::SameString(Alphas(12), "Timed"))
             state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = StandardRatings::HPdefrostControl::Timed;
         if (UtilityRoutines::SameString(Alphas(12), "OnDemand"))
             state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
         if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Unassigned) {
-=======
-        if (UtilityRoutines::SameString(Alphas(12), "Timed")) state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = Timed;
-        if (UtilityRoutines::SameString(Alphas(12), "OnDemand")) state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = OnDemand;
-        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == 0) {
->>>>>>> develop
             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", invalid");
             ShowContinueError(state, "...illegal " + cAlphaFields(12) + "=\"" + Alphas(12) + "\".");
             ShowContinueError(state, "...valid values for this field are Timed or OnDemand.");
@@ -2468,12 +2342,8 @@ void GetDXCoils(EnergyPlusData &state)
 
         // Set defrost time period
         state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime = Numbers(10);
-<<<<<<< HEAD
         if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime == 0.0 &&
             state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Timed) {
-=======
-        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime == 0.0 && state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == Timed) {
->>>>>>> develop
             ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", ");
             ShowContinueError(state, "..." + cNumericFields(10) + " = 0.0 for defrost control = TIMED.");
         }
@@ -2580,20 +2450,6 @@ void GetDXCoils(EnergyPlusData &state)
 
         ++DXCoilNum;
 
-<<<<<<< HEAD
-        inputProcessor->getObjectItem(state,
-                                      CurrentModuleObject,
-                                      DXCoilIndex,
-                                      Alphas,
-                                      NumAlphas,
-                                      Numbers,
-                                      NumNumbers,
-                                      IOStatus,
-                                      lNumericBlanks,
-                                      lAlphaBlanks,
-                                      cAlphaFields,
-                                      cNumericFields);
-=======
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  DXCoilIndex,
@@ -2606,7 +2462,6 @@ void GetDXCoils(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
->>>>>>> develop
 
         // allocate single performance mode for numeric field strings used for sizing routine
         state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
@@ -3175,20 +3030,6 @@ void GetDXCoils(EnergyPlusData &state)
     CurrentModuleObject = cAllCoilTypes(CoilDX_HeatPumpWaterHeaterPumped);
     for (DXHPWaterHeaterCoilNum = 1; DXHPWaterHeaterCoilNum <= state.dataDXCoils->NumDXHeatPumpWaterHeaterPumpedCoils; ++DXHPWaterHeaterCoilNum) {
 
-<<<<<<< HEAD
-        inputProcessor->getObjectItem(state,
-                                      CurrentModuleObject,
-                                      DXHPWaterHeaterCoilNum,
-                                      Alphas,
-                                      NumAlphas,
-                                      Numbers,
-                                      NumNumbers,
-                                      IOStatus,
-                                      lNumericBlanks,
-                                      lAlphaBlanks,
-                                      cAlphaFields,
-                                      cNumericFields);
-=======
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  DXHPWaterHeaterCoilNum,
@@ -3201,7 +3042,6 @@ void GetDXCoils(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
->>>>>>> develop
 
         ++DXCoilNum;
 
@@ -3685,20 +3525,6 @@ void GetDXCoils(EnergyPlusData &state)
     CurrentModuleObject = cAllCoilTypes(CoilDX_HeatPumpWaterHeaterWrapped);
     for (DXHPWaterHeaterCoilNum = 1; DXHPWaterHeaterCoilNum <= state.dataDXCoils->NumDXHeatPumpWaterHeaterWrappedCoils; ++DXHPWaterHeaterCoilNum) {
 
-<<<<<<< HEAD
-        inputProcessor->getObjectItem(state,
-                                      CurrentModuleObject,
-                                      DXHPWaterHeaterCoilNum,
-                                      Alphas,
-                                      NumAlphas,
-                                      Numbers,
-                                      NumNumbers,
-                                      IOStatus,
-                                      lNumericBlanks,
-                                      lAlphaBlanks,
-                                      cAlphaFields,
-                                      cNumericFields);
-=======
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  DXHPWaterHeaterCoilNum,
@@ -3711,7 +3537,6 @@ void GetDXCoils(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
->>>>>>> develop
 
         ++DXCoilNum;
 
@@ -4085,20 +3910,6 @@ void GetDXCoils(EnergyPlusData &state)
 
         ++DXCoilNum;
 
-<<<<<<< HEAD
-        inputProcessor->getObjectItem(state,
-                                      CurrentModuleObject,
-                                      DXCoilIndex,
-                                      Alphas,
-                                      NumAlphas,
-                                      Numbers,
-                                      NumNumbers,
-                                      IOStatus,
-                                      lNumericBlanks,
-                                      lAlphaBlanks,
-                                      cAlphaFields,
-                                      cNumericFields);
-=======
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  DXCoilIndex,
@@ -4111,7 +3922,6 @@ void GetDXCoils(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
->>>>>>> develop
 
         // allocate single performance mode for numeric field strings used for sizing routine (all fields are in this object)
         state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
@@ -4654,20 +4464,6 @@ void GetDXCoils(EnergyPlusData &state)
 
         ++DXCoilNum;
 
-<<<<<<< HEAD
-        inputProcessor->getObjectItem(state,
-                                      CurrentModuleObject,
-                                      DXCoilIndex,
-                                      Alphas,
-                                      NumAlphas,
-                                      Numbers,
-                                      NumNumbers,
-                                      IOStatus,
-                                      lNumericBlanks,
-                                      lAlphaBlanks,
-                                      cAlphaFields,
-                                      cNumericFields);
-=======
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  DXCoilIndex,
@@ -4680,7 +4476,6 @@ void GetDXCoils(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
->>>>>>> develop
 
         // *** will have to circle back to this one to fix since the multispeed coil has all fields in this coil object ***
         // allocate single performance mode for numeric field strings used for sizing routine
@@ -4791,17 +4586,11 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-<<<<<<< HEAD
         if (UtilityRoutines::SameString(Alphas(7), "Timed"))
             state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = StandardRatings::HPdefrostControl::Timed;
         if (UtilityRoutines::SameString(Alphas(7), "OnDemand"))
             state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
         if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Unassigned) {
-=======
-        if (UtilityRoutines::SameString(Alphas(7), "Timed")) state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = Timed;
-        if (UtilityRoutines::SameString(Alphas(7), "OnDemand")) state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = OnDemand;
-        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == 0) {
->>>>>>> develop
             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", invalid");
             ShowContinueError(state, "...illegal " + cAlphaFields(7) + "=\"" + Alphas(7) + "\".");
             ShowContinueError(state, "...valid values for this field are Timed or OnDemand.");
@@ -4813,12 +4602,8 @@ void GetDXCoils(EnergyPlusData &state)
 
         // Set defrost time period
         state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime = Numbers(6);
-<<<<<<< HEAD
         if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime == 0.0 &&
             state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Timed) {
-=======
-        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime == 0.0 && state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == Timed) {
->>>>>>> develop
             ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", ");
             ShowContinueError(state, "..." + cNumericFields(5) + " = 0.0 for defrost control = TIMED.");
         }
@@ -5174,20 +4959,6 @@ void GetDXCoils(EnergyPlusData &state)
     CurrentModuleObject = cAllCoilTypes(CoilVRF_Cooling);
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumVRFCoolingCoils; ++DXCoilIndex) {
 
-<<<<<<< HEAD
-        inputProcessor->getObjectItem(state,
-                                      CurrentModuleObject,
-                                      DXCoilIndex,
-                                      Alphas,
-                                      NumAlphas,
-                                      Numbers,
-                                      NumNumbers,
-                                      IOStatus,
-                                      lNumericBlanks,
-                                      lAlphaBlanks,
-                                      cAlphaFields,
-                                      cNumericFields);
-=======
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  DXCoilIndex,
@@ -5200,7 +4971,6 @@ void GetDXCoils(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
->>>>>>> develop
 
         ++DXCoilNum;
 
@@ -5337,20 +5107,6 @@ void GetDXCoils(EnergyPlusData &state)
     CurrentModuleObject = cAllCoilTypes(CoilVRF_Heating);
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumVRFHeatingCoils; ++DXCoilIndex) {
 
-<<<<<<< HEAD
-        inputProcessor->getObjectItem(state,
-                                      CurrentModuleObject,
-                                      DXCoilIndex,
-                                      Alphas,
-                                      NumAlphas,
-                                      Numbers,
-                                      NumNumbers,
-                                      IOStatus,
-                                      lNumericBlanks,
-                                      lAlphaBlanks,
-                                      cAlphaFields,
-                                      cNumericFields);
-=======
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  DXCoilIndex,
@@ -5363,7 +5119,6 @@ void GetDXCoils(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
->>>>>>> develop
 
         ++DXCoilNum;
 
@@ -5489,20 +5244,6 @@ void GetDXCoils(EnergyPlusData &state)
     CurrentModuleObject = cAllCoilTypes(CoilVRF_FluidTCtrl_Cooling);
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumVRFCoolingFluidTCtrlCoils; ++DXCoilIndex) {
 
-<<<<<<< HEAD
-        inputProcessor->getObjectItem(state,
-                                      CurrentModuleObject,
-                                      DXCoilIndex,
-                                      Alphas,
-                                      NumAlphas,
-                                      Numbers,
-                                      NumNumbers,
-                                      IOStatus,
-                                      lNumericBlanks,
-                                      lAlphaBlanks,
-                                      cAlphaFields,
-                                      cNumericFields);
-=======
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  DXCoilIndex,
@@ -5515,7 +5256,6 @@ void GetDXCoils(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
->>>>>>> develop
 
         ++DXCoilNum;
 
@@ -5620,20 +5360,6 @@ void GetDXCoils(EnergyPlusData &state)
     CurrentModuleObject = cAllCoilTypes(CoilVRF_FluidTCtrl_Heating);
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumVRFHeatingFluidTCtrlCoils; ++DXCoilIndex) {
 
-<<<<<<< HEAD
-        inputProcessor->getObjectItem(state,
-                                      CurrentModuleObject,
-                                      DXCoilIndex,
-                                      Alphas,
-                                      NumAlphas,
-                                      Numbers,
-                                      NumNumbers,
-                                      IOStatus,
-                                      lNumericBlanks,
-                                      lAlphaBlanks,
-                                      cAlphaFields,
-                                      cNumericFields);
-=======
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  DXCoilIndex,
@@ -5646,7 +5372,6 @@ void GetDXCoils(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
->>>>>>> develop
 
         ++DXCoilNum;
 
@@ -9944,7 +9669,6 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
         //  Calculate full load output conditions
         if (state.dataDXCoils->DXCoil(DXCoilNum).UserSHRCurveExists) {
             FullLoadOutAirEnth = InletAirEnthalpy - hDelta;
-<<<<<<< HEAD
             if (SHR < 1.0) {
                 hTinwout = InletAirEnthalpy - (1.0 - SHR) * hDelta;
                 FullLoadOutAirHumRat = PsyWFnTdbH(state, InletAirDryBulbTemp, hTinwout);
@@ -9959,19 +9683,11 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
             if (SHR > 1.0 || Counter > 0) SHR = 1.0;
             FullLoadOutAirEnth = InletAirEnthalpy - TotCap / AirMassFlow;
             hTinwout = InletAirEnthalpy - (1.0 - SHR) * hDelta;
-=======
->>>>>>> develop
             if (SHR < 1.0) {
-                hTinwout = InletAirEnthalpy - (1.0 - SHR) * hDelta;
                 FullLoadOutAirHumRat = PsyWFnTdbH(state, InletAirDryBulbTemp, hTinwout);
-                if (FullLoadOutAirHumRat <= 0.0) {
-                    FullLoadOutAirHumRat = min(DryCoilOutletHumRatioMin, InletAirHumRat);
-                }
             } else {
-                SHR = 1.0;
                 FullLoadOutAirHumRat = InletAirHumRat;
             }
-<<<<<<< HEAD
         }
         FullLoadOutAirTemp = PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
 
@@ -10002,53 +9718,9 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
                            FullLoadOutAirTemp);
                 state.dataDXCoils->DXCoil(DXCoilNum).LowOutTempBuffer2 = " ...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
                                                                          state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
-=======
-        } else {
-            if (SHR > 1.0 || Counter > 0) SHR = 1.0;
-            FullLoadOutAirEnth = InletAirEnthalpy - TotCap / AirMassFlow;
-            hTinwout = InletAirEnthalpy - (1.0 - SHR) * hDelta;
-            if (SHR < 1.0) {
-                FullLoadOutAirHumRat = PsyWFnTdbH(state, InletAirDryBulbTemp, hTinwout);
-            } else {
-                FullLoadOutAirHumRat = InletAirHumRat;
->>>>>>> develop
-            }
-        }
-        FullLoadOutAirTemp = PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
-
-<<<<<<< HEAD
-=======
-        // Check for saturation error and modify temperature at constant enthalpy
-        if (FullLoadOutAirTemp < PsyTsatFnHPb(state, FullLoadOutAirEnth, OutdoorPressure)) {
-            FullLoadOutAirTemp = PsyTsatFnHPb(state, FullLoadOutAirEnth, OutdoorPressure);
-            //  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
-            //   IF(FullLoadOutAirTemp .LT. PsyTsatFnHPb(FullLoadOutAirEnth,InletAirPressure)) THEN
-            //    FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth,InletAirPressure)
-            FullLoadOutAirHumRat = PsyWFnTdbH(state, FullLoadOutAirTemp, FullLoadOutAirEnth);
-        }
-
-        // Store actual outlet conditions when DX coil is ON for use in heat recovery module
-        state.dataDXCoils->DXCoilFullLoadOutAirTemp(DXCoilNum) = FullLoadOutAirTemp;
-        state.dataDXCoils->DXCoilFullLoadOutAirHumRat(DXCoilNum) = FullLoadOutAirHumRat;
-
-        // Add warning message for cold cooling coil (FullLoadOutAirTemp < 2 C)
-        if (FullLoadOutAirTemp < 2.0 && !FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
-            state.dataDXCoils->DXCoil(DXCoilNum).PrintLowOutTempMessage = true;
-            state.dataDXCoils->DXCoil(DXCoilNum).FullLoadOutAirTempLast = FullLoadOutAirTemp;
-            if (state.dataDXCoils->DXCoil(DXCoilNum).LowOutletTempIndex == 0) {
-                state.dataDXCoils->DXCoil(DXCoilNum).FullLoadInletAirTempLast = InletAirDryBulbTemp;
-                state.dataDXCoils->DXCoil(DXCoilNum).LowOutTempBuffer1 =
-                    format("{} \"{}\" - Full load outlet air dry-bulb temperature < 2C. This indicates the "
-                           "possibility of coil frost/freeze. Outlet temperature = {:.2R} C.",
-                           state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
-                           state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                           FullLoadOutAirTemp);
-                state.dataDXCoils->DXCoil(DXCoilNum).LowOutTempBuffer2 = " ...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
-                                                                         state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
             }
         }
 
->>>>>>> develop
         //  If constant fan with cycling compressor, call function to determine "effective SHR"
         //  which includes the part-load degradation on latent capacity
         if (FanOpMode == ContFanCycCoil) {
@@ -11002,7 +10674,6 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
                                    InletAirDryBulbTemp,
                                    InletAirWetBulbC,
                                    Mode);
-<<<<<<< HEAD
 
             //  Calculate full load output conditions
             //                if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
@@ -11017,22 +10688,6 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
             FullLoadOutAirTemp = PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
         }
 
-=======
-
-            //  Calculate full load output conditions
-            //                if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
-            if (SHR > 1.0) SHR = 1.0;
-            FullLoadOutAirEnth = InletAirEnthalpy - TotCap / AirMassFlow;
-            hTinwout = InletAirEnthalpy - (1.0 - SHR) * hDelta;
-            if (SHR < 1.0) {
-                FullLoadOutAirHumRat = PsyWFnTdbH(state, InletAirDryBulbTemp, hTinwout);
-            } else {
-                FullLoadOutAirHumRat = InletAirHumRat;
-            }
-            FullLoadOutAirTemp = PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
-        }
-
->>>>>>> develop
         //  Calculate actual outlet conditions for the input part load ratio
         //  Actual outlet conditions are "average" for time step when compressor cycles
 
@@ -11407,11 +11062,7 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
         if (OutdoorDryBulb <= state.dataDXCoils->DXCoil(DXCoilNum).MaxOATDefrost &&
             state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(Mode) != WaterCooled) {
             // Calculate defrost adjustment factors depending on defrost control type
-<<<<<<< HEAD
             if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Timed) {
-=======
-            if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == Timed) {
->>>>>>> develop
                 FractionalDefrostTime = state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime;
                 if (FractionalDefrostTime > 0.0) {
                     HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
@@ -14085,11 +13736,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
             // Check outdoor temperature to determine of defrost is active
             if (OutdoorDryBulb <= state.dataDXCoils->DXCoil(DXCoilNum).MaxOATDefrost) {
                 // Calculate defrost adjustment factors depending on defrost control type
-<<<<<<< HEAD
                 if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Timed) {
-=======
-                if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == Timed) {
->>>>>>> develop
                     FractionalDefrostTime = state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime;
                     if (FractionalDefrostTime > 0.0) {
                         HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
@@ -14104,11 +13751,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
                 if (FractionalDefrostTime > 0.0) {
                     // Calculate defrost adjustment factors depending on defrost control strategy
                     if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostStrategy == ReverseCycle &&
-<<<<<<< HEAD
                         state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
-=======
-                        state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == OnDemand) {
->>>>>>> develop
                         DefrostEIRTempModFac = CurveValue(
                             state, state.dataDXCoils->DXCoil(DXCoilNum).DefrostEIRFT, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
                         LoadDueToDefrostLS = (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) *
@@ -14321,11 +13964,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
             // Check outdoor temperature to determine of defrost is active
             if (OutdoorDryBulb <= state.dataDXCoils->DXCoil(DXCoilNum).MaxOATDefrost) {
                 // Calculate defrost adjustment factors depending on defrost control type
-<<<<<<< HEAD
                 if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Timed) {
-=======
-                if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == Timed) {
->>>>>>> develop
                     FractionalDefrostTime = state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime;
                     if (FractionalDefrostTime > 0.0) {
                         HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
@@ -14340,11 +13979,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
                 if (FractionalDefrostTime > 0.0) {
                     // Calculate defrost adjustment factors depending on defrost control strategy
                     if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostStrategy == ReverseCycle &&
-<<<<<<< HEAD
                         state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
-=======
-                        state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == OnDemand) {
->>>>>>> develop
                         LoadDueToDefrost = (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) *
                                            (state.dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap(1) / 1.01667);
                         DefrostEIRTempModFac = CurveValue(
@@ -16373,11 +16008,7 @@ void SetDXCoolingCoilData(EnergyPlusData &state,
                           Optional<Real64> MaxOATHeating,         // Parameter equivalent of condenser Max OAT for compressor heating operation
                           Optional_int HeatingPerformanceOATType, // Parameter equivalent to condenser entering air temp type (1-db, 2=wb)
                           Optional_int DefrostStrategy,
-<<<<<<< HEAD
                           Optional<StandardRatings::HPdefrostControl> DefrostControl,
-=======
-                          Optional_int DefrostControl,
->>>>>>> develop
                           Optional_int DefrostEIRPtr,
                           Optional<Real64> DefrostFraction,
                           Optional<Real64> DefrostCapacity,
