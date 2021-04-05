@@ -20917,36 +20917,35 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWHZon
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
-
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestDefaultBehaviourOfSimulationControl)
 {
 
     // Unit test for #5021
 
-    Zone.allocate(1);
-    Zone(1).Name = "SALA DE AULA";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "SALA DE AULA";
 
-    Surface.allocate(2);
-    Surface(1).Name = "WINDOW AULA 1";
-    Surface(1).Zone = 1;
-    Surface(1).ZoneName = "SALA DE AULA";
-    Surface(1).Azimuth = 0.0;
-    Surface(1).ExtBoundCond = 0;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).Tilt = 90.0;
-    Surface(1).Sides = 4;
-    Surface(2).Name = "WINDOW AULA 2";
-    Surface(2).Zone = 1;
-    Surface(2).ZoneName = "SALA DE AULA";
-    Surface(2).Azimuth = 180.0;
-    Surface(2).ExtBoundCond = 0;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).Tilt = 90.0;
-    Surface(2).Sides = 4;
+    state->dataSurface->Surface.allocate(2);
+    state->dataSurface->Surface(1).Name = "WINDOW AULA 1";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "SALA DE AULA";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(2).Name = "WINDOW AULA 2";
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).ZoneName = "SALA DE AULA";
+    state->dataSurface->Surface(2).Azimuth = 180.0;
+    state->dataSurface->Surface(2).ExtBoundCond = 0;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).Tilt = 90.0;
+    state->dataSurface->Surface(2).Sides = 4;
 
-    SurfaceGeometry::AllocateSurfaceWindows(2);
-    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
@@ -21002,22 +21001,22 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestDefaultBehaviourOfSimulationControl
     GetAirflowNetworkInput(*state);
 
     // MultizoneZoneData has only 1 element so may be hardcoded
-    EXPECT_TRUE(AirflowNetwork::AFNDefaultControlFlag);
+    EXPECT_TRUE(state->dataAirflowNetwork->AFNDefaultControlFlag);
 
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimu.AirflowNetworkSimuName, "AFNDefaultControl");
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimu.Control, "MULTIZONEWITHOUTDISTRIBUTION");
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimu.WPCCntr, "SURFACEAVERAGECALCULATION");
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimu.HeightOption, "OPENINGHEIGHT");
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimu.BldgType, "LOWRISE");
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimu.InitType, "ZERONODEPRESSURES");
-    EXPECT_FALSE(AirflowNetwork::AirflowNetworkSimu.TExtHeightDep);
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimu.solver, AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU);
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.AirflowNetworkSimuName, "AFNDefaultControl");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.Control, "MULTIZONEWITHOUTDISTRIBUTION");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.WPCCntr, "SURFACEAVERAGECALCULATION");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.HeightOption, "OPENINGHEIGHT");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.BldgType, "LOWRISE");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.InitType, "ZERONODEPRESSURES");
+    EXPECT_FALSE(state->dataAirflowNetwork->AirflowNetworkSimu.TExtHeightDep);
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.solver, AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU);
     //// Use default values for numerical fields
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimu.MaxIteration, 500);
-    EXPECT_NEAR(AirflowNetwork::AirflowNetworkSimu.RelTol, 1.0E-4, 0.00001);
-    EXPECT_NEAR(AirflowNetwork::AirflowNetworkSimu.AbsTol, 1.E-6, 0.0000001);
-    EXPECT_NEAR(AirflowNetwork::AirflowNetworkSimu.ConvLimit, -0.5, 0.01);
-    EXPECT_NEAR(AirflowNetwork::AirflowNetworkSimu.Azimuth, 0.0, 0.0001);
-    EXPECT_NEAR(AirflowNetwork::AirflowNetworkSimu.AspectRatio, 1.0, 0.0001);
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.MaxIteration, 500);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkSimu.RelTol, 1.0E-4, 0.00001);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkSimu.AbsTol, 1.E-6, 0.0000001);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkSimu.ConvLimit, -0.5, 0.01);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkSimu.Azimuth, 0.0, 0.0001);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkSimu.AspectRatio, 1.0, 0.0001);
 }
 } // namespace EnergyPlus
