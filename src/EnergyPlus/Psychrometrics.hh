@@ -45,10 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// testing the various configs
-// #undef EP_psych_errors
-#define EP_psych_stats
-
 #ifndef Psychrometrics_hh_INCLUDED
 #define Psychrometrics_hh_INCLUDED
 
