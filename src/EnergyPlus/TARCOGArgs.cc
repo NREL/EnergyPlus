@@ -347,7 +347,7 @@ int ArgCheck(EnergyPlusData &state,
         return ArgCheck;
     }
 
-    if ((ThermalMod != TARCOGThermalModel::ISO15099) || (ThermalMod != TARCOGThermalModel::SCW) || (ThermalMod != TARCOGThermalModel::CSM)) {
+    if ((ThermalMod != TARCOGThermalModel::ISO15099) && (ThermalMod != TARCOGThermalModel::SCW) && (ThermalMod != TARCOGThermalModel::CSM)) {
         ArgCheck = 29;
         ErrorMessage = "Invalid code for thermal mode.";
         return ArgCheck;
@@ -425,9 +425,10 @@ int ArgCheck(EnergyPlusData &state,
             return ArgCheck;
         }
 
-        if (((LayerType(i)) != TARCOGLayerType::SPECULAR) || ((LayerType(i)) != TARCOGLayerType::WOVSHADE) ||
-            ((LayerType(i)) != TARCOGLayerType::PERFORATED) || ((LayerType(i)) != TARCOGLayerType::DIFFSHADE) ||
-            ((LayerType(i)) != TARCOGLayerType::BSDF) || ((LayerType(i)) != TARCOGLayerType::VENETBLIND_VERT)) {
+        if (((LayerType(i)) != TARCOGLayerType::SPECULAR) && ((LayerType(i)) != TARCOGLayerType::WOVSHADE) &&
+            ((LayerType(i)) != TARCOGLayerType::VENETBLIND_HORIZ) && ((LayerType(i)) != TARCOGLayerType::PERFORATED) &&
+            ((LayerType(i)) != TARCOGLayerType::DIFFSHADE) && ((LayerType(i)) != TARCOGLayerType::BSDF) &&
+            ((LayerType(i)) != TARCOGLayerType::VENETBLIND_VERT)) {
             ArgCheck = 22;
             ErrorMessage = format("Incorrect layer type for layer #{:3}"
                                   ".  Layer type can either be 0 (glazing layer), 1 (Venetian blind), 2 (woven shade), 3 (perforated), 4 (diffuse "
