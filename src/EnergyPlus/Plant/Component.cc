@@ -133,11 +133,11 @@ namespace DataPlant {
                 // I anticipate the list of components that fall through to be very small, so that is the check I will do.
                 // If std::find returns the .end() iterator, that means it didn't find it in the list, which means it's not one of the ones to fall
                 // through, so RETURN
-                if (std::find(state.dataPlnt->compsToSimAfterInitLoopEquip.begin(),
-                              state.dataPlnt->compsToSimAfterInitLoopEquip.end(),
-                              this->TypeOf_Num) == state.dataPlnt->compsToSimAfterInitLoopEquip.end()) {
-                    return;
-                }
+//                if (std::find(state.dataPlnt->compsToSimAfterInitLoopEquip.begin(),
+//                              state.dataPlnt->compsToSimAfterInitLoopEquip.end(),
+//                              this->TypeOf_Num) == state.dataPlnt->compsToSimAfterInitLoopEquip.end()) {
+//                    return;
+//                }
             }
             this->compPtr->simulate(state, this->location, FirstHVACIteration, this->MyLoad, this->ON);
         }
