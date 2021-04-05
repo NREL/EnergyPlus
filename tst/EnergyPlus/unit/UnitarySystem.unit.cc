@@ -833,12 +833,12 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     EXPECT_EQ(compName, thisSys->Name);
     EXPECT_NEAR(100.0, thisSys->m_AncillaryOnPower, 0.00000001);
     EXPECT_NEAR(50.0, thisSys->m_AncillaryOffPower, 0.00000001);
-    EXPECT_NEAR(0.488072083, thisSys->m_PartLoadFrac, 0.000001);
+    EXPECT_NEAR(0.488072083, thisSys->m_PartLoadFrac, 0.00005);
     Real64 totalAncillaryPower =
         thisSys->m_AncillaryOnPower * thisSys->m_PartLoadFrac + thisSys->m_AncillaryOffPower * (1.0 - thisSys->m_PartLoadFrac);
     EXPECT_NEAR(totalAncillaryPower, thisSys->m_TotalAuxElecPower, 0.00000001);
     // at PLR very near 0.5, m_TotalAuxElecPower should be very near 75 W.
-    EXPECT_NEAR(74.4036, thisSys->m_TotalAuxElecPower, 0.0001);
+    EXPECT_NEAR(74.4036, thisSys->m_TotalAuxElecPower, 0.002);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
@@ -2851,11 +2851,11 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(6), thisSys->m_CoolVolumeFlowRate[6]);
     EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[7], fullFlow * 0.7, 0.0001);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(7), thisSys->m_CoolVolumeFlowRate[7]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[8], fullFlow * 0.8, 0.0001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[8], fullFlow * 0.8, 0.0002);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(8), thisSys->m_CoolVolumeFlowRate[8]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[9], fullFlow * 0.9, 0.0001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[9], fullFlow * 0.9, 0.0002);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(9), thisSys->m_CoolVolumeFlowRate[9]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[10], fullFlow * 1.0, 0.0001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[10], fullFlow * 1.0, 0.0002);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(10), thisSys->m_CoolVolumeFlowRate[10]);
 
     // checks on autosized heating air flow rates
@@ -7745,11 +7745,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
                 0.001);
 
     // 3 cooling speeds with autosized MSHP design spec yielding equally distributed air flow at 1/3 per speed
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[1], 0.032774, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[1], 0.032774, 0.000005);
     EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(1), thisSys->m_CoolVolumeFlowRate[1], 0.000005);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[2], 0.065549, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[2], 0.065549, 0.000005);
     EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(2), thisSys->m_CoolVolumeFlowRate[2], 0.000005);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[3], 0.098323, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[3], 0.098323, 0.00001);
     EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(3), thisSys->m_CoolVolumeFlowRate[3], 0.00001);
 
     EXPECT_NEAR(state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[0], 0.333333, 0.000001);
