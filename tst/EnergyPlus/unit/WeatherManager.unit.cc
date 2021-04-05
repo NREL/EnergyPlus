@@ -685,11 +685,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation)
         "   ** Warning ** Did you realize that you have Latitude=0.0, Longitude=0.0 and TimeZone=0.0?  Your building site is in the middle of the "
         "Atlantic Ocean.",
         "   ** Severe  ** GetNextEnvironment: No location specified, program will terminate.",
-<<<<<<< HEAD
         "   **  Fatal  ** GetNextEnvironment: Errors found in Weather Data Input. Program terminates.",
-=======
-        "   **  Fatal  ** GetNextEnvironment: Errors found in Weater Data Input. Program terminates.",
->>>>>>> develop
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=2",
         "   ..... Last severe error=GetNextEnvironment: No location specified, program will terminate.",
