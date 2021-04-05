@@ -7750,10 +7750,10 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                 //                                        + IterDampConst * TempInsOld(SurfNum)+ IsNotAdiabatic*IsNotSource*construct.CTFCross(0)
                 //                                        * TH11) * TempDiv;
 
-                if (surface.TInsideEMSOverrideOn) {
+                if (Surface(surfNum).TInsideEMSOverrideOn) {
                     // Is TempSurfInTmp important, or is it really temporary storage?
-                    state.dataHeatBalSurf->TempSurfInTmp(SurfNum) = surface.TInsideEMSOverrideValue;
-                    state.dataHeatBalSurf->TempSurfIn(SurfNum) = surface.TInsideEMSOverrideValue;
+                    state.dataHeatBalSurf->TempSurfInTmp(surfNum) = Surface(surfNum).TInsideEMSOverrideValue;
+                    state.dataHeatBalSurf->TempSurfIn(surfNum) = Surface(surfNum).TInsideEMSOverrideValue;
                     continue;
                 }
 

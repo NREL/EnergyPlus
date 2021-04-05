@@ -102,12 +102,6 @@ void externalHVAC(EnergyPlusState state) {
     printf("External HVAC called\n");
 }
 
-Real64 externalSurfaceManager(EnergyPlusState state, int const surfaceNum, int* isManaged) {
-  printf("External surface called\n");
-  *isManaged = 0; // 0 means surface with index "surfaceNum" is not managed by the external surface manager
-  return 0.0;
-}
-
 int main(int argc, const char * argv[]) {
 //    callbackBeginNewEnvironment(BeginNewEnvironmentHandler);
 //    callbackAfterNewEnvironmentWarmupComplete(AfterNewEnvironmentWarmupCompleteHandler);
@@ -144,7 +138,6 @@ int main(int argc, const char * argv[]) {
     }
     stateReset(state);
     registerExternalHVACManager(state, externalHVAC);
-    registerExternalSurfaceManager(state, externalSurfaceManager);
     energyplus(state, argc, argv);
     return 0;
 }
