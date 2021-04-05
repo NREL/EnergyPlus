@@ -53,11 +53,7 @@
 
 namespace EnergyPlus::TARCOGDeflection {
 
-<<<<<<< HEAD
 void PanesDeflection(TARCOGParams::DeflectionCalculation DeflectionStandard,
-=======
-void PanesDeflection(int DeflectionStandard,
->>>>>>> develop
                      Real64 W,
                      Real64 H,
                      int nlayer,
