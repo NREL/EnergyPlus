@@ -172,21 +172,6 @@ namespace AirflowNetwork {
         Array1D<Real64> SUMF;
     };
 
-<<<<<<< HEAD
-    // Data
-    extern int NetworkNumOfLinks;
-    extern int NetworkNumOfNodes;
-
-    int constexpr NrInt = 20; // Number of intervals for a large opening
-
-    // Large opening variables
-    extern Array1D<Real64> DpProf;   // Differential pressure profile for Large Openings [Pa]
-    extern Array1D<Real64> RhoProfF; // Density profile in FROM zone [kg/m3]
-    extern Array1D<Real64> RhoProfT; // Density profile in TO zone [kg/m3]
-    extern Array2D<Real64> DpL;      // Array of stack pressures in link
-
-=======
->>>>>>> develop
     // Functions
 
     int GenericCrack(EnergyPlusData &state,

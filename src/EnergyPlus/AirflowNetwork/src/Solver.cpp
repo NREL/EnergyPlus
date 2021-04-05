@@ -86,53 +86,6 @@ namespace AirflowNetwork {
     // Walton, G. N., 1989, "AIRNET - A Computer Program for Building Airflow Network Modeling,"
     // NISTIR 89-4072, National Institute of Standards and Technology, Gaithersburg, Maryland
 
-<<<<<<< HEAD
-    // Data
-    int NetworkNumOfLinks(0);
-    int NetworkNumOfNodes(0);
-
-    // Common block AFEDAT
-    Array1D<Real64> AFECTL;
-    Array1D<Real64> AFLOW2;
-    Array1D<Real64> AFLOW;
-    Array1D<Real64> PS;
-    Array1D<Real64> PW;
-
-    // Common block CONTRL
-    Real64 PB(0.0);
-    int LIST(0);
-
-    // Common block ZONL
-    // Array1D<Real64> RHOZ;
-    // Array1D<Real64> SQRTDZ;
-    // Array1D<Real64> VISCZ;
-    Array1D<Real64> SUMAF;
-    // Array1D<Real64> TZ; // Temperature [C]
-    // Array1D<Real64> WZ; // Humidity ratio [kg/kg]
-    Array1D<Real64> PZ; // Pressure [Pa]
-
-    // Other array variables
-    Array1D_int ID;
-    Array1D_int IK;
-    Array1D<Real64> AD;
-    Array1D<Real64> AU;
-
-#ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
-    Array1D_int newIK;     // noel
-    Array1D<Real64> newAU; // noel
-#endif
-
-    // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
-    Array1D<Real64> SUMF;
-
-    // Large opening variables
-    Array1D<Real64> DpProf;   // Differential pressure profile for Large Openings [Pa]
-    Array1D<Real64> RhoProfF; // Density profile in FROM zone [kg/m3]
-    Array1D<Real64> RhoProfT; // Density profile in TO zone [kg/m3]
-    Array2D<Real64> DpL;      // Array of stack pressures in link
-
-=======
->>>>>>> develop
     // Functions
 
     AirProperties::AirProperties(double const airDensity)
@@ -186,8 +139,6 @@ namespace AirflowNetwork {
         // Network array size is allocated based on the network of air distribution system.
         // If multizone airflow is simulated only, the array size is allocated based on the multizone network.
 
-<<<<<<< HEAD
-=======
         auto &NetworkNumOfLinks = state.dataAFNSolver->NetworkNumOfLinks;
         auto &NetworkNumOfNodes = state.dataAFNSolver->NetworkNumOfNodes;
         auto &DpProf = state.dataAFNSolver->DpProf;
@@ -195,7 +146,6 @@ namespace AirflowNetwork {
         auto &RhoProfT = state.dataAFNSolver->RhoProfT;
         auto &DpL = state.dataAFNSolver->DpL;
 
->>>>>>> develop
         NetworkNumOfLinks = state.dataAirflowNetwork->AirflowNetworkNumOfLinks;
         NetworkNumOfNodes = state.dataAirflowNetwork->AirflowNetworkNumOfNodes;
 
@@ -367,12 +317,9 @@ namespace AirflowNetwork {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-<<<<<<< HEAD
-=======
         auto &NetworkNumOfLinks = state.dataAFNSolver->NetworkNumOfLinks;
         auto &NetworkNumOfNodes = state.dataAFNSolver->NetworkNumOfNodes;
 
->>>>>>> develop
         for (int i = 1; i <= NetworkNumOfNodes; ++i) {
             ID(i) = i;
         }
@@ -435,11 +382,8 @@ namespace AirflowNetwork {
         int M;
         int N1;
         int N2;
-<<<<<<< HEAD
-=======
         auto &NetworkNumOfLinks = state.dataAFNSolver->NetworkNumOfLinks;
         auto &NetworkNumOfNodes = state.dataAFNSolver->NetworkNumOfNodes;
->>>>>>> develop
 
         // Initialize "IK".
         for (i = 1; i <= NetworkNumOfNodes + 1; ++i) {
@@ -514,12 +458,9 @@ namespace AirflowNetwork {
         // static ObjexxFCL::gio::Fmt Format_903("(1X,A6,I5,3F14.6)");
         // static ObjexxFCL::gio::Fmt Format_907("(,/,' CPU seconds for ',A,F12.3)");
 
-<<<<<<< HEAD
-=======
         auto &NetworkNumOfLinks = state.dataAFNSolver->NetworkNumOfLinks;
         auto &NetworkNumOfNodes = state.dataAFNSolver->NetworkNumOfNodes;
 
->>>>>>> develop
         // Initialize pressure for pressure control and for Initialization Type = LinearInitializationMethod
         if ((state.dataAirflowNetwork->AirflowNetworkSimu.InitFlag == 0) ||
             (state.dataAirflowNetwork->PressureSetFlag > 0 && state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
@@ -738,13 +679,8 @@ namespace AirflowNetwork {
 //            }
 // Solve linear system for approximate PZ.
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
-<<<<<<< HEAD
-            FACSKY(state, newAU, AD, newAU, newIK, NetworkNumOfNodes, NSYM); // noel
-            SLVSKY(newAU, AD, newAU, PZ, newIK, NetworkNumOfNodes, NSYM);    // noel
-=======
             FACSKY(state, newAU, AD, newAU, newIK, NetworkNumOfNodes, NSYM);     // noel
             SLVSKY(state, newAU, AD, newAU, PZ, newIK, NetworkNumOfNodes, NSYM); // noel
->>>>>>> develop
 #else
             FACSKY(AU, AD, AU, IK, NetworkNumOfNodes, NSYM);
             SLVSKY(AU, AD, AU, PZ, IK, NetworkNumOfNodes, NSYM);
@@ -792,13 +728,8 @@ namespace AirflowNetwork {
                 CCF(n) = SUMF(n);
             }
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
-<<<<<<< HEAD
-            FACSKY(state, newAU, AD, newAU, newIK, NetworkNumOfNodes, NSYM); // noel
-            SLVSKY(newAU, AD, newAU, CCF, newIK, NetworkNumOfNodes, NSYM);   // noel
-=======
             FACSKY(state, newAU, AD, newAU, newIK, NetworkNumOfNodes, NSYM);      // noel
             SLVSKY(state, newAU, AD, newAU, CCF, newIK, NetworkNumOfNodes, NSYM); // noel
->>>>>>> develop
 #else
             FACSKY(AU, AD, AU, IK, NetworkNumOfNodes, NSYM);
             SLVSKY(AU, AD, AU, CCF, IK, NetworkNumOfNodes, NSYM);
@@ -924,13 +855,10 @@ namespace AirflowNetwork {
         std::array<Real64, 2> F{{0.0, 0.0}};
         std::array<Real64, 2> DF{{0.0, 0.0}};
 
-<<<<<<< HEAD
-=======
         auto &NetworkNumOfLinks = state.dataAFNSolver->NetworkNumOfLinks;
         auto &NetworkNumOfNodes = state.dataAFNSolver->NetworkNumOfNodes;
         auto &DpL = state.dataAFNSolver->DpL;
 
->>>>>>> develop
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
             SUMF(n) = 0.0;
             SUMAF(n) = 0.0;
@@ -1603,12 +1531,8 @@ namespace AirflowNetwork {
         }
     }
 
-<<<<<<< HEAD
-    void FILSKY(const Array1D<Real64> &X,    // element array (row-wise sequence)
-=======
     void FILSKY(EnergyPlusData &state,
                 const Array1D<Real64> &X,    // element array (row-wise sequence)
->>>>>>> develop
                 std::array<int, 2> const LM, // location matrix
                 const Array1D_int &IK,       // pointer to the top of column/row "K"
                 Array1D<Real64> &AU,         // the upper triangle of [A] before and after factoring
@@ -1969,13 +1893,10 @@ namespace AirflowNetwork {
 
         zStT(i) = state.dataAirflowNetwork->AirflowNetworkLinkageData(il).NodeHeights[1] +
                   ActLh * OwnHeightFactor; // Autodesk:BoundsViolation zStT(i) @ i>2
-<<<<<<< HEAD
-=======
 
         auto &RhoProfF = state.dataAFNSolver->RhoProfF;
         auto &RhoProfT = state.dataAFNSolver->RhoProfT;
         auto &DpProf = state.dataAFNSolver->DpProf;
->>>>>>> develop
 
         // Calculation of DpProf, RhoProfF, RhoProfT
         for (i = 1; i <= NrInt + 2; ++i) {
