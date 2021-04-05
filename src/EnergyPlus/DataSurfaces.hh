@@ -705,6 +705,11 @@ namespace DataSurfaces {
         bool ViewFactorGroundEMSOverrideOn;      // if true, EMS is calling to override the surface's view factor to ground
         Real64 ViewFactorGroundEMSOverrideValue; // value to use for EMS override of the surface's view factor to ground
 
+        Real64 TInsideEMSOverrideValue; // EMS Inside surface temperature override value
+        bool TInsideEMSOverrideOn; // EMS Inside surface temperature override enable
+        Real64 TOutsideEMSOverrideValue; // EMS Outside surface temperature override value
+        bool TOutsideEMSOverrideOn; // EMS Outside surface temperature override enable
+
         Real64 WindDir;                    // Surface outside wind direction, for surface heat balance and ventilation(degree)
         bool WindDirEMSOverrideOn;         // if true, EMS is calling to override the surface's outside wind direction
         Real64 WindDirEMSOverrideValue;    // value to use for EMS override of the surface's outside wind speed
@@ -779,6 +784,8 @@ namespace DataSurfaces {
               OutDryBulbTempEMSOverrideOn(false), OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0), OutWetBulbTempEMSOverrideOn(false),
               OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0), WindSpeedEMSOverrideOn(false), WindSpeedEMSOverrideValue(0.0),
               ViewFactorGroundEMSOverrideOn(false), ViewFactorGroundEMSOverrideValue(0.0),
+
+              TInsideEMSOverrideValue(0.0), TInsideEMSOverrideOn(false), TOutsideEMSOverrideValue(0.0), TOutsideEMSOverrideOn(false),
 
               WindDir(0.0), WindDirEMSOverrideOn(false), WindDirEMSOverrideValue(0.0),
 

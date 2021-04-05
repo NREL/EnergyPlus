@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
@@ -390,6 +391,7 @@ namespace EMSManager {
             SetupSurfaceConvectionActuators(state);
             SetupSurfaceConstructionActuators(state);
             SetupSurfaceOutdoorBoundaryConditionActuators(state);
+            SetupSurfaceTemperatureActuators(state);
             SetupZoneOutdoorBoundaryConditionActuators(state);
             GetEMSInput(state);
             state.dataEMSMgr->GetEMSUserInput = false;
@@ -2217,6 +2219,30 @@ namespace EMSManager {
                                  "[degree]",
                                  state.dataSurface->Surface(SurfNum).WindDirEMSOverrideOn,
                                  state.dataSurface->Surface(SurfNum).WindDirEMSOverrideValue);
+            }
+        }
+    }
+
+    void SetupSurfaceTemperatureActuators(EnergyPlusData &state)
+    {
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
+            if (state.dataSurface->Surface(SurfNum).Class != DataSurfaces::SurfaceClass::Window) {
+                SetupEMSActuator(state,
+                                 "Surface",
+                                 state.dataSurface->Surface(SurfNum).Name,
+                                 "Surface Inside Temperature",
+                                 "[C]",
+                                 state.dataSurface->Surface(SurfNum).TInsideEMSOverrideOn,
+                                 state.dataSurface->Surface(SurfNum).TInsideEMSOverrideValue);
+
+                SetupEMSActuator(state,
+                                 "Surface",
+                                 state.dataSurface->Surface(SurfNum).Name,
+                                 "Surface Outside Temperature",
+                                 "[C]",
+                                 state.dataSurface->Surface(SurfNum).TOutsideEMSOverrideOn,
+                                 state.dataSurface->Surface(SurfNum).TOutsideEMSOverrideValue);
             }
         }
     }

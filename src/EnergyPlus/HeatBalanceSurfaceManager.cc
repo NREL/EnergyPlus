@@ -5842,8 +5842,9 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
             {
                 auto const SELECT_CASE_var(Surface(SurfNum).ExtBoundCond);
 
-                if (SELECT_CASE_var == Ground) { // Surface in contact with ground
-
+                if (Surface(SurfNum).TOutsideEMSOverrideOn) {
+                    state.dataHeatBalSurf->TH(1, 1, SurfNum) = Surface(SurfNum).TOutsideEMSOverrideValue;
+                } else if (SELECT_CASE_var == Ground) { // Surface in contact with ground
                     state.dataHeatBalSurf->TH(1, 1, SurfNum) = state.dataEnvrn->GroundTemp;
 
                     // Set the only radiant system heat balance coefficient that is non-zero for this case
@@ -6786,15 +6787,10 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
             Real64 const MAT_zone(state.dataHeatBalFanSys->MAT(ZoneNum));
             Real64 const HConvIn_surf(state.dataMstBal->HConvInFD(SurfNum) = state.dataHeatBal->HConvIn(SurfNum));
 
-            // If there is an externalSurfaceManager then let it set the surface temp and move on
-            // This is a precondition that circumvents any of the built in methods, and continues the loop early
-            if (state.dataGlobal->externalSurfaceManager) {
-              auto const result = state.dataGlobal->externalSurfaceManager(&state, SurfNum);
-              // second is only valid if first is true
-              if (result.first) {
-                state.dataHeatBalSurf->TempSurfIn(SurfNum) = result.second;
+            if (surface.TInsideEMSOverrideOn) {
+                state.dataHeatBalSurf->TempSurfInTmp(SurfNum) = surface.TInsideEMSOverrideValue;
+                state.dataHeatBalSurf->TempSurfIn(SurfNum) = surface.TInsideEMSOverrideValue;
                 continue;
-              }
             }
 
             if (surface.ExtBoundCond == SurfNum) {
@@ -7753,6 +7749,13 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                 //              IsPoolSurf*CTFConstInPart(SurfNum) + IsPoolSurf*QPoolSurfNumerator(SurfNum)
                 //                                        + IterDampConst * TempInsOld(SurfNum)+ IsNotAdiabatic*IsNotSource*construct.CTFCross(0)
                 //                                        * TH11) * TempDiv;
+
+                if (surface.TInsideEMSOverrideOn) {
+                    // Is TempSurfInTmp important, or is it really temporary storage?
+                    state.dataHeatBalSurf->TempSurfInTmp(SurfNum) = surface.TInsideEMSOverrideValue;
+                    state.dataHeatBalSurf->TempSurfIn(SurfNum) = surface.TInsideEMSOverrideValue;
+                    continue;
+                }
 
                 // Calculate the current inside surface temperature
                 state.dataHeatBalSurf->TempSurfInTmp(surfNum) =

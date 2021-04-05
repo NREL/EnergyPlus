@@ -120,27 +120,6 @@ void registerExternalHVACManager(EnergyPlusState state, void (*f)(EnergyPlusStat
     registerExternalHVACManager(state, std::function<void(EnergyPlusState)>(f));
 }
 
-void registerExternalSurfaceManager(EnergyPlusState state, std::function<std::pair<bool,Real64> (EnergyPlusState, int const)> f)
-{
-    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    thisState->dataGlobal->externalSurfaceManager = f; // NOLINT(performance-unnecessary-value-param)
-}
-
-void registerExternalSurfaceManager(EnergyPlusState state, Real64 (*f)(EnergyPlusState, int const, int*))
-{
-    // fprime converts the C function f, to a more C++ friendly function
-    auto fprime = [&](EnergyPlusState s, int const surfNum) {
-      int ismanaged = 0;
-      const auto surfTemp = f(s, surfNum, &ismanaged);
-      if(ismanaged) {
-        return std::make_pair(true, surfTemp);
-      } else {
-        return std::make_pair(false, 0.0);
-      }
-    };
-    registerExternalSurfaceManager(state, fprime);
-}
-
 void callbackBeginNewEnvironment(EnergyPlusState state, std::function<void(EnergyPlusState)> const &f)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);

@@ -75,8 +75,6 @@ ENERGYPLUSLIB_API void callbackEndOfAfterComponentGetInput(EnergyPlusState state
 ENERGYPLUSLIB_API void callbackUnitarySystemSizing(EnergyPlusState state, const std::function<void(EnergyPlusState)> &f);
 ENERGYPLUSLIB_API void registerStdOutCallback(EnergyPlusState state, std::function<void(const std::string &)>);
 ENERGYPLUSLIB_API void registerExternalHVACManager(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
-ENERGYPLUSLIB_API void registerExternalSurfaceManager(EnergyPlusState state, std::function<std::pair<bool,Real64> (EnergyPlusState, int const)> f);
-// ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
 
 extern "C" {
 
@@ -378,18 +376,6 @@ ENERGYPLUSLIB_API void callbackUnitarySystemSizing(EnergyPlusState state, void (
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] f The function to be called back at this specific calling point in the simulation.  The function expects one EnergyPlusState argument.
 ENERGYPLUSLIB_API void registerExternalHVACManager(EnergyPlusState state, void (*f)(EnergyPlusState));
-
-/// \brief Register a callback function to be used for setting individual wall temperatures.
-/// \details This callback is a placeholder for advanced use cases, and will be supported in a future release.
-/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
-/// \param[in] f The function to be called back at this specific calling point in the simulation.  
-//  The callback function requires three arguments: 
-//  1. an EnergyPlusState argument 
-//  2. an int corresponding to the surface index to be set.
-//  3. an int pointer which the callback function will set to either
-//    0 indicating surface index is not externally managed, or
-//    1 indicating surface index is managed and the return value will determine the surface temperature
-ENERGYPLUSLIB_API void registerExternalSurfaceManager(EnergyPlusState state, Real64 (*f)(EnergyPlusState, int const, int*));
 
 #ifdef __cplusplus
 }
