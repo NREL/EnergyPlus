@@ -337,7 +337,7 @@ struct WindowComplexManagerData : BaseGlobalStruct
         Array1D<Real64>(TARCOGParams::maxlay + 1, 0.0); // Vector of temperatures of ventilation gas for forced ventilation, for each
     //  gap, and for outdoor and indoor environment [K] {maxlay+1}
     Array1D<TARCOGParams::TARCOGLayerType> LayerType =
-        Array1D<TARCOGParams::TARCOGLayerType>(TARCOGParams::maxlay, 0); // Glazing layer type flag {maxlay}:
+        Array1D<TARCOGParams::TARCOGLayerType>(TARCOGParams::maxlay, TARCOGParams::TARCOGLayerType::SPECULAR); // Glazing layer type flag {maxlay}:
     //                 0 - Specular layer,
     //                 1 - Venetian blind (SD)
     //                 2 - Woven shade (SD) (not implemented)
@@ -387,6 +387,7 @@ struct WindowComplexManagerData : BaseGlobalStruct
         this->InitBSDFWindowsOnce = true;
         this->NumBasis = 0;
         this->MatrixNo = 0;
+        this->LayerType = Array1D<TARCOGParams::TARCOGLayerType>(TARCOGParams::maxlay, TARCOGParams::TARCOGLayerType::SPECULAR);
     }
 
     // Default Constructor
