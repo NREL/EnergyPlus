@@ -470,11 +470,7 @@ struct ThermalISO15099CalcData : BaseGlobalStruct
     Array1D<Real64> tvent_NOSD = Array1D<Real64>(maxlay1);
     Array1D<Real64> qv_NOSD = Array1D<Real64>(maxlay1);
     Array1D<Real64> q_NOSD = Array1D<Real64>(maxlay3);
-<<<<<<< HEAD
     Array1D<TARCOGParams::TARCOGLayerType> LayerType_NOSD = Array1D<TARCOGParams::TARCOGLayerType>(maxlay);
-=======
-    Array1D_int LayerType_NOSD = Array1D_int(maxlay);
->>>>>>> develop
     Array1D<Real64> gap_NOSD = Array1D<Real64>(maxlay);
     Array1D<Real64> thick_NOSD = Array1D<Real64>(maxlay);
     Array1D<Real64> scon_NOSD = Array1D<Real64>(maxlay);
@@ -546,10 +542,7 @@ struct ThermalISO15099CalcData : BaseGlobalStruct
 
     int iFP = 0;
     int kFP = 0;
-<<<<<<< HEAD
-=======
     std::string dynFormat;
->>>>>>> develop
 
     void clear_state() override
     {
@@ -583,11 +576,7 @@ struct ThermalISO15099CalcData : BaseGlobalStruct
         this->tvent_NOSD = Array1D<Real64>(maxlay1);
         this->qv_NOSD = Array1D<Real64>(maxlay1);
         this->q_NOSD = Array1D<Real64>(maxlay3);
-<<<<<<< HEAD
         this->LayerType_NOSD = Array1D<TARCOGLayerType>(maxlay);
-=======
-        this->LayerType_NOSD = Array1D_int(maxlay);
->>>>>>> develop
         this->gap_NOSD = Array1D<Real64>(maxlay);
         this->thick_NOSD = Array1D<Real64>(maxlay);
         this->scon_NOSD = Array1D<Real64>(maxlay);
@@ -659,10 +648,8 @@ struct ThermalISO15099CalcData : BaseGlobalStruct
 
         this->iFP = 0;
         this->kFP = 0;
-<<<<<<< HEAD
-=======
+
         this->dynFormat = "";
->>>>>>> develop
     }
 };
 
