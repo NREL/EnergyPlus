@@ -4815,7 +4815,7 @@ namespace EnergyPlus::SizingManager {
         auto &CalcFinalFacilitySizing(state.dataSize->CalcFinalFacilitySizing);
 
         //  test if allocated here
-        if (!CalcFacilitySizing.allocated()) {
+        if (!allocated(CalcFacilitySizing)) {
             CalcFacilitySizing.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
             for (int DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                 CalcFacilitySizing(DDNum).DOASHeatAddSeq.allocate(NumOfTimeStepInDay);
