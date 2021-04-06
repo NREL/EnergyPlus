@@ -140,7 +140,6 @@ namespace HeatBalanceIntRadExchange {
         typedef Array1D<Real64>::size_type size_type;
 
         // Using/Aliasing
-        using HeatBalanceMovableInsulation::EvalInsideMovableInsulation;
         using WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss;
 
         Real64 const StefanBoltzmannConst(5.6697e-8); // Stefan-Boltzmann constant in W/(m2*K4)
@@ -228,9 +227,6 @@ namespace HeatBalanceIntRadExchange {
 
             if (SurfIterations == 0) {
 
-                Real64 HMovInsul; // "Resistance" value of movable insulation (if present)
-                Real64 AbsInt; // Absorptivity of movable insulation material (supercedes that of the construction if interior movable insulation is
-                               // present)
                 bool IntMovInsulChanged; // True if the status of interior movable insulation has changed
 
                 IntShadeOrBlindStatusChanged = false;
@@ -257,8 +253,7 @@ namespace HeatBalanceIntRadExchange {
                     }
                 }
 
-                if (IntShadeOrBlindStatusChanged || IntMovInsulChanged ||
-                    state.dataGlobal->BeginEnvrnFlag) { // Calc inside surface emissivities for this time step
+                if (IntShadeOrBlindStatusChanged || IntMovInsulChanged || state.dataGlobal->BeginEnvrnFlag) { // Calc inside surface emissivities for this time step
                     for (int ZoneSurfNum = 1; ZoneSurfNum <= n_zone_Surfaces; ++ZoneSurfNum) {
                         int const SurfNum = zone_SurfacePtr(ZoneSurfNum);
                         int const ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
@@ -267,10 +262,8 @@ namespace HeatBalanceIntRadExchange {
                             ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                             zone_info.Emissivity(ZoneSurfNum) = state.dataHeatBal->ITABSF(SurfNum);
                         }
-                        if (state.dataSurface->Surface(SurfNum).MovInsulIntPresent) {
-                            HeatBalanceMovableInsulation::EvalInsideMovableInsulation(state, SurfNum, HMovInsul, AbsInt);
-                            zone_info.Emissivity(ZoneSurfNum) =
-                                state.dataMaterial->Material(state.dataSurface->Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal;
+                        if (state.dataSurface->SurfMovInsulIntPresent(SurfNum)) {
+                            zone_info.Emissivity(ZoneSurfNum) = state.dataMaterial->Material(state.dataSurface->Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal;
                         }
                         if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
                             state.dataWindowEquivLayer->CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr).ISControlled) {
@@ -444,15 +437,8 @@ namespace HeatBalanceIntRadExchange {
         // then the matrices which are used to calculate interior radiation must be recalculated.
 
         MovableInsulationChange = false;
-        if (state.dataSurface->Surface(SurfNum).MaterialMovInsulInt > 0) {
-            Real64 HMovInsul; // "Resistance" value of movable insulation (if present)
-            Real64 AbsInt;    // Absorptivity of movable insulation material
-                              // (supercedes that of the construction if interior movable insulation is present)
-            HeatBalanceMovableInsulation::EvalInsideMovableInsulation(state, SurfNum, HMovInsul, AbsInt);
-        } else {
-            state.dataSurface->Surface(SurfNum).MovInsulIntPresent = false;
-        }
-        if ((state.dataSurface->Surface(SurfNum).MovInsulIntPresent != state.dataSurface->Surface(SurfNum).MovInsulIntPresentPrevTS)) {
+
+        if (state.dataSurface->SurfMovInsulIntPresent(SurfNum) != state.dataSurface->SurfMovInsulIntPresentPrevTS(SurfNum)) {
             auto const &thissurf(state.dataSurface->Surface(SurfNum));
             Real64 AbsorpDiff = std::abs(state.dataConstruction->Construct(thissurf.Construction).InsideAbsorpThermal -
                                          state.dataMaterial->Material(thissurf.MaterialMovInsulInt).AbsorpThermal);

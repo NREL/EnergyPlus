@@ -303,8 +303,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
 
     SurfNum = 1;
     state->dataSurface->Surface(1).MaterialMovInsulInt = 1;
-    state->dataSurface->Surface(1).MovInsulIntPresent = false;
-    state->dataSurface->Surface(1).MovInsulIntPresentPrevTS = false;
+    state->dataSurface->SurfMovInsulIntPresent(1) = false;
+    state->dataSurface->SurfMovInsulIntPresentPrevTS(1) = false;
     state->dataSurface->Surface(1).Construction = 1;
     state->dataSurface->Surface(1).MaterialMovInsulInt = 1;
     state->dataConstruction->Construct(1).InsideAbsorpThermal = 0.9;
@@ -319,13 +319,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     EXPECT_TRUE(DidMIChange);
 
     // Test 2: Movable insulation present and was also present in previous time step.  This should result in a false value since nothing has changed.
-    state->dataSurface->Surface(1).MovInsulIntPresentPrevTS = true;
+    state->dataSurface->SurfMovInsulIntPresentPrevTS(1) = true;
     HeatBalanceIntRadExchange::UpdateMovableInsulationFlag(*state, DidMIChange, SurfNum);
     EXPECT_TRUE(!DidMIChange);
 
     // Test 2: Movable insulation present but wasn't in previous time step.  However, the emissivity of the movable insulation and that of the
     // 		   construction are the same so nothing has actually changed.  This should result in a false value.
-    state->dataSurface->Surface(1).MovInsulIntPresentPrevTS = false;
+    state->dataSurface->SurfMovInsulIntPresentPrevTS(1) = false;
     state->dataMaterial->Material(1).AbsorpThermal = state->dataConstruction->Construct(1).InsideAbsorpThermal;
     HeatBalanceIntRadExchange::UpdateMovableInsulationFlag(*state, DidMIChange, SurfNum);
     EXPECT_TRUE(!DidMIChange);

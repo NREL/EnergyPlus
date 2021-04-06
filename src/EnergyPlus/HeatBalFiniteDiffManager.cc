@@ -102,7 +102,6 @@ namespace HeatBalFiniteDiffManager {
     using DataHeatBalSurface::MinSurfaceTempLimit;
     using DataSurfaces::Ground;
     // Fan system Source/Sink heat value, and source/sink location temp from CondFD
-    using HeatBalanceMovableInsulation::EvalOutsideMovableInsulation;
 
     void ManageHeatBalFiniteDiff(EnergyPlusData &state,
                                  int const SurfNum,
@@ -1080,10 +1079,7 @@ namespace HeatBalFiniteDiffManager {
         auto &GSloopCounter(surfaceFD.GSloopCounter);
         auto &MaxNodeDelTemp(surfaceFD.MaxNodeDelTemp);
 
-        Real64 HMovInsul;       // Equiv H for TIM layer,  Comes with call to
-        int RoughIndexMovInsul; // roughness  Movable insulation
-        Real64 AbsExt;          // exterior absorptivity  movable insulation
-        EvalOutsideMovableInsulation(state, Surf, HMovInsul, RoughIndexMovInsul, AbsExt);
+        Real64 HMovInsul = state.dataSurface->SurfMovInsulHExt(Surf);
         // Start stepping through the slab with time.
         for (int J = 1, J_end = nint(state.dataGlobal->TimeStepZoneSec / Delt); J <= J_end; ++J) { // PT testing higher time steps
 

@@ -645,8 +645,6 @@ namespace DataSurfaces {
         int MaterialMovInsulInt;       // Pointer to the material used for interior movable insulation
         int SchedMovInsulExt;          // Schedule for exterior movable insulation
         int SchedMovInsulInt;          // Schedule for interior movable insulation
-        bool MovInsulIntPresent;       // True when movable insulation is present
-        bool MovInsulIntPresentPrevTS; // True when movable insulation was present during the previous time step
         // Vertices
         Array1D<Vector> NewVertex;
         Vertices Vertex; // Surface Vertices are represented by Number of Sides and Vector (type)
@@ -768,7 +766,7 @@ namespace DataSurfaces {
               SchedShadowSurfIndex(0), ShadowSurfSchedVaries(false), ShadowingSurf(false), IsTransparent(false), SchedMinValue(0.0),
               ShadowSurfDiffuseSolRefl(0.0), ShadowSurfDiffuseVisRefl(0.0), ShadowSurfGlazingFrac(0.0), ShadowSurfGlazingConstruct(0),
               ShadowSurfPossibleObstruction(true), ShadowSurfPossibleReflector(false), ShadowSurfRecSurfNum(0), MaterialMovInsulExt(0),
-              MaterialMovInsulInt(0), SchedMovInsulExt(0), SchedMovInsulInt(0), MovInsulIntPresent(false), MovInsulIntPresentPrevTS(false),
+              MaterialMovInsulInt(0), SchedMovInsulExt(0), SchedMovInsulInt(0),
               Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0), lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0),
               NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0), CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true),
               IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0), shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0),
@@ -1292,7 +1290,6 @@ struct SurfacesData : BaseGlobalStruct
 {
     int TotSurfaces = 0;           // Total number of surfaces (walls, floors, roofs, windows, shading surfaces, etc.--everything)
     int TotWindows = 0;            // Total number of windows
-    int TotComplexWin = 0;         // Total number of windows with complex optical properties
     int TotStormWin = 0;           // Total number of storm window blocks
     int TotWinShadingControl = 0;  // Total number of window shading control blocks
     int TotIntConvCoeff = 0;       // Total number of interior convection coefficient (overrides)
@@ -1320,6 +1317,7 @@ struct SurfacesData : BaseGlobalStruct
     Real64 GroundLevelZ = 0.0;            // Z value of ground level for solar refl calc (m)
     bool AirflowWindows = false;          // TRUE if one or more airflow windows
     bool ShadingTransmittanceVaries = false;   // overall, shading transmittance varies for the building
+    bool AnyMovableInsulation = false;         // True if any movable insulation presents
     Array1D_int InsideGlassCondensationFlag;   // 1 if innermost glass inside surface temp < zone air dew point;  0 otherwise
     Array1D_int InsideFrameCondensationFlag;   // 1 if frame inside surface temp < zone air dew point; 0 otherwise
     Array1D_int InsideDividerCondensationFlag; // 1 if divider inside surface temp < zone air dew point;  0 otherwise
@@ -1327,46 +1325,33 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> X0;                        // X-component of translation vector
     Array1D<Real64> Y0;                        // Y-component of translation vector
     Array1D<Real64> Z0;                        // Z-component of translation vector
+
     Array1D<Real64> EnclSolDB;                 // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces
-    Array1D<Real64>
-        EnclSolDBSSG; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
+    Array1D<Real64> EnclSolDBSSG;              // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
+    Array1D<Real64> EnclSolDBIntWin;           // Value of factor for beam solar entering a zone through interior windows (considered to contribute to diffuse in zone)
+
     Array1D<Real64> SurfOpaqAI;             // Time step value of factor for beam absorbed on inside of opaque surface
     Array1D<Real64> SurfOpaqAO;             // Time step value of factor for beam absorbed on outside of opaque surface
     Array1D<Real64> SurfBmToBmReflFacObs;   // Factor for incident solar from specular beam refl from obstructions (W/m2)/(W/m2)
     Array1D<Real64> SurfBmToDiffReflFacObs; // Factor for incident solar from diffuse beam refl from obstructions (W/m2)/(W/m2)
     Array1D<Real64> SurfBmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
     Array1D<Real64> SurfSkyDiffReflFacGnd;  // sky diffuse reflection view factors from ground
-    Array2D<Real64> SurfWinA;               // Time step value of factor for beam absorbed in window glass layers
+    Array1D<Real64> AirSkyRadSplit;         // Fractional split between the air and  the sky for radiation from the surface
+                                            // Fraction of sky IR coming from sky itself; 1-AirSkyRadSplit comes from the atmosphere.
+    Array2D<Real64> CosIncAveBmToBmSolObs;
+    Array2D<Real64> SUNCOSHR = Array2D<Real64>(24, 3, 0.0); // Hourly values of SUNCOS (solar direction cosines)
+                                                           // Autodesk: Init Zero-initialization added to avoid use uninitialized
+    Array1D<Real64> SurfSunlitArea;  // Sunlit area by surface number
+    Array1D<Real64> SurfSunlitFrac;  // Sunlit fraction by surface number
+    Array1D<Real64> SurfSkySolarInc; // Incident diffuse solar from sky; if CalcSolRefl is true, includes reflection of sky diffuse and beam solar from exterior obstructions [W/m2]
+    Array1D<Real64> SurfGndSolarInc; // Incident diffuse solar from ground; if CalcSolRefl is true, accounts for shadowing of ground by building and obstructions [W/m2]
 
-    // Time step value of factor for diffuse absorbed in window layers
-    Array2D<Real64> SurfWinADiffFront;
-    Array2D<Real64> SurfWinADiffBack;
 
-    Array2D<Real64> SurfWinACFOverlap; // Time step value of factor for beam
-    // absorbed in window glass layers which comes from other windows
-    // It happens sometimes that beam enters one window and hits back of
-    // second window. It is used in complex fenestration only
-
-    Array1D<Real64> AirSkyRadSplit; // Fractional split between the air and
-    // the sky for radiation from the surface
-    // Fraction of sky IR coming from sky itself; 1-AirSkyRadSplit comes from the atmosphere.
-
-    Array2D<Real64> SUNCOSHR = Array2D<Real64>(
-        24, 3, 0.0); // Hourly values of SUNCOS (solar direction cosines), Autodesk: Init Zero-initialization added to avoid use uninitialized
     Array2D<Real64> ReflFacBmToDiffSolObs;
     Array2D<Real64> ReflFacBmToDiffSolGnd;
     Array2D<Real64> ReflFacBmToBmSolObs;
     Array1D<Real64> ReflFacSkySolObs;
     Array1D<Real64> ReflFacSkySolGnd;
-    Array2D<Real64> CosIncAveBmToBmSolObs;
-    Array1D<Real64>
-        EnclSolDBIntWin; // Value of factor for beam solar entering a zone through interior windows (considered to contribute to diffuse in zone)
-    Array1D<Real64> SurfSunlitArea;  // Sunlit area by surface number
-    Array1D<Real64> SurfSunlitFrac;  // Sunlit fraction by surface number
-    Array1D<Real64> SurfSkySolarInc; // Incident diffuse solar from sky; if CalcSolRefl is true, includes reflection of sky diffuse and beam solar
-                                     // from exterior obstructions [W/m2]
-    Array1D<Real64> SurfGndSolarInc; // Incident diffuse solar from ground; if CalcSolRefl is true, accounts for shadowing of ground by building and
-                                     // obstructions [W/m2]
 
     std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
     std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
@@ -1374,15 +1359,28 @@ struct SurfacesData : BaseGlobalStruct
     std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
     std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
 
+    // Surface Heat Balance
+    Array1D<bool> SurfMovInsulIntPresent;       // True when interior movable insulation is present
+    Array1D<bool> SurfMovInsulIntPresentPrevTS; // True when interior movable insulation was present during the previous time step
+    Array1D<Real64> SurfMovInsulHExt;       // Resistance or "h" value of exterior movable insulation
+    Array1D<Real64> SurfMovInsulAbsExt;     // Absorptivity of exterior movable insulation if present
+    Array1D<Real64> SurfMovInsulHInt;       // Resistance or "h" value of interior movable insulation
+    Array1D<Real64> SurfMovInsulAbsInt;     // Absorptivity of interior movable insulation if present
+
     // Surface Window Heat Balance
+    Array2D<Real64> SurfWinA;          // Time step value of factor for beam absorbed in window glass layers
+    Array2D<Real64> SurfWinADiffFront;
+    Array2D<Real64> SurfWinADiffBack;
+    Array2D<Real64> SurfWinACFOverlap; // Time step value of factor for beam absorbed in window glass layers which comes from other windows
+                                       // It happens sometimes that beam enters one window and hits back ofsecond window. It is used in complex fenestration only
     Array1D<Real64> SurfWinTransSolar; // Exterior beam plus diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
     Array1D<Real64> SurfWinBmSolar;    // Exterior beam solar transmitted through window, or window plus blind, into zone (W)
     Array1D<Real64> SurfWinBmBmSolar;  // Exterior beam-to-beam solar transmitted through window, or window plus blind, into zone (W)
     Array1D<Real64> SurfWinBmDifSolar; // Exterior beam-to-diffuse solar transmitted through window, or window plus blind, into zone (W)
     Array1D<Real64> SurfWinDifSolar;   // Exterior diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
     Array1D<Real64> SurfWinHeatGain;   // Total heat gain from window = WinTransSolar + (IR and convection from glazing, or,
-    // if interior shade, IR and convection from zone-side of shade plus gap air convection to zone) +
-    // (IR convection from frame) + (IR and convection from divider if no interior shade) (W)
+                                       // if interior shade, IR and convection from zone-side of shade plus gap air convection to zone) +
+                                       // (IR convection from frame) + (IR and convection from divider if no interior shade) (W)
     Array1D<Real64> SurfWinHeatTransfer;              // Total heat transfer through the window = WinTransSolar + conduction through glazing and frame
     Array1D<Real64> SurfWinHeatGainRep;               // Equals WinHeatGain when WinHeatGain >= 0.0
     Array1D<Real64> SurfWinHeatLossRep;               // Equals -WinHeatGain when WinHeatGain < 0.0
@@ -1394,8 +1392,7 @@ struct SurfacesData : BaseGlobalStruct
                                                          // and the shade   (W)
     Array1D<Real64> SurfWinGainConvShadeToZoneRep;       // component of WinHeatGain convect to zone from front shade (W)
     Array1D<Real64> SurfWinGainIRShadeToZoneRep;         // component of WinHeatGain net IR to zone from front shade (W)
-    Array1D<Real64>
-        SurfWinOtherConvGainInsideFaceToZoneRep; // net imbalance of convection heat gain from equivalent Layer window inside face to zone air
+    Array1D<Real64> SurfWinOtherConvGainInsideFaceToZoneRep; // net imbalance of convection heat gain from equivalent Layer window inside face to zone air
     Array1D<Real64> SurfWinGapConvHtFlowRep;     // Convective heat flow from gap in airflow window (W)
     Array1D<Real64> SurfWinShadingAbsorbedSolar; // Exterior beam plus diffuse solar absorbed by window shading device (W)
     Array1D<Real64> SurfWinSysSolTransmittance;  // Effective solar transmittance of window + shading device, if present
@@ -1457,8 +1454,7 @@ struct SurfacesData : BaseGlobalStruct
                                                     // incident on the outside of the frame per m2 of frame (-)
     Array1D<Real64> SurfWinInsRevealDiffOntoFrame;  // Multiplied by BeamSolarRad, gives diffuse from beam reflection from inside reveal that is
                                                     // incident on the outside of the frame per m2 of frame (-) for debugging CR 7596. TH 5/26/2009
-    Array1D<Real64>
-        SurfWinInsRevealDiffOntoGlazingReport;            // Diffuse solar from beam reflection from inside reveal that is incident on the glazing (W)
+    Array1D<Real64> SurfWinInsRevealDiffOntoGlazingReport; // Diffuse solar from beam reflection from inside reveal that is incident on the glazing (W)
     Array1D<Real64> SurfWinInsRevealDiffIntoZoneReport;   // Diffuse from beam reflection from inside reveal that goes into zone directly or reflected
                                                           // from glazing (W)
     Array1D<Real64> SurfWinInsRevealDiffOntoFrameReport;  // Diffuse from beam reflection from inside reveal that is incident on the frame (W)
@@ -1471,14 +1467,12 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<DataSurfaces::WinShadingType> SurfWinShadingFlag; // -1: window has no shading device
     Array1D<bool> SurfWinShadingFlagEMSOn;                    // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
     Array1D<int> SurfWinShadingFlagEMSValue;                  // EMS control value for Shading Flag
-    Array1D<int>
-        SurfWinStormWinFlag; // -1: Storm window not applicable; 0: Window has storm window but it is off 1: Window has storm window and it is on
-    Array1D<int> SurfWinStormWinFlagPrevDay; // Previous time step value of StormWinFlag
-    Array1D<Real64>
-        SurfWinFracTimeShadingDeviceOn; // For a single time step, = 0.0 if no shading device or shading device is off = 1.0 if shading device is on;
-                                        // For time intervals longer than a time step, = fraction of time that shading device is on.
-    Array1D<DataSurfaces::WinShadingType>
-        SurfWinExtIntShadePrevTS;              // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
+    Array1D<int> SurfWinStormWinFlag;               // -1: Storm window not applicable;
+                                                    // 0: Window has storm window but it is off 1: Window has storm window and it is on
+    Array1D<int> SurfWinStormWinFlagPrevDay;        // Previous time step value of StormWinFlag
+    Array1D<Real64> SurfWinFracTimeShadingDeviceOn; // For a single time step, = 0.0 if no shading device or shading device is off = 1.0 if shading device is on;
+                                                    // For time intervals longer than a time step, = fraction of time that shading device is on.
+    Array1D<DataSurfaces::WinShadingType> SurfWinExtIntShadePrevTS; // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
     Array1D<bool> SurfWinHasShadeOrBlindLayer; // mark as true if the window construction has a shade or a blind layer
     Array1D<bool> SurfWinSurfDayLightInit;     // surface has been initialized for following 5 arrays
     Array1D<int> SurfWinDaylFacPoint;          // Pointer to daylight factors for the window
@@ -1489,8 +1483,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinRhoCeilingWall;     // Average interior reflectance seen by light moving up across horizontal plane thru center of window
     Array1D<Real64> SurfWinRhoFloorWall;       // Same as above, but for light moving down
     Array1D<Real64> SurfWinFractionUpgoing;    // Fraction light entering window that goes upward
-    Array1D<Real64>
-        SurfWinVisTransRatio; // For windows with switchable glazing, ratio of normal transmittance in switched state to that in unswitched state
+    Array1D<Real64> SurfWinVisTransRatio;      // For windows with switchable glazing, ratio of normal transmittance
+                                               // in switched state to that in unswitched state
     Array1D<Real64> SurfWinFrameArea;                  // Frame projected area (m2)
     Array1D<Real64> SurfWinFrameConductance;           // Frame conductance [no air films] (W/m2-K)
     Array1D<Real64> SurfWinFrameSolAbsorp;             // Frame solar absorptance (assumed same inside and outside)
@@ -1527,8 +1521,7 @@ struct SurfacesData : BaseGlobalStruct
                                              // apportioned to the two faces
     Array1D<Real64> SurfWinShadeAbsFacFace2; // Fraction of short-wave radiation incident that is absorbed by face 2 when total absorbed radiation is
                                              // apportioned to the two faces
-    Array1D<Real64>
-        SurfWinConvCoeffWithShade; // Convection coefficient from glass or shade to gap air when interior or exterior shade is present (W/m2-K)
+    Array1D<Real64> SurfWinConvCoeffWithShade; // Convection coeff from glass or shade to gap air when interior or exterior shade is present (W/m2-K)
     Array1D<Real64> SurfWinOtherConvHeatGain; // other convective = total conv - standard model prediction for EQL window model (W)
     Array1D<int> SurfWinBlindNumber;          // Blind number for a window with a blind
     Array1D<Real64> SurfWinEffInsSurfTemp; // Effective inside surface temperature for window with interior blind or shade; combination of shade/blind
@@ -1609,7 +1602,6 @@ struct SurfacesData : BaseGlobalStruct
     {
         this->TotSurfaces = 0;
         this->TotWindows = 0;
-        this->TotComplexWin = 0;
         this->TotStormWin = 0;
         this->TotWinShadingControl = 0;
         this->TotIntConvCoeff = 0;
@@ -1637,6 +1629,7 @@ struct SurfacesData : BaseGlobalStruct
         this->GroundLevelZ = 0.0;
         this->AirflowWindows = false;
         this->ShadingTransmittanceVaries = false;
+        this->AnyMovableInsulation = false;
         this->InsideGlassCondensationFlag.deallocate();
         this->InsideFrameCondensationFlag.deallocate();
         this->InsideDividerCondensationFlag.deallocate();
@@ -1652,6 +1645,13 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfBmToDiffReflFacObs.deallocate();
         this->SurfBmToDiffReflFacGnd.deallocate();
         this->SurfSkyDiffReflFacGnd.deallocate();
+        this->SurfMovInsulIntPresent.deallocate();
+        this->SurfMovInsulIntPresentPrevTS.deallocate();
+        this->SurfMovInsulHExt.deallocate();
+        this->SurfMovInsulAbsExt.deallocate();
+        this->SurfMovInsulHInt.deallocate();
+        this->SurfMovInsulAbsInt.deallocate();
+
         this->SurfWinA.deallocate();
         this->SurfWinADiffFront.deallocate();
         this->SurfWinADiffBack.deallocate();

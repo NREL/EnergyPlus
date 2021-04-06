@@ -5550,7 +5550,7 @@ namespace HeatBalanceManager {
             HeatBalanceSurfaceManager::InitEMSControlledSurfaceProperties(state);
         }
 
-
+        // Init storm window pointers
         if (state.dataSurface->TotStormWin > 0) {
             if (state.dataGlobal->BeginDayFlag) {
                 SetStormWindowControl(state);
@@ -5570,6 +5570,12 @@ namespace HeatBalanceManager {
             } else {
                 state.dataSurface->SurfWinActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
             }
+        }
+
+        // Calc movable insulation properties
+        if (state.dataSurface->AnyMovableInsulation) {
+            EvalOutsideMovableInsulation(state);
+            EvalInsideMovableInsulation(state);
         }
 
         if (state.dataGlobal->BeginSimFlag && state.dataGlobal->DoWeathSim && state.dataSysVars->ReportExtShadingSunlitFrac) {
@@ -5692,6 +5698,79 @@ namespace HeatBalanceManager {
                         state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowEQLModel) {
                         state.dataSurface->SurfWinWindowModelType(SurfNum) = DataSurfaces::Window5DetailedModel;
                     }
+                }
+            }
+        }
+    }
+
+    void EvalOutsideMovableInsulation(EnergyPlusData &state)
+    {
+        // This subroutine determines whether or not outside movable insulation on opaque surfaces is present at the current time.
+        // The SurfNum is passed in and then the rest of the parameters are set if movable insulation is present.
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
+            for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
+                Real64 MovInsulSchedVal = GetCurrentScheduleValue(state, state.dataSurface->Surface(SurfNum).SchedMovInsulExt);
+                if (MovInsulSchedVal <= 0) continue;
+
+                auto const MaterialIndex(state.dataSurface->Surface(SurfNum).MaterialMovInsulExt);
+                // TODO: can this be checked at input?
+                // Double check resistance and conductivity to avoid divide by zero problems
+                if ((state.dataMaterial->Material(MaterialIndex).Resistance) <= 0.0) {
+                    if ((state.dataMaterial->Material(MaterialIndex).Conductivity) > 0.0) {
+                        state.dataMaterial->Material(MaterialIndex).Resistance =
+                                state.dataMaterial->Material(state.dataSurface->Surface(SurfNum).MaterialMovInsulExt).Thickness /
+                                state.dataMaterial->Material(state.dataSurface->Surface(SurfNum).MaterialMovInsulExt).Conductivity;
+                    } else {
+                        ShowFatalError(state,
+                                       "EvalOutsideMovableInsulation: No resistance or conductivity found for material " +
+                                       state.dataMaterial->Material(state.dataSurface->Surface(SurfNum).MaterialMovInsulExt).Name);
+                    }
+                }
+                state.dataSurface->SurfMovInsulHExt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex).Resistance);
+                auto const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex).Group);
+                if (MaterialGroupNum == DataHeatBalance::WindowGlass || MaterialGroupNum == DataHeatBalance::GlassEquivalentLayer) {
+                    state.dataSurface->SurfMovInsulAbsExt(SurfNum) = max(0.0, 1.0 - state.dataMaterial->Material(MaterialIndex).Trans -
+                                                                              state.dataMaterial->Material(MaterialIndex).ReflectSolBeamFront);
+                } else {
+                    state.dataSurface->SurfMovInsulAbsExt(SurfNum) = state.dataMaterial->Material(MaterialIndex).AbsorpSolar;
+                }
+            }
+        }
+    }
+
+    void EvalInsideMovableInsulation(EnergyPlusData &state)
+    {
+
+        // This subroutine determines whether or not inside movable insulation is present at the current time.
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
+            for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
+                Real64 MovInsulSchedVal = GetCurrentScheduleValue(state, state.dataSurface->Surface(SurfNum).SchedMovInsulInt);
+                if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
+                    state.dataSurface->SurfMovInsulIntPresent(SurfNum) = false;
+                    continue;
+                }
+                auto const MaterialIndex(state.dataSurface->Surface(SurfNum).MaterialMovInsulInt);
+
+                state.dataSurface->SurfMovInsulIntPresent(SurfNum) = true;
+                int const &thisMovableInt = state.dataSurface->Surface(SurfNum).MaterialMovInsulInt;
+                if ((state.dataMaterial->Material(thisMovableInt).Resistance) <= 0.0) {
+                    if (state.dataMaterial->Material(thisMovableInt).Conductivity > 0.0 && state.dataMaterial->Material(thisMovableInt).Thickness > 0.0) {
+                        state.dataMaterial->Material(thisMovableInt).Resistance = state.dataMaterial->Material(thisMovableInt).Thickness / state.dataMaterial->Material(thisMovableInt).Conductivity;
+                    } else {
+                        ShowFatalError(state, "EvalInsideMovableInsulation: No resistance found for material " + state.dataMaterial->Material(MaterialIndex).Name);
+                    }
+                }
+
+                state.dataSurface->SurfMovInsulHInt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex).Resistance);
+                auto const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex).Group);
+                if (MaterialGroupNum == DataHeatBalance::WindowGlass || MaterialGroupNum == DataHeatBalance::GlassEquivalentLayer) {
+                    state.dataSurface->SurfMovInsulAbsInt(SurfNum) = max(0.0, 1.0 - state.dataMaterial->Material(MaterialIndex).Trans - state.dataMaterial->Material(MaterialIndex).ReflectSolBeamFront);
+                } else {
+                    state.dataSurface->SurfMovInsulAbsInt(SurfNum) = state.dataMaterial->Material(MaterialIndex).AbsorpSolar;
                 }
             }
         }
@@ -5936,7 +6015,7 @@ namespace HeatBalanceManager {
         // Update interior movable insulation flag--needed at the end of a zone time step so that the interior radiant
         // exchange algorithm knows whether there has been a change in interior movable insulation or not.
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            state.dataSurface->Surface(SurfNum).MovInsulIntPresentPrevTS = state.dataSurface->Surface(SurfNum).MovInsulIntPresent;
+            state.dataSurface->SurfMovInsulIntPresentPrevTS(SurfNum) = state.dataSurface->SurfMovInsulIntPresent(SurfNum);
         }
 
         // For non-complex windows, update a report variable so this shows up in the output as something other than zero

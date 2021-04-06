@@ -186,6 +186,11 @@ namespace HeatBalanceManager {
 
     void InitConductionTransferFunctions(EnergyPlusData &state);
 
+    void EvalOutsideMovableInsulation(EnergyPlusData &state);
+
+    void EvalInsideMovableInsulation(EnergyPlusData &state);
+
+
 } // namespace HeatBalanceManager
 
 struct HeatBalanceMgrData : BaseGlobalStruct
