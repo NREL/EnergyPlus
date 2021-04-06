@@ -184,7 +184,7 @@ namespace Psychrometrics {
 #endif
     }
 
-    void ShowPsychrometricSummary([[maybe_unused]] EnergyPlusData &state, InputOutputFile &auditFile)
+    void ShowPsychrometricSummary([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] InputOutputFile &auditFile)
     {
 
         // SUBROUTINE INFORMATION:
