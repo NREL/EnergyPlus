@@ -285,11 +285,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataSurface->Surface(1).MaterialMovInsulInt = 1;
     state->dataMaterial->Material(1).AbsorpThermal = 0.2;
     state->dataMaterial->Material(1).AbsorpSolar = 0.5;
-
-    state->dataSurface->Surface(1).SchedMovInsulInt =
-        -1; // According to schedule manager protocol, an index of -1 returns a 1.0 value for the schedule
-    state->dataMaterial->Material(1).Resistance = 1.25;
-
+    state->dataSurface->SurfMovInsulHInt.allocate(1);
+    state->dataSurface->SurfMovInsulHInt(1) = 1.0;
     ComputeIntThermalAbsorpFactors(*state);
 
     EXPECT_EQ(0.2, state->dataHeatBal->ITABSF(1));
@@ -770,6 +767,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataMstBal->HConvInFD.allocate(6);
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
+    state->dataSurface->SurfMovInsulHInt.dimension(state->dataSurface->TotSurfaces, 0.0);
+    state->dataSurface->SurfMovInsulIntPresent.dimension(state->dataSurface->TotSurfaces, false);
 
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
@@ -807,6 +806,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataMstBal->HConvInFD.deallocate();
     state->dataMstBal->RhoVaporAirIn.deallocate();
     state->dataMstBal->HMassConvInFD.deallocate();
+    state->dataSurface->SurfMovInsulHInt.deallocate();
+    state->dataSurface->SurfMovInsulIntPresent.deallocate();
     state->dataHeatBalFanSys->ZoneLatentGain.deallocate();
     state->dataHeatBal->ZoneWinHeatGain.deallocate();
     state->dataHeatBal->ZoneWinHeatGainRep.deallocate();
@@ -1306,6 +1307,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataMstBal->HConvInFD.allocate(6);
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
+    state->dataSurface->SurfMovInsulHInt.dimension(state->dataSurface->TotSurfaces, 0.0);
+    state->dataSurface->SurfMovInsulIntPresent.dimension(state->dataSurface->TotSurfaces, false);
+    state->dataSurface->SurfMovInsulHExt.dimension(state->dataSurface->TotSurfaces, 0.0);
 
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
@@ -1878,6 +1882,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataMstBal->HConvInFD.allocate(6);
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
+    state->dataSurface->SurfMovInsulHInt.dimension(state->dataSurface->TotSurfaces, 0.0);
+    state->dataSurface->SurfMovInsulIntPresent.dimension(state->dataSurface->TotSurfaces, false);
+    state->dataSurface->SurfMovInsulHExt.dimension(state->dataSurface->TotSurfaces, 0.0);
 
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
@@ -2453,6 +2460,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataMstBal->HConvInFD.allocate(6);
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
+    state->dataSurface->SurfMovInsulHInt.dimension(state->dataSurface->TotSurfaces, 0.0);
+    state->dataSurface->SurfMovInsulHExt.dimension(state->dataSurface->TotSurfaces, 0.0);
+    state->dataSurface->SurfMovInsulIntPresent.dimension(state->dataSurface->TotSurfaces, false);
 
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
@@ -2492,6 +2502,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataMstBal->HConvInFD.deallocate();
     state->dataMstBal->RhoVaporAirIn.deallocate();
     state->dataMstBal->HMassConvInFD.deallocate();
+    state->dataSurface->SurfMovInsulHInt.deallocate();
+    state->dataSurface->SurfMovInsulHExt.deallocate();
+    state->dataSurface->SurfMovInsulIntPresent.deallocate();
     state->dataHeatBalFanSys->ZoneLatentGain.deallocate();
     state->dataHeatBal->ZoneWinHeatGain.deallocate();
     state->dataHeatBal->ZoneWinHeatGainRep.deallocate();
@@ -2503,43 +2516,32 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestReportIntMovInsInsideSur
 
     Real64 ExpectedResult1;
     Real64 ExpectedResult2;
-    Real64 ExpectedResult3;
 
     state->dataSurface->TotSurfaces = 3;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBalSurf->TempSurfIn.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBalSurf->TempSurfInTmp.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBalSurf->TempSurfInMovInsRep.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfMovInsulIntPresent.allocate(state->dataSurface->TotSurfaces);
 
     // Test 1 Data: Surface does NOT have movable insulation
-    state->dataSurface->Surface(1).MaterialMovInsulInt = 0; // No material means no movable insulation
-    state->dataSurface->Surface(1).SchedMovInsulInt = 0;    // Schedule index of zero returns zero value (not scheduled)
+    state->dataSurface->SurfMovInsulIntPresent(1) = false; // No movable insulation
     state->dataHeatBalSurf->TempSurfIn(1) = 23.0;
     state->dataHeatBalSurf->TempSurfInTmp(1) = 12.3;
     state->dataHeatBalSurf->TempSurfInMovInsRep(1) = 1.23;
     ExpectedResult1 = 23.0; // TempSurfInMovInsRep should be set to TempSurfIn
 
-    // Test 2 Data: Surface does have movable insulation but it is scheduled OFF
-    state->dataSurface->Surface(2).MaterialMovInsulInt = 1; // Material index present means there is movable insulation
-    state->dataSurface->Surface(2).SchedMovInsulInt = 0;    // Schedule index of zero returns zero value (not scheduled)
+    // Test 2 Data: Surface has movable insulation
+    state->dataSurface->SurfMovInsulIntPresent(2) = true;
     state->dataHeatBalSurf->TempSurfIn(2) = 123.0;
     state->dataHeatBalSurf->TempSurfInTmp(2) = 12.3;
     state->dataHeatBalSurf->TempSurfInMovInsRep(2) = 1.23;
-    ExpectedResult2 = 123.0; // TempSurfInMovInsRep should be set to TempSurfIn
-
-    // Test 3 Data: Surface does have movable insulation and it is scheduled ON
-    state->dataSurface->Surface(3).MaterialMovInsulInt = 1; // Material index present means there is movable insulation
-    state->dataSurface->Surface(3).SchedMovInsulInt = -1;   // Schedule index of -1 returns 1.0 value
-    state->dataHeatBalSurf->TempSurfIn(3) = 12.3;
-    state->dataHeatBalSurf->TempSurfInTmp(3) = 1.23;
-    state->dataHeatBalSurf->TempSurfInMovInsRep(3) = -9999.9;
-    ExpectedResult3 = 1.23; // TempSurfInMovInsRep should be set to TempSurfInTmp
+    ExpectedResult2 = 12.3; // TempSurfInMovInsRep should be set to TempSurfIn
 
     // Now call the subroutine which will run all of the test cases at once and then make the comparisons
     HeatBalanceSurfaceManager::ReportIntMovInsInsideSurfTemp(*state);
     EXPECT_NEAR(state->dataHeatBalSurf->TempSurfInMovInsRep(1), ExpectedResult1, 0.00001);
     EXPECT_NEAR(state->dataHeatBalSurf->TempSurfInMovInsRep(2), ExpectedResult2, 0.00001);
-    EXPECT_NEAR(state->dataHeatBalSurf->TempSurfInMovInsRep(3), ExpectedResult3, 0.00001);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_OutsideSurfHeatBalanceWhenRainFlag)

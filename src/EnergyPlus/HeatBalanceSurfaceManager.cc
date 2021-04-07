@@ -96,7 +96,6 @@
 #include <EnergyPlus/HeatBalanceHAMTManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
-#include <EnergyPlus/HeatBalanceMovableInsulation.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -2327,7 +2326,6 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
     // Using/Aliasing
     using SolarShading::CalcInteriorSolarDistribution;
-    using namespace HeatBalanceMovableInsulation;
     using DaylightingDevices::TransTDD;
     using General::InterpSw;
     using General::POLYF;
@@ -3452,7 +3450,6 @@ void InitIntSolarDistribution(EnergyPlusData &state)
 
     // Using/Aliasing
     using General::InterpSw;
-    using namespace HeatBalanceMovableInsulation;
     using DaylightingDevices::DistributeTDDAbsorbedSolar;
     using namespace DataWindowEquivalentLayer;
     // Locals
@@ -3952,7 +3949,6 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
     // REFERENCES:
     // BLAST Routine: CITAF - Compute Interior Thermal Absorption Factors
 
-    using namespace HeatBalanceMovableInsulation;
     using General::InterpSw;
     auto &Surface(state.dataSurface->Surface);
 
@@ -4107,7 +4103,6 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
     // BLAST Routine - CIVAF - Compute Surface Absorption Factors For Short Wave Radiation
     //                         From Zone Lights And Diffuse Solar.
     // Using/Aliasing
-    using namespace HeatBalanceMovableInsulation;
     using General::InterpSw;
     using namespace DataWindowEquivalentLayer;
 
@@ -5651,14 +5646,10 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
 
 void ReportIntMovInsInsideSurfTemp(EnergyPlusData &state)
 {
-    int SurfNum;
-    auto &Surface(state.dataSurface->Surface);
     state.dataHeatBalSurf->TempSurfInMovInsRep = state.dataHeatBalSurf->TempSurfIn;
-    for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        if (Surface(SurfNum).MaterialMovInsulInt > 0) {
-            if (GetCurrentScheduleValue(state, Surface(SurfNum).SchedMovInsulInt) > 0.0) {
-                state.dataHeatBalSurf->TempSurfInMovInsRep(SurfNum) = state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
-            }
+    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        if (state.dataSurface->SurfMovInsulIntPresent(SurfNum)) {
+            state.dataHeatBalSurf->TempSurfInMovInsRep(SurfNum) = state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
         }
     }
 }

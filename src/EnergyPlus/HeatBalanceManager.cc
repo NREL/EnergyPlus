@@ -5715,21 +5715,9 @@ namespace HeatBalanceManager {
                 if (MovInsulSchedVal <= 0) continue;
 
                 auto const MaterialIndex(state.dataSurface->Surface(SurfNum).MaterialMovInsulExt);
-                // TODO: can this be checked at input?
-                // Double check resistance and conductivity to avoid divide by zero problems
-                if ((state.dataMaterial->Material(MaterialIndex).Resistance) <= 0.0) {
-                    if ((state.dataMaterial->Material(MaterialIndex).Conductivity) > 0.0) {
-                        state.dataMaterial->Material(MaterialIndex).Resistance =
-                                state.dataMaterial->Material(state.dataSurface->Surface(SurfNum).MaterialMovInsulExt).Thickness /
-                                state.dataMaterial->Material(state.dataSurface->Surface(SurfNum).MaterialMovInsulExt).Conductivity;
-                    } else {
-                        ShowFatalError(state,
-                                       "EvalOutsideMovableInsulation: No resistance or conductivity found for material " +
-                                       state.dataMaterial->Material(state.dataSurface->Surface(SurfNum).MaterialMovInsulExt).Name);
-                    }
-                }
-                state.dataSurface->SurfMovInsulHExt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex).Resistance);
                 auto const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex).Group);
+
+                state.dataSurface->SurfMovInsulHExt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex).Resistance);
                 if (MaterialGroupNum == DataHeatBalance::WindowGlass || MaterialGroupNum == DataHeatBalance::GlassEquivalentLayer) {
                     state.dataSurface->SurfMovInsulAbsExt(SurfNum) = max(0.0, 1.0 - state.dataMaterial->Material(MaterialIndex).Trans -
                                                                               state.dataMaterial->Material(MaterialIndex).ReflectSolBeamFront);
@@ -5742,7 +5730,6 @@ namespace HeatBalanceManager {
 
     void EvalInsideMovableInsulation(EnergyPlusData &state)
     {
-
         // This subroutine determines whether or not inside movable insulation is present at the current time.
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
@@ -5754,19 +5741,9 @@ namespace HeatBalanceManager {
                     continue;
                 }
                 auto const MaterialIndex(state.dataSurface->Surface(SurfNum).MaterialMovInsulInt);
-
-                state.dataSurface->SurfMovInsulIntPresent(SurfNum) = true;
-                int const &thisMovableInt = state.dataSurface->Surface(SurfNum).MaterialMovInsulInt;
-                if ((state.dataMaterial->Material(thisMovableInt).Resistance) <= 0.0) {
-                    if (state.dataMaterial->Material(thisMovableInt).Conductivity > 0.0 && state.dataMaterial->Material(thisMovableInt).Thickness > 0.0) {
-                        state.dataMaterial->Material(thisMovableInt).Resistance = state.dataMaterial->Material(thisMovableInt).Thickness / state.dataMaterial->Material(thisMovableInt).Conductivity;
-                    } else {
-                        ShowFatalError(state, "EvalInsideMovableInsulation: No resistance found for material " + state.dataMaterial->Material(MaterialIndex).Name);
-                    }
-                }
-
-                state.dataSurface->SurfMovInsulHInt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex).Resistance);
                 auto const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex).Group);
+                state.dataSurface->SurfMovInsulIntPresent(SurfNum) = true;
+                state.dataSurface->SurfMovInsulHInt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex).Resistance);
                 if (MaterialGroupNum == DataHeatBalance::WindowGlass || MaterialGroupNum == DataHeatBalance::GlassEquivalentLayer) {
                     state.dataSurface->SurfMovInsulAbsInt(SurfNum) = max(0.0, 1.0 - state.dataMaterial->Material(MaterialIndex).Trans - state.dataMaterial->Material(MaterialIndex).ReflectSolBeamFront);
                 } else {
