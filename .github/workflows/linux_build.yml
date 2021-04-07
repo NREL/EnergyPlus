@@ -66,8 +66,6 @@ jobs:
                 -DUSE_PSYCHROMETRICS_CACHING=OFF \
                 -DUSE_GLYCOL_CACHING=OFF \
                 -DOPENGL_REQUIRED=OFF \
-                -DUSE_PSYCH_STATS=ON \
-                -DUSE_PSYCH_ERRORS=OFF \
                 ../
 
       - name: Build EnergyPlus
