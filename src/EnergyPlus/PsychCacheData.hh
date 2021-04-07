@@ -52,6 +52,8 @@
 
 namespace EnergyPlus {
 
+constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychrometric routines that
+
 #ifdef EP_nocache_Psychrometrics
 #undef EP_cache_PsyTwbFnTdbWPb
 #undef EP_cache_PsyPsatFnTemp
@@ -136,6 +138,11 @@ struct PsychrometricCacheData : BaseGlobalStruct
     Array1D<cached_tsat_h_pb> cached_Tsat_HPb; // DIMENSION(0:tsat_hbp_cache_size)
 #endif
 
+#ifdef EP_psych_stats
+    Array1D<Int64> NumTimesCalled = Array1D<Int64>(NumPsychMonitors, 0);
+    Array1D_int NumIterations = Array1D_int(NumPsychMonitors, 0);
+#endif
+
     void clear_state() override
     {
 #ifdef EP_cache_PsyTwbFnTdbWPb
@@ -149,6 +156,10 @@ struct PsychrometricCacheData : BaseGlobalStruct
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
         cached_Tsat_HPb.clear();
+#endif
+#ifdef EP_psych_stats
+        NumTimesCalled = Array1D<Int64>(NumPsychMonitors, 0);
+        NumIterations = Array1D_int(NumPsychMonitors, 0);
 #endif
     }
 };
