@@ -239,13 +239,12 @@ template <typename T> inline Array1D<T> pack(Array1<T> const &a, EPVector<bool> 
 
 template <typename T> inline T magnitude_squared(const EPVector<T> &v)
 {
-    // note this is a bug, and we'll have to fix it later
-    return std::inner_product(v.begin(), v.end(), v.begin(), 0);
+    return std::inner_product(v.begin(), v.end(), v.begin(), T{});
 }
 
 template <typename T, typename V> inline T dot(const EPVector<T> &u, const V &v)
 {
-    return std::inner_product(u.begin(), u.end(), v.begin(), 0);
+    return std::inner_product(u.begin(), u.end(), v.begin(), T{});
 }
 
 template <typename Element, typename Member> inline Member maxval(EPVector<Element> const &a, Member Element::*pmem)
