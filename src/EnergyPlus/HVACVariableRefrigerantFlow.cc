@@ -873,7 +873,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
             OutdoorCoildw = max(1.0e-6, (OutdoorHumRat - PsyWFnTdpPb(state, OutdoorCoilT, OutdoorPressure)));
 
             // Calculate defrost adjustment factors depending on defrost control type
-            if (state.dataHVACVarRefFlow->VRF(VRFCond).DefrostControl == Timed) {
+            if (state.dataHVACVarRefFlow->VRF(VRFCond).DefrostControl == StandardRatings::HPdefrostControl::Timed) {
                 FractionalDefrostTime = state.dataHVACVarRefFlow->VRF(VRFCond).DefrostFraction;
                 if (FractionalDefrostTime > 0.0) {
                     HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
@@ -2198,16 +2198,18 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         if (!lAlphaFieldBlanks(32)) {
-            if (UtilityRoutines::SameString(cAlphaArgs(32), "Timed")) state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = Timed;
-            if (UtilityRoutines::SameString(cAlphaArgs(32), "OnDemand")) state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = OnDemand;
-            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == 0) {
+            if (UtilityRoutines::SameString(cAlphaArgs(32), "Timed"))
+                state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = StandardRatings::HPdefrostControl::Timed;
+            if (UtilityRoutines::SameString(cAlphaArgs(32), "OnDemand"))
+                state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
+            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == StandardRatings::HPdefrostControl::Unassigned) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(32) +
                                     " not found: " + cAlphaArgs(32));
                 ErrorsFound = true;
             }
         } else {
-            state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = Timed;
+            state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = StandardRatings::HPdefrostControl::Timed;
         }
 
         if (!lAlphaFieldBlanks(33)) {
@@ -2785,16 +2787,18 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         if (!lAlphaFieldBlanks(9)) {
-            if (UtilityRoutines::SameString(cAlphaArgs(9), "Timed")) state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = Timed;
-            if (UtilityRoutines::SameString(cAlphaArgs(9), "OnDemand")) state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = OnDemand;
-            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == 0) {
+            if (UtilityRoutines::SameString(cAlphaArgs(9), "Timed"))
+                state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = StandardRatings::HPdefrostControl::Timed;
+            if (UtilityRoutines::SameString(cAlphaArgs(9), "OnDemand"))
+                state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
+            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == StandardRatings::HPdefrostControl::Unassigned) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(9) +
                                     " not found: " + cAlphaArgs(9));
                 ErrorsFound = true;
             }
         } else {
-            state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = Timed;
+            state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = StandardRatings::HPdefrostControl::Timed;
         }
 
         if (!lAlphaFieldBlanks(10)) {
@@ -2810,7 +2814,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                             cAlphaFieldNames(10));                               // Field Name
             } else {
                 if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == ReverseCycle &&
-                    state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == OnDemand) {
+                    state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(10) +
                                         " not found:" + cAlphaArgs(10));
@@ -2819,7 +2823,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             }
         } else {
             if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == ReverseCycle &&
-                state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == OnDemand) {
+                state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(10) +
                                     " not found:" + cAlphaArgs(10));
@@ -3254,16 +3258,18 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         if (!lAlphaFieldBlanks(9)) {
-            if (UtilityRoutines::SameString(cAlphaArgs(9), "Timed")) state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = Timed;
-            if (UtilityRoutines::SameString(cAlphaArgs(9), "OnDemand")) state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = OnDemand;
-            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == 0) {
+            if (UtilityRoutines::SameString(cAlphaArgs(9), "Timed"))
+                state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = StandardRatings::HPdefrostControl::Timed;
+            if (UtilityRoutines::SameString(cAlphaArgs(9), "OnDemand"))
+                state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
+            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == StandardRatings::HPdefrostControl::Unassigned) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(9) +
                                     " not found: " + cAlphaArgs(9));
                 ErrorsFound = true;
             }
         } else {
-            state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = Timed;
+            state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = StandardRatings::HPdefrostControl::Timed;
         }
 
         if (!lAlphaFieldBlanks(10)) {
@@ -3279,7 +3285,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                             cAlphaFieldNames(10));                               // Field Name
             } else {
                 if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == ReverseCycle &&
-                    state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == OnDemand) {
+                    state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(10) +
                                         " not found:" + cAlphaArgs(10));
@@ -3288,7 +3294,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             }
         } else {
             if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == ReverseCycle &&
-                state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == OnDemand) {
+                state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(10) +
                                     " not found:" + cAlphaArgs(10));
@@ -12256,7 +12262,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
             OutdoorCoildw = max(1.0e-6, (OutdoorHumRat - PsyWFnTdpPb(state, OutdoorCoilT, OutdoorPressure)));
 
             // Calculate defrost adjustment factors depending on defrost control type
-            if (this->DefrostControl == Timed) {
+            if (this->DefrostControl == StandardRatings::HPdefrostControl::Timed) {
                 FractionalDefrostTime = this->DefrostFraction;
                 if (FractionalDefrostTime > 0.0) {
                     HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
@@ -12270,7 +12276,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
 
             if (FractionalDefrostTime > 0.0) {
                 // Calculate defrost adjustment factors depending on defrost control strategy
-                if (this->DefrostStrategy == ReverseCycle && this->DefrostControl == OnDemand) {
+                if (this->DefrostStrategy == ReverseCycle && this->DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
                     LoadDueToDefrost = (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) * (this->HeatingCapacity / 1.01667);
                     DefrostEIRTempModFac = CurveValue(state, this->DefrostEIRPtr, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
 
