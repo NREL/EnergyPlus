@@ -1974,7 +1974,7 @@ namespace WindowManager {
         //       RE-ENGINEERED  na
         //
         // PURPOSE OF THIS SUBROUTINE:
-        // Subroutine to direct wheter to use exterior or interior window routines
+        // Subroutine to direct whether to use exterior or interior window routines
         if (state.dataGlobal->KickOffSizing || state.dataGlobal->KickOffSimulation) return;
 
         if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
