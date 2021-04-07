@@ -51,30 +51,23 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 
-namespace EnergyPlus {
+namespace EnergyPlus::TARCOGGassesParams {
 
-namespace TARCOGGassesParams {
+// Max number of gasses
+int constexpr maxgas = 10;
 
-    // Data
-    // Max number of gasses
-    extern int const maxgas;
+// Standards:
+int constexpr ISO15099 = 1;    // standard = ISO15099
+int constexpr EN673 = 2;       // standard = EN 673 / ISO 10292 Declared
+int constexpr EN673Design = 3; // standard = EN 673 / ISO 10292 Design
 
-    // Standards:
-    extern int const ISO15099;    // standard = ISO15099
-    extern int const EN673;       // standard = EN 673 / ISO 10292 Declared
-    extern int const EN673Design; // standard = EN 673 / ISO 10292 Design
+int constexpr MinStandard = 1; // minimum index for standard
+int constexpr MaxStandard = 3; // maximum index for standard
 
-    extern int const MinStandard; // minimum index for standard
-    extern int const MaxStandard; // maximum index for standard
+Real64 constexpr alpha1 = 0.5;                // accommodation coefficient for low pressure gas calculations
+Real64 constexpr alpha2 = 0.5;                // accommodation coefficient for low pressure gas calculations
+Real64 constexpr InputDataTolerance = 1.0e-7; // coefficient used for input data tolerance in case for displaying error message
 
-    // REAL(r64), parameter :: pi       = 3.14159265358979323846d0
-    // REAL(r64), parameter :: UniversalGasConst = 8314.462175d0 !(J/mol*K)
-    extern Real64 const alpha1;             // accommodation coefficient for low pressure gas calculations
-    extern Real64 const alpha2;             // accommodation coefficient for low pressure gas calculations
-    extern Real64 const InputDataTolerance; // coefficient used for input data tolerance in case for displaying error message
-
-} // namespace TARCOGGassesParams
-
-} // namespace EnergyPlus
+} // namespace EnergyPlus::TARCOGGassesParams
 
 #endif

@@ -72,27 +72,12 @@ namespace DataTimings {
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    int constexpr MaxTimingStringLength () { return 250 ;} // string length for timing string array
+    int constexpr MaxTimingStringLength()
+    {
+        return 250;
+    } // string length for timing string array
 
     // Following for calls to routines
-#ifdef EP_Count_Calls
-    extern int NumShadow_Calls;
-    extern int NumShadowAtTS_Calls;
-    extern int NumClipPoly_Calls;
-    extern int NumInitSolar_Calls;
-    extern int NumAnisoSky_Calls;
-    extern int NumDetPolyOverlap_Calls;
-    extern int NumCalcPerSolBeam_Calls;
-    extern int NumDetShadowCombs_Calls;
-    extern int NumIntSolarDist_Calls;
-    extern int NumIntRadExchange_Calls;
-    extern int NumIntRadExchangeZ_Calls;
-    extern int NumIntRadExchangeMain_Calls;
-    extern int NumIntRadExchangeOSurf_Calls;
-    extern int NumIntRadExchangeISurf_Calls;
-    extern int NumMaxInsideSurfIterations;
-    extern int NumCalcScriptF_Calls;
-#endif
 
     // Types
 
@@ -131,7 +116,8 @@ namespace DataTimings {
 
 } // namespace DataTimings
 
-struct DataTimingsData : BaseGlobalStruct {
+struct DataTimingsData : BaseGlobalStruct
+{
 
     int NumTimingElements = 0;
     int MaxTimingElements = 0;
@@ -149,7 +135,28 @@ struct DataTimingsData : BaseGlobalStruct {
     bool lcloseoutReportingTiming = false;
     Array1D<DataTimings::timings> Timing;
 
-    void clear_state() override {
+    // Following for calls to routines
+#ifdef EP_Count_Calls
+    int NumShadow_Calls = 0;
+    int NumShadowAtTS_Calls = 0;
+    int NumClipPoly_Calls = 0;
+    int NumInitSolar_Calls = 0;
+    int NumAnisoSky_Calls = 0;
+    int NumDetPolyOverlap_Calls = 0;
+    int NumCalcPerSolBeam_Calls = 0;
+    int NumDetShadowCombs_Calls = 0;
+    int NumIntSolarDist_Calls = 0;
+    int NumIntRadExchange_Calls = 0;
+    int NumIntRadExchangeZ_Calls = 0;
+    int NumIntRadExchangeMain_Calls = 0;
+    int NumIntRadExchangeOSurf_Calls = 0;
+    int NumIntRadExchangeISurf_Calls = 0;
+    int NumMaxInsideSurfIterations = 0;
+    int NumCalcScriptF_Calls = 0;
+#endif
+
+    void clear_state() override
+    {
         this->NumTimingElements = 0;
         this->MaxTimingElements = 0;
         this->dailyWeatherTime = 0.0;
@@ -165,6 +172,25 @@ struct DataTimingsData : BaseGlobalStruct {
         this->lmanageSimulationTiming = false;
         this->lcloseoutReportingTiming = false;
         this->Timing.deallocate();
+
+#ifdef EP_Count_Calls
+        this->NumShadow_Calls = 0;
+        this->NumShadowAtTS_Calls = 0;
+        this->NumClipPoly_Calls = 0;
+        this->NumInitSolar_Calls = 0;
+        this->NumAnisoSky_Calls = 0;
+        this->NumDetPolyOverlap_Calls = 0;
+        this->NumCalcPerSolBeam_Calls = 0;
+        this->NumDetShadowCombs_Calls = 0;
+        this->NumIntSolarDist_Calls = 0;
+        this->NumIntRadExchange_Calls = 0;
+        this->NumIntRadExchangeZ_Calls = 0;
+        this->NumIntRadExchangeMain_Calls = 0;
+        this->NumIntRadExchangeOSurf_Calls = 0;
+        this->NumIntRadExchangeISurf_Calls = 0;
+        this->NumMaxInsideSurfIterations = 0;
+        this->NumCalcScriptF_Calls = 0;
+#endif
     }
 };
 

@@ -118,7 +118,7 @@ namespace DataRuntimeLanguage {
     int constexpr OperatorGreaterThan(12);    // >
     int constexpr OperatorRaiseToPower(13);   // ^
     int constexpr OperatorLogicalAND(14);     // &&
-    int constexpr OperatorLogicalOR(15);     // ||
+    int constexpr OperatorLogicalOR(15);      // ||
     // note there is an important check "> 15" to distinguish operators from functions
     //  so be careful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
 
@@ -144,7 +144,7 @@ namespace DataRuntimeLanguage {
 
     // begin psychrometric routines
     int constexpr FuncRhoAirFnPbTdbW(32);    // accessor for E+ psych routine
-    int constexpr FuncCpAirFnW(33);       // accessor for E+ psych routine
+    int constexpr FuncCpAirFnW(33);          // accessor for E+ psych routine
     int constexpr FuncHfgAirFnWTdb(34);      // accessor for E+ psych routine
     int constexpr FuncHgAirFnWTdb(35);       // accessor for E+ psych routine
     int constexpr FuncTdpFnTdbTwbPb(36);     // accessor for E+ psych routine
@@ -188,20 +188,20 @@ namespace DataRuntimeLanguage {
     int constexpr FuncCurveValue(68);
 
     // Weather data query functions
-    int constexpr FuncTodayIsRain(69);          // Access TodayIsRain(hour, timestep)
-    int constexpr FuncTodayIsSnow(70);          // Access TodayIsSnow(hour, timestep)
-    int constexpr FuncTodayOutDryBulbTemp(71);  // Access TodayOutDryBulbTemp(hour, timestep)
-    int constexpr FuncTodayOutDewPointTemp(72); // Access TodayOutDewPointTemp(hour, timestep)
-    int constexpr FuncTodayOutBaroPress(73);    // Access TodayOutBaroPress(hour, timestep)
-    int constexpr FuncTodayOutRelHum(74);       // Access TodayOutRelHum(hour, timestep)
-    int constexpr FuncTodayWindSpeed(75);       // Access TodayWindSpeed(hour, timestep)
-    int constexpr FuncTodayWindDir(76);         // Access TodayWindDir(hour, timestep)
-    int constexpr FuncTodaySkyTemp(77);         // Access TodaySkyTemp(hour, timestep)
-    int constexpr FuncTodayHorizIRSky(78);      // Access TodayHorizIRSky(hour, timestep)
-    int constexpr FuncTodayBeamSolarRad(79);    // Access TodayBeamSolarRad(hour, timestep)
-    int constexpr FuncTodayDifSolarRad(80);     // Access TodayDifSolarRad(hour, timestep)
-    int constexpr FuncTodayAlbedo(81);          // Access TodayAlbedo(hour, timestep)
-    int constexpr FuncTodayLiquidPrecip(82);    // Access TodayLiquidPrecip(hour, timestep)
+    int constexpr FuncTodayIsRain(69);             // Access TodayIsRain(hour, timestep)
+    int constexpr FuncTodayIsSnow(70);             // Access TodayIsSnow(hour, timestep)
+    int constexpr FuncTodayOutDryBulbTemp(71);     // Access TodayOutDryBulbTemp(hour, timestep)
+    int constexpr FuncTodayOutDewPointTemp(72);    // Access TodayOutDewPointTemp(hour, timestep)
+    int constexpr FuncTodayOutBaroPress(73);       // Access TodayOutBaroPress(hour, timestep)
+    int constexpr FuncTodayOutRelHum(74);          // Access TodayOutRelHum(hour, timestep)
+    int constexpr FuncTodayWindSpeed(75);          // Access TodayWindSpeed(hour, timestep)
+    int constexpr FuncTodayWindDir(76);            // Access TodayWindDir(hour, timestep)
+    int constexpr FuncTodaySkyTemp(77);            // Access TodaySkyTemp(hour, timestep)
+    int constexpr FuncTodayHorizIRSky(78);         // Access TodayHorizIRSky(hour, timestep)
+    int constexpr FuncTodayBeamSolarRad(79);       // Access TodayBeamSolarRad(hour, timestep)
+    int constexpr FuncTodayDifSolarRad(80);        // Access TodayDifSolarRad(hour, timestep)
+    int constexpr FuncTodayAlbedo(81);             // Access TodayAlbedo(hour, timestep)
+    int constexpr FuncTodayLiquidPrecip(82);       // Access TodayLiquidPrecip(hour, timestep)
     int constexpr FuncTomorrowIsRain(83);          // Access TomorrowIsRain(hour, timestep)
     int constexpr FuncTomorrowIsSnow(84);          // Access TomorrowIsSnow(hour, timestep)
     int constexpr FuncTomorrowOutDryBulbTemp(85);  // Access TomorrowOutDryBulbTemp(hour, timestep)
@@ -246,12 +246,12 @@ namespace DataRuntimeLanguage {
     {
         // Members
         // structure for internal data available for use in Erl that are not sourced by output variables
-        std::string DataTypeName;    // general internal variable name registered, All uppercase
-        std::string UniqueIDName;    // unique id for internal var, All uppercase
-        std::string Units;           // registered units, used for reporting and checks.
-        int PntrVarTypeUsed;         // data type used: integer (PntrInteger) or real (PntrReal)
-        Real64 * RealValue; // POINTER to the REAL value that is being accessed
-        int * IntValue;      // POINTER to the Integer value that is being accessed
+        std::string DataTypeName; // general internal variable name registered, All uppercase
+        std::string UniqueIDName; // unique id for internal var, All uppercase
+        std::string Units;        // registered units, used for reporting and checks.
+        int PntrVarTypeUsed;      // data type used: integer (PntrInteger) or real (PntrReal)
+        Real64 *RealValue;        // POINTER to the REAL value that is being accessed
+        int *IntValue;            // POINTER to the Integer value that is being accessed
 
         // Default Constructor
         InternalVarsAvailableType() : PntrVarTypeUsed(0), RealValue(nullptr), IntValue(nullptr)
@@ -287,10 +287,10 @@ namespace DataRuntimeLanguage {
         int handleCount;               // Number of times you tried to get a handle on this actuator,
                                        // whether from EMS:Actuator or getActuatorHandle (API)
         int PntrVarTypeUsed;           // data type used: integer (PntrInteger), real (PntrReal) or logical (PntrLogical)
-        bool * Actuated;     // POINTER to the logical value that signals EMS is actuating
-        Real64 * RealValue; // POINTER to the REAL value that is being actuated
-        int * IntValue;      // POINTER to the Integer value that is being actuated
-        bool * LogValue;     // POINTER to the Logical value that is being actuated
+        bool *Actuated;                // POINTER to the logical value that signals EMS is actuating
+        Real64 *RealValue;             // POINTER to the REAL value that is being actuated
+        int *IntValue;                 // POINTER to the Integer value that is being actuated
+        bool *LogValue;                // POINTER to the Logical value that is being actuated
 
         // Default Constructor
         EMSActuatorAvailableType() : handleCount(0), PntrVarTypeUsed(0), Actuated(nullptr), RealValue(nullptr), IntValue(nullptr), LogValue(nullptr)
@@ -320,10 +320,10 @@ namespace DataRuntimeLanguage {
     {
         // Members
         // structure for Erl program calling managers
-        std::string Name;          // user defined name for calling manager
+        std::string Name;                     // user defined name for calling manager
         EMSManager::EMSCallFrom CallingPoint; // EMS Calling point for this manager, see parameters emsCallFrom*
-        int NumErlPrograms;        // count of total number of Erl programs called by this manager
-        Array1D_int ErlProgramARR; // list of integer pointers to Erl programs used by this manager
+        int NumErlPrograms;                   // count of total number of Erl programs called by this manager
+        Array1D_int ErlProgramARR;            // list of integer pointers to Erl programs used by this manager
 
         // Default Constructor
         EMSProgramCallManagementType() : CallingPoint(EMSManager::EMSCallFrom::Unassigned), NumErlPrograms(0)
@@ -387,10 +387,10 @@ namespace DataRuntimeLanguage {
     {
         // Members
         // nested structure inside ErlStack that holds program instructions
-        int LineNum;   // Erl program line number reference
+        int LineNum;                                  // Erl program line number reference
         DataRuntimeLanguage::ErlKeywordParam Keyword; // type of instruction for this line, e.g. KeywordSet, KeywordIf, etc
-        int Argument1; // Index to a variable, function, expression, or stack
-        int Argument2; // Index to a variable, function, expression, or stack
+        int Argument1;                                // Index to a variable, function, expression, or stack
+        int Argument2;                                // Index to a variable, function, expression, or stack
 
         // Default Constructor
         InstructionType() : LineNum(0), Keyword(DataRuntimeLanguage::ErlKeywordParam::KeywordNone), Argument1(0), Argument2(0)
@@ -497,28 +497,29 @@ namespace DataRuntimeLanguage {
 
 } // namespace DataRuntimeLanguage
 
-struct RuntimeLanguageData : BaseGlobalStruct {
+struct RuntimeLanguageData : BaseGlobalStruct
+{
 
-    int NumProgramCallManagers = 0;                 // count of Erl program managers with calling points
-    int NumSensors = 0;                             // count of EMS sensors used in model (data from output variables)
-    int numActuatorsUsed = 0;                       // count of EMS actuators used in model
-    int numEMSActuatorsAvailable = 0;               // count of EMS actuators available for use in such a model
-    int maxEMSActuatorsAvailable = 0;               // count of EMS current maximum actuators available for use in such a model
-    int NumInternalVariablesUsed = 0;               // count of EMS internal variables used in model
-    int numEMSInternalVarsAvailable = 0;            // count of EMS internal variables available for use in such a model
-    int maxEMSInternalVarsAvailable = 0;            // count of EMS current maximum internal variables available for use in such a model
-    int varsAvailableAllocInc = 1000;               // allocation increment for variable arrays
-    int NumErlPrograms = 0;                         // count of Erl programs in model
-    int NumErlSubroutines = 0;                      // count of Erl subroutines in model
-    int NumUserGlobalVariables = 0;                 // count of global EMS variables defined by user
-    int NumErlVariables = 0;                        // count of Erl variables
-    int NumErlStacks = 0;                           // count of Erl program stacks in model. sum of programs and subroutines
-    int NumExpressions = 0;                         // count of Erl expressions
-    int NumEMSOutputVariables = 0;                  // count of EMS output variables, custom output variables from Erl
-    int NumEMSMeteredOutputVariables = 0;           // count of EMS metered output variables, custom meters from Erl
-    int NumErlTrendVariables = 0;                   // count of EMS trend variables in model
-    int NumEMSCurveIndices = 0;                     // count of EMS curve index variables in model
-    int NumEMSConstructionIndices = 0;              // count of EMS construction index variables in model
+    int NumProgramCallManagers = 0;       // count of Erl program managers with calling points
+    int NumSensors = 0;                   // count of EMS sensors used in model (data from output variables)
+    int numActuatorsUsed = 0;             // count of EMS actuators used in model
+    int numEMSActuatorsAvailable = 0;     // count of EMS actuators available for use in such a model
+    int maxEMSActuatorsAvailable = 0;     // count of EMS current maximum actuators available for use in such a model
+    int NumInternalVariablesUsed = 0;     // count of EMS internal variables used in model
+    int numEMSInternalVarsAvailable = 0;  // count of EMS internal variables available for use in such a model
+    int maxEMSInternalVarsAvailable = 0;  // count of EMS current maximum internal variables available for use in such a model
+    int varsAvailableAllocInc = 1000;     // allocation increment for variable arrays
+    int NumErlPrograms = 0;               // count of Erl programs in model
+    int NumErlSubroutines = 0;            // count of Erl subroutines in model
+    int NumUserGlobalVariables = 0;       // count of global EMS variables defined by user
+    int NumErlVariables = 0;              // count of Erl variables
+    int NumErlStacks = 0;                 // count of Erl program stacks in model. sum of programs and subroutines
+    int NumExpressions = 0;               // count of Erl expressions
+    int NumEMSOutputVariables = 0;        // count of EMS output variables, custom output variables from Erl
+    int NumEMSMeteredOutputVariables = 0; // count of EMS metered output variables, custom meters from Erl
+    int NumErlTrendVariables = 0;         // count of EMS trend variables in model
+    int NumEMSCurveIndices = 0;           // count of EMS curve index variables in model
+    int NumEMSConstructionIndices = 0;    // count of EMS construction index variables in model
 
     //######################################################################################################################################
     // code for ExternalInterface
@@ -533,13 +534,13 @@ struct RuntimeLanguageData : BaseGlobalStruct {
 
     //######################################################################################################################################
 
-    bool OutputEDDFile = false;                     // set to true if user requests EDD output file be written
-    bool OutputFullEMSTrace = false;                // how much to write out to trace, if true do verbose for each line
-    bool OutputEMSErrors = false;                   // how much to write out to trace, if true include Erl error messages
-    bool OutputEMSActuatorAvailFull = false;        // how much to write out to EDD file, if true dump full combinatorial actuator list
-    bool OutputEMSActuatorAvailSmall = false;       // how much to write out to EDD file, if true dump actuator list without key names
-    bool OutputEMSInternalVarsFull = false;         // how much to write out to EDD file, if true dump full combinatorial internal list
-    bool OutputEMSInternalVarsSmall = false;        // how much to write out to EDD file, if true dump internal list without key names
+    bool OutputEDDFile = false;               // set to true if user requests EDD output file be written
+    bool OutputFullEMSTrace = false;          // how much to write out to trace, if true do verbose for each line
+    bool OutputEMSErrors = false;             // how much to write out to trace, if true include Erl error messages
+    bool OutputEMSActuatorAvailFull = false;  // how much to write out to EDD file, if true dump full combinatorial actuator list
+    bool OutputEMSActuatorAvailSmall = false; // how much to write out to EDD file, if true dump actuator list without key names
+    bool OutputEMSInternalVarsFull = false;   // how much to write out to EDD file, if true dump full combinatorial internal list
+    bool OutputEMSInternalVarsSmall = false;  // how much to write out to EDD file, if true dump internal list without key names
 
     Array2D_bool EMSConstructActuatorChecked;
     Array2D_bool EMSConstructActuatorIsOkay;
@@ -556,12 +557,16 @@ struct RuntimeLanguageData : BaseGlobalStruct {
     Array1D<DataRuntimeLanguage::InternalVarsAvailableType> EMSInternalVarsAvailable; // internal data that could be used
     Array1D<DataRuntimeLanguage::InternalVarsUsedType> EMSInternalVarsUsed;           // internal data that are used
     Array1D<DataRuntimeLanguage::EMSProgramCallManagementType> EMSProgramCallManager; // program calling managers
-    DataRuntimeLanguage::ErlValueType Null = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);     // special "null" Erl variable value instance
-    DataRuntimeLanguage::ErlValueType False = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);    // special "false" Erl variable value instance
-    DataRuntimeLanguage::ErlValueType True = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);     // special "True" Erl variable value instance, gets reset
+    DataRuntimeLanguage::ErlValueType Null =
+        DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true); // special "null" Erl variable value instance
+    DataRuntimeLanguage::ErlValueType False =
+        DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true); // special "false" Erl variable value instance
+    DataRuntimeLanguage::ErlValueType True =
+        DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true); // special "True" Erl variable value instance, gets reset
 
     // EMS Actuator fast duplicate check lookup support
-    std::unordered_set<std::tuple<std::string, std::string, std::string>, DataRuntimeLanguage::EMSActuatorKey_hash> EMSActuator_lookup; // Fast duplicate lookup structure
+    std::unordered_set<std::tuple<std::string, std::string, std::string>, DataRuntimeLanguage::EMSActuatorKey_hash>
+        EMSActuator_lookup; // Fast duplicate lookup structure
 
     void clear_state() override
     {

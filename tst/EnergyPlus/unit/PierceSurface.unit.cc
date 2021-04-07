@@ -263,8 +263,14 @@ TEST_F(EnergyPlusFixture, PierceSurfaceTest_Convex8Sides)
 {
     DataSurfaces::SurfaceData floor;
     floor.Vertex.dimension(8);
-    floor.Vertex = {Vector(0, 0, 0), Vector(0.5, -0.25, 0), Vector(1, 0, 0), Vector(1.25, 0.5, 0),
-                    Vector(1, 1, 0), Vector(0.5, 1.25, 0),  Vector(0, 1, 0), Vector(-0.25, 0.5, 0)};
+    floor.Vertex = {Vector(0, 0, 0),
+                    Vector(0.5, -0.25, 0),
+                    Vector(1, 0, 0),
+                    Vector(1.25, 0.5, 0),
+                    Vector(1, 1, 0),
+                    Vector(0.5, 1.25, 0),
+                    Vector(0, 1, 0),
+                    Vector(-0.25, 0.5, 0)};
     floor.IsConvex = true;
     floor.set_computed_geometry();
     DataSurfaces::Surface2D const &floor2d(floor.surface2d);
@@ -424,8 +430,8 @@ TEST_F(EnergyPlusFixture, PierceSurfaceTest_NonconvexUShape)
 {
     DataSurfaces::SurfaceData ushape;
     ushape.Vertex.dimension(8);
-    ushape.Vertex = {Vector(0, 0, 0), Vector(3, 0, 0), Vector(3, 2, 0), Vector(2, 2, 0),
-                     Vector(2, 1, 0), Vector(1, 1, 0), Vector(1, 2, 0), Vector(0, 2, 0)};
+    ushape.Vertex = {
+        Vector(0, 0, 0), Vector(3, 0, 0), Vector(3, 2, 0), Vector(2, 2, 0), Vector(2, 1, 0), Vector(1, 1, 0), Vector(1, 2, 0), Vector(0, 2, 0)};
     ushape.IsConvex = false;
     ushape.set_computed_geometry();
     DataSurfaces::Surface2D const &ushape2d(ushape.surface2d);
@@ -497,8 +503,14 @@ TEST_F(EnergyPlusFixture, PierceSurfaceTest_NonconvexStar4)
 {
     DataSurfaces::SurfaceData star;
     star.Vertex.dimension(8);
-    star.Vertex = {Vector(0, 0, 0), Vector(2, 1, 0), Vector(4, 0, 0), Vector(3, 2, 0),
-                   Vector(4, 4, 0), Vector(2, 3, 0), Vector(0, 4, 0), Vector(1, 2, 0)}; // 4-pointed star resting on 2 vertices
+    star.Vertex = {Vector(0, 0, 0),
+                   Vector(2, 1, 0),
+                   Vector(4, 0, 0),
+                   Vector(3, 2, 0),
+                   Vector(4, 4, 0),
+                   Vector(2, 3, 0),
+                   Vector(0, 4, 0),
+                   Vector(1, 2, 0)}; // 4-pointed star resting on 2 vertices
     star.IsConvex = false;
     star.set_computed_geometry();
     DataSurfaces::Surface2D const &star2d(star.surface2d);

@@ -162,7 +162,7 @@ public: // Creation
 		assert( range.bounded() );
 		assert( multiplier <= size_type( std::numeric_limits< std::int64_t >::max() ) );
 		m_ = multiplier;
-		k_ = ( range.l() - 1 ) * multiplier;
+		k_ = ( static_cast<std::int64_t>(range.l()) - 1 ) * multiplier;
 		u_ = range.isize();
 	}
 

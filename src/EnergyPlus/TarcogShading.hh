@@ -53,14 +53,21 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 
 namespace EnergyPlus {
+
+// Using/Aliasing
+using namespace TARCOGGassesParams;
+using namespace TARCOGParams;
 
 namespace TarcogShading {
 
     // Functions
 
-    void shading(Array1D<Real64> const &theta,
+    void shading(EnergyPlusData &state,
+                 Array1D<Real64> const &theta,
                  Array1D<Real64> const &gap,
                  Array1D<Real64> &hgas,
                  Array1D<Real64> &hcgas,
@@ -94,7 +101,8 @@ namespace TarcogShading {
                  std::string &ErrorMessage,
                  Array1D<Real64> &vfreevent);
 
-    void forcedventilation(const Array1D_int &iprop,
+    void forcedventilation(EnergyPlusData &state,
+                           const Array1D_int &iprop,
                            const Array1D<Real64> &frct,
                            Real64 const press,
                            int const nmix,
@@ -114,7 +122,8 @@ namespace TarcogShading {
                            int &nperr,
                            std::string &ErrorMessage);
 
-    void shadingin(const Array1D_int &iprop1,
+    void shadingin(EnergyPlusData &state,
+                   const Array1D_int &iprop1,
                    const Array1D<Real64> &frct1,
                    Real64 const press1,
                    int const nmix1,
@@ -151,7 +160,8 @@ namespace TarcogShading {
                    int &nperr,
                    std::string &ErrorMessage);
 
-    void shadingedge(const Array1D_int &iprop1,
+    void shadingedge(EnergyPlusData &state,
+                     const Array1D_int &iprop1,
                      const Array1D<Real64> &frct1,
                      Real64 const press1,
                      int const nmix1,
@@ -201,6 +211,23 @@ namespace TarcogShading {
     );
 
 } // namespace TarcogShading
+
+struct TarcogShadingData : BaseGlobalStruct
+{
+
+    Array1D<Real64> frct1 = Array1D<Real64>(TARCOGGassesParams::maxgas);
+    Array1D<Real64> frct2 = Array1D<Real64>(TARCOGGassesParams::maxgas);
+    Array1D_int iprop1 = Array1D_int(TARCOGGassesParams::maxgas);
+    Array1D_int iprop2 = Array1D_int(TARCOGGassesParams::maxgas);
+
+    void clear_state() override
+    {
+        frct1 = Array1D<Real64>(TARCOGGassesParams::maxgas);
+        frct2 = Array1D<Real64>(TARCOGGassesParams::maxgas);
+        iprop1 = Array1D_int(TARCOGGassesParams::maxgas);
+        iprop2 = Array1D_int(TARCOGGassesParams::maxgas);
+    }
+};
 
 } // namespace EnergyPlus
 

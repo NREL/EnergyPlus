@@ -69,11 +69,6 @@ namespace HybridModel {
     // MODULE PARAMETER DEFINITIONS
 
     // MODULE VARIABLE TYPE DECLARATIONS:
-    extern bool FlagHybridModel;    // True if hybrid model is activated
-    extern bool FlagHybridModel_TM;   // User input IM option - True if hybrid model (thermal mass) is activated
-    extern bool FlagHybridModel_AI; // User input IM option - True if hybrid model (air infiltration) is activated
-    extern bool FlagHybridModel_PC;   // User input IM option - True if hybrid model (people count) is activated
-    extern int NumOfHybridModelZones; // Number of hybrid model zones in the model
 
     // SUBROUTINE SPECIFICATIONS:
 
@@ -128,21 +123,35 @@ namespace HybridModel {
     };
 
     // Object Data
-    extern Array1D<HybridModelProperties> HybridModelZone;
 
     // Functions
 
     void GetHybridModelZone(EnergyPlusData &state);
 
-    void clear_state();
-
 } // namespace HybridModel
 
-struct HybridModelData : BaseGlobalStruct {
+struct HybridModelData : BaseGlobalStruct
+{
+
+    bool FlagHybridModel = false;    // True if hybrid model is activated
+    bool FlagHybridModel_TM = false; // User input IM option - True if hybrid model (thermal mass) is activated
+    bool FlagHybridModel_AI = false; // User input IM option - True if hybrid model (air infiltration) is activated
+    bool FlagHybridModel_PC = false; // User input IM option - True if hybrid model (people count) is activated
+
+    int NumOfHybridModelZones = 0;   // Number of hybrid model zones in the model
+    std::string CurrentModuleObject; // to assist in getting input
+
+    Array1D<HybridModel::HybridModelProperties> HybridModelZone;
 
     void clear_state() override
     {
-
+        this->FlagHybridModel = false;
+        this->FlagHybridModel_TM = false;
+        this->FlagHybridModel_AI = false;
+        this->FlagHybridModel_PC = false;
+        this->NumOfHybridModelZones = 0;
+        this->CurrentModuleObject.clear();
+        this->HybridModelZone.deallocate();
     }
 };
 

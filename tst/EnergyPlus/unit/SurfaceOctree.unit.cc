@@ -70,22 +70,25 @@ using Surfaces = SurfaceOctreeCube::Surfaces;
 
 TEST(SurfaceOctreeTest, Basic)
 {
+
+    auto state = new EnergyPlusData;
+
     // Surfaces: Simple Unit Cube
-    TotSurfaces = 6;
+    state->dataSurface->TotSurfaces = 6;
     SurfaceData surface;
     surface.Area = 1.0;
     surface.Sides = 4;
     surface.Vertex.dimension(4);
-    Surface.dimension(TotSurfaces, surface);
-    Surface(1).Vertex = {Vertex(0, 0, 0), Vertex(1, 0, 0), Vertex(1, 0, 1), Vertex(0, 0, 1)};
-    Surface(2).Vertex = {Vertex(0, 1, 0), Vertex(1, 1, 0), Vertex(1, 1, 1), Vertex(0, 1, 1)};
-    Surface(3).Vertex = {Vertex(0, 0, 0), Vertex(0, 1, 0), Vertex(0, 1, 1), Vertex(0, 0, 1)};
-    Surface(4).Vertex = {Vertex(1, 0, 0), Vertex(1, 1, 0), Vertex(1, 1, 1), Vertex(1, 0, 1)};
-    Surface(5).Vertex = {Vertex(0, 0, 0), Vertex(1, 0, 0), Vertex(1, 1, 0), Vertex(0, 1, 0)};
-    Surface(6).Vertex = {Vertex(0, 0, 1), Vertex(1, 0, 1), Vertex(1, 1, 1), Vertex(0, 1, 1)};
+    state->dataSurface->Surface.dimension(state->dataSurface->TotSurfaces, surface);
+    state->dataSurface->Surface(1).Vertex = {Vertex(0, 0, 0), Vertex(1, 0, 0), Vertex(1, 0, 1), Vertex(0, 0, 1)};
+    state->dataSurface->Surface(2).Vertex = {Vertex(0, 1, 0), Vertex(1, 1, 0), Vertex(1, 1, 1), Vertex(0, 1, 1)};
+    state->dataSurface->Surface(3).Vertex = {Vertex(0, 0, 0), Vertex(0, 1, 0), Vertex(0, 1, 1), Vertex(0, 0, 1)};
+    state->dataSurface->Surface(4).Vertex = {Vertex(1, 0, 0), Vertex(1, 1, 0), Vertex(1, 1, 1), Vertex(1, 0, 1)};
+    state->dataSurface->Surface(5).Vertex = {Vertex(0, 0, 0), Vertex(1, 0, 0), Vertex(1, 1, 0), Vertex(0, 1, 0)};
+    state->dataSurface->Surface(6).Vertex = {Vertex(0, 0, 1), Vertex(1, 0, 1), Vertex(1, 1, 1), Vertex(0, 1, 1)};
 
     // Surface octree
-    SurfaceOctreeCube const cube(Surface);
+    SurfaceOctreeCube const cube(state->dataSurface->Surface);
 
     EXPECT_EQ(Vertex(0.0, 0.0, 0.0), cube.l());
     EXPECT_EQ(Vertex(0.5, 0.5, 0.5), cube.c());
@@ -95,12 +98,12 @@ TEST(SurfaceOctreeTest, Basic)
     { // Contains
         EXPECT_TRUE(cube.contains(Vertex(0, 1, 0)));
         EXPECT_FALSE(cube.contains(Vertex(0, 2, 0)));
-        EXPECT_TRUE(cube.contains(Surface(1)));
-        EXPECT_TRUE(cube.contains(Surface(2)));
-        EXPECT_TRUE(cube.contains(Surface(3)));
-        EXPECT_TRUE(cube.contains(Surface(4)));
-        EXPECT_TRUE(cube.contains(Surface(5)));
-        EXPECT_TRUE(cube.contains(Surface(6)));
+        EXPECT_TRUE(cube.contains(state->dataSurface->Surface(1)));
+        EXPECT_TRUE(cube.contains(state->dataSurface->Surface(2)));
+        EXPECT_TRUE(cube.contains(state->dataSurface->Surface(3)));
+        EXPECT_TRUE(cube.contains(state->dataSurface->Surface(4)));
+        EXPECT_TRUE(cube.contains(state->dataSurface->Surface(5)));
+        EXPECT_TRUE(cube.contains(state->dataSurface->Surface(6)));
         SurfaceData other_surface(surface);
         other_surface.Vertex = {Vertex(0, 0, 0), Vertex(1, 0, 0), Vertex(1, 0, 1), 2 * Vertex(0, 0, 1)};
         EXPECT_FALSE(cube.contains(other_surface));
@@ -270,38 +273,38 @@ TEST(SurfaceOctreeTest, Basic)
     }
 
     // Clean up
-    Surface.deallocate();
-    TotSurfaces = 0;
+    state->dataSurface->Surface.deallocate();
+    state->dataSurface->TotSurfaces = 0;
 }
 
 TEST_F(EnergyPlusFixture, Composite)
 {
     // Surfaces: Unit Cube in 2-Unit Cube
-    TotSurfaces = 12;
+    state->dataSurface->TotSurfaces = 12;
     SurfaceData surface;
     surface.Area = 1.0;
     surface.Sides = 4;
     surface.Vertex.dimension(4);
-    Surface.dimension(TotSurfaces, surface);
+    state->dataSurface->Surface.dimension(state->dataSurface->TotSurfaces, surface);
     // Outer [0,2] cube
-    Surface(1).Vertex = {2 * Vertex(0, 0, 0), 2 * Vertex(1, 0, 0), 2 * Vertex(1, 0, 1), 2 * Vertex(0, 0, 1)};
-    Surface(2).Vertex = {2 * Vertex(0, 1, 0), 2 * Vertex(1, 1, 0), 2 * Vertex(1, 1, 1), 2 * Vertex(0, 1, 1)};
-    Surface(3).Vertex = {2 * Vertex(0, 0, 0), 2 * Vertex(0, 1, 0), 2 * Vertex(0, 1, 1), 2 * Vertex(0, 0, 1)};
-    Surface(4).Vertex = {2 * Vertex(1, 0, 0), 2 * Vertex(1, 1, 0), 2 * Vertex(1, 1, 1), 2 * Vertex(1, 0, 1)};
-    Surface(5).Vertex = {2 * Vertex(0, 0, 0), 2 * Vertex(1, 0, 0), 2 * Vertex(1, 1, 0), 2 * Vertex(0, 1, 0)};
-    Surface(6).Vertex = {2 * Vertex(0, 0, 1), 2 * Vertex(1, 0, 1), 2 * Vertex(1, 1, 1), 2 * Vertex(0, 1, 1)};
+    state->dataSurface->Surface(1).Vertex = {2 * Vertex(0, 0, 0), 2 * Vertex(1, 0, 0), 2 * Vertex(1, 0, 1), 2 * Vertex(0, 0, 1)};
+    state->dataSurface->Surface(2).Vertex = {2 * Vertex(0, 1, 0), 2 * Vertex(1, 1, 0), 2 * Vertex(1, 1, 1), 2 * Vertex(0, 1, 1)};
+    state->dataSurface->Surface(3).Vertex = {2 * Vertex(0, 0, 0), 2 * Vertex(0, 1, 0), 2 * Vertex(0, 1, 1), 2 * Vertex(0, 0, 1)};
+    state->dataSurface->Surface(4).Vertex = {2 * Vertex(1, 0, 0), 2 * Vertex(1, 1, 0), 2 * Vertex(1, 1, 1), 2 * Vertex(1, 0, 1)};
+    state->dataSurface->Surface(5).Vertex = {2 * Vertex(0, 0, 0), 2 * Vertex(1, 0, 0), 2 * Vertex(1, 1, 0), 2 * Vertex(0, 1, 0)};
+    state->dataSurface->Surface(6).Vertex = {2 * Vertex(0, 0, 1), 2 * Vertex(1, 0, 1), 2 * Vertex(1, 1, 1), 2 * Vertex(0, 1, 1)};
     // Inner [0,1] cube
-    Surface(7).Vertex = {Vertex(0, 0, 0), Vertex(1, 0, 0), Vertex(1, 0, 1), Vertex(0, 0, 1)};
-    Surface(8).Vertex = {Vertex(0, 1, 0), Vertex(1, 1, 0), Vertex(1, 1, 1), Vertex(0, 1, 1)};
-    Surface(9).Vertex = {Vertex(0, 0, 0), Vertex(0, 1, 0), Vertex(0, 1, 1), Vertex(0, 0, 1)};
-    Surface(10).Vertex = {Vertex(1, 0, 0), Vertex(1, 1, 0), Vertex(1, 1, 1), Vertex(1, 0, 1)};
-    Surface(11).Vertex = {Vertex(0, 0, 0), Vertex(1, 0, 0), Vertex(1, 1, 0), Vertex(0, 1, 0)};
-    Surface(12).Vertex = {Vertex(0, 0, 1), Vertex(1, 0, 1), Vertex(1, 1, 1), Vertex(0, 1, 1)};
-    for (int i = 1; i <= TotSurfaces; ++i)
-        Surface(i).Shape = SurfaceShape::Rectangle;
+    state->dataSurface->Surface(7).Vertex = {Vertex(0, 0, 0), Vertex(1, 0, 0), Vertex(1, 0, 1), Vertex(0, 0, 1)};
+    state->dataSurface->Surface(8).Vertex = {Vertex(0, 1, 0), Vertex(1, 1, 0), Vertex(1, 1, 1), Vertex(0, 1, 1)};
+    state->dataSurface->Surface(9).Vertex = {Vertex(0, 0, 0), Vertex(0, 1, 0), Vertex(0, 1, 1), Vertex(0, 0, 1)};
+    state->dataSurface->Surface(10).Vertex = {Vertex(1, 0, 0), Vertex(1, 1, 0), Vertex(1, 1, 1), Vertex(1, 0, 1)};
+    state->dataSurface->Surface(11).Vertex = {Vertex(0, 0, 0), Vertex(1, 0, 0), Vertex(1, 1, 0), Vertex(0, 1, 0)};
+    state->dataSurface->Surface(12).Vertex = {Vertex(0, 0, 1), Vertex(1, 0, 1), Vertex(1, 1, 1), Vertex(0, 1, 1)};
+    for (int i = 1; i <= state->dataSurface->TotSurfaces; ++i)
+        state->dataSurface->Surface(i).Shape = SurfaceShape::Rectangle;
 
     // SurfaceOctreeCube
-    SurfaceOctreeCube const cube(Surface);
+    SurfaceOctreeCube const cube(state->dataSurface->Surface);
 
     EXPECT_EQ(Vertex(0.0, 0.0, 0.0), cube.l());
     EXPECT_EQ(Vertex(1.0, 1.0, 1.0), cube.c());
@@ -434,8 +437,4 @@ TEST_F(EnergyPlusFixture, Composite)
         cube.processSomeSurfaceRayIntersectsCube(*state, a, dir, predicate);
         EXPECT_EQ(8u, n);
     }
-
-    // Clean up
-    Surface.deallocate();
-    TotSurfaces = 0;
 }

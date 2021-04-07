@@ -283,7 +283,7 @@ This input object is used control the choice of models used for surface convecti
 
 \paragraph{Field: Algorithm}\label{field-algorithm-000}
 
-The model specified in this field is the default algorithm for the inside face all the surfaces.. The key choices are \textbf{Simple}, \textbf{TARP}, \textbf{CeilingDiffuser}, and \textbf{AdaptiveConvectionAlgorithm}.
+The model specified in this field is the default algorithm for the inside face all the surfaces.. The key choices are \textbf{Simple}, \textbf{TARP}, \textbf{CeilingDiffuser}, \textbf{AdaptiveConvectionAlgorithm}, and \textbf{ASTMC1340}.
 
 The \textbf{Simple} model applies constant heat transfer coefficients depending on the surface orientation.
 
@@ -292,6 +292,8 @@ The \textbf{TARP} model correlates the heat transfer coefficient to the temperat
 The \textbf{CeilingDiffuser} model is a mixed and forced convection model for ceiling diffuser configurations. The model correlates the heat transfer coefficient to the air change rate for ceilings, walls and floors. These correlations are based on experiments performed in an isothermal room with a cold ceiling jet. To avoid discontinuities in surface heat transfer rate calculations, all of correlations have been extrapolated beyond the lower limit of the data set (3 ACH) to a natural convection limit that is applied during the hours when the system is off.
 
 The \textbf{AdaptiveConvectionAlgorithm} model is an dynamic algorithm that organizes a large number of different convection models and automatically selects the one that best applies. The adaptive convection algorithm can also be customized using the \hyperref[surfaceconvectionalgorithminsideadaptivemodelselections]{SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections} input object. These models are explained in detail in the EnergyPlus Engineering Reference Document.
+
+The \textbf{ASTMC1340} model correlates mixed convection coefficients to the surface-to-air temperature difference, heat flow direction, surface tilt angle, surface characteristic length, and air speed past the surface. These correlations are based on ASTM C1340 standard.
 
 The default is \textbf{TARP}.
 
