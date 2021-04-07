@@ -1117,7 +1117,7 @@ TEST_F(AutoSizingFixture, HeatingCoilDesAirInletTempSizingGauntlet)
     // do sizing
     state->dataSize->DataDesicRegCoil = true;
     state->dataSize->DataDesicDehumNum = 1;
-    DesiccantDehumidifiers::DesicDehum.allocate(1);
+    state->dataDesiccantDehumidifiers->DesicDehum.allocate(1);
     sizer.wasAutoSized = false;
     printFlag = true;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);
@@ -1134,7 +1134,7 @@ TEST_F(AutoSizingFixture, HeatingCoilDesAirInletTempSizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test 5 - Airloop Equipment w/ desiccant regen coil in OA system
-    DesiccantDehumidifiers::DesicDehum(1).RegenInletIsOutsideAirNode = true;
+    state->dataDesiccantDehumidifiers->DesicDehum(1).RegenInletIsOutsideAirNode = true;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
@@ -1233,8 +1233,8 @@ TEST_F(AutoSizingFixture, HeatingCoilDesAirOutletTempSizingGauntlet)
     // do sizing
     state->dataSize->DataDesicRegCoil = true;
     state->dataSize->DataDesicDehumNum = 1;
-    DesiccantDehumidifiers::DesicDehum.allocate(1);
-    DesiccantDehumidifiers::DesicDehum(1).RegenSetPointTemp = 26.4;
+    state->dataDesiccantDehumidifiers->DesicDehum.allocate(1);
+    state->dataDesiccantDehumidifiers->DesicDehum(1).RegenSetPointTemp = 26.4;
     sizer.wasAutoSized = false;
     printFlag = true;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);
@@ -1338,7 +1338,7 @@ TEST_F(AutoSizingFixture, HeatingCoilDesAirInletHumRatSizingGauntlet)
     // do sizing
     state->dataSize->DataDesicRegCoil = true;
     state->dataSize->DataDesicDehumNum = 1;
-    DesiccantDehumidifiers::DesicDehum.allocate(1);
+    state->dataDesiccantDehumidifiers->DesicDehum.allocate(1);
     sizer.wasAutoSized = false;
     printFlag = true;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);
@@ -1355,7 +1355,7 @@ TEST_F(AutoSizingFixture, HeatingCoilDesAirInletHumRatSizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test 5 - Airloop Equipment w/ desiccant regen coil in OA system
-    DesiccantDehumidifiers::DesicDehum(1).RegenInletIsOutsideAirNode = true;
+    state->dataDesiccantDehumidifiers->DesicDehum(1).RegenInletIsOutsideAirNode = true;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);

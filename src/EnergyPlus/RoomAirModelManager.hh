@@ -79,12 +79,14 @@ namespace RoomAirModelManager {
 
     void GetRoomAirflowNetworkData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
-    void GetRAFNNodeNum(EnergyPlusData &state, std::string const &RAFNNodeName,
+    void GetRAFNNodeNum(EnergyPlusData &state,
+                        std::string const &RAFNNodeName,
                         int &ZoneNum,
                         int &RAFNNodeNum,
                         bool &Errorfound); // find zone number and node number based on the node name
 
-    bool CheckEquipName(EnergyPlusData &state, std::string const &EquipType, // Equipment type
+    bool CheckEquipName(EnergyPlusData &state,
+                        std::string const &EquipType, // Equipment type
                         std::string const &EquipName, // Equipment Name
                         std::string &SupplyNodeName,  // Supply node name
                         std::string &ReturnNodeName,  // Return node name
@@ -93,51 +95,52 @@ namespace RoomAirModelManager {
 
 } // namespace RoomAirModelManager
 
-struct RoomAirModelManagerData : BaseGlobalStruct {
+struct RoomAirModelManagerData : BaseGlobalStruct
+{
 
     bool GetUCSDDVDataFlag = true; // UCSD
-    bool GetAirModelData = true; // Used to "get" all air model data
+    bool GetAirModelData = true;   // Used to "get" all air model data
     bool MyOneTimeFlag = true;
     int CompNum = 0;
     int TypeNum = 0;
     int NodeNum1 = 0;
     int NodeNum2 = 0;
-    int CompNumber = 0;             // AirflowNetwork Component number
-    int TypeNumber = 0;             // Airflownetwork Type Number within a component
-    int NodeNumber1 = 0;            // The first node number in an AirflowNetwork linkage data
-    int NodeNumber2 = 0;            // The Second node number in an AirflowNetwork linkage data
-    int contFloorBegin = 0;            // counter
-    int contFloorLast = 0;             // counter
-    int contFloor = 0;                 // counter
-    int contCeilingBegin = 0;          // counter
-    int contCeilingLast = 0;           // counter
-    int contCeiling = 0;               // counter
-    int contWallBegin = 0;             // counter
-    int contWallLast = 0;              // counter
-    int contWall = 0;                  // counter
-    int contWindowBegin = 0;           // counter
-    int contWindowLast = 0;            // counter
-    int contWindow = 0;                // counter
-    int contInternalBegin = 0;         // counter
-    int contInternalLast = 0;          // counter
-    int contInternal = 0;              // counter
-    int contDoorBegin = 0;             // counter
-    int contDoorLast = 0;              // counter
-    int contDoor = 0;                  // counter
-    int Loop = 0;                      // counter
-    int Loop2 = 0;                     // counter
-    int Loop3 = 0;                     // counter
-    int i = 0;                         // counter
-    int N = 0;                         // counter
-    Real64 Z1ZoneAux = 0.0;            // Auxiliary variables
-    Real64 Z2ZoneAux = 0.0;            // Auxiliary variables
-    Real64 Z1Zone = 0.0;               // Auxiliary variables
-    Real64 Z2Zone = 0.0;               // Auxiliary variables
-    Real64 CeilingHeightDiffMax = 0.1; // Maximum difference between wall height and ceiling height
-    Real64 Z1ofZoneAux = 0.0;      // Auxiliary variables
-    Real64 Z2ofZoneAux = 0.0;     // Auxiliary variables
-    Real64 Z1ofZone = 0.0;         // Auxiliary variables
-    Real64 Z2ofZone = 0.0;         // Auxiliary variables
+    int CompNumber = 0;                    // AirflowNetwork Component number
+    int TypeNumber = 0;                    // Airflownetwork Type Number within a component
+    int NodeNumber1 = 0;                   // The first node number in an AirflowNetwork linkage data
+    int NodeNumber2 = 0;                   // The Second node number in an AirflowNetwork linkage data
+    int contFloorBegin = 0;                // counter
+    int contFloorLast = 0;                 // counter
+    int contFloor = 0;                     // counter
+    int contCeilingBegin = 0;              // counter
+    int contCeilingLast = 0;               // counter
+    int contCeiling = 0;                   // counter
+    int contWallBegin = 0;                 // counter
+    int contWallLast = 0;                  // counter
+    int contWall = 0;                      // counter
+    int contWindowBegin = 0;               // counter
+    int contWindowLast = 0;                // counter
+    int contWindow = 0;                    // counter
+    int contInternalBegin = 0;             // counter
+    int contInternalLast = 0;              // counter
+    int contInternal = 0;                  // counter
+    int contDoorBegin = 0;                 // counter
+    int contDoorLast = 0;                  // counter
+    int contDoor = 0;                      // counter
+    int Loop = 0;                          // counter
+    int Loop2 = 0;                         // counter
+    int Loop3 = 0;                         // counter
+    int i = 0;                             // counter
+    int N = 0;                             // counter
+    Real64 Z1ZoneAux = 0.0;                // Auxiliary variables
+    Real64 Z2ZoneAux = 0.0;                // Auxiliary variables
+    Real64 Z1Zone = 0.0;                   // Auxiliary variables
+    Real64 Z2Zone = 0.0;                   // Auxiliary variables
+    Real64 CeilingHeightDiffMax = 0.1;     // Maximum difference between wall height and ceiling height
+    Real64 Z1ofZoneAux = 0.0;              // Auxiliary variables
+    Real64 Z2ofZoneAux = 0.0;              // Auxiliary variables
+    Real64 Z1ofZone = 0.0;                 // Auxiliary variables
+    Real64 Z2ofZone = 0.0;                 // Auxiliary variables
     Real64 CeilingHeightDiffMaximum = 0.1; // Maximum difference between wall height and ceiling height
     Array1D_bool MyEnvrnFlag;
 
@@ -174,7 +177,7 @@ struct RoomAirModelManagerData : BaseGlobalStruct {
         this->contDoor = 0;
         this->Loop = 0;
         this->Loop2 = 0;
-        this->Loop3 = 0;  
+        this->Loop3 = 0;
         this->i = 0;
         this->N = 0;
         this->Z1ZoneAux = 0.0;
@@ -186,7 +189,7 @@ struct RoomAirModelManagerData : BaseGlobalStruct {
         this->Z2ofZoneAux = 0.0;
         this->Z1ofZone = 0.0;
         this->Z2ofZone = 0.0;
-        this->CeilingHeightDiffMaximum = 0.1; 
+        this->CeilingHeightDiffMaximum = 0.1;
         this->MyEnvrnFlag.clear();
     }
 };

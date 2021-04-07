@@ -134,12 +134,6 @@ namespace ScheduleManager {
 
     // MODULE VARIABLE DECLARATIONS:
 
-
-    // Derived Types Variables
-
-    // Object Data
-
-
     // MODULE SUBROUTINES:
     //*************************************************************************
 
@@ -248,9 +242,9 @@ namespace ScheduleManager {
         int UntilFld;
         int xxcount;
         //  REAL(r64) tempval
-        static std::string CurrentThrough;
-        static std::string LastFor;
-        static std::string errmsg;
+        std::string CurrentThrough;
+        std::string LastFor;
+        std::string errmsg;
         int kdy;
         bool FileExists;
         // for SCHEDULE:FILE
@@ -293,102 +287,104 @@ namespace ScheduleManager {
         MaxAlps = 0;
 
         CurrentModuleObject = "ScheduleTypeLimits";
-        state.dataScheduleMgr->NumScheduleTypes = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataScheduleMgr->NumScheduleTypes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataScheduleMgr->NumScheduleTypes > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
         CurrentModuleObject = "Schedule:Day:Hourly";
-        NumHrDaySchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumHrDaySchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumHrDaySchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
         CurrentModuleObject = "Schedule:Day:Interval";
-        NumIntDaySchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumIntDaySchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumIntDaySchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
         CurrentModuleObject = "Schedule:Day:List";
-        NumLstDaySchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumLstDaySchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumLstDaySchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
         CurrentModuleObject = "Schedule:Week:Daily";
-        NumRegWeekSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumRegWeekSchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumRegWeekSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
         CurrentModuleObject = "Schedule:Week:Compact";
-        NumCptWeekSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumCptWeekSchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumCptWeekSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
         CurrentModuleObject = "Schedule:Year";
-        NumRegSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumRegSchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumRegSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
         CurrentModuleObject = "Schedule:Compact";
-        NumCptSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumCptSchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumCptSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas + 1);
         }
         CurrentModuleObject = "Schedule:File";
-        NumCommaFileSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumCommaFileSchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumCommaFileSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
 
         CurrentModuleObject = "Schedule:Constant";
-        NumConstantSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumConstantSchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumConstantSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
         CurrentModuleObject = "ExternalInterface:Schedule";
-        NumExternalInterfaceSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumExternalInterfaceSchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         // added for FMI
         if (NumExternalInterfaceSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas + 1);
         }
         // added for FMU Import
         CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Schedule";
-        NumExternalInterfaceFunctionalMockupUnitImportSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumExternalInterfaceFunctionalMockupUnitImportSchedules =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumExternalInterfaceFunctionalMockupUnitImportSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas + 1);
         }
         // added for FMU Export
         CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Schedule";
-        NumExternalInterfaceFunctionalMockupUnitExportSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumExternalInterfaceFunctionalMockupUnitExportSchedules =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumExternalInterfaceFunctionalMockupUnitExportSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas + 1);
         }
         CurrentModuleObject = "Output:Schedules";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlps = max(MaxAlps, NumAlphas);
 
@@ -405,7 +401,8 @@ namespace ScheduleManager {
         CurrentModuleObject = "Schedule:Compact";
         MaxNums1 = 0;
         for (LoopIndex = 1; LoopIndex <= NumCptSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state, CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status);
+            state.dataInputProcessing->inputProcessor->getObjectItem(
+                state, CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status);
             // # 'THROUGH" => Number of additional week schedules
             // # 'FOR' => Number of additional day schedules
             for (Count = 3; Count <= NumAlphas; ++Count) {
@@ -445,7 +442,7 @@ namespace ScheduleManager {
         // to update during run time
 
         CurrentModuleObject = "Schedule:File:Shading";
-        NumCommaFileShading = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumCommaFileShading = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         NumAlphas = 0;
         NumNumbers = 0;
         if (NumCommaFileShading > 1) {
@@ -455,18 +452,18 @@ namespace ScheduleManager {
         NumCSVAllColumnsSchedules = 0;
 
         if (NumCommaFileShading != 0) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          1,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          Status,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     1,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
             std::string ShadingSunlitFracFileName = Alphas(1);
 
             std::string contextString = CurrentModuleObject + ", " + cAlphaFields(1) + ": ";
@@ -642,7 +639,6 @@ namespace ScheduleManager {
         state.dataScheduleMgr->UniqueWeekScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumWeekSchedules));
 
         state.dataScheduleMgr->Schedule.allocate({-1, state.dataScheduleMgr->NumSchedules});
-        //		UniqueScheduleNames.clear();
         state.dataScheduleMgr->UniqueScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumSchedules));
         state.dataScheduleMgr->Schedule(-1).ScheduleTypePtr = -1;
         state.dataScheduleMgr->Schedule(-1).WeekSchedulePointer = 1;
@@ -657,18 +653,18 @@ namespace ScheduleManager {
 
         CurrentModuleObject = "ScheduleTypeLimits";
         for (LoopIndex = 1; LoopIndex <= state.dataScheduleMgr->NumScheduleTypes; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          LoopIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          Status,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     LoopIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             state.dataScheduleMgr->ScheduleType(LoopIndex).Name = Alphas(1);
@@ -743,19 +739,20 @@ namespace ScheduleManager {
         Count = 0;
         CurrentModuleObject = "Schedule:Day:Hourly";
         for (LoopIndex = 1; LoopIndex <= NumHrDaySchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          LoopIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          Status,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     LoopIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, state.dataScheduleMgr->UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++Count;
             state.dataScheduleMgr->DaySchedule(Count).Name = Alphas(1);
             // Validate ScheduleType
@@ -815,19 +812,20 @@ namespace ScheduleManager {
 
         CurrentModuleObject = "Schedule:Day:Interval";
         for (LoopIndex = 1; LoopIndex <= NumIntDaySchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          LoopIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          Status,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     LoopIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, state.dataScheduleMgr->UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++Count;
             state.dataScheduleMgr->DaySchedule(Count).Name = Alphas(1);
             // Validate ScheduleType
@@ -926,19 +924,20 @@ namespace ScheduleManager {
 
         CurrentModuleObject = "Schedule:Day:List";
         for (LoopIndex = 1; LoopIndex <= NumLstDaySchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          LoopIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          Status,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     LoopIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, state.dataScheduleMgr->UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++Count;
             state.dataScheduleMgr->DaySchedule(Count).Name = Alphas(1);
             // Validate ScheduleType
@@ -1078,19 +1077,20 @@ namespace ScheduleManager {
 
         CurrentModuleObject = "Schedule:Week:Daily";
         for (LoopIndex = 1; LoopIndex <= NumRegWeekSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          LoopIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          Status,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     LoopIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, state.dataScheduleMgr->UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             state.dataScheduleMgr->WeekSchedule(LoopIndex).Name = Alphas(1);
             // Rest of Alphas are processed into Pointers
             for (InLoopIndex = 1; InLoopIndex <= MaxDayTypes; ++InLoopIndex) {
@@ -1111,18 +1111,18 @@ namespace ScheduleManager {
         Count = NumRegWeekSchedules;
         CurrentModuleObject = "Schedule:Week:Compact";
         for (LoopIndex = 1; LoopIndex <= NumCptWeekSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          LoopIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          Status,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     LoopIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
             if (Count > 0) {
                 GlobalNames::VerifyUniqueInterObjectName(
                     state, state.dataScheduleMgr->UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
@@ -1170,19 +1170,20 @@ namespace ScheduleManager {
 
         CurrentModuleObject = "Schedule:Year";
         for (LoopIndex = 1; LoopIndex <= NumRegSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          LoopIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          Status,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     LoopIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             state.dataScheduleMgr->Schedule(LoopIndex).Name = Alphas(1);
             state.dataScheduleMgr->Schedule(LoopIndex).SchType = SchedType::ScheduleInput_year;
             // Validate ScheduleType
@@ -1298,19 +1299,20 @@ namespace ScheduleManager {
         AddDaySch = NumRegDaySchedules;
         CurrentModuleObject = "Schedule:Compact";
         for (LoopIndex = 1; LoopIndex <= NumCptSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          LoopIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          Status,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     LoopIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
             state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_compact;
@@ -1641,19 +1643,20 @@ namespace ScheduleManager {
         }
         CurrentModuleObject = "Schedule:File";
         for (LoopIndex = 1; LoopIndex <= NumCommaFileSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          LoopIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          Status,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     LoopIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
             state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_file;
@@ -1799,8 +1802,9 @@ namespace ScheduleManager {
                 const auto endLine = len(LineIn.data);
                 if (endLine > 0) {
                     if (int(LineIn.data[endLine - 1]) == state.dataSysVars->iUnicode_end) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
-                                        " appears to be a Unicode or binary file.");
+                        ShowSevereError(state,
+                                        RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
+                                            " appears to be a Unicode or binary file.");
                         ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
                         ShowFatalError(state, "Program terminates due to previous condition.");
                     }
@@ -1996,7 +2000,8 @@ namespace ScheduleManager {
         for (auto &NameValue : CSVAllColumnNames) {
             curName = NameValue.first + "_shading";
             timestepColumnValues = CSVAllColumnNameAndValues[NameValue.second];
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, state.dataScheduleMgr->UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             state.dataScheduleMgr->Schedule(SchNum).Name = curName;
             state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_file;
@@ -2048,19 +2053,20 @@ namespace ScheduleManager {
         // Constant Schedules
         CurrentModuleObject = "Schedule:Constant";
         for (LoopIndex = 1; LoopIndex <= NumConstantSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          LoopIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          Status,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     LoopIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
             state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_constant;
@@ -2112,19 +2118,20 @@ namespace ScheduleManager {
         CurrentModuleObject = "ExternalInterface:Schedule";
         for (LoopIndex = 1; LoopIndex <= NumExternalInterfaceSchedules; ++LoopIndex) {
 
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          LoopIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          Status,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     LoopIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
             state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_external;
@@ -2171,18 +2178,18 @@ namespace ScheduleManager {
         CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Schedule";
         for (LoopIndex = 1; LoopIndex <= NumExternalInterfaceFunctionalMockupUnitImportSchedules; ++LoopIndex) {
 
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          LoopIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          Status,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     LoopIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
 
             if (NumExternalInterfaceSchedules >= 1) {
                 GlobalNames::VerifyUniqueInterObjectName(
@@ -2194,7 +2201,8 @@ namespace ScheduleManager {
                                       "will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitImport)",
                     ErrorsFound);
             } else {
-                GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(
+                    state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             }
             ++SchNum;
             state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
@@ -2242,18 +2250,18 @@ namespace ScheduleManager {
         // added for FMU Export
         CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Schedule";
         for (LoopIndex = 1; LoopIndex <= NumExternalInterfaceFunctionalMockupUnitExportSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          LoopIndex,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNumbers,
-                                          Status,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     LoopIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
 
             if (NumExternalInterfaceSchedules >= 1) {
                 GlobalNames::VerifyUniqueInterObjectName(
@@ -2265,7 +2273,8 @@ namespace ScheduleManager {
                                       "will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitExport)",
                     ErrorsFound);
             } else {
-                GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(
+                    state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             }
 
             ++SchNum;
@@ -2342,12 +2351,13 @@ namespace ScheduleManager {
                 state.dataScheduleMgr->NumSchedules >
             0) { // Report to EIO file
             CurrentModuleObject = "Output:Schedules";
-            NumFields = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+            NumFields = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
             //    RptSchedule=.FALSE.
             RptLevel = 1;
             for (Count = 1; Count <= NumFields; ++Count) {
-                inputProcessor->getObjectItem(state, CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, Status);
+                state.dataInputProcessing->inputProcessor->getObjectItem(
+                    state, CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, Status);
                 //      RptSchedule=.TRUE.
 
                 {
@@ -2366,7 +2376,8 @@ namespace ScheduleManager {
                         ReportScheduleDetails(state, RptLevel);
 
                     } else {
-                        ShowWarningError(state, format("{}Report for Schedules should specify \"HOURLY\" or \"TIMESTEP\" (\"DETAILED\")", RoutineName));
+                        ShowWarningError(state,
+                                         format("{}Report for Schedules should specify \"HOURLY\" or \"TIMESTEP\" (\"DETAILED\")", RoutineName));
                         ShowContinueError(state, "HOURLY report will be done");
                         RptLevel = 1;
                         ReportScheduleDetails(state, RptLevel);

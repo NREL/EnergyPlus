@@ -66,10 +66,10 @@ struct EnergyPlusData;
 
 namespace HeatBalFiniteDiffManager {
 
-    Real64 constexpr TempInitValue(23.0);   // Initialization value for Temperature
-    Real64 constexpr RhovInitValue(0.0115); // Initialization value for Rhov
-    Real64 constexpr EnthInitValue(100.0);  // Initialization value for Enthalpy
-    constexpr Real64 smalldiff(1.e-8); // Used in places where "equality" tests should not be used.
+    Real64 constexpr TempInitValue(23.0);       // Initialization value for Temperature
+    Real64 constexpr RhovInitValue(0.0115);     // Initialization value for Rhov
+    Real64 constexpr EnthInitValue(100.0);      // Initialization value for Enthalpy
+    constexpr Real64 smalldiff(1.e-8);          // Used in places where "equality" tests should not be used.
     constexpr int CrankNicholsonSecondOrder(1); // original CondFD scheme.  semi implicit, second order in time
     constexpr int FullyImplicitFirstOrder(2);   // fully implicit scheme, first order in time.
 
@@ -92,14 +92,15 @@ namespace HeatBalFiniteDiffManager {
         }
     };
 
-    struct MaterialActuatorData {
+    struct MaterialActuatorData
+    {
         std::string actuatorName;
         bool isActuated;
         Real64 actuatedValue;
 
-        MaterialActuatorData () :
-            isActuated(false), actuatedValue(0.0)
-        {}
+        MaterialActuatorData() : isActuated(false), actuatedValue(0.0)
+        {
+        }
     };
 
     struct SurfaceDataFD
@@ -207,10 +208,10 @@ namespace HeatBalFiniteDiffManager {
     Real64 terpld(Array2<Real64> const &a, Real64 x1, int nind, int ndep);
 
     void ExteriorBCEqns(EnergyPlusData &state,
-                        int Delt,              // Time Increment
-                        int i,                 // Node Index
-                        int Lay,               // Layer Number for Construction
-                        int Surf,              // Surface number
+                        int Delt,                    // Time Increment
+                        int i,                       // Node Index
+                        int Lay,                     // Layer Number for Construction
+                        int Surf,                    // Surface number
                         Array1D<Real64> const &T,    // Old node Temperature in MFD finite difference solution
                         Array1D<Real64> &TT,         // New node Temperature in MFD finite difference solution.
                         Array1D<Real64> const &Rhov, // MFD Nodal Vapor Density[kg/m3] and is the old or last time step result.
@@ -220,15 +221,15 @@ namespace HeatBalFiniteDiffManager {
                         Array1D<Real64> &TDT,        // The current or new Temperature at each node location for the CondFD solution..
                         Array1D<Real64> &EnthOld,    // Old Nodal enthalpy
                         Array1D<Real64> &EnthNew,    // New Nodal enthalpy
-                        int TotNodes,          // Total nodes in layer
-                        Real64 HMovInsul       // Conductance of movable(transparent) insulation.
+                        int TotNodes,                // Total nodes in layer
+                        Real64 HMovInsul             // Conductance of movable(transparent) insulation.
     );
 
     void InteriorNodeEqns(EnergyPlusData &state,
-                          int Delt,              // Time Increment
-                          int i,                 // Node Index
-                          int Lay,               // Layer Number for Construction
-                          int Surf,              // Surface number
+                          int Delt,                    // Time Increment
+                          int i,                       // Node Index
+                          int Lay,                     // Layer Number for Construction
+                          int Surf,                    // Surface number
                           Array1D<Real64> const &T,    // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
                           Array1D<Real64> &TT,         // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
                           Array1D<Real64> const &Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
@@ -241,10 +242,10 @@ namespace HeatBalFiniteDiffManager {
     );
 
     void IntInterfaceNodeEqns(EnergyPlusData &state,
-                              int Delt,                 // Time Increment
-                              int i,                    // Node Index
-                              int Lay,                  // Layer Number for Construction
-                              int Surf,                 // Surface number
+                              int Delt,                       // Time Increment
+                              int i,                          // Node Index
+                              int Lay,                        // Layer Number for Construction
+                              int Surf,                       // Surface number
                               Array1D<Real64> const &T,       // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
                               Array1D<Real64> &TT,            // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
                               Array1D<Real64> const &Rhov,    // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
@@ -254,14 +255,14 @@ namespace HeatBalFiniteDiffManager {
                               Array1D<Real64> &TDT,           // NEW NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
                               Array1D<Real64> const &EnthOld, // Old Nodal enthalpy
                               Array1D<Real64> &EnthNew,       // New Nodal enthalpy
-                              int GSiter                // Iteration number of Gauss Seidell iteration
+                              int GSiter                      // Iteration number of Gauss Seidell iteration
     );
 
     void InteriorBCEqns(EnergyPlusData &state,
-                        int Delt,              // Time Increment
-                        int i,                 // Node Index
-                        int Lay,               // Layer Number for Construction
-                        int Surf,              // Surface number
+                        int Delt,                    // Time Increment
+                        int i,                       // Node Index
+                        int Lay,                     // Layer Number for Construction
+                        int Surf,                    // Surface number
                         Array1D<Real64> const &T,    // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (Old).
                         Array1D<Real64> &TT,         // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (New).
                         Array1D<Real64> const &Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
@@ -279,7 +280,8 @@ namespace HeatBalFiniteDiffManager {
                                   Real64 CheckTemperature // calculated temperature, not reset
     );
 
-    void adjustPropertiesForPhaseChange(EnergyPlusData &state, int finiteDifferenceLayerIndex,
+    void adjustPropertiesForPhaseChange(EnergyPlusData &state,
+                                        int finiteDifferenceLayerIndex,
                                         int surfaceIndex,
                                         const Material::MaterialProperties &materialDefinition,
                                         Real64 temperaturePrevious,
@@ -290,7 +292,8 @@ namespace HeatBalFiniteDiffManager {
 
 } // namespace HeatBalFiniteDiffManager
 
-struct HeatBalFiniteDiffMgr : BaseGlobalStruct {
+struct HeatBalFiniteDiffMgr : BaseGlobalStruct
+{
     Array1D_string const cCondFDSchemeType = Array1D_string(2, {"CrankNicholsonSecondOrder", "FullyImplicitFirstOrder"});
 
     Array1D<Real64> SigmaR; // Total Resistance of construction layers
@@ -300,10 +303,10 @@ struct HeatBalFiniteDiffMgr : BaseGlobalStruct {
     Array1D<Real64> QHeatOutFlux; // HeatFlux on Surface for reporting
 
     int CondFDSchemeType = HeatBalFiniteDiffManager::FullyImplicitFirstOrder; // solution scheme for CondFD - default
-    Real64 SpaceDescritConstant = 3.0;              // spatial descritization constant,
-    Real64 MinTempLimit = -100.0;                   // lower limit check, degree C
-    Real64 MaxTempLimit = 100.0;                    // upper limit check, degree C
-    int MaxGSiter = 30;                             // maximum number of Gauss Seidel iterations
+    Real64 SpaceDescritConstant = 3.0;                                        // spatial descritization constant,
+    Real64 MinTempLimit = -100.0;                                             // lower limit check, degree C
+    Real64 MaxTempLimit = 100.0;                                              // upper limit check, degree C
+    int MaxGSiter = 30;                                                       // maximum number of Gauss Seidel iterations
     Real64 fracTimeStepZone_Hour = 0.0;
     bool GetHBFiniteDiffInputFlag = true;
     int WarmupSurfTemp = 0;
@@ -312,6 +315,7 @@ struct HeatBalFiniteDiffMgr : BaseGlobalStruct {
     Array1D<HeatBalFiniteDiffManager::ConstructionDataFD> ConstructFD;
     Array1D<HeatBalFiniteDiffManager::SurfaceDataFD> SurfaceFD;
     Array1D<HeatBalFiniteDiffManager::MaterialDataFD> MaterialFD;
+    bool MyEnvrnFlag = true;
 
     void clear_state() override
     {
@@ -330,6 +334,7 @@ struct HeatBalFiniteDiffMgr : BaseGlobalStruct {
         this->ConstructFD.deallocate();
         this->SurfaceFD.deallocate();
         this->MaterialFD.deallocate();
+        this->MyEnvrnFlag = true;
     }
 };
 

@@ -90,7 +90,7 @@ namespace DataHVACGlobals {
     Real64 constexpr DesCoilHWInletTempMin(46.0); // minimum heating water coil water inlet temp for UA sizing only. [deg C]
 
     int constexpr NumOfSizingTypes(35); // request sizing for cooling air flow rate
-    
+
     // Sizing types
     int constexpr CoolingAirflowSizing(1);                // request sizing for cooling air flow rate
     int constexpr CoolingWaterDesWaterInletTempSizing(6); // request sizing for cooling water coil inlet water temp
@@ -138,13 +138,13 @@ namespace DataHVACGlobals {
     int constexpr MinFrac(1);
     int constexpr FixedMin(2);
     // Fan mode
-    int constexpr CycFanCycCoil(1); // Cycling fan, cycling coil = 1
+    int constexpr CycFanCycCoil(1);  // Cycling fan, cycling coil = 1
     int constexpr ContFanCycCoil(2); // Continuous fan, cycling coil = 2
     // Fan placement
     int constexpr BlowThru(1); // fan before coil
     int constexpr DrawThru(2); // fan after coil
     // OA Controller Heat Recovery Bypass Control Types
-    int constexpr BypassWhenWithinEconomizerLimits(0); // heat recovery controlled by economizer limits
+    int constexpr BypassWhenWithinEconomizerLimits(0);   // heat recovery controlled by economizer limits
     int constexpr BypassWhenOAFlowGreaterThanMinimum(1); // heat recovery ON at minimum OA in economizer mode
 
     // parameters describing unitary systems
@@ -157,7 +157,7 @@ namespace DataHVACGlobals {
     int constexpr UnitarySys_HeatPump_AirToAir(5);
     int constexpr UnitarySys_HeatPump_WaterToAir(6);
     int constexpr UnitarySys_AnyCoilType(7);
-    
+
     // parameters describing coil types
     int constexpr NumAllCoilTypes(37);
     int constexpr CoilDX_CoolingSingleSpeed(1);
@@ -209,10 +209,10 @@ namespace DataHVACGlobals {
     int constexpr WatertoAir_VarSpeedLooUpTable(4);
 
     // Water to Air HP Water Flow Mode
-    int constexpr WaterCycling(1); // water flow cycles with compressor
+    int constexpr WaterCycling(1);  // water flow cycles with compressor
     int constexpr WaterConstant(2); // water flow is constant
-    int constexpr
-        WaterConstantOnDemand(3); // water flow is constant whenever the coil is operational - this is the only method used in EP V7.2 and earlier
+    int constexpr WaterConstantOnDemand(
+        3); // water flow is constant whenever the coil is operational - this is the only method used in EP V7.2 and earlier
 
     // parameters describing coil performance types
     int constexpr CoilPerfDX_CoolBypassEmpirical(100);
@@ -234,7 +234,7 @@ namespace DataHVACGlobals {
     // dx coil type (DXCT)
     int constexpr RegularDXCoil(1); // Regular DX coils or mixed air dx coils
     int constexpr DOASDXCoil(2);    // 100% DOAS DX coils
-     
+
     // Parameters describing Heat Exchanger types
     int constexpr NumHXTypes(3);
 
@@ -394,7 +394,8 @@ namespace DataHVACGlobals {
 
 } // namespace DataHVACGlobals
 
-struct HVACGlobalsData : BaseGlobalStruct {
+struct HVACGlobalsData : BaseGlobalStruct
+{
     // Object Data
     Array1D<DataHVACGlobals::ZoneCompTypeData> ZoneComp;
     DataHVACGlobals::OptStartDataType OptStartData; // For optimum start
@@ -402,7 +403,7 @@ struct HVACGlobalsData : BaseGlobalStruct {
     DataHVACGlobals::HVACSystemRootFindingAlgorithm HVACSystemRootFinding;
 
     // Hybrid ventilation control part
-    int NumHybridVentSysAvailMgrs = 0;               // Number of hybrid ventilation control
+    int NumHybridVentSysAvailMgrs = 0;              // Number of hybrid ventilation control
     Array1D_int HybridVentSysAvailAirLoopNum;       // Airloop number in hybrid vent availability manager
     Array1D_int HybridVentSysAvailVentCtrl;         // Ventilation control action in hybrid vent availability manager
     Array1D_int HybridVentSysAvailActualZoneNum;    // Actual zone num in hybrid vent availability manager
@@ -419,21 +420,26 @@ struct HVACGlobalsData : BaseGlobalStruct {
     Real64 deviationFromSetPtThresholdHtg = -0.2; // heating threshold for reporting setpoint deviation
     Real64 deviationFromSetPtThresholdClg = 0.2;  // cooling threshold for reporting setpoint deviation
 
-    bool SimAirLoopsFlag;                  // True when the air loops need to be (re)simulated
-    bool SimElecCircuitsFlag;              // True when electic circuits need to be (re)simulated
-    bool SimPlantLoopsFlag;                // True when the main plant loops need to be (re)simulated
-    bool SimZoneEquipmentFlag;             // True when zone equipment components need to be (re)simulated
-    bool SimNonZoneEquipmentFlag;          // True when non-zone equipment components need to be (re)simulated
-    bool ZoneMassBalanceHVACReSim;         // True when zone air mass flow balance and air loop needs (re)simulated
+    bool SimAirLoopsFlag;                   // True when the air loops need to be (re)simulated
+    bool SimElecCircuitsFlag;               // True when electic circuits need to be (re)simulated
+    bool SimPlantLoopsFlag;                 // True when the main plant loops need to be (re)simulated
+    bool SimZoneEquipmentFlag;              // True when zone equipment components need to be (re)simulated
+    bool SimNonZoneEquipmentFlag;           // True when non-zone equipment components need to be (re)simulated
+    bool ZoneMassBalanceHVACReSim;          // True when zone air mass flow balance and air loop needs (re)simulated
     int MinAirLoopIterationsAfterFirst = 1; // minimum number of HVAC iterations after FirstHVACIteration
 
-    Array1D<Real64> MaxRatedVolFlowPerRatedTotCap = Array1D<Real64>(2, {DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap1, DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap2});
-    Array1D<Real64> MinRatedVolFlowPerRatedTotCap= Array1D<Real64>(2, {DataHVACGlobals::MinRatedVolFlowPerRatedTotCap1, DataHVACGlobals::MinRatedVolFlowPerRatedTotCap2});
-    Array1D<Real64> MaxHeatVolFlowPerRatedTotCap= Array1D<Real64>(2, {DataHVACGlobals::MaxHeatVolFlowPerRatedTotCap1, DataHVACGlobals::MaxHeatVolFlowPerRatedTotCap2});
-    Array1D<Real64> MaxCoolVolFlowPerRatedTotCap= Array1D<Real64>(2, {DataHVACGlobals::MaxCoolVolFlowPerRatedTotCap1, DataHVACGlobals::MaxCoolVolFlowPerRatedTotCap2});
-    Array1D<Real64> MinOperVolFlowPerRatedTotCap= Array1D<Real64>(2, {DataHVACGlobals::MinOperVolFlowPerRatedTotCap1, DataHVACGlobals::MinOperVolFlowPerRatedTotCap2});
-    
-    int DXCT = 1;                // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
+    Array1D<Real64> MaxRatedVolFlowPerRatedTotCap =
+        Array1D<Real64>(2, {DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap1, DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap2});
+    Array1D<Real64> MinRatedVolFlowPerRatedTotCap =
+        Array1D<Real64>(2, {DataHVACGlobals::MinRatedVolFlowPerRatedTotCap1, DataHVACGlobals::MinRatedVolFlowPerRatedTotCap2});
+    Array1D<Real64> MaxHeatVolFlowPerRatedTotCap =
+        Array1D<Real64>(2, {DataHVACGlobals::MaxHeatVolFlowPerRatedTotCap1, DataHVACGlobals::MaxHeatVolFlowPerRatedTotCap2});
+    Array1D<Real64> MaxCoolVolFlowPerRatedTotCap =
+        Array1D<Real64>(2, {DataHVACGlobals::MaxCoolVolFlowPerRatedTotCap1, DataHVACGlobals::MaxCoolVolFlowPerRatedTotCap2});
+    Array1D<Real64> MinOperVolFlowPerRatedTotCap =
+        Array1D<Real64>(2, {DataHVACGlobals::MinOperVolFlowPerRatedTotCap1, DataHVACGlobals::MinOperVolFlowPerRatedTotCap2});
+
+    int DXCT = 1;                      // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
     bool FirstTimeStepSysFlag = false; // Set to true at the start of each sub-time step
 
     Real64 TimeStepSys = 0.0;                  // System Time Increment - the adaptive time step used by the HVAC simulation (hours)
@@ -462,9 +468,10 @@ struct HVACGlobalsData : BaseGlobalStruct {
     Real64 BalancedExhMassFlow = 0.0;   // balanced zone exhaust (declared as so by user)  [kg/s]
     Real64 PlenumInducedMassFlow = 0.0; // secondary air mass flow rate induced from a return plenum [kg/s]
     bool TurnFansOn = false;            // If true overrides fan schedule and cycles fans on
-    bool TurnZoneFansOnlyOn = false; // If true overrides zone fan schedule and cycles fans on (currently used only by parallel powered induction unit)
-    bool TurnFansOff = false;        // If True overides fan schedule and TurnFansOn and forces fans off
-    bool ZoneCompTurnFansOn = false; // If true overrides fan schedule and cycles fans on
+    bool TurnZoneFansOnlyOn =
+        false;                // If true overrides zone fan schedule and cycles fans on (currently used only by parallel powered induction unit)
+    bool TurnFansOff = false; // If True overides fan schedule and TurnFansOn and forces fans off
+    bool ZoneCompTurnFansOn = false;  // If true overrides fan schedule and cycles fans on
     bool ZoneCompTurnFansOff = false; // If True overides fan schedule and TurnFansOn and forces fans off
     bool SetPointErrorFlag = false;   // True if any needed setpoints not set; if true, program terminates
     bool DoSetPointTest = false;      // True one time only for sensed node setpoint test
@@ -477,6 +484,10 @@ struct HVACGlobalsData : BaseGlobalStruct {
     bool AirLoopInit = false;         // flag for whether InitAirLoops has been called
     bool AirLoopsSimOnce = false;     // True means that the air loops have been simulated once in this environment
     bool GetAirPathDataDone = false;  // True means that air loops inputs have been processed
+    bool StandardRatingsMyOneTimeFlag = true;
+    bool StandardRatingsMyCoolOneTimeFlag = true;
+    bool StandardRatingsMyCoolOneTimeFlag2 = true;
+    bool StandardRatingsMyHeatOneTimeFlag = true;
 
     void clear_state() override
     {
@@ -510,27 +521,32 @@ struct HVACGlobalsData : BaseGlobalStruct {
         this->ZoneMassBalanceHVACReSim = true;
         this->MinAirLoopIterationsAfterFirst = 1;
 
-        this->MaxRatedVolFlowPerRatedTotCap = Array1D<Real64>(2, {DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap1, DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap2});
-        this->MinRatedVolFlowPerRatedTotCap= Array1D<Real64>(2, {DataHVACGlobals::MinRatedVolFlowPerRatedTotCap1, DataHVACGlobals::MinRatedVolFlowPerRatedTotCap2});
-        this->MaxHeatVolFlowPerRatedTotCap= Array1D<Real64>(2, {DataHVACGlobals::MaxHeatVolFlowPerRatedTotCap1, DataHVACGlobals::MaxHeatVolFlowPerRatedTotCap2});
-        this->MaxCoolVolFlowPerRatedTotCap= Array1D<Real64>(2, {DataHVACGlobals::MaxCoolVolFlowPerRatedTotCap1, DataHVACGlobals::MaxCoolVolFlowPerRatedTotCap2});
-        this->MinOperVolFlowPerRatedTotCap= Array1D<Real64>(2, {DataHVACGlobals::MinOperVolFlowPerRatedTotCap1, DataHVACGlobals::MinOperVolFlowPerRatedTotCap2});
+        this->MaxRatedVolFlowPerRatedTotCap =
+            Array1D<Real64>(2, {DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap1, DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap2});
+        this->MinRatedVolFlowPerRatedTotCap =
+            Array1D<Real64>(2, {DataHVACGlobals::MinRatedVolFlowPerRatedTotCap1, DataHVACGlobals::MinRatedVolFlowPerRatedTotCap2});
+        this->MaxHeatVolFlowPerRatedTotCap =
+            Array1D<Real64>(2, {DataHVACGlobals::MaxHeatVolFlowPerRatedTotCap1, DataHVACGlobals::MaxHeatVolFlowPerRatedTotCap2});
+        this->MaxCoolVolFlowPerRatedTotCap =
+            Array1D<Real64>(2, {DataHVACGlobals::MaxCoolVolFlowPerRatedTotCap1, DataHVACGlobals::MaxCoolVolFlowPerRatedTotCap2});
+        this->MinOperVolFlowPerRatedTotCap =
+            Array1D<Real64>(2, {DataHVACGlobals::MinOperVolFlowPerRatedTotCap1, DataHVACGlobals::MinOperVolFlowPerRatedTotCap2});
 
-        this->DXCT = 1;                // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
-        this->FirstTimeStepSysFlag = false; // Set to true at the start of each sub-time step
-        this->TimeStepSys = 0.0;                  // System Time Increment - the adaptive time step used by the HVAC simulation (hours)
-        this->SysTimeElapsed = 0.0;               // elapsed system time in zone timestep (hours)
-        this->FracTimeStepZone = 0.0;             // System time step divided by the zone time step
-        this->ShortenTimeStepSys = false;           // Logical flag that triggers shortening of system time step
+        this->DXCT = 1;                              // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
+        this->FirstTimeStepSysFlag = false;          // Set to true at the start of each sub-time step
+        this->TimeStepSys = 0.0;                     // System Time Increment - the adaptive time step used by the HVAC simulation (hours)
+        this->SysTimeElapsed = 0.0;                  // elapsed system time in zone timestep (hours)
+        this->FracTimeStepZone = 0.0;                // System time step divided by the zone time step
+        this->ShortenTimeStepSys = false;            // Logical flag that triggers shortening of system time step
         this->NumOfSysTimeSteps = 1;                 // for current zone time step, number of system timesteps inside  it
         this->NumOfSysTimeStepsLastZoneTimeStep = 1; // previous zone time step, num of system timesteps inside
         this->LimitNumSysSteps = 0;
-        this->UseZoneTimeStepHistory = true;    // triggers use of zone time step history, else system time step history, for ZTM1, ZTMx
-        this->NumPlantLoops = 0;                 // Number of plant loops specified in simulation
-        this->NumCondLoops = 0;                  // Number of condenser plant loops specified in simulation
-        this->NumElecCircuits = 0;               // Number of electric circuits specified in simulation
-        this->NumGasMeters = 0;                  // Number of gas meters specified in simulation
-        this->NumPrimaryAirSys = 0;              // Number of primary HVAC air systems
+        this->UseZoneTimeStepHistory = true;  // triggers use of zone time step history, else system time step history, for ZTM1, ZTMx
+        this->NumPlantLoops = 0;              // Number of plant loops specified in simulation
+        this->NumCondLoops = 0;               // Number of condenser plant loops specified in simulation
+        this->NumElecCircuits = 0;            // Number of electric circuits specified in simulation
+        this->NumGasMeters = 0;               // Number of gas meters specified in simulation
+        this->NumPrimaryAirSys = 0;           // Number of primary HVAC air systems
         this->OnOffFanPartLoadFraction = 1.0; // fan part-load fraction (Fan:OnOff)
         this->DXCoilTotalCapacity = 0.0;      // DX coil total cooling capacity (eio report var for HPWHs)
         this->DXElecCoolingPower = 0.0;       // Electric power consumed by DX cooling coil last DX simulation
@@ -538,24 +554,29 @@ struct HVACGlobalsData : BaseGlobalStruct {
         this->ElecHeatingCoilPower = 0.0;     // Electric power consumed by electric heating coil
         this->SuppHeatingCoilPower = 0.0;     // Electric power consumed by electric supplemental heating coil
         this->AirToAirHXElecPower = 0.0;      // Electric power consumed by Heat Exchanger:Air To Air (Generic or Flat Plate)
-        this->UnbalExhMassFlow = 0.0;      // unbalanced zone exhaust from a zone equip component [kg/s]
-        this->BalancedExhMassFlow = 0.0;   // balanced zone exhaust (declared as so by user)  [kg/s]
-        this->PlenumInducedMassFlow = 0.0; // secondary air mass flow rate induced from a return plenum [kg/s]
-        this->TurnFansOn = false;            // If true overrides fan schedule and cycles fans on
-        this->TurnZoneFansOnlyOn = false; // If true overrides zone fan schedule and cycles fans on (currently used only by parallel powered induction unit)
-        this->TurnFansOff = false;        // If True overides fan schedule and TurnFansOn and forces fans off
-        this->ZoneCompTurnFansOn = false; // If true overrides fan schedule and cycles fans on
+        this->UnbalExhMassFlow = 0.0;         // unbalanced zone exhaust from a zone equip component [kg/s]
+        this->BalancedExhMassFlow = 0.0;      // balanced zone exhaust (declared as so by user)  [kg/s]
+        this->PlenumInducedMassFlow = 0.0;    // secondary air mass flow rate induced from a return plenum [kg/s]
+        this->TurnFansOn = false;             // If true overrides fan schedule and cycles fans on
+        this->TurnZoneFansOnlyOn =
+            false;                 // If true overrides zone fan schedule and cycles fans on (currently used only by parallel powered induction unit)
+        this->TurnFansOff = false; // If True overides fan schedule and TurnFansOn and forces fans off
+        this->ZoneCompTurnFansOn = false;  // If true overrides fan schedule and cycles fans on
         this->ZoneCompTurnFansOff = false; // If True overides fan schedule and TurnFansOn and forces fans off
         this->SetPointErrorFlag = false;   // True if any needed setpoints not set; if true, program terminates
         this->DoSetPointTest = false;      // True one time only for sensed node setpoint test
         this->NightVentOn = false;         // set TRUE in SimAirServingZone if night ventilation is happening
         this->NumTempContComps = 0;
-        this->HPWHInletDBTemp = 0.0;     // Used by curve objects when calculating DX coil performance for HEAT PUMP:WATER HEATER
-        this->HPWHInletWBTemp = 0.0;     // Used by curve objects when calculating DX coil performance for HEAT PUMP:WATER HEATER
-        this->HPWHCrankcaseDBTemp = 0.0; // Used for HEAT PUMP:WATER HEATER crankcase heater ambient temperature calculations
-        this->AirLoopInit = false;         // flag for whether InitAirLoops has been called
-        this->AirLoopsSimOnce = false;     // True means that the air loops have been simulated once in this environment
-        this->GetAirPathDataDone = false;  // True means that air loops inputs have been processed
+        this->HPWHInletDBTemp = 0.0;      // Used by curve objects when calculating DX coil performance for HEAT PUMP:WATER HEATER
+        this->HPWHInletWBTemp = 0.0;      // Used by curve objects when calculating DX coil performance for HEAT PUMP:WATER HEATER
+        this->HPWHCrankcaseDBTemp = 0.0;  // Used for HEAT PUMP:WATER HEATER crankcase heater ambient temperature calculations
+        this->AirLoopInit = false;        // flag for whether InitAirLoops has been called
+        this->AirLoopsSimOnce = false;    // True means that the air loops have been simulated once in this environment
+        this->GetAirPathDataDone = false; // True means that air loops inputs have been processed
+        this->StandardRatingsMyOneTimeFlag = true;
+        this->StandardRatingsMyCoolOneTimeFlag = true;
+        this->StandardRatingsMyCoolOneTimeFlag2 = true;
+        this->StandardRatingsMyHeatOneTimeFlag = true;
     }
 };
 

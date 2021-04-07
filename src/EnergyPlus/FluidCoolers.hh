@@ -156,9 +156,9 @@ namespace FluidCoolers {
               OutdoorAirInletNodeNum(0), HighMassFlowErrorCount(0), HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0),
               OutletWaterTempErrorIndex(0), SmallWaterMassFlowErrorCount(0), SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0),
               WMFRLessThanMinAvailErrIndex(0), WMFRGreaterThanMaxAvailErrCount(0), WMFRGreaterThanMaxAvailErrIndex(0), LoopNum(0), LoopSideNum(0),
-              BranchNum(0), CompNum(0), oneTimeInitFlag(true), beginEnvrnInit(true), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0),
-              Qactual(0.0), FanPower(0.0), FanEnergy(0.0), WaterTemp(0.0), AirTemp(0.0), AirHumRat(0.0), AirPress(0.0), AirWetBulb(0.0),
-              indexInArray(0)
+              BranchNum(0), CompNum(0), oneTimeInitFlag(true), beginEnvrnInit(true), InletWaterTemp(0.0), OutletWaterTemp(0.0),
+              WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), WaterTemp(0.0), AirTemp(0.0), AirHumRat(0.0), AirPress(0.0),
+              AirWetBulb(0.0), indexInArray(0)
         {
         }
 
@@ -192,7 +192,11 @@ namespace FluidCoolers {
 
         void calcTwoSpeed(EnergyPlusData &state);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         void getDesignCapacities(EnergyPlusData &state,
                                  [[maybe_unused]] const PlantLocation &calledFromLocation,
@@ -207,7 +211,8 @@ namespace FluidCoolers {
 
     void GetFluidCoolerInput(EnergyPlusData &state);
 
-    void CalcFluidCoolerOutlet(EnergyPlusData &state, int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
+    void CalcFluidCoolerOutlet(
+        EnergyPlusData &state, int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
 
     Real64 SimpleFluidCoolerUAResidual(EnergyPlusData &state,
                                        Real64 UA,                 // UA of fluid cooler
@@ -216,7 +221,8 @@ namespace FluidCoolers {
 
 } // namespace FluidCoolers
 
-struct FluidCoolersData : BaseGlobalStruct {
+struct FluidCoolersData : BaseGlobalStruct
+{
 
     bool GetFluidCoolerInputFlag = true;
     int NumSimpleFluidCoolers = 0;

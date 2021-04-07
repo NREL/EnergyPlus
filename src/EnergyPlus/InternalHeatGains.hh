@@ -63,7 +63,8 @@ struct EnergyPlusData;
 
 namespace InternalHeatGains {
 
-    void ManageInternalHeatGains(EnergyPlusData &state, Optional_bool_const InitOnly = _); // when true, just calls the get input, if appropriate and returns.
+    void ManageInternalHeatGains(EnergyPlusData &state,
+                                 Optional_bool_const InitOnly = _); // when true, just calls the get input, if appropriate and returns.
 
     void GetInternalHeatGainsInput(EnergyPlusData &state);
 
@@ -90,11 +91,11 @@ namespace InternalHeatGains {
                                        Real64 &SumConvGainRate); // For HybridModel
 
     void SumAllInternalConvectionGainsExceptPeople(EnergyPlusData &state,
-                                                   int const ZoneNum,                    // zone index pointer for which zone to sum gains for
+                                                   int const ZoneNum, // zone index pointer for which zone to sum gains for
                                                    Real64 &SumConvGainRateExceptPeople);
 
     void SumInternalConvectionGainsByTypes(EnergyPlusData &state,
-                                           int const ZoneNum,             // zone index pointer for which zone to sum gains for
+                                           int const ZoneNum,              // zone index pointer for which zone to sum gains for
                                            const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
                                            Real64 &SumConvGainRate);
 
@@ -107,21 +108,21 @@ namespace InternalHeatGains {
 
     void SumInternalConvectionGainsByIndices(
         EnergyPlusData &state,
-        int const ZoneNum,                 // zone index pointer for which zone to sum gains for
+        int const ZoneNum,                  // zone index pointer for which zone to sum gains for
         const Array1D_int &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
         const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumConvGainRate);
 
     void SumInternalLatentGainsByIndices(
         EnergyPlusData &state,
-        int const ZoneNum,                 // zone index pointer for which zone to sum gains for
+        int const ZoneNum,                  // zone index pointer for which zone to sum gains for
         const Array1D_int &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
         const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumLatentGainRate);
 
     void SumReturnAirConvectionGainsByIndices(
         EnergyPlusData &state,
-        int const ZoneNum,                 // zone index pointer for which zone to sum gains for
+        int const ZoneNum,                  // zone index pointer for which zone to sum gains for
         const Array1D_int &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
         const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumReturnAirGainRate);
@@ -133,7 +134,7 @@ namespace InternalHeatGains {
     );
 
     void SumReturnAirConvectionGainsByTypes(EnergyPlusData &state,
-                                            int const ZoneNum,             // zone index pointer for which zone to sum gains for
+                                            int const ZoneNum,              // zone index pointer for which zone to sum gains for
                                             const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
                                             Real64 &SumReturnAirGainRate);
 
@@ -142,7 +143,7 @@ namespace InternalHeatGains {
                                       Real64 &SumRadGainRate);
 
     void SumInternalRadiationGainsByTypes(EnergyPlusData &state,
-                                          int const ZoneNum,             // zone index pointer for which zone to sum gains for
+                                          int const ZoneNum,              // zone index pointer for which zone to sum gains for
                                           const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
                                           Real64 &SumRadiationGainRate);
 
@@ -156,7 +157,7 @@ namespace InternalHeatGains {
                                                Real64 &SumLatentGainRateExceptPeople);
 
     void SumInternalLatentGainsByTypes(EnergyPlusData &state,
-                                       int const ZoneNum,             // zone index pointer for which zone to sum gains for
+                                       int const ZoneNum,              // zone index pointer for which zone to sum gains for
                                        const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
                                        Real64 &SumLatentGainRate);
 
@@ -176,7 +177,7 @@ namespace InternalHeatGains {
                                             Real64 &SumCO2GainRateExceptPeople);
 
     void SumInternalCO2GainsByTypes(EnergyPlusData &state,
-                                    int const ZoneNum,             // zone index pointer for which zone to sum gains for
+                                    int const ZoneNum,              // zone index pointer for which zone to sum gains for
                                     const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
                                     Real64 &SumCO2GainRate);
 
@@ -188,10 +189,11 @@ namespace InternalHeatGains {
 
 } // namespace InternalHeatGains
 
-struct InternalHeatGainsData : BaseGlobalStruct {
+struct InternalHeatGainsData : BaseGlobalStruct
+{
 
     bool GetInternalHeatGainsInputFlag = true; // Controls the GET routine calling (limited to first time)
-    bool ErrorsFound = false;                   // if errors were found in the input
+    bool ErrorsFound = false;                  // if errors were found in the input
 
     // static variables extracted from functions
     bool UsingThermalComfort = false;
@@ -200,7 +202,8 @@ struct InternalHeatGainsData : BaseGlobalStruct {
     Real64 curQL = 0.0; // radiant value prior to adjustment for pulse for load component report
     Real64 adjQL = 0.0; // radiant value including adjustment for pulse for load component report
 
-    void clear_state() override {
+    void clear_state() override
+    {
 
         this->GetInternalHeatGainsInputFlag = true;
         this->ErrorsFound = false;

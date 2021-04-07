@@ -76,7 +76,7 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
     // Reads input and creates instance of Site:GroundDomain:Shallow object
 
     // USE STATEMENTS:
-        using namespace GroundTemperatureManager;
+    using namespace GroundTemperatureManager;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -88,7 +88,7 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
     std::shared_ptr<SiteShallowGroundTemps> thisModel(new SiteShallowGroundTemps());
 
     std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(objectType_SiteShallowGroundTemp);
-    int numCurrObjects = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int numCurrObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     thisModel->objectType = objectType;
     thisModel->objectName = objectName;
@@ -96,7 +96,8 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
     if (numCurrObjects == 1) {
 
         // Get the object names for each construction from the input processor
-        inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
+        state.dataInputProcessing->inputProcessor->getObjectItem(
+            state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
             ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");

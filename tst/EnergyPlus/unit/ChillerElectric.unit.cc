@@ -156,7 +156,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
     bool RunFlag(true);
     Real64 MyLoad(-20000.0);
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
     auto &thisChiller = state->dataPlantChillers->ElectricChiller(1);
     thisChiller.initialize(*state, RunFlag, MyLoad);
     thisChiller.size(*state);
@@ -283,7 +283,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     bool RunFlag(true);
     Real64 MyLoad(-20000.0);
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
     auto &thisChiller = state->dataPlantChillers->ElectricChiller(1);
     thisChiller.initialize(*state, RunFlag, MyLoad);
     thisChiller.size(*state);

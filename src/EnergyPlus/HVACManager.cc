@@ -56,6 +56,7 @@
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
@@ -184,20 +185,18 @@ void ManageHVAC(EnergyPlusData &state)
     bool ReportDebug;
     int ZoneNum;
 
-    static int ZTempTrendsNumSysSteps(0);
-    static int SysTimestepLoop(0);
     bool DummyLogical;
 
-    auto & AirLoopsSimOnce = state.dataHVACGlobal->AirLoopsSimOnce;
-    auto & NumOfSysTimeStepsLastZoneTimeStep = state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep;
-    auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    auto & FirstTimeStepSysFlag = state.dataHVACGlobal->FirstTimeStepSysFlag;
-    auto & ShortenTimeStepSys = state.dataHVACGlobal->ShortenTimeStepSys;
-    auto & UseZoneTimeStepHistory = state.dataHVACGlobal->UseZoneTimeStepHistory;
-    auto & NumOfSysTimeSteps = state.dataHVACGlobal->NumOfSysTimeSteps;
-    auto & FracTimeStepZone = state.dataHVACGlobal->FracTimeStepZone;
-    auto & LimitNumSysSteps = state.dataHVACGlobal->LimitNumSysSteps;
+    auto &AirLoopsSimOnce = state.dataHVACGlobal->AirLoopsSimOnce;
+    auto &NumOfSysTimeStepsLastZoneTimeStep = state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep;
+    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    auto &FirstTimeStepSysFlag = state.dataHVACGlobal->FirstTimeStepSysFlag;
+    auto &ShortenTimeStepSys = state.dataHVACGlobal->ShortenTimeStepSys;
+    auto &UseZoneTimeStepHistory = state.dataHVACGlobal->UseZoneTimeStepHistory;
+    auto &NumOfSysTimeSteps = state.dataHVACGlobal->NumOfSysTimeSteps;
+    auto &FracTimeStepZone = state.dataHVACGlobal->FracTimeStepZone;
+    auto &LimitNumSysSteps = state.dataHVACGlobal->LimitNumSysSteps;
 
     // SYSTEM INITIALIZATION
     if (state.dataHVACMgr->TriggerGetAFN) {
@@ -299,7 +298,7 @@ void ManageHVAC(EnergyPlusData &state)
     if (ZoneTempChange > state.dataConvergeParams->MaxZoneTempDiff && !state.dataGlobal->KickOffSimulation) {
         // determine value of adaptive system time step
         // model how many system timesteps we want in zone timestep
-        ZTempTrendsNumSysSteps = int(ZoneTempChange / state.dataConvergeParams->MaxZoneTempDiff + 1.0); // add 1 for truncation
+        int ZTempTrendsNumSysSteps = int(ZoneTempChange / state.dataConvergeParams->MaxZoneTempDiff + 1.0); // add 1 for truncation
         NumOfSysTimeSteps = min(ZTempTrendsNumSysSteps, LimitNumSysSteps);
         // then determine timestep length for even distribution, protect div by zero
         if (NumOfSysTimeSteps > 0) TimeStepSys = state.dataGlobal->TimeStepZone / NumOfSysTimeSteps;
@@ -312,7 +311,7 @@ void ManageHVAC(EnergyPlusData &state)
     }
 
     if (UseZoneTimeStepHistory) state.dataHVACGlobal->PreviousTimeStep = state.dataGlobal->TimeStepZone;
-    for (SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
+    for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
         if (state.dataGlobal->stopSimulation) break;
 
         if (TimeStepSys < state.dataGlobal->TimeStepZone) {
@@ -371,13 +370,13 @@ void ManageHVAC(EnergyPlusData &state)
             }
         }
 
-            DetectOscillatingZoneTemp(state);
-            UpdateZoneListAndGroupLoads(state); // Must be called before UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem)
-            IceThermalStorage::UpdateIceFractions(state);          // Update fraction of ice stored in TES
-            ManageWater(state);
-            // update electricity data for net, purchased, sold etc.
-            DummyLogical = false;
-            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, false, DummyLogical, true);
+        DetectOscillatingZoneTemp(state);
+        UpdateZoneListAndGroupLoads(state);           // Must be called before UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem)
+        IceThermalStorage::UpdateIceFractions(state); // Update fraction of ice stored in TES
+        ManageWater(state);
+        // update electricity data for net, purchased, sold etc.
+        DummyLogical = false;
+        state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, false, DummyLogical, true);
 
         // Update the plant and condenser loop capacitance model temperature history.
         PlantManager::UpdateNodeThermalHistory(state);
@@ -406,7 +405,8 @@ void ManageHVAC(EnergyPlusData &state)
                 UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
                 if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                     state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
-                    if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
+                    if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)
+                        state.dataHVACSizingSimMgr->hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
                 }
                 UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
             }
@@ -453,7 +453,8 @@ void ManageHVAC(EnergyPlusData &state)
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                 state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
-                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
+                if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)
+                    state.dataHVACSizingSimMgr->hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
             }
         } else if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface) { // added for FMI
             if (state.dataGlobal->BeginDayFlag && !state.dataEnvrn->PrintEnvrnStampWarmupPrinted) {
@@ -614,9 +615,9 @@ void SimHVAC(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool FirstHVACIteration; // True when solution technique on first iteration
-    static int ErrCount(0);  // Number of times that the maximum iterations was exceeded
-    static int MaxErrCount(0);
-    static std::string ErrEnvironmentName;
+    auto &ErrCount = state.dataHVACMgr->ErrCount;
+    auto &MaxErrCount = state.dataHVACMgr->MaxErrCount;
+    auto &ErrEnvironmentName = state.dataHVACMgr->ErrEnvironmentName;
     int LoopNum;
     int LoopSide;
     int ThisLoopSide;
@@ -743,13 +744,13 @@ void SimHVAC(EnergyPlusData &state)
         state.dataHVACMgr->SimHVACIterSetup = true;
     }
 
-        if (state.dataGlobal->ZoneSizingCalc) {
-            ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipmentFlag, SimAirLoopsFlag);
-            // need to call non zone equipment so water use zone gains can be included in sizing calcs
-            ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipmentFlag);
-            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
-            return;
-        }
+    if (state.dataGlobal->ZoneSizingCalc) {
+        ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipmentFlag, SimAirLoopsFlag);
+        // need to call non zone equipment so water use zone gains can be included in sizing calcs
+        ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipmentFlag);
+        state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+        return;
+    }
 
     // Before the HVAC simulation, reset control flags and specified flow
     // rates that might have been set by the set point and availability
@@ -1790,6 +1791,12 @@ void SimHVAC(EnergyPlusData &state)
         } else {
             DoSetPointTest = false;
         }
+
+        if (state.dataCoilCooingDX->stillNeedToReportStandardRatings) {
+            if (!state.dataGlobal->ZoneSizingCalc && !state.dataGlobal->SysSizingCalc && !state.dataGlobal->WarmupFlag) {
+                CoilCoolingDX::reportAllStandardRatings(state);
+            }
+        }
     }
     if (SetPointErrorFlag) {
         ShowFatalError(state, "Previous severe set point errors cause program termination");
@@ -1864,42 +1871,42 @@ void SimSelectedEquipment(EnergyPlusData &state,
         state.dataHVACMgr->MyEnvrnFlag2 = true;
     }
 
-        if (FirstHVACIteration) {
-            state.dataHVACMgr->RepIterAir = 0;
-            // Call AirflowNetwork simulation to calculate air flows and pressures
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                ManageAirflowNetworkBalance(state, FirstHVACIteration);
-            }
-            ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
-            state.dataAirLoop->AirLoopInputsFilled = true; // all air loop inputs have been read in
-            SimAirLoops = true;         // Need to make sure that SimAirLoop is simulated at min twice to calculate PLR in some air loop equipment
-            state.dataHVACGlobal->AirLoopsSimOnce = true;     // air loops simulated once for this environment
-            ResetTerminalUnitFlowLimits(state);
-            state.dataHVACMgr->FlowMaxAvailAlreadyReset = true;
-            ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
-            SimZoneEquipment = true; // needs to be simulated at least twice for flow resolution to propagate to this routine
-            ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
-            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
-                state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
+    if (FirstHVACIteration) {
+        state.dataHVACMgr->RepIterAir = 0;
+        // Call AirflowNetwork simulation to calculate air flows and pressures
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            ManageAirflowNetworkBalance(state, FirstHVACIteration);
+        }
+        ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
+        state.dataAirLoop->AirLoopInputsFilled = true; // all air loop inputs have been read in
+        SimAirLoops = true; // Need to make sure that SimAirLoop is simulated at min twice to calculate PLR in some air loop equipment
+        state.dataHVACGlobal->AirLoopsSimOnce = true; // air loops simulated once for this environment
+        ResetTerminalUnitFlowLimits(state);
+        state.dataHVACMgr->FlowMaxAvailAlreadyReset = true;
+        ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+        SimZoneEquipment = true; // needs to be simulated at least twice for flow resolution to propagate to this routine
+        ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
+        state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
+            state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
 
         ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
 
-            state.dataErrTracking->AskForPlantCheckOnAbort = true; // need to make a first pass through plant calcs before this check make sense
+        state.dataErrTracking->AskForPlantCheckOnAbort = true; // need to make a first pass through plant calcs before this check make sense
         state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
             state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
-        } else {
-            state.dataHVACMgr->FlowResolutionNeeded = false;
-            while ((SimAirLoops || SimZoneEquipment) && (IterAir <= MaxAir)) {
-                ++IterAir; // Increment the iteration counter
-                // Call AirflowNetwork simulation to calculate air flows and pressures
-                ResimulateAirZone = false;
-                if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                    ManageAirflowNetworkBalance(state, FirstHVACIteration, IterAir, ResimulateAirZone);
-                }
-                if (SimAirLoops) {
-                    ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
-                    SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
-                }
+    } else {
+        state.dataHVACMgr->FlowResolutionNeeded = false;
+        while ((SimAirLoops || SimZoneEquipment) && (IterAir <= MaxAir)) {
+            ++IterAir; // Increment the iteration counter
+            // Call AirflowNetwork simulation to calculate air flows and pressures
+            ResimulateAirZone = false;
+            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                ManageAirflowNetworkBalance(state, FirstHVACIteration, IterAir, ResimulateAirZone);
+            }
+            if (SimAirLoops) {
+                ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
+                SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
+            }
 
             // make sure flow resolution gets done
             if (state.dataHVACMgr->FlowResolutionNeeded) {
@@ -1941,10 +1948,10 @@ void SimSelectedEquipment(EnergyPlusData &state,
             SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
         }
 
-            if (SimElecCircuits) {
+        if (SimElecCircuits) {
             state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
                 state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
-            }
+        }
 
         if (!SimPlantLoops) {
             // check to see if any air side component may have requested plant resim
@@ -1957,12 +1964,12 @@ void SimSelectedEquipment(EnergyPlusData &state,
             ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
         }
 
-            if (SimElecCircuits) {
+        if (SimElecCircuits) {
             state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
                 state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
-            }
         }
     }
+}
 
 void ResetTerminalUnitFlowLimits(EnergyPlusData &state)
 {
@@ -2034,7 +2041,7 @@ void ResolveAirLoopFlowLimits(EnergyPlusData &state)
 
     auto &AirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo);
 
-    for (AirLoopIndex = 1; AirLoopIndex <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopIndex) {                                // loop over the primary air loops
+    for (AirLoopIndex = 1; AirLoopIndex <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopIndex) {          // loop over the primary air loops
         for (SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo(AirLoopIndex).NumSupplyNodes; ++SupplyIndex) { // loop over the air loop supply outlets
             if (AirToZoneNodeInfo(AirLoopIndex).SupplyDuctType(SupplyIndex) == Cooling) {                     // check for cooling duct
                 // check if terminal units requesting more air than air loop can supply; if so, set terminal unit inlet
@@ -2307,23 +2314,23 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     static std::string const RoutineName3("ReportAirHeatBalance:3");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneLoop;                      // Counter for the # of zones (nz)
-    int ZoneA;                         // Mated zone number for pair pf zones sharing refrigeration door opening
-    int ZoneB;                         // Mated zone number for pair pf zones sharing refrigeration door opening
-    int VentNum;                       // Counter for ventilation statements
-    int FanNum;                        // Counter for exhaust fans
-    Real64 AirDensity;                 // Density of air (kg/m^3)
-    Real64 CpAir;                      // Heat capacity of air (J/kg-C)
-    Real64 ADSCorrectionFactor;        // Correction factor of air flow model values when ADS is simulated
-    Real64 H2OHtOfVap;                 // Heat of vaporization of air
-    Real64 TotalLoad;                  // Total loss or gain
-    int MixNum;                        // Counter for MIXING and Cross Mixing statements
-    static Array1D<Real64> MixSenLoad; // Mixing sensible loss or gain
-    static Array1D<Real64> MixLatLoad; // Mixing latent loss or gain
-    int j;                             // Index in a do-loop
-    int VentZoneNum;                   // Number of ventilation object per zone
-    Real64 VentZoneMassflow;           // Total mass flow rate per zone
-    Real64 VentZoneAirTemp;            // Average Zone inlet temperature
+    int ZoneLoop;                                     // Counter for the # of zones (nz)
+    int ZoneA;                                        // Mated zone number for pair pf zones sharing refrigeration door opening
+    int ZoneB;                                        // Mated zone number for pair pf zones sharing refrigeration door opening
+    int VentNum;                                      // Counter for ventilation statements
+    int FanNum;                                       // Counter for exhaust fans
+    Real64 AirDensity;                                // Density of air (kg/m^3)
+    Real64 CpAir;                                     // Heat capacity of air (J/kg-C)
+    Real64 ADSCorrectionFactor;                       // Correction factor of air flow model values when ADS is simulated
+    Real64 H2OHtOfVap;                                // Heat of vaporization of air
+    Real64 TotalLoad;                                 // Total loss or gain
+    int MixNum;                                       // Counter for MIXING and Cross Mixing statements
+    auto &MixSenLoad = state.dataHVACMgr->MixSenLoad; // Mixing sensible loss or gain
+    auto &MixLatLoad = state.dataHVACMgr->MixLatLoad; // Mixing latent loss or gain
+    int j;                                            // Index in a do-loop
+    int VentZoneNum;                                  // Number of ventilation object per zone
+    Real64 VentZoneMassflow;                          // Total mass flow rate per zone
+    Real64 VentZoneAirTemp;                           // Average Zone inlet temperature
 
     state.dataHeatBal->ZoneTotalExfiltrationHeatLoss = 0.0;
     state.dataHeatBal->ZoneTotalExhaustHeatLoss = 0.0;
@@ -2378,7 +2385,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
 
     // Report results for SIMPLE option only
     if (!(state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimple ||
-            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS))
+          state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS))
         return;
 
     if (state.dataHVACMgr->ReportAirHeatBalanceFirstTimeFlag) {
@@ -2868,20 +2875,19 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     // Uses program data structures AirLoopControlInfo and ZoneEquipInfo
 
     // Using/Aliasing
-    auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
     using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
     using ScheduleManager::CheckScheduleValue;
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleMaxValue;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static int AirLoopNum(0);        // the air loop index
-    int ControlledZoneNum;           // controlled zone index
-    bool CyclingFan(false);          // TRUE means air loop operates in cycling fan mode at some point
-    static int ZoneNum(0);           // zone index
-    int LightNum;                    // Lights object index
-    int SurfNum;                     // Surface index
-    static Real64 CycFanMaxVal(0.0); // max value of cycling fan schedule
+    int AirLoopNum(0);      // the air loop index
+    int ZoneNum(0);         // zone index
+    int ControlledZoneNum;  // controlled zone index
+    bool CyclingFan(false); // TRUE means air loop operates in cycling fan mode at some point
+    int LightNum;           // Lights object index
+    int SurfNum;            // Surface index
 
     auto &Zone(state.dataHeatBal->Zone);
     auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
@@ -2894,7 +2900,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             if (AirLoopControlInfo(AirLoopNum).UnitarySys) { // for unitary systems check the cycling fan schedule
                 if (AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
-                    CycFanMaxVal = GetScheduleMaxValue(state, AirLoopControlInfo(AirLoopNum).CycFanSchedPtr);
+                    Real64 CycFanMaxVal = GetScheduleMaxValue(state, AirLoopControlInfo(AirLoopNum).CycFanSchedPtr);
                     if (CycFanMaxVal > 0.0) {
                         AirLoopControlInfo(AirLoopNum).AnyContFan = true;
                     } else {

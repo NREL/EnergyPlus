@@ -117,6 +117,11 @@ struct HVACManagerData : BaseGlobalStruct
     bool MyEnvrnFlag2 = true;
     bool FlowMaxAvailAlreadyReset = false;
     bool FlowResolutionNeeded = false;
+    int ErrCount = 0; // Number of times that the maximum iterations was exceeded
+    int MaxErrCount = 0;
+    std::string ErrEnvironmentName;
+    Array1D<Real64> MixSenLoad; // Mixing sensible loss or gain
+    Array1D<Real64> MixLatLoad; // Mixing latent loss or gain
 
     void clear_state() override
     {
@@ -133,6 +138,10 @@ struct HVACManagerData : BaseGlobalStruct
         MyEnvrnFlag2 = true;
         FlowMaxAvailAlreadyReset = false;
         FlowResolutionNeeded = false;
+        this->ErrCount = 0;
+        this->MaxErrCount = 0;
+        this->MixSenLoad.clear();
+        this->MixLatLoad.clear();
     }
 };
 

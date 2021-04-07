@@ -122,25 +122,23 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     state->dataSysRpts->SysHCCompNaturalGas(1) = 0;
     state->dataSysRpts->SysTotNaturalGas(1) = 0;
 
-    //Calculate SysHumidNaturalGas ("Air System Humidifier NaturalGas Energy" Output Variable)
-    CalcSystemEnergyUse(
-        *state,
-        CompLoadFlag,
-        AirLoopNum,
-        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf,
-        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType,
-        CompLoad,
-        CompEnergyUse);
+    // Calculate SysHumidNaturalGas ("Air System Humidifier NaturalGas Energy" Output Variable)
+    CalcSystemEnergyUse(*state,
+                        CompLoadFlag,
+                        AirLoopNum,
+                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf,
+                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType,
+                        CompLoad,
+                        CompEnergyUse);
 
     // Calculate SysHCCompNaturalGas ("Air System Heating Coil NaturalGas Energy" Output Variable)
-    CalcSystemEnergyUse(
-        *state,
-        CompLoadFlag,
-        AirLoopNum,
-        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).TypeOf,
-        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType,
-        CompLoad,
-        CompEnergyUse);
+    CalcSystemEnergyUse(*state,
+                        CompLoadFlag,
+                        AirLoopNum,
+                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).TypeOf,
+                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType,
+                        CompLoad,
+                        CompEnergyUse);
 
     EXPECT_EQ(state->dataSysRpts->SysHumidNaturalGas(1), 100);
     EXPECT_EQ(state->dataSysRpts->SysHCCompNaturalGas(1), 100);

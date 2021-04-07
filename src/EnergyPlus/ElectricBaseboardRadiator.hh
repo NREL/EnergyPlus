@@ -117,7 +117,8 @@ namespace ElectricBaseboardRadiator {
         }
     };
 
-    void SimElecBaseboard(EnergyPlusData &state, std::string const &EquipName,
+    void SimElecBaseboard(EnergyPlusData &state,
+                          std::string const &EquipName,
                           int const ActualZoneNum,
                           int const ControlledZoneNum,
                           bool const FirstHVACIteration,
@@ -155,7 +156,8 @@ namespace ElectricBaseboardRadiator {
 
 } // namespace ElectricBaseboardRadiator
 
-struct ElectricBaseboardRadiatorData : BaseGlobalStruct {
+struct ElectricBaseboardRadiatorData : BaseGlobalStruct
+{
     std::string const cCMO_BBRadiator_Electric = "ZoneHVAC:Baseboard:RadiantConvective:Electric";
 
     // Object Data
@@ -175,8 +177,10 @@ struct ElectricBaseboardRadiatorData : BaseGlobalStruct {
     bool MyOneTimeFlag = true;
     bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
+    Array1D_bool MyEnvrnFlag;
     void clear_state() override
     {
+        this->MyEnvrnFlag.clear();
         this->NumElecBaseboards = 0;
         this->GetInputFlag = true;
         this->MyOneTimeFlag = true;
@@ -184,9 +188,9 @@ struct ElectricBaseboardRadiatorData : BaseGlobalStruct {
         this->QBBElecRadSource.clear();     // Need to keep the last value in case we are still iterating
         this->QBBElecRadSrcAvg.clear();     // Need to keep the last value in case we are still iterating
         this->ZeroSourceSumHATsurf.clear(); // Equal to the SumHATsurf for all the walls in a zone with no source
-        this->LastQBBElecRadSrc.clear();  // Need to keep the last value in case we are still iterating
-        this->LastSysTimeElapsed.clear(); // Need to keep the last value in case we are still iterating
-        this->LastTimeStepSys.clear();    // Need to keep the last value in case we are still iterating
+        this->LastQBBElecRadSrc.clear();    // Need to keep the last value in case we are still iterating
+        this->LastSysTimeElapsed.clear();   // Need to keep the last value in case we are still iterating
+        this->LastTimeStepSys.clear();      // Need to keep the last value in case we are still iterating
         this->MySizeFlag.clear();
         this->CheckEquipName.clear();
         this->ElecBaseboard.clear();

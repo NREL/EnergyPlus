@@ -146,9 +146,8 @@ namespace SystemReports {
         std::vector<Real64> SysTimeAtOALimitOcc = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // time [hrs] at limit [n] during occupied
         std::vector<Real64> SysMechVentTotAtLimitOcc = {
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // air loop mech vent total vol OA at limit [n] {m3} during occupied
-
     };
-        
+
     // Functions
 
     void InitEnergyReports(EnergyPlusData &state);
@@ -260,9 +259,22 @@ namespace SystemReports {
     //        End of Reporting subroutines for the SimAir Module
     // *****************************************************************************
 
+    struct IdentifyLoop
+    {
+        // Members
+        int LoopNum;
+        int LoopType;
+
+        // Default Constructor
+        IdentifyLoop() : LoopNum(0), LoopType(0)
+        {
+        }
+    };
+
 } // namespace SystemReports
 
-struct SystemReportsData : BaseGlobalStruct {
+struct SystemReportsData : BaseGlobalStruct
+{
 
     Array1D<Real64> MaxCoolingLoadMetByVent;
     Array1D<Real64> MaxCoolingLoadAddedByVent;
@@ -349,7 +361,7 @@ struct SystemReportsData : BaseGlobalStruct {
     bool VentLoadsReportEnabled = true;
     bool VentEnergyReportEnabled = false;
     bool VentReportStructureCreated = false;
-    int TotalLoopConnects = 0;              // Total number of loop connections
+    int TotalLoopConnects = 0; // Total number of loop connections
     int MaxLoopArraySize = 100;
     int MaxCompArraySize = 500;
 
@@ -387,6 +399,7 @@ struct SystemReportsData : BaseGlobalStruct {
     int ArrayCounter_UpdateAirSysSubSubCompPtrArray = 1;
     int NumCompTypes = 0;
     Array1D<SystemReports::CompTypeError> CompTypeErrors = Array1D<SystemReports::CompTypeError>(100);
+    Array1D<SystemReports::IdentifyLoop> LoopStack;
 
     void clear_state() override
     {

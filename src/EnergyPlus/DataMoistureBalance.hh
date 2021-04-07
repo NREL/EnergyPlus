@@ -61,7 +61,8 @@
 
 namespace EnergyPlus {
 
-struct MoistureBalanceData : BaseGlobalStruct {
+struct MoistureBalanceData : BaseGlobalStruct
+{
     // This is more or less the traditional value from BLAST.
     static constexpr Real64 Lam = 2500000.0; // heat of adsorption for building materials
     // Public Variables that will also be used in the Moisture Surface Balance

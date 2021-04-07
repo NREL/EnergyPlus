@@ -48,8 +48,8 @@
 #ifndef ELEMENTS_HPP
 #define ELEMENTS_HPP
 
-#include "AirflowNetwork/Solver.hpp"
 #include "AirflowNetwork/Properties.hpp"
+#include "AirflowNetwork/Solver.hpp"
 
 namespace EnergyPlus {
 
@@ -59,38 +59,39 @@ struct AirflowNetworkData;
 
 namespace AirflowNetwork {
 
-    enum VentControlType  // TODO: make enum class
+    enum VentControlType // TODO: make enum class
     {
-        None = 0,           // Wrong input
-        Temp = 1,           // Temperature venting control
-        Enth = 2,           // Enthalpy venting control
-        Const = 3,          // Constant venting control
+        None = 0,  // Wrong input
+        Temp = 1,  // Temperature venting control
+        Enth = 2,  // Enthalpy venting control
+        Const = 3, // Constant venting control
         ASH55 = 4,
         CEN15251 = 5,
-        NoVent = 6,         // No venting
-        ZoneLevel = 7,      // ZoneLevel control for a heat transfer subsurface
-        AdjTemp = 8,        // Temperature venting control based on adjacent zone conditions
-        AdjEnth = 9         // Enthalpy venting control based on adjacent zone conditions
+        NoVent = 6,    // No venting
+        ZoneLevel = 7, // ZoneLevel control for a heat transfer subsurface
+        AdjTemp = 8,   // Temperature venting control based on adjacent zone conditions
+        AdjEnth = 9    // Enthalpy venting control based on adjacent zone conditions
     };
 
-    enum OpenStatus  // TODO: make enum class
+    enum OpenStatus // TODO: make enum class
     {
-        FreeOperation = 0,           // Free operation
-        MinCheckForceOpen = 1,      // Force open when opening elapsed time is less than minimum opening time
-        MinCheckForceClose = 2      // Force open when closing elapsed time is less than minimum closing time
+        FreeOperation = 0,     // Free operation
+        MinCheckForceOpen = 1, // Force open when opening elapsed time is less than minimum opening time
+        MinCheckForceClose = 2 // Force open when closing elapsed time is less than minimum closing time
     };
 
-    enum ProbabilityCheck  // TODO: make enum class
+    enum ProbabilityCheck // TODO: make enum class
     {
-        NoAction = 0,               // No action from probability check
-        ForceChange = 1,            // Force open or close from probability check
-        KeepStatus = 2              // Keep status at the previous time step from probability check
+        NoAction = 0,    // No action from probability check
+        ForceChange = 1, // Force open or close from probability check
+        KeepStatus = 2   // Keep status at the previous time step from probability check
     };
 
-    enum class EquivRec {
-        Height,             // Effective rectangle polygonal height selection
-        BaseAspectRatio,    // Effective rectangle base surface aspect ratio selection
-        UserAspectRatio     // Effective rectangle user input aspect ratio selection
+    enum class EquivRec
+    {
+        Height,          // Effective rectangle polygonal height selection
+        BaseAspectRatio, // Effective rectangle base surface aspect ratio selection
+        UserAspectRatio  // Effective rectangle user input aspect ratio selection
     };
 
     // Using/Aliasing
@@ -124,7 +125,6 @@ namespace AirflowNetwork {
         OAF = 19, // Distribution system OA
         REL = 20  // Distribution system relief air
     };
-
 
     enum class ComponentType
     {
@@ -183,7 +183,8 @@ namespace AirflowNetwork {
         SPO = 14  // Splitter Outlet Node
     };
 
-    enum class iWPCCntr : int{
+    enum class iWPCCntr : int
+    {
         Unassigned = 0,
         Input = 1,
         SurfAvg = 2
@@ -212,7 +213,7 @@ namespace AirflowNetwork {
     int constexpr AirflowNetworkControlSimpleADS(4); // Perform distribution system during system
     // on time and simple calculations during off time
     int constexpr AirflowNetworkControlMultiADS(5); // Perform distribution system during system on time
-                                                // and multizone calculations during off time
+                                                    // and multizone calculations during off time
 
     // Types
 
@@ -229,12 +230,12 @@ namespace AirflowNetwork {
         // MULTIZONE WITHOUT DISTRIBUTION
         // MULTIZONE WITH DISTRIBUTION ONLY DURING FAN OPERATION,
         // and NO MULTIZONE OR DISTRIBUTION
-        std::string WPCCntr;      // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
-        iWPCCntr iWPCCnt = iWPCCntr::Unassigned;        // Integer equivalent for WPCCntr field
-        std::string BldgType;     // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
-        std::string HeightOption; // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
-        int MaxIteration;         // Maximum number of iteration, default 500
-        int InitFlag;             // Initialization flag
+        std::string WPCCntr;                     // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
+        iWPCCntr iWPCCnt = iWPCCntr::Unassigned; // Integer equivalent for WPCCntr field
+        std::string BldgType;                    // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
+        std::string HeightOption;                // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
+        int MaxIteration;                        // Maximum number of iteration, default 500
+        int InitFlag;                            // Initialization flag
         Solver solver;
         Real64 RelTol;               // Relative airflow convergence
         Real64 AbsTol;               // Absolute airflow convergence
@@ -283,11 +284,11 @@ namespace AirflowNetwork {
                                Solver solver,                     // Solver type
                                bool const TExtHeightDep           // Choice of height dependence of external node temperature
                                )
-            : AirflowNetworkSimuName(AirflowNetworkSimuName), Control(Control), WPCCntr(WPCCntr), BldgType(BldgType),
-              HeightOption(HeightOption), MaxIteration(MaxIteration), InitFlag(InitFlag), solver(solver), RelTol(RelTol), AbsTol(AbsTol),
-              ConvLimit(ConvLimit), MaxPressure(MaxPressure), Azimuth(Azimuth), AspectRatio(AspectRatio), DiffP(DiffP),
-              ExtLargeOpeningErrCount(ExtLargeOpeningErrCount), ExtLargeOpeningErrIndex(ExtLargeOpeningErrIndex),
-              OpenFactorErrCount(OpenFactorErrCount), OpenFactorErrIndex(OpenFactorErrIndex), InitType(InitType), TExtHeightDep(TExtHeightDep)
+            : AirflowNetworkSimuName(AirflowNetworkSimuName), Control(Control), WPCCntr(WPCCntr), BldgType(BldgType), HeightOption(HeightOption),
+              MaxIteration(MaxIteration), InitFlag(InitFlag), solver(solver), RelTol(RelTol), AbsTol(AbsTol), ConvLimit(ConvLimit),
+              MaxPressure(MaxPressure), Azimuth(Azimuth), AspectRatio(AspectRatio), DiffP(DiffP), ExtLargeOpeningErrCount(ExtLargeOpeningErrCount),
+              ExtLargeOpeningErrIndex(ExtLargeOpeningErrIndex), OpenFactorErrCount(OpenFactorErrCount), OpenFactorErrIndex(OpenFactorErrIndex),
+              InitType(InitType), TExtHeightDep(TExtHeightDep)
         {
         }
     };
@@ -325,8 +326,8 @@ namespace AirflowNetwork {
         // Default Constructor
         MultizoneZoneProp()
             : VentControl("NoVent"), Height(0.0), OpenFactor(1.0), LowValueTemp(0.0), UpValueTemp(100.0), LowValueEnth(0.0), UpValueEnth(300000.0),
-              ZoneNum(0), VentSchNum(0), VentCtrNum(VentControlType::None), VentingSchNum(0), SingleSidedCpType("STANDARD"),
-              BuildWidth(10.0), ASH55PeopleInd(0), CEN15251PeopleInd(0), OccupantVentilationControlNum(0), RAFNNodeNum(0)
+              ZoneNum(0), VentSchNum(0), VentCtrNum(VentControlType::None), VentingSchNum(0), SingleSidedCpType("STANDARD"), BuildWidth(10.0),
+              ASH55PeopleInd(0), CEN15251PeopleInd(0), OccupantVentilationControlNum(0), RAFNNodeNum(0)
         {
         }
     };
@@ -360,7 +361,7 @@ namespace AirflowNetwork {
         // Modulating the Venting Open Factor with Enthalpic control
         std::string VentingSchName;                 // Name of ventilation temperature control schedule
         int VentSchNum;                             // Zone ventilation schedule number associated with ventilation schedule name
-        VentControlType VentSurfCtrNum;                 // Ventilation control mode number: 1 "Temperature", 2 "ENTHALPIC", 3 "CONSTANT", 4 "NOVENT"
+        VentControlType VentSurfCtrNum;             // Ventilation control mode number: 1 "Temperature", 2 "ENTHALPIC", 3 "CONSTANT", 4 "NOVENT"
         int VentingSchNum;                          // Ventilation schedule number
         int ZonePtr;                                // Pointer to inside face zone
         bool IndVentControl;                        // Individual surface venting control
@@ -383,20 +384,20 @@ namespace AirflowNetwork {
         int OpeningProbStatus;                      // Opening probability status
         bool RAFNflag;                              // True if this surface is used in AirflowNetwork:IntraZone:Linkage
         bool NonRectangular;                        // True if this surface is not rectangular
-        EquivRec EquivRecMethod;                    // Equivalent Rectangle Method input: 1 Height; 2 Base surface aspect ratio; 3 User input aspect ratio
-        Real64 EquivRecUserAspectRatio;             // user input value when EquivRecMethod = 3
+        EquivRec EquivRecMethod;        // Equivalent Rectangle Method input: 1 Height; 2 Base surface aspect ratio; 3 User input aspect ratio
+        Real64 EquivRecUserAspectRatio; // user input value when EquivRecMethod = 3
 
         // Default Constructor
         MultizoneSurfaceProp()
             : Factor(0.0), SurfNum(0), NodeNums{{0, 0}}, OpenFactor(0.0), OpenFactorLast(0.0), EMSOpenFactorActuated(false), EMSOpenFactor(0.0),
               Height(0.0), Width(0.0), CHeight(0.0), VentControl("ZONELEVEL"), ModulateFactor(0.0), LowValueTemp(0.0), UpValueTemp(100.0),
               LowValueEnth(0.0), UpValueEnth(300000.0), VentSchNum(0), VentSurfCtrNum(VentControlType::None), VentingSchNum(0), ZonePtr(0),
-              IndVentControl(false), ExtLargeOpeningErrCount(0), ExtLargeOpeningErrIndex(0), OpenFactorErrCount(0), OpenFactorErrIndex(0), Multiplier(1.0),
-              HybridVentClose(false), HybridCtrlGlobal(false), HybridCtrlMaster(false), WindModifier(1.0), OccupantVentilationControlNum(0),
-              OpeningStatus(OpenStatus::FreeOperation), PrevOpeningstatus(OpenStatus::FreeOperation),
+              IndVentControl(false), ExtLargeOpeningErrCount(0), ExtLargeOpeningErrIndex(0), OpenFactorErrCount(0), OpenFactorErrIndex(0),
+              Multiplier(1.0), HybridVentClose(false), HybridCtrlGlobal(false), HybridCtrlMaster(false), WindModifier(1.0),
+              OccupantVentilationControlNum(0), OpeningStatus(OpenStatus::FreeOperation), PrevOpeningstatus(OpenStatus::FreeOperation),
               CloseElapsedTime(0.0), OpenElapsedTime(0.0), ClosingProbStatus(ProbabilityCheck::NoAction),
-              OpeningProbStatus(ProbabilityCheck::NoAction), RAFNflag(false), NonRectangular(false),
-              EquivRecMethod(EquivRec::Height), EquivRecUserAspectRatio(1.0)
+              OpeningProbStatus(ProbabilityCheck::NoAction), RAFNflag(false), NonRectangular(false), EquivRecMethod(EquivRec::Height),
+              EquivRecUserAspectRatio(1.0)
         {
         }
     };
@@ -404,13 +405,16 @@ namespace AirflowNetwork {
     struct AirflowElement
     {
         AirflowElement()
-        {}
+        {
+        }
 
         AirflowElement(const std::string &name) : name(name)
-        {}
+        {
+        }
 
         virtual ~AirflowElement()
-        {}
+        {
+        }
 
         std::string name; // Name of airflow element
 
@@ -789,7 +793,8 @@ namespace AirflowNetwork {
         }
 
         virtual ~AirflowNetworkLinkage()
-        {}
+        {
+        }
     };
 
     struct IntraZoneLinkageProp : public AirflowNetworkLinkage // Intra zone linkage data
@@ -822,8 +827,8 @@ namespace AirflowNetwork {
     struct DuctLeak : public AirflowElement // duct leak component
     {
         // Members
-        Real64 FlowCoef;  // Air Mass Flow Coefficient [kg/s at 1Pa]
-        Real64 FlowExpo;  // Air Mass Flow exponent [dimensionless]
+        Real64 FlowCoef; // Air Mass Flow Coefficient [kg/s at 1Pa]
+        Real64 FlowExpo; // Air Mass Flow exponent [dimensionless]
 
         // Default Constructor
         DuctLeak() : FlowCoef(0.0), FlowExpo(0.0)
@@ -861,10 +866,10 @@ namespace AirflowNetwork {
     struct EffectiveLeakageRatio : public AirflowElement // effective leakage ratio component
     {
         // Members
-        Real64 ELR;       // Value of effective leakage ratio
-        Real64 FlowRate;  // Maximum airflow rate
-        Real64 RefPres;   // Reference pressure difference
-        Real64 FlowExpo;  // Air Mass Flow exponent
+        Real64 ELR;      // Value of effective leakage ratio
+        Real64 FlowRate; // Maximum airflow rate
+        Real64 RefPres;  // Reference pressure difference
+        Real64 FlowExpo; // Air Mass Flow exponent
 
         // Default Constructor
         EffectiveLeakageRatio() : ELR(0.0), FlowRate(0.0), RefPres(0.0), FlowExpo(0.0)
@@ -960,16 +965,16 @@ namespace AirflowNetwork {
     struct Damper : public AirflowElement // Damper component
     {
         // Members
-        Real64 LTP;       // Value for laminar turbulent transition
-        Real64 LamFlow;   // Laminar flow coefficient
-        Real64 TurFlow;   // Turbulent flow coefficient
-        Real64 FlowExpo;  // Air Mass Flow exponent
-        Real64 FlowMin;   // Minimum control air mass rate
-        Real64 FlowMax;   // Maximum control air mass rate
-        Real64 A0;        // First polynomial coefficient of the control variable (constant coefficient)
-        Real64 A1;        // Second polynomial coefficient of the control variable (linear coefficient)
-        Real64 A2;        // Third polynomial coefficient of the control variable (quadratic coefficient)
-        Real64 A3;        // Fourth polynomial coefficient of the control variable (cubic coefficient)
+        Real64 LTP;      // Value for laminar turbulent transition
+        Real64 LamFlow;  // Laminar flow coefficient
+        Real64 TurFlow;  // Turbulent flow coefficient
+        Real64 FlowExpo; // Air Mass Flow exponent
+        Real64 FlowMin;  // Minimum control air mass rate
+        Real64 FlowMax;  // Maximum control air mass rate
+        Real64 A0;       // First polynomial coefficient of the control variable (constant coefficient)
+        Real64 A1;       // Second polynomial coefficient of the control variable (linear coefficient)
+        Real64 A2;       // Third polynomial coefficient of the control variable (quadratic coefficient)
+        Real64 A3;       // Fourth polynomial coefficient of the control variable (cubic coefficient)
 
         // Default Constructor
         Damper() : LTP(0.0), LamFlow(0.0), TurFlow(0.0), FlowExpo(0.0), FlowMin(0.0), FlowMax(0.0), A0(0.0), A1(0.0), A2(0.0), A3(0.0)
@@ -1019,7 +1024,8 @@ namespace AirflowNetwork {
 
         // Default Constructor
         ConstantVolumeFan()
-            : FlowRate(0.0), Ctrl(0.0), FanTypeNum(0), FanIndex(0), InletNode(0), OutletNode(0), MaxAirMassFlowRate(0.0), AirLoopNum(0), FanModelFlag(false)
+            : FlowRate(0.0), Ctrl(0.0), FanTypeNum(0), FanIndex(0), InletNode(0), OutletNode(0), MaxAirMassFlowRate(0.0), AirLoopNum(0),
+              FanModelFlag(false)
         {
         }
 
@@ -1205,8 +1211,8 @@ namespace AirflowNetwork {
     struct ConstantPressureDrop : public AirflowElement // Constant pressure drop component
     {
         // Members
-        Real64 A;         // cross section area
-        Real64 DP;        // Pressure difference across the component
+        Real64 A;  // cross section area
+        Real64 DP; // Pressure difference across the component
 
         // Default Constructor
         ConstantPressureDrop() : A(0.0), DP(0.0)
@@ -1265,8 +1271,8 @@ namespace AirflowNetwork {
 
         // Default Constructor
         AirflowNetworkNodeProp()
-            : NodeHeight(0.0), NodeNum(0), NodeTypeNum(0), EPlusZoneNum(0), EPlusNodeNum(0), ExtNodeNum(0), OutAirNodeNum(0), EPlusTypeNum(iEPlusNodeType::Unassigned),
-              RAFNNodeNum(0), NumOfLinks(0), AirLoopNum(0)
+            : NodeHeight(0.0), NodeNum(0), NodeTypeNum(0), EPlusZoneNum(0), EPlusNodeNum(0), ExtNodeNum(0), OutAirNodeNum(0),
+              EPlusTypeNum(iEPlusNodeType::Unassigned), RAFNNodeNum(0), NumOfLinks(0), AirLoopNum(0)
         {
         }
     };
@@ -1274,14 +1280,14 @@ namespace AirflowNetwork {
     struct AirflowNetworkCompProp // AirflowNetwork element data
     {
         // Members
-        std::string Name;          // Provide a unique element name
-        iComponentTypeNum CompTypeNum;           // Provide numeric equivalent for AirflowNetworkCompType
-        int TypeNum;               // Component number under same component type
-        int CompNum;               // General component number
-        std::string EPlusName;     // Provide a unique element name
-        std::string EPlusCompName; // Provide EPlus component name or Other
-        std::string EPlusType;     // Provide EPlus type, such as terminal reheat, coil, etc. 9/30/03 or Other
-        iEPlusComponentType EPlusTypeNum;          // Provide EPlus component type
+        std::string Name;                 // Provide a unique element name
+        iComponentTypeNum CompTypeNum;    // Provide numeric equivalent for AirflowNetworkCompType
+        int TypeNum;                      // Component number under same component type
+        int CompNum;                      // General component number
+        std::string EPlusName;            // Provide a unique element name
+        std::string EPlusCompName;        // Provide EPlus component name or Other
+        std::string EPlusType;            // Provide EPlus type, such as terminal reheat, coil, etc. 9/30/03 or Other
+        iEPlusComponentType EPlusTypeNum; // Provide EPlus component type
 
         // Default Constructor
         AirflowNetworkCompProp() : CompTypeNum(iComponentTypeNum::Unassigned), TypeNum(0), CompNum(0), EPlusTypeNum(iEPlusComponentType::Unassigned)
@@ -1292,18 +1298,18 @@ namespace AirflowNetwork {
     struct AirflowNetworkLinkageProp : public AirflowNetworkLinkage // AirflowNetwork linkage data
     {
         // Members
-        std::string ZoneName; // Name of zone
-        int ZoneNum;          // Zone Number
-        int DetOpenNum;       // Large Opening number
-        iEPlusComponentType ConnectionFlag;   // Return and supply connection flag
-        bool VAVTermDamper;   // True if this component is a damper for a VAV terminal
+        std::string ZoneName;               // Name of zone
+        int ZoneNum;                        // Zone Number
+        int DetOpenNum;                     // Large Opening number
+        iEPlusComponentType ConnectionFlag; // Return and supply connection flag
+        bool VAVTermDamper;                 // True if this component is a damper for a VAV terminal
         int LinkageViewFactorObjectNum;
         int AirLoopNum; // Airloop number
 
         // Default Constructor
         AirflowNetworkLinkageProp()
-            : AirflowNetworkLinkage(), ZoneNum(0), DetOpenNum(0), ConnectionFlag(iEPlusComponentType::Unassigned), VAVTermDamper(false), LinkageViewFactorObjectNum(0),
-              AirLoopNum(0)
+            : AirflowNetworkLinkage(), ZoneNum(0), DetOpenNum(0), ConnectionFlag(iEPlusComponentType::Unassigned), VAVTermDamper(false),
+              LinkageViewFactorObjectNum(0), AirLoopNum(0)
         {
         }
     };
@@ -1570,8 +1576,8 @@ namespace AirflowNetwork {
         AiflowNetworkReportProp()
             : MultiZoneInfiSenGainW(0.0), MultiZoneInfiSenGainJ(0.0), MultiZoneInfiSenLossW(0.0), MultiZoneInfiSenLossJ(0.0),
               MultiZoneVentSenGainW(0.0), MultiZoneVentSenGainJ(0.0), MultiZoneVentSenLossW(0.0), MultiZoneVentSenLossJ(0.0),
-              MultiZoneMixSenGainW(0.0), MultiZoneMixSenGainJ(0.0), MultiZoneMixSenLossW(0.0), MultiZoneMixSenLossJ(0.0),
-              MultiZoneInfiLatGainW(0.0), MultiZoneInfiLatGainJ(0.0), MultiZoneInfiLatLossW(0.0), MultiZoneInfiLatLossJ(0.0), MultiZoneVentLatGainW(0.0),
+              MultiZoneMixSenGainW(0.0), MultiZoneMixSenGainJ(0.0), MultiZoneMixSenLossW(0.0), MultiZoneMixSenLossJ(0.0), MultiZoneInfiLatGainW(0.0),
+              MultiZoneInfiLatGainJ(0.0), MultiZoneInfiLatLossW(0.0), MultiZoneInfiLatLossJ(0.0), MultiZoneVentLatGainW(0.0),
               MultiZoneVentLatGainJ(0.0), MultiZoneVentLatLossW(0.0), MultiZoneVentLatLossJ(0.0), MultiZoneMixLatGainW(0.0),
               MultiZoneMixLatGainJ(0.0), MultiZoneMixLatLossW(0.0), MultiZoneMixLatLossJ(0.0), LeakSenGainW(0.0), LeakSenGainJ(0.0),
               LeakSenLossW(0.0), LeakSenLossJ(0.0), LeakLatGainW(0.0), LeakLatGainJ(0.0), LeakLatLossW(0.0), LeakLatLossJ(0.0), CondSenGainW(0.0),
@@ -1613,13 +1619,10 @@ namespace AirflowNetwork {
         }
     };
 
-    // Object Data
-
-    void clear_state();
-
 } // namespace AirflowNetwork
 
-struct AirflowNetworkData : BaseGlobalStruct {
+struct AirflowNetworkData : BaseGlobalStruct
+{
 
     int SimulateAirflowNetwork = 1;
     Array1D_bool AirflowNetworkZoneFlag;

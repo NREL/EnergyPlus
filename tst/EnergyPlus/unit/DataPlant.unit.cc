@@ -71,7 +71,7 @@ TEST_F(EnergyPlusFixture, DataPlant_AnyPlantLoopSidesNeedSim)
     }
 
     EXPECT_TRUE(PlantUtilities::AnyPlantLoopSidesNeedSim(*state)); // SimLoopSideNeeded is set to true in default ctor
-    PlantUtilities::SetAllPlantSimFlagsToValue(*state, false);       // Set all SimLoopSideNeeded to false
+    PlantUtilities::SetAllPlantSimFlagsToValue(*state, false);     // Set all SimLoopSideNeeded to false
     EXPECT_FALSE(PlantUtilities::AnyPlantLoopSidesNeedSim(*state));
 }
 

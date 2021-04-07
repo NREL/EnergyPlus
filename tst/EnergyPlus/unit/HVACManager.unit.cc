@@ -201,8 +201,8 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
                      Psychrometrics::PsyHFnTdbW(state->dataHeatBalFanSys->MAT(1), state->dataHeatBalFanSys->ZoneAirHumRat(1)));
     EXPECT_NEAR(-deltah, state->dataHeatBal->ZnAirRpt(1).InfilTotalLoss, 0.0001);
     deltah = state->dataHeatBalFanSys->MCPV(1) / (Psychrometrics::PsyCpAirFnW(state->dataEnvrn->OutHumRat)) * 3600.0 *
-                    (Psychrometrics::PsyHFnTdbW(state->dataHeatBal->Zone(1).OutDryBulbTemp, state->dataEnvrn->OutHumRat) -
-                     Psychrometrics::PsyHFnTdbW(state->dataHeatBalFanSys->MAT(1), state->dataHeatBalFanSys->ZoneAirHumRat(1)));
+             (Psychrometrics::PsyHFnTdbW(state->dataHeatBal->Zone(1).OutDryBulbTemp, state->dataEnvrn->OutHumRat) -
+              Psychrometrics::PsyHFnTdbW(state->dataHeatBalFanSys->MAT(1), state->dataHeatBalFanSys->ZoneAirHumRat(1)));
     EXPECT_NEAR(-deltah, state->dataHeatBal->ZnAirRpt(1).VentilTotalLoss, 0.0001);
 }
 
@@ -282,7 +282,7 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     state->dataAirSystemsData->PrimaryAirSystems(1).Name = "System 1";
     state->dataAirSystemsData->PrimaryAirSystems(2).Name = "System 2";
-        state->dataAirLoop->AirLoopFlow.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataAirLoop->AirLoopFlow.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     auto &thisAirLoopFlow1(state->dataAirLoop->AirLoopFlow(1));
     auto &thisAirLoopFlow2(state->dataAirLoop->AirLoopFlow(2));
 
@@ -298,7 +298,7 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     HVACManager::CheckAirLoopFlowBalance(*state);
     EXPECT_FALSE(has_err_output(true));
 
-    //Case 2 - Both loops are balanced
+    // Case 2 - Both loops are balanced
     thisAirLoopFlow1.SupFlow = 2.0;
     thisAirLoopFlow1.SysRetFlow = 1.0;
     thisAirLoopFlow1.OAFlow = 1.0;
@@ -310,7 +310,7 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     HVACManager::CheckAirLoopFlowBalance(*state);
     EXPECT_FALSE(has_err_output(true));
 
-    //Case 3 - Loop 1 is unbalanced
+    // Case 3 - Loop 1 is unbalanced
     thisAirLoopFlow1.SupFlow = 2.0;
     thisAirLoopFlow1.SysRetFlow = 1.0;
     thisAirLoopFlow1.OAFlow = 0.0;
@@ -321,15 +321,15 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
 
     HVACManager::CheckAirLoopFlowBalance(*state);
     EXPECT_TRUE(has_err_output(false));
-    std::string error_string = delimited_string({
-        "   ** Severe  ** CheckAirLoopFlowBalance: AirLoopHVAC System 1 is unbalanced. Supply is > return plus outdoor air.",
-        "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
-        "   **   ~~~   **   Flows [m3/s at standard density]: Supply=2.000000  Return=1.000000  Outdoor Air=0.000000",
-        "   **   ~~~   **   Imbalance=1.000000",
-        "   **   ~~~   **   This error will only be reported once per system." });
+    std::string error_string =
+        delimited_string({"   ** Severe  ** CheckAirLoopFlowBalance: AirLoopHVAC System 1 is unbalanced. Supply is > return plus outdoor air.",
+                          "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+                          "   **   ~~~   **   Flows [m3/s at standard density]: Supply=2.000000  Return=1.000000  Outdoor Air=0.000000",
+                          "   **   ~~~   **   Imbalance=1.000000",
+                          "   **   ~~~   **   This error will only be reported once per system."});
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    //Case 4 - Loop 2 is unbalanced
+    // Case 4 - Loop 2 is unbalanced
     thisAirLoopFlow1.SupFlow = 0.0;
     thisAirLoopFlow1.SysRetFlow = 0.0;
     thisAirLoopFlow1.OAFlow = 0.0;
@@ -340,12 +340,11 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
 
     HVACManager::CheckAirLoopFlowBalance(*state);
     EXPECT_TRUE(has_err_output(false));
-    error_string = delimited_string({
-        "   ** Severe  ** CheckAirLoopFlowBalance: AirLoopHVAC System 2 is unbalanced. Supply is > return plus outdoor air.",
-        "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
-        "   **   ~~~   **   Flows [m3/s at standard density]: Supply=3.000000  Return=2.000000  Outdoor Air=0.990000",
-        "   **   ~~~   **   Imbalance=1.000000E-002",
-        "   **   ~~~   **   This error will only be reported once per system." });
+    error_string =
+        delimited_string({"   ** Severe  ** CheckAirLoopFlowBalance: AirLoopHVAC System 2 is unbalanced. Supply is > return plus outdoor air.",
+                          "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+                          "   **   ~~~   **   Flows [m3/s at standard density]: Supply=3.000000  Return=2.000000  Outdoor Air=0.990000",
+                          "   **   ~~~   **   Imbalance=1.000000E-002",
+                          "   **   ~~~   **   This error will only be reported once per system."});
     EXPECT_TRUE(compare_err_stream(error_string, true));
-
 }

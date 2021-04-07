@@ -87,17 +87,9 @@ namespace PVWatts {
                                        Real64 azimuth,
                                        size_t surfaceNum,
                                        Real64 groundCoverageRatio)
-        : m_moduleType(moduleType),
-          m_arrayType(arrayType),
-          m_geometryType(geometryType),
-          m_DCtoACRatio(1.1),
-          m_inverterEfficiency(0.96),
-          m_outputDCPower(1000.0),
-          m_cellTemperature(-9999),
-          m_planeOfArrayIrradiance(-9999),
-          m_shadedPercent(0.0),
-          m_pvwattsModule(ssc_module_create("pvwattsv5_1ts")),
-          m_pvwattsData(ssc_data_create())
+        : m_moduleType(moduleType), m_arrayType(arrayType), m_geometryType(geometryType), m_DCtoACRatio(1.1), m_inverterEfficiency(0.96),
+          m_outputDCPower(1000.0), m_cellTemperature(-9999), m_planeOfArrayIrradiance(-9999), m_shadedPercent(0.0),
+          m_pvwattsModule(ssc_module_create("pvwattsv5_1ts")), m_pvwattsData(ssc_data_create())
 
     {
 
@@ -175,14 +167,14 @@ namespace PVWatts {
         ssc_data_set_number(m_pvwattsData, "gcr", m_groundCoverageRatio);
         // Initialize shaded percent
         ssc_data_set_number(m_pvwattsData, "shaded_percent", m_shadedPercent);
-
     }
 
     void PVWattsGenerator::setupOutputVariables(EnergyPlusData &state)
     {
         // Set up output variables
         SetupOutputVariable(state, "Generator Produced DC Electricity Rate", OutputProcessor::Unit::W, m_outputDCPower, "System", "Average", m_name);
-        SetupOutputVariable(state, "Generator Produced DC Electricity Energy",
+        SetupOutputVariable(state,
+                            "Generator Produced DC Electricity Energy",
                             OutputProcessor::Unit::J,
                             m_outputDCEnergy,
                             "System",
@@ -219,18 +211,18 @@ namespace PVWatts {
         int IOStat;
         bool errorsFound = false;
 
-        inputProcessor->getObjectItem(state,
-                                      "Generator:PVWatts",
-                                      objNum,
-                                      cAlphaArgs,
-                                      NumAlphas,
-                                      rNumericArgs,
-                                      NumNums,
-                                      IOStat,
-                                      lNumericFieldBlanks,
-                                      lAlphaFieldBlanks,
-                                      cAlphaFieldNames,
-                                      cNumericFieldNames);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 "Generator:PVWatts",
+                                                                 objNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
 
         const std::string name(cAlphaArgs(AlphaFields::NAME));
         const Real64 dcSystemCapacity(rNumericArgs(NumFields::DC_SYSTEM_CAPACITY));
@@ -288,8 +280,8 @@ namespace PVWatts {
         }
         const Real64 groundCoverageRatio(rNumericArgs(NumFields::GROUND_COVERAGE_RATIO));
 
-        PVWattsGenerator pvwattsGenerator(state,
-            name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, groundCoverageRatio);
+        PVWattsGenerator pvwattsGenerator(
+            state, name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, groundCoverageRatio);
         return pvwattsGenerator;
     }
 
@@ -368,9 +360,9 @@ namespace PVWatts {
         m_inverterEfficiency = inverterEfficiency;
     }
 
-    void PVWattsGenerator::calc(EnergyPlusData& state)
+    void PVWattsGenerator::calc(EnergyPlusData &state)
     {
-        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // We only run this once for each zone time step.
         if (!state.dataGlobal->BeginTimeStepFlag) {
@@ -407,16 +399,15 @@ namespace PVWatts {
             ssc_data_set_number(m_pvwattsData, "shaded_percent", m_shadedPercent);
         }
 
-        if ( ssc_module_exec(m_pvwattsModule, m_pvwattsData) == 0) {
+        if (ssc_module_exec(m_pvwattsModule, m_pvwattsData) == 0) {
             // Error
             const char *errtext;
             int sscErrType;
             float time;
             int i = 0;
-            while( (errtext = ssc_module_log(m_pvwattsModule, i++, &sscErrType, &time)) ) {
+            while ((errtext = ssc_module_log(m_pvwattsModule, i++, &sscErrType, &time))) {
                 std::string err("PVWatts: ");
-                switch (sscErrType)
-                {
+                switch (sscErrType) {
                 case SSC_WARNING:
                     err.append(errtext);
                     ShowWarningMessage(state, err);
@@ -438,7 +429,6 @@ namespace PVWatts {
             ssc_data_get_number(m_pvwattsData, "tcell", &m_cellTemperature);
             ssc_data_get_number(m_pvwattsData, "poa", &m_planeOfArrayIrradiance);
         }
-
     }
 
     void PVWattsGenerator::getResults(Real64 &GeneratorPower, Real64 &GeneratorEnergy, Real64 &ThermalPower, Real64 &ThermalEnergy)
@@ -452,13 +442,14 @@ namespace PVWatts {
     PVWattsGenerator &GetOrCreatePVWattsGenerator(EnergyPlusData &state, std::string const &GeneratorName)
     {
         // Find the generator, and create a new one if it hasn't been loaded yet.
-        int ObjNum = inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(GeneratorName));
+        int ObjNum =
+            state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(GeneratorName));
         assert(ObjNum >= 0);
         if (ObjNum == 0) {
             ShowFatalError(state, "Cannot find Generator:PVWatts " + GeneratorName);
         }
 
-        auto & PVWattsGenerators(state.dataPVWatts->PVWattsGenerators);
+        auto &PVWattsGenerators(state.dataPVWatts->PVWattsGenerators);
 
         auto it = PVWattsGenerators.find(ObjNum);
         if (it == PVWattsGenerators.end()) {

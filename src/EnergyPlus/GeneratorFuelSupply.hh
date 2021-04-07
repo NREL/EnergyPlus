@@ -65,7 +65,8 @@ namespace GeneratorFuelSupply {
 
 } // namespace GeneratorFuelSupply
 
-struct GeneratorFuelSupplyData : BaseGlobalStruct {
+struct GeneratorFuelSupplyData : BaseGlobalStruct
+{
 
     bool MyOneTimeFlag = true;
 

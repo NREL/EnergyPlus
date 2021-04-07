@@ -174,6 +174,8 @@ struct HeatPumpWaterToWaterCOOLINGData : BaseGlobalStruct
     int GSHPRefrigIndex = 0;
     bool GetWWHPCoolingInput = true;
     Array1D<HeatPumpWaterToWaterCOOLING::GshpPeCoolingSpecs> GSHP;
+    Real64 CurrentSimTime = 0.0;
+    Real64 PrevSimTime = 0.0;
 
     void clear_state() override
     {
@@ -181,6 +183,8 @@ struct HeatPumpWaterToWaterCOOLINGData : BaseGlobalStruct
         this->GSHPRefrigIndex = 0;
         this->GetWWHPCoolingInput = true;
         this->GSHP.deallocate();
+        this->CurrentSimTime = 0.0;
+        this->PrevSimTime = 0.0;
     }
 };
 

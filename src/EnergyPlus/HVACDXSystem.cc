@@ -88,7 +88,7 @@ namespace EnergyPlus {
 //  HVACDXHeatPumpSystem is for heating DX coils
 
 namespace HVACDXSystem {
-    // Module containing the DXCoolingSystem simulation routines
+    // Module containing the state.dataHVACDXSys->DXCoolingSystem simulation routines
 
     // MODULE INFORMATION:
     //       AUTHOR         Richard Liesen
@@ -104,13 +104,7 @@ namespace HVACDXSystem {
 
     // PURPOSE OF THIS MODULE:
     // To encapsulate the data and algorithms required to
-    // manage the DXCoolingSystem System Component
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-
-    // OTHER NOTES:
+    // manage the state.dataHVACDXSys->DXCoolingSystem System Component
 
     // USE STATEMENTS:
     // Use statements for data only modules
@@ -119,60 +113,10 @@ namespace HVACDXSystem {
     using namespace DataHVACGlobals;
     using namespace ScheduleManager;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    Real64 const MinAirMassFlow(0.001);
+    Real64 constexpr LatCapTimeConst(45.0);
 
-    // Dehumidification control modes (DehumidControlMode)
-    int const DehumidControl_None(0);
-    int const DehumidControl_Multimode(1);
-    int const DehumidControl_CoolReheat(2);
-    bool GetInputFlag(true); // Flag to get input only once
-
-    // packaged TES modes
-    int const OffMode(0);
-    int const CoolingOnlyMode(1);
-    int const CoolingAndChargeMode(2);
-    int const CoolingAndDischargeMode(3);
-    int const ChargeOnlyMode(4);
-    int const DischargeOnlyMode(5);
-
-    Real64 const LatCapTimeConst(45.0);
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    int NumDXSystem(0);         // The Number of DXCoolingSystems found in the Input
-    bool EconomizerFlag(false); // holds air loop economizer status
-
-    // Make this type allocatable
-    Array1D_bool CheckEquipName;
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Update routine to check convergence and update nodes
-
-    // Object Data
-    Array1D<DXCoolingConditions> DXCoolingSystem;
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
-    // Functions
-
-    void clear_state()
-    {
-        NumDXSystem = 0;
-        EconomizerFlag = false;
-        GetInputFlag = true;
-        CheckEquipName.deallocate();
-        DXCoolingSystem.deallocate();
-    }
-
-    void SimDXCoolingSystem(EnergyPlusData &state, std::string const &DXCoolingSystemName, // Name of DXSystem:Airloop object
+    void SimDXCoolingSystem(EnergyPlusData &state,
+                            std::string const &DXCoolingSystemName, // Name of DXSystem:Airloop object
                             bool const FirstHVACIteration,          // True when first HVAC iteration
                             int const AirLoopNum,                   // Primary air loop number
                             int &CompIndex,                         // Index to DXSystem:Airloop object
@@ -193,7 +137,7 @@ namespace HVACDXSystem {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine manages DXCoolingSystem component simulation.
+        // This subroutine manages state.dataHVACDXSys->DXCoolingSystem component simulation.
 
         // Using/Aliasing
         using DXCoils::SimDXCoil;
@@ -211,47 +155,41 @@ namespace HVACDXSystem {
         Real64 AirMassFlow;   // DX System air mass flow rate
         int InletNodeNum;     // DX System inlet node number
         int OutletNodeNum;    // DX System outlet node number
-        // local variables for calling variable speed coil
-        static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
-        static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-        static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
-        static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-        static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
+
+        auto &DXCoolingSystem(state.dataHVACDXSys->DXCoolingSystem);
 
         // Obtains and Allocates DX Cooling System related parameters from input file
-        if (GetInputFlag) { // First time subroutine has been entered
-            // Get the DXCoolingSystem input
+        if (state.dataHVACDXSys->GetInputFlag) { // First time subroutine has been entered
             GetDXCoolingSystemInput(state);
-            GetInputFlag = false;
+            state.dataHVACDXSys->GetInputFlag = false;
         }
 
         // Find the correct DXSystemNumber
         if (CompIndex == 0) {
-            DXSystemNum = UtilityRoutines::FindItemInList(DXCoolingSystemName, DXCoolingSystem);
+            DXSystemNum = UtilityRoutines::FindItemInList(DXCoolingSystemName, state.dataHVACDXSys->DXCoolingSystem);
             if (DXSystemNum == 0) {
                 ShowFatalError(state, "SimDXCoolingSystem: DXUnit not found=" + DXCoolingSystemName);
             }
             CompIndex = DXSystemNum;
         } else {
             DXSystemNum = CompIndex;
-            if (DXSystemNum > NumDXSystem || DXSystemNum < 1) {
+            if (DXSystemNum > state.dataHVACDXSys->NumDXSystem || DXSystemNum < 1) {
                 ShowFatalError(state,
                                format("SimulateDXCoolingSystem:  Invalid CompIndex passed={}, Number of DX Units={}, DX Unit name={}",
                                       DXSystemNum,
-                                      NumDXSystem,
+                                      state.dataHVACDXSys->NumDXSystem,
                                       DXCoolingSystemName));
             }
-            if (CheckEquipName(DXSystemNum)) {
+            if (state.dataHVACDXSys->CheckEquipName(DXSystemNum)) {
                 if (DXCoolingSystemName != DXCoolingSystem(DXSystemNum).Name) {
                     ShowFatalError(
                         state,
                         format("SimulateDXCoolingSystem: Invalid CompIndex passed={}, DX Unit name={}, stored DX Unit Name for that index={}",
                                DXSystemNum,
                                DXCoolingSystemName,
-                               DXCoolingSystem(DXSystemNum).Name));
+                               state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name));
                 }
-                CheckEquipName(DXSystemNum) = false;
+                state.dataHVACDXSys->CheckEquipName(DXSystemNum) = false;
             }
         }
 
@@ -263,84 +201,92 @@ namespace HVACDXSystem {
         ControlDXSystem(state, DXSystemNum, FirstHVACIteration, HXUnitOn);
 
         // simulate DX Cooling System
-        CompName = DXCoolingSystem(DXSystemNum).CoolingCoilName;
+        CompName = state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilName;
         // Need a cooling System call here I think
         {
-            auto const SELECT_CASE_var(DXCoolingSystem(DXSystemNum).CoolingCoilType_Num);
+            auto const SELECT_CASE_var(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilType_Num);
 
             if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) { // COIL:DX:COOLINGBYPASSFACTOREMPIRICAL
 
-                SimDXCoil(state, CompName,
+                SimDXCoil(state,
+                          CompName,
                           On,
                           FirstHVACIteration,
-                          DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
-                          DXCoolingSystem(DXSystemNum).FanOpMode,
-                          DXCoolingSystem(DXSystemNum).PartLoadFrac);
+                          state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                          state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).FanOpMode,
+                          state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).PartLoadFrac);
 
             } else if (SELECT_CASE_var == CoilDX_CoolingHXAssisted) { // CoilSystem:Cooling:DX:HeatExchangerAssisted
 
-                SimHXAssistedCoolingCoil(state, CompName,
+                SimHXAssistedCoolingCoil(state,
+                                         CompName,
                                          FirstHVACIteration,
                                          On,
-                                         DXCoolingSystem(DXSystemNum).PartLoadFrac,
-                                         DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
-                                         DXCoolingSystem(DXSystemNum).FanOpMode,
+                                         state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).PartLoadFrac,
+                                         state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                         state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).FanOpMode,
                                          HXUnitOn,
                                          _,
-                                         EconomizerFlag);
+                                         state.dataHVACDXSys->EconomizerFlag);
 
             } else if (SELECT_CASE_var == CoilDX_CoolingTwoSpeed) { // Coil:Cooling:DX:TwoSpeed
                 // formerly (v3 and beyond)COIL:DX:MULTISPEED:COOLINGEMPIRICAL
 
-                SimDXCoilMultiSpeed(state, CompName,
-                                    DXCoolingSystem(DXSystemNum).SpeedRatio,
-                                    DXCoolingSystem(DXSystemNum).CycRatio,
-                                    DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                SimDXCoilMultiSpeed(state,
+                                    CompName,
+                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).SpeedRatio,
+                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CycRatio,
+                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
 
             } else if (SELECT_CASE_var == CoilDX_CoolingTwoStageWHumControl) { // Coil:Cooling:DX:TwoStageWithHumidityControlMode
                 // formerly (v3 and beyond) COIL:DX:MULTIMODE:COOLINGEMPIRICAL
 
-                SimDXCoilMultiMode(state, CompName,
+                SimDXCoilMultiMode(state,
+                                   CompName,
                                    On,
                                    FirstHVACIteration,
-                                   DXCoolingSystem(DXSystemNum).PartLoadFrac,
-                                   DXCoolingSystem(DXSystemNum).DehumidificationMode,
-                                   DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
-                                   DXCoolingSystem(DXSystemNum).FanOpMode);
+                                   state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).PartLoadFrac,
+                                   state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DehumidificationMode,
+                                   state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                   state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).FanOpMode);
             } else if (SELECT_CASE_var == Coil_CoolingAirToAirVariableSpeed) { // Coil:Cooling:DX:VariableSpeed
 
-                SimVariableSpeedCoils(state, CompName,
+                SimVariableSpeedCoils(state,
+                                      CompName,
                                       DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                       DXCoolingSystem(DXSystemNum).FanOpMode,
-                                      MaxONOFFCyclesperHour,
-                                      HPTimeConstant,
-                                      FanDelayTime,
+                                      state.dataHVACDXSys->MaxONOFFCyclesperHour,
+                                      state.dataHVACDXSys->HPTimeConstant,
+                                      state.dataHVACDXSys->FanDelayTime,
                                       On,
                                       DXCoolingSystem(DXSystemNum).PartLoadFrac,
                                       DXCoolingSystem(DXSystemNum).SpeedNum,
                                       DXCoolingSystem(DXSystemNum).SpeedRatio,
-                                      QZnReq,
-                                      QLatReq,
-                                      OnOffAirFlowRatio);
+                                      state.dataHVACDXSys->QZnReq,
+                                      state.dataHVACDXSys->QLatReq,
+                                      state.dataHVACDXSys->OnOffAirFlowRatio);
 
             } else if (SELECT_CASE_var == CoilDX_PackagedThermalStorageCooling) {
 
-                SimTESCoil(state, CompName,
-                           DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
-                           DXCoolingSystem(DXSystemNum).FanOpMode,
-                           DXCoolingSystem(DXSystemNum).TESOpMode,
-                           DXCoolingSystem(DXSystemNum).PartLoadFrac);
+                SimTESCoil(state,
+                           CompName,
+                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).FanOpMode,
+                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).TESOpMode,
+                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).PartLoadFrac);
 
             } else {
-                ShowFatalError(state, "SimDXCoolingSystem: Invalid DX Cooling System/Coil=" + DXCoolingSystem(DXSystemNum).CoolingCoilType);
+                ShowFatalError(
+                    state, "SimDXCoolingSystem: Invalid DX Cooling System/Coil=" + state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilType);
             }
         }
         // set econo lockout flag
         // set econo lockout flag
         if (AirLoopNum != -1) {   // IF the sysem is not an equipment of outdoor air unit
             if (AirLoopNum > 0) { // Real airloopNum called from MixedAir and SimAirServingZones
-                if ((DXCoolingSystem(DXSystemNum).PartLoadFrac > 0.0 || DXCoolingSystem(DXSystemNum).SpeedRatio > 0.0 ||
-                     DXCoolingSystem(DXSystemNum).CycRatio > 0.0) &&
+                if ((state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).PartLoadFrac > 0.0 ||
+                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).SpeedRatio > 0.0 ||
+                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CycRatio > 0.0) &&
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CanLockoutEconoWithCompressor) {
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = true;
                 } else { // used for AirLoopHVACDOAS only
@@ -350,8 +296,8 @@ namespace HVACDXSystem {
         }
 
         if (present(QTotOut)) {
-            InletNodeNum = DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum;
-            OutletNodeNum = DXCoolingSystem(DXSystemNum).DXCoolingCoilOutletNodeNum;
+            InletNodeNum = state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum;
+            OutletNodeNum = state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingCoilOutletNodeNum;
             AirMassFlow = state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate;
             QTotOut = AirMassFlow * (state.dataLoopNodes->Node(InletNodeNum).Enthalpy - state.dataLoopNodes->Node(OutletNodeNum).Enthalpy);
         }
@@ -381,23 +327,22 @@ namespace HVACDXSystem {
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
+        using DXCoils::GetDXCoilIndex;
+        using DXCoils::SetCoilSystemCoolingData;
+        using DXCoils::SetDXCoilTypeData;
         using HVACHXAssistedCoolingCoil::GetHXDXCoilIndex;
         using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
         using NodeInputManager::GetOnlySingleNode;
         using PackagedThermalStorageCoil::GetTESCoilIndex;
         using VariableSpeedCoils::GetCoilIndexVariableSpeed;
-        using DXCoils::GetDXCoilIndex;
-        using DXCoils::SetCoilSystemCoolingData;
-        using DXCoils::SetDXCoilTypeData;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int DXSystemNum; // The DXCoolingSystem that you are currently loading input into
+        int DXSystemNum; // The state.dataHVACDXSys->DXCoolingSystem that you are currently loading input into
         int NumAlphas;
         int NumNums;
         int IOStat;
         static std::string const RoutineName("GetDXCoolingSystemInput: "); // include trailing blank space
-        static bool ErrorsFound(false);                                    // If errors detected in input
-        static bool ErrFound(false);                                       // used for mining functions
+        bool ErrorsFound(false);                                           // If errors detected in input
         bool IsNotOK;                                                      // Flag to verify name
         int DXCoolSysNum;
         bool FanErrorsFound;             // flag returned on fan operating mode check
@@ -410,16 +355,18 @@ namespace HVACDXSystem {
         Array1D<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
-        //  certain object in the input file
+
+        auto &DXCoolingSystem(state.dataHVACDXSys->DXCoolingSystem);
+        auto &ErrFound(state.dataHVACDXSys->ErrFound);
+        auto &TotalArgs(state.dataHVACDXSys->TotalArgs);
 
         CurrentModuleObject = "CoilSystem:Cooling:DX";
-        NumDXSystem = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataHVACDXSys->NumDXSystem = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
-        DXCoolingSystem.allocate(NumDXSystem);
-        CheckEquipName.dimension(NumDXSystem, true);
+        DXCoolingSystem.allocate(state.dataHVACDXSys->NumDXSystem);
+        state.dataHVACDXSys->CheckEquipName.dimension(state.dataHVACDXSys->NumDXSystem, true);
 
-        inputProcessor->getObjectDefMaxArgs(state, "CoilSystem:Cooling:DX", TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "CoilSystem:Cooling:DX", TotalArgs, NumAlphas, NumNums);
 
         Alphas.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
@@ -429,45 +376,68 @@ namespace HVACDXSystem {
         lNumericBlanks.dimension(NumNums, true);
 
         // Get the data for the DX Cooling System
-        for (DXCoolSysNum = 1; DXCoolSysNum <= NumDXSystem; ++DXCoolSysNum) {
+        for (DXCoolSysNum = 1; DXCoolSysNum <= state.dataHVACDXSys->NumDXSystem; ++DXCoolSysNum) {
 
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          DXCoolSysNum,
-                                          Alphas,
-                                          NumAlphas,
-                                          Numbers,
-                                          NumNums,
-                                          IOStat,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     DXCoolSysNum,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
-            DXCoolingSystem(DXCoolSysNum).DXCoolingSystemType = CurrentModuleObject; // push Object Name into data array
-            DXCoolingSystem(DXCoolSysNum).Name = Alphas(1);
+            state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DXCoolingSystemType = CurrentModuleObject; // push Object Name into data array
+            state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                DXCoolingSystem(DXCoolSysNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                DXCoolingSystem(DXCoolSysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
-                if (DXCoolingSystem(DXCoolSysNum).SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                    cAlphaFields(1) + '=' + Alphas(1));
+                state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
+                if (state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).SchedPtr == 0) {
+                    ShowSevereError(state,
+                                    RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                                        cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
             }
 
-            DXCoolingSystem(DXCoolSysNum).DXCoolingCoilInletNodeNum =
-                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsParent);
-            DXCoolingSystem(DXCoolSysNum).DXCoolingCoilOutletNodeNum =
-                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsParent);
+            state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DXCoolingCoilInletNodeNum = GetOnlySingleNode(state,
+                                                                                                             Alphas(3),
+                                                                                                             ErrorsFound,
+                                                                                                             CurrentModuleObject,
+                                                                                                             Alphas(1),
+                                                                                                             DataLoopNode::NodeFluidType::Air,
+                                                                                                             DataLoopNode::NodeConnectionType::Inlet,
+                                                                                                             1,
+                                                                                                             ObjectIsParent);
+            state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DXCoolingCoilOutletNodeNum =
+                GetOnlySingleNode(state,
+                                  Alphas(4),
+                                  ErrorsFound,
+                                  CurrentModuleObject,
+                                  Alphas(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::NodeConnectionType::Outlet,
+                                  1,
+                                  ObjectIsParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
-            DXCoolingSystem(DXCoolSysNum).DXSystemControlNodeNum =
-                GetOnlySingleNode(state, Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsParent);
-            if (DXCoolingSystem(DXCoolSysNum).DXSystemControlNodeNum == 0) {
+            state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DXSystemControlNodeNum = GetOnlySingleNode(state,
+                                                                                                          Alphas(5),
+                                                                                                          ErrorsFound,
+                                                                                                          CurrentModuleObject,
+                                                                                                          Alphas(1),
+                                                                                                          DataLoopNode::NodeFluidType::Air,
+                                                                                                          DataLoopNode::NodeConnectionType::Sensor,
+                                                                                                          1,
+                                                                                                          ObjectIsParent);
+            if (state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DXSystemControlNodeNum == 0) {
                 ShowSevereError(state, CurrentModuleObject + ": control node must be input");
                 ShowContinueError(state, "Error occurred in " + cAlphaFields(1) + '=' + Alphas(1));
                 ErrorsFound = true;
@@ -481,200 +451,226 @@ namespace HVACDXSystem {
                 UtilityRoutines::SameString(Alphas(6), "CoilSystem:Cooling:DX:HeatExchangerAssisted") ||
                 UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:SingleSpeed:ThermalStorage")) {
 
-                DXCoolingSystem(DXCoolSysNum).CoolingCoilType = Alphas(6);
-                DXCoolingSystem(DXCoolSysNum).CoolingCoilName = Alphas(7);
+                state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilType = Alphas(6);
+                state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilName = Alphas(7);
 
                 ErrFound = false;
                 if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:SingleSpeed")) {
-                    DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_CoolingSingleSpeed;
+                    state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_CoolingSingleSpeed;
                     GetDXCoilIndex(state,
-                                   DXCoolingSystem(DXCoolSysNum).CoolingCoilName,
-                                   DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex,
+                                   state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilName,
+                                   state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex,
                                    ErrFound,
                                    CurrentModuleObject,
                                    ObjexxFCL::Optional_bool_const());
                     if (ErrFound) {
-                        ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
+                        ShowContinueError(state,
+                                          "...occurs in " + CurrentModuleObject + " = " + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:VariableSpeed")) {
-                    DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
-                    DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex =
-                        GetCoilIndexVariableSpeed(state, "Coil:Cooling:DX:VariableSpeed", DXCoolingSystem(DXCoolSysNum).CoolingCoilName, ErrFound);
+                    state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
+                    state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex = GetCoilIndexVariableSpeed(
+                        state, "Coil:Cooling:DX:VariableSpeed", state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilName, ErrFound);
                     if (ErrFound) {
-                        ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
+                        ShowContinueError(state,
+                                          "...occurs in " + CurrentModuleObject + " = " + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:TwoSpeed")) {
-                    DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_CoolingTwoSpeed;
+                    state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_CoolingTwoSpeed;
                     GetDXCoilIndex(state,
-                                   DXCoolingSystem(DXCoolSysNum).CoolingCoilName,
-                                   DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex,
+                                   state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilName,
+                                   state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex,
                                    ErrFound,
                                    CurrentModuleObject,
                                    ObjexxFCL::Optional_bool_const());
                     if (ErrFound) {
-                        ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
+                        ShowContinueError(state,
+                                          "...occurs in " + CurrentModuleObject + " = " + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(Alphas(6), "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
-                    DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_CoolingHXAssisted;
+                    state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_CoolingHXAssisted;
                     GetHXDXCoilIndex(state,
-                        DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex, ErrFound, CurrentModuleObject);
+                                     state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilName,
+                                     state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex,
+                                     ErrFound,
+                                     CurrentModuleObject);
                     if (ErrFound) {
-                        ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
+                        ShowContinueError(state,
+                                          "...occurs in " + CurrentModuleObject + " = " + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
                     }
 
                     DXErrorsFound = false;
                     HXDXCoolCoilName = GetHXDXCoilName(state, Alphas(6), Alphas(7), DXErrorsFound);
                     if (DXErrorsFound) {
-                        ShowWarningError(state, CurrentModuleObject + " = \"" + DXCoolingSystem(DXCoolSysNum).Name + "\"");
+                        ShowWarningError(state, CurrentModuleObject + " = \"" + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name + "\"");
                         ShowContinueError(state, "CoilSystem:Cooling:DX:HeatExchangerAssisted \"" + Alphas(7) + "\" not found.");
                         ErrorsFound = true;
                     }
 
                 } else if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
-                    DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_CoolingTwoStageWHumControl;
+                    state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_CoolingTwoStageWHumControl;
                     GetDXCoilIndex(state,
-                                   DXCoolingSystem(DXCoolSysNum).CoolingCoilName,
-                                   DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex,
+                                   state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilName,
+                                   state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex,
                                    ErrFound,
                                    CurrentModuleObject,
                                    ObjexxFCL::Optional_bool_const());
                     if (ErrFound) {
-                        ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
+                        ShowContinueError(state,
+                                          "...occurs in " + CurrentModuleObject + " = " + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:SingleSpeed:ThermalStorage")) {
-                    DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_PackagedThermalStorageCooling;
+                    state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_PackagedThermalStorageCooling;
                     GetTESCoilIndex(state,
-                        DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex, ErrFound, CurrentModuleObject);
+                                    state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilName,
+                                    state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex,
+                                    ErrFound,
+                                    CurrentModuleObject);
                     if (ErrFound) {
-                        ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
+                        ShowContinueError(state,
+                                          "...occurs in " + CurrentModuleObject + " = " + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
                     }
                 }
 
             } else {
                 ShowSevereError(state, "Invalid entry for " + cAlphaFields(6) + " :" + Alphas(6));
-                ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
+                ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name + "\".");
                 ErrorsFound = true;
             }
 
             ValidateComponent(state,
-                DXCoolingSystem(DXCoolSysNum).CoolingCoilType, DXCoolingSystem(DXCoolSysNum).CoolingCoilName, IsNotOK, CurrentModuleObject);
+                              state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilType,
+                              state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilName,
+                              IsNotOK,
+                              CurrentModuleObject);
             if (IsNotOK) {
-                ShowContinueError(state, "In " + CurrentModuleObject + " = \"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
+                ShowContinueError(state, "In " + CurrentModuleObject + " = \"" + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name + "\".");
                 ErrorsFound = true;
             }
 
-            SetUpCompSets(
-                state, DXCoolingSystem(DXCoolSysNum).DXCoolingSystemType, DXCoolingSystem(DXCoolSysNum).Name, Alphas(6), Alphas(7), Alphas(3), Alphas(4));
+            SetUpCompSets(state,
+                          state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DXCoolingSystemType,
+                          state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name,
+                          Alphas(6),
+                          Alphas(7),
+                          Alphas(3),
+                          Alphas(4));
 
             FanErrorsFound = false;
 
             // Supply air fan operating mode defaulted to constant fan cycling coil/compressor
-            DXCoolingSystem(DXCoolSysNum).FanOpMode = ContFanCycCoil;
+            state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).FanOpMode = ContFanCycCoil;
 
             // Dehumidification control mode
             if (UtilityRoutines::SameString(Alphas(8), "None")) {
-                DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl_None;
+                DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl::None;
             } else if (UtilityRoutines::SameString(Alphas(8), "")) {
-                DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl_None;
+                DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl::None;
             } else if (UtilityRoutines::SameString(Alphas(8), "Multimode")) {
                 if (DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl) {
-                    DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl_Multimode;
+                    DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl::Multimode;
                 } else if (DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
-                    DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl_Multimode;
+                    DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl::Multimode;
                 } else {
                     ShowWarningError(state, "Invalid entry for " + cAlphaFields(8) + " :" + Alphas(8));
-                    ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
-                    ShowContinueError(state, "Valid only with cooling coil type = Coil:Cooling:DX:TwoStageWithHumidityControlMode or "
+                    ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name + "\".");
+                    ShowContinueError(state,
+                                      "Valid only with cooling coil type = Coil:Cooling:DX:TwoStageWithHumidityControlMode or "
                                       "CoilSystem:Cooling:DX:HeatExchangerAssisted.");
                     ShowContinueError(state, "Setting " + cAlphaFields(8) + " to None.");
-                    DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl_None;
+                    DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl::None;
                 }
             } else if (UtilityRoutines::SameString(Alphas(8), "CoolReheat")) {
-                DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl_CoolReheat;
+                DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl::CoolReheat;
             } else {
                 ShowSevereError(state, "Invalid entry for " + cAlphaFields(8) + " :" + Alphas(8));
-                ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
+                ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name + "\".");
             }
 
             // Run on sensible load
             if (UtilityRoutines::SameString(Alphas(9), "Yes")) {
-                DXCoolingSystem(DXCoolSysNum).RunOnSensibleLoad = true;
+                state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).RunOnSensibleLoad = true;
             } else if (UtilityRoutines::SameString(Alphas(9), "")) {
-                DXCoolingSystem(DXCoolSysNum).RunOnSensibleLoad = true;
+                state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).RunOnSensibleLoad = true;
             } else if (UtilityRoutines::SameString(Alphas(9), "No")) {
-                DXCoolingSystem(DXCoolSysNum).RunOnSensibleLoad = false;
+                state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).RunOnSensibleLoad = false;
             } else {
                 ShowSevereError(state, "Invalid entry for " + cAlphaFields(9) + " :" + Alphas(9));
-                ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
+                ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name + "\".");
                 ShowContinueError(state, "Must be Yes or No.");
             }
 
             // Run on latent load
             if (UtilityRoutines::SameString(Alphas(10), "Yes")) {
-                DXCoolingSystem(DXCoolSysNum).RunOnLatentLoad = true;
+                state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).RunOnLatentLoad = true;
             } else if (UtilityRoutines::SameString(Alphas(10), "")) {
-                DXCoolingSystem(DXCoolSysNum).RunOnLatentLoad = false;
+                state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).RunOnLatentLoad = false;
             } else if (UtilityRoutines::SameString(Alphas(10), "No")) {
-                DXCoolingSystem(DXCoolSysNum).RunOnLatentLoad = false;
+                state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).RunOnLatentLoad = false;
             } else {
                 ShowSevereError(state, "Invalid entry for " + cAlphaFields(10) + " :" + Alphas(10));
-                ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
+                ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name + "\".");
                 ShowContinueError(state, "Must be Yes or No.");
             }
 
             // Run as 100% DOAS DX coil
             if (lAlphaBlanks(11) && NumAlphas <= 10) {
-                DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil = false;
+                state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil = false;
             } else {
                 if (UtilityRoutines::SameString(Alphas(11), "Yes")) {
-                    DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil = true;
-                    if (DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
-                        ShowWarningError(state, CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
+                    state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil = true;
+                    if (state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
+                        ShowWarningError(state, CurrentModuleObject + " = " + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name);
                         ShowContinueError(state, "Invalid entry for " + cAlphaFields(11) + " :" + Alphas(11));
                         ShowContinueError(state, "Variable DX Cooling Coil is not supported as 100% DOAS DX coil.");
                         ShowContinueError(state, "Variable DX Cooling Coil is reset as a regular DX coil and the simulation continues.");
-                        DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil = false;
+                        state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil = false;
                     }
                 } else if (UtilityRoutines::SameString(Alphas(11), "")) {
-                    DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil = false;
+                    state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil = false;
                 } else if (UtilityRoutines::SameString(Alphas(11), "No")) {
-                    DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil = false;
+                    state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil = false;
                 } else {
                     ShowSevereError(state, "Invalid entry for " + cAlphaFields(11) + " :" + Alphas(11));
-                    ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
+                    ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name + "\".");
                     ShowContinueError(state, "Must be Yes or No.");
                 }
             }
 
             // considered as as 100% DOAS DX cooling coil
-            if (DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil) {
+            if (state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil) {
                 // set the system DX Coil application type to the child DX coil
-                if (!(DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed)) {
-                    SetDXCoilTypeData(state, DXCoolingSystem(DXCoolSysNum).CoolingCoilName);
+                if (!(state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed)) {
+                    SetDXCoilTypeData(state, state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilName);
                 } else {
-                    ShowWarningError(state, "CoilSystem:Cooling:DX named " + DXCoolingSystem(DXCoolSysNum).Name +
-                                     " entered with both variable speed DX coil and outdoor air mode set to YES, however VS coil model does not have "
-                                     "a special outdoor air mode");
+                    ShowWarningError(
+                        state,
+                        "CoilSystem:Cooling:DX named " + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name +
+                            " entered with both variable speed DX coil and outdoor air mode set to YES, however VS coil model does not have "
+                            "a special outdoor air mode");
                 }
             }
             // DOAS DX Cooling Coil Leaving Minimum Air Temperature
             if (NumNums > 0) {
                 if (!lNumericBlanks(1)) {
-                    DXCoolingSystem(DXCoolSysNum).DesignMinOutletTemp = Numbers(1);
+                    state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DesignMinOutletTemp = Numbers(1);
                 }
             }
-            if (DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed) {
-                SetCoilSystemCoolingData(state, DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).Name);
+            if (state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed) {
+                SetCoilSystemCoolingData(state,
+                                         state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilName,
+                                         state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name);
             }
 
-            if (state.dataGlobal->DoCoilDirectSolutions && DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
-                DXCoils::DisableLatentDegradation(state, DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex);
+            if (state.dataGlobal->DoCoilDirectSolutions &&
+                state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
+                DXCoils::DisableLatentDegradation(state, state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex);
             }
 
         } // End of the DX System Loop
@@ -683,54 +679,62 @@ namespace HVACDXSystem {
             ShowFatalError(state, RoutineName + "Errors found in input.  Program terminates.");
         }
 
-        for (DXSystemNum = 1; DXSystemNum <= NumDXSystem; ++DXSystemNum) {
+        for (DXSystemNum = 1; DXSystemNum <= state.dataHVACDXSys->NumDXSystem; ++DXSystemNum) {
             // Setup Report variables for the DXCoolingSystem that is not reported in the components themselves
             if (UtilityRoutines::SameString(DXCoolingSystem(DXSystemNum).CoolingCoilType, "Coil:Cooling:DX:TwoSpeed")) {
-                SetupOutputVariable(state, "Coil System Cycling Ratio",
+                SetupOutputVariable(state,
+                                    "Coil System Cycling Ratio",
                                     OutputProcessor::Unit::None,
-                                    DXCoolingSystem(DXSystemNum).CycRatio,
+                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CycRatio,
                                     "System",
                                     "Average",
-                                    DXCoolingSystem(DXSystemNum).Name);
-                SetupOutputVariable(state, "Coil System Compressor Speed Ratio",
+                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
+                SetupOutputVariable(state,
+                                    "Coil System Compressor Speed Ratio",
                                     OutputProcessor::Unit::None,
-                                    DXCoolingSystem(DXSystemNum).SpeedRatio,
+                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).SpeedRatio,
                                     "System",
                                     "Average",
-                                    DXCoolingSystem(DXSystemNum).Name);
-            } else if (UtilityRoutines::SameString(DXCoolingSystem(DXSystemNum).CoolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
-                SetupOutputVariable(state, "Coil System Cycling Ratio",
+                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
+            } else if (UtilityRoutines::SameString(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilType,
+                                                   "Coil:Cooling:DX:VariableSpeed")) {
+                SetupOutputVariable(state,
+                                    "Coil System Cycling Ratio",
                                     OutputProcessor::Unit::None,
-                                    DXCoolingSystem(DXSystemNum).CycRatio,
+                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CycRatio,
                                     "System",
                                     "Average",
-                                    DXCoolingSystem(DXSystemNum).Name);
-                SetupOutputVariable(state, "Coil System Compressor Speed Ratio",
+                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
+                SetupOutputVariable(state,
+                                    "Coil System Compressor Speed Ratio",
                                     OutputProcessor::Unit::None,
-                                    DXCoolingSystem(DXSystemNum).SpeedRatio,
+                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).SpeedRatio,
                                     "System",
                                     "Average",
-                                    DXCoolingSystem(DXSystemNum).Name);
-                SetupOutputVariable(state, "Coil System Compressor Speed Number",
+                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
+                SetupOutputVariable(state,
+                                    "Coil System Compressor Speed Number",
                                     OutputProcessor::Unit::None,
-                                    DXCoolingSystem(DXSystemNum).SpeedNum,
+                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).SpeedNum,
                                     "System",
                                     "Average",
-                                    DXCoolingSystem(DXSystemNum).Name);
+                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
             } else {
-                SetupOutputVariable(state, "Coil System Part Load Ratio",
+                SetupOutputVariable(state,
+                                    "Coil System Part Load Ratio",
                                     OutputProcessor::Unit::None,
-                                    DXCoolingSystem(DXSystemNum).PartLoadFrac,
+                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).PartLoadFrac,
                                     "System",
                                     "Average",
-                                    DXCoolingSystem(DXSystemNum).Name);
+                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
             }
-            SetupOutputVariable(state, "Coil System Frost Control Status",
+            SetupOutputVariable(state,
+                                "Coil System Frost Control Status",
                                 OutputProcessor::Unit::None,
-                                DXCoolingSystem(DXSystemNum).FrostControlStatus,
+                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).FrostControlStatus,
                                 "System",
                                 "Average",
-                                DXCoolingSystem(DXSystemNum).Name);
+                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
         }
 
         Alphas.deallocate();
@@ -747,7 +751,8 @@ namespace HVACDXSystem {
     // Beginning of Initialization subroutines for the Module
     // *****************************************************************************
 
-    void InitDXCoolingSystem(EnergyPlusData &state, int const DXSystemNum,                // number of the current DX Sys being simulated
+    void InitDXCoolingSystem(EnergyPlusData &state,
+                             int const DXSystemNum,                // number of the current DX Sys being simulated
                              int const AirLoopNum,                 // number of the current air loop being simulated
                              Optional_int_const OAUnitNum,         // number of the current outdoor air unit being simulated
                              Optional<Real64 const> OAUCoilOutTemp // the coil inlet temperature of OutdoorAirUnit
@@ -772,7 +777,7 @@ namespace HVACDXSystem {
         // na
 
         // Using/Aliasing
-        auto & DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
+        auto &DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
         // Locals
@@ -791,66 +796,78 @@ namespace HVACDXSystem {
         int OutNode;     // outlet node number
         int ControlNode; // control node number
         int DXSysIndex;
-        static bool MyOneTimeFlag(true);
-        static bool MySetPointCheckFlag(true);
         int OutdoorAirUnitNum;    // "ONLY" for ZoneHVAC:OutdoorAirUnit
         Real64 OAUCoilOutletTemp; // "ONLY" for zoneHVAC:OutdoorAirUnit
 
+        auto &DXCoolingSystem(state.dataHVACDXSys->DXCoolingSystem);
 
-        if (MyOneTimeFlag) {
+        if (state.dataHVACDXSys->MyOneTimeFlag) {
 
-            MyOneTimeFlag = false;
+            state.dataHVACDXSys->MyOneTimeFlag = false;
         }
         if (AirLoopNum == -1) { // This Dx system is component of ZoneHVAC:OutdoorAirUnit
             OutdoorAirUnitNum = OAUnitNum;
             OAUCoilOutletTemp = OAUCoilOutTemp;
         }
 
-        if (!state.dataGlobal->SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
-            for (DXSysIndex = 1; DXSysIndex <= NumDXSystem; ++DXSysIndex) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataHVACDXSys->MySetPointCheckFlag && DoSetPointTest) {
+            for (DXSysIndex = 1; DXSysIndex <= state.dataHVACDXSys->NumDXSystem; ++DXSysIndex) {
                 ControlNode = DXCoolingSystem(DXSysIndex).DXSystemControlNodeNum;
                 if (ControlNode > 0) {
-                    if (AirLoopNum == -1) {                                 // Outdoor Air Unit
+                    if (AirLoopNum == -1) {                                                      // Outdoor Air Unit
                         state.dataLoopNodes->Node(ControlNode).TempSetPoint = OAUCoilOutletTemp; // Set the coil outlet temperature
-                        if (DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil) {
-                            FrostControlSetPointLimit(state, DXSystemNum,
-                                                      DXCoolingSystem(DXSystemNum).DesiredOutletTemp,
+                        if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil) {
+                            FrostControlSetPointLimit(state,
+                                                      DXSystemNum,
+                                                      state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp,
                                                       state.dataLoopNodes->Node(ControlNode).HumRatMax,
                                                       state.dataEnvrn->OutBaroPress,
-                                                      DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
+                                                      state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                                       1);
                         }
                     } else if (AirLoopNum != -1) { // Not an outdoor air unit
 
                         if (state.dataLoopNodes->Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                                ShowSevereError(state, DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
-                                                ": Missing temperature setpoint for DX unit= " + DXCoolingSystem(DXSysIndex).Name);
+                                ShowSevereError(
+                                    state,
+                                    state.dataHVACDXSys->DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
+                                        ": Missing temperature setpoint for DX unit= " + state.dataHVACDXSys->DXCoolingSystem(DXSysIndex).Name);
                                 ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the unit control node.");
                                 state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
-                                CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                CheckIfNodeSetPointManagedByEMS(
+                                    state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
                                 if (state.dataHVACGlobal->SetPointErrorFlag) {
-                                    ShowSevereError(state, DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
-                                                    ": Missing temperature setpoint for DX unit= " + DXCoolingSystem(DXSysIndex).Name);
+                                    ShowSevereError(
+                                        state,
+                                        state.dataHVACDXSys->DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
+                                            ": Missing temperature setpoint for DX unit= " + state.dataHVACDXSys->DXCoolingSystem(DXSysIndex).Name);
                                     ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the unit control node.");
-                                    ShowContinueError(state, "  or use an EMS actuator to establish a temperature setpoint at the unit control node.");
+                                    ShowContinueError(state,
+                                                      "  or use an EMS actuator to establish a temperature setpoint at the unit control node.");
                                 }
                             }
                         }
-                        if ((DXCoolingSystem(DXSysIndex).DehumidControlType != DehumidControl_None) &&
+                        if ((DXCoolingSystem(DXSysIndex).DehumidControlType != DehumidControl::None) &&
                             (state.dataLoopNodes->Node(ControlNode).HumRatMax == SensedNodeFlagValue)) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                                ShowSevereError(state, DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
-                                                ": Missing humidity ratio setpoint (HUMRATMAX) for DX unit= " + DXCoolingSystem(DXSysIndex).Name);
+                                ShowSevereError(state,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
+                                                    ": Missing humidity ratio setpoint (HUMRATMAX) for DX unit= " +
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSysIndex).Name);
                                 ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the unit control node.");
                                 state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
-                                CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                CheckIfNodeSetPointManagedByEMS(state,
+                                                                ControlNode,
+                                                                EMSManager::SPControlType::iHumidityRatioMaxSetPoint,
+                                                                state.dataHVACGlobal->SetPointErrorFlag);
                                 if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(state,
-                                        DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
-                                        ": Missing maximum humidity ratio setpoint (HUMRATMAX) for DX unit= " + DXCoolingSystem(DXSysIndex).Name);
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
+                                                        ": Missing maximum humidity ratio setpoint (HUMRATMAX) for DX unit= " +
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSysIndex).Name);
                                     ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the unit control node.");
                                     ShowContinueError(state, "  or use an EMS actuator to establish a maximum humidity ratio setpoint.");
                                 }
@@ -859,31 +876,34 @@ namespace HVACDXSystem {
                     }
                 }
             }
-            MySetPointCheckFlag = false;
+            state.dataHVACDXSys->MySetPointCheckFlag = false;
         }
 
-        if (!DXCoolingSystem(DXSystemNum).VSCoilFanInfoSet && AirLoopNum > 0) {
-            if (DXCoolingSystem(DXSystemNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
+        if (!state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).VSCoilFanInfoSet && AirLoopNum > 0) {
+            if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
 
                 switch (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelTypeEnum) {
                 case DataAirSystems::structArrayLegacyFanModels: {
                     int SupFanNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum;
                     if (SupFanNum > 0) {
-                        state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state, DXCoolingSystem(DXSystemNum).CoolingCoilName,
-                                                                     DXCoolingSystem(DXSystemNum).CoolingCoilType,
-                                                                     state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum).FanName,
-                                                                     DataAirSystems::structArrayLegacyFanModels,
-                                                                     state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum);
+                        state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
+                            state,
+                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilName,
+                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilType,
+                            state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum).FanName,
+                            DataAirSystems::structArrayLegacyFanModels,
+                            state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum);
                     }
 
                     break;
                 }
                 case DataAirSystems::objectVectorOOFanSystemModel: {
                     if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex >= 0) {
-                        state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                            DXCoolingSystem(DXSystemNum).CoolingCoilName,
-                            DXCoolingSystem(DXSystemNum).CoolingCoilType,
-                            HVACFan::fanObjs[state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex]->name,
+                        state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
+                            state,
+                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilName,
+                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilType,
+                            state.dataHVACFan->fanObjs[state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex]->name,
                             DataAirSystems::objectVectorOOFanSystemModel,
                             state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex);
                     }
@@ -894,90 +914,102 @@ namespace HVACDXSystem {
                     break;
                 }
                 }
-                DXCoolingSystem(DXSystemNum).VSCoilFanInfoSet = true;
+                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).VSCoilFanInfoSet = true;
             }
         } // else if ( )  on OA system ??
         // These initializations are done every iteration
         if (AirLoopNum == -1) { // This IF-TEHN routine is just for ZoneHVAC:OUTDOORAIRUNIT
-            OutNode = DXCoolingSystem(DXSystemNum).DXCoolingCoilOutletNodeNum;
-            ControlNode = DXCoolingSystem(DXSystemNum).DXSystemControlNodeNum;
+            OutNode = state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingCoilOutletNodeNum;
+            ControlNode = state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXSystemControlNodeNum;
 
             if (ControlNode == 0) {
-                DXCoolingSystem(DXSystemNum).DesiredOutletTemp = 0.0;
-                DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = 1.0;
+                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp = 0.0;
+                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = 1.0;
             } else if (ControlNode == OutNode) {
-                DXCoolingSystem(DXSystemNum).DesiredOutletTemp = OAUCoilOutletTemp;
-                if (DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil && DXCoolingSystem(DXSystemNum).RunOnSensibleLoad) {
-                    FrostControlSetPointLimit(state, DXSystemNum,
-                                              DXCoolingSystem(DXSystemNum).DesiredOutletTemp,
+                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp = OAUCoilOutletTemp;
+                if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil &&
+                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).RunOnSensibleLoad) {
+                    FrostControlSetPointLimit(state,
+                                              DXSystemNum,
+                                              state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp,
                                               state.dataLoopNodes->Node(ControlNode).HumRatMax,
                                               state.dataEnvrn->OutBaroPress,
-                                              DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
+                                              state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                               1);
                 }
             }
             //  If the Dxsystem is an equipment of Outdoor Air Unit, the desiered coiloutlet humidity level is set to zero
-            DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = 1.0;
+            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = 1.0;
 
         } else if (AirLoopNum != -1) { // Not Outdoor Air Unit
 
-            OutNode = DXCoolingSystem(DXSystemNum).DXCoolingCoilOutletNodeNum;
-            ControlNode = DXCoolingSystem(DXSystemNum).DXSystemControlNodeNum;
+            OutNode = state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingCoilOutletNodeNum;
+            ControlNode = state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXSystemControlNodeNum;
             if (AirLoopNum == 0) {
-                EconomizerFlag = false;
+                state.dataHVACDXSys->EconomizerFlag = false;
             } else {
-                EconomizerFlag = state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive;
+                state.dataHVACDXSys->EconomizerFlag = state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive;
             }
             if (ControlNode == 0) {
-                DXCoolingSystem(DXSystemNum).DesiredOutletTemp = 0.0;
-                DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = 1.0;
+                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp = 0.0;
+                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = 1.0;
             } else if (ControlNode == OutNode) {
-                if (DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil && DXCoolingSystem(DXSystemNum).RunOnSensibleLoad) {
-                    FrostControlSetPointLimit(state, DXSystemNum,
+                if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil &&
+                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).RunOnSensibleLoad) {
+                    FrostControlSetPointLimit(state,
+                                              DXSystemNum,
                                               state.dataLoopNodes->Node(ControlNode).TempSetPoint,
                                               state.dataLoopNodes->Node(ControlNode).HumRatMax,
                                               state.dataEnvrn->OutBaroPress,
-                                              DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
+                                              state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                               1);
                 }
-                DXCoolingSystem(DXSystemNum).DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint;
+                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint;
                 //  If HumRatMax is zero, then there is no request from SetpointManager:SingleZone:Humidity:Maximum
-                if ((DXCoolingSystem(DXSystemNum).DehumidControlType != DehumidControl_None) && (state.dataLoopNodes->Node(ControlNode).HumRatMax > 0.0)) {
+                if ((DXCoolingSystem(DXSystemNum).DehumidControlType != DehumidControl::None) &&
+                    (state.dataLoopNodes->Node(ControlNode).HumRatMax > 0.0)) {
                     if (DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil && DXCoolingSystem(DXSystemNum).RunOnLatentLoad) {
-                        FrostControlSetPointLimit(state, DXSystemNum,
+                        FrostControlSetPointLimit(state,
+                                                  DXSystemNum,
                                                   state.dataLoopNodes->Node(ControlNode).TempSetPoint,
                                                   state.dataLoopNodes->Node(ControlNode).HumRatMax,
                                                   state.dataEnvrn->OutBaroPress,
-                                                  DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
+                                                  state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                                   2);
                     }
-                    DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = state.dataLoopNodes->Node(ControlNode).HumRatMax;
+                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = state.dataLoopNodes->Node(ControlNode).HumRatMax;
                 } else {
-                    DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = 1.0;
+                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = 1.0;
                 }
             } else {
-                if (DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil && DXCoolingSystem(DXSystemNum).RunOnSensibleLoad) {
-                    FrostControlSetPointLimit(state, DXSystemNum,
+                if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil &&
+                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).RunOnSensibleLoad) {
+                    FrostControlSetPointLimit(state,
+                                              DXSystemNum,
                                               state.dataLoopNodes->Node(ControlNode).TempSetPoint,
                                               state.dataLoopNodes->Node(ControlNode).HumRatMax,
                                               state.dataEnvrn->OutBaroPress,
-                                              DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
+                                              state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                               1);
                 }
-                DXCoolingSystem(DXSystemNum).DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint - (state.dataLoopNodes->Node(ControlNode).Temp - state.dataLoopNodes->Node(OutNode).Temp);
-                if (DXCoolingSystem(DXSystemNum).DehumidControlType != DehumidControl_None) {
+                DXCoolingSystem(DXSystemNum).DesiredOutletTemp =
+                    state.dataLoopNodes->Node(ControlNode).TempSetPoint -
+                    (state.dataLoopNodes->Node(ControlNode).Temp - state.dataLoopNodes->Node(OutNode).Temp);
+                if (DXCoolingSystem(DXSystemNum).DehumidControlType != DehumidControl::None) {
                     if (DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil && DXCoolingSystem(DXSystemNum).RunOnLatentLoad) {
-                        FrostControlSetPointLimit(state, DXSystemNum,
+                        FrostControlSetPointLimit(state,
+                                                  DXSystemNum,
                                                   state.dataLoopNodes->Node(ControlNode).TempSetPoint,
                                                   state.dataLoopNodes->Node(ControlNode).HumRatMax,
                                                   state.dataEnvrn->OutBaroPress,
-                                                  DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
+                                                  state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                                   2);
                     }
-                    DXCoolingSystem(DXSystemNum).DesiredOutletHumRat =
-                        state.dataLoopNodes->Node(ControlNode).HumRatMax - (state.dataLoopNodes->Node(ControlNode).HumRat - state.dataLoopNodes->Node(OutNode).HumRat);
+                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletHumRat =
+                        state.dataLoopNodes->Node(ControlNode).HumRatMax -
+                        (state.dataLoopNodes->Node(ControlNode).HumRat - state.dataLoopNodes->Node(OutNode).HumRat);
                 } else {
-                    DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = 1.0;
+                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = 1.0;
                 }
             }
         }
@@ -986,10 +1018,11 @@ namespace HVACDXSystem {
     // End of Initialization subroutines for the Module
     // *****************************************************************************
 
-    // Beginning of Calculation subroutines for the DXCoolingSystem Module
+    // Beginning of Calculation subroutines for the state.dataHVACDXSys->DXCoolingSystem Module
     // *****************************************************************************
 
-    void ControlDXSystem(EnergyPlusData &state, int const DXSystemNum,         // index to DXSystem
+    void ControlDXSystem(EnergyPlusData &state,
+                         int const DXSystemNum,         // index to DXSystem
                          bool const FirstHVACIteration, // First HVAC iteration flag
                          bool &HXUnitOn                 // flag to enable heat exchanger heat recovery
     )
@@ -1018,12 +1051,12 @@ namespace HVACDXSystem {
         using DXCoils::SimDXCoilMultiSpeed;
 
         using General::SolveRoot;
-        using TempSolveRoot::SolveRoot;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using PackagedThermalStorageCoil::ControlTESIceStorageTankCoil;
         using PackagedThermalStorageCoil::SimTESCoil;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyTdpFnWPb;
+        using TempSolveRoot::SolveRoot;
         using VariableSpeedCoils::SimVariableSpeedCoils;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1078,15 +1111,16 @@ namespace HVACDXSystem {
         int VSCoilIndex;              // variable-speed coil index
         int I;                        // interation increment
 
+        auto &DXCoolingSystem(state.dataHVACDXSys->DXCoolingSystem);
         // Set local variables
         // Retrieve the load on the controlled zone
-        OutletNode = DXCoolingSystem(DXSystemNum).DXCoolingCoilOutletNodeNum;
-        InletNode = DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum;
-        ControlNode = DXCoolingSystem(DXSystemNum).DXSystemControlNodeNum;
-        DesOutTemp = DXCoolingSystem(DXSystemNum).DesiredOutletTemp;
-        DesOutHumRat = DXCoolingSystem(DXSystemNum).DesiredOutletHumRat;
-        CompName = DXCoolingSystem(DXSystemNum).CoolingCoilName;
-        FanOpMode = DXCoolingSystem(DXSystemNum).FanOpMode;
+        OutletNode = state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingCoilOutletNodeNum;
+        InletNode = state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum;
+        ControlNode = state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXSystemControlNodeNum;
+        DesOutTemp = state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp;
+        DesOutHumRat = state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletHumRat;
+        CompName = state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilName;
+        FanOpMode = state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).FanOpMode;
         SpeedRatio = 0.0;
         CycRatio = 0.0;
         PartLoadFrac = 0.0;
@@ -1109,16 +1143,19 @@ namespace HVACDXSystem {
         auto &Node(state.dataLoopNodes->Node);
 
         // If there is a fault of coil SAT Sensor
-        if (DXCoolingSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
+        if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) &&
+            (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
-            int FaultIndex = DXCoolingSystem(DXSystemNum).FaultyCoilSATIndex;
-            DXCoolingSystem(DXSystemNum).FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
+            int FaultIndex = state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).FaultyCoilSATIndex;
+            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).FaultyCoilSATOffset =
+                state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the DesOutTemp
-            DesOutTemp -= DXCoolingSystem(DXSystemNum).FaultyCoilSATOffset;
+            DesOutTemp -= state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).FaultyCoilSATOffset;
         }
 
-        // If DXCoolingSystem is scheduled on and there is flow
-        if ((GetCurrentScheduleValue(state, DXCoolingSystem(DXSystemNum).SchedPtr) > 0.0) && (Node(InletNode).MassFlowRate > MinAirMassFlow)) {
+        // If state.dataHVACDXSys->DXCoolingSystem is scheduled on and there is flow
+        if ((GetCurrentScheduleValue(state, state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).SchedPtr) > 0.0) &&
+            (Node(InletNode).MassFlowRate > MinAirMassFlow)) {
 
             // Determine if there is a sensible load on this system
             if ((Node(InletNode).Temp > Node(ControlNode).TempSetPoint) && (Node(InletNode).Temp > DesOutTemp) &&
@@ -1128,28 +1165,41 @@ namespace HVACDXSystem {
             // Determine if there is a latent load on this system - for future use to serve latent-only loads
             if ((Node(InletNode).HumRat > Node(ControlNode).HumRatMax) && (Node(InletNode).HumRat > DesOutHumRat)) LatentLoad = true;
 
-            // If DXCoolingSystem runs with a cooling load then set PartLoadFrac on Cooling System and the Mass Flow
+            // If state.dataHVACDXSys->DXCoolingSystem runs with a cooling load then set PartLoadFrac on Cooling System and the Mass Flow
             // Multimode coil will switch to enhanced dehumidification if available and needed, but it
             // still runs to meet the sensible load. Multimode applies to Multimode or HXAssistedCooling coils.
-            if ((SensibleLoad && DXCoolingSystem(DXSystemNum).RunOnSensibleLoad) || (LatentLoad && DXCoolingSystem(DXSystemNum).RunOnLatentLoad)) {
+            if ((SensibleLoad && state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).RunOnSensibleLoad) ||
+                (LatentLoad && state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).RunOnLatentLoad)) {
                 // calculate sensible PLR, don't care if latent is true here but need to gaurd for
                 // when LatentLoad=TRUE and SensibleLoad=FALSE
                 {
-                    auto const SELECT_CASE_var(DXCoolingSystem(DXSystemNum).CoolingCoilType_Num);
+                    auto const SELECT_CASE_var(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilType_Num);
 
                     if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) { // COIL:DX:COOLINGBYPASSFACTOREMPIRICAL
 
                         // Get no load result
                         PartLoadFrac = 0.0;
-                        SimDXCoil(state, CompName, On, FirstHVACIteration, DXCoolingSystem(DXSystemNum).CoolingCoilIndex, FanOpMode, PartLoadFrac);
+                        SimDXCoil(state,
+                                  CompName,
+                                  On,
+                                  FirstHVACIteration,
+                                  state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                  FanOpMode,
+                                  PartLoadFrac);
                         NoOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) -
                                                                    PsyHFnTdbW(Node(InletNode).Temp, Node(OutletNode).HumRat));
-                        NoLoadHumRatOut = state.dataDXCoils->DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                        NoLoadHumRatOut = state.dataDXCoils->DXCoilOutletHumRat(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
 
                         // Get full load result
                         PartLoadFrac = 1.0;
-                        SimDXCoil(state, CompName, On, FirstHVACIteration, DXCoolingSystem(DXSystemNum).CoolingCoilIndex, FanOpMode, PartLoadFrac);
-                        FullLoadHumRatOut = state.dataDXCoils->DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                        SimDXCoil(state,
+                                  CompName,
+                                  On,
+                                  FirstHVACIteration,
+                                  state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                  FanOpMode,
+                                  PartLoadFrac);
+                        FullLoadHumRatOut = state.dataDXCoils->DXCoilOutletHumRat(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
 
                         FullOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) -
                                                                      PsyHFnTdbW(Node(InletNode).Temp, Node(OutletNode).HumRat));
@@ -1169,60 +1219,72 @@ namespace HVACDXSystem {
                             //           OutletTempDXCoil is the full capacity outlet temperature at PartLoadFrac = 1 from the CALL above. If this
                             //           temp is greater than the desired outlet temp, then run the compressor at PartLoadFrac = 1, otherwise find the
                             //           operating PLR.
-                            OutletTempDXCoil = state.dataDXCoils->DXCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                            OutletTempDXCoil =
+                                state.dataDXCoils->DXCoilOutletTemp(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                             if (OutletTempDXCoil > DesOutTemp) {
                                 PartLoadFrac = 1.0;
                             } else {
                                 if (state.dataGlobal->DoCoilDirectSolutions) {
                                     PartLoadFrac = (ReqOutput - NoOutput) / (FullOutput - NoOutput);
                                     SimDXCoil(state,
-                                        CompName, On, FirstHVACIteration, DXCoolingSystem(DXSystemNum).CoolingCoilIndex, FanOpMode, PartLoadFrac);
+                                              CompName,
+                                              On,
+                                              FirstHVACIteration,
+                                              state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                              FanOpMode,
+                                              PartLoadFrac);
                                 } else {
-                                    Par(1) = double(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                    Par(1) = double(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     Par(2) = DesOutTemp;
                                     Par(5) = double(FanOpMode);
                                     TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilResidual, 0.0, 1.0, Par);
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            if (DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
-                                                ++DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter;
-                                                ShowWarningError(state,
-                                                    DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                    " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
-                                                    DXCoolingSystem(DXSystemNum).Name);
+                                            if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
+                                                ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter;
+                                                ShowWarningError(
+                                                    state,
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                        " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                 ShowContinueError(state, format("Estimated part-load ratio  = {:.3R}", (ReqOutput / FullOutput)));
                                                 ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                                                ShowContinueErrorTimeStamp(state,
+                                                ShowContinueErrorTimeStamp(
+                                                    state,
                                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
-                                                                               DXCoolingSystem(DXSystemNum).Name +
+                                            ShowRecurringWarningErrorAtEnd(state,
+                                                                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                               " \"" + state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                                                "\" - Iteration limit exceeded calculating sensible part-load ratio "
                                                                                "error continues. Sensible PLR "
                                                                                "statistics follow.",
-                                                                           DXCoolingSystem(DXSystemNum).DXCoilSensPLRIterIndex,
+                                                                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRIterIndex,
                                                                            PartLoadFrac,
                                                                            PartLoadFrac);
                                         }
                                     } else if (SolFla == -2) {
                                         PartLoadFrac = ReqOutput / FullOutput;
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            if (DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
-                                                ++DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail;
-                                                ShowWarningError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                                 " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
-                                                                 "exceeded, for unit = " +
-                                                                 DXCoolingSystem(DXSystemNum).Name);
+                                            if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
+                                                ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail;
+                                                ShowWarningError(state,
+                                                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                     " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
+                                                                     "exceeded, for unit = " +
+                                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                 ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                                                ShowContinueErrorTimeStamp(state,
+                                                ShowContinueErrorTimeStamp(
+                                                    state,
                                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
-                                                                               DXCoolingSystem(DXSystemNum).Name +
+                                            ShowRecurringWarningErrorAtEnd(state,
+                                                                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                               " \"" + state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                                                "\" - DX unit sensible part-load ratio calculation failed error "
                                                                                "continues. Sensible PLR statistics "
                                                                                "follow.",
-                                                                           DXCoolingSystem(DXSystemNum).DXCoilSensPLRFailIndex,
+                                                                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRFailIndex,
                                                                            PartLoadFrac,
                                                                            PartLoadFrac);
                                         }
@@ -1236,14 +1298,15 @@ namespace HVACDXSystem {
                         if (PartLoadFrac == 0.0) {
                             OutletHumRatDXCoil = NoLoadHumRatOut;
                         } else {
-                            OutletHumRatDXCoil = state.dataDXCoils->DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                            OutletHumRatDXCoil =
+                                state.dataDXCoils->DXCoilOutletHumRat(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                         }
 
                         // If humidity setpoint is not satisfied and humidity control type is CoolReheat,
                         // then overcool to meet moisture load
 
                         if ((OutletHumRatDXCoil > DesOutHumRat) && (PartLoadFrac < 1.0) &&
-                            (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl_CoolReheat)) {
+                            (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl::CoolReheat)) {
 
                             //           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
                             //           do not run the compressor
@@ -1258,30 +1321,39 @@ namespace HVACDXSystem {
                                 if (state.dataGlobal->DoCoilDirectSolutions) {
                                     PartLoadFrac = (ReqOutput - NoOutput) / (FullOutput - NoOutput);
                                     SimDXCoil(state,
-                                        CompName, On, FirstHVACIteration, DXCoolingSystem(DXSystemNum).CoolingCoilIndex, FanOpMode, PartLoadFrac);
+                                              CompName,
+                                              On,
+                                              FirstHVACIteration,
+                                              state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                              FanOpMode,
+                                              PartLoadFrac);
                                 } else {
-                                    Par(1) = double(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                    Par(1) = double(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     Par(2) = DesOutHumRat;
                                     Par(5) = double(FanOpMode);
                                     TempSolveRoot::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilHumRatResidual, 0.0, 1.0, Par);
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            if (DXCoolingSystem(DXSystemNum).DXCoilLatPLRIter < 1) {
-                                                ++DXCoolingSystem(DXSystemNum).DXCoilLatPLRIter;
-                                                ShowWarningError(state,
-                                                    DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                    " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " +
-                                                    DXCoolingSystem(DXSystemNum).Name);
+                                            if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilLatPLRIter < 1) {
+                                                ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilLatPLRIter;
+                                                ShowWarningError(
+                                                    state,
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                        " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " +
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                 ShowContinueError(state, format("Estimated part-load ratio   = {:.3R}", (ReqOutput / FullOutput)));
                                                 ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                                                ShowContinueErrorTimeStamp(state,
+                                                ShowContinueErrorTimeStamp(
+                                                    state,
                                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(state,
-                                                DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                            ShowRecurringWarningErrorAtEnd(
+                                                state,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                     "\" - Iteration limit exceeded calculating latent part-load ratio error continues. Latent PLR "
                                                     "statistics follow.",
-                                                DXCoolingSystem(DXSystemNum).DXCoilLatPLRIterIndex,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilLatPLRIterIndex,
                                                 PartLoadFrac,
                                                 PartLoadFrac);
                                         }
@@ -1293,21 +1365,25 @@ namespace HVACDXSystem {
                                             PartLoadFrac = 1.0;
                                         }
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            if (DXCoolingSystem(DXSystemNum).DXCoilLatPLRFail < 1) {
-                                                ++DXCoolingSystem(DXSystemNum).DXCoilLatPLRFail;
-                                                ShowWarningError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                                 " - DX unit latent part-load ratio calculation failed: part-load ratio limits "
-                                                                 "exceeded, for unit = " +
-                                                                 DXCoolingSystem(DXSystemNum).Name);
+                                            if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilLatPLRFail < 1) {
+                                                ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilLatPLRFail;
+                                                ShowWarningError(state,
+                                                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                     " - DX unit latent part-load ratio calculation failed: part-load ratio limits "
+                                                                     "exceeded, for unit = " +
+                                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                 ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                                                ShowContinueErrorTimeStamp(state,
+                                                ShowContinueErrorTimeStamp(
+                                                    state,
                                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(state,
-                                                DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                            ShowRecurringWarningErrorAtEnd(
+                                                state,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                     "\" - DX unit latent part-load ratio calculation failed error continues. Latent PLR statistics "
                                                     "follow.",
-                                                DXCoolingSystem(DXSystemNum).DXCoilLatPLRFailIndex,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilLatPLRFailIndex,
                                                 PartLoadFrac,
                                                 PartLoadFrac);
                                         }
@@ -1326,7 +1402,7 @@ namespace HVACDXSystem {
 
                         //         Check the dehumidification control type. If it's multimode, turn off the HX to find the sensible PLR. Then check to
                         //         see if the humidity load is met without the use of the HX. Always run the HX for the other modes.
-                        if (DXCoolingSystem(DXSystemNum).DehumidControlType != DehumidControl_Multimode) {
+                        if (DXCoolingSystem(DXSystemNum).DehumidControlType != DehumidControl::Multimode) {
                             HXUnitOn = true;
                         } else {
                             HXUnitOn = false;
@@ -1334,33 +1410,35 @@ namespace HVACDXSystem {
 
                         // Get no load result
                         PartLoadFrac = 0.0;
-                        SimHXAssistedCoolingCoil(state, CompName,
+                        SimHXAssistedCoolingCoil(state,
+                                                 CompName,
                                                  FirstHVACIteration,
                                                  On,
                                                  PartLoadFrac,
-                                                 DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                                  FanOpMode,
                                                  HXUnitOn,
                                                  _,
-                                                 EconomizerFlag);
+                                                 state.dataHVACDXSys->EconomizerFlag);
                         NoOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) -
                                                                    PsyHFnTdbW(Node(InletNode).Temp, Node(OutletNode).HumRat));
-                        NoLoadHumRatOut = state.dataDXCoils->DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                        NoLoadHumRatOut = state.dataDXCoils->DXCoilOutletHumRat(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
 
                         // Get full load result
                         PartLoadFrac = 1.0;
-                        SimHXAssistedCoolingCoil(state, CompName,
+                        SimHXAssistedCoolingCoil(state,
+                                                 CompName,
                                                  FirstHVACIteration,
                                                  On,
                                                  PartLoadFrac,
-                                                 DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                                  FanOpMode,
                                                  HXUnitOn,
                                                  _,
-                                                 EconomizerFlag);
+                                                 state.dataHVACDXSys->EconomizerFlag);
                         FullOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) -
                                                                      PsyHFnTdbW(Node(InletNode).Temp, Node(OutletNode).HumRat));
-                        FullLoadHumRatOut = state.dataDXCoils->DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                        FullLoadHumRatOut = state.dataDXCoils->DXCoilOutletHumRat(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
 
                         ReqOutput = Node(InletNode).MassFlowRate *
                                     (PsyHFnTdbW(DesOutTemp, Node(OutletNode).HumRat) - PsyHFnTdbW(Node(InletNode).Temp, Node(OutletNode).HumRat));
@@ -1381,7 +1459,7 @@ namespace HVACDXSystem {
                             if ((OutletTempDXCoil > DesOutTemp) || std::abs(OutletTempDXCoil - DesOutTemp) <= (Acc * 2.0)) {
                                 PartLoadFrac = 1.0;
                             } else {
-                                Par(1) = double(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                Par(1) = double(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                 Par(2) = DesOutTemp;
                                 // FirstHVACIteration is a logical, Par is REAL(r64), so make TRUE = 1 and FALSE = 0
                                 if (FirstHVACIteration) {
@@ -1405,16 +1483,18 @@ namespace HVACDXSystem {
                                     while ((TempOutletTempDXCoil - DesOutTemp) > 0.0 && TempMaxPLR <= 1.0) {
                                         //                 find upper limit of PLR
                                         TempMaxPLR += 0.1;
-                                        SimHXAssistedCoolingCoil(state, CompName,
+                                        SimHXAssistedCoolingCoil(state,
+                                                                 CompName,
                                                                  FirstHVACIteration,
                                                                  On,
                                                                  TempMaxPLR,
-                                                                 DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                                                  FanOpMode,
                                                                  HXUnitOn,
                                                                  _,
-                                                                 EconomizerFlag);
-                                        TempOutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                                                 state.dataHVACDXSys->EconomizerFlag);
+                                        TempOutletTempDXCoil =
+                                            state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     }
                                     TempMinPLR = TempMaxPLR;
                                     while ((TempOutletTempDXCoil - DesOutTemp) < 0.0 && TempMinPLR >= 0.0) {
@@ -1423,62 +1503,73 @@ namespace HVACDXSystem {
                                         TempMaxPLR = TempMinPLR;
                                         //                 find minimum limit of PLR
                                         TempMinPLR -= 0.01;
-                                        SimHXAssistedCoolingCoil(state, CompName,
+                                        SimHXAssistedCoolingCoil(state,
+                                                                 CompName,
                                                                  FirstHVACIteration,
                                                                  On,
                                                                  TempMinPLR,
-                                                                 DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                                                  FanOpMode,
                                                                  HXUnitOn,
                                                                  _,
-                                                                 EconomizerFlag);
-                                        TempOutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                                                 state.dataHVACDXSys->EconomizerFlag);
+                                        TempOutletTempDXCoil =
+                                            state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     }
                                     //               Relax boundary slightly to assure a solution can be found using RegulaFalsi (i.e. one boundary
                                     //               may be very near the desired result)
                                     TempMinPLR = max(0.0, (TempMinPLR - 0.01));
                                     TempMaxPLR = min(1.0, (TempMaxPLR + 0.01));
                                     //               tighter boundary of solution has been found, call RegulaFalsi a second time
-                                    TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, TempMinPLR, TempMaxPLR, Par);
+                                    TempSolveRoot::SolveRoot(
+                                        state, Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, TempMinPLR, TempMaxPLR, Par);
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            if (DXCoolingSystem(DXSystemNum).HXAssistedSensPLRIter < 1) {
-                                                ++DXCoolingSystem(DXSystemNum).HXAssistedSensPLRIter;
-                                                ShowWarningError(state,
-                                                    DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                    " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
-                                                    DXCoolingSystem(DXSystemNum).Name);
+                                            if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedSensPLRIter < 1) {
+                                                ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedSensPLRIter;
+                                                ShowWarningError(
+                                                    state,
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                        " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                 ShowContinueError(state, format("Estimated part-load ratio   = {:.3R}", (ReqOutput / FullOutput)));
                                                 ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                                                ShowContinueErrorTimeStamp(state,
+                                                ShowContinueErrorTimeStamp(
+                                                    state,
                                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(state,
-                                                DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                            ShowRecurringWarningErrorAtEnd(
+                                                state,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                     "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible "
                                                     "PLR statistics follow.",
-                                                DXCoolingSystem(DXSystemNum).HXAssistedSensPLRIterIndex,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedSensPLRIterIndex,
                                                 PartLoadFrac,
                                                 PartLoadFrac);
                                         }
                                     } else if (SolFla == -2) {
                                         PartLoadFrac = ReqOutput / FullOutput;
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            if (DXCoolingSystem(DXSystemNum).HXAssistedSensPLRFail < 1) {
-                                                ++DXCoolingSystem(DXSystemNum).HXAssistedSensPLRFail;
-                                                ShowWarningError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                                 " - DX unit sensible part-load ratio calculation unexpectedly failed: part-load "
-                                                                 "ratio limits exceeded, for unit = " +
-                                                                 DXCoolingSystem(DXSystemNum).Name);
+                                            if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedSensPLRFail < 1) {
+                                                ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedSensPLRFail;
+                                                ShowWarningError(state,
+                                                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                     " - DX unit sensible part-load ratio calculation unexpectedly failed: part-load "
+                                                                     "ratio limits exceeded, for unit = " +
+                                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                 ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                                                ShowContinueErrorTimeStamp(state,
+                                                ShowContinueErrorTimeStamp(
+                                                    state,
                                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(state,
-                                                DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                            ShowRecurringWarningErrorAtEnd(
+                                                state,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                     "\" - DX unit sensible part-load ratio calculation unexpectedly failed error continues. Sensible "
                                                     "PLR statistics follow.",
-                                                DXCoolingSystem(DXSystemNum).HXAssistedSensPLRFailIndex,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedSensPLRFailIndex,
                                                 PartLoadFrac,
                                                 PartLoadFrac);
                                         }
@@ -1487,21 +1578,24 @@ namespace HVACDXSystem {
                                 } else if (SolFla == -2) {
                                     PartLoadFrac = ReqOutput / FullOutput;
                                     if (!state.dataGlobal->WarmupFlag) {
-                                        if (DXCoolingSystem(DXSystemNum).HXAssistedSensPLRFail2 < 1) {
-                                            ++DXCoolingSystem(DXSystemNum).HXAssistedSensPLRFail2;
-                                            ShowWarningError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                             " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
-                                                             "exceeded, for unit = " +
-                                                             DXCoolingSystem(DXSystemNum).Name);
+                                        if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedSensPLRFail2 < 1) {
+                                            ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedSensPLRFail2;
+                                            ShowWarningError(state,
+                                                             state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                 " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
+                                                                 "exceeded, for unit = " +
+                                                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                             ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                                            ShowContinueErrorTimeStamp(state,
-                                                "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
+                                            ShowContinueErrorTimeStamp(
+                                                state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(state,
-                                            DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                        ShowRecurringWarningErrorAtEnd(
+                                            state,
+                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                 "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR statistics "
                                                 "follow.",
-                                            DXCoolingSystem(DXSystemNum).HXAssistedSensPLRFailIndex2,
+                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedSensPLRFailIndex2,
                                             PartLoadFrac,
                                             PartLoadFrac);
                                     }
@@ -1520,20 +1614,21 @@ namespace HVACDXSystem {
                         // If humidity setpoint is not satisfied and humidity control type is MultiMode,
                         // then enable heat exchanger and run to meet sensible load
 
-                        if ((OutletHumRatDXCoil > DesOutHumRat) && (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl_Multimode)) {
+                        if ((OutletHumRatDXCoil > DesOutHumRat) && (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl::Multimode)) {
 
                             // Determine required part load when heat exchanger is ON
                             HXUnitOn = true;
                             PartLoadFrac = 1.0;
-                            SimHXAssistedCoolingCoil(state, CompName,
+                            SimHXAssistedCoolingCoil(state,
+                                                     CompName,
                                                      FirstHVACIteration,
                                                      On,
                                                      PartLoadFrac,
-                                                     DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                                      FanOpMode,
                                                      HXUnitOn,
                                                      _,
-                                                     EconomizerFlag);
+                                                     state.dataHVACDXSys->EconomizerFlag);
 
                             OutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
 
@@ -1554,7 +1649,7 @@ namespace HVACDXSystem {
                             } else if ((OutletTempDXCoil > DesOutTemp) || std::abs(OutletTempDXCoil - DesOutTemp) <= (Acc * 2.0)) {
                                 PartLoadFrac = 1.0;
                             } else {
-                                Par(1) = double(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                Par(1) = double(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                 Par(2) = DesOutTemp;
                                 // FirstHVACIteration is a logical, Par is REAL(r64), so make TRUE = 1.0 and FALSE = 0.0
                                 if (FirstHVACIteration) {
@@ -1571,42 +1666,50 @@ namespace HVACDXSystem {
                                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, 0.0, 1.0, Par);
                                 if (SolFla == -1) {
                                     if (!state.dataGlobal->WarmupFlag) {
-                                        if (DXCoolingSystem(DXSystemNum).HXAssistedLatPLRIter < 1) {
-                                            ++DXCoolingSystem(DXSystemNum).HXAssistedLatPLRIter;
-                                            ShowWarningError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                             " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " +
-                                                             DXCoolingSystem(DXSystemNum).Name);
+                                        if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedLatPLRIter < 1) {
+                                            ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedLatPLRIter;
+                                            ShowWarningError(
+                                                state,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                    " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " +
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                             ShowContinueError(state, format("Estimated latent part-load ratio   = {:.3R}", (ReqOutput / FullOutput)));
                                             ShowContinueError(state, format("Calculated latent part-load ratio = {:.3R}", PartLoadFrac));
-                                            ShowContinueErrorTimeStamp(state,
+                                            ShowContinueErrorTimeStamp(
+                                                state,
                                                 "The calculated latent part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(state,
-                                            DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                        ShowRecurringWarningErrorAtEnd(
+                                            state,
+                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                 "\" - Iteration limit exceeded calculating latent part-load ratio error continues. Latent PLR "
                                                 "statistics follow.",
-                                            DXCoolingSystem(DXSystemNum).HXAssistedLatPLRIterIndex,
+                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedLatPLRIterIndex,
                                             PartLoadFrac,
                                             PartLoadFrac);
                                     }
                                 } else if (SolFla == -2) {
                                     PartLoadFrac = ReqOutput / FullOutput;
                                     if (!state.dataGlobal->WarmupFlag) {
-                                        if (DXCoolingSystem(DXSystemNum).HXAssistedLatPLRFail < 1) {
-                                            ++DXCoolingSystem(DXSystemNum).HXAssistedLatPLRFail;
+                                        if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedLatPLRFail < 1) {
+                                            ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedLatPLRFail;
                                             ShowWarningError(state,
-                                                DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                " - DX unit latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
-                                                DXCoolingSystem(DXSystemNum).Name);
+                                                             state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                 " - DX unit latent part-load ratio calculation failed: part-load ratio limits "
+                                                                 "exceeded, for unit = " +
+                                                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                             ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                                            ShowContinueErrorTimeStamp(state,
-                                                "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
+                                            ShowContinueErrorTimeStamp(
+                                                state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(state,
-                                            DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                        ShowRecurringWarningErrorAtEnd(
+                                            state,
+                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                 "\" - DX unit latent part-load ratio calculation failed error continues. Latent PLR statistics "
                                                 "follow.",
-                                            DXCoolingSystem(DXSystemNum).HXAssistedLatPLRFailIndex,
+                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedLatPLRFailIndex,
                                             PartLoadFrac,
                                             PartLoadFrac);
                                     }
@@ -1618,7 +1721,7 @@ namespace HVACDXSystem {
                         // a new latent PLR
 
                         if (OutletHumRatDXCoil > DesOutHumRat && PartLoadFrac < 1.0 &&
-                            DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl_CoolReheat) {
+                            DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl::CoolReheat) {
 
                             //           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
                             //           do not run the compressor
@@ -1630,7 +1733,7 @@ namespace HVACDXSystem {
                                 PartLoadFrac = 1.0;
                                 //           Else find the PLR to meet the load
                             } else {
-                                Par(1) = double(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                Par(1) = double(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                 Par(2) = DesOutHumRat;
                                 // FirstHVACIteration is a logical, Par is REAL(r64), so make TRUE = 1 and FALSE = 0
                                 if (FirstHVACIteration) {
@@ -1654,16 +1757,18 @@ namespace HVACDXSystem {
                                     while ((OutletHumRatDXCoil - TempOutletHumRatDXCoil) >= 0.0 && TempMaxPLR <= 1.0) {
                                         //                 find upper limit of LatentPLR
                                         TempMaxPLR += 0.1;
-                                        SimHXAssistedCoolingCoil(state, CompName,
+                                        SimHXAssistedCoolingCoil(state,
+                                                                 CompName,
                                                                  FirstHVACIteration,
                                                                  On,
                                                                  TempMaxPLR,
-                                                                 DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                                                  FanOpMode,
                                                                  HXUnitOn,
                                                                  _,
-                                                                 EconomizerFlag);
-                                        OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                                                 state.dataHVACDXSys->EconomizerFlag);
+                                        OutletHumRatDXCoil =
+                                            state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     }
                                     TempMinPLR = TempMaxPLR;
                                     while ((OutletHumRatDXCoil - TempOutletHumRatDXCoil) <= 0.0 && TempMinPLR >= 0.0) {
@@ -1672,38 +1777,45 @@ namespace HVACDXSystem {
                                         TempMaxPLR = TempMinPLR;
                                         //                 find minimum limit of Latent PLR
                                         TempMinPLR -= 0.01;
-                                        SimHXAssistedCoolingCoil(state, CompName,
+                                        SimHXAssistedCoolingCoil(state,
+                                                                 CompName,
                                                                  FirstHVACIteration,
                                                                  On,
                                                                  TempMaxPLR,
-                                                                 DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                                                  FanOpMode,
                                                                  HXUnitOn,
                                                                  _,
-                                                                 EconomizerFlag);
-                                        OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                                                 state.dataHVACDXSys->EconomizerFlag);
+                                        OutletHumRatDXCoil =
+                                            state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     }
                                     //               tighter boundary of solution has been found, call RegulaFalsi a second time
-                                    TempSolveRoot::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilHRResidual, TempMinPLR, TempMaxPLR, Par);
+                                    TempSolveRoot::SolveRoot(
+                                        state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilHRResidual, TempMinPLR, TempMaxPLR, Par);
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            if (DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRIter < 1) {
-                                                ++DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRIter;
-                                                ShowWarningError(state,
-                                                    DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                    " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " +
-                                                    DXCoolingSystem(DXSystemNum).Name);
+                                            if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRIter < 1) {
+                                                ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRIter;
+                                                ShowWarningError(
+                                                    state,
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                        " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " +
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                 ShowContinueError(state,
                                                                   format("Estimated latent part-load ratio   = {:.3R}", (ReqOutput / FullOutput)));
                                                 ShowContinueError(state, format("Calculated latent part-load ratio = {:.3R}", PartLoadFrac));
-                                                ShowContinueErrorTimeStamp(state, "The calculated latent part-load ratio will be used and the simulation "
+                                                ShowContinueErrorTimeStamp(state,
+                                                                           "The calculated latent part-load ratio will be used and the simulation "
                                                                            "continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(state,
-                                                DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                            ShowRecurringWarningErrorAtEnd(
+                                                state,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                     "\" - Iteration limit exceeded calculating latent part-load ratio error continues. Latent PLR "
                                                     "statistics follow.",
-                                                DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRIterIndex,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRIterIndex,
                                                 PartLoadFrac,
                                                 PartLoadFrac);
                                         }
@@ -1711,21 +1823,26 @@ namespace HVACDXSystem {
                                     } else if (SolFla == -2) {
                                         PartLoadFrac = ReqOutput / FullOutput;
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            if (DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRFail < 1) {
-                                                ++DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRFail;
-                                                ShowWarningError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                                 " - DX unit latent part-load ratio calculation failed unexpectedly: part-load ratio "
-                                                                 "limits exceeded, for unit = " +
-                                                                 DXCoolingSystem(DXSystemNum).Name);
+                                            if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRFail < 1) {
+                                                ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRFail;
+                                                ShowWarningError(
+                                                    state,
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                        " - DX unit latent part-load ratio calculation failed unexpectedly: part-load ratio "
+                                                        "limits exceeded, for unit = " +
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                 ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                                                ShowContinueErrorTimeStamp(state,
+                                                ShowContinueErrorTimeStamp(
+                                                    state,
                                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(state,
-                                                DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                            ShowRecurringWarningErrorAtEnd(
+                                                state,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                     "\" - DX unit latent part-load ratio calculation failed unexpectedly error continues. Latent PLR "
                                                     "statistics follow.",
-                                                DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRFailIndex,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRFailIndex,
                                                 PartLoadFrac,
                                                 PartLoadFrac);
                                         }
@@ -1733,21 +1850,24 @@ namespace HVACDXSystem {
                                 } else if (SolFla == -2) {
                                     PartLoadFrac = ReqOutput / FullOutput;
                                     if (!state.dataGlobal->WarmupFlag) {
-                                        if (DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRFail2 < 1) {
-                                            ++DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRFail2;
+                                        if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRFail2 < 1) {
+                                            ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRFail2;
                                             ShowWarningError(state,
-                                                DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                " - DX unit latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
-                                                DXCoolingSystem(DXSystemNum).Name);
+                                                             state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                 " - DX unit latent part-load ratio calculation failed: part-load ratio limits "
+                                                                 "exceeded, for unit = " +
+                                                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                             ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                                            ShowContinueErrorTimeStamp(state,
-                                                "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
+                                            ShowContinueErrorTimeStamp(
+                                                state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(state,
-                                            DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                        ShowRecurringWarningErrorAtEnd(
+                                            state,
+                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                 "\" - DX unit latent part-load ratio calculation failed error continues. Latent PLR statistics "
                                                 "follow.",
-                                            DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRFailIndex2,
+                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedCRLatPLRFailIndex2,
                                             PartLoadFrac,
                                             PartLoadFrac);
                                     }
@@ -1764,73 +1884,79 @@ namespace HVACDXSystem {
                     } else if (SELECT_CASE_var == CoilDX_CoolingTwoSpeed) { // Coil:Cooling:DX:TwoSpeed
                         // formerly (v3 and beyond)COIL:DX:MULTISPEED:COOLINGEMPIRICAL
                         //         SUBROUTINE SimDXCoilMultiSpeed(CompName,SpeedRatio,CycRatio,CompIndex,SpeedNum,FanMode,CompOp)
-                        SimDXCoilMultiSpeed(state, CompName, 0.0, 1.0, DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
-                        OutletTempLS = state.dataDXCoils->DXCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                        SimDXCoilMultiSpeed(state, CompName, 0.0, 1.0, state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                        OutletTempLS = state.dataDXCoils->DXCoilOutletTemp(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                         if (OutletTempLS > DesOutTemp && SensibleLoad) {
                             CycRatio = 1.0;
-                            SimDXCoilMultiSpeed(state, CompName, 1.0, 1.0, DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
-                            OutletTempHS = state.dataDXCoils->DXCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                            SimDXCoilMultiSpeed(state, CompName, 1.0, 1.0, state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                            OutletTempHS = state.dataDXCoils->DXCoilOutletTemp(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                             if (OutletTempHS < DesOutTemp) {
-                                Par(1) = double(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                Par(1) = double(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                 Par(2) = DesOutTemp;
                                 SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, DXCoilVarSpeedResidual, 0.0, 1.0, Par);
                                 if (SolFla == -1) {
                                     if (!state.dataGlobal->WarmupFlag) {
-                                        if (DXCoolingSystem(DXSystemNum).MSpdSensPLRIter < 1) {
-                                            ++DXCoolingSystem(DXSystemNum).MSpdSensPLRIter;
-                                            ShowWarningError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                             " - Iteration limit exceeded calculating DX unit sensible speed ratio for unit = " +
-                                                             DXCoolingSystem(DXSystemNum).Name);
+                                        if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MSpdSensPLRIter < 1) {
+                                            ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MSpdSensPLRIter;
+                                            ShowWarningError(state,
+                                                             state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                 " - Iteration limit exceeded calculating DX unit sensible speed ratio for unit = " +
+                                                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                             ShowContinueError(state, format("Calculated speed ratio = {:.3R}", SpeedRatio));
-                                            ShowContinueErrorTimeStamp(state,
-                                                "The calculated speed ratio will be used and the simulation continues. Occurrence info:");
+                                            ShowContinueErrorTimeStamp(
+                                                state, "The calculated speed ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
-                                                                           DXCoolingSystem(DXSystemNum).Name +
+                                        ShowRecurringWarningErrorAtEnd(state,
+                                                                       state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                                            "\" - Iteration limit exceeded calculating sensible speed ratio error "
                                                                            "continues. Sensible speed ratio statistics follow.",
-                                                                       DXCoolingSystem(DXSystemNum).MSpdSensPLRIterIndex,
+                                                                       state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MSpdSensPLRIterIndex,
                                                                        SpeedRatio,
                                                                        SpeedRatio);
                                     }
                                 } else if (SolFla == -2) {
                                     if (!state.dataGlobal->WarmupFlag)
-                                        ShowFatalError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                       " - compressor speed calculation failed: speed limits exceeded, for unit=" +
-                                                       DXCoolingSystem(DXSystemNum).Name);
+                                        ShowFatalError(state,
+                                                       state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                           " - compressor speed calculation failed: speed limits exceeded, for unit=" +
+                                                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                 }
                             } else {
                                 SpeedRatio = 1.0;
                             }
                         } else if (SensibleLoad) {
                             SpeedRatio = 0.0;
-                            Par(1) = double(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                            Par(1) = double(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                             Par(2) = DesOutTemp;
                             SolveRoot(state, Acc, MaxIte, SolFla, CycRatio, DXCoilCyclingResidual, 0.0, 1.0, Par);
                             if (SolFla == -1) {
                                 if (!state.dataGlobal->WarmupFlag) {
-                                    if (DXCoolingSystem(DXSystemNum).MSpdCycSensPLRIter < 1) {
-                                        ++DXCoolingSystem(DXSystemNum).MSpdCycSensPLRIter;
-                                        ShowWarningError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                         " - Iteration limit exceeded calculating DX unit sensible cycling ratio for unit = " +
-                                                         DXCoolingSystem(DXSystemNum).Name);
+                                    if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MSpdCycSensPLRIter < 1) {
+                                        ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MSpdCycSensPLRIter;
+                                        ShowWarningError(state,
+                                                         state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                             " - Iteration limit exceeded calculating DX unit sensible cycling ratio for unit = " +
+                                                             state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                         ShowContinueError(state, format("Calculated cycling ratio = {:.3R}", CycRatio));
-                                        ShowContinueErrorTimeStamp(state,
-                                            "The calculated cycling ratio will be used and the simulation continues. Occurrence info:");
+                                        ShowContinueErrorTimeStamp(
+                                            state, "The calculated cycling ratio will be used and the simulation continues. Occurrence info:");
                                     }
-                                    ShowRecurringWarningErrorAtEnd(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
-                                                                       DXCoolingSystem(DXSystemNum).Name +
+                                    ShowRecurringWarningErrorAtEnd(state,
+                                                                   state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                                       state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                                        "\" - Iteration limit exceeded calculating sensible cycling ratio error "
                                                                        "continues. Sensible cycling ratio statistics follow.",
-                                                                   DXCoolingSystem(DXSystemNum).MSpdCycSensPLRIterIndex,
+                                                                   state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MSpdCycSensPLRIterIndex,
                                                                    CycRatio,
                                                                    CycRatio);
                                 }
                             } else if (SolFla == -2) { // should never get here, if it does logic above to protect from this
                                 if (!state.dataGlobal->WarmupFlag)
-                                    ShowFatalError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                   " - cycling ratio calculation failed: cycling limits exceeded, for unit=" +
-                                                   DXCoolingSystem(DXSystemNum).Name);
+                                    ShowFatalError(state,
+                                                   state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                       " - cycling ratio calculation failed: cycling limits exceeded, for unit=" +
+                                                       state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                             }
                         } else {
                             PartLoadFrac = 0.0;
@@ -1839,12 +1965,14 @@ namespace HVACDXSystem {
                             DehumidMode = 0;
                         }
 
-                        if (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl_CoolReheat) {
+                        if (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl::CoolReheat) {
 
                             //           Simulate MultiSpeed DX coil at sensible result
-                            SimDXCoilMultiSpeed(state, CompName, SpeedRatio, CycRatio, DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                            SimDXCoilMultiSpeed(
+                                state, CompName, SpeedRatio, CycRatio, state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
 
-                            OutletHumRatDXCoil = state.dataDXCoils->DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                            OutletHumRatDXCoil =
+                                state.dataDXCoils->DXCoilOutletHumRat(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                             // If humidity setpoint is not satisfied and humidity control type is CoolReheat,
                             // then overcool to meet moisture load
 
@@ -1854,74 +1982,87 @@ namespace HVACDXSystem {
                                 SpeedRatio = 0.0;
 
                                 //             SUBROUTINE SimDXCoilMultiSpeed(CompName,SpeedRatio,CycRatio,CompIndex,SpeedNum,FanMode,CompOp)
-                                SimDXCoilMultiSpeed(state, CompName, 0.0, 1.0, DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
-                                OutletHumRatLS = state.dataDXCoils->DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                SimDXCoilMultiSpeed(state, CompName, 0.0, 1.0, state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                OutletHumRatLS =
+                                    state.dataDXCoils->DXCoilOutletHumRat(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                 if (OutletHumRatLS > DesOutHumRat) {
                                     CycRatio = 1.0;
-                                    SimDXCoilMultiSpeed(state, CompName, 1.0, 1.0, DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
-                                    OutletHumRatHS = state.dataDXCoils->DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                    SimDXCoilMultiSpeed(
+                                        state, CompName, 1.0, 1.0, state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                    OutletHumRatHS =
+                                        state.dataDXCoils->DXCoilOutletHumRat(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     if (OutletHumRatHS < DesOutHumRat) {
-                                        Par(1) = double(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                        Par(1) = double(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                         Par(2) = DesOutHumRat;
                                         SolveRoot(state, HumRatAcc, MaxIte, SolFla, SpeedRatio, DXCoilVarSpeedHumRatResidual, 0.0, 1.0, Par);
                                         if (SolFla == -1) {
                                             if (!state.dataGlobal->WarmupFlag) {
-                                                if (DXCoolingSystem(DXSystemNum).MSpdLatPLRIter < 1) {
-                                                    ++DXCoolingSystem(DXSystemNum).MSpdLatPLRIter;
-                                                    ShowWarningError(state,
-                                                        DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                        " - Iteration limit exceeded calculating DX unit latent speed ratio for unit = " +
-                                                        DXCoolingSystem(DXSystemNum).Name);
+                                                if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MSpdLatPLRIter < 1) {
+                                                    ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MSpdLatPLRIter;
+                                                    ShowWarningError(
+                                                        state,
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                            " - Iteration limit exceeded calculating DX unit latent speed ratio for unit = " +
+                                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                     ShowContinueError(state, format("Calculated speed ratio = {:.3R}", SpeedRatio));
-                                                    ShowContinueErrorTimeStamp(state,
+                                                    ShowContinueErrorTimeStamp(
+                                                        state,
                                                         "The calculated speed ratio will be used and the simulation continues. Occurrence info:");
                                                 }
-                                                ShowRecurringWarningErrorAtEnd(state,
-                                                    DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                                ShowRecurringWarningErrorAtEnd(
+                                                    state,
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                         "\" - Iteration limit exceeded calculating latent speed ratio error continues. Latent speed "
                                                         "ratio statistics follow.",
-                                                    DXCoolingSystem(DXSystemNum).MSpdLatPLRIterIndex,
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MSpdLatPLRIterIndex,
                                                     SpeedRatio,
                                                     SpeedRatio);
                                             }
                                         } else if (SolFla == -2) {
                                             if (!state.dataGlobal->WarmupFlag)
-                                                ShowFatalError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                               " - compressor speed calculation failed:speed limits exceeded, for unit=" +
-                                                               DXCoolingSystem(DXSystemNum).Name);
+                                                ShowFatalError(state,
+                                                               state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                   " - compressor speed calculation failed:speed limits exceeded, for unit=" +
+                                                                   state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                         }
                                     } else {
                                         SpeedRatio = 1.0;
                                     }
                                 } else {
                                     SpeedRatio = 0.0;
-                                    Par(1) = double(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                    Par(1) = double(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     Par(2) = DesOutHumRat;
                                     SolveRoot(state, HumRatAcc, MaxIte, SolFla, CycRatio, DXCoilCyclingHumRatResidual, 0.0, 1.0, Par);
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            if (DXCoolingSystem(DXSystemNum).MSpdCycLatPLRIter < 1) {
-                                                ++DXCoolingSystem(DXSystemNum).MSpdCycLatPLRIter;
-                                                ShowWarningError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                                 " - Iteration limit exceeded calculating DX unit latent cycling ratio for unit = " +
-                                                                 DXCoolingSystem(DXSystemNum).Name);
+                                            if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MSpdCycLatPLRIter < 1) {
+                                                ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MSpdCycLatPLRIter;
+                                                ShowWarningError(
+                                                    state,
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                        " - Iteration limit exceeded calculating DX unit latent cycling ratio for unit = " +
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                 ShowContinueError(state, format("Calculated cycling ratio = {:.3R}", CycRatio));
-                                                ShowContinueErrorTimeStamp(state,
+                                                ShowContinueErrorTimeStamp(
+                                                    state,
                                                     "The calculated cycling ratio will be used and the simulation continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
-                                                                               DXCoolingSystem(DXSystemNum).Name +
+                                            ShowRecurringWarningErrorAtEnd(state,
+                                                                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                               " \"" + state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                                                "\" - Iteration limit exceeded calculating latent cycling ratio error "
                                                                                "continues. Latent cycling ratio statistics follow.",
-                                                                           DXCoolingSystem(DXSystemNum).MSpdCycLatPLRIterIndex,
+                                                                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MSpdCycLatPLRIterIndex,
                                                                            CycRatio,
                                                                            CycRatio);
                                         }
                                     } else if (SolFla == -2) { // should never get here, if it does logic above to protect from this
                                         if (!state.dataGlobal->WarmupFlag)
-                                            ShowFatalError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                           " - cycling ratio calculation failed: cycling limits exceeded, for unit=" +
-                                                           DXCoolingSystem(DXSystemNum).Name);
+                                            ShowFatalError(state,
+                                                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                               " - cycling ratio calculation failed: cycling limits exceeded, for unit=" +
+                                                               state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                     }
                                 }
                             }
@@ -1933,16 +2074,28 @@ namespace HVACDXSystem {
                         // Get no load result
                         PartLoadFrac = 0.0;
                         SimDXCoilMultiMode(state,
-                            CompName, On, FirstHVACIteration, PartLoadFrac, DehumidMode, DXCoolingSystem(DXSystemNum).CoolingCoilIndex, FanOpMode);
+                                           CompName,
+                                           On,
+                                           FirstHVACIteration,
+                                           PartLoadFrac,
+                                           DehumidMode,
+                                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                           FanOpMode);
                         NoOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) -
                                                                    PsyHFnTdbW(Node(InletNode).Temp, Node(OutletNode).HumRat));
-                        NoLoadHumRatOut = state.dataDXCoils->DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                        NoLoadHumRatOut = state.dataDXCoils->DXCoilOutletHumRat(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
 
                         // Get full load result
                         PartLoadFrac = 1.0;
                         SimDXCoilMultiMode(state,
-                            CompName, On, FirstHVACIteration, PartLoadFrac, DehumidMode, DXCoolingSystem(DXSystemNum).CoolingCoilIndex, FanOpMode);
-                        FullLoadHumRatOut = state.dataDXCoils->DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                           CompName,
+                                           On,
+                                           FirstHVACIteration,
+                                           PartLoadFrac,
+                                           DehumidMode,
+                                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                           FanOpMode);
+                        FullLoadHumRatOut = state.dataDXCoils->DXCoilOutletHumRat(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
 
                         FullOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) -
                                                                      PsyHFnTdbW(Node(InletNode).Temp, Node(OutletNode).HumRat));
@@ -1959,11 +2112,12 @@ namespace HVACDXSystem {
                             PartLoadFrac = 1.0;
                             //         Else find the PLR to meet the load
                         } else {
-                            OutletTempDXCoil = state.dataDXCoils->DXCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                            OutletTempDXCoil =
+                                state.dataDXCoils->DXCoilOutletTemp(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                             if (OutletTempDXCoil > DesOutTemp) {
                                 PartLoadFrac = 1.0;
                             } else {
-                                Par(1) = double(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                Par(1) = double(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                 Par(2) = DesOutTemp;
                                 // Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
                                 Par(3) = double(DehumidMode);
@@ -1971,54 +2125,61 @@ namespace HVACDXSystem {
                                 SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par);
                                 if (SolFla == -1) {
                                     if (!state.dataGlobal->WarmupFlag) {
-                                        if (DXCoolingSystem(DXSystemNum).MModeSensPLRIter < 1) {
-                                            ++DXCoolingSystem(DXSystemNum).MModeSensPLRIter;
-                                            ShowWarningError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                             " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
-                                                             DXCoolingSystem(DXSystemNum).Name);
+                                        if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MModeSensPLRIter < 1) {
+                                            ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MModeSensPLRIter;
+                                            ShowWarningError(
+                                                state,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                    " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                             ShowContinueError(state, format("Estimated part-load ratio  = {:.3R}", (ReqOutput / FullOutput)));
                                             ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                                            ShowContinueErrorTimeStamp(state,
-                                                "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
+                                            ShowContinueErrorTimeStamp(
+                                                state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(state,
-                                            DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                        ShowRecurringWarningErrorAtEnd(
+                                            state,
+                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                 "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR "
                                                 "statistics follow.",
-                                            DXCoolingSystem(DXSystemNum).MModeSensPLRIterIndex,
+                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MModeSensPLRIterIndex,
                                             PartLoadFrac,
                                             PartLoadFrac);
                                     }
                                 } else if (SolFla == -2) {
                                     if (!state.dataGlobal->WarmupFlag) {
-                                        ShowSevereError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                        " : part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" +
-                                                        DXCoolingSystem(DXSystemNum).Name);
+                                        ShowSevereError(state,
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                            " : part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" +
+                                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                         ShowFatalError(state, "Program terminates due to previous condition.");
                                     }
                                 }
                             }
                         }
 
-                        OutletHumRatDXCoil = state.dataDXCoils->DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                        OutletHumRatDXCoil =
+                            state.dataDXCoils->DXCoilOutletHumRat(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
 
                         // If humidity setpoint is not satisfied and humidity control type is Multimode,
                         // then turn on enhanced dehumidification mode 1
 
-                        if ((OutletHumRatDXCoil > DesOutHumRat) && (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl_Multimode)) {
+                        if ((OutletHumRatDXCoil > DesOutHumRat) && (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl::Multimode)) {
 
                             // Determine required part load for enhanced dehumidification mode 1
 
                             // Get full load result
                             PartLoadFrac = 1.0;
                             DehumidMode = 1;
-                            DXCoolingSystem(DXSystemNum).DehumidificationMode = DehumidMode;
-                            SimDXCoilMultiMode(state,CompName,
+                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DehumidificationMode = DehumidMode;
+                            SimDXCoilMultiMode(state,
+                                               CompName,
                                                On,
                                                FirstHVACIteration,
                                                PartLoadFrac,
                                                DehumidMode,
-                                               DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                               state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                                FanOpMode);
                             FullOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) -
                                                                          PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
@@ -2032,19 +2193,22 @@ namespace HVACDXSystem {
                             if (FullOutput >= 0) {
                                 PartLoadFrac = 0.0;
                             } else {
-                                OutletTempDXCoil = state.dataDXCoils->DXCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
-                                OutletHumRatDXCoil = state.dataDXCoils->DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                OutletTempDXCoil =
+                                    state.dataDXCoils->DXCoilOutletTemp(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                OutletHumRatDXCoil =
+                                    state.dataDXCoils->DXCoilOutletHumRat(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                 // if sensible load and setpoint cannot be met, set PLR = 1. If no sensible load and
                                 // latent load exists and setpoint cannot be met, set PLR = 1.
-                                if ((OutletTempDXCoil >= DesOutTemp && SensibleLoad && DXCoolingSystem(DXSystemNum).RunOnSensibleLoad) ||
+                                if ((OutletTempDXCoil >= DesOutTemp && SensibleLoad &&
+                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).RunOnSensibleLoad) ||
                                     (OutletHumRatDXCoil >= DesOutHumRat && !SensibleLoad && LatentLoad &&
-                                     DXCoolingSystem(DXSystemNum).RunOnLatentLoad)) {
+                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).RunOnLatentLoad)) {
                                     PartLoadFrac = 1.0;
                                     // if no sensible load and latent load can be met, find PLR
-                                } else if (!SensibleLoad &&
-                                           (OutletHumRatDXCoil < DesOutHumRat && LatentLoad && DXCoolingSystem(DXSystemNum).RunOnLatentLoad)) {
+                                } else if (!SensibleLoad && (OutletHumRatDXCoil < DesOutHumRat && LatentLoad &&
+                                                             state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).RunOnLatentLoad)) {
                                     // is a latent load with no sensible load, iterate on humidity ratio
-                                    Par(1) = double(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                    Par(1) = double(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     Par(2) = DesOutHumRat;
                                     // Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
                                     Par(3) = double(DehumidMode);
@@ -2052,12 +2216,13 @@ namespace HVACDXSystem {
                                     SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilHumRatResidual, 0.0, 1.0, Par);
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            if (DXCoolingSystem(DXSystemNum).MModeLatPLRIter < 1) {
-                                                ++DXCoolingSystem(DXSystemNum).MModeLatPLRIter;
-                                                ShowWarningError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                                 " - Iteration limit exceeded calculating DX unit multimode latent (no sensible) "
-                                                                 "part-load ratio for unit = " +
-                                                                 DXCoolingSystem(DXSystemNum).Name);
+                                            if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MModeLatPLRIter < 1) {
+                                                ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MModeLatPLRIter;
+                                                ShowWarningError(state,
+                                                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                     " - Iteration limit exceeded calculating DX unit multimode latent (no sensible) "
+                                                                     "part-load ratio for unit = " +
+                                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                 if (NoLoadHumRatOut - OutletHumRatDXCoil > 0.0) {
                                                     TempMinPLR = (DesOutHumRat - OutletHumRatDXCoil) / (NoLoadHumRatOut - OutletHumRatDXCoil);
                                                 } else {
@@ -2065,29 +2230,33 @@ namespace HVACDXSystem {
                                                 }
                                                 ShowContinueError(state, format("Estimated part-load ratio  = {:.3R}", TempMinPLR));
                                                 ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                                                ShowContinueErrorTimeStamp(state,
+                                                ShowContinueErrorTimeStamp(
+                                                    state,
                                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(state,
-                                                DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                            ShowRecurringWarningErrorAtEnd(
+                                                state,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                     "\" - Iteration limit exceeded calculating multimode latent (no sensible) part-load ratio error "
                                                     "continues. Latent PLR statistics follow.",
-                                                DXCoolingSystem(DXSystemNum).MModeLatPLRIterIndex,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MModeLatPLRIterIndex,
                                                 PartLoadFrac,
                                                 PartLoadFrac);
                                         }
                                     } else if (SolFla == -2) {
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            ShowSevereError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                            " : part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" +
-                                                            DXCoolingSystem(DXSystemNum).Name);
+                                            ShowSevereError(state,
+                                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                " : part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" +
+                                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                             ShowFatalError(state, "Program terminates due to previous condition.");
                                         }
                                     }
 
                                 } else { // must be a sensible load so find PLR
                                     PartLoadFrac = ReqOutput / FullOutput;
-                                    Par(1) = double(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                    Par(1) = double(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     Par(2) = DesOutTemp;
                                     // Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
                                     Par(3) = double(DehumidMode);
@@ -2095,30 +2264,35 @@ namespace HVACDXSystem {
                                     SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par);
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            if (DXCoolingSystem(DXSystemNum).MModeLatPLRIter < 1) {
-                                                ++DXCoolingSystem(DXSystemNum).MModeLatPLRIter;
+                                            if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MModeLatPLRIter < 1) {
+                                                ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MModeLatPLRIter;
                                                 ShowWarningError(state,
-                                                    DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                    " - Iteration limit exceeded calculating DX unit multimode latent part-load ratio for unit = " +
-                                                    DXCoolingSystem(DXSystemNum).Name);
+                                                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                     " - Iteration limit exceeded calculating DX unit multimode latent part-load "
+                                                                     "ratio for unit = " +
+                                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                 ShowContinueError(state, format("Estimated part-load ratio  = {:.3R}", (ReqOutput / FullOutput)));
                                                 ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                                                ShowContinueErrorTimeStamp(state,
+                                                ShowContinueErrorTimeStamp(
+                                                    state,
                                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(state,
-                                                DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                            ShowRecurringWarningErrorAtEnd(
+                                                state,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                     "\" - Iteration limit exceeded calculating multimode latent part-load ratio error continues. "
                                                     "Latent PLR statistics follow.",
-                                                DXCoolingSystem(DXSystemNum).MModeLatPLRIterIndex,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MModeLatPLRIterIndex,
                                                 PartLoadFrac,
                                                 PartLoadFrac);
                                         }
                                     } else if (SolFla == -2) {
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            ShowSevereError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                            " : part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" +
-                                                            DXCoolingSystem(DXSystemNum).Name);
+                                            ShowSevereError(state,
+                                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                " : part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" +
+                                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                             ShowFatalError(state, "Program terminates due to previous condition.");
                                         }
                                     }
@@ -2132,10 +2306,11 @@ namespace HVACDXSystem {
                         if (PartLoadFrac == 0.0) {
                             OutletHumRatDXCoil = NoLoadHumRatOut;
                         } else {
-                            OutletHumRatDXCoil = state.dataDXCoils->DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                            OutletHumRatDXCoil =
+                                state.dataDXCoils->DXCoilOutletHumRat(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                         }
 
-                        if ((OutletHumRatDXCoil > DesOutHumRat) && (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl_CoolReheat)) {
+                        if ((OutletHumRatDXCoil > DesOutHumRat) && (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl::CoolReheat)) {
 
                             //            CoolReheat operates cooling stage 1 and/or 2 to meet DesOutHumRat. Dehumidification mode is not active.
                             DehumidMode = 0;
@@ -2150,7 +2325,7 @@ namespace HVACDXSystem {
                                 PartLoadFrac = 1.0;
                                 //            Else find the PLR to meet the load
                             } else {
-                                Par(1) = double(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                Par(1) = double(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                 Par(2) = DesOutHumRat;
                                 // Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
                                 Par(3) = double(DehumidMode);
@@ -2158,30 +2333,34 @@ namespace HVACDXSystem {
                                 SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilHumRatResidual, 0.0, 1.0, Par);
                                 if (SolFla == -1) {
                                     if (!state.dataGlobal->WarmupFlag) {
-                                        if (DXCoolingSystem(DXSystemNum).MModeLatPLRIter2 < 1) {
-                                            ++DXCoolingSystem(DXSystemNum).MModeLatPLRIter2;
-                                            ShowWarningError(state,
-                                                DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                " - Iteration limit exceeded calculating DX unit coolreheat latent part-load ratio for unit = " +
-                                                DXCoolingSystem(DXSystemNum).Name);
+                                        if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MModeLatPLRIter2 < 1) {
+                                            ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MModeLatPLRIter2;
+                                            ShowWarningError(
+                                                state,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                    " - Iteration limit exceeded calculating DX unit coolreheat latent part-load ratio for unit = " +
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                             ShowContinueError(state, format("Estimated part-load ratio  = {:.3R}", (ReqOutput / FullOutput)));
                                             ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                                            ShowContinueErrorTimeStamp(state,
-                                                "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
+                                            ShowContinueErrorTimeStamp(
+                                                state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(state,
-                                            DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                        ShowRecurringWarningErrorAtEnd(
+                                            state,
+                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                 "\" - Iteration limit exceeded calculating coolreheat latent part-load ratio error continues. Latent "
                                                 "PLR statistics follow.",
-                                            DXCoolingSystem(DXSystemNum).MModeLatPLRIterIndex2,
+                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).MModeLatPLRIterIndex2,
                                             PartLoadFrac,
                                             PartLoadFrac);
                                     }
                                 } else if (SolFla == -2) {
                                     if (!state.dataGlobal->WarmupFlag) {
-                                        ShowSevereError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                        " : part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" +
-                                                        DXCoolingSystem(DXSystemNum).Name);
+                                        ShowSevereError(state,
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                            " : part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" +
+                                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                         ShowFatalError(state, "Program terminates due to previous condition.");
                                     }
                                 }
@@ -2205,8 +2384,9 @@ namespace HVACDXSystem {
                         OnOffAirFlowRatio = 1.0;
                         SpeedRatio = 0.0;
 
-                        SimVariableSpeedCoils(state, CompName,
-                                              DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                        SimVariableSpeedCoils(state,
+                                              CompName,
+                                              state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                               FanOpMode,
                                               MaxONOFFCyclesperHour,
                                               HPTimeConstant,
@@ -2219,7 +2399,7 @@ namespace HVACDXSystem {
                                               QLatReq,
                                               OnOffAirFlowRatio);
 
-                        VSCoilIndex = DXCoolingSystem(DXSystemNum).CoolingCoilIndex;
+                        VSCoilIndex = state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex;
                         NumOfSpeeds = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).NumOfSpeeds;
 
                         NoOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) -
@@ -2242,7 +2422,8 @@ namespace HVACDXSystem {
                             SpeedRatio = 1.0;
                             CycRatio = 1.0;
                             QZnReq = 0.001; // to indicate the coil is running
-                            SimVariableSpeedCoils(state, CompName,
+                            SimVariableSpeedCoils(state,
+                                                  CompName,
                                                   VSCoilIndex,
                                                   FanOpMode,
                                                   MaxONOFFCyclesperHour,
@@ -2265,7 +2446,8 @@ namespace HVACDXSystem {
                             if ((TempSpeedReqst - TempSpeedOut) > Acc) {
                                 if (state.dataGlobal->DoCoilDirectSolutions) {
                                     PartLoadFrac = (DesOutTemp - Node(InletNode).Temp) / (TempOut1 - Node(InletNode).Temp);
-                                    SimVariableSpeedCoils(state, CompName,
+                                    SimVariableSpeedCoils(state,
+                                                          CompName,
                                                           VSCoilIndex,
                                                           FanOpMode,
                                                           MaxONOFFCyclesperHour,
@@ -2286,44 +2468,51 @@ namespace HVACDXSystem {
                                     SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag && std::abs(Node(OutletNode).Temp - DesOutTemp) > Acc) {
-                                            if (DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
-                                                ++DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter;
-                                                ShowWarningError(state,
-                                                    DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                    " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
-                                                    DXCoolingSystem(DXSystemNum).Name);
+                                            if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
+                                                ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter;
+                                                ShowWarningError(
+                                                    state,
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                        " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                 ShowContinueError(state,
                                                                   format("Estimated part-load ratio  = {:.3R}", (TempSpeedOut / TempSpeedReqst)));
                                                 ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                                                ShowContinueErrorTimeStamp(state,
+                                                ShowContinueErrorTimeStamp(
+                                                    state,
                                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(state,
-                                                DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                            ShowRecurringWarningErrorAtEnd(
+                                                state,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                     "\" - Iteration limit exceeded calculating sensible part-load ratio error "
                                                     "continues. Sensible PLR statistics follow.",
-                                                DXCoolingSystem(DXSystemNum).DXCoilSensPLRIterIndex,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRIterIndex,
                                                 PartLoadFrac,
                                                 PartLoadFrac);
                                         }
                                     } else if (SolFla == -2) {
                                         PartLoadFrac = TempSpeedReqst / TempSpeedOut;
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            if (DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
-                                                ++DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail;
-                                                ShowWarningError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                                 " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
-                                                                 "exceeded, for unit = " +
-                                                                 DXCoolingSystem(DXSystemNum).Name);
+                                            if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
+                                                ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail;
+                                                ShowWarningError(state,
+                                                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                     " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
+                                                                     "exceeded, for unit = " +
+                                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                 ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                                                ShowContinueErrorTimeStamp(state,
+                                                ShowContinueErrorTimeStamp(
+                                                    state,
                                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
-                                                                               DXCoolingSystem(DXSystemNum).Name +
+                                            ShowRecurringWarningErrorAtEnd(state,
+                                                                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                               " \"" + state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                                                "\" - DX unit sensible part-load ratio calculation failed error "
                                                                                "continues. Sensible PLR statistics follow.",
-                                                                           DXCoolingSystem(DXSystemNum).DXCoilSensPLRFailIndex,
+                                                                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRFailIndex,
                                                                            PartLoadFrac,
                                                                            PartLoadFrac);
                                         }
@@ -2336,7 +2525,8 @@ namespace HVACDXSystem {
                                 SpeedRatio = 1.0;
                                 for (I = 2; I <= NumOfSpeeds; ++I) {
                                     SpeedNum = I;
-                                    SimVariableSpeedCoils(state, CompName,
+                                    SimVariableSpeedCoils(state,
+                                                          CompName,
                                                           VSCoilIndex,
                                                           FanOpMode,
                                                           MaxONOFFCyclesperHour,
@@ -2367,7 +2557,8 @@ namespace HVACDXSystem {
                                 if ((TempSpeedReqst - TempSpeedOut) > Acc) {
                                     if (state.dataGlobal->DoCoilDirectSolutions) {
                                         SpeedRatio = (DesOutTemp - TempOut1) / (TempOut2 - TempOut1);
-                                        SimVariableSpeedCoils(state, CompName,
+                                        SimVariableSpeedCoils(state,
+                                                              CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
                                                               MaxONOFFCyclesperHour,
@@ -2394,45 +2585,54 @@ namespace HVACDXSystem {
                                         }
                                         if (SolFla == -1) {
                                             if (!state.dataGlobal->WarmupFlag && std::abs(Node(OutletNode).Temp - DesOutTemp) > Acc) {
-                                                if (DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
-                                                    ++DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter;
-                                                    ShowWarningError(state,
-                                                        DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                        " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
-                                                        DXCoolingSystem(DXSystemNum).Name);
+                                                if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
+                                                    ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter;
+                                                    ShowWarningError(
+                                                        state,
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                            " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
+                                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                     ShowContinueError(state, format("Estimated part-load ratio  = {:.3R}", (ReqOutput / FullOutput)));
                                                     ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", SpeedRatio));
-                                                    ShowContinueErrorTimeStamp(state,
+                                                    ShowContinueErrorTimeStamp(
+                                                        state,
                                                         "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                                 }
-                                                ShowRecurringWarningErrorAtEnd(state,
-                                                    DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                                ShowRecurringWarningErrorAtEnd(
+                                                    state,
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                         "\" - Iteration limit exceeded calculating sensible part-load ratio "
                                                         "error continues. Sensible PLR statistics follow.",
-                                                    DXCoolingSystem(DXSystemNum).DXCoilSensPLRIterIndex,
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRIterIndex,
                                                     PartLoadFrac,
                                                     PartLoadFrac);
                                             }
                                         } else if (SolFla == -2) {
                                             PartLoadFrac = TempSpeedReqst / TempSpeedOut;
                                             if (!state.dataGlobal->WarmupFlag) {
-                                                if (DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
-                                                    ++DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail;
-                                                    ShowWarningError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                                     " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
-                                                                     "exceeded, for unit = " +
-                                                                     DXCoolingSystem(DXSystemNum).Name);
+                                                if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
+                                                    ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail;
+                                                    ShowWarningError(
+                                                        state,
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                            " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
+                                                            "exceeded, for unit = " +
+                                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                     ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                                                    ShowContinueErrorTimeStamp(state,
+                                                    ShowContinueErrorTimeStamp(
+                                                        state,
                                                         "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                                 }
-                                                ShowRecurringWarningErrorAtEnd(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
-                                                                                   DXCoolingSystem(DXSystemNum).Name +
-                                                                                   "\" - DX unit sensible part-load ratio calculation failed error "
-                                                                                   "continues. Sensible PLR statistics follow.",
-                                                                               DXCoolingSystem(DXSystemNum).DXCoilSensPLRFailIndex,
-                                                                               PartLoadFrac,
-                                                                               PartLoadFrac);
+                                                ShowRecurringWarningErrorAtEnd(
+                                                    state,
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
+                                                        "\" - DX unit sensible part-load ratio calculation failed error "
+                                                        "continues. Sensible PLR statistics follow.",
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRFailIndex,
+                                                    PartLoadFrac,
+                                                    PartLoadFrac);
                                             }
                                         }
                                     }
@@ -2445,13 +2645,15 @@ namespace HVACDXSystem {
                         if (PartLoadFrac == 0.0) {
                             OutletHumRatDXCoil = NoLoadHumRatOut;
                         } else {
-                            OutletHumRatDXCoil = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoolingSystem(DXSystemNum).CoolingCoilIndex).OutletAirHumRat;
+                            OutletHumRatDXCoil =
+                                state.dataVariableSpeedCoils->VarSpeedCoil(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex)
+                                    .OutletAirHumRat;
                         }
 
                         // If humidity setpoint is not satisfied and humidity control type is CoolReheat,
                         // then overcool to meet moisture load
 
-                        if ((OutletHumRatDXCoil > DesOutHumRat) && (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl_CoolReheat)) {
+                        if ((OutletHumRatDXCoil > DesOutHumRat) && (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl::CoolReheat)) {
 
                             if ((NumOfSpeeds > 1 && SpeedNum == NumOfSpeeds && SpeedRatio == 1.0) || (NumOfSpeeds == 1 && CycRatio == 1.0)) {
                                 PartLoadFrac = 1.0;
@@ -2461,7 +2663,8 @@ namespace HVACDXSystem {
                                 SpeedRatio = 1.0;
                                 CycRatio = 1.0;
                                 QZnReq = 0.001; // to indicate the coil is running
-                                SimVariableSpeedCoils(state, CompName,
+                                SimVariableSpeedCoils(state,
+                                                      CompName,
                                                       VSCoilIndex,
                                                       FanOpMode,
                                                       MaxONOFFCyclesperHour,
@@ -2483,7 +2686,8 @@ namespace HVACDXSystem {
                                     int SaveSpeedNum = min(SpeedNum + 1, NumOfSpeeds);
                                     for (I = SaveSpeedNum; I <= NumOfSpeeds; ++I) {
                                         SpeedNum = I;
-                                        SimVariableSpeedCoils(state, CompName,
+                                        SimVariableSpeedCoils(state,
+                                                              CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
                                                               MaxONOFFCyclesperHour,
@@ -2519,45 +2723,54 @@ namespace HVACDXSystem {
 
                                         if (SolFla == -1) {
                                             if (!state.dataGlobal->WarmupFlag && std::abs(Node(OutletNode).HumRat - DesOutHumRat) > (Acc / 100.0)) {
-                                                if (DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
-                                                    ++DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter;
-                                                    ShowWarningError(state,
-                                                        DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                        " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " +
-                                                        DXCoolingSystem(DXSystemNum).Name);
+                                                if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
+                                                    ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter;
+                                                    ShowWarningError(
+                                                        state,
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                            " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " +
+                                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                     ShowContinueError(state, format("Estimated part-load ratio  = {:.3R}", (ReqOutput / FullOutput)));
                                                     ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                                                    ShowContinueErrorTimeStamp(state,
+                                                    ShowContinueErrorTimeStamp(
+                                                        state,
                                                         "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                                 }
-                                                ShowRecurringWarningErrorAtEnd(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
-                                                                                   DXCoolingSystem(DXSystemNum).Name +
-                                                                                   "\" - Iteration limit exceeded calculating latent part-load ratio "
-                                                                                   "error continues. Latent PLR statistics follow.",
-                                                                               DXCoolingSystem(DXSystemNum).DXCoilSensPLRIterIndex,
-                                                                               PartLoadFrac,
-                                                                               PartLoadFrac);
+                                                ShowRecurringWarningErrorAtEnd(
+                                                    state,
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
+                                                        "\" - Iteration limit exceeded calculating latent part-load ratio "
+                                                        "error continues. Latent PLR statistics follow.",
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRIterIndex,
+                                                    PartLoadFrac,
+                                                    PartLoadFrac);
                                             }
                                         } else if (SolFla == -2) {
                                             PartLoadFrac = SpeedRatio;
                                             if (!state.dataGlobal->WarmupFlag) {
-                                                if (DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
-                                                    ++DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail;
-                                                    ShowWarningError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                                     " - DX unit latent part-load ratio calculation failed: part-load ratio limits "
-                                                                     "exceeded, for unit = " +
-                                                                     DXCoolingSystem(DXSystemNum).Name);
+                                                if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
+                                                    ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail;
+                                                    ShowWarningError(
+                                                        state,
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                            " - DX unit latent part-load ratio calculation failed: part-load ratio limits "
+                                                            "exceeded, for unit = " +
+                                                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                     ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                                                    ShowContinueErrorTimeStamp(state,
+                                                    ShowContinueErrorTimeStamp(
+                                                        state,
                                                         "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                                 }
-                                                ShowRecurringWarningErrorAtEnd(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
-                                                                                   DXCoolingSystem(DXSystemNum).Name +
-                                                                                   "\" - DX unit latent part-load ratio calculation failed error "
-                                                                                   "continues. Latent PLR statistics follow.",
-                                                                               DXCoolingSystem(DXSystemNum).DXCoilSensPLRFailIndex,
-                                                                               PartLoadFrac,
-                                                                               PartLoadFrac);
+                                                ShowRecurringWarningErrorAtEnd(
+                                                    state,
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
+                                                        "\" - DX unit latent part-load ratio calculation failed error "
+                                                        "continues. Latent PLR statistics follow.",
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRFailIndex,
+                                                    PartLoadFrac,
+                                                    PartLoadFrac);
                                             }
                                         }
                                     }
@@ -2575,43 +2788,51 @@ namespace HVACDXSystem {
                                     }
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag && std::abs(Node(OutletNode).HumRat - DesOutHumRat) > (Acc / 100.0)) {
-                                            if (DXCoolingSystem(DXSystemNum).DXCoilLatPLRIter < 1) {
-                                                ++DXCoolingSystem(DXSystemNum).DXCoilLatPLRIter;
-                                                ShowWarningError(state,
-                                                    DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                    " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " +
-                                                    DXCoolingSystem(DXSystemNum).Name);
+                                            if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilLatPLRIter < 1) {
+                                                ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilLatPLRIter;
+                                                ShowWarningError(
+                                                    state,
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                        " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " +
+                                                        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                 ShowContinueError(state, format("Estimated part-load ratio   = {:.3R}", (ReqOutput / FullOutput)));
                                                 ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                                                ShowContinueErrorTimeStamp(state,
+                                                ShowContinueErrorTimeStamp(
+                                                    state,
                                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(state,
-                                                DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                            ShowRecurringWarningErrorAtEnd(
+                                                state,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                     "\" - Iteration limit exceeded calculating latent part-load ratio error continues. Latent PLR "
                                                     "statistics follow.",
-                                                DXCoolingSystem(DXSystemNum).DXCoilLatPLRIterIndex,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilLatPLRIterIndex,
                                                 PartLoadFrac,
                                                 PartLoadFrac);
                                         }
                                     } else if (SolFla == -2) {
                                         PartLoadFrac = 1.0;
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            if (DXCoolingSystem(DXSystemNum).DXCoilLatPLRFail < 1) {
-                                                ++DXCoolingSystem(DXSystemNum).DXCoilLatPLRFail;
-                                                ShowWarningError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
-                                                                 " - DX unit latent part-load ratio calculation failed: part-load ratio limits "
-                                                                 "exceeded, for unit = " +
-                                                                 DXCoolingSystem(DXSystemNum).Name);
+                                            if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilLatPLRFail < 1) {
+                                                ++state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilLatPLRFail;
+                                                ShowWarningError(state,
+                                                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                                     " - DX unit latent part-load ratio calculation failed: part-load ratio limits "
+                                                                     "exceeded, for unit = " +
+                                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                                                 ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                                                ShowContinueErrorTimeStamp(state,
+                                                ShowContinueErrorTimeStamp(
+                                                    state,
                                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(state,
-                                                DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" + DXCoolingSystem(DXSystemNum).Name +
+                                            ShowRecurringWarningErrorAtEnd(
+                                                state,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
+                                                    state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name +
                                                     "\" - DX unit latent part-load ratio calculation failed error continues. Latent PLR statistics "
                                                     "follow.",
-                                                DXCoolingSystem(DXSystemNum).DXCoilLatPLRFailIndex,
+                                                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilLatPLRFailIndex,
                                                 PartLoadFrac,
                                                 PartLoadFrac);
                                         }
@@ -2632,36 +2853,39 @@ namespace HVACDXSystem {
 
                     } else if (SELECT_CASE_var == CoilDX_PackagedThermalStorageCooling) {
 
-                        ControlTESIceStorageTankCoil(state, CompName,
-                                                     DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
-                                                     DXCoolingSystem(DXSystemNum).DXCoolingSystemType,
-                                                     DXCoolingSystem(DXSystemNum).FanOpMode,
+                        ControlTESIceStorageTankCoil(state,
+                                                     CompName,
+                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingSystemType,
+                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).FanOpMode,
                                                      DesOutTemp,
                                                      DesOutHumRat,
                                                      PartLoadFrac,
-                                                     DXCoolingSystem(DXSystemNum).TESOpMode,
-                                                     DXCoolingSystem(DXSystemNum).DehumidControlType,
-                                                     DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter,
-                                                     DXCoolingSystem(DXSystemNum).DXCoilSensPLRIterIndex,
-                                                     DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail,
-                                                     DXCoolingSystem(DXSystemNum).DXCoilSensPLRFailIndex,
-                                                     DXCoolingSystem(DXSystemNum).DXCoilLatPLRIter,
-                                                     DXCoolingSystem(DXSystemNum).DXCoilLatPLRIterIndex,
-                                                     DXCoolingSystem(DXSystemNum).DXCoilLatPLRFail,
-                                                     DXCoolingSystem(DXSystemNum).DXCoilLatPLRFailIndex);
+                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).TESOpMode,
+                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DehumidControlType,
+                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter,
+                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRIterIndex,
+                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail,
+                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRFailIndex,
+                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilLatPLRIter,
+                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilLatPLRIterIndex,
+                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilLatPLRFail,
+                                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilLatPLRFailIndex);
                     } else {
-                        ShowFatalError(state, "ControlDXSystem: Invalid DXCoolingSystem coil type = " + DXCoolingSystem(DXSystemNum).CoolingCoilType);
+                        ShowFatalError(state,
+                                       "ControlDXSystem: Invalid state.dataHVACDXSys->DXCoolingSystem coil type = " +
+                                           state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilType);
                     }
                 }
             } // End of cooling load type (sensible or latent) if block
-        }     // End of If DXCoolingSystem is scheduled on and there is flow
+        }     // End of If state.dataHVACDXSys->DXCoolingSystem is scheduled on and there is flow
 
         // Set the final results
-        DXCoolingSystem(DXSystemNum).PartLoadFrac = PartLoadFrac;
-        DXCoolingSystem(DXSystemNum).SpeedRatio = SpeedRatio;
-        DXCoolingSystem(DXSystemNum).CycRatio = CycRatio;
-        DXCoolingSystem(DXSystemNum).DehumidificationMode = DehumidMode;
-        DXCoolingSystem(DXSystemNum).SpeedNum = SpeedNum;
+        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).PartLoadFrac = PartLoadFrac;
+        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).SpeedRatio = SpeedRatio;
+        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CycRatio = CycRatio;
+        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DehumidificationMode = DehumidMode;
+        state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).SpeedNum = SpeedNum;
     }
 
     Real64 DXCoilVarSpeedResidual(EnergyPlusData &state,
@@ -2994,7 +3218,8 @@ namespace HVACDXSystem {
         return Residuum;
     }
 
-    Real64 MultiModeDXCoilResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 MultiModeDXCoilResidual(EnergyPlusData &state,
+                                   Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                    Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
@@ -3047,14 +3272,15 @@ namespace HVACDXSystem {
         CoilIndex = int(Par(1));
         DehumidMode = int(Par(3));
         FanOpMode = int(Par(4));
-        SimDXCoilMultiMode(state,"", On, false, PartLoadRatio, DehumidMode, CoilIndex, FanOpMode);
+        SimDXCoilMultiMode(state, "", On, false, PartLoadRatio, DehumidMode, CoilIndex, FanOpMode);
         OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
         Residuum = Par(2) - OutletAirTemp;
 
         return Residuum;
     }
 
-    Real64 MultiModeDXCoilHumRatResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 MultiModeDXCoilHumRatResidual(EnergyPlusData &state,
+                                         Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                          Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
@@ -3106,14 +3332,15 @@ namespace HVACDXSystem {
         CoilIndex = int(Par(1));
         DehumidMode = int(Par(3));
         FanOpMode = int(Par(4));
-        SimDXCoilMultiMode(state,"", On, false, PartLoadRatio, DehumidMode, CoilIndex, FanOpMode);
+        SimDXCoilMultiMode(state, "", On, false, PartLoadRatio, DehumidMode, CoilIndex, FanOpMode);
         OutletAirHumRat = state.dataDXCoils->DXCoilOutletHumRat(CoilIndex);
         Residuum = Par(2) - OutletAirHumRat;
 
         return Residuum;
     }
 
-    Real64 HXAssistedCoolCoilTempResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 HXAssistedCoolCoilTempResidual(EnergyPlusData &state,
+                                          Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                           Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
@@ -3175,7 +3402,8 @@ namespace HVACDXSystem {
         return Residuum;
     }
 
-    Real64 HXAssistedCoolCoilHRResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 HXAssistedCoolCoilHRResidual(EnergyPlusData &state,
+                                        Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                         Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
@@ -3231,7 +3459,8 @@ namespace HVACDXSystem {
         FirstHVACIteration = (Par(3) == 1.0);
         HXUnitOn = (Par(4) == 1.0);
         FanOpMode = int(Par(5));
-        CalcHXAssistedCoolingCoil(state, CoilIndex, FirstHVACIteration, On, PartLoadRatio, HXUnitOn, FanOpMode, _, EconomizerFlag);
+        CalcHXAssistedCoolingCoil(
+            state, CoilIndex, FirstHVACIteration, On, PartLoadRatio, HXUnitOn, FanOpMode, _, state.dataHVACDXSys->EconomizerFlag);
         OutletAirHumRat = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(CoilIndex);
         Residuum = Par(2) - OutletAirHumRat;
         return Residuum;
@@ -3299,14 +3528,14 @@ namespace HVACDXSystem {
         TESOpMode = int(Par(3));
 
         {
-            auto const SELECT_CASE_var(TESOpMode);
-            if (SELECT_CASE_var == CoolingOnlyMode) {
+            auto const SELECT_CASE_var(static_cast<TESMode>(TESOpMode));
+            if (SELECT_CASE_var == TESMode::CoolingOnlyMode) {
                 CalcTESCoilCoolingOnlyMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-            } else if (SELECT_CASE_var == CoolingAndChargeMode) {
+            } else if (SELECT_CASE_var == TESMode::CoolingAndChargeMode) {
                 CalcTESCoilCoolingAndChargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-            } else if (SELECT_CASE_var == CoolingAndDischargeMode) {
+            } else if (SELECT_CASE_var == TESMode::CoolingAndDischargeMode) {
                 CalcTESCoilCoolingAndDischargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-            } else if (SELECT_CASE_var == DischargeOnlyMode) {
+            } else if (SELECT_CASE_var == TESMode::DischargeOnlyMode) {
                 CalcTESCoilDischargeOnlyMode(state, CoilIndex, PartLoadRatio);
             }
         }
@@ -3379,14 +3608,14 @@ namespace HVACDXSystem {
         TESOpMode = int(Par(3));
 
         {
-            auto const SELECT_CASE_var(TESOpMode);
-            if (SELECT_CASE_var == CoolingOnlyMode) {
+            auto const SELECT_CASE_var(static_cast<TESMode>(TESOpMode));
+            if (SELECT_CASE_var == TESMode::CoolingOnlyMode) {
                 CalcTESCoilCoolingOnlyMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-            } else if (SELECT_CASE_var == CoolingAndChargeMode) {
+            } else if (SELECT_CASE_var == TESMode::CoolingAndChargeMode) {
                 CalcTESCoilCoolingAndChargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-            } else if (SELECT_CASE_var == CoolingAndDischargeMode) {
+            } else if (SELECT_CASE_var == TESMode::CoolingAndDischargeMode) {
                 CalcTESCoilCoolingAndDischargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-            } else if (SELECT_CASE_var == DischargeOnlyMode) {
+            } else if (SELECT_CASE_var == TESMode::DischargeOnlyMode) {
                 CalcTESCoilDischargeOnlyMode(state, CoilIndex, PartLoadRatio);
             }
         }
@@ -3437,22 +3666,22 @@ namespace HVACDXSystem {
         Real64 HumRatioSat; // saturation humidity ratio at forst control temperature
         Real64 AirMassFlow; // air masss flow rate through the DX coil
 
-        AirMassFlow = state.dataLoopNodes->Node(DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum).MassFlowRate;
+        AirMassFlow = state.dataLoopNodes->Node(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum).MassFlowRate;
         if (ControlMode == RunOnSensible && AirMassFlow > MinAirMassFlow &&
-            TempSetPoint < state.dataLoopNodes->Node(DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum).Temp) {
+            TempSetPoint < state.dataLoopNodes->Node(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum).Temp) {
             if (TempSetPoint < TfrostControl) {
                 TempSetPoint = TfrostControl;
-                DXCoolingSystem(DXSystemNum).FrostControlStatus = 1;
+                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).FrostControlStatus = 1;
             }
         } else if (ControlMode == RunOnLatent && AirMassFlow > MinAirMassFlow &&
-                   HumRatSetPoint < state.dataLoopNodes->Node(DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum).HumRat) {
+                   HumRatSetPoint < state.dataLoopNodes->Node(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum).HumRat) {
             HumRatioSat = PsyWFnTdpPb(state, TfrostControl, BaroPress, RoutineName);
             if (HumRatioSat > HumRatSetPoint) {
                 HumRatSetPoint = HumRatioSat;
-                DXCoolingSystem(DXSystemNum).FrostControlStatus = 2;
+                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).FrostControlStatus = 2;
             }
         } else {
-            DXCoolingSystem(DXSystemNum).FrostControlStatus = 0;
+            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).FrostControlStatus = 0;
         }
     }
 
@@ -3473,17 +3702,17 @@ namespace HVACDXSystem {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DXCoolSysNum;
 
-        if (GetInputFlag) { // First time subroutine has been entered
+        if (state.dataHVACDXSys->GetInputFlag) { // First time subroutine has been entered
             GetDXCoolingSystemInput(state);
-            GetInputFlag = false;
+            state.dataHVACDXSys->GetInputFlag = false;
         }
 
         DXCoolSysNum = 0;
-        if (NumDXSystem > 0) {
-            DXCoolSysNum = UtilityRoutines::FindItemInList(DXCoilSysName, DXCoolingSystem);
-            if (DXCoolSysNum > 0 && DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil) {
-                if (!(DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed)) {
-                    SetDXCoilTypeData(state, DXCoolingSystem(DXCoolSysNum).CoolingCoilName);
+        if (state.dataHVACDXSys->NumDXSystem > 0) {
+            DXCoolSysNum = UtilityRoutines::FindItemInList(DXCoilSysName, state.dataHVACDXSys->DXCoolingSystem);
+            if (DXCoolSysNum > 0 && state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil) {
+                if (!(state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed)) {
+                    SetDXCoilTypeData(state, state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilName);
                 }
             }
         }
@@ -3511,25 +3740,26 @@ namespace HVACDXSystem {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DXCoolSysNum;
 
-        if (GetInputFlag) { // First time subroutine has been entered
+        if (state.dataHVACDXSys->GetInputFlag) { // First time subroutine has been entered
             GetDXCoolingSystemInput(state);
-            GetInputFlag = false;
+            state.dataHVACDXSys->GetInputFlag = false;
         }
 
         DXCoolSysNum = 0;
-        if (NumDXSystem > 0) {
-            DXCoolSysNum = UtilityRoutines::FindItemInList(DXCoilSysName, DXCoolingSystem);
-            if (DXCoolSysNum > 0 && DXCoolSysNum <= NumDXSystem) {
-                CoolCoilType = DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num;
-                CoolCoilIndex = DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex;
-                CoolCoilName = DXCoolingSystem(DXCoolSysNum).CoolingCoilName;
+        if (state.dataHVACDXSys->NumDXSystem > 0) {
+            DXCoolSysNum = UtilityRoutines::FindItemInList(DXCoilSysName, state.dataHVACDXSys->DXCoolingSystem);
+            if (DXCoolSysNum > 0 && DXCoolSysNum <= state.dataHVACDXSys->NumDXSystem) {
+                CoolCoilType = state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num;
+                CoolCoilIndex = state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex;
+                CoolCoilName = state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilName;
             }
         }
     }
 
     //******************************************************************************
 
-    Real64 VSCoilCyclingResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilCyclingResidual(EnergyPlusData &state,
+                                 Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                  Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
@@ -3561,34 +3791,27 @@ namespace HVACDXSystem {
         // par(5) = supply air fan operating mode (ContFanCycCoil)
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int CoilIndex;                            // index of this coil
-        Real64 OutletAirTemp;                     // outlet air temperature [C]
-        int FanOpMode;                            // Supply air fan operating mode
-        static int SpeedNum(1);                   // speed number of variable speed DX cooling coil
-        static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
-        static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-        static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
-        static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-        static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-        static Real64 SpeedRatio(0.0);            // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+        int CoilIndex;        // index of this coil
+        Real64 OutletAirTemp; // outlet air temperature [C]
+        int FanOpMode;        // Supply air fan operating mode
 
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
 
-        SimVariableSpeedCoils(state, "",
+        SimVariableSpeedCoils(state,
+                              "",
                               CoilIndex,
                               FanOpMode,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
+                              state.dataHVACDXSys->MaxONOFFCyclesperHourCycling,
+                              state.dataHVACDXSys->HPTimeConstantCycling,
+                              state.dataHVACDXSys->FanDelayTimeCycling,
                               On,
                               PartLoadRatio,
-                              SpeedNum,
-                              SpeedRatio,
-                              QZnReq,
-                              QLatReq,
-                              OnOffAirFlowRatio);
+                              state.dataHVACDXSys->SpeedNum,
+                              state.dataHVACDXSys->SpeedRatio,
+                              state.dataHVACDXSys->QZnReqCycling,
+                              state.dataHVACDXSys->QLatReqCycling,
+                              state.dataHVACDXSys->OnOffAirFlowRatioCycling);
 
         OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
         Residuum = Par(2) - OutletAirTemp;
@@ -3598,7 +3821,8 @@ namespace HVACDXSystem {
 
     //******************************************************************************
 
-    Real64 VSCoilSpeedResidual(EnergyPlusData &state, Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilSpeedResidual(EnergyPlusData &state,
+                               Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                Array1D<Real64> const &Par // par(1) = DX coil number
     )
     {
@@ -3638,35 +3862,28 @@ namespace HVACDXSystem {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int CoilIndex;                            // index of this coil
-        Real64 OutletAirTemp;                     // outlet air temperature [C]
-        int FanOpMode;                            // Supply air fan operating mode
-        static int SpeedNum(1);                   // speed number of variable speed DX cooling coil
-        static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
-        static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-        static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
-        static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-        static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-        static Real64 PartLoadRatio(1.0);         // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+        int CoilIndex;        // index of this coil
+        Real64 OutletAirTemp; // outlet air temperature [C]
+        int FanOpMode;        // Supply air fan operating mode
 
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
-        SpeedNum = int(Par(3));
+        state.dataHVACDXSys->mySpeedNum = int(Par(3));
 
-        SimVariableSpeedCoils(state, "",
+        SimVariableSpeedCoils(state,
+                              "",
                               CoilIndex,
                               FanOpMode,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
+                              state.dataHVACDXSys->myMaxONOFFCyclesperHour,
+                              state.dataHVACDXSys->myHPTimeConstant,
+                              state.dataHVACDXSys->myFanDelayTime,
                               On,
-                              PartLoadRatio,
-                              SpeedNum,
+                              state.dataHVACDXSys->PartLoadRatio,
+                              state.dataHVACDXSys->mySpeedNum,
                               SpeedRatio,
-                              QZnReq,
-                              QLatReq,
-                              OnOffAirFlowRatio);
+                              state.dataHVACDXSys->myQZnReq,
+                              state.dataHVACDXSys->myQLatReq,
+                              state.dataHVACDXSys->myOnOffAirFlowRatio);
 
         OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
         Residuum = Par(2) - OutletAirTemp;
@@ -3674,7 +3891,8 @@ namespace HVACDXSystem {
         return Residuum;
     }
 
-    Real64 VSCoilCyclingHumResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilCyclingHumResidual(EnergyPlusData &state,
+                                    Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                     Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
@@ -3714,34 +3932,27 @@ namespace HVACDXSystem {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int CoilIndex;                            // index of this coil
-        Real64 OutletAirHumRat;                   // outlet air humidity ratio [kg/kg]
-        int FanOpMode;                            // Supply air fan operating mode
-        static int SpeedNum(1);                   // speed number of variable speed DX cooling coil
-        static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
-        static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-        static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
-        static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-        static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-        static Real64 SpeedRatio(0.0);            // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+        int CoilIndex;          // index of this coil
+        Real64 OutletAirHumRat; // outlet air humidity ratio [kg/kg]
+        int FanOpMode;          // Supply air fan operating mode
 
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
 
-        SimVariableSpeedCoils(state, "",
+        SimVariableSpeedCoils(state,
+                              "",
                               CoilIndex,
                               FanOpMode,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
+                              state.dataHVACDXSys->MaxONOFFCyclesperHourCyclingHum,
+                              state.dataHVACDXSys->HPTimeConstantCyclingHum,
+                              state.dataHVACDXSys->FanDelayTimeCyclingHum,
                               On,
                               PartLoadRatio,
-                              SpeedNum,
-                              SpeedRatio,
-                              QZnReq,
-                              QLatReq,
-                              OnOffAirFlowRatio);
+                              state.dataHVACDXSys->SpeedNumCyclingHum,
+                              state.dataHVACDXSys->SpeedRatioCyclingHum,
+                              state.dataHVACDXSys->QZnReqCyclingHum,
+                              state.dataHVACDXSys->QLatReqCyclingHum,
+                              state.dataHVACDXSys->OnOffAirFlowRatioCyclingHum);
 
         OutletAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirHumRat;
         Residuum = Par(2) - OutletAirHumRat;
@@ -3751,7 +3962,8 @@ namespace HVACDXSystem {
 
     //******************************************************************************
 
-    Real64 VSCoilSpeedHumResidual(EnergyPlusData &state, Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilSpeedHumResidual(EnergyPlusData &state,
+                                  Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                   Array1D<Real64> const &Par // par(1) = DX coil number
     )
     {
@@ -3792,35 +4004,28 @@ namespace HVACDXSystem {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int CoilIndex;                            // index of this coil
-        Real64 OutletAirHumRat;                   // outlet air humidity ratio [kg/kg]
-        int FanOpMode;                            // Supply air fan operating mode
-        static int SpeedNum(1);                   // speed number of variable speed DX cooling coil
-        static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
-        static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-        static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
-        static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-        static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-        static Real64 PartLoadRatio(1.0);         // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+        int CoilIndex;          // index of this coil
+        Real64 OutletAirHumRat; // outlet air humidity ratio [kg/kg]
+        int FanOpMode;          // Supply air fan operating mode
 
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
-        SpeedNum = int(Par(3));
+        state.dataHVACDXSys->SpeedNumSpeedHum = int(Par(3));
 
-        SimVariableSpeedCoils(state, "",
+        SimVariableSpeedCoils(state,
+                              "",
                               CoilIndex,
                               FanOpMode,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
+                              state.dataHVACDXSys->MaxONOFFCyclesperHourSpeedHum,
+                              state.dataHVACDXSys->HPTimeConstantSpeedHum,
+                              state.dataHVACDXSys->FanDelayTimeSpeedHum,
                               On,
-                              PartLoadRatio,
-                              SpeedNum,
+                              state.dataHVACDXSys->PartLoadRatioSpeedHum,
+                              state.dataHVACDXSys->SpeedNumSpeedHum,
                               SpeedRatio,
-                              QZnReq,
-                              QLatReq,
-                              OnOffAirFlowRatio);
+                              state.dataHVACDXSys->QZnReqSpeedHum,
+                              state.dataHVACDXSys->QLatReqSpeedHum,
+                              state.dataHVACDXSys->OnOffAirFlowRatioSpeedHum);
 
         OutletAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirHumRat;
         Residuum = Par(2) - OutletAirHumRat;
@@ -3840,16 +4045,16 @@ namespace HVACDXSystem {
         int NodeNum;
         int DXCoolSysNum;
 
-        if (GetInputFlag) { // First time subroutine has been entered
+        if (state.dataHVACDXSys->GetInputFlag) { // First time subroutine has been entered
             GetDXCoolingSystemInput(state);
-            GetInputFlag = false;
+            state.dataHVACDXSys->GetInputFlag = false;
         }
 
         NodeNum = 0;
-        if (NumDXSystem > 0) {
-            DXCoolSysNum = UtilityRoutines::FindItemInList(DXCoilSysName, DXCoolingSystem);
-            if (DXCoolSysNum > 0 && DXCoolSysNum <= NumDXSystem) {
-                NodeNum = DXCoolingSystem(DXCoolSysNum).DXCoolingCoilInletNodeNum;
+        if (state.dataHVACDXSys->NumDXSystem > 0) {
+            DXCoolSysNum = UtilityRoutines::FindItemInList(DXCoilSysName, state.dataHVACDXSys->DXCoolingSystem);
+            if (DXCoolSysNum > 0 && DXCoolSysNum <= state.dataHVACDXSys->NumDXSystem) {
+                NodeNum = state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DXCoolingCoilInletNodeNum;
             }
         }
         if (NodeNum == 0) InletNodeErrFlag = true;
@@ -3869,23 +4074,23 @@ namespace HVACDXSystem {
         int NodeNum;
         int DXCoolSysNum;
 
-        if (GetInputFlag) { // First time subroutine has been entered
+        if (state.dataHVACDXSys->GetInputFlag) { // First time subroutine has been entered
             GetDXCoolingSystemInput(state);
-            GetInputFlag = false;
+            state.dataHVACDXSys->GetInputFlag = false;
         }
 
         NodeNum = 0;
-        if (NumDXSystem > 0) {
-            DXCoolSysNum = UtilityRoutines::FindItemInList(DXCoilSysName, DXCoolingSystem);
-            if (DXCoolSysNum > 0 && DXCoolSysNum <= NumDXSystem) {
-                NodeNum = DXCoolingSystem(DXCoolSysNum).DXCoolingCoilOutletNodeNum;
+        if (state.dataHVACDXSys->NumDXSystem > 0) {
+            DXCoolSysNum = UtilityRoutines::FindItemInList(DXCoilSysName, state.dataHVACDXSys->DXCoolingSystem);
+            if (DXCoolSysNum > 0 && DXCoolSysNum <= state.dataHVACDXSys->NumDXSystem) {
+                NodeNum = state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DXCoolingCoilOutletNodeNum;
             }
         }
         if (NodeNum == 0) OutletNodeErrFlag = true;
 
         return NodeNum;
     }
-    //        End of Calculation subroutines for the DXCoolingSystem Module
+    //        End of Calculation subroutines for the state.dataHVACDXSys->DXCoolingSystem Module
     // *****************************************************************************
 
 } // namespace HVACDXSystem

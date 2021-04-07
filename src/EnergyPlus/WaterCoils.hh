@@ -66,6 +66,12 @@ struct EnergyPlusData;
 
 namespace WaterCoils {
 
+    constexpr int MaxPolynomOrder = 4;
+    constexpr int MaxOrderedPairs = 60;
+    constexpr Real64 PolyConvgTol = 1.E-05;
+    constexpr Real64 MinWaterMassFlowFrac = 0.000001;
+    constexpr Real64 MinAirMassFlow = 0.001;
+
     enum class iCoilModel
     {
         Unassigned,
@@ -545,13 +551,6 @@ namespace WaterCoils {
 struct WaterCoilsData : BaseGlobalStruct
 {
 
-    int const MaxPolynomOrder;
-    int const MaxOrderedPairs;
-
-    Real64 const PolyConvgTol;
-    Real64 const MinWaterMassFlowFrac;
-    Real64 const MinAirMassFlow;
-
     // Parameters for Heat Exchanger Configuration
     int const CounterFlow;
     int const CrossFlow;
@@ -589,6 +588,31 @@ struct WaterCoilsData : BaseGlobalStruct
     Array1D<WaterCoils::WaterCoilEquipConditions> WaterCoil;
     Array1D<WaterCoils::WaterCoilNumericFieldData> WaterCoilNumericFields;
 
+    Real64 TOutNew = 0.0;            // reset outlet air temperature for Coil:Cooling:Water
+    Real64 WOutNew = 0.0;            // reset outlet air humidity ratio for Coil:Cooling:Water
+    Array1D<Real64> DesCpAir;        // CpAir at Design Inlet Air Temp
+    Array1D<Real64> DesUARangeCheck; // Value for range check based on Design Inlet Air Humidity Ratio
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MyCoilReportFlag;
+    Array1D_bool PlantLoopScanFlag;
+    Array1D<Real64> CoefSeries = Array1D<Real64>(5); // Tuned Changed to static: High call count: Set before use
+    Array1D<Real64> Par = Array1D<Real64>(4);        // Tuned Changed to static: High call count: Set before use
+    bool NoSatCurveIntersect = false;                // TRUE if failed to find apparatus dew-point
+    bool BelowInletWaterTemp = false;                // TRUE if apparatus dew-point below design inlet water temperature
+    bool CBFTooLarge = false;                        // TRUE if the coil bypass factor is unrealistically large
+    bool NoExitCondReset = false;                    // TRUE if exit condition reset is not to be done
+    Real64 RatedLatentCapacity = 0.0;                // latent cooling capacity at the rating point [W]
+    Real64 RatedSHR = 0.0;                           // sensible heat ratio at the rating point
+    Real64 CapacitanceWater = 0.0;                   // capacitance of the water stream [W/K]
+    Real64 CMin = 0.0;                               // minimum capacitance of 2 streams [W/K]
+    Real64 CoilEffectiveness = 0.0;                  // effectiveness of the coil (rated)
+    Real64 SurfaceArea = 0.0;                        // heat exchanger surface area, [m2]
+    Real64 UATotal = 0.0;                            // heat exchanger UA total, [W/C]
+    Array1D_bool RptCoilHeaderFlag = Array1D_bool(2, true);
+    Array2D<Real64> OrderedPair = Array2D<Real64>(WaterCoils::MaxOrderedPairs, 2);
+    Array2D<Real64> OrdPairSum = Array2D<Real64>(10, 2);
+    Array2D<Real64> OrdPairSumMatrix = Array2D<Real64>(10, 10);
+
     void clear_state() override
     {
         this->NumWaterCoils = 0;
@@ -604,13 +628,36 @@ struct WaterCoilsData : BaseGlobalStruct
         this->WaterCoil.deallocate();
         this->WaterCoilNumericFields.deallocate();
         this->WaterCoilControllerCheckOneTimeFlag = true;
+        this->TOutNew = 0.0;
+        this->WOutNew = 0.0;
+        this->DesCpAir.deallocate();
+        this->DesUARangeCheck.deallocate();
+        this->MyEnvrnFlag.deallocate();
+        this->MyCoilReportFlag.deallocate();
+        this->PlantLoopScanFlag.deallocate();
+        this->CoefSeries = Array1D<Real64>(5);
+        this->Par = Array1D<Real64>(4);
+        this->NoSatCurveIntersect = false;
+        this->BelowInletWaterTemp = false;
+        this->CBFTooLarge = false;
+        this->NoExitCondReset = false;
+        this->RatedLatentCapacity = 0.0;
+        this->RatedSHR = 0.0;
+        this->CapacitanceWater = 0.0;
+        this->CMin = 0.0;
+        this->CoilEffectiveness = 0.0;
+        this->SurfaceArea = 0.0;
+        this->UATotal = 0.0;
+        this->RptCoilHeaderFlag = Array1D_bool(2, true);
+        this->OrderedPair = Array2D<Real64>(WaterCoils::MaxOrderedPairs, 2);
+        this->OrdPairSum = Array2D<Real64>(10, 2);
+        this->OrdPairSumMatrix = Array2D<Real64>(10, 10);
     }
 
     // Default Constructor
     WaterCoilsData()
-        : MaxPolynomOrder(4), MaxOrderedPairs(60), PolyConvgTol(1.E-05), MinWaterMassFlowFrac(0.000001), MinAirMassFlow(0.001), CounterFlow(1),
-          CrossFlow(2), SimpleAnalysis(1), DetailedAnalysis(2), CondensateDiscarded(1001), CondensateToTank(1002), UAandFlow(1), NomCap(2),
-          DesignCalc(1), SimCalc(2), NumWaterCoils(0), GetWaterCoilsInputFlag(true), WaterCoilControllerCheckOneTimeFlag(true),
+        : CounterFlow(1), CrossFlow(2), SimpleAnalysis(1), DetailedAnalysis(2), CondensateDiscarded(1001), CondensateToTank(1002), UAandFlow(1),
+          NomCap(2), DesignCalc(1), SimCalc(2), NumWaterCoils(0), GetWaterCoilsInputFlag(true), WaterCoilControllerCheckOneTimeFlag(true),
           InitWaterCoilOneTimeFlag(true)
     {
     }

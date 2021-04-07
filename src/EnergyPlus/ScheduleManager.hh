@@ -75,7 +75,8 @@ namespace ScheduleManager {
 
     int const MaxDayTypes(12);
 
-    enum class SchedType :int {
+    enum class SchedType : int
+    {
         Unassigned = 0,
         ScheduleInput_year = 1,
         ScheduleInput_compact = 2,
@@ -164,8 +165,8 @@ namespace ScheduleManager {
 
         // Default Constructor
         ScheduleData()
-            : ScheduleTypePtr(0), WeekSchedulePointer(366, 0), Used(false), MaxMinSet(false), MaxValue(0.0), MinValue(0.0),
-              CurrentValue(0.0), EMSActuatedOn(false), EMSValue(0.0)
+            : ScheduleTypePtr(0), WeekSchedulePointer(366, 0), Used(false), MaxMinSet(false), MaxValue(0.0), MinValue(0.0), CurrentValue(0.0),
+              EMSActuatedOn(false), EMSValue(0.0)
         {
         }
     };
@@ -331,6 +332,12 @@ namespace ScheduleManager {
 
 struct ScheduleManagerData : BaseGlobalStruct
 {
+    bool CheckScheduleValueMinMaxRunOnceOnly = true;
+    bool DoScheduleReportingSetup = true;
+    std::unordered_map<std::string, std::string> UniqueDayScheduleNames;
+    std::unordered_map<std::string, std::string> UniqueWeekScheduleNames;
+    std::unordered_map<std::string, std::string> UniqueScheduleNames;
+
     // Integer Variables for the Module
     int NumScheduleTypes = 0;
     int NumDaySchedules = 0;
@@ -342,14 +349,6 @@ struct ScheduleManagerData : BaseGlobalStruct
     bool ScheduleDSTSFileWarningIssued = false;
     bool ScheduleFileShadingProcessed = false; // This is false unless there is a Schedule:File:Shading object.
 
-    // These were within the namespace
-    bool CheckScheduleValueMinMaxRunOnceOnly = true;
-    bool DoScheduleReportingSetup = true;
-    // Object data
-    std::unordered_map<std::string, std::string> UniqueDayScheduleNames;
-    std::unordered_map<std::string, std::string> UniqueWeekScheduleNames;
-    std::unordered_map<std::string, std::string> UniqueScheduleNames;
-
     // Object Data
     Array1D<ScheduleManager::ScheduleTypeData> ScheduleType; // Allowed Schedule Types
     Array1D<ScheduleManager::DayScheduleData> DaySchedule;   // Day Schedule Storage
@@ -358,16 +357,16 @@ struct ScheduleManagerData : BaseGlobalStruct
 
     void clear_state() override
     {
-        NumScheduleTypes = 0;
-        NumDaySchedules = 0;
-        NumWeekSchedules = 0;
-        NumSchedules = 0;
-
         CheckScheduleValueMinMaxRunOnceOnly = true;
         UniqueDayScheduleNames.clear();
         UniqueWeekScheduleNames.clear();
         UniqueScheduleNames.clear();
         DoScheduleReportingSetup = true;
+
+        NumScheduleTypes = 0;
+        NumDaySchedules = 0;
+        NumWeekSchedules = 0;
+        NumSchedules = 0;
 
         ScheduleInputProcessed = false;
         ScheduleDSTSFileWarningIssued = false;

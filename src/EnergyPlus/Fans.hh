@@ -322,7 +322,7 @@ namespace Fans {
     );
 
     Real64 CalFaultyFanAirFlowReduction(EnergyPlusData &state,
-                                        std::string const &FanName,          // Name of the Fan
+                                        std::string const &FanName,    // Name of the Fan
                                         Real64 FanDesignAirFlowRate,   // Fan Design Volume Flow Rate [m3/s]
                                         Real64 FanDesignDeltaPress,    // Fan Design Delta Pressure [Pa]
                                         Real64 FanFaultyDeltaPressInc, // Increase of Fan Delta Pressure in the Faulty Case [Pa]
@@ -369,6 +369,7 @@ struct FansData : BaseGlobalStruct
     std::unordered_map<std::string, std::string> UniqueFanNames;
     Array1D<Fans::NightVentPerfData> NightVentPerf;
     Array1D<Fans::FanNumericFieldData> FanNumericFields;
+    int ErrCount = 0;
 
     void clear_state() override
     {
@@ -386,6 +387,7 @@ struct FansData : BaseGlobalStruct
         this->UniqueFanNames.clear();
         this->NightVentPerf.deallocate();
         this->FanNumericFields.deallocate();
+        this->ErrCount = 0;
     }
 };
 

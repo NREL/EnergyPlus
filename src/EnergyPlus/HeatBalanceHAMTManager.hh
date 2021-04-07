@@ -64,16 +64,16 @@ namespace HeatBalanceHAMTManager {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    
+
     constexpr int ittermax(150); // Maximum Number of itterations
     constexpr int adjmax(6);     // Maximum Number of Adjacent Cells
 
     constexpr Real64 wdensity(1000.0); // Density of water kg.m-3
     constexpr Real64 wspech(4180.0);   // Specific Heat Capacity of Water J.kg-1.K-1 (at 20C)
-    constexpr Real64 whv(2489000.0);      // Evaporation enthalpy of water J.kg-1
-    constexpr Real64 convt(0.002);    // Temperature convergence limit
-    constexpr Real64 qvplim(100000.0);   // Maximum latent heat W
-    constexpr Real64 rhmax(1.01);    // Maximum RH value
+    constexpr Real64 whv(2489000.0);   // Evaporation enthalpy of water J.kg-1
+    constexpr Real64 convt(0.002);     // Temperature convergence limit
+    constexpr Real64 qvplim(100000.0); // Maximum latent heat W
+    constexpr Real64 rhmax(1.01);      // Maximum RH value
 
     // Types
     struct subcell
@@ -129,8 +129,8 @@ namespace HeatBalanceHAMTManager {
 
     void UpdateHeatBalHAMT(EnergyPlusData &state, int const sid);
 
-    void
-    interp(int const ndata, const Array1D<Real64> &xx, const Array1D<Real64> &yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad = _);
+    void interp(
+        int const ndata, const Array1D<Real64> &xx, const Array1D<Real64> &yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad = _);
 
     Real64 RHtoVP(EnergyPlusData &state, Real64 const RH, Real64 const Temperature);
 
@@ -158,7 +158,8 @@ namespace HeatBalanceHAMTManager {
 
 } // namespace HeatBalanceHAMTManager
 
-struct HeatBalHAMTMgrData : BaseGlobalStruct {
+struct HeatBalHAMTMgrData : BaseGlobalStruct
+{
 
     Array1D_int firstcell;
     Array1D_int lastcell;
@@ -180,15 +181,20 @@ struct HeatBalHAMTMgrData : BaseGlobalStruct {
     Array1D_bool extvtcflag;  // External Surface vapor transfer coefficient flag
     Array1D_bool intvtcflag;  // Internal Surface Vapor Transfer Coefficient flag
     Array1D_bool MyEnvrnFlag; // Flag to reset surface properties.
-    Real64 deltat = 0.0; // time step in seconds
-    int TotCellsMax = 0; // Maximum number of cells per material
-    bool latswitch = false;  // latent heat switch,
-    bool rainswitch = false; // rain switch,
+    Real64 deltat = 0.0;      // time step in seconds
+    int TotCellsMax = 0;      // Maximum number of cells per material
+    bool latswitch = false;   // latent heat switch,
+    bool rainswitch = false;  // rain switch,
     Array1D<HeatBalanceHAMTManager::subcell> cells;
+    bool OneTimeFlag = true;
+    int qvpErrCount = 0;
+    int qvpErrReport = 0;
 
     void clear_state() override
     {
-
+        this->OneTimeFlag = true;
+        this->qvpErrCount = 0;
+        this->qvpErrReport = 0;
     }
 };
 

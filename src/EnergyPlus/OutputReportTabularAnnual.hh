@@ -177,7 +177,8 @@ namespace OutputReportTabularAnnual {
 
 } // namespace OutputReportTabularAnnual
 
-struct OutputReportTabularAnnualData : BaseGlobalStruct {
+struct OutputReportTabularAnnualData : BaseGlobalStruct
+{
 
     std::vector<OutputReportTabularAnnual::AnnualTable> annualTables;
 

@@ -61,14 +61,15 @@
 // We don't have a remove_all function since we do not use std::filesystem (or boost::filesystem), so make a very sketchy and crude one for testing
 // only
 namespace fs {
-    void remove_all(const std::string& p) {
+void remove_all(const std::string &p)
+{
 #ifdef _WIN32
-        EnergyPlus::FileSystem::systemCall("rmdir /Q /S \"" + p + "\"");
+    EnergyPlus::FileSystem::systemCall("rmdir /Q /S \"" + p + "\"");
 #else
-        EnergyPlus::FileSystem::systemCall("rm -Rf \"" + p + "\"");
+    EnergyPlus::FileSystem::systemCall("rm -Rf \"" + p + "\"");
 #endif
-    }
 }
+} // namespace fs
 
 TEST(FileSystem, movefile_test)
 {
@@ -117,7 +118,7 @@ TEST(FileSystem, getAbsolutePath)
     EXPECT_TRUE(absPathName.find(pathName) != std::string::npos); // Check that the path name appears in the absolute path
 
     std::string currentDirWithSep = std::string(".") + EnergyPlus::DataStringGlobals::pathChar;
-    pathName =  currentDirWithSep + std::string("FileSystemTest.idf");  // e.g., "./FileSystemTest.idf"
+    pathName = currentDirWithSep + std::string("FileSystemTest.idf"); // e.g., "./FileSystemTest.idf"
     absPathName = EnergyPlus::FileSystem::getAbsolutePath(pathName);
     EXPECT_FALSE(absPathName.find(currentDirWithSep) != std::string::npos); // Make sure "./" doesn't appear in absolute path
 }
@@ -141,7 +142,6 @@ TEST(FileSystem, Others)
     std::string root = "./";
     EnergyPlus::FileSystem::makeNativePath(root);
     EXPECT_EQ(root, EnergyPlus::FileSystem::getParentDirectoryPath("Myfile.txt.idf"));
-
 }
 
 TEST(FileSystem, getProgramPath)
@@ -213,7 +213,6 @@ TEST(FileSystem, make_and_remove_Directory)
     EXPECT_FALSE(EnergyPlus::FileSystem::directoryExists((filePathName)));
 }
 
-
 TEST(FileSystem, Elaborate)
 {
     EnergyPlus::FileSystem::makeDirectory("sandbox");
@@ -226,16 +225,16 @@ TEST(FileSystem, Elaborate)
     EXPECT_TRUE(EnergyPlus::FileSystem::directoryExists("sandbox/"));
     EXPECT_GT(EnergyPlus::FileSystem::getAbsolutePath(pathName).size(), pathName.size());
     // Fails, ..../sandbox/ versus ..../sandbox
-    //EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("sandbox/"),
-              //EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName)));
-    //EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("sandbox"),
-              //EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName)));
-    //EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("sandbox/"), EnergyPlus::FileSystem::getAbsolutePath("./sandbox/"));
+    // EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("sandbox/"),
+    // EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName)));
+    // EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("sandbox"),
+    // EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName)));
+    // EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("sandbox/"), EnergyPlus::FileSystem::getAbsolutePath("./sandbox/"));
 
     EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("./"), EnergyPlus::FileSystem::getAbsolutePath("sandbox/../"));
 
     // Fails, "/home/julien/Software/Others/EnergyPlus-build/." versus "/home/julien/Software/Others/EnergyPlus-build"
-    //EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("."), EnergyPlus::FileSystem::getAbsolutePath("sandbox/.."));
+    // EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("."), EnergyPlus::FileSystem::getAbsolutePath("sandbox/.."));
 
     EnergyPlus::FileSystem::removeFile(pathName);
     EXPECT_FALSE(EnergyPlus::FileSystem::pathExists(pathName));

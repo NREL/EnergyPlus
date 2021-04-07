@@ -129,7 +129,8 @@ namespace PlantLoadProfile {
 
 } // namespace PlantLoadProfile
 
-struct PlantLoadProfileData : BaseGlobalStruct {
+struct PlantLoadProfileData : BaseGlobalStruct
+{
 
     bool GetPlantLoadProfileInputFlag = true;
     int NumOfPlantProfile = 0;
