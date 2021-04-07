@@ -16,6 +16,7 @@
 
 // C++ Headers
 #include <ostream>
+#include <istream>
 
 namespace ObjexxFCL {
 
