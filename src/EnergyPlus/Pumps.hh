@@ -106,8 +106,6 @@ namespace Pumps {
         Bank_ConSpeed = 105
     };
 
-    extern Array1D_string const cPumpTypes;
-
     enum powerSizingMethodEnum
     {
         sizePowerPerFlow,
