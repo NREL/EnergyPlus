@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/AirTerminalUnit.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GlobalNames.hh>
@@ -81,10 +82,11 @@ namespace FourPipeBeam {
               deltaTempRatedHeating(0.0), vDotNormRatedHW(0.0), mDotNormRatedHW(0.0), modHeatingQdotDeltaTFuncNum(0), modHeatingQdotAirFlowFuncNum(0),
               modHeatingQdotHWFlowFuncNum(0), mDotHW(0.0), hWTempIn(0.0), hWTempOut(0.0), hWTempOutErrorCount(0), hWInNodeNum(0), hWOutNodeNum(0),
               hWLocation(PlantLocation(0, 0, 0, 0)), beamCoolingEnergy(0.0), beamCoolingRate(0.0), beamHeatingEnergy(0.0), beamHeatingRate(0.0),
-              supAirCoolingEnergy(0.0), supAirCoolingRate(0.0), supAirHeatingEnergy(0.0), supAirHeatingRate(0.0), primAirFlow(0.0), OutdoorAirFlowRate(0.0), myEnvrnFlag(true),
-              mySizeFlag(true), plantLoopScanFlag(true), zoneEquipmentListChecked(false), tDBZoneAirTemp(0.0), tDBSystemAir(0.0), mDotSystemAir(0.0),
-              cpZoneAir(0.0), cpSystemAir(0.0), qDotSystemAir(0.0), qDotBeamCoolingMax(0.0), qDotBeamHeatingMax(0.0), qDotTotalDelivered(0.0),
-              qDotBeamCooling(0.0), qDotBeamHeating(0.0), qDotZoneReq(0.0), qDotBeamReq(0.0), qDotZoneToHeatSetPt(0.0), qDotZoneToCoolSetPt(0.0)
+              supAirCoolingEnergy(0.0), supAirCoolingRate(0.0), supAirHeatingEnergy(0.0), supAirHeatingRate(0.0), primAirFlow(0.0),
+              OutdoorAirFlowRate(0.0), myEnvrnFlag(true), mySizeFlag(true), plantLoopScanFlag(true), zoneEquipmentListChecked(false),
+              tDBZoneAirTemp(0.0), tDBSystemAir(0.0), mDotSystemAir(0.0), cpZoneAir(0.0), cpSystemAir(0.0), qDotSystemAir(0.0),
+              qDotBeamCoolingMax(0.0), qDotBeamHeatingMax(0.0), qDotTotalDelivered(0.0), qDotBeamCooling(0.0), qDotBeamHeating(0.0), qDotZoneReq(0.0),
+              qDotBeamReq(0.0), qDotZoneToHeatSetPt(0.0), qDotZoneToCoolSetPt(0.0)
         {
         }
 
@@ -94,7 +96,7 @@ namespace FourPipeBeam {
         {
         }
 
-    public: // Methods		MARK ANY THAT DON'T ALTER STATE const !!!
+    public: // Methods        MARK ANY THAT DON'T ALTER STATE const !!!
         ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
         static std::shared_ptr<AirTerminalUnit> fourPipeBeamFactory(EnergyPlusData &state, std::string objectName);
         void simulate(EnergyPlusData &state,
@@ -112,7 +114,8 @@ namespace FourPipeBeam {
 
     private: // Methods
         void
-        init(EnergyPlusData &state, bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step         MAYBE THIS SHOULD HAVE A DEFAULT ARG OF = false
+        init(EnergyPlusData &state,
+             bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step         MAYBE THIS SHOULD HAVE A DEFAULT ARG OF = false
         );
 
         void set_size(EnergyPlusData &state);
@@ -223,10 +226,19 @@ namespace FourPipeBeam {
 
     }; // HVACFourPipeBeam
 
-    ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
-    extern Array1D<std::shared_ptr<HVACFourPipeBeam>> FourPipeBeams; // dimension to number of machines
-
 } // namespace FourPipeBeam
+
+struct FourPipeBeamData : BaseGlobalStruct
+{
+
+    ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
+    Array1D<std::shared_ptr<FourPipeBeam::HVACFourPipeBeam>> FourPipeBeams; // dimension to number of machines
+
+    void clear_state() override
+    {
+        FourPipeBeams.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,7 +53,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -66,7 +65,6 @@
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -1101,7 +1099,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
 
     state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
-    ProcessScheduleInput(*state);  // read schedule data
+    ProcessScheduleInput(*state);               // read schedule data
 
     ErrorsFound = false;
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound); // read project control data
@@ -1117,7 +1115,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataGlobal->ZoneSizingCalc = true;
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     SizingManager::ManageSizing(*state);
 
     EXPECT_FALSE(ErrorsFound);
@@ -1125,8 +1123,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     EXPECT_EQ("ZONE2UNITHEAT", state->dataUnitHeaters->UnitHeat(1).Name);
 
     ErrorsFound = false;
-    ZoneEqUnitHeater = true;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->ZoneEqUnitHeater = true;
+    state->dataSize->CurZoneEqNum = 1;
 
     InitUnitHeater(*state, UnitHeatNum, ZoneNum, FirstHVACIteration);
     InitWaterCoil(*state, CoilNum, FirstHVACIteration); // init hot water heating coil
@@ -1140,15 +1138,17 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     EXPECT_FALSE(ErrorsFound);
 
     HWMaxVolFlowRate = state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate;
-    HWDensity = GetDensityGlycol(*state, PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
-                                 DataGlobalConstants::HWInitConvTemp(),
-                                 PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+    HWDensity = GetDensityGlycol(*state,
+                                 state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                                 DataGlobalConstants::HWInitConvTemp,
+                                 state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                  "xxx");
-    CpHW = GetSpecificHeatGlycol(*state, PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
-                                 DataGlobalConstants::HWInitConvTemp(),
-                                 PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+    CpHW = GetSpecificHeatGlycol(*state,
+                                 state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                                 DataGlobalConstants::HWInitConvTemp,
+                                 state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                  "xxx");
-    HWPlantDeltaTDesign = PlantSizData(PltSizHeatNum).DeltaT;
+    HWPlantDeltaTDesign = state->dataSize->PlantSizData(PltSizHeatNum).DeltaT;
     // calculate hot water coil design capacity
     HWCoilDesignCapacity = HWMaxVolFlowRate * HWDensity * CpHW * HWPlantDeltaTDesign;
     EXPECT_NEAR(HWCoilDesignCapacity, state->dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate, 1.0);
@@ -1276,7 +1276,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
 
     state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
-    ProcessScheduleInput(*state);  // read schedule data
+    ProcessScheduleInput(*state);               // read schedule data
 
     ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
@@ -1302,55 +1302,57 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     EXPECT_EQ("ZONE2UNITHEAT", state->dataUnitHeaters->UnitHeat(1).Name);
 
     ErrorsFound = false;
-    ZoneEqUnitHeater = true;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->ZoneEqUnitHeater = true;
+    state->dataSize->CurZoneEqNum = 1;
 
-    TotNumLoops = 1;
-    PlantLoop.allocate(TotNumLoops);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
-    for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
 
-    PlantLoop(1).Name = "HotWaterLoop";
-    PlantLoop(1).FluidName = "HotWater";
-    PlantLoop(1).FluidIndex = 1;
-    PlantLoop(1).FluidName = "WATER";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
 
-    ZoneSysEnergyDemand.allocate(1);
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2000.0;
 
-    ZoneSizingRunDone = true;
-    ZoneEqSizing.allocate(1);
-    ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataGlobal->DoingSizing = true;
 
-    ZoneCompTurnFansOn = true;
-    ZoneCompTurnFansOff = false;
+    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
 
-    Schedule(1).CurrentValue = 1;
-    CurDeadBandOrSetback.allocate(1);
-    CurDeadBandOrSetback(ZoneNum) = false;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
 
-    Node(Fan(1).InletNodeNum).Temp = 16.6;
-    Node(Fan(1).InletNodeNum).HumRat = PsyWFnTdbRhPb(*state, 16.6, 0.5, 101325.0, "UnitTest");
-    Node(Fan(1).InletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(Fan(1).InletNodeNum).Temp, Node(Fan(1).InletNodeNum).HumRat);
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).Temp = 16.6;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).HumRat = PsyWFnTdbRhPb(*state, 16.6, 0.5, 101325.0, "UnitTest");
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).Temp,
+                                   state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).HumRat);
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
 
     WCWaterInletNode = state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
     WCWaterOutletNode = state->dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum;
-    Node(WCWaterInletNode).Temp = 60.0;
+    state->dataLoopNodes->Node(WCWaterInletNode).Temp = 60.0;
 
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataGlobal->SysSizingCalc = true;
@@ -1358,21 +1360,37 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     UHAirInletNode = state->dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode;
     UHAirOutletNode = state->dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode;
 
-    SimUnitHeater(*state, state->dataUnitHeaters->UnitHeat(UnitHeatNum).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum);
-    // SimUnitHeater does not converge on the first call: the unit heater deliveres more than required heating load. But it meets
+    SimUnitHeater(*state,
+                  state->dataUnitHeaters->UnitHeat(UnitHeatNum).Name,
+                  ZoneNum,
+                  FirstHVACIteration,
+                  SysOutputProvided,
+                  LatOutputProvided,
+                  state->dataSize->CurZoneEqNum);
+    // SimUnitHeater does not converge on the first call: the unit heater delivers more than required heating load. But it meets
     // on the second call (iteration). I suspect it may be an initialization issue related to ControlCompOutput routine
-    SimUnitHeater(*state, state->dataUnitHeaters->UnitHeat(UnitHeatNum).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum);
+    SimUnitHeater(*state,
+                  state->dataUnitHeaters->UnitHeat(UnitHeatNum).Name,
+                  ZoneNum,
+                  FirstHVACIteration,
+                  SysOutputProvided,
+                  LatOutputProvided,
+                  state->dataSize->CurZoneEqNum);
     // verify the total heat rate deleivered by the unit heater
-    UHAirMassFlowRate = Node(UHAirInletNode).MassFlowRate;
-    UHEnteringAirEnthalpy = PsyHFnTdbW(Node(UHAirInletNode).Temp, Node(UHAirInletNode).HumRat);
-    UHLeavingAirEnthalpy = PsyHFnTdbW(Node(UHAirOutletNode).Temp, Node(UHAirOutletNode).HumRat);
+    UHAirMassFlowRate = state->dataLoopNodes->Node(UHAirInletNode).MassFlowRate;
+    UHEnteringAirEnthalpy = PsyHFnTdbW(state->dataLoopNodes->Node(UHAirInletNode).Temp, state->dataLoopNodes->Node(UHAirInletNode).HumRat);
+    UHLeavingAirEnthalpy = PsyHFnTdbW(state->dataLoopNodes->Node(UHAirOutletNode).Temp, state->dataLoopNodes->Node(UHAirOutletNode).HumRat);
     UHHeatingRate = UHAirMassFlowRate * (UHLeavingAirEnthalpy - UHEnteringAirEnthalpy);
     EXPECT_NEAR(UHHeatingRate, state->dataUnitHeaters->UnitHeat(UnitHeatNum).HeatPower, ConvTol);
     // verify the heat rate delivered by the hot water heating coil
     HWMassFlowRate = state->dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate;
     CpHW = GetSpecificHeatGlycol(*state,
-        PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName, 60.0, PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex, "UnitTest");
-    HWCoilHeatingRate = HWMassFlowRate * CpHW * (Node(WCWaterInletNode).Temp - Node(WCWaterOutletNode).Temp);
+                                 state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                                 60.0,
+                                 state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+                                 "UnitTest");
+    HWCoilHeatingRate =
+        HWMassFlowRate * CpHW * (state->dataLoopNodes->Node(WCWaterInletNode).Temp - state->dataLoopNodes->Node(WCWaterOutletNode).Temp);
     EXPECT_NEAR(HWCoilHeatingRate, state->dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate, ConvTol);
 }
 
@@ -2424,33 +2442,34 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
 
     ManageSimulation(*state);
 
-    EXPECT_EQ(ZoneEquipList(1).NumOfEquipTypes, 2);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes, 2);
     // first priority zone equipment is zone ADU
     EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(1).EquipType, "ZONEHVAC:AIRDISTRIBUTIONUNIT");
     EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(1).EquipName, "MAIN ZONE ATU");
-    EXPECT_EQ(HeatingCoils::HeatingCoil(1).Name, "MAIN ZONE REHEAT COIL");
+    EXPECT_EQ(state->dataHeatingCoils->HeatingCoil(1).Name, "MAIN ZONE REHEAT COIL");
     // second priority zone equipment is unit heater
     EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(2).EquipType, "ZONEHVAC:UNITHEATER");
     EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(2).EquipName, "UNITHEATER");
-    EXPECT_EQ(HeatingCoils::HeatingCoil(2).Name, "UNITHEATER_ELECTRICHEATER");
+    EXPECT_EQ(state->dataHeatingCoils->HeatingCoil(2).Name, "UNITHEATER_ELECTRICHEATER");
     // check the reheat coil output
-    EXPECT_NEAR(HeatingCoils::HeatingCoil(1).HeatingCoilRate, 7028.9, 1.0);
+    EXPECT_NEAR(state->dataHeatingCoils->HeatingCoil(1).HeatingCoilRate, 7028.9, 1.0);
     // check the unit heater heating coil output
-    EXPECT_EQ(HeatingCoils::HeatingCoil(2).HeatingCoilRate, 0.0);
+    EXPECT_EQ(state->dataHeatingCoils->HeatingCoil(2).HeatingCoilRate, 0.0);
 
     // re-set the hour of the day
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 24;
     state->dataGlobal->CurrentTime = 24.0;
     // set zone air node condition
-    Node(ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
-    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.005;
-    Node(ZoneEquipConfig(1).ZoneNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(Node(ZoneEquipConfig(1).ZoneNode).Temp, Node(ZoneEquipConfig(1).ZoneNode).HumRat);
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.005;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
+                                   state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
     // set the zone loads
-    ZoneSysEnergyDemand(1).TotalOutputRequired = 0.0;
-    ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 15000.0;
-    ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 20000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 15000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 20000.0;
     // local variables
     bool SimZoneEquipment = true;
     bool SimAirLoops = true;
@@ -2458,11 +2477,11 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     // re-simulate the zone HVAC equipment per the priority order
     ZoneEquipmentManager::ManageZoneEquipment(*state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
     // check the reheat coil nominal capacity
-    EXPECT_NEAR(HeatingCoils::HeatingCoil(1).NominalCapacity, 17542.3, 1.0);
+    EXPECT_NEAR(state->dataHeatingCoils->HeatingCoil(1).NominalCapacity, 17542.3, 1.0);
     // check the reheat coil outputis the full capacity
-    EXPECT_NEAR(HeatingCoils::HeatingCoil(1).HeatingCoilRate, 17542.3, 1.0);
+    EXPECT_NEAR(state->dataHeatingCoils->HeatingCoil(1).HeatingCoilRate, 17542.3, 1.0);
     // check the unit heater heating coil is handling the remaining load
-    EXPECT_NEAR(HeatingCoils::HeatingCoil(2).HeatingCoilRate, 213.9, 1.0);
+    EXPECT_NEAR(state->dataHeatingCoils->HeatingCoil(2).HeatingCoilRate, 213.9, 1.0);
     // finaly check that RemaingingOutputRequired is zero
-    EXPECT_EQ(ZoneSysEnergyDemand(1).RemainingOutputRequired, 0.0);
+    EXPECT_EQ(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired, 0.0);
 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -253,7 +254,8 @@ namespace DataContaminantBalance {
 
 } // namespace DataContaminantBalance
 
-struct ContaminantBalanceData : BaseGlobalStruct {
+struct ContaminantBalanceData : BaseGlobalStruct
+{
 
     Array1D<Real64> ZoneCO2SetPoint;
     Array1D<Real64> CO2PredictedRate;
@@ -284,7 +286,7 @@ struct ContaminantBalanceData : BaseGlobalStruct {
     Array1D<Real64> ZoneCO2M2; // TEMPORARY ZONE CO2 at timestep t-2 in Exact and Euler method
     Array1D<Real64> ZoneCO21;  // Zone CO2 at the previous time step used in Exact and Euler method
 
-    Array1D<Real64> CONTRAT; // Zone CO2 at the previous time step used in Exact and Euler method
+    Array1D<Real64> CONTRAT;           // Zone CO2 at the previous time step used in Exact and Euler method
     Array1D<Real64> MixingMassFlowCO2; // Mixing MASS FLOW * CO2
     int NumContControlledZones = 0;
     Real64 OutdoorCO2 = 0.0; // Outdoor CO2 level
@@ -335,7 +337,8 @@ struct ContaminantBalanceData : BaseGlobalStruct {
     Array1D<Real64> CZGC;
 
     Array1D<DataContaminantBalance::ZoneSystemContaminantDemandData> ZoneSysContDemand;
-    DataContaminantBalance::ContaminantData Contaminant; // A logical flag to determine whether any contaminants are simulated or not | CO2 simulation flag | CO2 outdoor
+    DataContaminantBalance::ContaminantData
+        Contaminant; // A logical flag to determine whether any contaminants are simulated or not | CO2 simulation flag | CO2 outdoor
     // level schedule pointer | Generic contaminant simulation flag | Generic contaminant outdoor level schedule pointer
     Array1D<DataContaminantBalance::ZoneContControls> ContaminantControlledZone;
     Array1D<DataContaminantBalance::ZoneContamGenericDataConstant> ZoneContamGenericConstant;

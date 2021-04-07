@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,15 +53,13 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace DataViewFactorInformation {
-
-    extern int NumOfRadiantEnclosures; // Number of radiant enclosures
-    extern int NumOfSolarEnclosures;   // Number of solar enclosures
 
     struct ZoneViewFactorInformation
     {
@@ -92,12 +90,24 @@ namespace DataViewFactorInformation {
         }
     };
 
-    extern Array1D<ZoneViewFactorInformation> ZoneRadiantInfo;
-    extern Array1D<ZoneViewFactorInformation> ZoneSolarInfo;
-
-    void clear_state();
-
 } // namespace DataViewFactorInformation
+
+struct ViewFactorInfoData : BaseGlobalStruct
+{
+
+    int NumOfRadiantEnclosures = 0; // Number of radiant enclosures
+    int NumOfSolarEnclosures = 0;   // Number of solar enclosures
+    Array1D<DataViewFactorInformation::ZoneViewFactorInformation> ZoneRadiantInfo;
+    Array1D<DataViewFactorInformation::ZoneViewFactorInformation> ZoneSolarInfo;
+
+    void clear_state() override
+    {
+        NumOfRadiantEnclosures = 0;
+        NumOfSolarEnclosures = 0;
+        ZoneRadiantInfo.clear();
+        ZoneSolarInfo.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

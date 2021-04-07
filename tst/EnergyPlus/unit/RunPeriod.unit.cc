@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -61,9 +63,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WeatherManager.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::WeatherManager;
@@ -223,7 +222,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
     EXPECT_EQ(2457755, state->dataWeatherManager->RunPeriodInput[3].startJulianDate);
     EXPECT_EQ(2458119, state->dataWeatherManager->RunPeriodInput[3].endJulianDate);
     // This is the default, check that it works properly
-    std::array<Real64, 12> startDays{ {1, 4, 4, 7, 2, 5, 7, 3, 6, 1, 4, 6} };
+    std::array<Real64, 12> startDays{{1, 4, 4, 7, 2, 5, 7, 3, 6, 1, 4, 6}};
     for (size_t i = 0; i < 12; ++i) {
         EXPECT_EQ(startDays[i], state->dataWeatherManager->RunPeriodInput[3].monWeekDay[i]);
     }
@@ -275,7 +274,8 @@ TEST_F(EnergyPlusFixture, RunPeriod_EndYearOnly)
 }
 
 // Test for #6937: this tests that whenever the RunPeriod doesn't have a name, it should be rejected
-TEST_F(EnergyPlusFixture, RunPeriod_NoName) {
+TEST_F(EnergyPlusFixture, RunPeriod_NoName)
+{
 
     // Doesn't have a name, InputProcessor should reject it
     std::string const idf_objects = delimited_string({
@@ -299,10 +299,9 @@ TEST_F(EnergyPlusFixture, RunPeriod_NoName) {
     ASSERT_FALSE(process_idf(idf_objects, false));
 
     std::string const error_string =
-        delimited_string({
-            "   ** Severe  ** <root>[RunPeriod] - Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints: ''.",
-            "   ** Severe  ** <root>[RunPeriod] - Object name is required and cannot be blank or whitespace"
-        });
+        delimited_string({"   ** Severe  ** <root>[RunPeriod] - Object contains a property that could not be validated using 'properties' or "
+                          "'additionalProperties' constraints: ''.",
+                          "   ** Severe  ** <root>[RunPeriod] - Object name is required and cannot be blank or whitespace"});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
@@ -339,11 +338,10 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
         // This should just issue a warning
         EXPECT_FALSE(ErrorsFound);
 
-        std::string const error_string =
-            delimited_string({"   ** Warning ** RunPeriod: object=JAN, start weekday (TUESDAY) does not match the start year (2005), corrected to SATURDAY."});
+        std::string const error_string = delimited_string(
+            {"   ** Warning ** RunPeriod: object=JAN, start weekday (TUESDAY) does not match the start year (2005), corrected to SATURDAY."});
 
         EXPECT_TRUE(compare_err_stream(error_string, true));
-
     }
 
     // Case 2: has a name, but starts on 2/29 on a non-leap year.
@@ -374,14 +372,11 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
         // This should issue a severe
         EXPECT_TRUE(ErrorsFound);
 
-        std::string const error_string =
-            delimited_string({"   ** Severe  ** RunPeriod: object=NOTLEAP, start year (2005) is not a leap year but the requested start date is 2/29."});
+        std::string const error_string = delimited_string(
+            {"   ** Severe  ** RunPeriod: object=NOTLEAP, start year (2005) is not a leap year but the requested start date is 2/29."});
 
         EXPECT_TRUE(compare_err_stream(error_string, true));
-
     }
-
-
 }
 
 // Side issue discovered in #6937: The parsing of SizingPeriod:WeatherFileDays and WeatherFileConditionType references RunPeriod array
@@ -411,35 +406,33 @@ TEST_F(EnergyPlusFixture, SizingPeriod_WeatherFile)
         // This should just issue a severe
         EXPECT_TRUE(ErrorsFound);
 
-        std::string const error_string =
-            delimited_string({"   ** Severe  ** SizingPeriod:WeatherFileDays: object=WEATHER FILE SIZING PERIOD Begin Day of Month invalid (Day of Month) [31]"});
+        std::string const error_string = delimited_string(
+            {"   ** Severe  ** SizingPeriod:WeatherFileDays: object=WEATHER FILE SIZING PERIOD Begin Day of Month invalid (Day of Month) [31]"});
 
         EXPECT_TRUE(compare_err_stream(error_string, true));
-
     }
 }
 
 TEST_F(EnergyPlusFixture, RunPeriod_BadLeapDayFlagLogic)
 {
-    std::string const idf_objects = delimited_string({
-        "SimulationControl, NO, NO, NO, YES, YES;",
-        "Timestep,4;",
-        "RunPeriod,",
-        "RP3,                     !- Name",
-        "1,                       !- Begin Month",
-        "1,                       !- Begin Day of Month",
-        "2019,                    !- Begin Year",
-        "12,                      !- End Month",
-        "31,                      !- End Day of Month",
-        ",                        !- End Year",
-        ",                        !- Day of Week for Start Day",
-        "Yes,                     !- Use Weather File Holidays and Special Days",
-        "Yes,                     !- Use Weather File Daylight Saving Period",
-        "No,                      !- Apply Weekend Holiday Rule",
-        "Yes,                     !- Use Weather File Rain Indicators",
-        "Yes;                     !- Use Weather File Snow Indicators",
-        "BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;"
-    });
+    std::string const idf_objects =
+        delimited_string({"SimulationControl, NO, NO, NO, YES, YES;",
+                          "Timestep,4;",
+                          "RunPeriod,",
+                          "RP3,                     !- Name",
+                          "1,                       !- Begin Month",
+                          "1,                       !- Begin Day of Month",
+                          "2019,                    !- Begin Year",
+                          "12,                      !- End Month",
+                          "31,                      !- End Day of Month",
+                          ",                        !- End Year",
+                          ",                        !- Day of Week for Start Day",
+                          "Yes,                     !- Use Weather File Holidays and Special Days",
+                          "Yes,                     !- Use Weather File Daylight Saving Period",
+                          "No,                      !- Apply Weekend Holiday Rule",
+                          "Yes,                     !- Use Weather File Rain Indicators",
+                          "Yes;                     !- Use Weather File Snow Indicators",
+                          "BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;"});
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool errors_in_input(false);

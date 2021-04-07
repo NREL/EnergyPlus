@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,12 +55,12 @@
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/StandardRatings.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::StandardRatings;
@@ -75,29 +75,28 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 {
     // Test that the standard ratings calculation with negative curve value
 
-    using DXCoils::DXCoil;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using StandardRatings::SingleSpeedDXHeatingCoilStandardRatings;
 
     // Set up heating coil and curves.
     int DXCoilNum;
-    NumDXCoils = 1;
+    state->dataDXCoils->NumDXCoils = 1;
     DXCoilNum = 1;
-    DXCoil.allocate(NumDXCoils);
-    DXCoilNumericFields.allocate(1);
-    DXCoilOutletTemp.allocate(NumDXCoils);
-    DXCoilOutletHumRat.allocate(NumDXCoils);
-    DXCoilFanOpMode.allocate(NumDXCoils);
-    DXCoilPartLoadRatio.allocate(NumDXCoils);
-    DXCoilTotalHeating.allocate(NumDXCoils);
-    DXCoilHeatInletAirDBTemp.allocate(NumDXCoils);
-    DXCoilHeatInletAirWBTemp.allocate(NumDXCoils);
-    DXCoilData &Coil = DXCoil(DXCoilNum);
+    state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataDXCoils->DXCoilNumericFields.allocate(1);
+    state->dataDXCoils->DXCoilOutletTemp.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataDXCoils->DXCoilOutletHumRat.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataDXCoils->DXCoilFanOpMode.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataDXCoils->DXCoilPartLoadRatio.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataDXCoils->DXCoilTotalHeating.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataDXCoils->DXCoilHeatInletAirDBTemp.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataDXCoils->DXCoilHeatInletAirWBTemp.allocate(state->dataDXCoils->NumDXCoils);
+    DXCoilData &Coil = state->dataDXCoils->DXCoil(DXCoilNum);
 
     Coil.Name = "DX Single Speed Heating Coil";
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
     Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
-    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     Coil.RatedSHR(1) = 1.0;
     Coil.RatedTotCap(1) = 1600.0;
     Coil.RatedCOP(1) = 4.0;
@@ -204,10 +203,23 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Real64 NetHeatingCapRatedLowTemp;
     Real64 HSPF;
 
-    SingleSpeedDXHeatingCoilStandardRatings(*state, Coil.RatedTotCap(1), Coil.RatedCOP(1), Coil.CCapFFlow(1), Coil.CCapFTemp(1), Coil.EIRFFlow(1),
-                                            Coil.EIRFTemp(1), Coil.RatedAirVolFlowRate(1), Coil.FanPowerPerEvapAirFlowRate(1),
-                                            NetHeatingCapRatedHighTemp, NetHeatingCapRatedLowTemp, HSPF, Coil.RegionNum, Coil.MinOATCompressor,
-                                            Coil.OATempCompressorOn, Coil.OATempCompressorOnOffBlank, Coil.DefrostControl);
+    SingleSpeedDXHeatingCoilStandardRatings(*state,
+                                            Coil.RatedTotCap(1),
+                                            Coil.RatedCOP(1),
+                                            Coil.CCapFFlow(1),
+                                            Coil.CCapFTemp(1),
+                                            Coil.EIRFFlow(1),
+                                            Coil.EIRFTemp(1),
+                                            Coil.RatedAirVolFlowRate(1),
+                                            Coil.FanPowerPerEvapAirFlowRate(1),
+                                            NetHeatingCapRatedHighTemp,
+                                            NetHeatingCapRatedLowTemp,
+                                            HSPF,
+                                            Coil.RegionNum,
+                                            Coil.MinOATCompressor,
+                                            Coil.OATempCompressorOn,
+                                            Coil.OATempCompressorOnOffBlank,
+                                            Coil.DefrostControl);
 
     // evaluate capacity curves
     Real64 TotCapTempModFacRated = CurveValue(*state, Coil.CCapFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempRated);
@@ -242,15 +254,15 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 TEST_F(EnergyPlusFixture, ChillerIPLVTest)
 {
 
-    using StandardRatings::CalcChillerIPLV;
     using DataPlant::TypeOf_Chiller_ElectricEIR;
+    using StandardRatings::CalcChillerIPLV;
 
     // Setup an air-cooled Chiller:Electric:EIR chiller
     state->dataChillerElectricEIR->ElectricEIRChiller.allocate(1);
     state->dataChillerElectricEIR->ElectricEIRChiller(1).Name = "Air Cooled Chiller";
-    state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCap = 216000; // W
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCap = 216000;           // W
     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCOP = 2.81673861898309; // W/W
-    state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::CondenserType::AIRCOOLED;
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::CondenserType::AirCooled;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat = 0.15;
 
     int CurveNum;
@@ -327,7 +339,6 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
                     Optional<const Real64>());
 
     EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 3.87); // 13.20 IPLV
-
 }
 
 TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
@@ -451,7 +462,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
 
     GetDXCoils(*state);
 
-    auto &thisCoil(DXCoils::DXCoil(1));
+    auto &thisCoil(state->dataDXCoils->DXCoil(1));
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(thisCoil.PLFFPLR(1)));
     // ckeck user PLF curve coefficients
     EXPECT_EQ(0.90, thisCoolPLFfPLR.Coeff1);
@@ -489,8 +500,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
                                             thisCoil.RatedAirVolFlowRate(1),
                                             thisCoil.FanPowerPerEvapAirFlowRate(1),
                                             NetCoolingCapRated(1),
-        SEER_User,
-        SEER_Standard,
+                                            SEER_User,
+                                            SEER_Standard,
                                             EER,
                                             IEER);
     // check SEER values calculated using user PLF and default PLF curve
@@ -500,10 +511,10 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     // Test 2: user PLF curve is the same as the AHRI Std 210/240-2008 default PLF Curve
     // reset the user PLF curve to the AHRI Std 210/240-2008 default PLF curve
     // AHRI Std 210/240-2008 default PLF curve is linear equation, PLF = a + b * PLR
-    thisCoolPLFfPLR.Coeff1 = 0.75;  // = a
-    thisCoolPLFfPLR.Coeff2 = 0.25;  // = b
-    thisCoolPLFfPLR.Var1Min = 0.0;  // PLR minimum value allowed by the PLF curve
-    thisCoolPLFfPLR.Var1Max = 1.0;  // PLR maximum value allowed by the PLF curve
+    thisCoolPLFfPLR.Coeff1 = 0.75; // = a
+    thisCoolPLFfPLR.Coeff2 = 0.25; // = b
+    thisCoolPLFfPLR.Var1Min = 0.0; // PLR minimum value allowed by the PLF curve
+    thisCoolPLFfPLR.Var1Max = 1.0; // PLR maximum value allowed by the PLF curve
     // reset output variables
     SEER_User = 0.0;
     SEER_Standard = 0.0;
@@ -724,7 +735,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
 
     GetDXCoils(*state);
 
-    auto &thisCoil(DXCoils::DXCoil(1));
+    auto &thisCoil(state->dataDXCoils->DXCoil(1));
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(thisCoil.MSPLFFPLR(1)));
     // ckeck user PLF curve coefficients
     EXPECT_EQ(0.90, thisCoolPLFfPLR.Coeff1);
@@ -765,10 +776,10 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     // Test 2: user PLF curve is the same as the AHRI Std 210/240-2008 default PLF Curve
     // reset the user PLF curve to the AHRI Std 210/240-2008 default PLF curve
     // AHRI Std 210/240-2008 default PLF curve is linear equation, PLF = a + b * PLR
-    thisCoolPLFfPLR.Coeff1 = 0.75;  // = a
-    thisCoolPLFfPLR.Coeff2 = 0.25;  // = b
-    thisCoolPLFfPLR.Var1Min = 0.0;  // PLR minimum value allowed by the PLF curve
-    thisCoolPLFfPLR.Var1Max = 1.0;  // PLR maximum value allowed by the PLF curve
+    thisCoolPLFfPLR.Coeff1 = 0.75; // = a
+    thisCoolPLFfPLR.Coeff2 = 0.25; // = b
+    thisCoolPLFfPLR.Var1Min = 0.0; // PLR minimum value allowed by the PLF curve
+    thisCoolPLFfPLR.Var1Max = 1.0; // PLR maximum value allowed by the PLF curve
     // reset output variables
     SEER_User = 0.0;
     SEER_Standard = 0.0;

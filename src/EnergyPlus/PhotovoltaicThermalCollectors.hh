@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,8 +52,9 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -165,7 +166,11 @@ namespace PhotovoltaicThermalCollectors {
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         void setupReportVars(EnergyPlusData &state);
 
@@ -173,16 +178,12 @@ namespace PhotovoltaicThermalCollectors {
 
         void size(EnergyPlusData &state);
 
-        void control();
+        void control(EnergyPlusData &state);
 
         void calculate(EnergyPlusData &state);
 
-        void update();
+        void update(EnergyPlusData &state);
     };
-
-    extern Array1D<PVTCollectorStruct> PVT;
-
-    void clear_state();
 
     void GetPVTcollectorsInput(EnergyPlusData &state);
 
@@ -190,13 +191,30 @@ namespace PhotovoltaicThermalCollectors {
 
     int getPVTindexFromName(EnergyPlusData &state, std::string const &name);
 
-    void GetPVTThermalPowerProduction(int PVindex, Real64 &ThermalPower, Real64 &ThermalEnergy);
+    void GetPVTThermalPowerProduction(EnergyPlusData &state, int PVindex, Real64 &ThermalPower, Real64 &ThermalEnergy);
 
     int GetAirInletNodeNum(EnergyPlusData &state, std::string const &PVTName, bool &ErrorsFound);
 
     int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &PVTName, bool &ErrorsFound);
 
 } // namespace PhotovoltaicThermalCollectors
+
+struct PhotovoltaicThermalCollectorsData : BaseGlobalStruct
+{
+
+    bool GetInputFlag = true; // First time, input is "gotten"
+
+    int NumPVT = 0; // count of all types of PVT in input file
+
+    Array1D<PhotovoltaicThermalCollectors::PVTCollectorStruct> PVT;
+
+    void clear_state() override
+    {
+        GetInputFlag = true;
+        NumPVT = 0;
+        PVT.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

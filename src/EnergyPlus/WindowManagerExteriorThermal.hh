@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -47,8 +47,6 @@
 
 #ifndef WindowManagerExteriorThermal_hh_INCLUDED
 #define WindowManagerExteriorThermal_hh_INCLUDED
-
-//#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -134,7 +132,8 @@ namespace WindowManager {
 
         int getNumOfLayers(EnergyPlusData &state) const;
 
-        std::shared_ptr<Tarcog::CBaseIGULayer> getSolidLayer(DataSurfaces::SurfaceData const &surface,
+        std::shared_ptr<Tarcog::CBaseIGULayer> getSolidLayer(EnergyPlusData &state,
+                                                             DataSurfaces::SurfaceData const &surface,
                                                              Material::MaterialProperties const &material,
                                                              int const t_Index,
                                                              int const t_SurfNum);
@@ -143,7 +142,7 @@ namespace WindowManager {
 
         std::shared_ptr<Tarcog::CBaseIGULayer> getShadeToGlassLayer(EnergyPlusData &state, int const t_Index) const;
 
-        std::shared_ptr<Tarcog::CBaseIGULayer> getComplexGapLayer(Material::MaterialProperties const &material) const;
+        std::shared_ptr<Tarcog::CBaseIGULayer> getComplexGapLayer(EnergyPlusData &state, Material::MaterialProperties const &material) const;
 
         std::shared_ptr<Gases::CGas> getGas(Material::MaterialProperties const &material) const;
         std::shared_ptr<Gases::CGas> getAir() const;

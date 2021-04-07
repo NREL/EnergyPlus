@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,7 @@ extern "C" {
 }
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExternalInterface.hh>
 
@@ -70,32 +71,18 @@ struct EnergyPlusData;
 
 namespace ExternalInterface {
 
-    // MODULE VARIABLE DECLARATIONS:
-    extern Real64 tComm;
-    extern Real64 tStop;
-    extern Real64 tStart;
-    extern Real64 hStep;
-    extern bool FlagReIni;
-    extern std::string FMURootWorkingFolder;
-    extern int LEN_FMU_ROOT_DIR;
-
     // MODULE PARAMETER DEFINITIONS:
-    extern int const maxVar;               // Maximum number of variables to be exchanged
-    extern int const maxErrMsgLength;      // Maximum error message length from xml schema validation
-    extern int const indexSchedule;        // Index for schedule in inpVarTypes
-    extern int const indexVariable;        // Index for variable in inpVarTypes
-    extern int const indexActuator;        // Index for actuator in inpVarTypes
-    extern int nInKeys;                    // Number of input variables available in ExternalInterface (=highest index* number)
-    extern int const fmiOK;                // fmiOK
-    extern int const fmiWarning;           // fmiWarning
-    extern int const fmiDiscard;           // fmiDiscard
-    extern int const fmiError;             // fmiError
-    extern int const fmiFatal;             // fmiPending
-    extern int const fmiPending;           // fmiPending
-    extern std::string const socCfgFilNam; // socket configuration file
-    extern std::string const BlankString;
-
-    void clear_state();
+    int constexpr maxVar(100000);         // Maximum number of variables to be exchanged
+    int constexpr maxErrMsgLength(10000); // Maximum error message length from xml schema validation
+    int constexpr indexSchedule(1);       // Index for schedule in inpVarTypes
+    int constexpr indexVariable(2);       // Index for variable in inpVarTypes
+    int constexpr indexActuator(3);       // Index for actuator in inpVarTypes
+    int constexpr fmiOK(0);               // fmiOK
+    int constexpr fmiWarning(1);          // fmiWarning
+    int constexpr fmiDiscard(2);          // fmiDiscard
+    int constexpr fmiError(3);            // fmiError
+    int constexpr fmiFatal(4);            // fmiPending
+    int constexpr fmiPending(5);          // fmiPending
 
     struct fmuInputVariableType
     {
@@ -104,7 +91,7 @@ namespace ExternalInterface {
         int ValueReference; // = fmiValueReference specific to FMU variable
 
         // Default Constructor
-        fmuInputVariableType() : Name(BlankString), ValueReference(0)
+        fmuInputVariableType() : Name(std::string()), ValueReference(0)
         {
         }
     };
@@ -115,7 +102,7 @@ namespace ExternalInterface {
         std::string Name; // Name of fmu instance
 
         // Default Constructor
-        checkFMUInstanceNameType() : Name(BlankString)
+        checkFMUInstanceNameType() : Name(std::string())
         {
         }
     };
@@ -132,7 +119,8 @@ namespace ExternalInterface {
         std::string VarUnits; // Units string, may be blank
 
         // Default Constructor
-        eplusOutputVariableType() : Name(BlankString), VarKey(BlankString), RTSValue(0.0), ITSValue(0), VarIndex(0), VarType(0), VarUnits(BlankString)
+        eplusOutputVariableType()
+            : Name(std::string()), VarKey(std::string()), RTSValue(0.0), ITSValue(0), VarIndex(0), VarType(0), VarUnits(std::string())
         {
         }
     };
@@ -145,7 +133,7 @@ namespace ExternalInterface {
         int ValueReference;  // = fmiValueReference specific to FMU variable
 
         // Default Constructor
-        fmuOutputVariableScheduleType() : Name(BlankString), RealVarValue(0.0), ValueReference(0)
+        fmuOutputVariableScheduleType() : Name(std::string()), RealVarValue(0.0), ValueReference(0)
         {
         }
     };
@@ -158,7 +146,7 @@ namespace ExternalInterface {
         int ValueReference;  // = fmiValueReference specific to FMU variable
 
         // Default Constructor
-        fmuOutputVariableVariableType() : Name(BlankString), RealVarValue(0.0), ValueReference(0)
+        fmuOutputVariableVariableType() : Name(std::string()), RealVarValue(0.0), ValueReference(0)
         {
         }
     };
@@ -171,7 +159,7 @@ namespace ExternalInterface {
         int ValueReference;  // = fmiValueReference specific to FMU variable
 
         // Default Constructor
-        fmuOutputVariableActuatorType() : Name(BlankString), RealVarValue(0.0), ValueReference(0)
+        fmuOutputVariableActuatorType() : Name(std::string()), RealVarValue(0.0), ValueReference(0)
         {
         }
     };
@@ -184,7 +172,7 @@ namespace ExternalInterface {
         int InitialValue; // Initial value used during the warmup
 
         // Default Constructor
-        eplusInputVariableScheduleType() : Name(BlankString), VarIndex(0)
+        eplusInputVariableScheduleType() : Name(std::string()), VarIndex(0)
         {
             // InitialValue not initialized in default constructor
         }
@@ -197,7 +185,7 @@ namespace ExternalInterface {
         int VarIndex;     // Index Value of this variable
 
         // Default Constructor
-        eplusInputVariableVariableType() : Name(BlankString), VarIndex(0)
+        eplusInputVariableVariableType() : Name(std::string()), VarIndex(0)
         {
         }
     };
@@ -209,7 +197,7 @@ namespace ExternalInterface {
         int VarIndex;     // Index Value of this variable
 
         // Default Constructor
-        eplusInputVariableActuatorType() : Name(BlankString), VarIndex(0)
+        eplusInputVariableActuatorType() : Name(std::string()), VarIndex(0)
         {
         }
     };
@@ -258,8 +246,8 @@ namespace ExternalInterface {
 
         // Default Constructor
         InstanceType()
-            : Name(BlankString), modelID(BlankString), modelGUID(BlankString), WorkingFolder(BlankString), WorkingFolder_wLib(BlankString),
-              fmiVersionNumber(BlankString), NumInputVariablesInFMU(0), NumInputVariablesInIDF(0), NumOutputVariablesInFMU(0),
+            : Name(std::string()), modelID(std::string()), modelGUID(std::string()), WorkingFolder(std::string()), WorkingFolder_wLib(std::string()),
+              fmiVersionNumber(std::string()), NumInputVariablesInFMU(0), NumInputVariablesInIDF(0), NumOutputVariablesInFMU(0),
               NumOutputVariablesInIDF(0), NumOutputVariablesSchedule(0), NumOutputVariablesVariable(0), NumOutputVariablesActuator(0), LenModelID(0),
               LenModelGUID(0), LenWorkingFolder(0), LenWorkingFolder_wLib(0)
         {
@@ -284,50 +272,18 @@ namespace ExternalInterface {
 
         // Default Constructor
         FMUType()
-            : Name(BlankString), TimeOut(0.0), Visible(0), Interactive(0), LoggingOn(0), NumInstances(0), TotNumInputVariablesInIDF(0),
+            : Name(std::string()), TimeOut(0.0), Visible(0), Interactive(0), LoggingOn(0), NumInstances(0), TotNumInputVariablesInIDF(0),
               TotNumOutputVariablesSchedule(0), TotNumOutputVariablesVariable(0), TotNumOutputVariablesActuator(0)
         {
             // Instance not instantiated in default constructor
         }
     };
 
-    extern Array1D<FMUType> FMU;                                // Variable Types structure
-    extern Array1D<FMUType> FMUTemp;                            // Variable Types structure
-    extern Array1D<checkFMUInstanceNameType> checkInstanceName; // Variable Types structure for checking instance names
-    extern int NumExternalInterfaces;                           // Number of ExternalInterface objects
-    extern int NumExternalInterfacesBCVTB;                      // Number of BCVTB ExternalInterface objects
-    extern int NumExternalInterfacesFMUImport;                  // Number of FMU ExternalInterface objects
-    extern int NumExternalInterfacesFMUExport;                  // Number of FMU ExternalInterface objects
-    extern int NumFMUObjects;                                   // Number of FMU objects
-    extern int FMUExportActivate;                               // FMU Export flag
-    extern bool haveExternalInterfaceBCVTB;                     // Flag for BCVTB interface
-    extern bool haveExternalInterfaceFMUImport;                 // Flag for FMU-Import interface
-    extern bool haveExternalInterfaceFMUExport;                 // Flag for FMU-Export interface
-    extern int simulationStatus;                                // Status flag. Used to report during
-    // which phase an error occurred.
-    // (1=initialization, 2=time stepping)
-
-    extern Array1D<int> keyVarIndexes; // Array index for specific key name
-    extern Array1D<int> varTypes;      // Types of variables in keyVarIndexes
-    extern Array1D<int> varInd;        // Index of ErlVariables for ExternalInterface
-    extern int socketFD;               // socket file descriptor
-    extern bool ErrorsFound;           // Set to true if errors are found
-    extern bool noMoreValues;          // Flag, true if no more values
-    // will be sent by the server
-
-    extern Array1D<std::string> varKeys;     // Keys of report variables used for data exchange
-    extern Array1D<std::string> varNames;    // Names of report variables used for data exchange
-    extern Array1D<int> inpVarTypes;         // Names of report variables used for data exchange
-    extern Array1D<std::string> inpVarNames; // Names of report variables used for data exchange
-
-    extern bool configuredControlPoints; // True if control points have been configured
-    extern bool useEMS;                  // Will be set to true if ExternalInterface writes to EMS variables or actuators
-
     // Functions
 
     void ExternalInterfaceExchangeVariables(EnergyPlusData &state);
 
-    void CloseSocket(int const FlagToWriteToSocket);
+    void CloseSocket(EnergyPlusData &state, int FlagToWriteToSocket);
 
     void InitExternalInterface(EnergyPlusData &state);
 
@@ -335,11 +291,11 @@ namespace ExternalInterface {
 
     void CalcExternalInterface(EnergyPlusData &state);
 
-    void ParseString(std::string const &str, Array1D_string &ele, int const nEle);
+    void ParseString(std::string const &str, Array1D_string &ele, int nEle);
 
     void GetReportVariableKey(EnergyPlusData &state,
                               const Array1D_string &varKeys,
-                              int const numberOfKeys,
+                              int numberOfKeys,
                               const Array1D_string &varNames,
                               Array1D_int &keyVarIndexes,
                               Array1D_int &varTypes);
@@ -371,6 +327,120 @@ namespace ExternalInterface {
     std::string trim(std::string const &str);
 
 } // namespace ExternalInterface
+
+struct ExternalInterfaceData : BaseGlobalStruct
+{
+    Real64 tComm = 0.0;
+    Real64 tStop = 3600.0;
+    Real64 tStart = 0.0;
+    Real64 hStep = 15.0;
+    bool FlagReIni = false;
+    std::string FMURootWorkingFolder;
+    int nInKeys = 3; // Number of input variables available in ExternalInterface (=highest index* number)
+
+    Array1D<ExternalInterface::FMUType> FMU;                                // Variable Types structure
+    Array1D<ExternalInterface::FMUType> FMUTemp;                            // Variable Types structure
+    Array1D<ExternalInterface::checkFMUInstanceNameType> checkInstanceName; // Variable Types structure for checking instance names
+
+    int NumExternalInterfaces = 0;               // Number of ExternalInterface objects
+    int NumExternalInterfacesBCVTB = 0;          // Number of BCVTB ExternalInterface objects
+    int NumExternalInterfacesFMUImport = 0;      // Number of FMU ExternalInterface objects
+    int NumExternalInterfacesFMUExport = 0;      // Number of FMU ExternalInterface objects
+    int NumFMUObjects = 0;                       // Number of FMU objects
+    int FMUExportActivate = 0;                   // FMU Export flag
+    bool haveExternalInterfaceBCVTB = false;     // Flag for BCVTB interface
+    bool haveExternalInterfaceFMUImport = false; // Flag for FMU-Import interface
+    bool haveExternalInterfaceFMUExport = false; // Flag for FMU-Export interface
+    int simulationStatus = 1; // Status flag. Used to report during which phase an error occurred. (1=initialization, 2=time stepping)
+
+    Array1D<int> keyVarIndexes; // Array index for specific key name
+    Array1D<int> varTypes;      // Types of variables in keyVarIndexes
+    Array1D<int> varInd;        // Index of ErlVariables for ExternalInterface
+    int socketFD = -1;          // socket file descriptor
+    bool ErrorsFound = false;   // Set to true if errors are found
+    bool noMoreValues = false;  // Flag, true if no more values will be sent by the server
+
+    Array1D<std::string> varKeys;     // Keys of report variables used for data exchange
+    Array1D<std::string> varNames;    // Names of report variables used for data exchange
+    Array1D<int> inpVarTypes;         // Names of report variables used for data exchange
+    Array1D<std::string> inpVarNames; // Names of report variables used for data exchange
+
+    bool configuredControlPoints = false; // True if control points have been configured
+    bool useEMS = false;                  // Will be set to true if ExternalInterface writes to EMS variables or actuators
+
+    bool firstCall = true;
+    bool showContinuationWithoutUpdate = true;
+    bool GetInputFlag = true; // First time, input is "gotten"
+    bool InitExternalInterfacefirstCall = true;
+    bool FirstCallGetSetDoStep = true; // Flag to check when External Interface is called first time
+    bool FirstCallIni = true;          // First time, input has been read
+    bool FirstCallDesignDays = true;   // Flag fo first call during warmup
+    bool FirstCallWUp = true;          // Flag fo first call during warmup
+    bool FirstCallTStep = true;        // Flag for first call during time stepping
+    int fmiEndSimulation = 0;          // Flag to indicate end of simulation
+
+    std::string const socCfgFilNam = "socket.cfg"; // socket configuration file
+    std::unordered_map<std::string, std::string> UniqueFMUInputVarNames;
+
+    int nOutVal; // Number of output values (E+ -> ExternalInterface)
+    int nInpVar; // Number of input values (ExternalInterface -> E+)
+
+    void clear_state() override
+    {
+        this->tComm = 0.0;
+        this->tStop = 3600.0;
+        this->tStart = 0.0;
+        this->hStep = 15.0;
+        this->FlagReIni = false;
+        this->FMURootWorkingFolder = "";
+        this->nInKeys = 3; // Number of input variables available in ExternalInterface (=highest index* number)
+
+        this->FMU.clear();               // Variable Types structure
+        this->FMUTemp.clear();           // Variable Types structure
+        this->checkInstanceName.clear(); // Variable Types structure for checking instance names
+
+        this->NumExternalInterfaces = 0;              // Number of ExternalInterface objects
+        this->NumExternalInterfacesBCVTB = 0;         // Number of BCVTB ExternalInterface objects
+        this->NumExternalInterfacesFMUImport = 0;     // Number of FMU ExternalInterface objects
+        this->NumExternalInterfacesFMUExport = 0;     // Number of FMU ExternalInterface objects
+        this->NumFMUObjects = 0;                      // Number of FMU objects
+        this->FMUExportActivate = 0;                  // FMU Export flag
+        this->haveExternalInterfaceBCVTB = false;     // Flag for BCVTB interface
+        this->haveExternalInterfaceFMUImport = false; // Flag for FMU-Import interface
+        this->haveExternalInterfaceFMUExport = false; // Flag for FMU-Export interface
+        this->simulationStatus = 1; // Status flag. Used to report during which phase an error occurred. (1=initialization, 2=time stepping)
+
+        this->keyVarIndexes.clear(); // Array index for specific key name
+        this->varTypes.clear();      // Types of variables in keyVarIndexes
+        this->varInd.clear();        // Index of ErlVariables for ExternalInterface
+        this->socketFD = -1;         // socket file descriptor
+        this->ErrorsFound = false;   // Set to true if errors are found
+        this->noMoreValues = false;  // Flag, true if no more values will be sent by the server
+
+        this->varKeys.clear();     // Keys of report variables used for data exchange
+        this->varNames.clear();    // Names of report variables used for data exchange
+        this->inpVarTypes.clear(); // Names of report variables used for data exchange
+        this->inpVarNames.clear(); // Names of report variables used for data exchange
+
+        this->configuredControlPoints = false; // True if control points have been configured
+        this->useEMS = false;                  // Will be set to true if ExternalInterface writes to EMS variables or actuators
+        this->firstCall = true;
+        this->showContinuationWithoutUpdate = true;
+        this->GetInputFlag = true; // First time, input is "gotten"
+        this->InitExternalInterfacefirstCall = true;
+        this->FirstCallGetSetDoStep = true; // Flag to check when External Interface is called first time
+        this->FirstCallIni = true;          // First time, input has been read
+        this->FirstCallDesignDays = true;   // Flag fo first call during warmup
+        this->FirstCallWUp = true;          // Flag fo first call during warmup
+        this->FirstCallTStep = true;        // Flag for first call during time stepping
+        this->fmiEndSimulation = 0;         // Flag to indicate end of simulation
+        this->UniqueFMUInputVarNames.clear();
+
+        // these were statics without an initial value
+        //        int nOutVal;       // Number of output values (E+ -> ExternalInterface)
+        //        int nInpVar;       // Number of input values (ExternalInterface -> E+)
+    }
+};
 
 } // namespace EnergyPlus
 

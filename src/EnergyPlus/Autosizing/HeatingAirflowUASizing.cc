@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,7 +61,10 @@ void HeatingAirflowUASizer::initializeForSingleDuctZoneTerminal(EnergyPlusData &
     this->termUnitSizing(1).AirVolFlow = mainFlowRate;
 }
 
-void HeatingAirflowUASizer::initializeForZoneInductionUnit(EnergyPlusData &state, Real64 const elevation, Real64 mainFlowRate, Real64 reheatMultiplier)
+void HeatingAirflowUASizer::initializeForZoneInductionUnit(EnergyPlusData &state,
+                                                           Real64 const elevation,
+                                                           Real64 mainFlowRate,
+                                                           Real64 reheatMultiplier)
 {
     this->initializeFromAPI(state, elevation);
     this->zoneSizingRunDone = true;
@@ -102,7 +105,10 @@ void HeatingAirflowUASizer::initializeForSystemOutdoorAir(EnergyPlusData &state,
     }
 }
 
-void HeatingAirflowUASizer::initializeForSystemMainDuct(EnergyPlusData &state, Real64 const elevation, Real64 overallSystemVolFlow, Real64 minFlowRateRatio)
+void HeatingAirflowUASizer::initializeForSystemMainDuct(EnergyPlusData &state,
+                                                        Real64 const elevation,
+                                                        Real64 overallSystemVolFlow,
+                                                        Real64 minFlowRateRatio)
 {
     this->initializeFromAPI(state, elevation);
     this->curSysNum = 1;

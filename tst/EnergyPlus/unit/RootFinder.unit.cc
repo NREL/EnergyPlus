@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,14 +50,11 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-
 // EnergyPlus Headers
-#include <EnergyPlus/RootFinder.hh>
-#include <EnergyPlus/DataRootFinder.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataRootFinder.hh>
+#include <EnergyPlus/RootFinder.hh>
 
 using namespace EnergyPlus;
 
@@ -65,18 +62,18 @@ TEST_F(EnergyPlusFixture, RootFinder_CheckConvergence)
 {
     DataRootFinder::RootFinderDataType rootFinderData;
     int slopeType = DataRootFinder::iSlopeDecreasing;
-    int methodType = DataRootFinder::iMethodBrent;
+    DataRootFinder::iMethod methodType = DataRootFinder::iMethod::Brent;
     Real64 relativeXTolerance = 0.0;
     Real64 absoluteXTolerance = 1.0e-6;
     Real64 absoluteYTolerance = 1.0e-5;
 
     RootFinder::SetupRootFinder(*state, rootFinderData, slopeType, methodType, relativeXTolerance, absoluteXTolerance, absoluteYTolerance);
-    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
+    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatus::None);
 
     Real64 xMin = 0.0;
     Real64 xMax = 100.0;
     RootFinder::InitializeRootFinder(*state, rootFinderData, xMin, xMax);
-    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
+    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatus::None);
 
     bool isDone = false;
 
@@ -84,28 +81,28 @@ TEST_F(EnergyPlusFixture, RootFinder_CheckConvergence)
     Real64 xValue = xMin;
     Real64 yValue = 100.0;
     RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
-    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
+    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatus::None);
     EXPECT_FALSE(isDone);
 
     // Set max point
     xValue = xMax;
     yValue = -100.0;
     RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
-    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
+    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatus::None);
     EXPECT_FALSE(isDone);
 
     // Set 3rd point
     xValue = 20.0;
     yValue = -1.0;
     RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
-    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
+    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatus::None);
     EXPECT_FALSE(isDone);
 
     // 4th point should converge
     xValue = rootFinderData.XCandidate;
     yValue = absoluteYTolerance / 2.0;
     RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
-    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusOK);
+    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatus::OK);
     EXPECT_TRUE(isDone);
 }
 
@@ -113,18 +110,18 @@ TEST_F(EnergyPlusFixture, RootFinder_CheckBracketRoundOff)
 {
     DataRootFinder::RootFinderDataType rootFinderData;
     int slopeType = DataRootFinder::iSlopeDecreasing;
-    int methodType = DataRootFinder::iMethodBrent;
+    DataRootFinder::iMethod methodType = DataRootFinder::iMethod::Brent;
     Real64 relativeXTolerance = 0.0;
     Real64 absoluteXTolerance = 1.0e-6;
     Real64 absoluteYTolerance = 1.0e-5;
 
     RootFinder::SetupRootFinder(*state, rootFinderData, slopeType, methodType, relativeXTolerance, absoluteXTolerance, absoluteYTolerance);
-    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
+    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatus::None);
 
     Real64 xMin = 0.0;
     Real64 xMax = 100.0;
     RootFinder::InitializeRootFinder(*state, rootFinderData, xMin, xMax);
-    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
+    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatus::None);
 
     bool isDone = false;
 
@@ -132,34 +129,34 @@ TEST_F(EnergyPlusFixture, RootFinder_CheckBracketRoundOff)
     Real64 xValue = xMin;
     Real64 yValue = 100.0;
     RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
-    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
+    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatus::None);
     EXPECT_FALSE(isDone);
 
     // Set max point
     xValue = xMax;
     yValue = -100.0;
     RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
-    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
+    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatus::None);
     EXPECT_FALSE(isDone);
 
     // Set 3rd point (this will be the upper point)
     xValue = 20.0;
     yValue = -10.0;
     RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
-    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
+    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatus::None);
     EXPECT_FALSE(isDone);
 
     // Set 4th point slightly below 3rd point but with opposite sign for y (this will be the lower point)
     xValue = xValue - absoluteXTolerance / 3.0;
     yValue = 10.0;
     RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
-    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
+    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatus::None);
     EXPECT_FALSE(isDone);
 
     // Set 5th point in between upper and lower, but non-convergent so it gets to the Increment check)
     xValue = rootFinderData.XCandidate;
     yValue = 5.0;
     RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
-    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusOKRoundOff);
+    EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatus::OKRoundOff);
     EXPECT_TRUE(isDone);
 }

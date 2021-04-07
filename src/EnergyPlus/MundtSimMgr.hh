@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -77,26 +78,6 @@ namespace MundtSimMgr {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_int FloorSurfSetIDs; // fixed variable for floors
-    extern Array1D_int TheseSurfIDs;    // temporary working variable
-    extern int MundtCeilAirID;          // air node index in AirDataManager
-    extern int MundtFootAirID;          // air node index in AirDataManager
-    extern int SupplyNodeID;            // air node index in AirDataManager
-    extern int TstatNodeID;             // air node index in AirDataManager
-    extern int ReturnNodeID;            // air node index in AirDataManager
-    extern int NumRoomNodes;            // number of nodes connected to walls
-    extern int NumFloorSurfs;           // total number of surfaces for floor
-    extern Array1D_int RoomNodeIDs;     // ids of the first NumRoomNode Air Nodes
-    extern Array1D_int ID1dSurf;        // numbers used to identify surfaces
-    extern int MundtZoneNum;            // index of zones using Mundt model
-    extern Real64 ZoneHeight;           // zone height
-    extern Real64 ZoneFloorArea;        // zone floor area
-    extern Real64 QventCool;            // heat gain due to ventilation
-    extern Real64 ConvIntGain;          // heat gain due to internal gains
-    extern Real64 SupplyAirTemp;        // supply air temperature
-    extern Real64 SupplyAirVolumeRate;  // supply air volume flowrate
-    extern Real64 ZoneAirDensity;       // zone air density
-    extern Real64 QsysCoolTot;          // zone sensible cooling load
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE MundtSimMgr
 
@@ -150,15 +131,9 @@ namespace MundtSimMgr {
         }
     };
 
-    // Object Data
-    extern Array1D<DefineZoneData> ZoneData;            // zone data
-    extern Array2D<DefineLinearModelNode> LineNode;     // air nodes
-    extern Array2D<DefineSurfaceSettings> MundtAirSurf; // surfaces
-    extern Array1D<DefineSurfaceSettings> FloorSurf;    // floor
-
     // Functions
 
-    void ManageMundtModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
+    void ManageMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
@@ -166,38 +141,99 @@ namespace MundtSimMgr {
 
     //*****************************************************************************************
 
-    void GetSurfHBDataForMundtModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
+    void GetSurfHBDataForMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
     void SetupMundtModel(EnergyPlusData &state,
-                         int const ZoneNum, // index number for the specified zone
-                         bool &ErrorsFound  // true if problems setting up model
+                         int ZoneNum,      // index number for the specified zone
+                         bool &ErrorsFound // true if problems setting up model
     );
 
     //*****************************************************************************************
 
-    void CalcMundtModel(int const ZoneNum); // index number for the specified zone
+    void CalcMundtModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
-    void SetNodeResult(int const NodeID,       // node ID
-                       Real64 const TempResult // temperature for the specified air node
+    void SetNodeResult(EnergyPlusData &state,
+                       int NodeID,       // node ID
+                       Real64 TempResult // temperature for the specified air node
     );
 
     //*****************************************************************************************
 
-    void SetSurfTmeanAir(int const SurfID,    // surface ID
-                         Real64 const TeffAir // temperature of air node adjacent to the specified surface
+    void SetSurfTmeanAir(EnergyPlusData &state,
+                         int SurfID,    // surface ID
+                         Real64 TeffAir // temperature of air node adjacent to the specified surface
     );
 
     //*****************************************************************************************
 
-    void SetSurfHBDataForMundtModel(int const ZoneNum); // index number for the specified zone
+    void SetSurfHBDataForMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
 } // namespace MundtSimMgr
+
+struct MundtSimMgrData : BaseGlobalStruct
+{
+
+    Array1D_int FloorSurfSetIDs;      // fixed variable for floors
+    Array1D_int TheseSurfIDs;         // temporary working variable
+    int MundtCeilAirID = 0;           // air node index in AirDataManager
+    int MundtFootAirID = 0;           // air node index in AirDataManager
+    int SupplyNodeID = 0;             // air node index in AirDataManager
+    int TstatNodeID = 0;              // air node index in AirDataManager
+    int ReturnNodeID = 0;             // air node index in AirDataManager
+    int NumRoomNodes = 0;             // number of nodes connected to walls
+    int NumFloorSurfs = 0;            // total number of surfaces for floor
+    Array1D_int RoomNodeIDs;          // ids of the first NumRoomNode Air Nodes
+    Array1D_int ID1dSurf;             // numbers used to identify surfaces
+    int MundtZoneNum = 0;             // index of zones using Mundt model
+    Real64 ZoneHeight = 0.0;          // zone height
+    Real64 ZoneFloorArea = 0.0;       // zone floor area
+    Real64 QventCool = 0.0;           // heat gain due to ventilation
+    Real64 ConvIntGain = 0.0;         // heat gain due to internal gains
+    Real64 SupplyAirTemp = 0.0;       // supply air temperature
+    Real64 SupplyAirVolumeRate = 0.0; // supply air volume flowrate
+    Real64 ZoneAirDensity = 0.0;      // zone air density
+    Real64 QsysCoolTot = 0.0;         // zone sensible cooling load
+
+    // Object Data
+    Array1D<MundtSimMgr::DefineZoneData> ZoneData;            // zone data
+    Array2D<MundtSimMgr::DefineLinearModelNode> LineNode;     // air nodes
+    Array2D<MundtSimMgr::DefineSurfaceSettings> MundtAirSurf; // surfaces
+    Array1D<MundtSimMgr::DefineSurfaceSettings> FloorSurf;    // floor
+
+    void clear_state() override
+    {
+        this->FloorSurfSetIDs.clear();   // fixed variable for floors
+        this->TheseSurfIDs.clear();      // temporary working variable
+        this->MundtCeilAirID = 0;        // air node index in AirDataManager
+        this->MundtFootAirID = 0;        // air node index in AirDataManager
+        this->SupplyNodeID = 0;          // air node index in AirDataManager
+        this->TstatNodeID = 0;           // air node index in AirDataManager
+        this->ReturnNodeID = 0;          // air node index in AirDataManager
+        this->NumRoomNodes = 0;          // number of nodes connected to walls
+        this->NumFloorSurfs = 0;         // total number of surfaces for floor
+        this->RoomNodeIDs.clear();       // ids of the first NumRoomNode Air Nodes
+        this->ID1dSurf.clear();          // numbers used to identify surfaces
+        this->MundtZoneNum = 0;          // index of zones using Mundt model
+        this->ZoneHeight = 0.0;          // zone height
+        this->ZoneFloorArea = 0.0;       // zone floor area
+        this->QventCool = 0.0;           // heat gain due to ventilation
+        this->ConvIntGain = 0.0;         // heat gain due to internal gains
+        this->SupplyAirTemp = 0.0;       // supply air temperature
+        this->SupplyAirVolumeRate = 0.0; // supply air volume flowrate
+        this->ZoneAirDensity = 0.0;      // zone air density
+        this->QsysCoolTot = 0.0;         // zone sensible cooling load
+        this->ZoneData.clear();          // zone data
+        this->LineNode.clear();          // air nodes
+        this->MundtAirSurf.clear();      // surfaces
+        this->FloorSurf.clear();         // floor
+    }
+};
 
 } // namespace EnergyPlus
 

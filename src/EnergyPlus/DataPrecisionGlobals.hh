@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,28 +51,16 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 
-namespace EnergyPlus {
+namespace EnergyPlus::DataPrecisionGlobals {
 
-namespace DataPrecisionGlobals {
+constexpr Real64 constant_zero = 0.0;
+constexpr Real64 constant_one = 1.0;
+constexpr Real64 constant_minusone = -1.0;
+constexpr Real64 constant_twenty = 20.0;
+constexpr Real64 constant_pointfive = 0.5;
+constexpr Real64 EXP_LowerLimit = -20.0; // In IVF=2.061153622438558d-009 - used 20 because it's already used in other parts of the code
+constexpr Real64 EXP_UpperLimit = 40.0;  // In IVF=2.353852668370200d+017
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const i32; // 6 digits
-    extern int const i64; // 12 digits
-    extern int const r32;
-    extern int const r64;
-    extern int const default_prec;
-    extern Real64 const constant_zero;
-    extern Real64 const constant_one;
-    extern Real64 const constant_minusone;
-    extern Real64 const constant_twenty;
-    extern Real64 const constant_pointfive;
-    extern Real64 const EXP_LowerLimit; // In IVF=2.061153622438558d-009 - used 20
-    // because it's already used in other parts of the code
-    extern Real64 const EXP_UpperLimit; // In IVF=2.353852668370200d+017
-
-} // namespace DataPrecisionGlobals
-
-} // namespace EnergyPlus
+} // namespace EnergyPlus::DataPrecisionGlobals
 
 #endif

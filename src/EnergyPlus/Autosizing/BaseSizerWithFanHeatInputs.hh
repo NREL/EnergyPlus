@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,9 +48,10 @@
 #ifndef BaseSizerWithFanHeatInputs_hh_INCLUDED
 #define BaseSizerWithFanHeatInputs_hh_INCLUDED
 
-#include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/api/TypeDefs.h>
 #include <string>
 
 namespace EnergyPlus {
@@ -58,7 +59,8 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-struct BaseSizerWithFanHeatInputs : BaseSizer {
+struct BaseSizerWithFanHeatInputs : BaseSizer
+{
 
     // fan data
     Real64 deltaP = 0.0;
@@ -88,9 +90,10 @@ struct BaseSizerWithFanHeatInputs : BaseSizer {
                             bool const &_printWarningFlag,
                             std::string const &_callingRoutine) override;
 
-    void setDataDesAccountForFanHeat(bool flag);
+    void setDataDesAccountForFanHeat(EnergyPlusData &state, bool flag);
 
-    void clearState() {
+    void clearState()
+    {
         BaseSizer::clearState();
         deltaP = 0.0;
         motEff = 0.0;
@@ -100,7 +103,14 @@ struct BaseSizerWithFanHeatInputs : BaseSizer {
         fanShaftPow = 0.0;
         motInPower = 0.0;
     }
+};
 
+struct BaseSizerWithFanHeatInputsData : BaseGlobalStruct
+{
+
+    void clear_state() override
+    {
+    }
 };
 
 } // namespace EnergyPlus

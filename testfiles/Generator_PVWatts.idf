@@ -1,4 +1,4 @@
-  Version,9.4;
+  Version,9.5;
 
   Building,
     PVWatts Test Case,       !- Name
@@ -467,6 +467,10 @@
   Output:Variable,*,Generator Produced DC Electricity Energy,Timestep;
 
   Output:Variable,*,Generator PV Cell Temperature,Timestep;
+
+  Output:Variable,*,Plane of Array Irradiance,Timestep;
+
+  Output:Variable,*,Shaded Percent,Timestep;
 
   Output:Variable,*,Electric Load Center Produced Electricity Rate,Timestep;
 

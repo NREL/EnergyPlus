@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -96,28 +96,30 @@ namespace TempSolveRoot {
 
     // Functions
 
-    void SolveRoot(EnergyPlusData &state, Real64 const Eps, // required absolute accuracy
+    void SolveRoot(EnergyPlusData &state,
+                   Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x [,Par]) = 0
                    std::function<Real64(EnergyPlusData &state, Real64 const, std::vector<Real64> const &)> f,
-                   Real64 const X_0,         // 1st bound of interval that contains the solution
-                   Real64 const X_1,         // 2nd bound of interval that contains the solution
+                   Real64 const X_0,              // 1st bound of interval that contains the solution
+                   Real64 const X_1,              // 2nd bound of interval that contains the solution
                    std::vector<Real64> const &Par // array with additional parameters used for function evaluation
     );
 
-    void SolveRoot(EnergyPlusData &state, Real64 const Eps, // required absolute accuracy
+    void SolveRoot(EnergyPlusData &state,
+                   Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x [,Par]) = 0
                    std::function<Real64(EnergyPlusData &state, Real64 const, Array1D<Real64> const &)> f,
-                   Real64 const X_0,         // 1st bound of interval that contains the solution
-                   Real64 const X_1,         // 2nd bound of interval that contains the solution
+                   Real64 const X_0,          // 1st bound of interval that contains the solution
+                   Real64 const X_1,          // 2nd bound of interval that contains the solution
                    Array1D<Real64> const &Par // array with additional parameters used for function evaluation
     );
 
-
-    void SolveRoot(EnergyPlusData &state, Real64 const Eps, // required absolute accuracy
+    void SolveRoot(EnergyPlusData &state,
+                   Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x [,Par]) = 0
@@ -140,20 +142,20 @@ namespace TempSolveRoot {
                    Real64 const X_1  // 2nd bound of interval that contains the solution
     );
 
-/*
-    void SolveRoot(Real64 const Eps, // required absolute accuracy
-                   int const MaxIte, // maximum number of allowed iterations
-                   int &Flag,        // integer storing exit status
-                   Real64 &XRes,     // value of x that solves f(x) = 0
-                   std::function<Real64(Real64 const)> f,
-                   Real64 const X_0,           // 1st bound of interval that contains the solution
-                   Real64 const X_1,           // 2nd bound of interval that contains the solution
-                   int const AlgorithmTypeNum, // ALgorithm selection
-                   Real64 &XX_0,               // Low bound obtained with maximum number of allowed iterations
-                   Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
-    );
- */
-} // namespace General
+    /*
+        void SolveRoot(Real64 const Eps, // required absolute accuracy
+                       int const MaxIte, // maximum number of allowed iterations
+                       int &Flag,        // integer storing exit status
+                       Real64 &XRes,     // value of x that solves f(x) = 0
+                       std::function<Real64(Real64 const)> f,
+                       Real64 const X_0,           // 1st bound of interval that contains the solution
+                       Real64 const X_1,           // 2nd bound of interval that contains the solution
+                       int const AlgorithmTypeNum, // ALgorithm selection
+                       Real64 &XX_0,               // Low bound obtained with maximum number of allowed iterations
+                       Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
+        );
+     */
+} // namespace TempSolveRoot
 
 } // namespace EnergyPlus
 

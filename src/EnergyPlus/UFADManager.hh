@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,6 +49,7 @@
 #define UFADManager_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -59,16 +60,18 @@ struct EnergyPlusData;
 namespace UFADManager {
 
     void ManageUCSDUFModels(EnergyPlusData &state,
-                            int const ZoneNum,      // index number for the specified zone
-                            int const ZoneModelType // type of zone model; UCSDUFI = 6
+                            int const ZoneNum,                                 // index number for the specified zone
+                            DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
-    void InitUCSDUF(EnergyPlusData &state, int const ZoneNum,
-                    int const ZoneModelType // type of zone model; UCSDUFI = 6
+    void InitUCSDUF(EnergyPlusData &state,
+                    int const ZoneNum,
+                    DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
-    void SizeUCSDUF(EnergyPlusData &state, int const ZoneNum,
-                    int const ZoneModelType // type of zone model; UCSDUFI = 6
+    void SizeUCSDUF(EnergyPlusData &state,
+                    int const ZoneNum,
+                    DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
     void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight);
@@ -79,7 +82,8 @@ namespace UFADManager {
 
 } // namespace UFADManager
 
-struct UFADManagerData : BaseGlobalStruct {
+struct UFADManagerData : BaseGlobalStruct
+{
 
     Real64 HAT_MX = 0.0;                  // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone
     Real64 HAT_MXWin = 0.0;               // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone (windows only)
@@ -97,10 +101,12 @@ struct UFADManagerData : BaseGlobalStruct {
     Real64 HeightIntMassDefault = 2.0;    // Default height of internal mass surfaces
 
     bool MyOneTimeFlag = true;
+    Array1D_bool MySizeFlag;
 
     void clear_state() override
     {
-        MyOneTimeFlag = true;
+        this->MyOneTimeFlag = true;
+        this->MySizeFlag.deallocate();
     }
 
     // Default Constructor

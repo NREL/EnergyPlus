@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,18 +51,16 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace ObjexxFCL;
 using namespace EnergyPlus;
@@ -86,7 +84,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     int ConstrNum;
     int MatNum;
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -97,36 +95,36 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     SurfNum = 1;
     ConstrNum = 1;
     // allocate surface variable data
-    Surface.allocate(NumOfSurf);
-    Surface(SurfNum).Area = 10.0;
-    Surface(SurfNum).OutDryBulbTemp = 20.0;
-    Surface(SurfNum).OutWetBulbTemp = 15.0;
-    Surface(SurfNum).WindSpeed = 3.0;
-    Surface(SurfNum).Construction = ConstrNum;
-    Surface(SurfNum).BaseSurf = SurfNum;
-    Surface(SurfNum).Zone = ZoneNum;
-    Surface(SurfNum).IsICS = true;
-    Surface(SurfNum).ExtConvCoeff = 0;
-    Surface(SurfNum).ExtWind = false;
+    state->dataSurface->Surface.allocate(NumOfSurf);
+    state->dataSurface->Surface(SurfNum).Area = 10.0;
+    state->dataSurface->Surface(SurfNum).OutDryBulbTemp = 20.0;
+    state->dataSurface->Surface(SurfNum).OutWetBulbTemp = 15.0;
+    state->dataSurface->Surface(SurfNum).WindSpeed = 3.0;
+    state->dataSurface->Surface(SurfNum).Construction = ConstrNum;
+    state->dataSurface->Surface(SurfNum).BaseSurf = SurfNum;
+    state->dataSurface->Surface(SurfNum).Zone = ZoneNum;
+    state->dataSurface->Surface(SurfNum).IsICS = true;
+    state->dataSurface->Surface(SurfNum).ExtConvCoeff = 0;
+    state->dataSurface->Surface(SurfNum).ExtWind = false;
     // allocate construction variable data
     state->dataConstruction->Construct.allocate(ConstrNum);
     state->dataConstruction->Construct(ConstrNum).LayerPoint.allocate(MatNum);
     state->dataConstruction->Construct(ConstrNum).LayerPoint(MatNum) = 1;
-    dataMaterial.Material.allocate(MatNum);
-    dataMaterial.Material(MatNum).AbsorpThermal = 0.8;
-    // allocate exterior vented cavaity variable data
-    ExtVentedCavity.allocate(1);
-    ExtVentedCavity(NumOfSurf).SurfPtrs.allocate(NumOfSurf);
-    ExtVentedCavity(NumOfSurf).SurfPtrs(NumOfSurf) = 1;
+    state->dataMaterial->Material.allocate(MatNum);
+    state->dataMaterial->Material(MatNum).AbsorpThermal = 0.8;
+    // allocate exterior vented cavity variable data
+    state->dataSurface->ExtVentedCavity.allocate(1);
+    state->dataSurface->ExtVentedCavity(NumOfSurf).SurfPtrs.allocate(NumOfSurf);
+    state->dataSurface->ExtVentedCavity(NumOfSurf).SurfPtrs(NumOfSurf) = 1;
     // allocate zone variable data
-    Zone.allocate(ZoneNum);
-    Zone(ZoneNum).OutsideConvectionAlgo = ASHRAESimple;
+    state->dataHeatBal->Zone.allocate(ZoneNum);
+    state->dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo = ASHRAESimple;
     // allocate surface temperature variable data
-    TH.allocate(NumOfSurf, 1, 2);
-    TH(SurfNum, 1, 1) = 22.0;
+    state->dataHeatBalSurf->TH.allocate(NumOfSurf, 1, 2);
+    state->dataHeatBalSurf->TH(SurfNum, 1, 1) = 22.0;
     // allocate solar incident radiation variable data
-    SurfQRadSWOutIncident.allocate(1);
-    SurfQRadSWOutIncident(1) = 0.0;
+    state->dataHeatBal->SurfQRadSWOutIncident.allocate(1);
+    state->dataHeatBal->SurfQRadSWOutIncident(1) = 0.0;
     // set user defined conv. coeff. calculation to false
     state->dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
 
@@ -152,9 +150,27 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Real64 VdotBouyRpt;          // gap buoyancy driven volume flow rate [m3/s]
 
     // call to test fix to resolve crash
-    CalcPassiveExteriorBaffleGap(*state, ExtVentedCavity(1).SurfPtrs, VentArea, Cv, Cd, HdeltaNPL, SolAbs,
-                                 AbsExt, Tilt, AspRat, GapThick, Roughness, QdotSource, TsBaffle, TaGap, HcGapRpt, HrGapRpt, IscRpt,
-                                 MdotVentRpt, VdotWindRpt, VdotBouyRpt);
+    CalcPassiveExteriorBaffleGap(*state,
+                                 state->dataSurface->ExtVentedCavity(1).SurfPtrs,
+                                 VentArea,
+                                 Cv,
+                                 Cd,
+                                 HdeltaNPL,
+                                 SolAbs,
+                                 AbsExt,
+                                 Tilt,
+                                 AspRat,
+                                 GapThick,
+                                 Roughness,
+                                 QdotSource,
+                                 TsBaffle,
+                                 TaGap,
+                                 HcGapRpt,
+                                 HrGapRpt,
+                                 IscRpt,
+                                 MdotVentRpt,
+                                 VdotWindRpt,
+                                 VdotBouyRpt);
 
     EXPECT_NEAR(21.862, TsBaffle, 0.001);
     EXPECT_NEAR(1.692, HcGapRpt, 0.001);
@@ -162,13 +178,13 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     EXPECT_NEAR(0.036, MdotVentRpt, 0.001);
 
     // deallocated variables
-    Surface.deallocate();
+    state->dataSurface->Surface.deallocate();
     state->dataConstruction->Construct(ConstrNum).LayerPoint.deallocate();
     state->dataConstruction->Construct.deallocate();
-    dataMaterial.Material.deallocate();
-    ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
-    ExtVentedCavity.deallocate();
-    Zone.deallocate();
-    TH.deallocate();
-    SurfQRadSWOutIncident.deallocate();
+    state->dataMaterial->Material.deallocate();
+    state->dataSurface->ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
+    state->dataSurface->ExtVentedCavity.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+    state->dataHeatBalSurf->TH.deallocate();
+    state->dataHeatBal->SurfQRadSWOutIncident.deallocate();
 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,7 +57,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -79,11 +78,9 @@
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
-#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SteamBaseboardRadiator.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
@@ -106,51 +103,15 @@ namespace RoomAirModelAirflowNetwork {
     // Interact with Surface HB, internal gain, HVAC system and Airflow Network Domains
     // Do heat and moisture balance calculations on roomair nodes.
 
-    // REFERENCES:
-    // none
-
-    // OTHER NOTES:
-    // na
-
     // Using/Aliasing
     using namespace DataRoomAirModel;
     using namespace DataHeatBalSurface;
-    using namespace DataMoistureBalance;
     using namespace DataSurfaces;
     using namespace DataHeatBalance;
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-
-    // MODULE DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // see DataRoomAir
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
 
     // Object Data
-    Array1D<RAFNData> RAFN;
-
-    namespace {
-        bool InitRoomAirModelAirflowNetworkOneTimeFlag(true);
-        bool InitRoomAirModelAirflowNetworkOneTimeFlagConf(true);
-        bool InitRoomAirModelAirflowNetworkEnvrnFlag(true);
-        bool LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag(true);
-    } // namespace
 
     // Functions
-
-    void clear_state()
-    {
-        InitRoomAirModelAirflowNetworkOneTimeFlag = true;
-        InitRoomAirModelAirflowNetworkOneTimeFlagConf = true;
-        InitRoomAirModelAirflowNetworkEnvrnFlag = true;
-        LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag = true;
-        RAFN.deallocate();
-    }
 
     void SimRoomAirModelAirflowNetwork(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
@@ -177,18 +138,19 @@ namespace RoomAirModelAirflowNetwork {
         int ThisRoomAirNode;
         int RAFNNum;
 
-        // FLOW:
-        RAFNNum = RoomAirflowNetworkZoneInfo(ZoneNum).RAFNNum;
+        RAFNNum = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).RAFNNum;
 
         if (RAFNNum == 0) {
-            ShowFatalError(state, "SimRoomAirModelAirflowNetwork: Zone is not defined in the RoomAirModelAirflowNetwork model =" + Zone(ZoneNum).Name);
+            ShowFatalError(state,
+                           "SimRoomAirModelAirflowNetwork: Zone is not defined in the RoomAirModelAirflowNetwork model =" +
+                               state.dataHeatBal->Zone(ZoneNum).Name);
         }
 
-        auto &thisRAFN(RAFN(RAFNNum));
+        auto &thisRAFN(state.dataRoomAirflowNetModel->RAFN(RAFNNum));
         thisRAFN.ZoneNum = ZoneNum;
 
         // model control volume for each roomAir:node in the zone.
-        for (ThisRoomAirNode = 1; ThisRoomAirNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++ThisRoomAirNode) {
+        for (ThisRoomAirNode = 1; ThisRoomAirNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++ThisRoomAirNode) {
 
             thisRAFN.RoomAirNode = ThisRoomAirNode;
 
@@ -203,7 +165,9 @@ namespace RoomAirModelAirflowNetwork {
 
     //****************************************************
 
-    void LoadPredictionRoomAirModelAirflowNetwork(EnergyPlusData &state, int const ZoneNum, int const RoomAirNode) // index number for the specified zone and node
+    void LoadPredictionRoomAirModelAirflowNetwork(EnergyPlusData &state,
+                                                  int const ZoneNum,
+                                                  int const RoomAirNode) // index number for the specified zone and node
     {
 
         // SUBROUTINE INFORMATION:
@@ -226,23 +190,24 @@ namespace RoomAirModelAirflowNetwork {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool OneTimeFlag( true );  // one time setup flag // LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag
+        // static bool OneTimeFlag_FindFirstLastPtr( true );  // one time setup flag //
+        // state.dataRoomAirflowNetModel->LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag
         ////////////////////////////////////////////////////////////////////////////////////
         int RAFNNum;
 
-        // FLOW:
-        if (LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag) {
-            RAFN.allocate(NumOfRoomAirflowNetControl);
-            LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag = false;
+        if (state.dataRoomAirflowNetModel->LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag) {
+            state.dataRoomAirflowNetModel->RAFN.allocate(state.dataRoomAirMod->NumOfRoomAirflowNetControl);
+            state.dataRoomAirflowNetModel->LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag = false;
         }
 
-        RAFNNum = RoomAirflowNetworkZoneInfo(ZoneNum).RAFNNum;
+        RAFNNum = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).RAFNNum;
 
         if (RAFNNum == 0) {
-            ShowFatalError(state, "LoadPredictionRoomAirModelAirflowNetwork: Zone is not defined in the RoomAirModelAirflowNetwork model =" +
-                           Zone(ZoneNum).Name);
+            ShowFatalError(state,
+                           "LoadPredictionRoomAirModelAirflowNetwork: Zone is not defined in the RoomAirModelAirflowNetwork model =" +
+                               state.dataHeatBal->Zone(ZoneNum).Name);
         }
-        auto &thisRAFN(RAFN(RAFNNum));
+        auto &thisRAFN(state.dataRoomAirflowNetModel->RAFN(RAFNNum));
         thisRAFN.ZoneNum = ZoneNum;
 
         thisRAFN.InitRoomAirModelAirflowNetwork(state, RoomAirNode);
@@ -262,17 +227,6 @@ namespace RoomAirModelAirflowNetwork {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Perform one-time checking and term calculations
-
-        // Using/Aliasing
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::NonAirSystemResponse;
-        using DataHeatBalFanSys::SumLatentHTRadSys;
-        using DataHeatBalFanSys::SysDepZoneLoadsLagged;
-        using DataHeatBalFanSys::ZoneLatentGain;
-        using DataLoopNode::NodeID;
-        using DataLoopNode::NumOfNodes;
-        using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipList;
 
         using InternalHeatGains::SumInternalLatentGainsByTypes;
         using Psychrometrics::PsyCpAirFnW;
@@ -312,56 +266,61 @@ namespace RoomAirModelAirflowNetwork {
         Array1D<Real64> SupplyFrac;
         Array1D<Real64> ReturnFrac;
 
-        if (InitRoomAirModelAirflowNetworkOneTimeFlag) { // then do one - time setup inits
+        if (state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlag) { // then do one - time setup inits
 
             // loop over all zones with RoomAirflowNetwork model
             for (LoopZone = 1; LoopZone <= state.dataGlobal->NumOfZones; ++LoopZone) {
-                if (!RoomAirflowNetworkZoneInfo(LoopZone).IsUsed) continue;
-                NumSurfs = Zone(LoopZone).SurfaceLast - Zone(LoopZone).SurfaceFirst + 1;
-                for (LoopAirNode = 1; LoopAirNode <= RoomAirflowNetworkZoneInfo(LoopZone).NumOfAirNodes;
+                if (!state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).IsUsed) continue;
+                NumSurfs = state.dataHeatBal->Zone(LoopZone).HTSurfaceLast - state.dataHeatBal->Zone(LoopZone).HTSurfaceFirst + 1;
+                for (LoopAirNode = 1; LoopAirNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).NumOfAirNodes;
                      ++LoopAirNode) { // loop over all the modeled room air nodes
                     // calculate volume of air in node's control volume
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirVolume =
-                        Zone(LoopZone).Volume * RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).ZoneVolumeFraction;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirVolume =
+                        state.dataHeatBal->Zone(LoopZone).Volume *
+                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).ZoneVolumeFraction;
 
-                    SetupOutputVariable(state, "RoomAirflowNetwork Node NonAirSystemResponse",
+                    SetupOutputVariable(state,
+                                        "RoomAirflowNetwork Node NonAirSystemResponse",
                                         OutputProcessor::Unit::W,
-                                        RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).NonAirSystemResponse,
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).NonAirSystemResponse,
                                         "HVAC",
                                         "Average",
-                                        RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).Name);
-                    SetupOutputVariable(state, "RoomAirflowNetwork Node SysDepZoneLoadsLagged",
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).Name);
+                    SetupOutputVariable(state,
+                                        "RoomAirflowNetwork Node SysDepZoneLoadsLagged",
                                         OutputProcessor::Unit::W,
-                                        RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).SysDepZoneLoadsLagged,
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).SysDepZoneLoadsLagged,
                                         "HVAC",
                                         "Average",
-                                        RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).Name);
-                    SetupOutputVariable(state, "RoomAirflowNetwork Node SumIntSensibleGain",
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).Name);
+                    SetupOutputVariable(state,
+                                        "RoomAirflowNetwork Node SumIntSensibleGain",
                                         OutputProcessor::Unit::W,
-                                        RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).SumIntSensibleGain,
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).SumIntSensibleGain,
                                         "HVAC",
                                         "Average",
-                                        RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).Name);
-                    SetupOutputVariable(state, "RoomAirflowNetwork Node SumIntLatentGain",
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).Name);
+                    SetupOutputVariable(state,
+                                        "RoomAirflowNetwork Node SumIntLatentGain",
                                         OutputProcessor::Unit::W,
-                                        RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).SumIntLatentGain,
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).SumIntLatentGain,
                                         "HVAC",
                                         "Average",
-                                        RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).Name);
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).Name);
                 }
             }
-            InitRoomAirModelAirflowNetworkOneTimeFlag = false;
+            state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlag = false;
         }
 
-        if (InitRoomAirModelAirflowNetworkOneTimeFlagConf) { // then do one - time setup inits
-            if (allocated(ZoneEquipConfig) && allocated(ZoneEquipList)) {
+        if (state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlagConf) { // then do one - time setup inits
+            if (allocated(state.dataZoneEquip->ZoneEquipConfig) && allocated(state.dataZoneEquip->ZoneEquipList)) {
                 MaxNodeNum = 0;
                 MaxEquipNum = 0;
                 ErrorsFound = false;
                 for (LoopZone = 1; LoopZone <= state.dataGlobal->NumOfZones; ++LoopZone) {
-                    if (!Zone(LoopZone).IsControlled) continue;
-                    MaxEquipNum = max(MaxEquipNum, ZoneEquipList(LoopZone).NumOfEquipTypes);
-                    MaxNodeNum = max(MaxNodeNum, ZoneEquipConfig(LoopZone).NumInletNodes);
+                    if (!state.dataHeatBal->Zone(LoopZone).IsControlled) continue;
+                    MaxEquipNum = max(MaxEquipNum, state.dataZoneEquip->ZoneEquipList(LoopZone).NumOfEquipTypes);
+                    MaxNodeNum = max(MaxNodeNum, state.dataZoneEquip->ZoneEquipConfig(LoopZone).NumInletNodes);
                 }
                 if (MaxNodeNum > 0) {
                     NodeFound.allocate(MaxNodeNum);
@@ -378,12 +337,12 @@ namespace RoomAirModelAirflowNetwork {
 
                 // loop over all zones with RoomAirflowNetwork model
                 for (LoopZone = 1; LoopZone <= state.dataGlobal->NumOfZones; ++LoopZone) {
-                    if (!Zone(LoopZone).IsControlled) continue;
-                    if (!RoomAirflowNetworkZoneInfo(LoopZone).IsUsed) continue;
+                    if (!state.dataHeatBal->Zone(LoopZone).IsControlled) continue;
+                    if (!state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).IsUsed) continue;
                     // find actualZoneID in ZoneEquipConfig
                     for (IdZone = 1; IdZone <= state.dataGlobal->NumOfZones; ++IdZone) {
-                        if (ZoneEquipConfig(IdZone).ActualZoneNum == LoopZone) {
-                            RoomAirflowNetworkZoneInfo(LoopZone).ActualZoneID = IdZone;
+                        if (state.dataZoneEquip->ZoneEquipConfig(IdZone).ActualZoneNum == LoopZone) {
+                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).ActualZoneID = IdZone;
                             break;
                         }
                     }
@@ -392,77 +351,98 @@ namespace RoomAirModelAirflowNetwork {
                     NodeFound = false;
 
                     // find supply air node number
-                    for (LoopAirNode = 1; LoopAirNode <= RoomAirflowNetworkZoneInfo(LoopZone).NumOfAirNodes;
+                    for (LoopAirNode = 1; LoopAirNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).NumOfAirNodes;
                          ++LoopAirNode) { // loop over all the modeled room air nodes
-                        for (EquipLoop = 1; EquipLoop <= RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).NumHVACs;
+                        for (EquipLoop = 1; EquipLoop <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).NumHVACs;
                              ++EquipLoop) { // loop over all the equip for a single room air node
                             // Check zone equipment name
-                            for (I = 1; I <= ZoneEquipList(LoopZone).NumOfEquipTypes; ++I) { // loop over all equip types
-                                if (UtilityRoutines::SameString(ZoneEquipList(LoopZone).EquipName(I),
-                                                                RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).Name)) {
-                                    if (RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).EquipConfigIndex == 0)
-                                        RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).EquipConfigIndex = I;
+                            for (I = 1; I <= state.dataZoneEquip->ZoneEquipList(LoopZone).NumOfEquipTypes; ++I) { // loop over all equip types
+                                if (UtilityRoutines::SameString(
+                                        state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I),
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).Name)) {
+                                    if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone)
+                                            .Node(LoopAirNode)
+                                            .HVAC(EquipLoop)
+                                            .EquipConfigIndex == 0)
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone)
+                                            .Node(LoopAirNode)
+                                            .HVAC(EquipLoop)
+                                            .EquipConfigIndex = I;
                                     EquipFound(I) = true;
                                     SupplyFrac(I) =
-                                        SupplyFrac(I) + RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).SupplyFraction;
+                                        SupplyFrac(I) +
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).SupplyFraction;
                                     ReturnFrac(I) =
-                                        ReturnFrac(I) + RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).ReturnFraction;
+                                        ReturnFrac(I) +
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).ReturnFraction;
                                 }
                             }
-                            for (IdNode = 1; IdNode <= NumOfNodes; ++IdNode) { // loop over all nodes to find supply node ID
-                                if (UtilityRoutines::SameString(
-                                        NodeID(IdNode), RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).SupplyNodeName)) {
-                                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).SupNodeNum = IdNode;
+                            for (IdNode = 1; IdNode <= state.dataLoopNodes->NumOfNodes; ++IdNode) { // loop over all nodes to find supply node ID
+                                if (UtilityRoutines::SameString(state.dataLoopNodes->NodeID(IdNode),
+                                                                state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone)
+                                                                    .Node(LoopAirNode)
+                                                                    .HVAC(EquipLoop)
+                                                                    .SupplyNodeName)) {
+                                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).SupNodeNum = IdNode;
                                     break;
                                 }
                             }
                             // Verify inlet nodes
                             int inletNodeIndex = 0;
-                            for (NodeNum = 1; NodeNum <= ZoneEquipConfig(LoopZone).NumInletNodes;
+                            for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(LoopZone).NumInletNodes;
                                  ++NodeNum) { // loop over all supply inlet nodes in a single zone
                                 // !Get node conditions
-                                if (ZoneEquipConfig(LoopZone).InletNode(NodeNum) == IdNode) {
+                                if (state.dataZoneEquip->ZoneEquipConfig(LoopZone).InletNode(NodeNum) == IdNode) {
                                     NodeFound(NodeNum) = true;
                                     inletNodeIndex = NodeNum;
                                     break;
                                 }
                             }
 
-                            if (RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).SupNodeNum > 0 &&
-                                UtilityRoutines::SameString(RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).ReturnNodeName,
-                                                            "")) {
+                            if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).SupNodeNum > 0 &&
+                                UtilityRoutines::SameString(
+                                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).ReturnNodeName,
+                                    "")) {
                                 // Find matching return node
-                                for (int retNode = 1; retNode <= ZoneEquipConfig(LoopZone).NumReturnNodes; ++retNode) {
-                                    if ((ZoneEquipConfig(LoopZone).ReturnNodeInletNum(retNode) == inletNodeIndex) &&
-                                        (ZoneEquipConfig(LoopZone).ReturnNode(retNode) > 0)) {
-                                        RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).RetNodeNum =
-                                            ZoneEquipConfig(LoopZone).ReturnNode(retNode); // Zone return node
+                                for (int retNode = 1; retNode <= state.dataZoneEquip->ZoneEquipConfig(LoopZone).NumReturnNodes; ++retNode) {
+                                    if ((state.dataZoneEquip->ZoneEquipConfig(LoopZone).ReturnNodeInletNum(retNode) == inletNodeIndex) &&
+                                        (state.dataZoneEquip->ZoneEquipConfig(LoopZone).ReturnNode(retNode) > 0)) {
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).RetNodeNum =
+                                            state.dataZoneEquip->ZoneEquipConfig(LoopZone).ReturnNode(retNode); // Zone return node
                                         break;
                                     }
                                 }
                             }
 
-                            if (RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).RetNodeNum == 0) {
-                                for (IdNode = 1; IdNode <= NumOfNodes; ++IdNode) { // loop over all nodes to find return node ID
-                                    if (UtilityRoutines::SameString(
-                                            NodeID(IdNode), RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).ReturnNodeName)) {
-                                        RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).RetNodeNum = IdNode;
+                            if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).RetNodeNum == 0) {
+                                for (IdNode = 1; IdNode <= state.dataLoopNodes->NumOfNodes; ++IdNode) { // loop over all nodes to find return node ID
+                                    if (UtilityRoutines::SameString(state.dataLoopNodes->NodeID(IdNode),
+                                                                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone)
+                                                                        .Node(LoopAirNode)
+                                                                        .HVAC(EquipLoop)
+                                                                        .ReturnNodeName)) {
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).RetNodeNum =
+                                            IdNode;
                                         break;
                                     }
                                 }
                             }
-                            SetupOutputVariable(state, "RoomAirflowNetwork Node HVAC Supply Fraction",
-                                                OutputProcessor::Unit::None,
-                                                RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).SupplyFraction,
-                                                "HVAC",
-                                                "Average",
-                                                RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).Name);
-                            SetupOutputVariable(state, "RoomAirflowNetwork Node HVAC Return Fraction",
-                                                OutputProcessor::Unit::None,
-                                                RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).ReturnFraction,
-                                                "HVAC",
-                                                "Average",
-                                                RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).Name);
+                            SetupOutputVariable(
+                                state,
+                                "RoomAirflowNetwork Node HVAC Supply Fraction",
+                                OutputProcessor::Unit::None,
+                                state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).SupplyFraction,
+                                "HVAC",
+                                "Average",
+                                state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).Name);
+                            SetupOutputVariable(
+                                state,
+                                "RoomAirflowNetwork Node HVAC Return Fraction",
+                                OutputProcessor::Unit::None,
+                                state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).ReturnFraction,
+                                "HVAC",
+                                "Average",
+                                state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).Name);
                         }
                     }
                     // Count node with.TRUE.
@@ -471,53 +451,61 @@ namespace RoomAirModelAirflowNetwork {
                         if (NodeFound(NodeNum)) ISum = ISum + 1;
                     }
                     // Provide error messages with incorrect supplu node inputs
-                    if (ISum != ZoneEquipConfig(LoopZone).NumInletNodes) {
-                        if (ISum > ZoneEquipConfig(LoopZone).NumInletNodes) {
-                            ShowSevereError(state,
-                                "GetRoomAirflowNetworkData: The number of equipment listed in RoomAirflowNetwork:Node:HVACEquipment objects");
-                            ShowContinueError(state, "is greater than the number of zone configuration inlet nodes in " + Zone(LoopZone).Name);
+                    if (ISum != state.dataZoneEquip->ZoneEquipConfig(LoopZone).NumInletNodes) {
+                        if (ISum > state.dataZoneEquip->ZoneEquipConfig(LoopZone).NumInletNodes) {
+                            ShowSevereError(
+                                state, "GetRoomAirflowNetworkData: The number of equipment listed in RoomAirflowNetwork:Node:HVACEquipment objects");
+                            ShowContinueError(
+                                state, "is greater than the number of zone configuration inlet nodes in " + state.dataHeatBal->Zone(LoopZone).Name);
                             ShowContinueError(state, "Please check inputs of both objects.");
                             ErrorsFound = true;
                         } else {
-                            ShowSevereError(state,
-                                "GetRoomAirflowNetworkData: The number of equipment listed in RoomAirflowNetwork:Node:HVACEquipment objects");
-                            ShowContinueError(state, "is less than the number of zone configuration inlet nodes in " + Zone(LoopZone).Name);
+                            ShowSevereError(
+                                state, "GetRoomAirflowNetworkData: The number of equipment listed in RoomAirflowNetwork:Node:HVACEquipment objects");
+                            ShowContinueError(
+                                state, "is less than the number of zone configuration inlet nodes in " + state.dataHeatBal->Zone(LoopZone).Name);
                             ShowContinueError(state, "Please check inputs of both objects.");
                             ErrorsFound = true;
                         }
                     }
 
                     // Check equipment names to ensure they are used in RoomAirflowNetwork : Node : HVACEquipment objects
-                    for (I = 1; I <= ZoneEquipList(LoopZone).NumOfEquipTypes; ++I) { // loop over all equip types
+                    for (I = 1; I <= state.dataZoneEquip->ZoneEquipList(LoopZone).NumOfEquipTypes; ++I) { // loop over all equip types
                         if (!EquipFound(I)) {
-                            ShowSevereError(state, "GetRoomAirflowNetworkData: The equipment listed in ZoneEquipList is not found in the lsit of "
+                            ShowSevereError(state,
+                                            "GetRoomAirflowNetworkData: The equipment listed in ZoneEquipList is not found in the lsit of "
                                             "RoomAir:Node:AirflowNetwork:HVACEquipment objects =");
-                            ShowContinueError(state, ZoneEquipList(LoopZone).EquipName(I) + ". Please check inputs of both objects.");
+                            ShowContinueError(state,
+                                              state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I) + ". Please check inputs of both objects.");
                             ErrorsFound = true;
                         }
                     }
 
                     // Check fraction to ensure sum = 1.0 for every equipment
-                    for (I = 1; I <= ZoneEquipList(LoopZone).NumOfEquipTypes; ++I) { // loop over all equip types
+                    for (I = 1; I <= state.dataZoneEquip->ZoneEquipList(LoopZone).NumOfEquipTypes; ++I) { // loop over all equip types
                         if (std::abs(SupplyFrac(I) - 1.0) > 0.001) {
                             ShowSevereError(state, "GetRoomAirflowNetworkData: Invalid, zone supply fractions do not sum to 1.0");
-                            ShowContinueError(state, "Entered in " + ZoneEquipList(LoopZone).EquipName(I) +
-                                              " defined in RoomAir:Node:AirflowNetwork:HVACEquipment");
-                            ShowContinueError(state, "The Fraction of supply fraction values across all the roomair nodes in a zone needs to sum to 1.0.");
+                            ShowContinueError(state,
+                                              "Entered in " + state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I) +
+                                                  " defined in RoomAir:Node:AirflowNetwork:HVACEquipment");
+                            ShowContinueError(state,
+                                              "The Fraction of supply fraction values across all the roomair nodes in a zone needs to sum to 1.0.");
                             ShowContinueError(state, format("The sum of fractions entered = {:.3R}", SupplyFrac(I)));
                             ErrorsFound = true;
                         }
                         if (std::abs(ReturnFrac(I) - 1.0) > 0.001) {
                             ShowSevereError(state, "GetRoomAirflowNetworkData: Invalid, zone return fractions do not sum to 1.0");
-                            ShowContinueError(state, "Entered in " + ZoneEquipList(LoopZone).EquipName(I) +
-                                              " defined in RoomAir:Node:AirflowNetwork:HVACEquipment");
-                            ShowContinueError(state, "The Fraction of return fraction values across all the roomair nodes in a zone needs to sum to 1.0.");
+                            ShowContinueError(state,
+                                              "Entered in " + state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I) +
+                                                  " defined in RoomAir:Node:AirflowNetwork:HVACEquipment");
+                            ShowContinueError(state,
+                                              "The Fraction of return fraction values across all the roomair nodes in a zone needs to sum to 1.0.");
                             ShowContinueError(state, format("The sum of fractions entered = {:.3R}", ReturnFrac(I)));
                             ErrorsFound = true;
                         }
                     }
                 }
-                InitRoomAirModelAirflowNetworkOneTimeFlagConf = false;
+                state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlagConf = false;
                 if (allocated(NodeFound)) NodeFound.deallocate();
                 if (ErrorsFound) {
                     ShowFatalError(state, "GetRoomAirflowNetworkData: Errors found getting air model input.  Program terminates.");
@@ -525,45 +513,45 @@ namespace RoomAirModelAirflowNetwork {
             }
         } // End of InitRoomAirModelAirflowNetworkOneTimeFlagConf
 
-        if (state.dataGlobal->BeginEnvrnFlag && InitRoomAirModelAirflowNetworkEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkEnvrnFlag) {
             for (LoopZone = 1; LoopZone <= state.dataGlobal->NumOfZones; ++LoopZone) {
-                if (!RoomAirflowNetworkZoneInfo(LoopZone).IsUsed) continue;
-                for (LoopAirNode = 1; LoopAirNode <= RoomAirflowNetworkZoneInfo(LoopZone).NumOfAirNodes;
+                if (!state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).IsUsed) continue;
+                for (LoopAirNode = 1; LoopAirNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).NumOfAirNodes;
                      ++LoopAirNode) { // loop over all the modeled room air nodes
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTemp = 23.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempX1 = 23.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempX2 = 23.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempX3 = 23.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempX4 = 23.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempDSX1 = 23.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempDSX2 = 23.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempDSX3 = 23.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempDSX4 = 23.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempT1 = 23.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempTMX = 23.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempTM2 = 23.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTemp = 23.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempX1 = 23.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempX2 = 23.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempX3 = 23.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempX4 = 23.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempDSX1 = 23.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempDSX2 = 23.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempDSX3 = 23.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempDSX4 = 23.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempT1 = 23.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempTMX = 23.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).AirTempTM2 = 23.0;
 
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRat = 0.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatX1 = 0.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatX2 = 0.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatX3 = 0.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatX4 = 0.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatDSX1 = 0.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatDSX2 = 0.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatDSX3 = 0.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatDSX4 = 0.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatW1 = 0.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatWMX = 0.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatWM2 = 0.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRat = 0.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatX1 = 0.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatX2 = 0.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatX3 = 0.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatX4 = 0.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatDSX1 = 0.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatDSX2 = 0.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatDSX3 = 0.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatDSX4 = 0.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatW1 = 0.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatWMX = 0.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HumRatWM2 = 0.0;
 
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).SysDepZoneLoadsLagged = 0.0;
-                    RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).SysDepZoneLoadsLaggedOld = 0.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).SysDepZoneLoadsLagged = 0.0;
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).SysDepZoneLoadsLaggedOld = 0.0;
                 }
             }
-            InitRoomAirModelAirflowNetworkEnvrnFlag = false;
+            state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkEnvrnFlag = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            InitRoomAirModelAirflowNetworkEnvrnFlag = true;
+            state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkEnvrnFlag = true;
         }
 
         // reuse code in ZoneTempPredictorCorrector for sensible components.
@@ -572,7 +560,7 @@ namespace RoomAirModelAirflowNetwork {
         SumNonAirSystemResponseForNode(state, RoomAirNode);
 
         // latent gains.
-        auto &ThisRAFNNode(RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode));
+        auto &ThisRAFNNode(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode));
 
         if (allocated(ThisRAFNNode.SurfMask)) {
             CalcSurfaceMoistureSums(state, RoomAirNode, ThisRAFNNode.SumHmAW, ThisRAFNNode.SumHmARa, ThisRAFNNode.SumHmARaW, ThisRAFNNode.SurfMask);
@@ -588,17 +576,17 @@ namespace RoomAirModelAirflowNetwork {
         if (NodeNum > 0) {
             for (linkNum = 1; linkNum <= ThisRAFNNode.NumOfAirflowLinks; ++linkNum) {
                 Link = ThisRAFNNode.Link(linkNum).AirflowNetworkLinkSimuID;
-                if (AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[0] == NodeNum) { // incoming flow
-                    NodeIn = AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[1];
-                    ThisRAFNNode.Link(linkNum).TempIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).TZ;
-                    ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).WZ;
-                    ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetwork::AirflowNetworkLinkSimu(Link).FLOW2;
+                if (state.dataAirflowNetwork->AirflowNetworkLinkageData(Link).NodeNums[0] == NodeNum) { // incoming flow
+                    NodeIn = state.dataAirflowNetwork->AirflowNetworkLinkageData(Link).NodeNums[1];
+                    ThisRAFNNode.Link(linkNum).TempIn = state.dataAirflowNetwork->AirflowNetworkNodeSimu(NodeIn).TZ;
+                    ThisRAFNNode.Link(linkNum).HumRatIn = state.dataAirflowNetwork->AirflowNetworkNodeSimu(NodeIn).WZ;
+                    ThisRAFNNode.Link(linkNum).MdotIn = state.dataAirflowNetwork->AirflowNetworkLinkSimu(Link).FLOW2;
                 }
-                if (AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[1] == NodeNum) { // outgoing flow
-                    NodeIn = AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[0];
-                    ThisRAFNNode.Link(linkNum).TempIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).TZ;
-                    ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).WZ;
-                    ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetwork::AirflowNetworkLinkSimu(Link).FLOW;
+                if (state.dataAirflowNetwork->AirflowNetworkLinkageData(Link).NodeNums[1] == NodeNum) { // outgoing flow
+                    NodeIn = state.dataAirflowNetwork->AirflowNetworkLinkageData(Link).NodeNums[0];
+                    ThisRAFNNode.Link(linkNum).TempIn = state.dataAirflowNetwork->AirflowNetworkNodeSimu(NodeIn).TZ;
+                    ThisRAFNNode.Link(linkNum).HumRatIn = state.dataAirflowNetwork->AirflowNetworkNodeSimu(NodeIn).WZ;
+                    ThisRAFNNode.Link(linkNum).MdotIn = state.dataAirflowNetwork->AirflowNetworkLinkSimu(Link).FLOW;
                 }
             }
 
@@ -620,7 +608,8 @@ namespace RoomAirModelAirflowNetwork {
         ThisRAFNNode.SumLinkMW = SumLinkMW;
         ThisRAFNNode.SysDepZoneLoadsLagged = ThisRAFNNode.SysDepZoneLoadsLaggedOld;
 
-        ThisRAFNNode.RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ThisRAFNNode.AirTemp, ThisRAFNNode.HumRat, "InitRoomAirModelAirflowNetwork");
+        ThisRAFNNode.RhoAir =
+            PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ThisRAFNNode.AirTemp, ThisRAFNNode.HumRat, "InitRoomAirModelAirflowNetwork");
 
         ThisRAFNNode.CpAir = PsyCpAirFnW(ThisRAFNNode.HumRat);
 
@@ -648,10 +637,7 @@ namespace RoomAirModelAirflowNetwork {
         // na
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRat;
-        using DataHVACGlobals::TimeStepSys;
-        using DataHVACGlobals::UseZoneTimeStepHistory;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using Psychrometrics::PsyHgAirFnWTdb;
         using Psychrometrics::PsyRhFnTdbWPb;
 
@@ -674,9 +660,9 @@ namespace RoomAirModelAirflowNetwork {
         Real64 AirTempT1;
         Real64 HumRatW1;
 
-        auto &ThisRAFNNode(RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode));
+        auto &ThisRAFNNode(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode));
 
-        if (UseZoneTimeStepHistory) {
+        if (state.dataHVACGlobal->UseZoneTimeStepHistory) {
             NodeTempX1 = ThisRAFNNode.AirTempX1;
             NodeTempX2 = ThisRAFNNode.AirTempX2;
             NodeTempX3 = ThisRAFNNode.AirTempX3;
@@ -694,7 +680,7 @@ namespace RoomAirModelAirflowNetwork {
             NodeHumRatX3 = ThisRAFNNode.HumRatDSX3;
         }
 
-        if (ZoneAirSolutionAlgo != Use3rdOrder) {
+        if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
             AirTempT1 = ThisRAFNNode.AirTempT1;
             HumRatW1 = ThisRAFNNode.HumRatW1;
         }
@@ -702,15 +688,16 @@ namespace RoomAirModelAirflowNetwork {
         TempDepCoef = ThisRAFNNode.SumHA + ThisRAFNNode.SumLinkMCp + ThisRAFNNode.SumSysMCp;
         TempIndCoef = ThisRAFNNode.SumIntSensibleGain + ThisRAFNNode.SumHATsurf - ThisRAFNNode.SumHATref + ThisRAFNNode.SumLinkMCpT +
                       ThisRAFNNode.SumSysMCpT + ThisRAFNNode.NonAirSystemResponse + ThisRAFNNode.SysDepZoneLoadsLagged;
-        AirCap = ThisRAFNNode.AirVolume * Zone(ZoneNum).ZoneVolCapMultpSens * ThisRAFNNode.RhoAir * ThisRAFNNode.CpAir / (TimeStepSys * DataGlobalConstants::SecInHour());
+        AirCap = ThisRAFNNode.AirVolume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens * ThisRAFNNode.RhoAir * ThisRAFNNode.CpAir /
+                 (TimeStepSys * DataGlobalConstants::SecInHour);
 
-        if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+        if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
             if (TempDepCoef == 0.0) { // B=0
                 TempTmp = AirTempT1 + TempIndCoef / AirCap;
             } else {
                 TempTmp = (AirTempT1 - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) + TempIndCoef / TempDepCoef;
             }
-        } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+        } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
             TempTmp = (AirCap * AirTempT1 + TempIndCoef) / (AirCap + TempDepCoef);
         } else {
             TempTmp = (TempIndCoef + AirCap * (3.0 * NodeTempX1 - (3.0 / 2.0) * NodeTempX2 + (1.0 / 3.0) * NodeTempX3)) /
@@ -723,16 +710,17 @@ namespace RoomAirModelAirflowNetwork {
         H2OHtOfVap = PsyHgAirFnWTdb(ThisRAFNNode.HumRat, ThisRAFNNode.AirTemp);
         A = ThisRAFNNode.SumLinkM + ThisRAFNNode.SumHmARa + ThisRAFNNode.SumSysM;
         B = (ThisRAFNNode.SumIntLatentGain / H2OHtOfVap) + ThisRAFNNode.SumSysMW + ThisRAFNNode.SumLinkMW + ThisRAFNNode.SumHmARaW;
-        C = ThisRAFNNode.RhoAir * ThisRAFNNode.AirVolume * Zone(ZoneNum).ZoneVolCapMultpMoist / (DataGlobalConstants::SecInHour() * TimeStepSys);
+        C = ThisRAFNNode.RhoAir * ThisRAFNNode.AirVolume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist /
+            (DataGlobalConstants::SecInHour * TimeStepSys);
 
         // Exact solution
-        if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+        if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
             if (A == 0.0) { // B=0
                 HumRatTmp = HumRatW1 + B / C;
             } else {
                 HumRatTmp = (HumRatW1 - B / A) * std::exp(min(700., -A / C)) + B / A;
             }
-        } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+        } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
             HumRatTmp = (C * HumRatW1 + B) / (C + A);
         } else {
             HumRatTmp = (B + C * (3.0 * NodeHumRatX1 - (3.0 / 2.0) * NodeHumRatX2 + (1.0 / 3.0) * NodeHumRatX3)) / ((11.0 / 6.0) * C + A);
@@ -765,13 +753,6 @@ namespace RoomAirModelAirflowNetwork {
         // REFERENCES:
         // na
 
-        // Using/Aliasing
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::TempTstatAir;
-        using DataLoopNode::Node;
-        using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipList;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirNodeNum; // nested node structure index
         int I;
@@ -783,16 +764,16 @@ namespace RoomAirModelAirflowNetwork {
         Real64 SumMassW;
         int RetNodeNum;
 
-        auto &ThisRAFNZone(RoomAirflowNetworkZoneInfo(ZoneNum));
+        auto &ThisRAFNZone(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum));
 
         if (!ThisRAFNZone.IsUsed) return;
 
         if (!state.dataGlobal->ZoneSizingCalc) SumSystemDepResponseForNode(state);
 
-        AirNodeNum = RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID;
+        AirNodeNum = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID;
 
         // Update return node conditions
-        for (I = 1; I <= ZoneEquipList(ZoneNum).NumOfEquipTypes; ++I) { // loop over all equip types
+        for (I = 1; I <= state.dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes; ++I) { // loop over all equip types
             SumMass = 0.0;
             SumMassT = 0.0;
             SumMassW = 0.0;
@@ -802,7 +783,7 @@ namespace RoomAirModelAirflowNetwork {
                     if (ThisRAFNZone.Node(LoopAirNode).HVAC(EquipLoop).EquipConfigIndex == I) {
                         if (ThisRAFNZone.Node(LoopAirNode).HVAC(EquipLoop).SupNodeNum > 0 &&
                             ThisRAFNZone.Node(LoopAirNode).HVAC(EquipLoop).RetNodeNum > 0) {
-                            NodeMass = Node(ThisRAFNZone.Node(LoopAirNode).HVAC(EquipLoop).SupNodeNum).MassFlowRate *
+                            NodeMass = state.dataLoopNodes->Node(ThisRAFNZone.Node(LoopAirNode).HVAC(EquipLoop).SupNodeNum).MassFlowRate *
                                        ThisRAFNZone.Node(LoopAirNode).HVAC(EquipLoop).ReturnFraction;
                             SumMass += NodeMass;
                             SumMassT += NodeMass * ThisRAFNZone.Node(LoopAirNode).AirTemp;
@@ -813,8 +794,8 @@ namespace RoomAirModelAirflowNetwork {
                 }
             }
             if (SumMass > 0.0) {
-                Node(RetNodeNum).Temp = SumMassT / SumMass;
-                Node(RetNodeNum).HumRat = SumMassW / SumMass;
+                state.dataLoopNodes->Node(RetNodeNum).Temp = SumMassT / SumMass;
+                state.dataLoopNodes->Node(RetNodeNum).HumRat = SumMassW / SumMass;
             }
         }
     } // UpdateRoomAirModelAirflowNetwork
@@ -842,30 +823,13 @@ namespace RoomAirModelAirflowNetwork {
         // If Tref is not used at all, SumHATref = 0, and SumHA /= 0.
         //
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // USE STATEMENTS:
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRat;
-        using DataLoopNode::Node;
-        using DataSurfaces::Surface;
-        using DataZoneEquipment::ZoneEquipConfig;
         using InternalHeatGains::SumInternalConvectionGainsByIndices;
-        //using InternalHeatGains::SumInternalConvectionGainsByTypes;
         using InternalHeatGains::SumInternalLatentGainsByIndices;
         using InternalHeatGains::SumReturnAirConvectionGainsByIndices;
         using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
-        //using ZonePlenum::NumZoneReturnPlenums;
-        //using ZonePlenum::NumZoneSupplyPlenums;
-        //using ZonePlenum::ZoneRetPlenCond;
-        //using ZonePlenum::ZoneSupPlenCond;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum;         // System node number
@@ -904,7 +868,6 @@ namespace RoomAirModelAirflowNetwork {
         Real64 SumLinkM;   //               !Zone sum of MassFlowRate from the AirflowNetwork model
         Real64 SumLinkMW;  //             !Zone sum of MassFlowRate*W from the AirflowNetwork model
 
-        // FLOW
         SumIntGain = 0.0;
         SumHA = 0.0;
         SumHATsurf = 0.0;
@@ -921,32 +884,32 @@ namespace RoomAirModelAirflowNetwork {
         // Sum all convective internal gains: SumIntGain
         SumInternalConvectionGainsByIndices(state,
                                             ZoneNum,
-                                            RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsDeviceIndices,
-                                            RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsFractions,
-                                            RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumIntSensibleGain);
+                                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsDeviceIndices,
+                                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsFractions,
+                                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumIntSensibleGain);
 
         SumInternalLatentGainsByIndices(state,
                                         ZoneNum,
-                                        RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsDeviceIndices,
-                                        RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsFractions,
-                                        RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumIntLatentGain);
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsDeviceIndices,
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsFractions,
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumIntLatentGain);
         // Add heat to return air if zonal system(no return air) or cycling system(return air frequently very low or zero)
-        if (Zone(ZoneNum).NoHeatToReturnAir) {
+        if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
             // *******************************************
             SumReturnAirConvectionGainsByIndices(state,
                                                  ZoneNum,
-                                                 RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsDeviceIndices,
-                                                 RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsFractions,
+                                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsDeviceIndices,
+                                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsFractions,
                                                  SumIntGain);
-            RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumIntSensibleGain += SumIntGain;
+            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumIntSensibleGain += SumIntGain;
         }
 
         // Check to see if this is a controlled zone
 
         ControlledZoneAirFlag = false;
         for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
-            if (!Zone(ZoneEquipConfigNum).IsControlled) continue;
-            if (ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum != ZoneNum) continue;
+            if (!state.dataHeatBal->Zone(ZoneEquipConfigNum).IsControlled) continue;
+            if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum != ZoneNum) continue;
             ControlledZoneAirFlag = true;
             break; // sloppy way of finding ZoneEquipConfigNum for later use.
         }          // ZoneEquipConfigNum
@@ -967,18 +930,20 @@ namespace RoomAirModelAirflowNetwork {
 
         // Plenum and controlled zones have a different set of inlet nodes which must be calculated.
         if (ControlledZoneAirFlag) {
-            for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+            for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                 // Get node conditions
                 // this next block is of interest to irratic system loads... maybe nodes are not accurate at time of call ?
                 // how can we tell ? predict step must be lagged ? correct step, systems have run.
-                for (EquipLoop = 1; EquipLoop <= RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).NumHVACs; ++EquipLoop) {
-                    if (RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).HVAC(EquipLoop).SupNodeNum ==
-                        ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)) {
-                        NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                        NodeW = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).HumRat;
-                        MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
-                                       RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).HVAC(EquipLoop).SupplyFraction;
-                        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                for (EquipLoop = 1; EquipLoop <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).NumHVACs;
+                     ++EquipLoop) {
+                    if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).HVAC(EquipLoop).SupNodeNum ==
+                        state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)) {
+                        NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                        NodeW = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).HumRat;
+                        MassFlowRate =
+                            state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
+                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).HVAC(EquipLoop).SupplyFraction;
+                        CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                         SumSysM += MassFlowRate;
@@ -989,9 +954,9 @@ namespace RoomAirModelAirflowNetwork {
         } else if (ZoneRetPlenumAirFlag) {
             for (NodeNum = 1; NodeNum <= state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
                 // Get node conditions
-                NodeTemp = Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
-                MassFlowRate = Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
-                CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                NodeTemp = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
+                MassFlowRate = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
+                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
             } // NodeNum
@@ -1000,31 +965,31 @@ namespace RoomAirModelAirflowNetwork {
                 ADUNum = state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
                 if (state.dataDefineEquipment->AirDistUnit(ADUNum).UpStreamLeak) {
                     ADUInNode = state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum;
-                    NodeTemp = Node(ADUInNode).Temp;
+                    NodeTemp = state.dataLoopNodes->Node(ADUInNode).Temp;
                     MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk;
-                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                    CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                     SumSysMCp += MassFlowRate * CpAir;
                     SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                 }
                 if (state.dataDefineEquipment->AirDistUnit(ADUNum).DownStreamLeak) {
                     ADUOutNode = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
-                    NodeTemp = Node(ADUOutNode).Temp;
+                    NodeTemp = state.dataLoopNodes->Node(ADUOutNode).Temp;
                     MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk;
-                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                    CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                     SumSysMCp += MassFlowRate * CpAir;
                     SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                 }
             } // ADUListIndex
         } else if (ZoneSupPlenumAirFlag) {
             // Get node conditions
-            NodeTemp = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
-            MassFlowRate = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
-            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+            NodeTemp = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
+            MassFlowRate = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
+            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
             SumSysMCp += MassFlowRate * CpAir;
             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
         }
 
-        ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
+        ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
 
         SumSysMCp = SumSysMCp / ZoneMult;
         SumSysMCpT = SumSysMCpT / ZoneMult;
@@ -1033,16 +998,16 @@ namespace RoomAirModelAirflowNetwork {
 
         // Sum all surface convection : SumHA, SumHATsurf, SumHATref(and additional contributions to SumIntGain)
         // Modified by Gu to include assigned surfaces only shown in the surface lsit
-        if (!RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).HasSurfacesAssigned) return;
+        if (!state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).HasSurfacesAssigned) return;
 
-        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non - heat transfer surfaces
-            if (RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID == RoomAirNodeNum) {
+            if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID == RoomAirNodeNum) {
                 Found = false;
-                for (Loop = 1; Loop <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++Loop) {
+                for (Loop = 1; Loop <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++Loop) {
                     if (Loop != RoomAirNodeNum) {
-                        if (RoomAirflowNetworkZoneInfo(ZoneNum).Node(Loop).SurfMask(SurfNum - Zone(ZoneNum).SurfaceFirst + 1)) {
+                        if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(Loop).SurfMask(
+                                SurfNum - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1)) {
                             Found = true;
                             break;
                         }
@@ -1050,96 +1015,107 @@ namespace RoomAirModelAirflowNetwork {
                 }
                 if (Found) continue;
             } else {
-                if (!RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SurfMask(SurfNum - Zone(ZoneNum).SurfaceFirst + 1)) continue;
+                if (!state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum)
+                         .Node(RoomAirNodeNum)
+                         .SurfMask(SurfNum - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1))
+                    continue;
             }
 
             HA = 0.0;
-            Area = Surface(SurfNum).Area; // For windows, this is the glazing area
+            Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
 
-            if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
+            if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
 
                 // Add to the convective internal gains
-                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // The shade area covers the area of the glazing plus the area of the dividers.
-                    Area += SurfWinDividerArea(SurfNum);
-                    SumIntGain += SurfWinDividerHeatGain(SurfNum);
+                    Area += state.dataSurface->SurfWinDividerArea(SurfNum);
+                    SumIntGain += state.dataSurface->SurfWinDividerHeatGain(SurfNum);
                 }
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
-                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn)
-                    SumIntGain += SurfWinConvHeatFlowNatural(SurfNum);
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum)))
+                    SumIntGain += state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum);
 
                 // Convective heat gain from airflow window
-                if (SurfWinAirflowThisTS(SurfNum) > 0.0) {
-                    SumIntGain += SurfWinConvHeatGainToZoneAir(SurfNum);
-                    if (Zone(ZoneNum).NoHeatToReturnAir) {
-                        SumIntGain += SurfWinRetHeatGainToZoneAir(SurfNum);
-                        SurfWinHeatGain(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
-                        SurfWinHeatTransfer(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
-                        if (SurfWinHeatGain(SurfNum) >= 0.0) {
-                            SurfWinHeatGainRep(SurfNum) = SurfWinHeatGain(SurfNum);
-                            SurfWinHeatGainRepEnergy(SurfNum) = SurfWinHeatGainRep(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+                if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0) {
+                    SumIntGain += state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum);
+                    if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
+                        SumIntGain += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
+                        state.dataSurface->SurfWinHeatGain(SurfNum) += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
+                        state.dataSurface->SurfWinHeatTransfer(SurfNum) += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
+                        if (state.dataSurface->SurfWinHeatGain(SurfNum) >= 0.0) {
+                            state.dataSurface->SurfWinHeatGainRep(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
+                            state.dataSurface->SurfWinHeatGainRepEnergy(SurfNum) =
+                                state.dataSurface->SurfWinHeatGainRep(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
                         } else {
-                            SurfWinHeatLossRep(SurfNum) = - SurfWinHeatGain(SurfNum);
-                            SurfWinHeatLossRepEnergy(SurfNum) = SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+                            state.dataSurface->SurfWinHeatLossRep(SurfNum) = -state.dataSurface->SurfWinHeatGain(SurfNum);
+                            state.dataSurface->SurfWinHeatLossRepEnergy(SurfNum) =
+                                state.dataSurface->SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
                         }
-                        SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
-                        SurfWinHeatTransferRepEnergy(SurfNum) = SurfWinHeatGain(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+                        state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
+                        state.dataSurface->SurfWinHeatTransferRepEnergy(SurfNum) =
+                            state.dataSurface->SurfWinHeatGain(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
                     }
                 }
 
                 // Add to the surface convection sums
-                if (SurfWinFrameArea(SurfNum) > 0.0) {
+                if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
-                                  SurfWinFrameTempSurfIn(SurfNum);
-                    HA += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum));
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
+                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempSurfIn(SurfNum);
+                    HA += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
+                          (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum));
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn &&
-                    SurfWinShadingFlag(SurfNum) != IntBlindOn) {
+                if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 &&
+                    !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution(only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
-                                  SurfWinDividerTempSurfIn(SurfNum);
-                    HA += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum));
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
+                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
+                                  state.dataSurface->SurfWinDividerTempSurfIn(SurfNum);
+                    HA += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
+                          (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum));
                 }
 
             } // End of check if window
 
-            HA = HA + HConvIn(SurfNum) * Area;
-            SumHATsurf += HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            HA = HA + state.dataHeatBal->HConvIn(SurfNum) * Area;
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
 
-            if (Surface(SurfNum).TAirRef == ZoneMeanAirTemp) {
+            if (state.dataSurface->Surface(SurfNum).TAirRef == ZoneMeanAirTemp) {
                 // The zone air is the reference temperature(which is to be solved for in CorrectZoneAirTemp).
-                RefAirTemp = MAT(ZoneNum);
+                RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 SumHA += HA;
-            } else if (Surface(SurfNum).TAirRef == AdjacentAirTemp) {
-                RefAirTemp = TempEffBulkAir(SurfNum);
+            } else if (state.dataSurface->Surface(SurfNum).TAirRef == AdjacentAirTemp) {
+                RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
                 SumHATref += HA * RefAirTemp;
-            } else if (Surface(SurfNum).TAirRef == ZoneSupplyAirTemp) {
+            } else if (state.dataSurface->Surface(SurfNum).TAirRef == ZoneSupplyAirTemp) {
                 // check whether this zone is a controlled zone or not
                 if (!ControlledZoneAirFlag) {
-                    ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
+                    ShowFatalError(state,
+                                   "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
+                                       state.dataHeatBal->Zone(ZoneNum).Name);
                     return;
                 }
                 // determine supply air temperature as a weighted average of the inlet temperatures.
                 RefAirTemp = SumSysMCpT / SumSysMCp;
                 SumHATref += HA * RefAirTemp;
             } else {
-                RefAirTemp = MAT(ZoneNum);
+                RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 SumHA = SumHA + HA;
             }
 
         } // SurfNum
 
         // Assemble values
-        RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumHA = SumHA;
-        RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumHATsurf = SumHATsurf;
-        RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumHATref = SumHATref;
-        RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumSysMCp = SumSysMCp;
-        RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumSysMCpT = SumSysMCpT;
-        RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumSysM = SumSysM;
-        RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumSysMW = SumSysMW;
+        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumHA = SumHA;
+        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumHATsurf = SumHATsurf;
+        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumHATref = SumHATref;
+        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumSysMCp = SumSysMCp;
+        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumSysMCpT = SumSysMCpT;
+        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumSysM = SumSysM;
+        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumSysMW = SumSysMW;
 
     } // CalcNodeSums
 
@@ -1161,16 +1137,8 @@ namespace RoomAirModelAirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // Breakout summation of surface moisture interaction terms
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalSurface::TempSurfInTmp;
-        using DataMoistureBalanceEMPD::RVSurface;
+
         using HeatBalanceHAMTManager::UpdateHeatBalHAMT;
         using MoistureBalanceEMPDManager::UpdateMoistureBalanceEMPD;
         using Psychrometrics::PsyRhFnTdbRhov;
@@ -1189,16 +1157,16 @@ namespace RoomAirModelAirflowNetwork {
         SumHmARa = 0.0;
         SumHmARaW = 0.0;
 
-        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non - heat transfer surfaces
-            if (Surface(SurfNum).Class == SurfaceClass::Window) continue;
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
+            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) continue;
 
-            if (RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID == RoomAirNode) {
+            if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID == RoomAirNode) {
                 Found = false;
-                for (Loop = 1; Loop <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++Loop) {
+                for (Loop = 1; Loop <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++Loop) {
                     // None - assigned surfaces belong to the zone node
                     if (Loop != RoomAirNode) {
-                        if (RoomAirflowNetworkZoneInfo(ZoneNum).Node(Loop).SurfMask(SurfNum - Zone(ZoneNum).SurfaceFirst + 1)) {
+                        if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(Loop).SurfMask(
+                                SurfNum - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1)) {
                             Found = true;
                             break;
                         }
@@ -1206,37 +1174,55 @@ namespace RoomAirModelAirflowNetwork {
                 }
                 if (Found) continue;
             } else {
-                if (!RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SurfMask(SurfNum - Zone(ZoneNum).SurfaceFirst + 1)) continue;
+                if (!state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum)
+                         .Node(RoomAirNode)
+                         .SurfMask(SurfNum - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1))
+                    continue;
             }
 
-            if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+            auto &HMassConvInFD = state.dataMstBal->HMassConvInFD;
+            auto &RhoVaporSurfIn = state.dataMstBal->RhoVaporSurfIn;
+            auto &RhoVaporAirIn = state.dataMstBal->RhoVaporAirIn;
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
                 UpdateHeatBalHAMT(state, SurfNum);
 
-                SumHmAW += HMassConvInFD(SurfNum) * Surface(SurfNum).Area * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
+                SumHmAW += HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
 
-                RhoAirZone = PsyRhoAirFnPbTdbW(state,
-                    state.dataEnvrn->OutBaroPress, MAT(Surface(SurfNum).Zone), PsyRhFnTdbRhov(state, MAT(Surface(SurfNum).Zone), RhoVaporAirIn(SurfNum), "RhoAirZone"));
+                RhoAirZone = PsyRhoAirFnPbTdbW(
+                    state,
+                    state.dataEnvrn->OutBaroPress,
+                    state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(SurfNum).Zone),
+                    PsyRhFnTdbRhov(
+                        state, state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(SurfNum).Zone), RhoVaporAirIn(SurfNum), "RhoAirZone"));
 
-                Wsurf = PsyWFnTdbRhPb(state, TempSurfInTmp(SurfNum), PsyRhFnTdbRhov(state, TempSurfInTmp(SurfNum), RhoVaporSurfIn(SurfNum), "Wsurf"), state.dataEnvrn->OutBaroPress);
+                Wsurf = PsyWFnTdbRhPb(state,
+                                      state.dataHeatBalSurf->TempSurfInTmp(SurfNum),
+                                      PsyRhFnTdbRhov(state, state.dataHeatBalSurf->TempSurfInTmp(SurfNum), RhoVaporSurfIn(SurfNum), "Wsurf"),
+                                      state.dataEnvrn->OutBaroPress);
 
-                SumHmARa = SumHmARa + HMassConvInFD(SurfNum) * Surface(SurfNum).Area * RhoAirZone;
+                SumHmARa = SumHmARa + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * RhoAirZone;
 
-                SumHmARaW = SumHmARaW + HMassConvInFD(SurfNum) * Surface(SurfNum).Area * RhoAirZone * Wsurf;
+                SumHmARaW = SumHmARaW + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * RhoAirZone * Wsurf;
             }
 
-            if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
 
-                UpdateMoistureBalanceEMPD(SurfNum);
-                RhoVaporSurfIn(SurfNum) = RVSurface(SurfNum);
+                UpdateMoistureBalanceEMPD(state, SurfNum);
+                RhoVaporSurfIn(SurfNum) = state.dataMstBalEMPD->RVSurface(SurfNum);
 
-                SumHmAW = SumHmAW + HMassConvInFD(SurfNum) * Surface(SurfNum).Area * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
-                SumHmARa = SumHmARa + HMassConvInFD(SurfNum) * Surface(SurfNum).Area *
-                                          PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress,
-                                                            TempSurfInTmp(SurfNum),
-                                                            PsyWFnTdbRhPb(state, TempSurfInTmp(SurfNum),
-                                                                          PsyRhFnTdbRhovLBnd0C(state, TempSurfInTmp(SurfNum), RhoVaporAirIn(SurfNum)),
-                                                                          state.dataEnvrn->OutBaroPress));
-                SumHmARaW = SumHmARaW + HMassConvInFD(SurfNum) * Surface(SurfNum).Area * RhoVaporSurfIn(SurfNum);
+                SumHmAW =
+                    SumHmAW + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
+                SumHmARa = SumHmARa +
+                           HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area *
+                               PsyRhoAirFnPbTdbW(
+                                   state,
+                                   state.dataEnvrn->OutBaroPress,
+                                   state.dataHeatBalSurf->TempSurfInTmp(SurfNum),
+                                   PsyWFnTdbRhPb(state,
+                                                 state.dataHeatBalSurf->TempSurfInTmp(SurfNum),
+                                                 PsyRhFnTdbRhovLBnd0C(state, state.dataHeatBalSurf->TempSurfInTmp(SurfNum), RhoVaporAirIn(SurfNum)),
+                                                 state.dataEnvrn->OutBaroPress));
+                SumHmARaW = SumHmARaW + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * RhoVaporSurfIn(SurfNum);
             }
         }
 
@@ -1270,7 +1256,6 @@ namespace RoomAirModelAirflowNetwork {
         using DataHVACGlobals::ZoneEquipTypeOf_BaseboardRadiantConvectiveWater;
         using DataHVACGlobals::ZoneEquipTypeOf_HighTemperatureRadiant;
         using DataHVACGlobals::ZoneEquipTypeOf_RefrigerationChillerSet;
-        using DataZoneEquipment::ZoneEquipConfig;
         using ElectricBaseboardRadiator::SimElecBaseboard;
         using HighTempRadiantSystem::SimHighTempRadiantSystem;
         using HWBaseboardRadiator::SimHWBaseboard;
@@ -1283,19 +1268,20 @@ namespace RoomAirModelAirflowNetwork {
         Real64 LatOutputProvided;
 
         // TODO
-        auto &ThisRAFNNode(RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum));
+        auto &ThisRAFNNode(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum));
 
         ThisRAFNNode.NonAirSystemResponse = 0.0;
 
-        if (!allocated(ZoneEquipConfig)) return;
+        if (!allocated(state.dataZoneEquip->ZoneEquipConfig)) return;
 
         for (I = 1; I <= ThisRAFNNode.NumHVACs; ++I) {
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_BaseboardRadiantConvectiveWater) {
                 //'ZoneHVAC:Baseboard:RadiantConvective:Water' 13
-                SimHWBaseboard(state, ThisRAFNNode.HVAC(I).Name,
+                SimHWBaseboard(state,
+                               ThisRAFNNode.HVAC(I).Name,
                                ZoneNum,
-                               RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
+                               state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
                                false,
                                SysOutputProvided,
                                ThisRAFNNode.HVAC(I).CompIndex);
@@ -1305,9 +1291,10 @@ namespace RoomAirModelAirflowNetwork {
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_BaseboardRadiantConvectiveSteam) {
                 // CASE(BBSteam_Num) !'ZoneHVAC:Baseboard:RadiantConvective:Steam' 14
-                SimSteamBaseboard(state, ThisRAFNNode.HVAC(I).Name,
+                SimSteamBaseboard(state,
+                                  ThisRAFNNode.HVAC(I).Name,
                                   ZoneNum,
-                                  RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
+                                  state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
                                   false,
                                   SysOutputProvided,
                                   ThisRAFNNode.HVAC(I).CompIndex);
@@ -1318,9 +1305,10 @@ namespace RoomAirModelAirflowNetwork {
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_BaseboardConvectiveWater) {
                 // CASE(BBWaterConvective_Num)  !'ZoneHVAC:Baseboard:Convective:Water' 16
-                SimBaseboard(state, ThisRAFNNode.HVAC(I).Name,
+                SimBaseboard(state,
+                             ThisRAFNNode.HVAC(I).Name,
                              ZoneNum,
-                             RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
+                             state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
                              false,
                              SysOutputProvided,
                              ThisRAFNNode.HVAC(I).CompIndex);
@@ -1330,9 +1318,10 @@ namespace RoomAirModelAirflowNetwork {
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_BaseboardConvectiveElectric) {
                 // CASE(BBElectricConvective_Num)  !'ZoneHVAC:Baseboard:Convective:Electric' 15
-                SimElectricBaseboard(state, ThisRAFNNode.HVAC(I).Name,
+                SimElectricBaseboard(state,
+                                     ThisRAFNNode.HVAC(I).Name,
                                      ZoneNum,
-                                     RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
+                                     state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
                                      SysOutputProvided,
                                      ThisRAFNNode.HVAC(I).CompIndex);
                 ThisRAFNNode.NonAirSystemResponse += ThisRAFNNode.HVAC(I).SupplyFraction * SysOutputProvided;
@@ -1341,15 +1330,17 @@ namespace RoomAirModelAirflowNetwork {
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_RefrigerationChillerSet) {
                 // CASE(RefrigerationAirChillerSet_Num)  !'ZoneHVAC:RefrigerationChillerSet' 20
-                SimAirChillerSet(state, ThisRAFNNode.HVAC(I).Name, ZoneNum, false, SysOutputProvided, LatOutputProvided, ThisRAFNNode.HVAC(I).CompIndex);
+                SimAirChillerSet(
+                    state, ThisRAFNNode.HVAC(I).Name, ZoneNum, false, SysOutputProvided, LatOutputProvided, ThisRAFNNode.HVAC(I).CompIndex);
                 ThisRAFNNode.NonAirSystemResponse += ThisRAFNNode.HVAC(I).SupplyFraction * SysOutputProvided;
             }
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_BaseboardRadiantConvectiveElectric) {
                 // CASE(BBElectric_Num)  !'ZoneHVAC:Baseboard:RadiantConvective:Electric' 12
-                SimElecBaseboard(state, ThisRAFNNode.HVAC(I).Name,
+                SimElecBaseboard(state,
+                                 ThisRAFNNode.HVAC(I).Name,
                                  ZoneNum,
-                                 RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
+                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
                                  false,
                                  SysOutputProvided,
                                  ThisRAFNNode.HVAC(I).CompIndex);
@@ -1403,7 +1394,7 @@ namespace RoomAirModelAirflowNetwork {
 
         // TODO
 
-        auto &ThisRAFNZone(RoomAirflowNetworkZoneInfo(ZoneNum));
+        auto &ThisRAFNZone(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum));
 
         // SysDepZoneLoads saved to be added to zone heat balance next
         SysOutputProvided = 0.0;
@@ -1412,7 +1403,8 @@ namespace RoomAirModelAirflowNetwork {
             for (I = 1; I <= ThisRAFNZone.Node(RoomAirNode).NumHVACs; ++I) {
                 if (ThisRAFNZone.Node(RoomAirNode).HVAC(I).TypeOfNum == ZoneEquipTypeOf_DehumidifierDX) {
                     if (SysOutputProvided == 0.0)
-                        SimZoneDehumidifier(state, ThisRAFNZone.Node(RoomAirNode).HVAC(I).Name,
+                        SimZoneDehumidifier(state,
+                                            ThisRAFNZone.Node(RoomAirNode).HVAC(I).Name,
                                             ZoneNum,
                                             false,
                                             SysOutputProvided,

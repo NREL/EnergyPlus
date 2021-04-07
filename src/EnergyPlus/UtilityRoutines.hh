@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -132,9 +132,9 @@ bool env_var_on(std::string const &env_var_str);
 class FatalError : public std::runtime_error
 {
 public:
-    FatalError(std::string const& msg):
-    runtime_error(msg)
-    {}
+    FatalError(std::string const &msg) : runtime_error(msg)
+    {
+    }
 };
 
 using OptionalOutputFileRef = Optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
@@ -143,17 +143,26 @@ void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, Opti
 
 void ShowSevereError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowSevereMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowSevereMessage(EnergyPlusData &state,
+                       std::string const &ErrorMessage,
+                       OptionalOutputFileRef OutUnit1 = _,
+                       OptionalOutputFileRef OutUnit2 = _);
 
 void ShowContinueError(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowContinueErrorTimeStamp(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowContinueErrorTimeStamp(EnergyPlusData &state,
+                                std::string const &Message,
+                                OptionalOutputFileRef OutUnit1 = _,
+                                OptionalOutputFileRef OutUnit2 = _);
 
 void ShowMessage(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
 void ShowWarningError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowWarningMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowWarningMessage(EnergyPlusData &state,
+                        std::string const &ErrorMessage,
+                        OptionalOutputFileRef OutUnit1 = _,
+                        OptionalOutputFileRef OutUnit2 = _);
 
 void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
                                    std::string const &Message,             // Message automatically written to "error file" at end of simulation
@@ -575,17 +584,21 @@ namespace UtilityRoutines {
     // For map, you'd only need the comparator
     struct case_insensitive_hasher
     {
-        size_t operator()(const std::string& key) const noexcept;
+        size_t operator()(const std::string &key) const noexcept;
     };
 
     struct case_insensitive_comparator
     {
-        bool operator()(const std::string& a, const std::string& b) const noexcept;
+        bool operator()(const std::string &a, const std::string &b) const noexcept;
     };
 
-    void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn=false);
+    void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn = false);
 
-    bool ValidateFuelType(EnergyPlusData &state, std::string const &FuelTypeInput, std::string &FuelTypeOutput, bool &FuelTypeErrorsFound, bool const &AllowSteamAndDistrict = false);
+    bool ValidateFuelType(EnergyPlusData &state,
+                          std::string const &FuelTypeInput,
+                          std::string &FuelTypeOutput,
+                          bool &FuelTypeErrorsFound,
+                          bool const &AllowSteamAndDistrict = false);
 
     bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
                                                    std::string &FuelTypeOutput,
@@ -594,17 +607,20 @@ namespace UtilityRoutines {
 
 } // namespace UtilityRoutines
 
-struct UtilityRoutinesData : BaseGlobalStruct {
+struct UtilityRoutinesData : BaseGlobalStruct
+{
 
     bool outputErrorHeader = true;
     std::string appendPerfLog_headerRow;
     std::string appendPerfLog_valuesRow;
+    bool GetMatrixInputFlag = true;
 
     void clear_state() override
     {
         outputErrorHeader = true;
         appendPerfLog_headerRow.clear();
         appendPerfLog_valuesRow.clear();
+        GetMatrixInputFlag = true;
     }
 
     // Default Constructor

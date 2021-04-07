@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -166,7 +167,8 @@ namespace TranspiredCollector {
 
     void UpdateTranspiredCollector(EnergyPlusData &state, int const UTSCNum);
 
-    void SetUTSCQdotSource(EnergyPlusData &state, int const UTSCNum,
+    void SetUTSCQdotSource(EnergyPlusData &state,
+                           int const UTSCNum,
                            Real64 const QSource // source term in Watts
     );
 
@@ -174,15 +176,14 @@ namespace TranspiredCollector {
 
     void GetUTSCTsColl(EnergyPlusData &state, int const UTSCNum, Real64 &TsColl);
 
-    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound
-    );
+    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound);
 
-    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound
-    );
+    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound);
 
 } // namespace TranspiredCollector
 
-struct TranspiredCollectorData : BaseGlobalStruct {
+struct TranspiredCollectorData : BaseGlobalStruct
+{
 
     int const Layout_Square = 1;
     int const Layout_Triangle = 2;
@@ -197,13 +198,16 @@ struct TranspiredCollectorData : BaseGlobalStruct {
     bool MyOneTimeFlag = true;
     bool MySetPointCheckFlag = true;
 
+    Array1D_bool MyEnvrnFlag;
+
     void clear_state() override
     {
-        NumUTSC = 0;
-        GetInputFlag = true;
-        UTSC.deallocate();
-        MyOneTimeFlag = true;
-        MySetPointCheckFlag = true;
+        this->NumUTSC = 0;
+        this->GetInputFlag = true;
+        this->UTSC.deallocate();
+        this->MyOneTimeFlag = true;
+        this->MySetPointCheckFlag = true;
+        this->MyEnvrnFlag.deallocate();
     }
 
     // Default Constructor

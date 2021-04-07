@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,8 +49,8 @@
 #define SimulationManager_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -93,19 +93,20 @@ namespace SimulationManager {
 
 } // namespace SimulationManager
 
-struct SimulationManagerData : BaseGlobalStruct {
+struct SimulationManagerData : BaseGlobalStruct
+{
     bool RunPeriodsInInput = false;
     bool RunControlInInput = false;
     bool PreP_Fatal = false;
     bool WarningOut = true;
-    void clear_state() override {
+    void clear_state() override
+    {
         this->RunPeriodsInInput = false;
         this->RunControlInInput = false;
         this->PreP_Fatal = false;
         this->WarningOut = true;
     }
 };
-
 
 void Resimulate(EnergyPlusData &state,
                 bool &ResimExt, // Flag to resimulate the exterior energy use simulation

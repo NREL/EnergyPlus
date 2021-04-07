@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.5;
 
   Building,
     Building,                !- Name
@@ -2005,6 +2005,47 @@
     0.2237,                  !- Velocity Term Coefficient
     0;                       !- Velocity Squared Term Coefficient
 
+  ZoneHVAC:Baseboard:RadiantConvective:Steam,
+    SPACE1-1 Baseboard, !- Name
+    Baseboard Design, !- Design_Object_Name
+    REHEATCOILAVAILSCHED, !- Availability_Schedule_Name
+    SPACE1-1 Reheat Coil Steam Inlet, !- Inlet_Node_Name
+    SPACE1-1 Reheat Coil Steam Outlet, !- Outlet_Node_Name
+    Autosize, !- Heating_Design_Capacity
+    5, !- Degree_of_SubCooling
+    autosize, !- Maximum_Steam_Flow_Rate
+    FRONT-1, !- Surface_1_Name
+    0.4, !- Fraction_of_Radiant_Energy_to_Surface_1
+    C1-1, !- Surface_2_Name
+    0.2, !- Fraction_of_Radiant_Energy_to_Surface_2
+    SB15, !- Surface_3_Name
+    0.1; !- Fraction_of_Radiant_Energy_to_Surface_3
+
+  ZoneHVAC:Baseboard:RadiantConvective:Steam,
+    SPACE3-1 Baseboard, !- Name
+    Baseboard Design, !- Design_Object_Name
+    REHEATCOILAVAILSCHED, !- Availability_Schedule_Name
+    SPACE3-1 Reheat Coil Steam Inlet, !- Inlet_Node_Name
+    SPACE3-1 Reheat Coil Steam Outlet, !- Outlet_Node_Name
+    Autosize, !- Heating_Design_Capacity
+    5, !- Degree_of_SubCooling
+    autosize, !- Maximum_Steam_Flow_Rate
+    BACK-1, !- Surface_1_Name
+    0.4, !- Fraction_of_Radiant_Energy_to_Surface_1
+    C3-1, !- Surface_2_Name
+    0.2, !- Fraction_of_Radiant_Energy_to_Surface_2
+    SB35, !- Surface_3_Name
+    0.1; !- Fraction_of_Radiant_Energy_to_Surface_3
+
+  ZoneHVAC:Baseboard:RadiantConvective:Steam:Design,
+    Baseboard Design, !- Design_Object_Name
+    HeatingDesignCapacity, !- Heating_Design_Capacity_Method
+    , !- Heating_Design_Capacity_Per_Floor_Area
+    , !- Fraction_of_Autosized_Heating_Design_Capacity
+    0.001, !- Convergence_Tolerance
+    0.3, !- Fraction_Radiant
+    0.3; !- Fraction_of_Radiant_Energy_Incident_on_People
+
   ZoneInfiltration:DesignFlowRate,
     SPACE5-1 Infil 1,        !- Name
     SPACE5-1,                !- Zone or ZoneList Name
@@ -2804,48 +2845,6 @@
     VAV SYS 1 Air Loop Outlet,  !- Fan Outlet Node Name
     VAV SYS 1 Mixed Air Outlet;  !- Setpoint Node or NodeList Name
 
-  ZoneHVAC:Baseboard:RadiantConvective:Steam,
-    SPACE1-1 Baseboard,      !- Name
-    REHEATCOILAVAILSCHED,    !- Availability Schedule Name
-    SPACE1-1 Reheat Coil Steam Inlet,  !- Inlet Node Name
-    SPACE1-1 Reheat Coil Steam Outlet,  !- Outlet Node Name
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Heating Design Capacity
-    5,                       !- Degree of SubCooling {deltaC}
-    autosize,                !- Maximum Steam Flow Rate {m3/s}
-    0.001,                   !- Convergence Tolerance
-    0.3,                     !- Fraction Radiant
-    0.3,                     !- Fraction of Radiant Energy Incident on People
-    FRONT-1,                 !- Surface 1 Name
-    0.4,                     !- Fraction of Radiant Energy to Surface 1
-    C1-1,                    !- Surface 2 Name
-    0.2,                     !- Fraction of Radiant Energy to Surface 2
-    SB15,                    !- Surface 3 Name
-    0.1;                     !- Fraction of Radiant Energy to Surface 3
-
-  ZoneHVAC:Baseboard:RadiantConvective:Steam,
-    SPACE3-1 Baseboard,      !- Name
-    REHEATCOILAVAILSCHED,    !- Availability Schedule Name
-    SPACE3-1 Reheat Coil Steam Inlet,  !- Inlet Node Name
-    SPACE3-1 Reheat Coil Steam Outlet,  !- Outlet Node Name
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Heating Design Capacity
-    5,                       !- Degree of SubCooling {deltaC}
-    autosize,                !- Maximum Steam Flow Rate {m3/s}
-    0.001,                   !- Convergence Tolerance
-    0.3,                     !- Fraction Radiant
-    0.3,                     !- Fraction of Radiant Energy Incident on People
-    BACK-1,                  !- Surface 1 Name
-    0.4,                     !- Fraction of Radiant Energy to Surface 1
-    C3-1,                    !- Surface 2 Name
-    0.2,                     !- Fraction of Radiant Energy to Surface 2
-    SB35,                    !- Surface 3 Name
-    0.1;                     !- Fraction of Radiant Energy to Surface 3
-
   Controller:WaterCoil,
     VAV SYS 1 Cooling Coil Controller,  !- Name
     Temperature,             !- Control Variable
@@ -3418,4 +3417,3 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
-

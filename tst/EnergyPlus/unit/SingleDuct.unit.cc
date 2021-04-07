@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -66,19 +67,15 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace SimulationManager;
 using namespace DataSizing;
-using DataHeatBalance::Zone;
 
 TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
 {
@@ -128,7 +125,7 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -143,12 +140,12 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
     // node number table
     //  1   Zone 1 Air Node
@@ -156,7 +153,7 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     //  3   Zone 1 Supply Inlet
     //  4   Zone 1 Zone Equip Inlet
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
     // Setup for Zone 1 VAV No Reheat
     int SysNum = 1;
@@ -168,68 +165,72 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     Real64 SysMaxMassFlow = 2.0 * state->dataEnvrn->StdRhoAir; // From inputs for Zone 1 VAV
 
     // Test with heating load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0; // Heating load - expect min flow rate
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0; // Heating load - expect min flow rate
 
     // First test - AlwaysOff Schedule - expecting no flow
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 1;
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
     state->dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru SingleDuct::InitSys for this terminal unit
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state,
+                                                          FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     state->dataSingleDuct->sd_airterminal(SysNum).SimVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 
     // Second test - AlwaysOn Schedule - expecting flow
     // Reset flows and switch to AlwaysOn Schedule
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 2;
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     FirstHVACIteration = false;
-    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state,
+                                                          FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     state->dataSingleDuct->sd_airterminal(SysNum).SimVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     EXPECT_EQ(SysMaxMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMinMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 
     // Test with cooling load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -2000.0; // Cooling load - expect max flow rate
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -2000.0; // Cooling load - expect max flow rate
 
     // First test - AlwaysOff Schedule - expecting no flow
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 1;
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
     state->dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru SingleDuct::InitSys for this terminal unit
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state,
+                                                          FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     state->dataSingleDuct->sd_airterminal(SysNum).SimVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 
     // Second test - AlwaysOn Schedule - expecting flow
     // Reset flows and switch to AlwaysOn Schedule
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 2;
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     FirstHVACIteration = false;
-    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state,
+                                                          FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     state->dataSingleDuct->sd_airterminal(SysNum).SimVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     EXPECT_EQ(SysMaxMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMaxMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 
     // Cleanup
-    DataHeatBalFanSys::TempControlType.deallocate();
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.deallocate();
+    state->dataHeatBalFanSys->TempControlType.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
@@ -299,7 +300,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -314,12 +315,12 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
     // node number table
     //  1   Zone 1 Air Node
@@ -328,7 +329,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     //  4   Zone 1 VAV Reheat Coil Air Inlet
     //  5   Zone 1 Zone Equip Inlet
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
     // Setup for Zone 1 VAV No Reheat
     int SysNum = 1;
@@ -340,68 +341,72 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     Real64 SysMaxMassFlow = 1.0 * state->dataEnvrn->StdRhoAir;  // From inputs for Zone 1 VAV
 
     // Test with heating load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0; // Heating load - expect min flow rate
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0; // Heating load - expect min flow rate
 
     // First test - AlwaysOff Schedule - expecting no flow
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 1;
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
     state->dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru SingleDuct::InitSys for this terminal unit
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state,
+                                                          FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     state->dataSingleDuct->sd_airterminal(SysNum).SimVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 
     // Second test - AlwaysOn Schedule - expecting flow
     // Reset flows and switch to AlwaysOn Schedule
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 2;
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     FirstHVACIteration = false;
-    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state,
+                                                          FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     state->dataSingleDuct->sd_airterminal(SysNum).SimVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     EXPECT_EQ(SysMaxMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMinMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 
     // Test with cooling load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -2000.0; // Cooling load - expect max flow rate
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -2000.0; // Cooling load - expect max flow rate
 
     // First test - AlwaysOff Schedule - expecting no flow
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 1;
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
     state->dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru SingleDuct::InitSys for this terminal unit
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state,
+                                                          FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     state->dataSingleDuct->sd_airterminal(SysNum).SimVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 
     // Second test - AlwaysOn Schedule - expecting flow
     // Reset flows and switch to AlwaysOn Schedule
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 2;
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     FirstHVACIteration = false;
-    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+    state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state,
+                                                          FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     state->dataSingleDuct->sd_airterminal(SysNum).SimVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     EXPECT_EQ(SysMaxMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMaxMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 
     // Cleanup
-    DataHeatBalFanSys::TempControlType.deallocate();
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.deallocate();
+    state->dataHeatBalFanSys->TempControlType.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
@@ -1262,15 +1267,19 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
 
     // zone floor area of zone 1 = 0, zone 2 > 0. Expect TU MaxAirVolFlowRateDuringReheat = 0 only for zone 1.
     // this test isn't relevant anymore since defaulting is done differently
-    Real64 MaxAirVolFlowRateDuringReheatDes = min(FinalZoneSizing(1).DesHeatVolFlowMax, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate);
-    // Real64 MaxAirVolFlowRateDuringReheatDes = min( 0.002032 * state->dataSingleDuct->sd_airterminal( 1 ).ZoneFloorArea, state->dataSingleDuct->sd_airterminal( 1 ).MaxAirVolFlowRate );
-    // apply limit based on min stop
+    Real64 MaxAirVolFlowRateDuringReheatDes =
+        min(state->dataSize->FinalZoneSizing(1).DesHeatVolFlowMax, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate);
+    // Real64 MaxAirVolFlowRateDuringReheatDes = min( 0.002032 * state->dataSingleDuct->sd_airterminal( 1 ).ZoneFloorArea,
+    // state->dataSingleDuct->sd_airterminal( 1 ).MaxAirVolFlowRate ); apply limit based on min stop
     MaxAirVolFlowRateDuringReheatDes =
-        max(MaxAirVolFlowRateDuringReheatDes, (state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate * state->dataSingleDuct->sd_airterminal(1).ZoneMinAirFrac));
+        max(MaxAirVolFlowRateDuringReheatDes,
+            (state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate * state->dataSingleDuct->sd_airterminal(1).ZoneMinAirFrac));
 
     // This isn't relevant any more since the default is calculated differently
-    Real64 MaxAirVolFractionDuringReheatDes = min(1.0, (FinalZoneSizing(1).DesHeatVolFlowMax / state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate));
-    // Real64 MaxAirVolFractionDuringReheatDes = min( 1.0, ( 0.002032 * state->dataSingleDuct->sd_airterminal( 1 ).ZoneFloorArea / state->dataSingleDuct->sd_airterminal( 1 ).MaxAirVolFlowRate )
+    Real64 MaxAirVolFractionDuringReheatDes =
+        min(1.0, (state->dataSize->FinalZoneSizing(1).DesHeatVolFlowMax / state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate));
+    // Real64 MaxAirVolFractionDuringReheatDes = min( 1.0, ( 0.002032 * state->dataSingleDuct->sd_airterminal( 1 ).ZoneFloorArea /
+    // state->dataSingleDuct->sd_airterminal( 1 ).MaxAirVolFlowRate )
     // ); apply limit based on min stop
     MaxAirVolFractionDuringReheatDes = max(MaxAirVolFractionDuringReheatDes, state->dataSingleDuct->sd_airterminal(1).ZoneMinAirFrac);
     // apply model math
@@ -1282,10 +1291,13 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRateDuringReheat, MaxAirVolFlowRateDuringReheatDes, 0.0000000000001);
     EXPECT_NEAR(MaxAirVolFractionDuringReheatDes, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFractionDuringReheat, 0.0000000000001);
 
-    MaxAirVolFlowRateDuringReheatDes = min(FinalZoneSizing(2).DesHeatVolFlowMax, state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate);
     MaxAirVolFlowRateDuringReheatDes =
-        max(MaxAirVolFlowRateDuringReheatDes, (state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate * state->dataSingleDuct->sd_airterminal(2).ZoneMinAirFrac));
-    MaxAirVolFractionDuringReheatDes = min(1.0, (FinalZoneSizing(2).DesHeatVolFlowMax / state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate));
+        min(state->dataSize->FinalZoneSizing(2).DesHeatVolFlowMax, state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate);
+    MaxAirVolFlowRateDuringReheatDes =
+        max(MaxAirVolFlowRateDuringReheatDes,
+            (state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate * state->dataSingleDuct->sd_airterminal(2).ZoneMinAirFrac));
+    MaxAirVolFractionDuringReheatDes =
+        min(1.0, (state->dataSize->FinalZoneSizing(2).DesHeatVolFlowMax / state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate));
     MaxAirVolFractionDuringReheatDes = max(MaxAirVolFractionDuringReheatDes, state->dataSingleDuct->sd_airterminal(2).ZoneMinAirFrac);
     MaxAirVolFlowRateDuringReheatDes =
         min(max(MaxAirVolFlowRateDuringReheatDes, MaxAirVolFractionDuringReheatDes * state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate),
@@ -1308,31 +1320,31 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
     Real64 AirLoopOAFrac;
 
     state->dataSingleDuct->sd_airterminal.allocate(1);
-    Zone.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
-    DataSizing::OARequirements.allocate(1);
-    DataHeatBalance::ZoneIntGain.allocate(1);
+    state->dataSize->OARequirements.allocate(1);
+    state->dataHeatBal->ZoneIntGain.allocate(1);
 
-    Zone(1).FloorArea = 10.0;
+    state->dataHeatBal->Zone(1).FloorArea = 10.0;
     state->dataSingleDuct->sd_airterminal(1).CtrlZoneNum = 1;
     state->dataSingleDuct->sd_airterminal(1).ActualZoneNum = 1;
     state->dataSingleDuct->sd_airterminal(1).NoOAFlowInputFromUser = false;
     state->dataSingleDuct->sd_airterminal(1).OARequirementsPtr = 1;
     state->dataSingleDuct->sd_airterminal(1).AirLoopNum = 1;
 
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 0.4;
     state->dataAirLoop->AirLoopControlInfo(1).AirLoopDCVFlag = true;
 
-    DataSizing::OARequirements(1).Name = "CM DSOA WEST ZONE";
-    DataSizing::OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
-    DataSizing::OARequirements(1).OAFlowPerPerson = 0.003149;
-    DataSizing::OARequirements(1).OAFlowPerArea = 0.000407;
+    state->dataSize->OARequirements(1).Name = "CM DSOA WEST ZONE";
+    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowPerPerson = 0.003149;
+    state->dataSize->OARequirements(1).OAFlowPerArea = 0.000407;
     state->dataEnvrn->StdRhoAir = 1.20;
-    DataHeatBalance::ZoneIntGain(1).NOFOCC = 0.1;
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 0.1;
 
     state->dataSingleDuct->sd_airterminal(1).CalcOAMassFlow(*state, SAMassFlow, AirLoopOAFrac);
     EXPECT_NEAR(0.0131547, SAMassFlow, 0.00001);
@@ -1340,12 +1352,12 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
 
     // Cleanup
     state->dataSingleDuct->sd_airterminal.deallocate();
-    Zone.deallocate();
-    DataZoneEquipment::ZoneEquipConfig.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
     state->dataAirLoop->AirLoopControlInfo.deallocate();
-    DataSizing::OARequirements.deallocate();
-    DataHeatBalance::ZoneIntGain.deallocate();
+    state->dataSize->OARequirements.deallocate();
+    state->dataHeatBal->ZoneIntGain.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
@@ -2472,11 +2484,11 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
     //	" Until: 24:00, 10.0;       !- Field 23",
 
     state->dataEnvrn->StdRhoAir = 1.2027389349552706;
-    Real64 CoilInTemp = TermUnitFinalZoneSizing(1).DesHeatCoilInTempTU;
-    Real64 DesMassFlow = state->dataEnvrn->StdRhoAir * TermUnitSizing(1).AirVolFlow;
-    Real64 DesZoneHeatLoad = FinalZoneSizing(1).DesHeatLoad * FinalZoneSizing(1).HeatSizingFactor;
-    Real64 ZoneDesTemp = FinalZoneSizing(1).ZoneTempAtHeatPeak;
-    Real64 ZoneDesHumRat = FinalZoneSizing(1).ZoneHumRatAtHeatPeak;
+    Real64 CoilInTemp = state->dataSize->TermUnitFinalZoneSizing(1).DesHeatCoilInTempTU;
+    Real64 DesMassFlow = state->dataEnvrn->StdRhoAir * state->dataSize->TermUnitSizing(1).AirVolFlow;
+    Real64 DesZoneHeatLoad = state->dataSize->FinalZoneSizing(1).DesHeatLoad * state->dataSize->FinalZoneSizing(1).HeatSizingFactor;
+    Real64 ZoneDesTemp = state->dataSize->FinalZoneSizing(1).ZoneTempAtHeatPeak;
+    Real64 ZoneDesHumRat = state->dataSize->FinalZoneSizing(1).ZoneHumRatAtHeatPeak;
 
     Real64 DesCoilLoad = DesZoneHeatLoad + Psychrometrics::PsyCpAirFnW(ZoneDesHumRat) * DesMassFlow * (ZoneDesTemp - CoilInTemp);
 
@@ -2495,15 +2507,15 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
 
     int ATMixerNum = 1;
     state->dataSingleDuct->NumATMixers = 1;
-    DataHeatBalance::TotPeople = 1;
+    state->dataHeatBal->TotPeople = 1;
 
     state->dataSingleDuct->SysATMixer.allocate(ATMixerNum);
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
-    DataLoopNode::Node.allocate(3);
-    DataSizing::OARequirements.allocate(1);
-    Zone.allocate(1);
-    DataHeatBalance::ZoneIntGain.allocate(1);
+    state->dataLoopNodes->Node.allocate(3);
+    state->dataSize->OARequirements.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->ZoneIntGain.allocate(1);
 
     state->dataSingleDuct->SysATMixer(ATMixerNum).SecInNode = 1;
     state->dataSingleDuct->SysATMixer(ATMixerNum).PriInNode = 2;
@@ -2516,16 +2528,16 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
 
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 1.0;
 
-    Zone(1).FloorArea = 10.0;
-    OARequirements(1).OAFlowMethod = OAFlowSum;
-    OARequirements(1).OAFlowPerZone = 0.1;
-    OARequirements(1).OAFlowPerPerson = 0.1;
+    state->dataHeatBal->Zone(1).FloorArea = 10.0;
+    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowPerZone = 0.1;
+    state->dataSize->OARequirements(1).OAFlowPerPerson = 0.1;
 
-    DataLoopNode::Node(2).Press = 101325.0;
-    DataLoopNode::Node(2).Temp = 23.0;
-    DataLoopNode::Node(2).HumRat = 0.001;
+    state->dataLoopNodes->Node(2).Press = 101325.0;
+    state->dataLoopNodes->Node(2).Temp = 23.0;
+    state->dataLoopNodes->Node(2).HumRat = 0.001;
 
-    DataHeatBalance::ZoneIntGain(1).NOFOCC = 5.0;
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 5.0;
 
     state->dataEnvrn->StdRhoAir = 1.20;
     state->dataSingleDuct->SysATMixer(1).MassFlowRateMaxAvail = 1.0;
@@ -2535,20 +2547,20 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     // Current occupancy
     state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = 1;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
-    EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, 0.72, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).MassFlowRate, 0.72, 0.0001);
     // Design occupancy
     state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = 2;
-    Zone(1).TotOccupants = 10;
+    state->dataHeatBal->Zone(1).TotOccupants = 10;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
-    EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, 1.32, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).MassFlowRate, 1.32, 0.0001);
 
     state->dataSingleDuct->SysATMixer.deallocate();
-    DataZoneEquipment::ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
-    DataLoopNode::Node.deallocate();
-    DataSizing::OARequirements.deallocate();
-    Zone.deallocate();
-    DataHeatBalance::ZoneIntGain.deallocate();
+    state->dataLoopNodes->Node.deallocate();
+    state->dataSize->OARequirements.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+    state->dataHeatBal->ZoneIntGain.deallocate();
 }
 TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
 {
@@ -2558,15 +2570,15 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
 
     int ATMixerNum = 1;
     state->dataSingleDuct->NumATMixers = 1;
-    DataHeatBalance::TotPeople = 1;
+    state->dataHeatBal->TotPeople = 1;
 
     state->dataSingleDuct->SysATMixer.allocate(ATMixerNum);
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
-    DataLoopNode::Node.allocate(3);
-    DataSizing::OARequirements.allocate(1);
-    Zone.allocate(1);
-    DataHeatBalance::ZoneIntGain.allocate(1);
+    state->dataLoopNodes->Node.allocate(3);
+    state->dataSize->OARequirements.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->ZoneIntGain.allocate(1);
 
     state->dataSingleDuct->SysATMixer(ATMixerNum).SecInNode = 1;
     state->dataSingleDuct->SysATMixer(ATMixerNum).PriInNode = 2;
@@ -2577,23 +2589,23 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser = false;
     state->dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr = 1;
 
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
 
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 1.0;
 
-    Zone(1).FloorArea = 10.0;
-    OARequirements(1).OAFlowMethod = OAFlowSum;
-    OARequirements(1).OAFlowPerZone = 0.5;
-    OARequirements(1).OAFlowPerPerson = 0.0;
-    OARequirements(1).OAFlowPerArea = 0.0;
-    OARequirements(1).OAFlowACH = 0.0;
+    state->dataHeatBal->Zone(1).FloorArea = 10.0;
+    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowPerZone = 0.5;
+    state->dataSize->OARequirements(1).OAFlowPerPerson = 0.0;
+    state->dataSize->OARequirements(1).OAFlowPerArea = 0.0;
+    state->dataSize->OARequirements(1).OAFlowACH = 0.0;
 
-    DataLoopNode::Node(2).Press = 101325.0;
-    DataLoopNode::Node(2).Temp = 23.0;
-    DataLoopNode::Node(2).HumRat = 0.001;
+    state->dataLoopNodes->Node(2).Press = 101325.0;
+    state->dataLoopNodes->Node(2).Temp = 23.0;
+    state->dataLoopNodes->Node(2).HumRat = 0.001;
 
-    DataHeatBalance::ZoneIntGain(1).NOFOCC = 5.0;
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 5.0;
 
     state->dataEnvrn->StdRhoAir = 1.0;
     state->dataSingleDuct->SysATMixer(1).MassFlowRateMaxAvail = 1.0;
@@ -2605,33 +2617,33 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
 
     // InletSideMixer, Mixed air outlet mass flow > OA requirement, expect primary flow to equal OA requirement
     state->dataSingleDuct->SysATMixer(1).MixerType = DataHVACGlobals::ATMixer_InletSide;
-    DataLoopNode::Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 1.0;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
-    EXPECT_NEAR(DataLoopNode::Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
 
     // InletSideMixer, Mixed air outlet mass flow < OA requirement, expect primary flow to equal mixed air flow
-    DataLoopNode::Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 0.10;
+    state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 0.10;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
-    EXPECT_NEAR(DataLoopNode::Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.10, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.10, 0.0001);
 
     // SupplySideMixer, Mixed air outlet mass flow > OA requirement, expect primary flow to equal OA requirement
     state->dataSingleDuct->SysATMixer(1).MixerType = DataHVACGlobals::ATMixer_SupplySide;
-    DataLoopNode::Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 1.0;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
-    EXPECT_NEAR(DataLoopNode::Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
 
     // SupplySideMixer, Mixed air outlet mass flow < OA requirement, expect primary flow to equal OA requirement
-    DataLoopNode::Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 0.10;
+    state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 0.10;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
-    EXPECT_NEAR(DataLoopNode::Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
     state->dataSingleDuct->SysATMixer.deallocate();
 
-    DataZoneEquipment::ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
-    DataLoopNode::Node.deallocate();
-    DataSizing::OARequirements.deallocate();
-    Zone.deallocate();
-    DataHeatBalance::ZoneIntGain.deallocate();
+    state->dataLoopNodes->Node.deallocate();
+    state->dataSize->OARequirements.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+    state->dataHeatBal->ZoneIntGain.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
@@ -2692,10 +2704,10 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
-    DataSizing::TermUnitFinalZoneSizing.allocate(1);
-    DataSizing::TermUnitSizing.allocate(1);
-    DataSizing::FinalZoneSizing.allocate(1);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitSizing.allocate(1);
+    state->dataSize->FinalZoneSizing.allocate(1);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
@@ -2703,53 +2715,53 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
     int SysNum = 1;
 
     // First test -  design min flow < max flow
-    ZoneSizingRunDone = true;
-    CurZoneEqNum = 1;
-    CurTermUnitSizingNum = 1;
-    DataSizing::TermUnitFinalZoneSizing(1).DesCoolVolFlowMin = 0.5;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataSize->CurTermUnitSizingNum = 1;
+    state->dataSize->TermUnitFinalZoneSizing(1).DesCoolVolFlowMin = 0.5;
     state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
     EXPECT_EQ(0.5, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
 
     // Second test -  design min flow > max flow
-    ZoneSizingRunDone = true;
-    CurZoneEqNum = 1;
-    CurTermUnitSizingNum = 1;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataSize->CurTermUnitSizingNum = 1;
     state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes = AutoSize; // need to reset this so it sizes again
-    DataSizing::TermUnitFinalZoneSizing(1).DesCoolVolFlowMin = 1.5;
+    state->dataSize->TermUnitFinalZoneSizing(1).DesCoolVolFlowMin = 1.5;
     state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
     EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
 }
 
 TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
 {
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
-    SysSizingRunDone = true;
-    SysSizInput.allocate(1);
-    NumSysSizInput = 1;
-    SysSizInput(1).AirLoopNum = 1;
-    SysSizInput(1).AirPriLoopName = "MyAirLoop";
-    FinalSysSizing.allocate(1);
-    FinalSysSizing(1).AirPriLoopName = "MyAirLoop";
-    FinalSysSizing(1).PreheatTemp = 15.0;
-    FinalSysSizing(1).PreheatHumRat = 0.005;
-    FinalSysSizing(1).HeatRetTemp = 20.0;
-    FinalSysSizing(1).HeatRetHumRat = 0.007;
-    FinalSysSizing(1).PrecoolTemp = 18.0;
-    FinalSysSizing(1).PrecoolHumRat = 0.008;
-    FinalSysSizing(1).RetTempAtCoolPeak = 24.0;
-    FinalSysSizing(1).RetHumRatAtCoolPeak = 0.01;
-    FinalSysSizing(1).OutTempAtCoolPeak = 32.0;
-    FinalSysSizing(1).OutHumRatAtCoolPeak = 0.012;
-    FinalSysSizing(1).HeatOutTemp = 10.0;
-    FinalSysSizing(1).HeatOutHumRat = 0.003;
-    FinalSysSizing(1).DesMainVolFlow = 1.2345;
-    FinalSysSizing(1).DesOutAirVolFlow = 1.2345;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->NumSysSizInput = 1;
+    state->dataSize->SysSizInput(1).AirLoopNum = 1;
+    state->dataSize->SysSizInput(1).AirPriLoopName = "MyAirLoop";
+    state->dataSize->FinalSysSizing.allocate(1);
+    state->dataSize->FinalSysSizing(1).AirPriLoopName = "MyAirLoop";
+    state->dataSize->FinalSysSizing(1).PreheatTemp = 15.0;
+    state->dataSize->FinalSysSizing(1).PreheatHumRat = 0.005;
+    state->dataSize->FinalSysSizing(1).HeatRetTemp = 20.0;
+    state->dataSize->FinalSysSizing(1).HeatRetHumRat = 0.007;
+    state->dataSize->FinalSysSizing(1).PrecoolTemp = 18.0;
+    state->dataSize->FinalSysSizing(1).PrecoolHumRat = 0.008;
+    state->dataSize->FinalSysSizing(1).RetTempAtCoolPeak = 24.0;
+    state->dataSize->FinalSysSizing(1).RetHumRatAtCoolPeak = 0.01;
+    state->dataSize->FinalSysSizing(1).OutTempAtCoolPeak = 32.0;
+    state->dataSize->FinalSysSizing(1).OutHumRatAtCoolPeak = 0.012;
+    state->dataSize->FinalSysSizing(1).HeatOutTemp = 10.0;
+    state->dataSize->FinalSysSizing(1).HeatOutHumRat = 0.003;
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 1.2345;
+    state->dataSize->FinalSysSizing(1).DesOutAirVolFlow = 1.2345;
 
     state->dataSingleDuct->SysATMixer.allocate(1);
     state->dataSingleDuct->SysATMixer(1).CtrlZoneInNodeIndex = 1;
-    state->dataSingleDuct->SysATMixer(1).DesignPrimaryAirVolRate = FinalSysSizing(1).DesMainVolFlow;
+    state->dataSingleDuct->SysATMixer(1).DesignPrimaryAirVolRate = state->dataSize->FinalSysSizing(1).DesMainVolFlow;
     state->dataSingleDuct->SysATMixer(1).MixerType = DataHVACGlobals::ATMixer_InletSide;
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
@@ -2758,47 +2770,47 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
     state->dataAirSystemsData->PrimaryAirSystems(1).NumOAHeatCoils = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).NumOACoolCoils = 1;
 
-    ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
 
     int ATMixerIndex = 1;
     int ControlledZoneNum = 1;
-    CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     // set ATMixer properties used for sizing
-    SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
+    SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, state->dataSize->CurZoneEqNum);
 
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerVolFlow, state->dataSingleDuct->SysATMixer(1).DesignPrimaryAirVolRate);
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriDryBulb, FinalSysSizing(1).CoolSupTemp);
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriHumRat, FinalSysSizing(1).CoolSupHumRat);
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriDryBulb, FinalSysSizing(1).HeatSupTemp);
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriHumRat, FinalSysSizing(1).HeatSupHumRat);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerVolFlow, state->dataSingleDuct->SysATMixer(1).DesignPrimaryAirVolRate);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerCoolPriDryBulb, state->dataSize->FinalSysSizing(1).CoolSupTemp);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerCoolPriHumRat, state->dataSize->FinalSysSizing(1).CoolSupHumRat);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriDryBulb, state->dataSize->FinalSysSizing(1).HeatSupTemp);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriHumRat, state->dataSize->FinalSysSizing(1).HeatSupHumRat);
 
     state->dataAirSystemsData->PrimaryAirSystems(1).CentralCoolCoilExists = false;
     state->dataAirSystemsData->PrimaryAirSystems(1).CentralHeatCoilExists = false;
     // set ATMixer properties used for sizing
-    SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
+    SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, state->dataSize->CurZoneEqNum);
 
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriDryBulb, FinalSysSizing(1).PrecoolTemp);
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriHumRat, FinalSysSizing(1).PrecoolHumRat);
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriDryBulb, FinalSysSizing(1).PreheatTemp);
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriHumRat, FinalSysSizing(1).PreheatHumRat);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerCoolPriDryBulb, state->dataSize->FinalSysSizing(1).PrecoolTemp);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerCoolPriHumRat, state->dataSize->FinalSysSizing(1).PrecoolHumRat);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriDryBulb, state->dataSize->FinalSysSizing(1).PreheatTemp);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriHumRat, state->dataSize->FinalSysSizing(1).PreheatHumRat);
 
     // set ATMixer properties used for sizing
     state->dataSingleDuct->SysATMixer(1).DesignPrimaryAirVolRate /= 2.0;
-    SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
+    SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, state->dataSize->CurZoneEqNum);
 
-    EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriDryBulb, FinalSysSizing(1).PrecoolTemp, 0.0000001);
-    EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriHumRat, FinalSysSizing(1).PrecoolHumRat, 0.0000001);
-    EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriDryBulb, FinalSysSizing(1).PreheatTemp, 0.0000001);
-    EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriHumRat, FinalSysSizing(1).PreheatHumRat, 0.0000001);
+    EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerCoolPriDryBulb, state->dataSize->FinalSysSizing(1).PrecoolTemp, 0.0000001);
+    EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerCoolPriHumRat, state->dataSize->FinalSysSizing(1).PrecoolHumRat, 0.0000001);
+    EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriDryBulb, state->dataSize->FinalSysSizing(1).PreheatTemp, 0.0000001);
+    EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriHumRat, state->dataSize->FinalSysSizing(1).PreheatHumRat, 0.0000001);
 
     state->dataAirSystemsData->PrimaryAirSystems(1).NumOAHeatCoils = 0;
     state->dataAirSystemsData->PrimaryAirSystems(1).NumOACoolCoils = 0;
     state->dataSingleDuct->SysATMixer(1).DesignPrimaryAirVolRate *= 2.0;
 
-    SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
+    SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, state->dataSize->CurZoneEqNum);
 
-    EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriDryBulb, FinalSysSizing(1).OutTempAtCoolPeak, 0.0000001);
-    EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriHumRat, FinalSysSizing(1).OutHumRatAtCoolPeak, 0.0000001);
-    EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriDryBulb, FinalSysSizing(1).HeatOutTemp, 0.0000001);
-    EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriHumRat, FinalSysSizing(1).HeatOutHumRat, 0.0000001);
+    EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerCoolPriDryBulb, state->dataSize->FinalSysSizing(1).OutTempAtCoolPeak, 0.0000001);
+    EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerCoolPriHumRat, state->dataSize->FinalSysSizing(1).OutHumRatAtCoolPeak, 0.0000001);
+    EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriDryBulb, state->dataSize->FinalSysSizing(1).HeatOutTemp, 0.0000001);
+    EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriHumRat, state->dataSize->FinalSysSizing(1).HeatOutHumRat, 0.0000001);
 }

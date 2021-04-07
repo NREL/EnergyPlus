@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -241,16 +241,16 @@ namespace DataAirLoop {
         Array1D_string ControllerName;
         Array1D_string ControllerType;
         Array1D_int ControllerIndex; // Which one in list -- updated by routines called from here
-        Array1D_int InletNodeNum;    // component inelt node number
-        Array1D_int OutletNodeNum;   // component outelt node number
+        Array1D_int InletNodeNum;    // component inlet node number
+        Array1D_int OutletNodeNum;   // component outlet node number
         bool HeatExchangerFlag;      // True to have a heat exchanger in the equipment list
         int AirLoopDOASNum;          // AirLoopHVAC:DedicatedOutdoorAirSystem number
         bool DXCoolingCoilFlag;      // True with DX cooling coil
 
         // Default Constructor
         OutsideAirSysProps()
-            : ControllerListNum(0), NumComponents(0), NumControllers(0), NumSimpleControllers(0), OAControllerIndex(0),
-              HeatExchangerFlag(false), AirLoopDOASNum(-1), DXCoolingCoilFlag(false)
+            : ControllerListNum(0), NumComponents(0), NumControllers(0), NumSimpleControllers(0), OAControllerIndex(0), HeatExchangerFlag(false),
+              AirLoopDOASNum(-1), DXCoolingCoilFlag(false)
 
         {
         }
@@ -278,36 +278,37 @@ namespace DataAirLoop {
 
 } // namespace DataAirLoop
 
-    struct DataAirLoopData : BaseGlobalStruct {
+struct DataAirLoopData : BaseGlobalStruct
+{
 
-        int NumOASystems = 0;               // Number of Outdoor Air Systems
-        bool AirLoopInputsFilled = false;   // Set to TRUE after first pass through air loop
-        Real64 LoopDXCoilRTF = 0.0;         // OnOff fan run time fraction in an HVAC Air Loop
+    int NumOASystems = 0;             // Number of Outdoor Air Systems
+    bool AirLoopInputsFilled = false; // Set to TRUE after first pass through air loop
+    Real64 LoopDXCoilRTF = 0.0;       // OnOff fan run time fraction in an HVAC Air Loop
 
-        Array1D<DataAirLoop::AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
-        Array1D<DataAirLoop::AirLoopOutsideAirConnectData> AirToOANodeInfo;
-        Array1D<DataAirLoop::DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
-        Array1D<DataAirLoop::AirLooptoZoneData> AirLoopZoneInfo;
-        Array1D<DataAirLoop::AirLoopControlData> AirLoopControlInfo;
-        Array1D<DataAirLoop::AirLoopFlowData> AirLoopFlow;
-        Array1D<DataAirLoop::OutsideAirSysProps> OutsideAirSys;
-        Array1D<DataAirLoop::AirLoopAFNData> AirLoopAFNInfo;
+    Array1D<DataAirLoop::AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
+    Array1D<DataAirLoop::AirLoopOutsideAirConnectData> AirToOANodeInfo;
+    Array1D<DataAirLoop::DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
+    Array1D<DataAirLoop::AirLooptoZoneData> AirLoopZoneInfo;
+    Array1D<DataAirLoop::AirLoopControlData> AirLoopControlInfo;
+    Array1D<DataAirLoop::AirLoopFlowData> AirLoopFlow;
+    Array1D<DataAirLoop::OutsideAirSysProps> OutsideAirSys;
+    Array1D<DataAirLoop::AirLoopAFNData> AirLoopAFNInfo;
 
-        void clear_state() override
-        {
-            this->NumOASystems = 0;
-            this->LoopDXCoilRTF = 0.0;
-            this->AirLoopInputsFilled = false;
-            this->AirLoopAFNInfo.deallocate();
-            this->AirToZoneNodeInfo.deallocate();
-            this->AirToOANodeInfo.deallocate();
-            this->PriAirSysAvailMgr.deallocate();
-            this->AirLoopZoneInfo.deallocate();
-            this->AirLoopControlInfo.deallocate();
-            this->AirLoopFlow.deallocate();
-            this->OutsideAirSys.deallocate();
-        }
-    };
+    void clear_state() override
+    {
+        this->NumOASystems = 0;
+        this->LoopDXCoilRTF = 0.0;
+        this->AirLoopInputsFilled = false;
+        this->AirLoopAFNInfo.deallocate();
+        this->AirToZoneNodeInfo.deallocate();
+        this->AirToOANodeInfo.deallocate();
+        this->PriAirSysAvailMgr.deallocate();
+        this->AirLoopZoneInfo.deallocate();
+        this->AirLoopControlInfo.deallocate();
+        this->AirLoopFlow.deallocate();
+        this->OutsideAirSys.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,8 +54,8 @@
 #include <vector>
 
 // EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Vectors.hh>
 
@@ -109,12 +109,14 @@ namespace WindowManager {
     using Layers_Map = std::map<int, IGU_Layers>;
 
     // Test if surface is hit by beam defined with vector
-    bool isSurfaceHit(const int t_SurfNum, const DataVectorTypes::Vector &t_Ray);
+    bool isSurfaceHit(EnergyPlusData &state, const int t_SurfNum, const DataVectorTypes::Vector &t_Ray);
 
     // Converts world coordinates (E+) into local surface coordinates that suites better for
     // WCE operations. Return values are angles Theta and Phi that are used to define WCE direction
-    std::pair<Real64, Real64>
-    getWCECoordinates(EnergyPlusData &state, const int t_SurfNum, const DataVectorTypes::Vector &t_Ray, const SingleLayerOptics::BSDFHemisphere t_Direction);
+    std::pair<Real64, Real64> getWCECoordinates(EnergyPlusData &state,
+                                                const int t_SurfNum,
+                                                const DataVectorTypes::Vector &t_Ray,
+                                                const SingleLayerOptics::BSDFHemisphere t_Direction);
 
     // Returns Theta and Phi coordinates of surface BSDF for current Sun position
     std::pair<Real64, Real64> getSunWCEAngles(EnergyPlusData &state, const int t_SurfNum, const SingleLayerOptics::BSDFHemisphere t_Direction);
@@ -125,9 +127,8 @@ namespace WindowManager {
     class CWCESpecturmProperties
     {
     public:
-        static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(int const t_SampleDataPtr);
-        static std::shared_ptr<SpectralAveraging::CSpectralSampleData>
-        getSpectralSample(Material::MaterialProperties const &t_MaterialProperties);
+        static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(EnergyPlusData &state, int const t_SampleDataPtr);
+        static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(Material::MaterialProperties const &t_MaterialProperties);
         static std::shared_ptr<FenestrationCommon::CSeries> getDefaultSolarRadiationSpectrum(EnergyPlusData &state);
         static std::shared_ptr<FenestrationCommon::CSeries> getDefaultVisiblePhotopicResponse(EnergyPlusData &state);
     };
@@ -145,9 +146,8 @@ namespace WindowManager {
                        int const t_ConstrNum,
                        std::shared_ptr<SingleLayerOptics::CScatteringLayer> const &t_Layer);
 
-        std::shared_ptr<MultiLayerOptics::CMultiLayerScattered> getEquivalentLayer(EnergyPlusData &state,
-                                                                                   FenestrationCommon::WavelengthRange const t_Range,
-                                                                                   int const t_ConstrNum);
+        std::shared_ptr<MultiLayerOptics::CMultiLayerScattered>
+        getEquivalentLayer(EnergyPlusData &state, FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum);
 
         static void clearState();
 

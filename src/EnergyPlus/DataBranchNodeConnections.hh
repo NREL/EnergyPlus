@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -126,10 +126,11 @@ namespace DataBranchNodeConnections {
 
 } // namespace DataBranchNodeConnections
 
-struct BranchNodeConnectionsData : BaseGlobalStruct {
+struct BranchNodeConnectionsData : BaseGlobalStruct
+{
 
-    int NumCompSets = 0;                // Number of Component Sets found in branches
-    int NumNodeConnectionErrors = 0;    // Count of node connection errors
+    int NumCompSets = 0;             // Number of Component Sets found in branches
+    int NumNodeConnectionErrors = 0; // Count of node connection errors
     int NumOfNodeConnections = 0;
     int MaxNumOfNodeConnections = 0;
     int NodeConnectionAlloc = 1000;

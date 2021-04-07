@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,8 +50,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -63,12 +63,12 @@ struct EnergyPlusData;
 
 namespace Construction {
 
-    int constexpr MaxLayersInConstruct(11);  // Maximum number of layers allowed in a single construction
-    int constexpr MaxCTFTerms(19);           // Maximum number of CTF terms allowed to still allow stability
+    int constexpr MaxLayersInConstruct(11); // Maximum number of layers allowed in a single construction
+    int constexpr MaxCTFTerms(19);          // Maximum number of CTF terms allowed to still allow stability
     // Note Sync with SurfaceGroundHeatExchanger::local::MaxCTFTerms
     // ** has to be big enough to hold no matter what window model
     //    each window model should validate layers individually
-    int constexpr MaxSpectralDataElements(800);     // Maximum number in Spectral Data arrays.
+    int constexpr MaxSpectralDataElements(800); // Maximum number in Spectral Data arrays.
 
     struct ConstructionProps
     {
@@ -126,14 +126,14 @@ namespace Construction {
         Real64 UValue;          // Overall heat transfer coefficient for the construction
         int SolutionDimensions; // Number of dimensions in the solution (1 for normal constructions,
         // 1 or 2 for constructions with sources or sinks)-->may allow 3-D later?
-        int SourceAfterLayer;    // Source/sink is present after this layer in the construction
-        int TempAfterLayer;      // User is requesting a temperature calculation after this layer in the construction
+        int SourceAfterLayer; // Source/sink is present after this layer in the construction
+        int TempAfterLayer;   // User is requesting a temperature calculation after this layer in the construction
         // This location is also the position of a temperature on the interior of a slab
         // that could be used to control a low temperature radiant system
         Real64 ThicknessPerpend; // Thickness between planes of symmetry in the direction
         // perpendicular to the main direction of heat transfer
         // (same as half the distance between tubes)
-        Real64 userTemperatureLocationPerpendicular;    // Location of the source perpendicular to the main direction
+        Real64 userTemperatureLocationPerpendicular; // Location of the source perpendicular to the main direction
         // of heat transfer.  Used in conjunction with the TempAfterLayer
         // term to provide specific location of user defined temperature.
         // This value is only used when SolutionDimension = 2.
@@ -244,29 +244,25 @@ namespace Construction {
         Real64 TransDiffFrontEQL;        // Diffuse system front transmittance for EQL window
         Real64 TransDiffBackEQL;         // Diffuse system back transmittance for EQL window
         // Air boundary
-        bool TypeIsAirBoundary;               // true for Construction:AirBoundary
-        bool TypeIsAirBoundarySolar;          // true for Construction:AirBoundary with grouped zones for solar and daylighting
-        bool TypeIsAirBoundaryInteriorWindow; // true for Construction:AirBoundary with InteriorWindow for solar and daylighting
-        bool TypeIsAirBoundaryGroupedRadiant; // true for Construction:AirBoundary with grouped zones for radiant
-        bool TypeIsAirBoundaryIRTSurface;     // true for Construction:AirBoundary with IRTSurface for radiant
-        bool TypeIsAirBoundaryMixing;         // true for Construction:AirBoundary with SimpleMixing for air exchange
-        Real64 AirBoundaryACH;                // Air boundary simple mixing air changes per hour [1/hr]
-        int AirBoundaryMixingSched;           // Air boundary simple mixing schedule index
+        bool TypeIsAirBoundary;       // true for Construction:AirBoundary
+        bool TypeIsAirBoundaryMixing; // true for Construction:AirBoundary with SimpleMixing for air exchange
+        Real64 AirBoundaryACH;        // Air boundary simple mixing air changes per hour [1/hr]
+        int AirBoundaryMixingSched;   // Air boundary simple mixing schedule index
 
-        int rcmax;                // Total number of nodes in the construct (<= MaxTotNodes)
-        Array2D<Real64> AExp; // Exponential of AMat
-        Array2D<Real64> AInv; // Inverse of AMat
-        Array2D<Real64> AMat; // "A" matrix from Seem's dissertation (constant coefficients of linear system)
-        Array1D<Real64> BMat; // "B" matrix of state space method (non-zero elements)
-        Array1D<Real64> CMat; // "C" matrix of state space method (non-zero elements)
-        Array1D<Real64> DMat; // "D" matrix of state space method (non-zero elements)
-        Array1D<Real64> e;       // Coefficients for the surface flux history term
-        Array2D<Real64> Gamma1;  // Intermediate calculation array corresponding to a term in Seem's dissertation
-        Array2D<Real64> Gamma2; // Intermediate calculation array corresponding to a term in Seem's dissertation
-        Array3D<Real64> s;        // Coefficients for the surface temperature history terms
-        Array2D<Real64> s0; // Coefficients for the current surface temperature terms
+        int rcmax;                  // Total number of nodes in the construct (<= MaxTotNodes)
+        Array2D<Real64> AExp;       // Exponential of AMat
+        Array2D<Real64> AInv;       // Inverse of AMat
+        Array2D<Real64> AMat;       // "A" matrix from Seem's dissertation (constant coefficients of linear system)
+        Array1D<Real64> BMat;       // "B" matrix of state space method (non-zero elements)
+        Array1D<Real64> CMat;       // "C" matrix of state space method (non-zero elements)
+        Array1D<Real64> DMat;       // "D" matrix of state space method (non-zero elements)
+        Array1D<Real64> e;          // Coefficients for the surface flux history term
+        Array2D<Real64> Gamma1;     // Intermediate calculation array corresponding to a term in Seem's dissertation
+        Array2D<Real64> Gamma2;     // Intermediate calculation array corresponding to a term in Seem's dissertation
+        Array3D<Real64> s;          // Coefficients for the surface temperature history terms
+        Array2D<Real64> s0;         // Coefficients for the current surface temperature terms
         Array2D<Real64> IdenMatrix; // Identity Matrix
-        int NumOfPerpendNodes = 7; // Number of nodes in the direction
+        int NumOfPerpendNodes = 7;  // Number of nodes in the direction
         // perpendicular to the main direction of heat transfer.  This is only used
         // when a two-dimensional solution has been requested for a construction
         // with a heat source/sink.
@@ -283,27 +279,25 @@ namespace Construction {
               CTFTSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFTSourceQ({0, MaxCTFTerms - 1}, 0.0), CTFTUserOut({0, MaxCTFTerms - 1}, 0.0),
               CTFTUserIn({0, MaxCTFTerms - 1}, 0.0), CTFTUserSource({0, MaxCTFTerms - 1}, 0.0), NumHistories(0), NumCTFTerms(0), UValue(0.0),
               SolutionDimensions(0), SourceAfterLayer(0), TempAfterLayer(0), ThicknessPerpend(0.0), userTemperatureLocationPerpendicular(0.0),
-              AbsDiffIn(0.0), AbsDiffOut(0.0), AbsDiff(DataHeatBalance::MaxSolidWinLayers, 0.0), BlAbsDiff(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0),
-              BlAbsDiffGnd(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), BlAbsDiffSky(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsDiffBack(DataHeatBalance::MaxSolidWinLayers, 0.0),
-              BlAbsDiffBack(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsDiffShade(0.0), AbsDiffBlind(DataSurfaces::MaxSlatAngs, 0.0),
-              AbsDiffBlindGnd(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBlindSky(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBackShade(0.0), AbsDiffBackBlind(DataSurfaces::MaxSlatAngs, 0.0),
-              ShadeAbsorpThermal(0.0), AbsBeamCoef(6, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsBeamBackCoef(6, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsBeamShadeCoef(6, 0.0),
-              TransDiff(0.0), BlTransDiff(DataSurfaces::MaxSlatAngs, 0.0), BlTransDiffGnd(DataSurfaces::MaxSlatAngs, 0.0), BlTransDiffSky(DataSurfaces::MaxSlatAngs, 0.0), TransDiffVis(0.0),
-              BlTransDiffVis(DataSurfaces::MaxSlatAngs, 0.0), ReflectSolDiffBack(0.0), BlReflectSolDiffBack(DataSurfaces::MaxSlatAngs, 0.0), ReflectSolDiffFront(0.0),
-              BlReflectSolDiffFront(DataSurfaces::MaxSlatAngs, 0.0), ReflectVisDiffBack(0.0), BlReflectVisDiffBack(DataSurfaces::MaxSlatAngs, 0.0), ReflectVisDiffFront(0.0),
-              BlReflectVisDiffFront(DataSurfaces::MaxSlatAngs, 0.0), TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0), ReflSolBeamFrontCoef(6, 0.0),
-              ReflSolBeamBackCoef(6, 0.0), tBareSolCoef(6, 5, 0.0), tBareVisCoef(6, 5, 0.0), rfBareSolCoef(6, 5, 0.0), rfBareVisCoef(6, 5, 0.0),
-              rbBareSolCoef(6, 5, 0.0), rbBareVisCoef(6, 5, 0.0), afBareSolCoef(6, 5, 0.0), abBareSolCoef(6, 5, 0.0), tBareSolDiff(5, 0.0),
-              tBareVisDiff(5, 0.0), rfBareSolDiff(5, 0.0), rfBareVisDiff(5, 0.0), rbBareSolDiff(5, 0.0), rbBareVisDiff(5, 0.0), afBareSolDiff(5, 0.0),
-              abBareSolDiff(5, 0.0), FromWindow5DataFile(false), W5FileMullionWidth(0.0), W5FileMullionOrientation(0), W5FileGlazingSysWidth(0.0),
-              W5FileGlazingSysHeight(0.0), SummerSHGC(0.0), VisTransNorm(0.0), SolTransNorm(0.0), SourceSinkPresent(false), TypeIsWindow(false),
-              WindowTypeBSDF(false), TypeIsEcoRoof(false), TypeIsIRT(false), TypeIsCfactorWall(false), TypeIsFfactorFloor(false), TCFlag(0),
-              TCLayer(0), TCMasterConst(0), TCLayerID(0), TCGlassID(0), CFactor(0.0), Height(0.0), FFactor(0.0), Area(0.0), PerimeterExposed(0.0),
-              ReverseConstructionNumLayersWarning(false), ReverseConstructionLayersOrderWarning(false), WindowTypeEQL(false), EQLConsPtr(0),
-              AbsDiffFrontEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0), AbsDiffBackEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0), TransDiffFrontEQL(0.0), TransDiffBackEQL(0.0), TypeIsAirBoundary(false),
-              TypeIsAirBoundarySolar(false), TypeIsAirBoundaryInteriorWindow(false), TypeIsAirBoundaryGroupedRadiant(false),
-              TypeIsAirBoundaryIRTSurface(false), TypeIsAirBoundaryMixing(false), AirBoundaryACH(0.0),
-              AirBoundaryMixingSched(0), rcmax(0), NodeSource(0), NodeUserTemp(0)
+              AbsDiffIn(0.0), AbsDiffOut(0.0), AbsDiffShade(0.0), AbsDiffBlind(DataSurfaces::MaxSlatAngs, 0.0),
+              AbsDiffBlindGnd(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBlindSky(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBackShade(0.0),
+              AbsDiffBackBlind(DataSurfaces::MaxSlatAngs, 0.0), ShadeAbsorpThermal(0.0), AbsBeamShadeCoef(6, 0.0), TransDiff(0.0),
+              BlTransDiff(DataSurfaces::MaxSlatAngs, 0.0), BlTransDiffGnd(DataSurfaces::MaxSlatAngs, 0.0),
+              BlTransDiffSky(DataSurfaces::MaxSlatAngs, 0.0), TransDiffVis(0.0), BlTransDiffVis(DataSurfaces::MaxSlatAngs, 0.0),
+              ReflectSolDiffBack(0.0), BlReflectSolDiffBack(DataSurfaces::MaxSlatAngs, 0.0), ReflectSolDiffFront(0.0),
+              BlReflectSolDiffFront(DataSurfaces::MaxSlatAngs, 0.0), ReflectVisDiffBack(0.0), BlReflectVisDiffBack(DataSurfaces::MaxSlatAngs, 0.0),
+              ReflectVisDiffFront(0.0), BlReflectVisDiffFront(DataSurfaces::MaxSlatAngs, 0.0), TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0),
+              ReflSolBeamFrontCoef(6, 0.0), ReflSolBeamBackCoef(6, 0.0), tBareSolCoef(6, 5, 0.0), tBareVisCoef(6, 5, 0.0), rfBareSolCoef(6, 5, 0.0),
+              rfBareVisCoef(6, 5, 0.0), rbBareSolCoef(6, 5, 0.0), rbBareVisCoef(6, 5, 0.0), afBareSolCoef(6, 5, 0.0), abBareSolCoef(6, 5, 0.0),
+              tBareSolDiff(5, 0.0), tBareVisDiff(5, 0.0), rfBareSolDiff(5, 0.0), rfBareVisDiff(5, 0.0), rbBareSolDiff(5, 0.0), rbBareVisDiff(5, 0.0),
+              afBareSolDiff(5, 0.0), abBareSolDiff(5, 0.0), FromWindow5DataFile(false), W5FileMullionWidth(0.0), W5FileMullionOrientation(0),
+              W5FileGlazingSysWidth(0.0), W5FileGlazingSysHeight(0.0), SummerSHGC(0.0), VisTransNorm(0.0), SolTransNorm(0.0),
+              SourceSinkPresent(false), TypeIsWindow(false), WindowTypeBSDF(false), TypeIsEcoRoof(false), TypeIsIRT(false), TypeIsCfactorWall(false),
+              TypeIsFfactorFloor(false), TCFlag(0), TCLayer(0), TCMasterConst(0), TCLayerID(0), TCGlassID(0), CFactor(0.0), Height(0.0), FFactor(0.0),
+              Area(0.0), PerimeterExposed(0.0), ReverseConstructionNumLayersWarning(false), ReverseConstructionLayersOrderWarning(false),
+              WindowTypeEQL(false), EQLConsPtr(0), AbsDiffFrontEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0),
+              AbsDiffBackEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0), TransDiffFrontEQL(0.0), TransDiffBackEQL(0.0), TypeIsAirBoundary(false),
+              TypeIsAirBoundaryMixing(false), AirBoundaryACH(0.0), AirBoundaryMixingSched(0), rcmax(0), NodeSource(0), NodeUserTemp(0)
         {
             BMat.allocate(3);
             CMat.allocate(2);
@@ -311,7 +305,7 @@ namespace Construction {
             s0.allocate(3, 4);
         }
 
-        void calculateTransferFunction(EnergyPlusData &state, bool & ErrorsFound, bool & DoCTFErrorReport);
+        void calculateTransferFunction(EnergyPlusData &state, bool &ErrorsFound, bool &DoCTFErrorReport);
 
         void calculateExponentialMatrix(); // Time step of the resulting CTFs
 
@@ -321,25 +315,31 @@ namespace Construction {
 
         void calculateFinalCoefficients();
 
-        void reportTransferFunction(EnergyPlusData &state, int const cCounter);
+        void reportTransferFunction(EnergyPlusData &state, int cCounter);
 
-        bool isGlazingConstruction() const;
+        bool isGlazingConstruction(EnergyPlusData &state) const;
 
         Real64 setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue);
 
-        void setNodeSourceAndUserTemp(Array1D_int & Nodes);
+        void setNodeSourceAndUserTemp(Array1D_int &Nodes);
+
+        void setArraysBasedOnMaxSolidWinLayers(EnergyPlusData &state);
     };
-}   // namespace Construction
+} // namespace Construction
 
-    struct ConstructionData : BaseGlobalStruct {
-        Array1D<Construction::ConstructionProps> Construct;
+struct ConstructionData : BaseGlobalStruct
+{
+    Array1D<Construction::ConstructionProps> Construct;
+    Array1D_int LayerPoint = Array1D<int>(Construction::MaxLayersInConstruct, 0);
 
-        void clear_state() override
-        {
-            this->Construct.deallocate();
-        }
-    };
+    void clear_state() override
+    {
+        this->Construct.deallocate();
+        this->LayerPoint.deallocate();
+        this->LayerPoint.dimension(Construction::MaxLayersInConstruct, 0);
+    }
+};
 
-}   // namespace EnergyPlus
+} // namespace EnergyPlus
 
 #endif

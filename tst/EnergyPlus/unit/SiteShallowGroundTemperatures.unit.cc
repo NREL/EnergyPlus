@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,7 +53,6 @@
 // EnergyPlus Headers
 #include "EnergyPlus/DataIPShortCuts.hh"
 #include "EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh"
-#include "EnergyPlus/GroundTemperatureModeling/SiteShallowGroundTemperatures.hh"
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 
@@ -80,7 +79,7 @@ TEST_F(EnergyPlusFixture, SiteShallowGroundTempTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    std::string const CurrentModuleObject = CurrentModuleObjects(objectType_SiteShallowGroundTemp);
+    std::string const CurrentModuleObject = state->dataGrndTempModelMgr->CurrentModuleObjects(objectType_SiteShallowGroundTemp);
 
     auto thisModel = GetGroundTempModelAndInit(*state, CurrentModuleObject, "TEST");
 

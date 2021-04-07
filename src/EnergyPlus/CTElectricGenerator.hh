@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -142,12 +142,12 @@ namespace CTElectricGenerator {
         {
         }
 
-        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void
+        simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVars(EnergyPlusData &state);
 
-        void InitCTGenerators(EnergyPlusData &state,
-                              bool RunFlag, bool FirstHVACIteration);
+        void InitCTGenerators(EnergyPlusData &state, bool RunFlag, bool FirstHVACIteration);
 
         void CalcCTGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
@@ -158,19 +158,20 @@ namespace CTElectricGenerator {
 
 } // namespace CTElectricGenerator
 
-    struct CTElectricGeneratorData : BaseGlobalStruct {
+struct CTElectricGeneratorData : BaseGlobalStruct
+{
 
-        int NumCTGenerators = 0;
-        bool getCTInputFlag = true;
-        Array1D<CTElectricGenerator::CTGeneratorData> CTGenerator;
+    int NumCTGenerators = 0;
+    bool getCTInputFlag = true;
+    Array1D<CTElectricGenerator::CTGeneratorData> CTGenerator;
 
-        void clear_state() override
-        {
-            this->NumCTGenerators = 0;
-            this->getCTInputFlag = true;
-            this->CTGenerator.deallocate();
-        }
-    };
+    void clear_state() override
+    {
+        this->NumCTGenerators = 0;
+        this->getCTInputFlag = true;
+        this->CTGenerator.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

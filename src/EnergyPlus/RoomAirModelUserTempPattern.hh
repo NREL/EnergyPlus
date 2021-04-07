@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,6 +49,7 @@
 #define RoomAirModelUserTempPattern_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -81,29 +82,27 @@ namespace RoomAirModelUserTempPattern {
 
     // Functions
 
-    void clear_state();
-
     void ManageUserDefinedPatterns(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
     //****************************************************
 
     void InitTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
-    void GetSurfHBDataForTempDistModel(int const ZoneNum); // index number for the specified zone
+    void GetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
     void CalcTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
-    void FigureSurfMapPattern(int const PattrnID, int const ZoneNum);
+    void FigureSurfMapPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
 
-    void FigureHeightPattern(int const PattrnID, int const ZoneNum);
+    void FigureHeightPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
 
     void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
 
     Real64 OutdoorDryBulbGrad(Real64 DryBulbTemp, Real64 UpperBound, Real64 HiGradient, Real64 LowerBound, Real64 LowGradient);
 
-    void FigureConstGradPattern(int const PattrnID, int const ZoneNum);
+    void FigureConstGradPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
 
     //*****************************************************************************************
 
@@ -116,6 +115,23 @@ namespace RoomAirModelUserTempPattern {
     //*****************************************************************************************
 
 } // namespace RoomAirModelUserTempPattern
+
+struct RoomAirModelUserTempPatternData : BaseGlobalStruct
+{
+    bool MyOneTimeFlag = true; // one time setup flag
+    bool MyOneTimeFlag2 = true;
+
+    Array1D_bool MyEnvrnFlag;     // flag for init once at start of environment
+    Array1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
+
+    void clear_state() override
+    {
+        MyOneTimeFlag = true;
+        MyOneTimeFlag2 = true;
+        MyEnvrnFlag.clear();
+        SetupOutputFlag.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

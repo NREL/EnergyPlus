@@ -326,6 +326,10 @@ This is the aspect ratio of a rectangular footprint. It is given by the width of
 
 This is an optional field. Input is Yes or No. The default is No. Yes is that external node temperature is dependent on node height. No means that external node temperature is calculated with zero height.
 
+\paragraph{Field: Allow Unsupported Zone Equipment}\label{allow-unsupported-zone-equipment}
+
+This is an optional field. Input is Yes or No. The default is No. Set this input to Yes to have zone equipment that are currently unsupported in the AirflowNetwork model allowed in the simulation. Setting this field to Yes, allows the following equipment to be modeled along an AirflowNetwork model: ZoneHVAC:Dehumidifier, ZoneHVAC:EnergyRecoveryVentilator, WaterHeater:HeatPump:*. The AirflowNetwork model will exclude mass balance in these equipment objects and assume the mass flows are self-balanced in the equipment objects.
+
 An IDF example is shown below:
 
 \begin{lstlisting}

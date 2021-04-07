@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,12 +51,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::CoolingPanelSimple;
 
@@ -74,13 +75,13 @@ TEST_F(EnergyPlusFixture, SetCoolingPanelControlTemp)
     ZoneNum = 1;
 
     state->dataChilledCeilingPanelSimple->CoolingPanel.allocate(1);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::MAT(1) = 22.0;
-    DataHeatBalance::MRT.allocate(1);
-    DataHeatBalance::MRT(1) = 20.0;
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).OutDryBulbTemp = 10.0;
-    DataHeatBalance::Zone(1).OutWetBulbTemp = 5.0;
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->MAT(1) = 22.0;
+    state->dataHeatBal->MRT.allocate(1);
+    state->dataHeatBal->MRT(1) = 20.0;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = 10.0;
+    state->dataHeatBal->Zone(1).OutWetBulbTemp = 5.0;
 
     state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::MAT;
     state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(*state, ControlTemp, ZoneNum);
@@ -171,7 +172,7 @@ TEST_F(EnergyPlusFixture, ReportCoolingPanel)
     state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).Power = -9.0;
     state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ConvPower = -4.0;
     state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).RadPower = -5.0;
-    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ReportCoolingPanel();
+    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ReportCoolingPanel(*state);
     EXPECT_NEAR(state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).TotPower, 10.0, 1.0);
     EXPECT_NEAR(state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).Power, 9.0, 1.0);
     EXPECT_NEAR(state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ConvPower, 4.0, 1.0);

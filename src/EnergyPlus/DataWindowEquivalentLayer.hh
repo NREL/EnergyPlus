@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -63,7 +64,7 @@ namespace DataWindowEquivalentLayer {
 
     // Data
     // CFSTY: Complex Fenestration System
-    extern int const CFSMAXNL; // max # of glaze or shade layers
+    int constexpr CFSMAXNL = 6; // max # of glaze or shade layers
     // Long-wave (aka LW or thermal) layer properties
     // Short wave (aka SW or solar) layer properties
     // "black" room (no reflection)
@@ -73,22 +74,23 @@ namespace DataWindowEquivalentLayer {
     // Gap information
     // Equivalent Layer Window Constructon
     // CFSLAYER: layer types
-    extern int const ltyNONE;   // unused / empty layer
-    extern int const ltyGLAZE;  // glazing layer i.e, purely specular
-    extern int const ltyDRAPE;  // pleated drapes/curtains
-    extern int const ltyROLLB;  // roller blind
-    extern int const ltyVBHOR;  // venetian blinds - horizontal
-    extern int const ltyVBVER;  // venetian blinds - vertical
-    extern int const ltyINSCRN; // insect screen
-    extern int const ltyROOM;   // indoor space and/or make no adjustment
-    extern int const ltyGZS;    // glazing with spectral data (read from aux file)
-    // index for solar arrays
-    extern int const isDIFF;
-    extern int const isBEAM;
-    // Defined CFSLayers and CFSs
-    extern int TotWinEquivLayerConstructs; // Number of constructions with Window equivalent Layer
+    enum class LayerType
+    {
+        Unassigned,
+        ltyNONE,   // unused / empty layer
+        ltyGLAZE,  // glazing layer i.e, purely specular
+        ltyDRAPE,  // pleated drapes/curtains
+        ltyROLLB,  // roller blind
+        ltyVBHOR,  // venetian blinds - horizontal
+        ltyVBVER,  // venetian blinds - vertical
+        ltyINSCRN, // insect screen
+        ltyROOM,   // indoor space and/or make no adjustment
+        ltyGZS     // glazing with spectral data (read from aux file)
+    };
 
-    // Types
+    // index for solar arrays
+    int constexpr isDIFF = 1;
+    int constexpr isBEAM = 2;
 
     struct CFSLWP
     {
@@ -136,7 +138,7 @@ namespace DataWindowEquivalentLayer {
     {
         // Members
         std::string Name; // ID of layer
-        int LTYPE;        // layer type (see ltyXXX above)
+        LayerType LTYPE;  // layer type (see ltyXXX above)
         int iGZS;         // re spectral glazing
         //   = GZSTbl idx of LTYPE=ltyGZS (spectral glazing)
         //   else 0
@@ -180,7 +182,7 @@ namespace DataWindowEquivalentLayer {
         //                   PHI_DEG = 20 if diffuse only
 
         // Default Constructor
-        CFSLAYER() : LTYPE(0), iGZS(0), S(0.0), W(0.0), C(0.0), PHI_DEG(0.0), CNTRL(0)
+        CFSLAYER() : LTYPE(LayerType::Unassigned), iGZS(0), S(0.0), W(0.0), C(0.0), PHI_DEG(0.0), CNTRL(0)
         {
         }
     };
@@ -246,16 +248,32 @@ namespace DataWindowEquivalentLayer {
         }
     };
 
-    // Object Data
-    extern CFSSWP SWP_ROOMBLK; // Solar reflectance, BEAM-BEAM, front | Solar reflectance, BEAM-BEAM, back | Solar transmittance, BEAM-BEAM, front |
-                               // Solar transmittance, BEAM-BEAM, back | Solar reflectance, BEAM-DIFFUSE, front | Solar reflectance, BEAM-DIFFUSE,
-                               // back | Solar transmittance, BEAM-DIFFUSE, front | Solar transmittance, BEAM-DIFFUSE, back | Solar reflectance,
-                               // DIFFUSE-DIFFUSE, front | Solar reflectance, DIFFUSE-DIFFUSE, back | Solar transmittance, DIFFUSE-DIFFUSE
-    extern Array1D<CFSLAYER> CFSLayers;
-    extern Array1D<CFSTY> CFS;
-    extern Array1D<CFSGAP> CFSGaps;
-
 } // namespace DataWindowEquivalentLayer
+
+struct WindowEquivLayerData : BaseGlobalStruct
+{
+
+    // Defined CFSLayers and CFSs
+    int TotWinEquivLayerConstructs = 0; // Number of constructions with Window equivalent Layer
+
+    DataWindowEquivalentLayer::CFSSWP
+        SWP_ROOMBLK; // Solar reflectance, BEAM-BEAM, front | Solar reflectance, BEAM-BEAM, back | Solar transmittance, BEAM-BEAM, front | Solar
+    // transmittance, BEAM-BEAM, back | Solar reflectance, BEAM-DIFFUSE, front | Solar reflectance, BEAM-DIFFUSE, back | Solar
+    // transmittance, BEAM-DIFFUSE, front | Solar transmittance, BEAM-DIFFUSE, back | Solar reflectance, DIFFUSE-DIFFUSE, front |
+    // Solar reflectance, DIFFUSE-DIFFUSE, back | Solar transmittance, DIFFUSE-DIFFUSE
+    Array1D<DataWindowEquivalentLayer::CFSLAYER> CFSLayers;
+    Array1D<DataWindowEquivalentLayer::CFSTY> CFS;
+    Array1D<DataWindowEquivalentLayer::CFSGAP> CFSGaps;
+
+    void clear_state() override
+    {
+        this->TotWinEquivLayerConstructs = 0;
+        this->SWP_ROOMBLK = {};
+        this->CFSLayers.clear();
+        this->CFS.clear();
+        this->CFSGaps.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -61,7 +62,6 @@
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -78,29 +78,29 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
     Real64 AbsExt;
 
     SurfNum = 1;
-    DataSurfaces::Surface.allocate(SurfNum);
-    DataSurfaces::Surface(SurfNum).SchedMovInsulExt = -1;
-    DataSurfaces::Surface(SurfNum).MaterialMovInsulExt = 1;
+    state->dataSurface->Surface.allocate(SurfNum);
+    state->dataSurface->Surface(SurfNum).SchedMovInsulExt = -1;
+    state->dataSurface->Surface(SurfNum).MaterialMovInsulExt = 1;
 
-    dataMaterial.Material.allocate(1);
-    dataMaterial.Material(1).Resistance = 1.25;
-    dataMaterial.Material(1).Roughness = 1;
-    dataMaterial.Material(1).Group = 0;
-    dataMaterial.Material(1).AbsorpSolar = 0.75;
-    dataMaterial.Material(1).Trans = 0.25;
-    dataMaterial.Material(1).ReflectSolBeamFront = 0.20;
+    state->dataMaterial->Material.allocate(1);
+    state->dataMaterial->Material(1).Resistance = 1.25;
+    state->dataMaterial->Material(1).Roughness = 1;
+    state->dataMaterial->Material(1).Group = 0;
+    state->dataMaterial->Material(1).AbsorpSolar = 0.75;
+    state->dataMaterial->Material(1).Trans = 0.25;
+    state->dataMaterial->Material(1).ReflectSolBeamFront = 0.20;
 
     AbsExt = 0.0;
     EvalOutsideMovableInsulation(*state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
     EXPECT_EQ(0.75, AbsExt);
 
     AbsExt = 0.0;
-    dataMaterial.Material(1).Group = DataHeatBalance::WindowGlass;
+    state->dataMaterial->Material(1).Group = DataHeatBalance::WindowGlass;
     EvalOutsideMovableInsulation(*state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
     EXPECT_EQ(0.55, AbsExt);
 
     AbsExt = 0.0;
-    dataMaterial.Material(1).Group = DataHeatBalance::GlassEquivalentLayer;
+    state->dataMaterial->Material(1).Group = DataHeatBalance::GlassEquivalentLayer;
     EvalOutsideMovableInsulation(*state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
     EXPECT_EQ(0.55, AbsExt);
 }
@@ -113,29 +113,29 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulati
     Real64 AbsExt;
 
     SurfNum = 1;
-    DataSurfaces::Surface.allocate(SurfNum);
-    DataSurfaces::Surface(SurfNum).SchedMovInsulInt = -1;
-    DataSurfaces::Surface(SurfNum).MaterialMovInsulInt = 1;
+    state->dataSurface->Surface.allocate(SurfNum);
+    state->dataSurface->Surface(SurfNum).SchedMovInsulInt = -1;
+    state->dataSurface->Surface(SurfNum).MaterialMovInsulInt = 1;
 
-    dataMaterial.Material.allocate(1);
-    dataMaterial.Material(1).Resistance = 1.25;
-    dataMaterial.Material(1).Roughness = 1;
-    dataMaterial.Material(1).Group = 0;
-    dataMaterial.Material(1).AbsorpSolar = 0.75;
-    dataMaterial.Material(1).Trans = 0.25;
-    dataMaterial.Material(1).ReflectSolBeamFront = 0.20;
+    state->dataMaterial->Material.allocate(1);
+    state->dataMaterial->Material(1).Resistance = 1.25;
+    state->dataMaterial->Material(1).Roughness = 1;
+    state->dataMaterial->Material(1).Group = 0;
+    state->dataMaterial->Material(1).AbsorpSolar = 0.75;
+    state->dataMaterial->Material(1).Trans = 0.25;
+    state->dataMaterial->Material(1).ReflectSolBeamFront = 0.20;
 
     AbsExt = 0.0;
     EvalInsideMovableInsulation(*state, SurfNum, HMovInsul, AbsExt);
     EXPECT_EQ(0.75, AbsExt);
 
     AbsExt = 0.0;
-    dataMaterial.Material(1).Group = DataHeatBalance::WindowGlass;
+    state->dataMaterial->Material(1).Group = DataHeatBalance::WindowGlass;
     EvalInsideMovableInsulation(*state, SurfNum, HMovInsul, AbsExt);
     EXPECT_EQ(0.55, AbsExt);
 
     AbsExt = 0.0;
-    dataMaterial.Material(1).Group = DataHeatBalance::GlassEquivalentLayer;
+    state->dataMaterial->Material(1).Group = DataHeatBalance::GlassEquivalentLayer;
     EvalInsideMovableInsulation(*state, SurfNum, HMovInsul, AbsExt);
     EXPECT_EQ(0.55, AbsExt);
 }
@@ -231,18 +231,18 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     bool ErrorsFound(false);
     // set zone data
     state->dataGlobal->NumOfZones = 1;
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).Name = "ZONE ONE";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE ONE";
     // get schedule data
     ScheduleManager::ProcessScheduleInput(*state);
     // get materials data
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(4, DataHeatBalance::TotMaterials);
-    EXPECT_EQ(dataMaterial.Material(4).Group, DataHeatBalance::WindowSimpleGlazing);
+    EXPECT_EQ(4, state->dataHeatBal->TotMaterials);
+    EXPECT_EQ(state->dataMaterial->Material(4).Group, DataHeatBalance::WindowSimpleGlazing);
     // get construction data
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
-    EXPECT_EQ(1, DataHeatBalance::TotConstructs);
+    EXPECT_EQ(1, state->dataHeatBal->TotConstructs);
     EXPECT_FALSE(ErrorsFound);
     // set relative coordinate
     SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
@@ -253,10 +253,10 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     // set surface data
-    DataSurfaces::TotSurfaces = 1;
+    state->dataSurface->TotSurfaces = 1;
     state->dataSurfaceGeometry->SurfaceTmp.allocate(1);
     int SurfNum = 0;
-    int TotHTSurfs = DataSurfaces::TotSurfaces = 1;
+    int TotHTSurfs = state->dataSurface->TotSurfaces = 1;
     Array1D_string const BaseSurfCls(1, {"WALL"});
     Array1D<DataSurfaces::SurfaceClass> const BaseSurfIDs(1, {DataSurfaces::SurfaceClass::Wall});
     int NeedToAddSurfaces;
@@ -265,10 +265,10 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     // get movable insulation object data
     SurfaceGeometry::GetMovableInsulationData(*state, ErrorsFound);
     // check movable insulation material
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).BaseSurfName, "ZN001:WALL001");             // base surface name
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).MaterialMovInsulExt, 4);                    // index to movable insulation material
-    EXPECT_EQ(dataMaterial.Material(4).Name, "SIMPLEGLAZINGSYSTEM");                 // name of movable insulation material
-    EXPECT_EQ(dataMaterial.Material(4).Group, DataHeatBalance::WindowSimpleGlazing); // invalid material group type
-    EXPECT_TRUE(ErrorsFound);                                                            // error found due to invalid material
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).BaseSurfName, "ZN001:WALL001");      // base surface name
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).MaterialMovInsulExt, 4);             // index to movable insulation material
+    EXPECT_EQ(state->dataMaterial->Material(4).Name, "SIMPLEGLAZINGSYSTEM");                 // name of movable insulation material
+    EXPECT_EQ(state->dataMaterial->Material(4).Group, DataHeatBalance::WindowSimpleGlazing); // invalid material group type
+    EXPECT_TRUE(ErrorsFound);                                                                // error found due to invalid material
 }
 } // namespace EnergyPlus

@@ -49,19 +49,19 @@ jobs:
       run: |
         set -x
         echo "Downloading MiKTeX CLI installer"
-        # We download from a specific miror already
-        curl -L -O https://ctan.math.illinois.edu/systems/win32/miktex/setup/windows-x64/miktexsetup-4.0-x64.zip
-        unzip miktexsetup-4.0-x64.zip
+        # We download from a specific miror already # TODO: Should store this setup package somewhere ourselves
+        curl -L -O https://ctan.math.illinois.edu/systems/win32/miktex/setup/windows-x64/miktexsetup-4.1-x64.zip
+        unzip miktexsetup-4.1-x64.zip
 
         echo "Setting up the local package directory via download"
-        ./miktexsetup --verbose \
+        ./miktexsetup_standalone --verbose \
             --local-package-repository=C:/ProgramData/MiKTeX-Repo \
             --remote-package-repository="https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/" \
             --package-set=basic \
             download
 
         echo "Installing from the local package directory previously set up"
-        ./miktexsetup --verbose \
+        ./miktexsetup_standalone --verbose \
             --local-package-repository=C:/ProgramData/MiKTeX-Repo \
             --package-set=basic \
             --shared \
@@ -85,7 +85,7 @@ jobs:
       run: |
         set -x
         out_dir="C:/Qt"
-        aqt tool windows tools_ifw 4.0 qt.tools.ifw.4.0 --outputdir="$out_dir"
+        aqt tool windows tools_ifw 4.0 qt.tools.ifw.40 --outputdir="$out_dir"
         echo "$out_dir/Tools/QtInstallerFramework/4.0/bin" >> $GITHUB_PATH
 
     - name: Create Build Directory

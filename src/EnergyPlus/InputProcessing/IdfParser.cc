@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -276,7 +276,8 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
             }
 
             if (root[obj_name].find(name) != root[obj_name].end()) {
-                errors_.emplace_back("Duplicate name found. name: \"" + name + "\". Overwriting existing object.");
+                errors_.emplace_back("Duplicate name found for object of type \"" + obj_name + "\" named \"" + name +
+                                     "\". Overwriting existing object.");
             }
 
             root[obj_name][name] = std::move(obj);
@@ -345,14 +346,14 @@ json IdfParser::parse_object(
             if (!was_value_parsed) {
                 int ext_size = 0;
                 if (legacy_idd_index < legacy_idd_fields_array.size()) {
-                    //					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
-                    //					root[ field_name ] = "";
+                    //                    std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
+                    //                    root[ field_name ] = "";
                 } else {
                     auto const &legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
                     ext_size = static_cast<int>(legacy_idd_extensibles_array.size());
-                    //					std::string const & field_name = legacy_idd_extensibles_array[ extensible_index % ext_size ];
+                    //                    std::string const & field_name = legacy_idd_extensibles_array[ extensible_index % ext_size ];
                     extensible_index++;
-                    //					extensible[ field_name ] = "";
+                    //                    extensible[ field_name ] = "";
                 }
                 if (ext_size && extensible_index % ext_size == 0) {
                     array_of_extensions.push_back(extensible);
@@ -368,8 +369,8 @@ json IdfParser::parse_object(
                     min_fields = found_min_fields.value();
                 }
                 for (; legacy_idd_index < min_fields; legacy_idd_index++) {
-                    //					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
-                    //					root[ field_name ] = "";
+                    //                    std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
+                    //                    root[ field_name ] = "";
                 }
                 if (extensible.size()) {
                     array_of_extensions.push_back(extensible);

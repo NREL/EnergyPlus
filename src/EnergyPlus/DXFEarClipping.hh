@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,9 +49,10 @@
 #define DXFEarClipping_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include "DataSurfaces.hh"
 
 namespace EnergyPlus {
 
@@ -72,7 +73,6 @@ namespace DXFEarClipping {
 
     // Module variable declarations:
     // na
-    extern bool trackit;
     // Subroutine specifications for module <module_name>:
 
     // Functions
@@ -85,10 +85,10 @@ namespace DXFEarClipping {
                     int const nsides, // number of sides to polygon
                     Array1D<Vector> &polygon,
                     Array1D<dTriangle> &outtriangles,
-                    Real64 const surfazimuth,    // surface azimuth angle (outward facing normal)
-                    Real64 const surftilt,       // surface tilt angle
-                    std::string const &surfname, // surface name (for error messages)
-                    DataSurfaces::SurfaceClass surfclass          // surface class
+                    Real64 const surfazimuth,            // surface azimuth angle (outward facing normal)
+                    Real64 const surftilt,               // surface tilt angle
+                    std::string const &surfname,         // surface name (for error messages)
+                    DataSurfaces::SurfaceClass surfclass // surface class
     );
 
     Real64 angle_2dvector(Real64 const xa, // vertex coordinate
@@ -136,6 +136,19 @@ namespace DXFEarClipping {
     void reorder(int &nvert); // unused1208
 
 } // namespace DXFEarClipping
+
+struct DXFEarClippingData : BaseGlobalStruct
+{
+
+    bool trackit = false;
+    int errcount = 0;
+
+    void clear_state() override
+    {
+        this->trackit = false;
+        this->errcount = 0;
+    }
+};
 
 } // namespace EnergyPlus
 
