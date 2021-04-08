@@ -574,9 +574,9 @@ CoilCoolingDXCurveFitSpeed &CoilCoolingDX::altModeNomSpeed()
 Real64 CoilCoolingDX::condMassFlowRate(bool const useAlternateMode)
 {
     if (useAlternateMode) {
-        return this->altModeNomSpeed().condenser_air_flow_rate;
+        return this->altModeNomSpeed().RatedCondAirMassFlowRate;
     } else {
-        return this->normModeNomSpeed().condenser_air_flow_rate;
+        return this->normModeNomSpeed().RatedCondAirMassFlowRate;
     }
 }
 
@@ -833,10 +833,24 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state,
             state.dataEnvrn->OutBaroPress = holdOutBaroPress;
             state.dataEnvrn->OutHumRat = holdOutHumRat;
 
-            Real64 const coolingRate = dummyEvapInlet.MassFlowRate * (dummyEvapInlet.Enthalpy - dummyEvapOutlet.Enthalpy);
-            Real64 const thisMinAirHumRat = min(dummyEvapInlet.HumRat, dummyEvapOutlet.HumRat);
-            Real64 const sensCoolingRate = dummyEvapInlet.MassFlowRate * (Psychrometrics::PsyHFnTdbW(dummyEvapInlet.Temp, thisMinAirHumRat) -
-                                                                          Psychrometrics::PsyHFnTdbW(dummyEvapOutlet.Temp, thisMinAirHumRat));
+            //Real64 const coolingRate = dummyEvapInlet.MassFlowRate * (dummyEvapInlet.Enthalpy - dummyEvapOutlet.Enthalpy);
+            //Real64 const thisMinAirHumRat = min(dummyEvapInlet.HumRat, dummyEvapOutlet.HumRat);
+            //Real64 const sensCoolingRate = dummyEvapInlet.MassFlowRate * (Psychrometrics::PsyHFnTdbW(dummyEvapInlet.Temp, thisMinAirHumRat) -
+            //                                                              Psychrometrics::PsyHFnTdbW(dummyEvapOutlet.Temp, thisMinAirHumRat));
+            Real64 coolingRate = 0.0;
+            Real64 sensCoolingRate = 0.0;
+            Real64 latCoolingRate = 0.0;
+            CalcComponentSensibleLatentOutput(dummyEvapInlet.MassFlowRate,
+                dummyEvapInlet.Temp,
+                dummyEvapInlet.HumRat,
+                dummyEvapOutlet.Temp,
+                dummyEvapOutlet.HumRat,
+                sensCoolingRate,
+                latCoolingRate,
+                coolingRate);
+
+
+
             Real64 const ratedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
                 state, dummyEvapOutlet.Temp, dummyEvapOutlet.HumRat, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
             state.dataRptCoilSelection->coilSelectionReportObj->setRatedCoilConditions(state,
