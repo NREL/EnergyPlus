@@ -184,11 +184,7 @@ namespace Psychrometrics {
 #endif
     }
 
-#ifdef EP_psych_stats
-    void ShowPsychrometricSummary(InputOutputFile &auditFile)
-#else
-    void ShowPsychrometricSummary([[maybe_unused]] InputOutputFile &auditFile)
-#endif
+    void ShowPsychrometricSummary([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] InputOutputFile &auditFile)
     {
 
         // SUBROUTINE INFORMATION:
@@ -227,14 +223,14 @@ namespace Psychrometrics {
         Real64 AverageIterations;
 
         if (!auditFile.good()) return;
-        if (any_gt(state.dataPsychrometrics->NumTimesCalled, 0)) {
+        if (any_gt(state.dataPsychCache->NumTimesCalled, 0)) {
             print(auditFile, "RoutineName,#times Called,Avg Iterations\n");
             for (Loop = 1; Loop <= NumPsychMonitors; ++Loop) {
                 if (!PsyReportIt(Loop)) continue;
-                const auto istring = fmt::to_string(state.dataPsychrometrics->NumTimesCalled(Loop));
-                if (state.dataPsychrometrics->NumIterations(Loop) > 0) {
+                const auto istring = fmt::to_string(state.dataPsychCache->NumTimesCalled(Loop));
+                if (state.dataPsychCache->NumIterations(Loop) > 0) {
                     AverageIterations =
-                        double(state.dataPsychrometrics->NumIterations(Loop)) / double(state.dataPsychrometrics->NumTimesCalled(Loop));
+                        double(state.dataPsychCache->NumIterations(Loop)) / double(state.dataPsychCache->NumTimesCalled(Loop));
                     print(auditFile, "{},{},{:.2R}\n", PsyRoutineNames(Loop), istring, AverageIterations);
                 } else {
                     print(auditFile, "{},{}\n", PsyRoutineNames(Loop), istring);
@@ -471,7 +467,7 @@ namespace Psychrometrics {
         bool FlagError;  // set when errors should be flagged
 
 #ifdef EP_psych_stats
-        ++state.dataPsychrometrics->NumTimesCalled(iPsyTwbFnTdbWPb);
+        ++state.dataPsychCache->NumTimesCalled(iPsyTwbFnTdbWPb);
 #endif
 
         // CHECK TDB IN RANGE.
@@ -583,7 +579,7 @@ namespace Psychrometrics {
         } // End of Iteration Loop
 
 #ifdef EP_psych_stats
-        state.dataPsychrometrics->NumIterations(iPsyTwbFnTdbWPb) += iter;
+        state.dataPsychCache->NumIterations(iPsyTwbFnTdbWPb) += iter;
 #endif
 
         // Wet bulb temperature has not converged after maximum specified
@@ -712,7 +708,7 @@ namespace Psychrometrics {
 
     Real64 PsyPsatFnTemp(EnergyPlusData &state,
                          Real64 const T,               // dry-bulb temperature {C}
-                         std::string const &CalledFrom // routine this function was called from (error messages)
+                         [[maybe_unused]] std::string const &CalledFrom // routine this function was called from (error messages)
     )
 #endif
     {
@@ -752,7 +748,7 @@ namespace Psychrometrics {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
 #ifdef EP_psych_stats
-        ++state.dataPsychrometrics->NumTimesCalled(iPsyPsatFnTemp);
+        ++state.dataPsychCache->NumTimesCalled(iPsyPsatFnTemp);
 #endif
 
         // CHECK T IN RANGE.
@@ -1000,7 +996,7 @@ namespace Psychrometrics {
         }
 
 #ifdef EP_psych_stats
-        ++state.dataPsychrometrics->NumTimesCalled(iPsyTsatFnHPb);
+        ++state.dataPsychCache->NumTimesCalled(iPsyTsatFnHPb);
 #endif
 
         FlagError = false;
@@ -1352,7 +1348,7 @@ namespace Psychrometrics {
         int iter;       // Iteration counter
 
 #ifdef EP_psych_stats
-        ++state.dataPsychrometrics->NumTimesCalled(iPsyTsatFnPb);
+        ++state.dataPsychCache->NumTimesCalled(iPsyTsatFnPb);
 #endif
 
         // Check press in range.
@@ -1433,7 +1429,7 @@ namespace Psychrometrics {
         } // End If for the Pressure Range Checking
 
 #ifdef EP_psych_stats
-        state.dataPsychrometrics->NumIterations(iPsyTsatFnPb) += iter;
+        state.dataPsychCache->NumIterations(iPsyTsatFnPb) += iter;
 #endif
 
 #ifdef EP_psych_errors

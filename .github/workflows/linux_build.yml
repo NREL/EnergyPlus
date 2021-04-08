@@ -65,9 +65,9 @@ jobs:
                 -DLINK_WITH_PYTHON=OFF \
                 -DUSE_PSYCHROMETRICS_CACHING=OFF \
                 -DUSE_GLYCOL_CACHING=OFF \
-                -OPENGL_REQUIRED=OFF \
-                -USE_PSYCH_STATS=ON \
-                -USE_PSYCH_ERRORS=OFF \
+                -DOPENGL_REQUIRED=OFF \
+                -DUSE_PSYCH_STATS=ON \
+                -DUSE_PSYCH_ERRORS=OFF \
                 ../
 
       - name: Build EnergyPlus
