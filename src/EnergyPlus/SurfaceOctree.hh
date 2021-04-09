@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/EPVector.hh>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1.fwd.hh>
