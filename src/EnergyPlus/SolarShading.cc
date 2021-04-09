@@ -12155,7 +12155,6 @@ void CalcInteriorWinTransDifSolInitialDistribution(
     using namespace DataViewFactorInformation;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ConstrNumSh;             // Shaded construction number
     int IGlass;                  // Glass layer counter
     int TotGlassLayers;          // Number of glass layers in a window construction
     WinShadingType ShadeFlag;    // Shading flag
