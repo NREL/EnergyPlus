@@ -119,16 +119,18 @@ We will also add the fields **Inside Face Convective Coefficient Adjustment Rati
 ```
 SurfaceProperty:ConvectionCoefficients,
   …
-  A10, \field Outside Face Convective Coefficient Adjustment Ratio
+  A10, \field Convective Coefficient 1 Adjustment Ratio
        \type real
        \note this parameter is to adjust the calculated convective coefficient on the outside face
+       \note only applicable to exterior windows
        \default 1.0
        \minimum 0.0
        \maximum 1.0
        \units dimensionless
-  A11, \field Inside Face Convective Coefficient Adjustment Ratio
+  A11; \field Convective Coefficient 2 Adjustment Ratio
        \type real
        \note this parameter is to adjust the calculated convective coefficient on the inside face
+       \note only applicable to exterior windows
        \default 1.0
        \minimum 0.0
        \maximum 1.0
