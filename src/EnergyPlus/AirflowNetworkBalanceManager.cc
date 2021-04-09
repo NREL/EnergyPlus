@@ -9869,14 +9869,15 @@ namespace AirflowNetworkBalanceManager {
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixMass =
                 (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp / CpAir) * ReportingConstant;
             // save values for predefined report
-            Real64 StdDensInfilVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp / CpAir / state.dataEnvrn->StdRhoAir) *
-                                        ReportingConstant; // compute volume using standard density air
-            // MJWToDo - Separate AFN Vent and InfilVolFlow
-            state.dataHeatBal->ZonePreDefRep(i).AFNVentVolTotalStdDen += 0.0;
-            state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalStdDen += StdDensInfilVolume;
+            Real64 stdDensAFNInfilVolume =
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * AirDensity / state.dataEnvrn->StdRhoAir;
+            Real64 stdDensAFNNatVentVolume =
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilVolume * AirDensity / state.dataEnvrn->StdRhoAir;
+            state.dataHeatBal->ZonePreDefRep(i).AFNVentVolTotalStdDen += stdDensAFNNatVentVolume;
+            state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalStdDen += stdDensAFNInfilVolume;
             if (state.dataHeatBal->ZonePreDefRep(i).isOccupied) {
-                state.dataHeatBal->ZonePreDefRep(i).AFNVentVolTotalOccStdDen += 0.0;
-                state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalOccStdDen += StdDensInfilVolume;
+                state.dataHeatBal->ZonePreDefRep(i).AFNVentVolTotalOccStdDen += stdDensAFNNatVentVolume;
+                state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalOccStdDen += stdDensAFNInfilVolume;
                 state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalOcc +=
                     (state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume +
                      state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilVolume) *
