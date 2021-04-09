@@ -11919,7 +11919,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                                             construct_sh_BlAbsDiffBack(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1), IGlass),
                                             SurfWinSlatsAngInterpFac);
                                     } else {
-                                        BlAbsDiffBk = construct_sh_BlAbsDiffBack(1, Lay);
+                                        BlAbsDiffBk = construct_sh_BlAbsDiffBack(1, IGlass);
                                     }
                                     // Calc diffuse solar absorbed in each window glass layer and shade
                                     WinDifSolLayAbsW = WinDifSolarTrans_Factor * BlAbsDiffBk;
