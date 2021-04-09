@@ -101,7 +101,6 @@ namespace GeneratorDynamicsManager {
         // like a get input routine but feeds from
         //  parent objects, could have its own input object someday
 
-
         // get the number of generators that might use this module
         state.dataGenerator->NumGensWDynamics = state.dataCHPElectGen->NumMicroCHPs; // TODO  + NumFuelCellCGenerators
 
@@ -123,7 +122,8 @@ namespace GeneratorDynamicsManager {
         state.dataGenerator->GeneratorDynamics(GenNum).MandatoryFullCoolDown = state.dataCHPElectGen->MicroCHP(GenNum).A42Model.MandatoryFullCoolDown;
         state.dataGenerator->GeneratorDynamics(GenNum).WarmRestartOkay = state.dataCHPElectGen->MicroCHP(GenNum).A42Model.WarmRestartOkay;
         state.dataGenerator->GeneratorDynamics(GenNum).WarmUpDelay = state.dataCHPElectGen->MicroCHP(GenNum).A42Model.WarmUpDelay;
-        state.dataGenerator->GeneratorDynamics(GenNum).CoolDownDelay = state.dataCHPElectGen->MicroCHP(GenNum).A42Model.CoolDownDelay / DataGlobalConstants::SecInHour; // seconds to hours
+        state.dataGenerator->GeneratorDynamics(GenNum).CoolDownDelay =
+            state.dataCHPElectGen->MicroCHP(GenNum).A42Model.CoolDownDelay / DataGlobalConstants::SecInHour; // seconds to hours
         state.dataGenerator->GeneratorDynamics(GenNum).PcoolDown = state.dataCHPElectGen->MicroCHP(GenNum).A42Model.PcoolDown;
         state.dataGenerator->GeneratorDynamics(GenNum).Pstandby = state.dataCHPElectGen->MicroCHP(GenNum).A42Model.Pstandby;
         state.dataGenerator->GeneratorDynamics(GenNum).MCeng = state.dataCHPElectGen->MicroCHP(GenNum).A42Model.MCeng;
@@ -132,14 +132,17 @@ namespace GeneratorDynamicsManager {
         state.dataGenerator->GeneratorDynamics(GenNum).TnomEngOp = state.dataCHPElectGen->MicroCHP(GenNum).A42Model.TnomEngOp;
         state.dataGenerator->GeneratorDynamics(GenNum).kp = state.dataCHPElectGen->MicroCHP(GenNum).A42Model.kp;
         state.dataGenerator->GeneratorDynamics(GenNum).AvailabilitySchedID = state.dataCHPElectGen->MicroCHP(GenNum).AvailabilitySchedID;
-        state.dataGenerator->GeneratorDynamics(GenNum).StartUpTimeDelay = state.dataCHPElectGen->MicroCHP(GenNum).A42Model.WarmUpDelay / DataGlobalConstants::SecInHour; // seconds to hours
+        state.dataGenerator->GeneratorDynamics(GenNum).StartUpTimeDelay =
+            state.dataCHPElectGen->MicroCHP(GenNum).A42Model.WarmUpDelay / DataGlobalConstants::SecInHour; // seconds to hours
 
         state.dataGenerator->GeneratorDynamics(GenNum).ElectEffNom = state.dataCHPElectGen->MicroCHP(GenNum).A42Model.ElecEff;
         state.dataGenerator->GeneratorDynamics(GenNum).ThermEffNom = state.dataCHPElectGen->MicroCHP(GenNum).A42Model.ThermEff;
-        state.dataGenerator->GeneratorDynamics(GenNum).QdotHXMax =
-            state.dataCHPElectGen->MicroCHP(GenNum).A42Model.ThermEff * state.dataCHPElectGen->MicroCHP(GenNum).A42Model.MaxElecPower / state.dataCHPElectGen->MicroCHP(GenNum).A42Model.ElecEff;
-        state.dataGenerator->GeneratorDynamics(GenNum).QdotHXMin =
-            state.dataCHPElectGen->MicroCHP(GenNum).A42Model.ThermEff * state.dataCHPElectGen->MicroCHP(GenNum).A42Model.MinElecPower / state.dataCHPElectGen->MicroCHP(GenNum).A42Model.ElecEff;
+        state.dataGenerator->GeneratorDynamics(GenNum).QdotHXMax = state.dataCHPElectGen->MicroCHP(GenNum).A42Model.ThermEff *
+                                                                   state.dataCHPElectGen->MicroCHP(GenNum).A42Model.MaxElecPower /
+                                                                   state.dataCHPElectGen->MicroCHP(GenNum).A42Model.ElecEff;
+        state.dataGenerator->GeneratorDynamics(GenNum).QdotHXMin = state.dataCHPElectGen->MicroCHP(GenNum).A42Model.ThermEff *
+                                                                   state.dataCHPElectGen->MicroCHP(GenNum).A42Model.MinElecPower /
+                                                                   state.dataCHPElectGen->MicroCHP(GenNum).A42Model.ElecEff;
         state.dataGenerator->GeneratorDynamics(GenNum).QdotHXOpt = state.dataGenerator->GeneratorDynamics(GenNum).QdotHXMax;
         state.dataCHPElectGen->MicroCHP(GenNum).DynamicsControlID = GenNum;
     }
@@ -153,7 +156,7 @@ namespace GeneratorDynamicsManager {
                                      Real64 const ElecLoadRequest,                  // Generator Electrical power demand
                                      Real64 const ThermalLoadRequest,               // cogenerator Thermal power demand
                                      Real64 &ElecLoadProvided,                      // power allowed
-                                     DataGenerators::OperatingMode &OperatingMode,                            // operating mode
+                                     DataGenerators::OperatingMode &OperatingMode,  // operating mode
                                      Real64 &PLRforSubtimestepStartUp,              // part load ratio for switch to normal from start up
                                      Real64 &PLRforSubtimestepShutDown,             // part load ratio for switch from cool down to other
                                      [[maybe_unused]] bool const FirstHVACIteration // True is this is first HVAC iteration
@@ -212,9 +215,8 @@ namespace GeneratorDynamicsManager {
         // controls specifications in Annex 42 model specs.
         // Using/Aliasing
         using namespace DataGlobalConstants;
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
-        using DataLoopNode::Node;
+        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleIndex;
 
@@ -244,7 +246,6 @@ namespace GeneratorDynamicsManager {
         Real64 Pel;
         DataGenerators::OperatingMode newOpMode(DataGenerators::OperatingMode::Unassigned);
         Real64 SchedVal;
-        //  REAL(r64)    :: PelDiff
         Real64 ElectLoadForThermalRequest;
         bool ConstrainedMaxP;           // true if request was altered because of max power limit
         bool ConstrainedMinP;           // true if request was altered because of min power limit
@@ -253,12 +254,11 @@ namespace GeneratorDynamicsManager {
         bool ConstrainedByPlant;        // true if request was altered because of cooling water problem
         bool PLRStartUp;                // true if subtimestep issue involving startup
         bool PLRShutDown;
-        //  INTEGER :: OutletCWnode        = 0 ! cooling water outlet node ID
-        static int InletCWnode(0); // cooling water inlet node ID
-        static bool InternalFlowControl(false);
-        static Real64 TcwIn(0.0);          // inlet cooling water temperature (C)
-        static Real64 TrialMdotcw(0.0);    // test or estimate of what the plant flows are going to be (kg/s)
-        static Real64 LimitMinMdotcw(0.0); // lower limit for cooling water flow for generatior operation (kg/s)
+        auto &InletCWnode = state.dataGenerator->InletCWnode;
+        auto &InternalFlowControl = state.dataGenerator->InternalFlowControl;
+        auto &TcwIn = state.dataGenerator->TcwIn;
+        auto &TrialMdotcw = state.dataGenerator->TrialMdotcw;
+        auto &LimitMinMdotcw = state.dataGenerator->LimitMinMdotcw;
 
         // inits
         PLRforSubtimestepStartUp = 1.0;
@@ -279,7 +279,7 @@ namespace GeneratorDynamicsManager {
                 DynaCntrlNum = state.dataCHPElectGen->MicroCHP(GeneratorNum).DynamicsControlID;
                 // OutletCWnode = MicroCHPElectricGenerator::MicroCHP(GeneratorNum)%PlantOutletNodeID
                 InletCWnode = state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInletNodeID;
-                TcwIn = Node(state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInletNodeID).Temp;
+                TcwIn = state.dataLoopNodes->Node(state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInletNodeID).Temp;
                 if (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.InternalFlowControl) {
                     InternalFlowControl = true;
                 }
@@ -294,8 +294,8 @@ namespace GeneratorDynamicsManager {
         ElectLoadForThermalRequest = 0.0;
         if ((ThermalLoadRequest > 0.0) && RunFlagPlant) { // deal with possible thermal load following
             // Modify electric load request based on thermal load following signal using nominal efficiencies
-            ElectLoadForThermalRequest =
-                state.dataGenerator->GeneratorDynamics(DynaCntrlNum).ThermEffNom * ThermalLoadRequest / state.dataGenerator->GeneratorDynamics(DynaCntrlNum).ElectEffNom;
+            ElectLoadForThermalRequest = state.dataGenerator->GeneratorDynamics(DynaCntrlNum).ThermEffNom * ThermalLoadRequest /
+                                         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).ElectEffNom;
             PelInput = max(PelInput, ElectLoadForThermalRequest);
         }
 
@@ -314,7 +314,7 @@ namespace GeneratorDynamicsManager {
         if (InternalFlowControl && (SchedVal > 0.0)) {
             TrialMdotcw = FuncDetermineCWMdotForInternalFlowControl(state, GeneratorNum, Pel, TcwIn);
         } else {
-            TrialMdotcw = Node(InletCWnode).MassFlowRate;
+            TrialMdotcw = state.dataLoopNodes->Node(InletCWnode).MassFlowRate;
         }
 
         // determine current operating mode.
@@ -341,23 +341,30 @@ namespace GeneratorDynamicsManager {
                             // generator just started so set start time
                             state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastStartUp =
                                 double(state.dataGlobal->DayOfSim) +
-                                (int(state.dataGlobal->CurrentTime) + (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime) - TimeStepSys))) / DataGlobalConstants::HoursInDay;
+                                (int(state.dataGlobal->CurrentTime) +
+                                 (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime) - TimeStepSys))) /
+                                    DataGlobalConstants::HoursInDay;
 
                         } else { // warm up period is less than a single system time step
                             newOpMode = DataGenerators::OperatingMode::OpModeNormal;
                             PLRStartUp = true;
-                            PLRforSubtimestepStartUp = (TimeStepSys - state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay) / TimeStepSys;
+                            PLRforSubtimestepStartUp =
+                                (TimeStepSys - state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay) / TimeStepSys;
                         }
                     }
                     if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).WarmUpByEngineTemp) {
-                        if (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.Teng >= state.dataGenerator->GeneratorDynamics(DynaCntrlNum).TnomEngOp) {
+                        if (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.Teng >=
+                            state.dataGenerator->GeneratorDynamics(DynaCntrlNum).TnomEngOp) {
                             newOpMode = DataGenerators::OperatingMode::OpModeNormal;
                             // assume linear interpolation for PLR
                             PLRStartUp = true;
-                            if ((state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.Teng - state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.TengLast) > 0.0) {
+                            if ((state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.Teng -
+                                 state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.TengLast) > 0.0) {
                                 // protect divide by zero or neg
-                                PLRforSubtimestepStartUp = (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.Teng - state.dataGenerator->GeneratorDynamics(DynaCntrlNum).TnomEngOp) /
-                                                           (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.Teng - state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.TengLast);
+                                PLRforSubtimestepStartUp = (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.Teng -
+                                                            state.dataGenerator->GeneratorDynamics(DynaCntrlNum).TnomEngOp) /
+                                                           (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.Teng -
+                                                            state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.TengLast);
                             } else {
                                 PLRforSubtimestepStartUp = 1.0;
                             }
@@ -379,7 +386,10 @@ namespace GeneratorDynamicsManager {
                             newOpMode = DataGenerators::OperatingMode::OpModeCoolDown;
                             // need to reset time of last shut down here
                             state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown =
-                                double(state.dataGlobal->DayOfSim) + (int(state.dataGlobal->CurrentTime) + (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) / DataGlobalConstants::HoursInDay;
+                                double(state.dataGlobal->DayOfSim) +
+                                (int(state.dataGlobal->CurrentTime) +
+                                 (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
+                                    DataGlobalConstants::HoursInDay;
                         } else {
                             newOpMode = DataGenerators::OperatingMode::OpModeOff;
                         }
@@ -393,7 +403,10 @@ namespace GeneratorDynamicsManager {
                             newOpMode = DataGenerators::OperatingMode::OpModeCoolDown;
                             // need to reset time of last shut down here
                             state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown =
-                                double(state.dataGlobal->DayOfSim) + (int(state.dataGlobal->CurrentTime) + (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) / DataGlobalConstants::HoursInDay;
+                                double(state.dataGlobal->DayOfSim) +
+                                (int(state.dataGlobal->CurrentTime) +
+                                 (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
+                                    DataGlobalConstants::HoursInDay;
 
                         } else {
                             newOpMode = DataGenerators::OperatingMode::OpModeStandby;
@@ -406,8 +419,10 @@ namespace GeneratorDynamicsManager {
                     if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).WarmUpByTimeDelay) {
                         // compare current time to when warm up is over
                         // calculate time for end of warmup period
-                        CurrentFractionalDay =
-                            double(state.dataGlobal->DayOfSim) + (int(state.dataGlobal->CurrentTime) + (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) / DataGlobalConstants::HoursInDay;
+                        CurrentFractionalDay = double(state.dataGlobal->DayOfSim) +
+                                               (int(state.dataGlobal->CurrentTime) +
+                                                (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
+                                                   DataGlobalConstants::HoursInDay;
                         EndingFractionalDay = state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastStartUp +
                                               state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay / DataGlobalConstants::HoursInDay;
                         if ((std::abs(CurrentFractionalDay - EndingFractionalDay) < 0.000001) || (CurrentFractionalDay > EndingFractionalDay)) {
@@ -423,14 +438,18 @@ namespace GeneratorDynamicsManager {
                     } else if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).WarmUpByEngineTemp) {
                         if (GeneratorType == GeneratorType::MicroCHP) {
                             // only change to normal if this is result from completed timestep, not just an interation
-                            if (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.TengLast >= state.dataGenerator->GeneratorDynamics(DynaCntrlNum).TnomEngOp) {
+                            if (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.TengLast >=
+                                state.dataGenerator->GeneratorDynamics(DynaCntrlNum).TnomEngOp) {
                                 newOpMode = DataGenerators::OperatingMode::OpModeNormal;
                                 // assume linear interpolation for PLR
                                 PLRStartUp = true;
-                                if ((state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.Teng - state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.TengLast) > 0.0) {
+                                if ((state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.Teng -
+                                     state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.TengLast) > 0.0) {
                                     // protect divide by zero or neg
-                                    PLRforSubtimestepStartUp = (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.Teng - state.dataGenerator->GeneratorDynamics(DynaCntrlNum).TnomEngOp) /
-                                                               (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.Teng - state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.TengLast);
+                                    PLRforSubtimestepStartUp = (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.Teng -
+                                                                state.dataGenerator->GeneratorDynamics(DynaCntrlNum).TnomEngOp) /
+                                                               (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.Teng -
+                                                                state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.TengLast);
                                 } else {
                                     PLRforSubtimestepStartUp = 1.0;
                                 }
@@ -458,7 +477,10 @@ namespace GeneratorDynamicsManager {
                         newOpMode = DataGenerators::OperatingMode::OpModeCoolDown;
                         // also, generator just shut down so record shut down time
                         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown =
-                            double(state.dataGlobal->DayOfSim) + (int(state.dataGlobal->CurrentTime) + (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) / DataGlobalConstants::HoursInDay;
+                            double(state.dataGlobal->DayOfSim) +
+                            (int(state.dataGlobal->CurrentTime) +
+                             (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
+                                DataGlobalConstants::HoursInDay;
                     } else { // cool down period is less than a single system time step
                         if (SchedVal != 0.0) {
                             newOpMode = DataGenerators::OperatingMode::OpModeStandby;
@@ -470,7 +492,10 @@ namespace GeneratorDynamicsManager {
 
                         // also, generator just shut down so record shut down time
                         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown =
-                            double(state.dataGlobal->DayOfSim) + (int(state.dataGlobal->CurrentTime) + (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) / DataGlobalConstants::HoursInDay;
+                            double(state.dataGlobal->DayOfSim) +
+                            (int(state.dataGlobal->CurrentTime) +
+                             (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
+                                DataGlobalConstants::HoursInDay;
                     }
                 } else if ((SchedVal != 0.0) && (RunFlag)) {
 
@@ -484,16 +509,20 @@ namespace GeneratorDynamicsManager {
                     // probably goes to off but could be stuck in cool down for awhile
                     if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay > 0.0) {
                         // calculate time for end of cool down period
-                        CurrentFractionalDay =
-                            double(state.dataGlobal->DayOfSim) + (int(state.dataGlobal->CurrentTime) + (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) / DataGlobalConstants::HoursInDay;
+                        CurrentFractionalDay = double(state.dataGlobal->DayOfSim) +
+                                               (int(state.dataGlobal->CurrentTime) +
+                                                (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
+                                                   DataGlobalConstants::HoursInDay;
                         EndingFractionalDay = state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown +
-                                              state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay / DataGlobalConstants::HoursInDay - (TimeStepSys / DataGlobalConstants::HoursInDay);
+                                              state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay / DataGlobalConstants::HoursInDay -
+                                              (TimeStepSys / DataGlobalConstants::HoursInDay);
                         if ((std::abs(CurrentFractionalDay - EndingFractionalDay) < 0.000001) ||
                             (CurrentFractionalDay > EndingFractionalDay)) { // CurrentFractionalDay == EndingFractionalDay
                             newOpMode = DataGenerators::OperatingMode::OpModeOff;
                             PLRShutDown = true;
                             LastSystemTimeStepFractionalDay = CurrentFractionalDay - (TimeStepSys / DataGlobalConstants::HoursInDay);
-                            PLRforSubtimestepShutDown = (EndingFractionalDay - LastSystemTimeStepFractionalDay) * DataGlobalConstants::HoursInDay / TimeStepSys;
+                            PLRforSubtimestepShutDown =
+                                (EndingFractionalDay - LastSystemTimeStepFractionalDay) * DataGlobalConstants::HoursInDay / TimeStepSys;
                         } else { // CurrentFractionalDay > EndingFractionalDay
                             newOpMode = DataGenerators::OperatingMode::OpModeCoolDown;
                         }
@@ -504,16 +533,20 @@ namespace GeneratorDynamicsManager {
                     // probably goes to standby but could be stuck in cool down for awhile
                     if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay > 0.0) {
                         // calculate time for end of cool down period
-                        CurrentFractionalDay =
-                            double(state.dataGlobal->DayOfSim) + (int(state.dataGlobal->CurrentTime) + (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) / DataGlobalConstants::HoursInDay;
+                        CurrentFractionalDay = double(state.dataGlobal->DayOfSim) +
+                                               (int(state.dataGlobal->CurrentTime) +
+                                                (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
+                                                   DataGlobalConstants::HoursInDay;
                         EndingFractionalDay = state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown +
-                                              state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay / DataGlobalConstants::HoursInDay - (TimeStepSys / DataGlobalConstants::HoursInDay);
+                                              state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay / DataGlobalConstants::HoursInDay -
+                                              (TimeStepSys / DataGlobalConstants::HoursInDay);
                         if ((std::abs(CurrentFractionalDay - EndingFractionalDay) < 0.000001) ||
                             (CurrentFractionalDay > EndingFractionalDay)) { // CurrentFractionalDay == EndingFractionalDay
                             newOpMode = DataGenerators::OperatingMode::OpModeStandby;
                             PLRShutDown = true;
                             LastSystemTimeStepFractionalDay = CurrentFractionalDay - (TimeStepSys / DataGlobalConstants::HoursInDay);
-                            PLRforSubtimestepShutDown = (EndingFractionalDay - LastSystemTimeStepFractionalDay) * DataGlobalConstants::HoursInDay / TimeStepSys;
+                            PLRforSubtimestepShutDown =
+                                (EndingFractionalDay - LastSystemTimeStepFractionalDay) * DataGlobalConstants::HoursInDay / TimeStepSys;
                         } else { // CurrentFractionalDay < EndingFractionalDay
                             newOpMode = DataGenerators::OperatingMode::OpModeCoolDown;
                         }
@@ -527,10 +560,14 @@ namespace GeneratorDynamicsManager {
                         // is cool down done or not?
                         if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay > 0.0) {
                             // calculate time for end of cool down period
-                            CurrentFractionalDay =
-                                double(state.dataGlobal->DayOfSim) + (int(state.dataGlobal->CurrentTime) + (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) / DataGlobalConstants::HoursInDay;
-                            EndingFractionalDay = state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown +
-                                                  state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay / DataGlobalConstants::HoursInDay - (TimeStepSys / DataGlobalConstants::HoursInDay);
+                            CurrentFractionalDay = double(state.dataGlobal->DayOfSim) +
+                                                   (int(state.dataGlobal->CurrentTime) +
+                                                    (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
+                                                       DataGlobalConstants::HoursInDay;
+                            EndingFractionalDay =
+                                state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown +
+                                state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay / DataGlobalConstants::HoursInDay -
+                                (TimeStepSys / DataGlobalConstants::HoursInDay);
                             if ((std::abs(CurrentFractionalDay - EndingFractionalDay) < 0.000001) ||
                                 (CurrentFractionalDay < EndingFractionalDay)) { // CurrentFractionalDay == EndingFractionalDay
 
@@ -539,7 +576,8 @@ namespace GeneratorDynamicsManager {
                                 // could go to warm up or normal now
                                 PLRShutDown = true;
                                 LastSystemTimeStepFractionalDay = CurrentFractionalDay - (TimeStepSys / DataGlobalConstants::HoursInDay);
-                                PLRforSubtimestepShutDown = (EndingFractionalDay - LastSystemTimeStepFractionalDay) * DataGlobalConstants::HoursInDay / TimeStepSys;
+                                PLRforSubtimestepShutDown =
+                                    (EndingFractionalDay - LastSystemTimeStepFractionalDay) * DataGlobalConstants::HoursInDay / TimeStepSys;
                                 if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay == 0.0) {
                                     newOpMode = DataGenerators::OperatingMode::OpModeNormal;
                                     // possible PLR on start up.
@@ -549,7 +587,8 @@ namespace GeneratorDynamicsManager {
 
                                 } else if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay > 0.0) {
                                     // is remaining time enough?
-                                    if ((CurrentFractionalDay - EndingFractionalDay) > state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay) {
+                                    if ((CurrentFractionalDay - EndingFractionalDay) >
+                                        state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay) {
                                         newOpMode = DataGenerators::OperatingMode::OpModeNormal;
                                         // possible PLR on start up.
                                         PLRStartUp = true;
@@ -560,7 +599,9 @@ namespace GeneratorDynamicsManager {
                                         // generator just started so set start time
                                         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastStartUp =
                                             double(state.dataGlobal->DayOfSim) +
-                                            (int(state.dataGlobal->CurrentTime) + (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime) - TimeStepSys))) / DataGlobalConstants::HoursInDay;
+                                            (int(state.dataGlobal->CurrentTime) +
+                                             (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime) - TimeStepSys))) /
+                                                DataGlobalConstants::HoursInDay;
                                     }
                                 }
                             }
@@ -575,10 +616,13 @@ namespace GeneratorDynamicsManager {
                                 newOpMode = DataGenerators::OperatingMode::OpModeNormal;
 
                             } else if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay > 0.0) {
-                                CurrentFractionalDay =
-                                    double(state.dataGlobal->DayOfSim) + (int(state.dataGlobal->CurrentTime) + (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) / DataGlobalConstants::HoursInDay;
-                                EndingFractionalDay = state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown +
-                                                      state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay / DataGlobalConstants::HoursInDay;
+                                CurrentFractionalDay = double(state.dataGlobal->DayOfSim) +
+                                                       (int(state.dataGlobal->CurrentTime) +
+                                                        (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
+                                                           DataGlobalConstants::HoursInDay;
+                                EndingFractionalDay =
+                                    state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown +
+                                    state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay / DataGlobalConstants::HoursInDay;
                                 if ((std::abs(CurrentFractionalDay - EndingFractionalDay) < 0.000001) ||
                                     (CurrentFractionalDay > EndingFractionalDay)) { // CurrentFractionalDay == EndingFractionalDay
                                     newOpMode = DataGenerators::OperatingMode::OpModeNormal;
@@ -593,7 +637,9 @@ namespace GeneratorDynamicsManager {
                                     // generator just started so set start time
                                     state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastStartUp =
                                         double(state.dataGlobal->DayOfSim) +
-                                        (int(state.dataGlobal->CurrentTime) + (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime) - TimeStepSys))) / DataGlobalConstants::HoursInDay;
+                                        (int(state.dataGlobal->CurrentTime) +
+                                         (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime) - TimeStepSys))) /
+                                            DataGlobalConstants::HoursInDay;
                                 }
                             }
                         }
@@ -615,7 +661,8 @@ namespace GeneratorDynamicsManager {
                 if (SELECT_CASE_var == GeneratorType::FuelCell) {
                     // constant power level during start up (modeling artifact)
                     //? hours or seconds here?
-                    Pel = state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpElectProd / state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay;
+                    Pel = state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpElectProd /
+                          state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay;
 
                 } else if (SELECT_CASE_var == GeneratorType::MicroCHP) {
 
@@ -629,12 +676,14 @@ namespace GeneratorDynamicsManager {
             Pel *= PLRforSubtimestepStartUp;
             // unit may have constraints from transient limits or operating ranges.
             if (Pel > state.dataGenerator->GeneratorDynamics(DynaCntrlNum).PelLastTimeStep) { // powering up
-                MaxPel = state.dataGenerator->GeneratorDynamics(DynaCntrlNum).PelLastTimeStep + state.dataGenerator->GeneratorDynamics(DynaCntrlNum).UpTranLimit * TimeStepSys * DataGlobalConstants::SecInHour;
+                MaxPel = state.dataGenerator->GeneratorDynamics(DynaCntrlNum).PelLastTimeStep +
+                         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).UpTranLimit * TimeStepSys * DataGlobalConstants::SecInHour;
                 if (MaxPel < Pel) {
                     Pel = MaxPel;
                 }
             } else if (Pel < state.dataGenerator->GeneratorDynamics(DynaCntrlNum).PelLastTimeStep) { // powering down
-                MinPel = state.dataGenerator->GeneratorDynamics(DynaCntrlNum).PelLastTimeStep - state.dataGenerator->GeneratorDynamics(DynaCntrlNum).DownTranLimit * TimeStepSys * DataGlobalConstants::SecInHour;
+                MinPel = state.dataGenerator->GeneratorDynamics(DynaCntrlNum).PelLastTimeStep -
+                         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).DownTranLimit * TimeStepSys * DataGlobalConstants::SecInHour;
                 if (Pel < MinPel) {
                     Pel = MinPel;
                 }
@@ -679,8 +728,10 @@ namespace GeneratorDynamicsManager {
                         if (PLRforSubtimestepShutDown == 0.0) {
                             state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.OffModeTime = TimeStepSys * DataGlobalConstants::SecInHour;
                         } else if ((PLRforSubtimestepShutDown > 0.0) && (PLRforSubtimestepShutDown < 1.0)) {
-                            state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSys * DataGlobalConstants::SecInHour * (PLRforSubtimestepShutDown);
-                            state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.OffModeTime = TimeStepSys * DataGlobalConstants::SecInHour * (1.0 - PLRforSubtimestepShutDown);
+                            state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.CoolDownModeTime =
+                                TimeStepSys * DataGlobalConstants::SecInHour * (PLRforSubtimestepShutDown);
+                            state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.OffModeTime =
+                                TimeStepSys * DataGlobalConstants::SecInHour * (1.0 - PLRforSubtimestepShutDown);
                         } else {
                             state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.OffModeTime = TimeStepSys * DataGlobalConstants::SecInHour;
                         }
@@ -688,8 +739,10 @@ namespace GeneratorDynamicsManager {
                         if (PLRforSubtimestepShutDown == 0.0) {
                             state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.StandyByModeTime = TimeStepSys * DataGlobalConstants::SecInHour;
                         } else if ((PLRforSubtimestepShutDown > 0.0) && (PLRforSubtimestepShutDown < 1.0)) {
-                            state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSys * DataGlobalConstants::SecInHour * (PLRforSubtimestepShutDown);
-                            state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.StandyByModeTime = TimeStepSys * DataGlobalConstants::SecInHour * (1.0 - PLRforSubtimestepShutDown);
+                            state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.CoolDownModeTime =
+                                TimeStepSys * DataGlobalConstants::SecInHour * (PLRforSubtimestepShutDown);
+                            state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.StandyByModeTime =
+                                TimeStepSys * DataGlobalConstants::SecInHour * (1.0 - PLRforSubtimestepShutDown);
                         } else {
                             state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.StandyByModeTime = TimeStepSys * DataGlobalConstants::SecInHour;
                         }
@@ -697,8 +750,10 @@ namespace GeneratorDynamicsManager {
                         if (PLRforSubtimestepShutDown == 0.0) {
                             state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * DataGlobalConstants::SecInHour;
                         } else if ((PLRforSubtimestepShutDown > 0.0) && (PLRforSubtimestepShutDown < 1.0)) {
-                            state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSys * DataGlobalConstants::SecInHour * (PLRforSubtimestepShutDown);
-                            state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * DataGlobalConstants::SecInHour * (1.0 - PLRforSubtimestepShutDown);
+                            state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.CoolDownModeTime =
+                                TimeStepSys * DataGlobalConstants::SecInHour * (PLRforSubtimestepShutDown);
+                            state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WarmUpModeTime =
+                                TimeStepSys * DataGlobalConstants::SecInHour * (1.0 - PLRforSubtimestepShutDown);
                         } else {
                             state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * DataGlobalConstants::SecInHour;
                         }
@@ -708,15 +763,19 @@ namespace GeneratorDynamicsManager {
                             state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * DataGlobalConstants::SecInHour;
 
                         } else if ((PLRforSubtimestepStartUp > 0.0) && (PLRforSubtimestepStartUp < 1.0)) {
-                            state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * DataGlobalConstants::SecInHour * (1.0 - PLRforSubtimestepStartUp);
-                            state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.NormalModeTime = TimeStepSys * DataGlobalConstants::SecInHour * (PLRforSubtimestepStartUp);
+                            state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WarmUpModeTime =
+                                TimeStepSys * DataGlobalConstants::SecInHour * (1.0 - PLRforSubtimestepStartUp);
+                            state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.NormalModeTime =
+                                TimeStepSys * DataGlobalConstants::SecInHour * (PLRforSubtimestepStartUp);
 
                         } else {
                             if (PLRforSubtimestepShutDown == 0.0) {
                                 state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.NormalModeTime = TimeStepSys * DataGlobalConstants::SecInHour;
                             } else if ((PLRforSubtimestepShutDown > 0.0) && (PLRforSubtimestepShutDown < 1.0)) {
-                                state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSys * DataGlobalConstants::SecInHour * (PLRforSubtimestepShutDown);
-                                state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.NormalModeTime = TimeStepSys * DataGlobalConstants::SecInHour * (1.0 - PLRforSubtimestepShutDown);
+                                state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.CoolDownModeTime =
+                                    TimeStepSys * DataGlobalConstants::SecInHour * (PLRforSubtimestepShutDown);
+                                state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.NormalModeTime =
+                                    TimeStepSys * DataGlobalConstants::SecInHour * (1.0 - PLRforSubtimestepShutDown);
                             } else {
                                 state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.NormalModeTime = TimeStepSys * DataGlobalConstants::SecInHour;
                             }
@@ -763,7 +822,7 @@ namespace GeneratorDynamicsManager {
 
         // Using/Aliasing
         using namespace DataGlobalConstants;
-        using DataHVACGlobals::TimeStepSys;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MdotFuel;
@@ -784,16 +843,16 @@ namespace GeneratorDynamicsManager {
         }
 
         if (FuelFlowRequest > state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FuelMdotLastTimestep) { // fuel flow is up
-            MaxMdot =
-                state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FuelMdotLastTimestep + state.dataGenerator->GeneratorDynamics(DynaCntrlNum).UpTranLimitFuel * TimeStepSys * DataGlobalConstants::SecInHour;
+            MaxMdot = state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FuelMdotLastTimestep +
+                      state.dataGenerator->GeneratorDynamics(DynaCntrlNum).UpTranLimitFuel * TimeStepSys * DataGlobalConstants::SecInHour;
             if (MaxMdot < FuelFlowRequest) {
                 MdotFuel = MaxMdot;
                 ConstrainedIncreasingMdot = true;
             }
 
         } else if (FuelFlowRequest < state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FuelMdotLastTimestep) { // fuel flow is down
-            MinMdot =
-                state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FuelMdotLastTimestep - state.dataGenerator->GeneratorDynamics(DynaCntrlNum).DownTranLimitFuel * TimeStepSys * DataGlobalConstants::SecInHour;
+            MinMdot = state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FuelMdotLastTimestep -
+                      state.dataGenerator->GeneratorDynamics(DynaCntrlNum).DownTranLimitFuel * TimeStepSys * DataGlobalConstants::SecInHour;
             if (FuelFlowRequest < MinMdot) {
                 MdotFuel = MinMdot;
                 ConstrainedDecreasingMdot = true;
@@ -829,7 +888,6 @@ namespace GeneratorDynamicsManager {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataLoopNode::Node;
         using PlantUtilities::SetComponentFlowRate;
 
         // Return value
@@ -863,7 +921,8 @@ namespace GeneratorDynamicsManager {
 
         // make sure plant can provide, utility call may change flow
         if (state.dataCHPElectGen->MicroCHP(GeneratorNum).CWLoopNum > 0) { // protect early calls
-            SetComponentFlowRate(state, MdotCW,
+            SetComponentFlowRate(state,
+                                 MdotCW,
                                  InletNode,
                                  OutletNode,
                                  state.dataCHPElectGen->MicroCHP(GeneratorNum).CWLoopNum,

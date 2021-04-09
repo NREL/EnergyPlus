@@ -250,8 +250,8 @@ namespace DataAirLoop {
 
         // Default Constructor
         OutsideAirSysProps()
-            : ControllerListNum(0), NumComponents(0), NumControllers(0), NumSimpleControllers(0), OAControllerIndex(0),
-              HeatExchangerFlag(false), AirLoopDOASNum(-1), DXCoolingCoilFlag(false)
+            : ControllerListNum(0), NumComponents(0), NumControllers(0), NumSimpleControllers(0), OAControllerIndex(0), HeatExchangerFlag(false),
+              AirLoopDOASNum(-1), DXCoolingCoilFlag(false)
 
         {
         }
@@ -279,36 +279,37 @@ namespace DataAirLoop {
 
 } // namespace DataAirLoop
 
-    struct DataAirLoopData : BaseGlobalStruct {
+struct DataAirLoopData : BaseGlobalStruct
+{
 
-        int NumOASystems = 0;               // Number of Outdoor Air Systems
-        bool AirLoopInputsFilled = false;   // Set to TRUE after first pass through air loop
-        Real64 LoopDXCoilRTF = 0.0;         // OnOff fan run time fraction in an HVAC Air Loop
+    int NumOASystems = 0;             // Number of Outdoor Air Systems
+    bool AirLoopInputsFilled = false; // Set to TRUE after first pass through air loop
+    Real64 LoopDXCoilRTF = 0.0;       // OnOff fan run time fraction in an HVAC Air Loop
 
-        SimpleArray1D<DataAirLoop::AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
-        SimpleArray1D<DataAirLoop::AirLoopOutsideAirConnectData> AirToOANodeInfo;
-        SimpleArray1D<DataAirLoop::DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
-        SimpleArray1D<DataAirLoop::AirLooptoZoneData> AirLoopZoneInfo;
-        SimpleArray1D<DataAirLoop::AirLoopControlData> AirLoopControlInfo;
-        SimpleArray1D<DataAirLoop::AirLoopFlowData> AirLoopFlow;
-        SimpleArray1D<DataAirLoop::OutsideAirSysProps> OutsideAirSys;
-        SimpleArray1D<DataAirLoop::AirLoopAFNData> AirLoopAFNInfo;
+    SimpleArray1D<DataAirLoop::AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
+    SimpleArray1D<DataAirLoop::AirLoopOutsideAirConnectData> AirToOANodeInfo;
+    SimpleArray1D<DataAirLoop::DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
+    SimpleArray1D<DataAirLoop::AirLooptoZoneData> AirLoopZoneInfo;
+    SimpleArray1D<DataAirLoop::AirLoopControlData> AirLoopControlInfo;
+    SimpleArray1D<DataAirLoop::AirLoopFlowData> AirLoopFlow;
+    SimpleArray1D<DataAirLoop::OutsideAirSysProps> OutsideAirSys;
+    SimpleArray1D<DataAirLoop::AirLoopAFNData> AirLoopAFNInfo;
 
-        void clear_state() override
-        {
-            this->NumOASystems = 0;
-            this->LoopDXCoilRTF = 0.0;
-            this->AirLoopInputsFilled = false;
-            this->AirLoopAFNInfo.deallocate();
-            this->AirToZoneNodeInfo.deallocate();
-            this->AirToOANodeInfo.deallocate();
-            this->PriAirSysAvailMgr.deallocate();
-            this->AirLoopZoneInfo.deallocate();
-            this->AirLoopControlInfo.deallocate();
-            this->AirLoopFlow.deallocate();
-            this->OutsideAirSys.deallocate();
-        }
-    };
+    void clear_state() override
+    {
+        this->NumOASystems = 0;
+        this->LoopDXCoilRTF = 0.0;
+        this->AirLoopInputsFilled = false;
+        this->AirLoopAFNInfo.deallocate();
+        this->AirToZoneNodeInfo.deallocate();
+        this->AirToOANodeInfo.deallocate();
+        this->PriAirSysAvailMgr.deallocate();
+        this->AirLoopZoneInfo.deallocate();
+        this->AirLoopControlInfo.deallocate();
+        this->AirLoopFlow.deallocate();
+        this->OutsideAirSys.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

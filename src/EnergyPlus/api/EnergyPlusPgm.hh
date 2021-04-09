@@ -48,8 +48,8 @@
 #ifndef EnergyPlusPgm_hh_INCLUDED
 #define EnergyPlusPgm_hh_INCLUDED
 
-#include <EnergyPlus/api/EnergyPlusAPI.h>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/api/EnergyPlusAPI.h>
 
 // C++ Headers
 #include <string>
@@ -58,13 +58,13 @@
 
 std::string CreateCurrentDateTimeString();
 
-int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath);
+int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath);
 
 int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state);
 
 int ENERGYPLUSLIB_API EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath = std::string());
 
-int ENERGYPLUSLIB_API RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath = std::string());
+int ENERGYPLUSLIB_API RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath = std::string());
 
 int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const char *argv[]);
 

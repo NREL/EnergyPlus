@@ -141,7 +141,8 @@ namespace MixerComponent {
 
     // Beginning of Utility subroutines for the Mixer Component
     // *****************************************************************************
-    void GetZoneMixerIndex(EnergyPlusData &state, std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType = std::string());
+    void GetZoneMixerIndex(
+        EnergyPlusData &state, std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType = std::string());
 
     int getZoneMixerIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum);
 
@@ -150,7 +151,8 @@ namespace MixerComponent {
 
 } // namespace MixerComponent
 
-struct MixerComponentData : BaseGlobalStruct {
+struct MixerComponentData : BaseGlobalStruct
+{
 
     int NumMixers = 0;
     int LoopInletNode = 0;

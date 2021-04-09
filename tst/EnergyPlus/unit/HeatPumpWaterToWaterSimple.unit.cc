@@ -410,7 +410,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                           "    1640,                    !- Rated Heating Power Consumption {W}",
                           "    HtgCapCurve,             !- Heating Capacity Curve Name",
                           "    HtgPowCurve;             !- Heating Compressor Power Curve Name",
-                              
+
                           "Curve:QuadLinear,",
                           "    HtgCapCurve,             ! Curve Name",
                           "    -3.01043,                ! CoefficientC1",
@@ -744,8 +744,8 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    OutputProcessor::SetupTimePointers(*state, "HVAC", state->dataHVACGlobal->TimeStepSys);
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
 
@@ -793,7 +793,8 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                 state->dataGlobal->BeginHourFlag = true;
                 state->dataGlobal->EndHourFlag = false;
 
-                for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
+                for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour;
+                     ++state->dataGlobal->TimeStep) {
 
                     state->dataGlobal->BeginTimeStepFlag = true;
 
@@ -836,7 +837,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
     } // ... End environment loop.
 
-    EXPECT_NEAR(DataLoopNode::Node(12).MassFlowRate, 0.3, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(12).MassFlowRate, 0.3, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
@@ -1182,7 +1183,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
                           "    HtgPowCurve,                !- Heating Compressor Power Curve Name",
                           "    3.3475,                  !- Reference Coefficient of Performance",
                           "    1.0;                     !- Sizing Factor",
-                                                            
+
                           "Curve:QuadLinear,",
                           "    HtgCapCurve,             ! Curve Name",
                           "    -3.01043,                ! CoefficientC1",
@@ -1522,8 +1523,8 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    OutputProcessor::SetupTimePointers(*state, "HVAC", state->dataHVACGlobal->TimeStepSys);
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
 
@@ -1550,15 +1551,15 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
 
     // Check that we are outputing the correct values
     EXPECT_EQ("HeatPump:WaterToWater:EquationFit:Heating",
-              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechType,
-                                                               state->dataHPWaterToWaterSimple->GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(
+                  *state, state->dataOutRptPredefined->pdchMechType, state->dataHPWaterToWaterSimple->GSHP(1).Name));
 
     EXPECT_EQ("3.35",
-              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechNomEff,
-                                                               state->dataHPWaterToWaterSimple->GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(
+                  *state, state->dataOutRptPredefined->pdchMechNomEff, state->dataHPWaterToWaterSimple->GSHP(1).Name));
 
     EXPECT_EQ("7200.71",
-              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechNomCap,
-                                                               state->dataHPWaterToWaterSimple->GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(
+                  *state, state->dataOutRptPredefined->pdchMechNomCap, state->dataHPWaterToWaterSimple->GSHP(1).Name));
 }
 } // namespace EnergyPlus

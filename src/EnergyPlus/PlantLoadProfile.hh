@@ -119,9 +119,9 @@ namespace PlantLoadProfile {
 
         void InitPlantProfile(EnergyPlusData &state);
 
-        void UpdatePlantProfile() const;
+        void UpdatePlantProfile(EnergyPlusData &state) const;
 
-        void ReportPlantProfile();
+        void ReportPlantProfile(EnergyPlusData &state);
     };
 
     // This could be static inside the class
@@ -129,7 +129,8 @@ namespace PlantLoadProfile {
 
 } // namespace PlantLoadProfile
 
-struct PlantLoadProfileData : BaseGlobalStruct {
+struct PlantLoadProfileData : BaseGlobalStruct
+{
 
     bool GetPlantLoadProfileInputFlag = true;
     int NumOfPlantProfile = 0;

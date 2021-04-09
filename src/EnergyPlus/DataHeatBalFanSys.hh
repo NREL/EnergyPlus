@@ -93,7 +93,8 @@ namespace DataHeatBalFanSys {
 
 } // namespace DataHeatBalFanSys
 
-struct HeatBalFanSysData : BaseGlobalStruct {
+struct HeatBalFanSysData : BaseGlobalStruct
+{
     Array1D<Real64> SumConvHTRadSys;         // Sum of convection to zone air from hi temp radiant heaters
     Array1D<Real64> SumLatentHTRadSys;       // Sum of latent gains from hi temp radiant heaters
     Array1D<Real64> SumConvPool;             // Sum of convection to zone air from pools
@@ -172,9 +173,8 @@ struct HeatBalFanSysData : BaseGlobalStruct {
     // return air flow = 0.
     Array1D<Real64> SysDepZoneLoadsLagged; // SysDepZoneLoads saved to be added to zone heat balance next
     // HVAC time step
-    Array1D<Real64>
-            MDotCPOA; // Airbalance MASS FLOW * AIR SPECIFIC HEAT used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
-    Array1D<Real64> MDotOA; // Airbalance MASS FLOW rate used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
+    Array1D<Real64> MDotCPOA; // Airbalance MASS FLOW * AIR SPECIFIC HEAT used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
+    Array1D<Real64> MDotOA;   // Airbalance MASS FLOW rate used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
 
     Array1D<Real64> MixingMassFlowZone;    // Mixing MASS FLOW (kg/s)
     Array1D<Real64> MixingMassFlowXHumRat; // Mixing MASS FLOW * Humidity Ratio
@@ -388,7 +388,8 @@ struct HeatBalFanSysData : BaseGlobalStruct {
         this->ComfortControlType.deallocate();
         this->ZoneHeatIndex.deallocate();
         this->ZoneHumidex.deallocate();
-        this->ZoneNumOcc.deallocate();;
+        this->ZoneNumOcc.deallocate();
+        ;
         this->ZoneHeatIndexHourBins.deallocate();
         this->ZoneHeatIndexOccuHourBins.deallocate();
         this->ZoneHumidexHourBins.deallocate();

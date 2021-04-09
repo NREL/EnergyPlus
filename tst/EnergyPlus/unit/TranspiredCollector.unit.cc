@@ -210,13 +210,13 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     GetZoneEquipmentData(*state);
 
     GetMaterialData(*state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);    // expect no errors
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
 
     GetConstructData(*state, ErrorsFound); // read construction data
-    EXPECT_FALSE(ErrorsFound);     // expect no errors
+    EXPECT_FALSE(ErrorsFound);             // expect no errors
 
-    GetZoneData(*state, ErrorsFound);  // read zone data
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);        // expect no errors
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
@@ -227,14 +227,14 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
-    EXPECT_FALSE(ErrorsFound);   // expect no errors
+    EXPECT_FALSE(ErrorsFound);           // expect no errors
 
     state->dataEnvrn->OutDryBulbTemp = 20.0;
     state->dataEnvrn->OutWetBulbTemp = 15.0;
 
     SetSurfaceOutBulbTempAt(*state);
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     GetTranspiredCollectorInput(*state);
     EXPECT_FALSE(ErrorsFound);

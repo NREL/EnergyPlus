@@ -1272,7 +1272,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
                           "    Until: 24:00,20;         !- Field 3"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -1285,7 +1285,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
-    Node(thisGLHE.inletNodeNum).Temp = 20;
+    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20;
     thisGLHE.designFlow = 0.00075708;
 
     Real64 rho = 998.207; // Density at 20 C using CoolProp
@@ -1379,7 +1379,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_conduction_re
                           "    ,                    !- Response Factors Object Name",
                           "    GHE-Array;          !- GHE Array Object Name"});
 
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -1439,7 +1439,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_friction_factor)
                           "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -1754,7 +1754,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
                           "    Until: 24:00,20;         !- Field 3"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -1767,7 +1767,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
-    Node(thisGLHE.inletNodeNum).Temp = 13.0;
+    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 13.0;
     thisGLHE.designFlow = 0.000303 * 4;
 
     Real64 rho = 999.380058; // Density at 13 C using CoolProp
@@ -2058,7 +2058,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
                           "    Until: 24:00,20;         !- Field 3"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2071,7 +2071,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
-    Node(thisGLHE.inletNodeNum).Temp = 13.0;
+    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 13.0;
     thisGLHE.designFlow = 0.000303 * 4;
 
     Real64 rho = 999.380058; // Density at 13 C using CoolProp
@@ -2354,7 +2354,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2367,7 +2367,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
-    Node(thisGLHE.inletNodeNum).Temp = 20.0;
+    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
     Real64 const tolerance = 0.00001;
@@ -2652,7 +2652,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2665,7 +2665,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
-    Node(thisGLHE.inletNodeNum).Temp = 20.0;
+    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
     Real64 const tolerance = 0.00001;
@@ -2950,7 +2950,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2963,7 +2963,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
-    Node(thisGLHE.inletNodeNum).Temp = 20.0;
+    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
     Real64 const tolerance = 0.00001;
@@ -3248,7 +3248,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -3261,7 +3261,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
-    Node(thisGLHE.inletNodeNum).Temp = 20.0;
+    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
     Real64 const tolerance = 0.00001;
@@ -3546,7 +3546,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -3559,7 +3559,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
-    Node(thisGLHE.inletNodeNum).Temp = 20.0;
+    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
     Real64 const tolerance = 0.00001;
@@ -3844,7 +3844,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -3857,7 +3857,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
-    Node(thisGLHE.inletNodeNum).Temp = 20.0;
+    state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
     Real64 const tolerance = 0.00001;

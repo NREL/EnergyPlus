@@ -64,9 +64,8 @@ struct EnergyPlusData;
 namespace PlantUtilities {
 
     // Functions
-    void clear_state();
-
-    void InitComponentNodes(Real64 MinCompMdot,
+    void InitComponentNodes(EnergyPlusData &state,
+                            Real64 MinCompMdot,
                             Real64 MaxCompMdot,
                             int InletNode,   // component's inlet node index in node structure
                             int OutletNode,  // component's outlet node index in node structure
@@ -145,14 +144,14 @@ namespace PlantUtilities {
                                          bool FirstHVACIteration);
 
     void UpdateAbsorberChillerComponentGeneratorSide(EnergyPlusData &state,
-                                                     int LoopNum,                   // component's loop index
-                                                     int LoopSide,                  // component's loop side number
-                                                     int TypeOfNum,                 // Component's type index
-                                                     int InletNodeNum,              // Component's inlet node pointer
-                                                     int OutletNodeNum,             // Component's outlet node pointer
-                                                     int HeatSourceType,            // Type of fluid in Generator loop
-                                                     Real64 ModelGeneratorHeatRate, // model's generator heat rate (W)
-                                                     Real64 ModelMassFlowRate,      // model's generator mass flow rate (kg/s)
+                                                     int LoopNum,                                // component's loop index
+                                                     int LoopSide,                               // component's loop side number
+                                                     int TypeOfNum,                              // Component's type index
+                                                     int InletNodeNum,                           // Component's inlet node pointer
+                                                     int OutletNodeNum,                          // Component's outlet node pointer
+                                                     DataLoopNode::NodeFluidType HeatSourceType, // Type of fluid in Generator loop
+                                                     Real64 ModelGeneratorHeatRate,              // model's generator heat rate (W)
+                                                     Real64 ModelMassFlowRate,                   // model's generator mass flow rate (kg/s)
                                                      bool FirstHVACIteration);
 
     void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
@@ -177,9 +176,9 @@ namespace PlantUtilities {
                            Optional<Real64 const> OutletTemp = _ // set on outlet node if present and water.
     );
 
-    Real64 BoundValueToNodeMinMaxAvail(Real64 ValueToBound, int NodeNumToBoundWith);
+    Real64 BoundValueToNodeMinMaxAvail(EnergyPlusData &state, Real64 ValueToBound, int NodeNumToBoundWith);
 
-    void TightenNodeMinMaxAvails(int NodeNum, Real64 NewMinAvail, Real64 NewMaxAvail);
+    void TightenNodeMinMaxAvails(EnergyPlusData &state, int NodeNum, Real64 NewMinAvail, Real64 NewMaxAvail);
 
     Real64 BoundValueToWithinTwoValues(Real64 ValueToBound, Real64 LowerBound, Real64 UpperBound);
 

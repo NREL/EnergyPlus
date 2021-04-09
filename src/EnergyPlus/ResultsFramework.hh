@@ -223,7 +223,7 @@ namespace ResultsFramework {
         bool iVariablesScanned() const;
 
         void newRow(EnergyPlusData &state, const int month, const int dayOfMonth, int hourOfDay, int curMin);
-//        void newRow(const std::string &ts);
+        //        void newRow(const std::string &ts);
         virtual void pushVariableValue(const int reportID, double value);
 
         Variable &lastVariable();
@@ -247,7 +247,7 @@ namespace ResultsFramework {
     class MeterDataFrame : public DataFrame
     {
     public:
-        explicit MeterDataFrame(const std::string &ReportFreq) : DataFrame(ReportFreq) {};
+        explicit MeterDataFrame(const std::string &ReportFreq) : DataFrame(ReportFreq){};
         virtual ~MeterDataFrame() = default;
 
         void addVariable(MeterVariable const &var);
@@ -317,15 +317,20 @@ namespace ResultsFramework {
         Report rpt;
     };
 
-    class CSVWriter : public BaseResultObject {
+    class CSVWriter : public BaseResultObject
+    {
     public:
         CSVWriter() = default;
-        explicit CSVWriter(std::size_t num_output_variables) {
+        explicit CSVWriter(std::size_t num_output_variables)
+        {
             outputVariableIndices = std::vector<bool>(num_output_variables, false);
         }
 
-        void writeOutput(EnergyPlusData &state, std::vector<std::string> const & outputVariables, InputOutputFile & outputFile, bool outputControl);
-        void parseTSOutputs(EnergyPlusData &state, json const &data, std::vector<std::string> const& outputVariables, OutputProcessor::ReportingFrequency reportingFrequency);
+        void writeOutput(EnergyPlusData &state, std::vector<std::string> const &outputVariables, InputOutputFile &outputFile, bool outputControl);
+        void parseTSOutputs(EnergyPlusData &state,
+                            json const &data,
+                            std::vector<std::string> const &outputVariables,
+                            OutputProcessor::ReportingFrequency reportingFrequency);
 
     private:
         friend class EnergyPlus::EnergyPlusFixture;
@@ -342,7 +347,8 @@ namespace ResultsFramework {
         // void readMVI();
     };
 
-    class ResultsFramework : public BaseResultObject {
+    class ResultsFramework : public BaseResultObject
+    {
     public:
         ResultsFramework() = default;
 
@@ -370,8 +376,7 @@ namespace ResultsFramework {
                                     const int NumOfIVariable,
                                     const OutputProcessor::TimeStepType timeStepType = OutputProcessor::TimeStepType::TimeStepZone);
 
-        void initializeMeters(const Array1D<OutputProcessor::MeterType> &EnergyMeters,
-                              const OutputProcessor::ReportingFrequency reportFrequency);
+        void initializeMeters(const Array1D<OutputProcessor::MeterType> &EnergyMeters, const OutputProcessor::ReportingFrequency reportFrequency);
 
         DataFrame RIDetailedZoneTSData = DataFrame("Detailed-Zone");
         DataFrame RIDetailedHVACTSData = DataFrame("Detailed-HVAC");
@@ -395,9 +400,7 @@ namespace ResultsFramework {
                                std::string const &units,
                                OutputProcessor::ReportingFrequency const reportingInterval);
 
-        void addReportMeter(std::string const &meter,
-                            std::string const &units,
-                            OutputProcessor::ReportingFrequency const reportingInterval);
+        void addReportMeter(std::string const &meter, std::string const &units, OutputProcessor::ReportingFrequency const reportingInterval);
 
         SimInfo SimulationInformation;
 
@@ -424,66 +427,97 @@ namespace ResultsFramework {
         friend class EnergyPlus::ResultsFrameworkFixture;
 
     protected:
-        inline bool hasRIDetailedZoneTSData() {
+        inline bool hasRIDetailedZoneTSData()
+        {
             return RIDetailedZoneTSData.iDataFrameEnabled() || RIDetailedZoneTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIDetailedHVACTSData() {
+        inline bool hasRIDetailedHVACTSData()
+        {
             return RIDetailedHVACTSData.iDataFrameEnabled() || RIDetailedHVACTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRITimestepTSData() {
+        inline bool hasRITimestepTSData()
+        {
             return RITimestepTSData.iDataFrameEnabled() || RITimestepTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIHourlyTSData() {
+        inline bool hasRIHourlyTSData()
+        {
             return RIHourlyTSData.iDataFrameEnabled() || RIHourlyTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIDailyTSData() {
+        inline bool hasRIDailyTSData()
+        {
             return RIDailyTSData.iDataFrameEnabled() || RIDailyTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIMonthlyTSData() {
+        inline bool hasRIMonthlyTSData()
+        {
             return RIMonthlyTSData.iDataFrameEnabled() || RIMonthlyTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIRunPeriodTSData() {
+        inline bool hasRIRunPeriodTSData()
+        {
             return RIRunPeriodTSData.iDataFrameEnabled() || RIRunPeriodTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIYearlyTSData() {
+        inline bool hasRIYearlyTSData()
+        {
             return RIYearlyTSData.iDataFrameEnabled() || RIYearlyTSData.rDataFrameEnabled();
         };
 
-        inline bool hasTSMeters() { return TSMeters.rDataFrameEnabled(); };
+        inline bool hasTSMeters()
+        {
+            return TSMeters.rDataFrameEnabled();
+        };
 
-        inline bool hasHRMeters() { return HRMeters.rDataFrameEnabled(); };
+        inline bool hasHRMeters()
+        {
+            return HRMeters.rDataFrameEnabled();
+        };
 
-        inline bool hasDYMeters() { return DYMeters.rDataFrameEnabled(); };
+        inline bool hasDYMeters()
+        {
+            return DYMeters.rDataFrameEnabled();
+        };
 
-        inline bool hasMNMeters() { return MNMeters.rDataFrameEnabled(); };
+        inline bool hasMNMeters()
+        {
+            return MNMeters.rDataFrameEnabled();
+        };
 
-        inline bool hasSMMeters() { return SMMeters.rDataFrameEnabled(); };
+        inline bool hasSMMeters()
+        {
+            return SMMeters.rDataFrameEnabled();
+        };
 
-        inline bool hasYRMeters() { return YRMeters.rDataFrameEnabled(); };
+        inline bool hasYRMeters()
+        {
+            return YRMeters.rDataFrameEnabled();
+        };
 
-        inline bool hasMeterData() {
+        inline bool hasMeterData()
+        {
             return hasTSMeters() || hasHRMeters() || hasDYMeters() || hasMNMeters() || hasSMMeters() || hasYRMeters();
         };
 
-        inline bool hasTSData() {
-            return hasRIDetailedZoneTSData() || hasRIDetailedHVACTSData() || hasRITimestepTSData() ||
-                   hasRIHourlyTSData() || hasRIDailyTSData() || hasRIMonthlyTSData() || hasRIRunPeriodTSData() ||
-                   hasRIYearlyTSData();
+        inline bool hasTSData()
+        {
+            return hasRIDetailedZoneTSData() || hasRIDetailedHVACTSData() || hasRITimestepTSData() || hasRIHourlyTSData() || hasRIDailyTSData() ||
+                   hasRIMonthlyTSData() || hasRIRunPeriodTSData() || hasRIYearlyTSData();
         };
 
-        inline bool hasOutputData() { return hasTSData() || hasMeterData(); };
+        inline bool hasOutputData()
+        {
+            return hasTSData() || hasMeterData();
+        };
     };
 
 } // namespace ResultsFramework
 
-struct ResultsFrameworkData : BaseGlobalStruct {
+struct ResultsFrameworkData : BaseGlobalStruct
+{
 
     std::unique_ptr<ResultsFramework::ResultsFramework> resultsFramework = std::make_unique<ResultsFramework::ResultsFramework>();
 

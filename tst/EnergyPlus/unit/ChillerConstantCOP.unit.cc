@@ -146,7 +146,7 @@ TEST_F(EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize)
     bool RunFlag(true);
     Real64 MyLoad(-20000.0);
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
     thisChiller.initialize(*state, RunFlag, MyLoad);
     thisChiller.size(*state);
 

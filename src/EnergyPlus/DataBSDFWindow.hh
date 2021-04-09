@@ -104,8 +104,8 @@ namespace DataBSDFWindow {
         // These indices are in the BasisElement array, which matches the row/column of the matrix
 
         // Default Constructor
-        BasisElemDescr() :
-              Theta(0.0), Phi(0.0), dTheta(0.0), dPhi(0.0), UpprTheta(0.0), LwrTheta(0.0), UpprPhi(0.0), LwrPhi(0.0), INNbInL(0), INNbInH(0),
+        BasisElemDescr()
+            : Theta(0.0), Phi(0.0), dTheta(0.0), dPhi(0.0), UpprTheta(0.0), LwrTheta(0.0), UpprPhi(0.0), LwrPhi(0.0), INNbInL(0), INNbInH(0),
               INNbOutL(0), INNbOutH(0), INNbLft(0), INNbRt(0)
         {
         }
@@ -118,8 +118,7 @@ namespace DataBSDFWindow {
         Real64 Azimuth;  // Azimuth is measured from positive x counter clockwise. Its range is from -pi to pi
 
         // Default Constructor
-        BSDFDaylghtPosition() :
-            Altitude(0.0), Azimuth(0.0)
+        BSDFDaylghtPosition() : Altitude(0.0), Azimuth(0.0)
         {
         }
 
@@ -298,9 +297,9 @@ namespace DataBSDFWindow {
         Array1D<Real64> IntegratedBkTrans; // Integrated back layer transmittance (for each back direction)
 
         // Default Constructor
-        BSDFStateDescr() :
-              Konst(0), WinDiffTrans(0.0), WinDiffVisTrans(0.0), WinSkyTrans(0.0), WinSkyGndTrans(0.0), WinBkHemRefl(0.0),
-              WinBkHemVisRefl(0.0), NLayers(0)
+        BSDFStateDescr()
+            : Konst(0), WinDiffTrans(0.0), WinDiffVisTrans(0.0), WinSkyTrans(0.0), WinSkyGndTrans(0.0), WinBkHemRefl(0.0), WinBkHemVisRefl(0.0),
+              NLayers(0)
         {
         }
     };
@@ -422,7 +421,8 @@ namespace DataBSDFWindow {
 
 } // namespace DataBSDFWindow
 
-struct BSDFWindowData : BaseGlobalStruct {
+struct BSDFWindowData : BaseGlobalStruct
+{
 
     int TotComplexFenStates = 0; // Number of complex fenestration construction definitions
     int FirstBSDF = 0;           // Location of first complex fenestration construction definition in Constr array
@@ -430,11 +430,12 @@ struct BSDFWindowData : BaseGlobalStruct {
     int TotThermalModels = 0;    // Number of thermal models
 
     // calculation
-    Array3D<Real64> SUNCOSTS = Array3D<Real64>(60, 24, 3); // Timestep values of solar direction cosines
-    Array2D<Real64> BSDFTempMtrx;        // Temporary matrix for holding axisymmetric input
+    Array3D<Real64> SUNCOSTS = Array3D<Real64>(60, 24, 3);    // Timestep values of solar direction cosines
+    Array2D<Real64> BSDFTempMtrx;                             // Temporary matrix for holding axisymmetric input
     SimpleArray1D<DataBSDFWindow::BSDFWindowGeomDescr> ComplexWind; // Window geometry structure: set in CalcPerSolarBeam/SolarShading
 
-    void clear_state() override {
+    void clear_state() override
+    {
         this->TotComplexFenStates = 0;
         this->FirstBSDF = 0;
         this->MaxBkSurf = 20;

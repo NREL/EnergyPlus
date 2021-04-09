@@ -195,8 +195,8 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                         // Parent object sets heating flow rate
                         this->autoSizedValue = this->oaSysEqSizing(this->curOASysNum).HeatingAirVolFlow;
                     } else if (outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                        this->autoSizedValue = this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow /
-                                               state.dataEnvrn->StdRhoAir;
+                        this->autoSizedValue =
+                            this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow / state.dataEnvrn->StdRhoAir;
                     } else {
                         this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
                     }
@@ -273,7 +273,8 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
 
     if (this->isCoilReportObject) {
         // SizingResult is airflow in m3/s
-        coilSelectionReportObj->setCoilAirFlow(state, this->compName, this->compType, this->autoSizedValue, this->wasAutoSized);
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilAirFlow(
+            state, this->compName, this->compType, this->autoSizedValue, this->wasAutoSized);
     }
     if (this->isFanReportObject) {
         //  fill fan peak day and time here

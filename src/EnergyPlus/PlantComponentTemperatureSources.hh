@@ -67,7 +67,8 @@ struct EnergyPlusData;
 namespace PlantComponentTemperatureSources {
 
     // MODULE PARAMETER DEFINITIONS:
-    enum class iTempSpecType {
+    enum class iTempSpecType
+    {
         Unassigned,
         Constant,
         Schedule,
@@ -120,11 +121,16 @@ namespace PlantComponentTemperatureSources {
 
         void calculate(EnergyPlusData &state);
 
-        void update();
+        void update(EnergyPlusData &state);
 
-        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void
+        simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state,
+                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                 Real64 &MaxLoad,
+                                 Real64 &MinLoad,
+                                 Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &_SizFac) override;
 
@@ -137,7 +143,8 @@ namespace PlantComponentTemperatureSources {
 
 } // namespace PlantComponentTemperatureSources
 
-struct PlantCompTempSrcData : BaseGlobalStruct {
+struct PlantCompTempSrcData : BaseGlobalStruct
+{
 
     int NumSources = 0;
     bool getWaterSourceInput = true;

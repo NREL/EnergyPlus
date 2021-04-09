@@ -216,12 +216,19 @@ namespace DElightManagerF {
         auto delightInFile = state.files.delightIn.open(state, "DElightInputGenerator", state.files.outputControl.delightin);
 
         // Start of DElight input file
-        print(delightInFile, Format_901, CurrentDateTime);
+        print(delightInFile, Format_901, state.dataStrGlobals->CurrentDateTime);
 
         // Building Data Section retrieved from DataHeatBalance and DataEnvironment modules
         // Remove any blanks from the Building Name for ease of input to DElight
         cNameWOBlanks = ReplaceBlanksWithUnderscores(state.dataHeatBal->BuildingName);
-        print(delightInFile, Format_902, cNameWOBlanks, state.dataEnvrn->Latitude, state.dataEnvrn->Longitude, state.dataEnvrn->Elevation * M2FT, state.dataHeatBal->BuildingAzimuth, state.dataEnvrn->TimeZoneNumber);
+        print(delightInFile,
+              Format_902,
+              cNameWOBlanks,
+              state.dataEnvrn->Latitude,
+              state.dataEnvrn->Longitude,
+              state.dataEnvrn->Elevation * M2FT,
+              state.dataHeatBal->BuildingAzimuth,
+              state.dataEnvrn->TimeZoneNumber);
 
         // Calc cos and sin of Building Relative North values for later use in transforming Reference Point coordinates
         CosBldgRelNorth = std::cos(-state.dataHeatBal->BuildingAzimuth * DataGlobalConstants::DegToRadians);
@@ -365,16 +372,18 @@ namespace DElightManagerF {
 
                                         // Error if window has multiplier > 1 since this causes incorrect illuminance calc
                                         if (wndo.Multiplier > 1.0) {
-                                            ShowSevereError(state, "Multiplier > 1.0 for window " + wndo.Name +
-                                                            " not allowed since it is in a zone with DElight daylighting.");
+                                            ShowSevereError(state,
+                                                            "Multiplier > 1.0 for window " + wndo.Name +
+                                                                " not allowed since it is in a zone with DElight daylighting.");
                                             ErrorsFound = true;
                                         }
 
                                         // Error if window has a shading device (blind/shade/screen) since
                                         // DElight cannot perform dynamic shading device deployment
                                         if (wndo.HasShadeControl) {
-                                            ShowSevereError(state, "Shading Device on window " + wndo.Name +
-                                                            " dynamic control is not supported in a zone with DElight daylighting.");
+                                            ShowSevereError(state,
+                                                            "Shading Device on window " + wndo.Name +
+                                                                " dynamic control is not supported in a zone with DElight daylighting.");
                                             ErrorsFound = true;
                                         }
 
@@ -618,7 +627,8 @@ namespace DElightManagerF {
                                           znDayl.IllumSetPoint(refPt.indexToFracAndIllum) * LUX2FC,
                                           znDayl.LightControlType);
                                     // RJH 2008-03-07: Set up DaylIllumAtRefPt for output for this DElight zone RefPt
-                                    SetupOutputVariable(state, "Daylighting Reference Point Illuminance",
+                                    SetupOutputVariable(state,
+                                                        "Daylighting Reference Point Illuminance",
                                                         OutputProcessor::Unit::lux,
                                                         znDayl.DaylIllumAtRefPt(refPt.indexToFracAndIllum),
                                                         "Zone",
@@ -689,8 +699,6 @@ namespace DElightManagerF {
         // Perform GetInput function for the Daylighting:DELight:ComplexFenestration object
         // Glazer - July 2016
 
-        using namespace DataIPShortCuts; // Gives access to commonly dimensioned field names, etc for getinput
-
         int NumAlpha;
         int NumNumber;
         int IOStat;
@@ -698,36 +706,45 @@ namespace DElightManagerF {
 
         constexpr auto cCurrentModuleObject("Daylighting:DELight:ComplexFenestration");
 
-        state.dataDaylightingData->TotDElightCFS = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataDaylightingData->TotDElightCFS = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataDaylightingData->DElightComplexFene.allocate(state.dataDaylightingData->TotDElightCFS);
         for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
-                                          ++CFSNum,
-                                          cAlphaArgs,
-                                          NumAlpha,
-                                          rNumericArgs,
-                                          NumNumber,
-                                          IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            cfs.Name = cAlphaArgs(1);
-            cfs.ComplexFeneType = cAlphaArgs(2);
-            cfs.surfName = cAlphaArgs(3);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     ++CFSNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            cfs.Name = state.dataIPShortCut->cAlphaArgs(1);
+            cfs.ComplexFeneType = state.dataIPShortCut->cAlphaArgs(2);
+            cfs.surfName = state.dataIPShortCut->cAlphaArgs(3);
             if (UtilityRoutines::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
-                ShowSevereError(state, format("{}{}", cCurrentModuleObject, ": " + cfs.Name + ", invalid " + cAlphaFieldNames(3) + "=\"" + cfs.surfName + "\"."));
+                ShowSevereError(state,
+                                format("{}{}",
+                                       cCurrentModuleObject,
+                                       ": " + cfs.Name + ", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + cfs.surfName + "\"."));
                 ErrorsFound = true;
             }
-            cfs.wndwName = cAlphaArgs(4);
+            cfs.wndwName = state.dataIPShortCut->cAlphaArgs(4);
             if (UtilityRoutines::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
-                ShowSevereError(state, format("{}{}", cCurrentModuleObject, ": " + cfs.Name + ", invalid " + cAlphaFieldNames(4) + "=\"" + cfs.wndwName + "\"."));
+                ShowSevereError(state,
+                                format("{}{}",
+                                       cCurrentModuleObject,
+                                       ": " + cfs.Name + ", invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + cfs.wndwName + "\"."));
                 ErrorsFound = true;
             }
-            cfs.feneRota = rNumericArgs(1);
+            cfs.feneRota = state.dataIPShortCut->rNumericArgs(1);
             if (cfs.feneRota < 0. || cfs.feneRota > 360.) {
-                ShowSevereError(state, format("{}{}", cCurrentModuleObject, ": " + cfs.Name + ", invalid " + cNumericFieldNames(1) + " outside of range 0 to 360."));
+                ShowSevereError(state,
+                                format("{}{}",
+                                       cCurrentModuleObject,
+                                       ": " + cfs.Name + ", invalid " + state.dataIPShortCut->cNumericFieldNames(1) + " outside of range 0 to 360."));
                 ErrorsFound = true;
             }
         }
@@ -750,8 +767,6 @@ namespace DElightManagerF {
         //  change them to reflect a different aspect
         // ratio for the entire building based on user input.
 
-        using namespace DataIPShortCuts;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr auto CurrentModuleObject("GeometryTransform");
 
@@ -768,23 +783,25 @@ namespace DElightManagerF {
         OldAspectRatio = 1.0;
         NewAspectRatio = 1.0;
 
-        if (inputProcessor->getNumObjectsFound(state, CurrentModuleObject) == 1) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          1,
-                                          cAlphas,
-                                          NAlphas,
-                                          rNumerics,
-                                          NNum,
-                                          IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+        if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject) == 1) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     1,
+                                                                     cAlphas,
+                                                                     NAlphas,
+                                                                     rNumerics,
+                                                                     NNum,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             OldAspectRatio = rNumerics(1);
             NewAspectRatio = rNumerics(2);
             if (cAlphas(1) != "XY") {
-                ShowWarningError(state, format("{}{}", CurrentModuleObject, ": invalid " + cAlphaFieldNames(1) + "=" + cAlphas(1) + "...ignored."));
+                ShowWarningError(
+                    state,
+                    format("{}{}", CurrentModuleObject, ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=" + cAlphas(1) + "...ignored."));
             }
             doTransform = true;
             state.dataSurface->AspectTransform = true;
