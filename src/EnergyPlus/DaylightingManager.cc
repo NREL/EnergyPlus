@@ -1737,7 +1737,7 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
         ExtWinType = DataDaylighting::iExtWinType::AdjZoneExtWin;
     }
 
-    IConst = state.dataSurface->SurfWinActiveConstruction(IWin);
+    IConst = state.dataSurface->SurfActiveConstruction(IWin);
 
     // For thermochromic windows, the daylight and glare factors are calculated for a base window cosntruction
     //  at base TC layer temperature. During each time step calculations at DayltgInteriorIllum,
@@ -3272,7 +3272,6 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
     auto &HitPtIntWinDisk = state.dataDaylightingManager->HitPtIntWinDisk; // Intersection point on an interior window for ray from ref pt to sun (m)
     Real64 Alfa;                                                           // Intermediate variables
     bool hitObs;                                                           // True iff obstruction is hit
-    int ObsConstrNum;                                                      // Construction number of obstruction
     Real64 ObsVisRefl;                                                     // Visible reflectance of obstruction
     Real64 SkyReflVisLum;                                                  // Reflected sky luminance at hit point divided by
 
@@ -3289,7 +3288,6 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
     Real64 SpecReflectance; // Specular reflectance of a reflecting surface
     Real64 TVisRefl;        // Bare window vis trans for reflected beam
     //  (times light well efficiency, if appropriate)
-    int ConstrNumRefl; // Window construction number for a specularly reflecting shading surf
     Real64 PHSUNrefl;  // Altitude angle of reflected sun (radians)
     Real64 THSUNrefl;  // Azimuth anggle of reflected sun (radians)
 
@@ -3380,7 +3378,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
 
             // Sky solar reflected from nearest obstruction
 
-            ObsConstrNum = state.dataSurface->Surface(NearestHitSurfNum).Construction;
+            int const ObsConstrNum = state.dataSurface->SurfActiveConstruction(NearestHitSurfNum);
             if (ObsConstrNum > 0) {
                 // Exterior building surface is nearest hit
                 if (!state.dataConstruction->Construct(ObsConstrNum).TypeIsWindow) {
@@ -3388,7 +3386,6 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                     ObsVisRefl = 1.0 - state.dataMaterial->Material(state.dataConstruction->Construct(ObsConstrNum).LayerPoint(1)).AbsorpVisible;
                 } else {
                     // Obstruction is a window; assume it is bare
-                    ObsConstrNum = state.dataSurface->SurfWinActiveConstruction(NearestHitSurfNum);
                     ObsVisRefl = state.dataConstruction->Construct(ObsConstrNum).ReflectVisDiffFront;
                 }
             } else {
@@ -3798,7 +3795,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             SpecReflectance = 0.0;
                             CosIncAngRefl = std::abs(dot(RAYCOS, ReflNorm));
                             if (state.dataSurface->Surface(ReflSurfNum).Class == SurfaceClass::Window) {
-                                ConstrNumRefl = state.dataSurface->SurfWinActiveConstruction(ReflSurfNum);
+                                int const ConstrNumRefl = state.dataSurface->SurfActiveConstruction(ReflSurfNum);
                                 SpecReflectance =
                                     POLYF(std::abs(CosIncAngRefl), state.dataConstruction->Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
                             }
@@ -6184,8 +6181,6 @@ void DayltgInteriorIllum(EnergyPlusData &state, int &ZoneNum) // Zone number
     int ISWFLG; // Switchable glazing flag: =1 if one or more windows in a zone
     //  has switchable glazing that adjusts visible transmittance to just meet
     //  daylighting setpoint; =0 otherwise.
-    int IConst;       // Window construction pointer
-    int IConstShaded; // Pointer to shaded window construction
     int ICtrl;        // Window shading control pointer
     Array1D<Real64> TVIS1(state.dataDaylightingData->ZoneDaylight(ZoneNum)
                               .ShadeDeployOrderExtWins.size()); // Visible transmittance at normal incidence of unswitched glazing
@@ -6272,7 +6267,7 @@ void DayltgInteriorIllum(EnergyPlusData &state, int &ZoneNum) // Zone number
         // Added TH 6/29/2009 for thermochromic windows
         VTRatio = 1.0;
         if (NREFPT > 0) {
-            IConst = state.dataSurface->Surface(IWin).Construction;
+            int const IConst = state.dataSurface->Surface(IWin).Construction;
             if (state.dataConstruction->Construct(IConst).TCFlag == 1) {
                 // For thermochromic windows, daylight and glare factors are always calculated
                 //  based on the master construction. They need to be adjusted by the VTRatio, including:
@@ -6723,13 +6718,13 @@ void DayltgInteriorIllum(EnergyPlusData &state, int &ZoneNum) // Zone number
                         continue;
                     }
 
-                    IConst = state.dataSurface->SurfWinActiveConstruction(IWin);
+                    int const IConst = state.dataSurface->SurfActiveConstruction(IWin);
                     // Vis trans at normal incidence of unswitched glass
                     TVIS1(igroup) =
                         POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin);
 
                     // Vis trans at normal incidence of fully switched glass
-                    IConstShaded = state.dataSurface->Surface(IWin).activeShadedConstruction;
+                    int const IConstShaded = state.dataSurface->Surface(IWin).activeShadedConstruction;
                     TVIS2(igroup) =
                         POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin);
 
@@ -6913,13 +6908,13 @@ void DayltgInteriorIllum(EnergyPlusData &state, int &ZoneNum) // Zone number
                                 tmpBackLumFromWinAtRefPt(loop, 2, IL);
                         }
 
-                        IConst = state.dataSurface->SurfWinActiveConstruction(IWin);
+                        int const IConst = state.dataSurface->SurfActiveConstruction(IWin);
                         // Vis trans at normal incidence of unswitched glass
                         TVIS1(igroup) =
                             POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin);
 
                         // Vis trans at normal incidence of fully switched glass
-                        IConstShaded = state.dataSurface->Surface(IWin).activeShadedConstruction;
+                        int const IConstShaded = state.dataSurface->Surface(IWin).activeShadedConstruction;
                         TVIS2(igroup) =
                             POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin);
                     }
@@ -7610,7 +7605,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     Real64 PhWin; // Altitude, azimuth angle of window normal (radians)
     Real64 ThWin;
     Real64 ACosTanTan; // ACOS(-TAN(Ph)*TAN(PhWin))
-    int IConst;        // Construction pointer
     Real64 DA;         // CPH*DTH*DPH
     Real64 COSB;       // Cosine of angle of incidence of light from sky or ground
     Real64 TVISBR;     // Transmittance of window without shading at COSB
@@ -7622,7 +7616,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     // unused  REAL(r64)         :: HitPointLumFrOvercSky     ! Luminance of obstruction from overcast sky (cd/m2)
     // unused  REAL(r64)         :: HitPointLumFrSun          ! Luminance of obstruction from sun (cd/m2)
     int ICtrl;        // Window control pointer
-    int IConstShaded; // Pointer to shaded construction for a window
     int JSH;          // Shading index: JSH=1 is bare window, JSH=2 is shaded window
     Real64 COSBSun;   // Cosine of angle of incidence of direct sun on window
     Real64 TVISBSun;  // Window's visible transmittance at COSBSun
@@ -7675,7 +7668,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     Real64 HorDis;        // Distance between ground hit point and proj'n of window center onto ground (m)
     int ObsSurfNum;       // Obstruction surface number
     bool hitObs;          // True iff obstruction is hit
-    int ObsConstrNum;     // Construction number of obstruction
     Real64 ObsVisRefl;    // Visible reflectance of obstruction
     Real64 SkyReflVisLum; // Reflected sky luminance at hit point divided by unobstructed sky
     //  diffuse horizontal illuminance [(cd/m2)/lux]
@@ -7728,7 +7720,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     FLCWSK = 0.0;
     FLCWSU = 0.0;
 
-    IConst = state.dataSurface->SurfWinActiveConstruction(IWin);
+    int const IConst = state.dataSurface->SurfActiveConstruction(IWin);
     BlindOn = false;
     ShadeOn = false;
     ScreenOn = false;
@@ -7884,7 +7876,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     ZSU += ZSUObsRefl;
 
                     // Sky solar reflected from nearest obstruction.
-                    ObsConstrNum = state.dataSurface->Surface(NearestHitSurfNum).Construction;
+                    int const ObsConstrNum = state.dataSurface->Surface(NearestHitSurfNum).Construction;
                     if (ObsConstrNum > 0) {
                         // Exterior building surface is nearest hit
                         if (!state.dataConstruction->Construct(ObsConstrNum).TypeIsWindow) {
@@ -7893,7 +7885,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                 1.0 - state.dataMaterial->Material(state.dataConstruction->Construct(ObsConstrNum).LayerPoint(1)).AbsorpVisible;
                         } else {
                             // Obstruction is a window; assume it is bare
-                            ObsConstrNum = state.dataSurface->SurfWinActiveConstruction(NearestHitSurfNum);
                             ObsVisRefl = state.dataConstruction->Construct(ObsConstrNum).ReflectVisDiffFront;
                         }
                     } else {
@@ -7965,7 +7956,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 }
 
             } else { // Bare window
-
                 // Transmittance of bare window for this sky/ground element
                 TVISBR = POLYF(COSB, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin) *
                          state.dataSurface->SurfWinLightWellEff(IWin);
@@ -8063,7 +8053,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 // between the screen's cylinders goes either up or down depending on the altitude angle of the
                 // element from which the light came.
 
-                IConstShaded = state.dataSurface->SurfWinActiveShadedConstruction(IWin);
+                int IConstShaded = state.dataSurface->SurfWinActiveShadedConstruction(IWin);
                 if (state.dataSurface->SurfWinSolarDiffusing(IWin)) IConstShaded = state.dataSurface->Surface(IWin).Construction;
 
                 // Transmittance of window including shade, screen or blind
@@ -8308,6 +8298,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                 TransMult(1) = state.dataHeatBal->SurfaceScreens(state.dataSurface->SurfWinScreenNumber(IWin)).BmBmTransVis *
                                                state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
                             } else {
+                                int IConstShaded = state.dataSurface->SurfWinActiveShadedConstruction(IWin);
+                                if (state.dataSurface->SurfWinSolarDiffusing(IWin)) IConstShaded = state.dataSurface->Surface(IWin).Construction;
                                 TransMult(1) = POLYF(COSBSun, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) *
                                                state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
                             }
@@ -8417,6 +8409,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
 
                     if (ShadeOn || state.dataSurface->SurfWinSolarDiffusing(IWin)) { // Shade on or diffusing glass
+                        int IConstShaded = state.dataSurface->SurfWinActiveShadedConstruction(IWin);
+                        if (state.dataSurface->SurfWinSolarDiffusing(IWin)) IConstShaded = state.dataSurface->Surface(IWin).Construction;
                         TransMult(1) = state.dataConstruction->Construct(IConstShaded).TransDiffVis * state.dataSurface->SurfWinGlazedFrac(IWin) *
                                        state.dataSurface->SurfWinLightWellEff(IWin);
 

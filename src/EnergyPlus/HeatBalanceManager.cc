@@ -5565,10 +5565,10 @@ namespace HeatBalanceManager {
             }
         }
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
-            if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) {
-                state.dataSurface->SurfWinActiveConstruction(SurfNum) = state.dataSurface->SurfWinStormWinConstr(SurfNum);
+            if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1 && state.dataSurface->SurfWinWindowModelType(SurfNum) == DataSurfaces::Window5DetailedModel) {
+                state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->SurfWinStormWinConstr(SurfNum);
             } else {
-                state.dataSurface->SurfWinActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+                state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
             }
         }
 

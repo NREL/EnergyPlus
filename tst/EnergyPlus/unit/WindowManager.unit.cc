@@ -597,10 +597,6 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataSurface->SurfWinTransSolar = 0.0;
     state->dataHeatBal->QS = 0.0;
 
-    for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
-        state->dataSurface->SurfWinActiveConstruction(SurfNum) = state->dataSurface->Surface(SurfNum).Construction;
-    }
-
     Real64 inSurfTemp;
     Real64 outSurfTemp;
 
@@ -2828,10 +2824,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
     state->dataSurface->SurfWinTransSolar = 0.0;
     state->dataHeatBal->QS = 0.0;
-
-    for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
-        state->dataSurface->SurfWinActiveConstruction(SurfNum) = state->dataSurface->Surface(SurfNum).Construction;
-    }
+    
 
     Real64 inSurfTemp;
     Real64 outSurfTemp;

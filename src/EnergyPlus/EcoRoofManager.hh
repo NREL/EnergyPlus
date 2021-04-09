@@ -64,7 +64,7 @@ namespace EcoRoofManager {
     void CalcEcoRoof(EnergyPlusData &state,
                      int const SurfNum, // Indicator of Surface Number for the current surface
                      int const ZoneNum, // Indicator for zone number where the current surface
-                     int &ConstrNum,    // Indicator for construction index for the current surface
+                     int const ConstrNum,    // Indicator for construction index for the current surface
                      Real64 &TempExt    // Exterior temperature boundary condition
     );
 
@@ -76,7 +76,7 @@ namespace EcoRoofManager {
                          Real64 const SoilThickness,
                          Real64 const Vfluxf, // Water mass flux from vegetation [m/s]
                          Real64 const Vfluxg, // Water mass flux from soil surface [m/s]
-                         int &ConstrNum,      // Indicator for construction index for the current surface
+                         int const ConstrNum,      // Indicator for construction index for the current surface
                          Real64 &Alphag,
                          int const unit,    // unused1208
                          Real64 const Tg,   // unused1208
