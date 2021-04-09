@@ -78,7 +78,7 @@ namespace AirflowNetworkBalanceManager {
         Real64 VentilHeatGain;     // Heat Loss {W} due to ventilation
         Real64 VentilVolume;       // Volume of Air {m3} due to ventilation
         Real64 VentilMass;         // Mass of Air {kg} due to ventilation
-        Real64 VentilAirChangeRate; // Infiltration air change rate {ach}
+        Real64 VentilAirChangeRate; // Ventilation air change rate {ach}
         Real64 VentilFanElec;      // Fan Electricity {W} due to ventilation
         Real64 VentilAirTemp;      // Air Temp {C} of ventilation
         Real64 MixVolume;          // Mixing volume of Air {m3}
@@ -171,7 +171,7 @@ namespace AirflowNetworkBalanceManager {
 
     void CalcSingleSidedCps(EnergyPlusData &state, std::vector<std::vector<Real64>> &valsByFacade, int numWindDirs = 36);
 
-    Real64 GetZoneInfilAirChangeRate(EnergyPlusData &state, int ZoneNum); // hybrid ventilation system controlled zone number
+    Real64 GetZoneOutdoorAirChangeRate(EnergyPlusData &state, int ZoneNum); // hybrid ventilation system controlled zone number
 
     int GetAirLoopNumber(EnergyPlusData &state, int NodeNumber); // Get air loop number for each distribution node and linkage
 
