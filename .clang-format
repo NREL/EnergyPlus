@@ -1,0 +1,40 @@
+# Commented out lines are those which are not yet valid
+# in clang-3.8 which ships with Ubuntu
+
+IndentWidth: 4
+AccessModifierOffset: -4
+ColumnLimit: 150
+CommentPragmas: '^ IWYU pragma:'
+UseTab: Never
+SpacesInParentheses: false
+# SpaceBeforeParens: 'Control'
+SpaceInEmptyParentheses: false
+SpacesInAngles: false
+# CompactNamespaces: false
+NamespaceIndentation: 'Inner'
+# FixNamespaceComments: true
+BreakBeforeBraces: 'Custom'
+# BreakConstructorInitializers: 'AfterColon'
+AllowShortFunctionsOnASingleLine: 'None'
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: true
+AllowShortBlocksOnASingleLine: false
+BinPackArguments: false
+BinPackParameters: false
+Standard: Cpp11
+BraceWrapping:
+  AfterClass: true
+  AfterControlStatement: false
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: false
+  AfterStruct: true
+  AfterUnion: true
+#  AfterExternBlock: true
+  BeforeCatch: false
+  BeforeElse: false
+  IndentBraces: false
+#  SplitEmptyFunction: true
+#  SplitEmptyRecord: true
+#  SplitEmptyNamespace: true
+
