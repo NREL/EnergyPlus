@@ -25,7 +25,7 @@ add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_17)
 
 add_library(cpp_pch_files INTERFACE)
-option(ENABLE_PCH "Enable Precompiled Headers" OFF)
+option(ENABLE_PCH "Enable Precompiled Headers" ON)
 if(ENABLE_PCH)
   # This sets a global PCH parameter, each project will build its own PCH, which is a good idea if any #define's change
   #

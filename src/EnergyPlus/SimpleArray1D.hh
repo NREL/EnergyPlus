@@ -224,17 +224,29 @@ template <typename T> [[nodiscard]] auto isize(const EPVector<T> &v) noexcept
 
 [[nodiscard]] inline bool all(EPVector<bool> const &values) noexcept
 {
-    return std::all_of(begin(values), end(values), [](const bool val) { return val; });
+    if (values.empty()) return true;
+    for (auto v : values) {
+        if (!v) return false;
+    }
+    return true;
 }
 
 [[nodiscard]] inline bool any(EPVector<bool> const &values) noexcept
 {
-    return std::any_of(begin(values), end(values), [](const bool val){ return val; });
+    if (values.empty()) return false;
+    for (auto v : values) {
+        if (v) return true;
+    }
+    return false;
 }
 
 [[nodiscard]] inline std::size_t count(EPVector<bool> const &values) noexcept
 {
-    return std::count(begin(values), end(values), true);
+    std::size_t c(0u);
+    for (auto v : values) {
+        if (v) ++c;
+    }
+    return c;
 }
 
 template <typename T> [[nodiscard]] EPVector<T> pack(EPVector<T> const &v, EPVector<bool> const &mask)
