@@ -586,8 +586,8 @@ struct WaterCoilsData : BaseGlobalStruct
 
     bool InitWaterCoilOneTimeFlag;
 
-    SimpleArray1D<WaterCoils::WaterCoilEquipConditions> WaterCoil;
-    SimpleArray1D<WaterCoils::WaterCoilNumericFieldData> WaterCoilNumericFields;
+    EPVector<WaterCoils::WaterCoilEquipConditions> WaterCoil;
+    EPVector<WaterCoils::WaterCoilNumericFieldData> WaterCoilNumericFields;
 
     Real64 TOutNew = 0.0;            // reset outlet air temperature for Coil:Cooling:Water
     Real64 WOutNew = 0.0;            // reset outlet air humidity ratio for Coil:Cooling:Water

@@ -57,7 +57,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/SimpleArray1D.hh>
+#include <EnergyPlus/EPVector.hh>
 
 namespace EnergyPlus {
 
@@ -432,7 +432,7 @@ struct BSDFWindowData : BaseGlobalStruct
     // calculation
     Array3D<Real64> SUNCOSTS = Array3D<Real64>(60, 24, 3);    // Timestep values of solar direction cosines
     Array2D<Real64> BSDFTempMtrx;                             // Temporary matrix for holding axisymmetric input
-    SimpleArray1D<DataBSDFWindow::BSDFWindowGeomDescr> ComplexWind; // Window geometry structure: set in CalcPerSolarBeam/SolarShading
+    EPVector<DataBSDFWindow::BSDFWindowGeomDescr> ComplexWind; // Window geometry structure: set in CalcPerSolarBeam/SolarShading
 
     void clear_state() override
     {

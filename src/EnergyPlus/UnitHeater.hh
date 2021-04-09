@@ -220,8 +220,8 @@ struct UnitHeatersData : BaseGlobalStruct
     bool SetMassFlowRateToZero = false;    // TRUE when mass flow rates need to be set to zero
 
     // Object Data
-    SimpleArray1D<UnitHeater::UnitHeaterData> UnitHeat;
-    SimpleArray1D<UnitHeater::UnitHeatNumericFieldData> UnitHeatNumericFields;
+    EPVector<UnitHeater::UnitHeaterData> UnitHeat;
+    EPVector<UnitHeater::UnitHeatNumericFieldData> UnitHeatNumericFields;
 
     Array1D_bool MyEnvrnFlag;
     Array1D_bool MyPlantScanFlag;

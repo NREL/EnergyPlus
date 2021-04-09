@@ -88,7 +88,7 @@ struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs
     Real64 unitaryHeatCap = 0.0;
 
     int zoneHVACSizingIndex = 0;
-    SimpleArray1D<DataSizing::ZoneHVACSizingData> zoneHVACSizing;
+    EPVector<DataSizing::ZoneHVACSizingData> zoneHVACSizing;
 
     void initializeWithinEP(EnergyPlusData &state,
                             std::string const &_compType,

@@ -266,7 +266,7 @@ struct WindowComplexManagerData : BaseGlobalStruct
     int NumComplexWind; // Total number of complex windows
 
     Array1D<DataBSDFWindow::BasisStruct> BasisList;
-    SimpleArray1D<WindowComplexManager::WindowIndex> WindowList;
+    EPVector<WindowComplexManager::WindowIndex> WindowList;
     Array2D<WindowComplexManager::WindowStateIndex> WindowStateList;
 
     bool InitComplexWindowsOnce = true; // Flag for insuring things happen once

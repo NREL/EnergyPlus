@@ -400,8 +400,8 @@ struct VentilatedSlabData : BaseGlobalStruct
     Array1D_bool MySizeFlag;
 
     // Object Data
-    SimpleArray1D<VentilatedSlab::VentilatedSlabData> VentSlab;
-    SimpleArray1D<VentilatedSlab::VentSlabNumericFieldData> VentSlabNumericFields;
+    EPVector<VentilatedSlab::VentilatedSlabData> VentSlab;
+    EPVector<VentilatedSlab::VentSlabNumericFieldData> VentSlabNumericFields;
 
     bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
     Array1D_bool MyEnvrnFlag;

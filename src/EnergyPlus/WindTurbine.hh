@@ -182,7 +182,7 @@ struct WindTurbineData : BaseGlobalStruct
     bool GetInputFlag;
     bool MyOneTimeFlag;
     Real64 AnnualTMYWS = 0.0; // Annual average wind speed in stat file
-    SimpleArray1D<WindTurbine::WindTurbineParams> WindTurbineSys;
+    EPVector<WindTurbine::WindTurbineParams> WindTurbineSys;
 
     void clear_state() override
     {

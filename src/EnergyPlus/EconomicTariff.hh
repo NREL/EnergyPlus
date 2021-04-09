@@ -56,7 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/SimpleArray1D.hh>
+#include <EnergyPlus/EPVector.hh>
 
 namespace EnergyPlus {
 
@@ -766,14 +766,14 @@ struct EconomicTariffData : BaseGlobalStruct
     bool Update_GetInput = true;
     int addOperand_prevVarMe = 0;
 
-    SimpleArray1D<EconomicTariff::EconVarType> econVar;
-    SimpleArray1D<EconomicTariff::TariffType> tariff;
-    SimpleArray1D<EconomicTariff::QualifyType> qualify;
-    SimpleArray1D<EconomicTariff::ChargeSimpleType> chargeSimple;
-    SimpleArray1D<EconomicTariff::ChargeBlockType> chargeBlock;
-    SimpleArray1D<EconomicTariff::RatchetType> ratchet;
-    SimpleArray1D<EconomicTariff::ComputationType> computation;
-    SimpleArray1D<EconomicTariff::StackType> stack;
+    EPVector<EconomicTariff::EconVarType> econVar;
+    EPVector<EconomicTariff::TariffType> tariff;
+    EPVector<EconomicTariff::QualifyType> qualify;
+    EPVector<EconomicTariff::ChargeSimpleType> chargeSimple;
+    EPVector<EconomicTariff::ChargeBlockType> chargeBlock;
+    EPVector<EconomicTariff::RatchetType> ratchet;
+    EPVector<EconomicTariff::ComputationType> computation;
+    EPVector<EconomicTariff::StackType> stack;
 
     void clear_state() override
     {

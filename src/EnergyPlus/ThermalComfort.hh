@@ -365,10 +365,10 @@ struct ThermalComfortsData : BaseGlobalStruct
     bool useEpwData = false;
     Array1D<Real64> DailyAveOutTemp;
 
-    SimpleArray1D<ThermalComfort::ThermalComfortInASH55Type> ThermalComfortInASH55;
-    SimpleArray1D<ThermalComfort::ThermalComfortSetPointType> ThermalComfortSetPoint;
-    SimpleArray1D<ThermalComfort::ThermalComfortDataType> ThermalComfortData;
-    SimpleArray1D<ThermalComfort::AngleFactorData> AngleFactorList; // Angle Factor List data for each Angle Factor List
+    EPVector<ThermalComfort::ThermalComfortInASH55Type> ThermalComfortInASH55;
+    EPVector<ThermalComfort::ThermalComfortSetPointType> ThermalComfortSetPoint;
+    EPVector<ThermalComfort::ThermalComfortDataType> ThermalComfortData;
+    EPVector<ThermalComfort::AngleFactorData> AngleFactorList; // Angle Factor List data for each Angle Factor List
 
     Real64 runningAverageASH = 0.0;
 

@@ -56,7 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/SimpleArray1D.hh>
+#include <EnergyPlus/EPVector.hh>
 
 namespace EnergyPlus {
 
@@ -286,14 +286,14 @@ struct DataAirLoopData : BaseGlobalStruct
     bool AirLoopInputsFilled = false; // Set to TRUE after first pass through air loop
     Real64 LoopDXCoilRTF = 0.0;       // OnOff fan run time fraction in an HVAC Air Loop
 
-    SimpleArray1D<DataAirLoop::AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
-    SimpleArray1D<DataAirLoop::AirLoopOutsideAirConnectData> AirToOANodeInfo;
-    SimpleArray1D<DataAirLoop::DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
-    SimpleArray1D<DataAirLoop::AirLooptoZoneData> AirLoopZoneInfo;
-    SimpleArray1D<DataAirLoop::AirLoopControlData> AirLoopControlInfo;
-    SimpleArray1D<DataAirLoop::AirLoopFlowData> AirLoopFlow;
-    SimpleArray1D<DataAirLoop::OutsideAirSysProps> OutsideAirSys;
-    SimpleArray1D<DataAirLoop::AirLoopAFNData> AirLoopAFNInfo;
+    EPVector<DataAirLoop::AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
+    EPVector<DataAirLoop::AirLoopOutsideAirConnectData> AirToOANodeInfo;
+    EPVector<DataAirLoop::DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
+    EPVector<DataAirLoop::AirLooptoZoneData> AirLoopZoneInfo;
+    EPVector<DataAirLoop::AirLoopControlData> AirLoopControlInfo;
+    EPVector<DataAirLoop::AirLoopFlowData> AirLoopFlow;
+    EPVector<DataAirLoop::OutsideAirSysProps> OutsideAirSys;
+    EPVector<DataAirLoop::AirLoopAFNData> AirLoopAFNInfo;
 
     void clear_state() override
     {

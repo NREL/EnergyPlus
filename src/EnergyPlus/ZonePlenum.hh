@@ -56,7 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/SimpleArray1D.hh>
+#include <EnergyPlus/EPVector.hh>
 
 namespace EnergyPlus {
 
@@ -204,8 +204,8 @@ struct ZonePlenumData : BaseGlobalStruct
     Array1D_bool CheckSupEquipName;
 
     // Object Data
-    SimpleArray1D<ZonePlenum::ZoneReturnPlenumConditions> ZoneRetPlenCond;
-    SimpleArray1D<ZonePlenum::ZoneSupplyPlenumConditions> ZoneSupPlenCond;
+    EPVector<ZonePlenum::ZoneReturnPlenumConditions> ZoneRetPlenCond;
+    EPVector<ZonePlenum::ZoneSupplyPlenumConditions> ZoneSupPlenCond;
     bool MyEnvrnFlag = true;
 
     void clear_state() override

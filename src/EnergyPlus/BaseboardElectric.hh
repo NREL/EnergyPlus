@@ -55,7 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/SimpleArray1D.hh>
+#include <EnergyPlus/EPVector.hh>
 
 namespace EnergyPlus {
 
@@ -122,8 +122,8 @@ struct BaseboardElectricData : BaseGlobalStruct
 {
     int NumBaseboards = 0;
     bool getInputFlag = true;
-    SimpleArray1D<BaseboardElectric::BaseboardParams> Baseboard;
-    SimpleArray1D<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
+    EPVector<BaseboardElectric::BaseboardParams> Baseboard;
+    EPVector<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
     bool MyOneTimeFlag = true;
     bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
     Array1D_bool MyEnvrnFlag;

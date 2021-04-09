@@ -398,7 +398,7 @@ struct HVACUnitaryBypassVAVData : BaseGlobalStruct
     Real64 TempSteamIn = 100.0;          // steam coil steam inlet temperature
     Array1D_bool CheckEquipName;
 
-    SimpleArray1D<HVACUnitaryBypassVAV::CBVAVData> CBVAV;
+    EPVector<HVACUnitaryBypassVAV::CBVAVData> CBVAV;
     bool GetInputFlag = true; // Flag set to make sure you get input once
 
     bool MyOneTimeFlag = true;    // Initialization flag

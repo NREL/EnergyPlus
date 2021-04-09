@@ -511,10 +511,10 @@ struct PlantChillersData : BaseGlobalStruct
     bool GetGasTurbineInput = true;
     bool GetConstCOPInput = true;
 
-    SimpleArray1D<PlantChillers::ElectricChillerSpecs> ElectricChiller;
-    SimpleArray1D<PlantChillers::EngineDrivenChillerSpecs> EngineDrivenChiller;
-    SimpleArray1D<PlantChillers::GTChillerSpecs> GTChiller;
-    SimpleArray1D<PlantChillers::ConstCOPChillerSpecs> ConstCOPChiller;
+    EPVector<PlantChillers::ElectricChillerSpecs> ElectricChiller;
+    EPVector<PlantChillers::EngineDrivenChillerSpecs> EngineDrivenChiller;
+    EPVector<PlantChillers::GTChillerSpecs> GTChiller;
+    EPVector<PlantChillers::ConstCOPChillerSpecs> ConstCOPChiller;
 
     void clear_state() override
     {

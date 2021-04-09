@@ -174,8 +174,8 @@ struct EarthTubeData : BaseGlobalStruct
 {
     int TotEarthTube = 0; // Total EarthTube Statements in input
     bool GetInputFlag = true;
-    SimpleArray1D<EarthTube::EarthTubeData> EarthTubeSys;
-    SimpleArray1D<EarthTube::EarthTubeZoneReportVars> ZnRptET;
+    EPVector<EarthTube::EarthTubeData> EarthTubeSys;
+    EPVector<EarthTube::EarthTubeZoneReportVars> ZnRptET;
 
     void clear_state() override
     {

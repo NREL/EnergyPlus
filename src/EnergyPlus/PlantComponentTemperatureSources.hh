@@ -148,7 +148,7 @@ struct PlantCompTempSrcData : BaseGlobalStruct
 
     int NumSources = 0;
     bool getWaterSourceInput = true;
-    SimpleArray1D<PlantComponentTemperatureSources::WaterSourceSpecs> WaterSource;
+    EPVector<PlantComponentTemperatureSources::WaterSourceSpecs> WaterSource;
 
     void clear_state() override
     {

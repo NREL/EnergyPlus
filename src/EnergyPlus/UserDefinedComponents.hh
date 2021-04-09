@@ -349,10 +349,10 @@ struct UserDefinedComponentsData : BaseGlobalStruct
     Array1D_bool CheckUserAirTerminal;
 
     // Object Data
-    SimpleArray1D<UserDefinedComponents::UserPlantComponentStruct> UserPlantComp;
-    SimpleArray1D<UserDefinedComponents::UserCoilComponentStruct> UserCoil;
-    SimpleArray1D<UserDefinedComponents::UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
-    SimpleArray1D<UserDefinedComponents::UserAirTerminalComponentStruct> UserAirTerminal;
+    EPVector<UserDefinedComponents::UserPlantComponentStruct> UserPlantComp;
+    EPVector<UserDefinedComponents::UserCoilComponentStruct> UserCoil;
+    EPVector<UserDefinedComponents::UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
+    EPVector<UserDefinedComponents::UserAirTerminalComponentStruct> UserAirTerminal;
 
     bool lDummy_EMSActuatedPlantComp = false;
     bool lDummy_GetUserDefComp = false;

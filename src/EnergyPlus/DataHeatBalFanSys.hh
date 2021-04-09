@@ -54,7 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/SimpleArray1D.hh>
+#include <EnergyPlus/EPVector.hh>
 
 namespace EnergyPlus {
 
@@ -267,7 +267,7 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<std::vector<Real64>> ZoneLowSETHours;
     Array1D<std::vector<Real64>> ZoneHighSETHours;
 
-    SimpleArray1D<DataHeatBalFanSys::ZoneComfortControlsFangerData> ZoneComfortControlsFanger;
+    EPVector<DataHeatBalFanSys::ZoneComfortControlsFangerData> ZoneComfortControlsFanger;
 
     void clear_state() override
     {

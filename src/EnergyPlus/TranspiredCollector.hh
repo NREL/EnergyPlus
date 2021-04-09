@@ -194,7 +194,7 @@ struct TranspiredCollectorData : BaseGlobalStruct
     Array1D_bool CheckEquipName;
     bool GetInputFlag = true; // First time, input is gotten
 
-    SimpleArray1D<TranspiredCollector::UTSCDataStruct> UTSC;
+    EPVector<TranspiredCollector::UTSCDataStruct> UTSC;
     bool MyOneTimeFlag = true;
     bool MySetPointCheckFlag = true;
 

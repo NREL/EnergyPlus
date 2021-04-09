@@ -273,8 +273,8 @@ struct MicroCHPElectricGeneratorData : BaseGlobalStruct
 
     int NumMicroCHPs = 0;
     int NumMicroCHPParams = 0;
-    SimpleArray1D<MicroCHPElectricGenerator::MicroCHPDataStruct> MicroCHP;
-    SimpleArray1D<MicroCHPElectricGenerator::MicroCHPParamsNonNormalized> MicroCHPParamInput;
+    EPVector<MicroCHPElectricGenerator::MicroCHPDataStruct> MicroCHP;
+    EPVector<MicroCHPElectricGenerator::MicroCHPParamsNonNormalized> MicroCHPParamInput;
     bool getMicroCHPInputFlag = true;
     bool MyOneTimeFlag = true;
     bool MyEnvrnFlag = true;

@@ -56,7 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
-#include <EnergyPlus/SimpleArray1D.hh>
+#include <EnergyPlus/EPVector.hh>
 
 namespace EnergyPlus {
 
@@ -107,7 +107,7 @@ namespace Pipes {
 struct PipesData : BaseGlobalStruct
 {
     bool GetPipeInputFlag = true;
-    SimpleArray1D<Pipes::LocalPipeData> LocalPipe;
+    EPVector<Pipes::LocalPipeData> LocalPipe;
     std::unordered_map<std::string, std::string> LocalPipeUniqueNames;
 
     void clear_state() override

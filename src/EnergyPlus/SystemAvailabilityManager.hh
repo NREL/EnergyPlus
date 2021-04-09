@@ -567,21 +567,21 @@ struct SystemAvailabilityManagerData : BaseGlobalStruct
     Array1D<Real64> OptStart_AdaTempGradTrdHeat; // Heating temp gradient for previous days - used in CalcOptStartSysAvailMgr
     Array1D<Real64> OptStart_AdaTempGradTrdCool; // Cooling temp gradient for previous days - used in CalcOptStartSysAvailMgr
 
-    SimpleArray1D<SystemAvailabilityManager::DefineSchedSysAvailManager> SchedSysAvailMgrData;
-    SimpleArray1D<SystemAvailabilityManager::DefineSchedOnSysAvailManager> SchedOnSysAvailMgrData;
-    SimpleArray1D<SystemAvailabilityManager::DefineSchedOffSysAvailManager> SchedOffSysAvailMgrData;
-    SimpleArray1D<SystemAvailabilityManager::DefineNightCycSysAvailManager> NCycSysAvailMgrData;
-    SimpleArray1D<SystemAvailabilityManager::DefineDiffTSysAvailManager> DiffTSysAvailMgrData;
-    SimpleArray1D<SystemAvailabilityManager::DefineHiLoSysAvailManager> HiTurnOffSysAvailMgrData;
-    SimpleArray1D<SystemAvailabilityManager::DefineHiLoSysAvailManager> HiTurnOnSysAvailMgrData;
-    SimpleArray1D<SystemAvailabilityManager::DefineHiLoSysAvailManager> LoTurnOffSysAvailMgrData;
-    SimpleArray1D<SystemAvailabilityManager::DefineHiLoSysAvailManager> LoTurnOnSysAvailMgrData;
-    SimpleArray1D<SystemAvailabilityManager::DefineNightVentSysAvailManager> NVentSysAvailMgrData;
-    SimpleArray1D<SystemAvailabilityManager::DefineHybridVentSysAvailManager> HybridVentSysAvailMgrData;
-    SimpleArray1D<SystemAvailabilityManager::SysAvailManagerList> SysAvailMgrListData;
-    SimpleArray1D<SystemAvailabilityManager::DefineOptStartSysAvailManager> OptStartSysAvailMgrData;
-    SimpleArray1D<SystemAvailabilityManager::DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffCooling;
-    SimpleArray1D<SystemAvailabilityManager::DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffHeating;
+    EPVector<SystemAvailabilityManager::DefineSchedSysAvailManager> SchedSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineSchedOnSysAvailManager> SchedOnSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineSchedOffSysAvailManager> SchedOffSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineNightCycSysAvailManager> NCycSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineDiffTSysAvailManager> DiffTSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineHiLoSysAvailManager> HiTurnOffSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineHiLoSysAvailManager> HiTurnOnSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineHiLoSysAvailManager> LoTurnOffSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineHiLoSysAvailManager> LoTurnOnSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineNightVentSysAvailManager> NVentSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineHybridVentSysAvailManager> HybridVentSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::SysAvailManagerList> SysAvailMgrListData;
+    EPVector<SystemAvailabilityManager::DefineOptStartSysAvailManager> OptStartSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffCooling;
+    EPVector<SystemAvailabilityManager::DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffHeating;
 
     bool BeginOfDayResetFlag = true;
 

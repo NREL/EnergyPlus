@@ -1471,7 +1471,7 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinBmSolRefldInsRevealRepEnergy;  // energy of BmSolRefldInsRevealReport [J]
     Array1D<Real64> SurfWinProfileAngHor;                 // Horizontal beam solar profile angle (degrees)
     Array1D<Real64> SurfWinProfileAngVert;                // Vertical beam solar profile angle (degrees)
-    SimpleArray1D<DataSurfaces::WinShadingType> SurfWinShadingFlag; // -1: window has no shading device
+    EPVector<DataSurfaces::WinShadingType> SurfWinShadingFlag; // -1: window has no shading device
     Array1D<bool> SurfWinShadingFlagEMSOn;                    // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
     Array1D<int> SurfWinShadingFlagEMSValue;                  // EMS control value for Shading Flag
     Array1D<int>
@@ -1480,7 +1480,7 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64>
         SurfWinFracTimeShadingDeviceOn; // For a single time step, = 0.0 if no shading device or shading device is off = 1.0 if shading device is on;
                                         // For time intervals longer than a time step, = fraction of time that shading device is on.
-    SimpleArray1D<DataSurfaces::WinShadingType>
+    EPVector<DataSurfaces::WinShadingType>
         SurfWinExtIntShadePrevTS;              // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
     Array1D<bool> SurfWinHasShadeOrBlindLayer; // mark as true if the window construction has a shade or a blind layer
     Array1D<bool> SurfWinSurfDayLightInit;     // surface has been initialized for following 5 arrays
@@ -1525,7 +1525,7 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinCenterGlArea;               // Center of glass area (m2); area of glass where 1-D conduction dominates
     Array1D<Real64> SurfWinEdgeGlCorrFac; // Correction factor to center-of-glass conductance to account for 2-D glass conduction thermal bridging
                                           // effects near frame and divider
-    SimpleArray1D<DataSurfaces::SurfaceClass> SurfWinOriginalClass; // 0 or if entered originally as:
+    EPVector<DataSurfaces::SurfaceClass> SurfWinOriginalClass; // 0 or if entered originally as:
     Array1D<Real64> SurfWinShadeAbsFacFace1; // Fraction of short-wave radiation incident that is absorbed by face 1 when total absorbed radiation is
                                              // apportioned to the two faces
     Array1D<Real64> SurfWinShadeAbsFacFace2; // Fraction of short-wave radiation incident that is absorbed by face 2 when total absorbed radiation is
@@ -1588,22 +1588,22 @@ struct SurfacesData : BaseGlobalStruct
     bool AnyHeatBalanceInsideSourceTerm = false;  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
     bool AnyHeatBalanceOutsideSourceTerm = false; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
 
-    SimpleArray1D<DataSurfaces::SurfaceData> Surface;
-    SimpleArray1D<DataSurfaces::SurfaceWindowCalc> SurfaceWindow;
-    SimpleArray1D<DataSurfaces::FrameDividerProperties> FrameDivider;
-    SimpleArray1D<DataSurfaces::StormWindowData> StormWindow;
-    SimpleArray1D<DataSurfaces::WindowShadingControlData> WindowShadingControl;
-    SimpleArray1D<DataSurfaces::OSCData> OSC;
-    SimpleArray1D<DataSurfaces::OSCMData> OSCM;
-    SimpleArray1D<DataSurfaces::ConvectionCoefficient> UserIntConvectionCoeffs;
-    SimpleArray1D<DataSurfaces::ConvectionCoefficient> UserExtConvectionCoeffs;
-    SimpleArray1D<DataSurfaces::ShadingVertexData> ShadeV;
-    SimpleArray1D<DataSurfaces::ExtVentedCavityStruct> ExtVentedCavity;
-    SimpleArray1D<DataSurfaces::SurfaceSolarIncident> SurfIncSolSSG;
-    SimpleArray1D<DataSurfaces::FenestrationSolarAbsorbed> FenLayAbsSSG;
-    SimpleArray1D<DataSurfaces::SurfaceLocalEnvironment> SurfLocalEnvironment;
-    SimpleArray1D<DataSurfaces::SurroundingSurfacesProperty> SurroundingSurfsProperty;
-    SimpleArray1D<DataSurfaces::IntMassObject> IntMassObjects;
+    EPVector<DataSurfaces::SurfaceData> Surface;
+    EPVector<DataSurfaces::SurfaceWindowCalc> SurfaceWindow;
+    EPVector<DataSurfaces::FrameDividerProperties> FrameDivider;
+    EPVector<DataSurfaces::StormWindowData> StormWindow;
+    EPVector<DataSurfaces::WindowShadingControlData> WindowShadingControl;
+    EPVector<DataSurfaces::OSCData> OSC;
+    EPVector<DataSurfaces::OSCMData> OSCM;
+    EPVector<DataSurfaces::ConvectionCoefficient> UserIntConvectionCoeffs;
+    EPVector<DataSurfaces::ConvectionCoefficient> UserExtConvectionCoeffs;
+    EPVector<DataSurfaces::ShadingVertexData> ShadeV;
+    EPVector<DataSurfaces::ExtVentedCavityStruct> ExtVentedCavity;
+    EPVector<DataSurfaces::SurfaceSolarIncident> SurfIncSolSSG;
+    EPVector<DataSurfaces::FenestrationSolarAbsorbed> FenLayAbsSSG;
+    EPVector<DataSurfaces::SurfaceLocalEnvironment> SurfLocalEnvironment;
+    EPVector<DataSurfaces::SurroundingSurfacesProperty> SurroundingSurfsProperty;
+    EPVector<DataSurfaces::IntMassObject> IntMassObjects;
 
     void clear_state() override
     {

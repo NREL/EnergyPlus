@@ -56,7 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/SimpleArray1D.hh>
+#include <EnergyPlus/EPVector.hh>
 
 namespace EnergyPlus {
 
@@ -321,8 +321,8 @@ struct UnitVentilatorsData : BaseGlobalStruct
     bool GetUnitVentilatorInputFlag = true; // First time, input is "gotten"
     Array1D_bool CheckEquipName;
 
-    SimpleArray1D<UnitVentilator::UnitVentilatorData> UnitVent;
-    SimpleArray1D<UnitVentilator::UnitVentNumericFieldData> UnitVentNumericFields;
+    EPVector<UnitVentilator::UnitVentilatorData> UnitVent;
+    EPVector<UnitVentilator::UnitVentNumericFieldData> UnitVentNumericFields;
 
     bool MyOneTimeFlag = true;
     bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items

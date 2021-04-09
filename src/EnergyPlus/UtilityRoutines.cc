@@ -75,6 +75,7 @@ extern "C" {
 #include <EnergyPlus/DataTimings.hh>
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
@@ -86,7 +87,6 @@ extern "C" {
 #include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/SimpleArray1D.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/SystemReports.hh>

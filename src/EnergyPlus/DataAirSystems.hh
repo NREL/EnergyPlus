@@ -420,14 +420,14 @@ namespace DataAirSystems {
 struct AirSystemsData : BaseGlobalStruct
 {
 
-    SimpleArray1D<DataAirSystems::DefinePrimaryAirSystem> PrimaryAirSystems;
-    SimpleArray1D<DataAirSystems::ConnectionPoint> DemandSideConnect;               // Connections between loops
-    SimpleArray1D<DataAirSystems::ConnectZoneComp> ZoneCompToPlant;                 // Connections between loops
-    SimpleArray1D<DataAirSystems::ConnectZoneSubComp> ZoneSubCompToPlant;           // Connections between loops
-    SimpleArray1D<DataAirSystems::ConnectZoneSubSubComp> ZoneSubSubCompToPlant;     // Connections between loops
-    SimpleArray1D<DataAirSystems::ConnectAirSysComp> AirSysCompToPlant;             // Connections between loops
-    SimpleArray1D<DataAirSystems::ConnectAirSysSubComp> AirSysSubCompToPlant;       // Connections between loops
-    SimpleArray1D<DataAirSystems::ConnectAirSysSubSubComp> AirSysSubSubCompToPlant; // Connections between loops
+    EPVector<DataAirSystems::DefinePrimaryAirSystem> PrimaryAirSystems;
+    EPVector<DataAirSystems::ConnectionPoint> DemandSideConnect;               // Connections between loops
+    EPVector<DataAirSystems::ConnectZoneComp> ZoneCompToPlant;                 // Connections between loops
+    EPVector<DataAirSystems::ConnectZoneSubComp> ZoneSubCompToPlant;           // Connections between loops
+    EPVector<DataAirSystems::ConnectZoneSubSubComp> ZoneSubSubCompToPlant;     // Connections between loops
+    EPVector<DataAirSystems::ConnectAirSysComp> AirSysCompToPlant;             // Connections between loops
+    EPVector<DataAirSystems::ConnectAirSysSubComp> AirSysSubCompToPlant;       // Connections between loops
+    EPVector<DataAirSystems::ConnectAirSysSubSubComp> AirSysSubSubCompToPlant; // Connections between loops
 
     void clear_state() override
     {
