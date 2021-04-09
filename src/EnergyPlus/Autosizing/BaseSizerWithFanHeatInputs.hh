@@ -59,7 +59,8 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-struct BaseSizerWithFanHeatInputs : BaseSizer {
+struct BaseSizerWithFanHeatInputs : BaseSizer
+{
 
     // fan data
     Real64 deltaP = 0.0;
@@ -89,9 +90,10 @@ struct BaseSizerWithFanHeatInputs : BaseSizer {
                             bool const &_printWarningFlag,
                             std::string const &_callingRoutine) override;
 
-    void setDataDesAccountForFanHeat(bool flag);
+    void setDataDesAccountForFanHeat(EnergyPlusData &state, bool flag);
 
-    void clearState() {
+    void clearState()
+    {
         BaseSizer::clearState();
         deltaP = 0.0;
         motEff = 0.0;
@@ -101,14 +103,13 @@ struct BaseSizerWithFanHeatInputs : BaseSizer {
         fanShaftPow = 0.0;
         motInPower = 0.0;
     }
-
 };
 
-struct BaseSizerWithFanHeatInputsData : BaseGlobalStruct {
+struct BaseSizerWithFanHeatInputsData : BaseGlobalStruct
+{
 
     void clear_state() override
     {
-
     }
 };
 

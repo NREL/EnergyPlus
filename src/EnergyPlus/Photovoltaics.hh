@@ -73,19 +73,16 @@ namespace Photovoltaics {
     // DERIVED TYPE DEFINITIONS:
     //   see DataPhotovoltaics.cc
 
-    extern Array1D_bool CheckEquipName;
-
-    void clear_state();
-
     void SimPVGenerator(EnergyPlusData &state,
-                        GeneratorType const GeneratorType,          // type of Generator
-                        std::string const &GeneratorName, // user specified name of Generator
+                        GeneratorType const GeneratorType, // type of Generator
+                        std::string const &GeneratorName,  // user specified name of Generator
                         int &GeneratorIndex,
                         bool const RunFlag, // is PV ON or OFF as determined by schedules in ElecLoadCenter
                         Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on"
     );
 
-    void GetPVGeneratorResults(GeneratorType const GeneratorType, // type of Generator
+    void GetPVGeneratorResults(EnergyPlusData &state,
+                               GeneratorType const GeneratorType, // type of Generator
                                int const GeneratorIndex,
                                Real64 &GeneratorPower,  // electrical power
                                Real64 &GeneratorEnergy, // electrical energy
@@ -106,7 +103,8 @@ namespace Photovoltaics {
 
     // *************
 
-    void CalcSandiaPV(EnergyPlusData &state, int const PVnum,   // ptr to current PV system
+    void CalcSandiaPV(EnergyPlusData &state,
+                      int const PVnum,   // ptr to current PV system
                       bool const RunFlag // controls if generator is scheduled *ON*
     );
 
@@ -146,7 +144,17 @@ namespace Photovoltaics {
                 Real64 const XS,
                 Real64 const EPS);
 
-    void SEARCH(EnergyPlusData &state, Real64 &A, Real64 &B, Real64 &P, int &K, Real64 &IO, Real64 &IL, Real64 &RSER, Real64 &AA, Real64 const EPS, int const KMAX);
+    void SEARCH(EnergyPlusData &state,
+                Real64 &A,
+                Real64 &B,
+                Real64 &P,
+                int &K,
+                Real64 &IO,
+                Real64 &IL,
+                Real64 &RSER,
+                Real64 &AA,
+                Real64 const EPS,
+                int const KMAX);
 
     Real64 FUN(EnergyPlusData &state, Real64 const II, Real64 const VV, Real64 const IL, Real64 const IO, Real64 const RSER, Real64 const AA);
 
@@ -293,13 +301,14 @@ namespace Photovoltaics {
                      Real64 const mBVoc        // change in BVoc with irradiance
     );
 
-    void SetVentedModuleQdotSource(int const VentModNum,
+    void SetVentedModuleQdotSource(EnergyPlusData &state,
+                                   int const VentModNum,
                                    Real64 const QSource // source term in Watts
     );
 
     void GetExtVentedCavityIndex(EnergyPlusData &state, int const SurfacePtr, int &VentCavIndex);
 
-    void GetExtVentedCavityTsColl(int const VentModNum, Real64 &TsColl);
+    void GetExtVentedCavityTsColl(EnergyPlusData &state, int const VentModNum, Real64 &TsColl);
 
     // -------------------------------------------------------------------------------
 
@@ -315,11 +324,23 @@ namespace Photovoltaics {
 
 } // namespace Photovoltaics
 
-struct PhotovoltaicStateData : BaseGlobalStruct {
+struct PhotovoltaicStateData : BaseGlobalStruct
+{
+
+    Array1D_bool CheckEquipName;
+    bool GetInputFlag = true; // one time get input flag
+    bool MyOneTimeFlag = true;
+    bool firstTime = true;
+    Real64 PVTimeStep; // internal timestep (in seconds) for cell temperature mode 3
+    Array1D_bool MyEnvrnFlag;
 
     void clear_state() override
     {
-
+        CheckEquipName.clear();
+        GetInputFlag = true;
+        MyOneTimeFlag = true;
+        firstTime = true;
+        MyEnvrnFlag.clear();
     }
 };
 

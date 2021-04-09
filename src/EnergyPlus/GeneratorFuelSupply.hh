@@ -59,37 +59,20 @@ struct EnergyPlusData;
 
 namespace GeneratorFuelSupply {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // <name Public routines, optionally name Private routines within this module>
-
-    // Functions
-
-    void clear_state();
-
     void GetGeneratorFuelSupplyInput(EnergyPlusData &state);
 
-    //******************************************************************************
-
-    void SetupFuelConstituentData(EnergyPlusData &state, int const FuelSupplyNum, bool &ErrorsFound);
+    void SetupFuelConstituentData(EnergyPlusData &state, int FuelSupplyNum, bool &ErrorsFound);
 
 } // namespace GeneratorFuelSupply
 
-struct GeneratorFuelSupplyData : BaseGlobalStruct {
+struct GeneratorFuelSupplyData : BaseGlobalStruct
+{
+
+    bool MyOneTimeFlag = true;
 
     void clear_state() override
     {
-
+        this->MyOneTimeFlag = true;
     }
 };
 

@@ -59,7 +59,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.5;
 
   Building,
     LBuilding-G180,          !- Name

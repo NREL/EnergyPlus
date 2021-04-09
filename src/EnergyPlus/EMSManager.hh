@@ -65,7 +65,8 @@ struct EnergyPlusData;
 
 namespace EMSManager {
 
-    enum class SPControlType {
+    enum class SPControlType
+    {
         iTemperatureSetPoint,      // integer for node setpoint control type
         iTemperatureMinSetPoint,   // integer for node setpoint control type
         iTemperatureMaxSetPoint,   // integer for node setpoint control type
@@ -78,7 +79,8 @@ namespace EMSManager {
     };
 
     // Parameters for EMS Calling Points
-    enum class EMSCallFrom {
+    enum class EMSCallFrom
+    {
         Unassigned,
         ZoneSizing,
         SystemSizing,
@@ -105,7 +107,7 @@ namespace EMSManager {
     void CheckIfAnyEMS(EnergyPlusData &state);
 
     void ManageEMS(EnergyPlusData &state,
-                   EMSCallFrom iCalledFrom,  // indicates where subroutine was called from, parameters in DataGlobals.
+                   EMSCallFrom iCalledFrom,                   // indicates where subroutine was called from, parameters in DataGlobals.
                    bool &anyProgramRan,                       // true if any Erl programs ran for this call
                    Optional_int_const ProgramManagerToRun = _ // specific program manager to run
     );
@@ -129,7 +131,7 @@ namespace EMSManager {
     void UpdateEMSTrendVariables(EnergyPlusData &state);
 
     std::string controlTypeName(SPControlType SetPointType); // Maps int to the std::string equivalent
-                                                         // (eg iTemperatureSetPoint => "Temperature Setpoint")
+                                                             // (eg iTemperatureSetPoint => "Temperature Setpoint")
 
     bool CheckIfNodeSetPointManaged(EnergyPlusData &state,
                                     int NodeNum, // index of node being checked.
@@ -194,21 +196,28 @@ void SetupEMSActuator(EnergyPlusData &state,
                       bool &lEMSActuated,
                       bool &lValue);
 
-void SetupEMSInternalVariable(EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, Real64 &rValue);
+void SetupEMSInternalVariable(
+    EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, Real64 &rValue);
 
-void SetupEMSInternalVariable(EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, int &iValue);
+void SetupEMSInternalVariable(
+    EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, int &iValue);
 
-struct EMSManagerData : BaseGlobalStruct {
+struct EMSManagerData : BaseGlobalStruct
+{
 
     bool GetEMSUserInput = true; // Flag to prevent input from being read multiple times
     bool ZoneThermostatActuatorsHaveBeenSetup = false;
     bool FinishProcessingUserInput = true; // Flag to indicate still need to process input
+    bool lDummy = false;                   // dummy pointer location
+    bool lDummy2 = false;                  // dummy pointer location
 
     void clear_state() override
     {
         GetEMSUserInput = true;
         ZoneThermostatActuatorsHaveBeenSetup = false;
         FinishProcessingUserInput = true;
+        this->lDummy = false;
+        this->lDummy2 = false;
     }
 };
 
