@@ -766,14 +766,14 @@ struct EconomicTariffData : BaseGlobalStruct
     bool Update_GetInput = true;
     int addOperand_prevVarMe = 0;
 
-    Array1D<EconomicTariff::EconVarType> econVar;
+    SimpleArray1D<EconomicTariff::EconVarType> econVar;
     SimpleArray1D<EconomicTariff::TariffType> tariff;
     SimpleArray1D<EconomicTariff::QualifyType> qualify;
     SimpleArray1D<EconomicTariff::ChargeSimpleType> chargeSimple;
     SimpleArray1D<EconomicTariff::ChargeBlockType> chargeBlock;
     SimpleArray1D<EconomicTariff::RatchetType> ratchet;
     SimpleArray1D<EconomicTariff::ComputationType> computation;
-    Array1D<EconomicTariff::StackType> stack;
+    SimpleArray1D<EconomicTariff::StackType> stack;
 
     void clear_state() override
     {

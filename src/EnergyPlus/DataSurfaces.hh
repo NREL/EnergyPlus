@@ -1471,7 +1471,7 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinBmSolRefldInsRevealRepEnergy;  // energy of BmSolRefldInsRevealReport [J]
     Array1D<Real64> SurfWinProfileAngHor;                 // Horizontal beam solar profile angle (degrees)
     Array1D<Real64> SurfWinProfileAngVert;                // Vertical beam solar profile angle (degrees)
-    Array1D<DataSurfaces::WinShadingType> SurfWinShadingFlag; // -1: window has no shading device
+    SimpleArray1D<DataSurfaces::WinShadingType> SurfWinShadingFlag; // -1: window has no shading device
     Array1D<bool> SurfWinShadingFlagEMSOn;                    // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
     Array1D<int> SurfWinShadingFlagEMSValue;                  // EMS control value for Shading Flag
     Array1D<int>
@@ -1480,7 +1480,7 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64>
         SurfWinFracTimeShadingDeviceOn; // For a single time step, = 0.0 if no shading device or shading device is off = 1.0 if shading device is on;
                                         // For time intervals longer than a time step, = fraction of time that shading device is on.
-    Array1D<DataSurfaces::WinShadingType>
+    SimpleArray1D<DataSurfaces::WinShadingType>
         SurfWinExtIntShadePrevTS;              // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
     Array1D<bool> SurfWinHasShadeOrBlindLayer; // mark as true if the window construction has a shade or a blind layer
     Array1D<bool> SurfWinSurfDayLightInit;     // surface has been initialized for following 5 arrays
@@ -1525,7 +1525,7 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinCenterGlArea;               // Center of glass area (m2); area of glass where 1-D conduction dominates
     Array1D<Real64> SurfWinEdgeGlCorrFac; // Correction factor to center-of-glass conductance to account for 2-D glass conduction thermal bridging
                                           // effects near frame and divider
-    Array1D<DataSurfaces::SurfaceClass> SurfWinOriginalClass; // 0 or if entered originally as:
+    SimpleArray1D<DataSurfaces::SurfaceClass> SurfWinOriginalClass; // 0 or if entered originally as:
     Array1D<Real64> SurfWinShadeAbsFacFace1; // Fraction of short-wave radiation incident that is absorbed by face 1 when total absorbed radiation is
                                              // apportioned to the two faces
     Array1D<Real64> SurfWinShadeAbsFacFace2; // Fraction of short-wave radiation incident that is absorbed by face 2 when total absorbed radiation is
@@ -1588,9 +1588,9 @@ struct SurfacesData : BaseGlobalStruct
     bool AnyHeatBalanceInsideSourceTerm = false;  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
     bool AnyHeatBalanceOutsideSourceTerm = false; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
 
-    Array1D<DataSurfaces::SurfaceData> Surface;
+    SimpleArray1D<DataSurfaces::SurfaceData> Surface;
     SimpleArray1D<DataSurfaces::SurfaceWindowCalc> SurfaceWindow;
-    Array1D<DataSurfaces::FrameDividerProperties> FrameDivider;
+    SimpleArray1D<DataSurfaces::FrameDividerProperties> FrameDivider;
     SimpleArray1D<DataSurfaces::StormWindowData> StormWindow;
     SimpleArray1D<DataSurfaces::WindowShadingControlData> WindowShadingControl;
     SimpleArray1D<DataSurfaces::OSCData> OSC;

@@ -3,9 +3,8 @@
 #ifndef SimpleArray1D_INCLUDED
 #define SimpleArray1D_INCLUDED
 
-#define SIMPLEARRAY
-// #define EPVECTOR
-
+// #define SIMPLEARRAY
+#define EPVECTOR
 
 #ifdef EPVECTOR
 #include <numeric>
@@ -77,16 +76,30 @@ template <typename T> [[nodiscard]] auto isize(const SimpleArray1D<T> &v)
 
 #elif defined(EPVECTOR)
 
-template <typename T> struct EPVector : std::vector<T>
+template <typename T> struct EPVector : private std::vector<T>
 {
     using std::vector<T>::vector;
+    using std::vector<T>::size;
+    using std::vector<T>::operator[];
+    using std::vector<T>::empty;
+    using std::vector<T>::begin;
+    using std::vector<T>::end;
+    using std::vector<T>::cbegin;
+    using std::vector<T>::cend;
+    using std::vector<T>::clear;
+    using std::vector<T>::emplace_back;
+    using std::vector<T>::push_back;
+    using const_iterator = typename std::vector<T>::const_iterator;
 
-    T &operator()(std::size_t n)
+    using value_type = T;
+    using size_type = typename std::vector<T>::size_type;
+
+    [[nodiscard]] T &operator()(std::size_t n)
     {
         return this->at(n - 1);
     }
 
-    const T &operator()(std::size_t n) const
+    [[nodiscard]] const T &operator()(std::size_t n) const
     {
         return this->at(n - 1);
     }
@@ -101,9 +114,14 @@ template <typename T> struct EPVector : std::vector<T>
         this->resize(size);
     }
 
-    void deallocate()
+    void deallocate() noexcept
     {
         this->clear();
+    }
+
+    [[nodiscard]] bool allocated() const noexcept
+    {
+        return !this->empty();
     }
 
     // operator= used for initialization of the vector
@@ -119,24 +137,43 @@ template <typename T> struct EPVector : std::vector<T>
     }
 
     // isize needed for current FindItemInList
-    int isize() const
+    [[nodiscard]] int isize() const noexcept
     {
         return static_cast<int>(this->size());
     }
 };
 
-template <> struct EPVector<bool> : std::vector<std::uint8_t>
+template <> struct EPVector<bool> : private std::vector<std::uint8_t>
 {
     using std::vector<std::uint8_t>::vector;
+    using std::vector<std::uint8_t>::size;
+    using std::vector<std::uint8_t>::operator[];
+    using std::vector<std::uint8_t>::empty;
+    using std::vector<std::uint8_t>::begin;
+    using std::vector<std::uint8_t>::end;
+    using std::vector<std::uint8_t>::cbegin;
+    using std::vector<std::uint8_t>::cend;
+    using std::vector<std::uint8_t>::clear;
+    using std::vector<std::uint8_t>::emplace_back;
+    using std::vector<std::uint8_t>::push_back;
+    using const_iterator = typename std::vector<std::uint8_t>::const_iterator;
 
-    std::uint8_t &operator()(std::size_t n)
+    using value_type = std::uint8_t;
+    using size_type = typename std::vector<std::uint8_t>::size_type;
+
+    [[nodiscard]] std::uint8_t &operator()(std::size_t n)
     {
         return this->at(n - 1);
     }
 
-    const std::uint8_t &operator()(std::size_t n) const
+    [[nodiscard]] const std::uint8_t &operator()(std::size_t n) const
     {
         return this->at(n - 1);
+    }
+
+    [[nodiscard]] bool allocated() const noexcept
+    {
+        return !this->empty();
     }
 
     void allocate(int size)
@@ -149,7 +186,7 @@ template <> struct EPVector<bool> : std::vector<std::uint8_t>
         this->resize(size);
     }
 
-    void deallocate()
+    void deallocate() noexcept
     {
         this->clear();
     }
@@ -167,7 +204,7 @@ template <> struct EPVector<bool> : std::vector<std::uint8_t>
     }
 
     // isize needed for current FindItemInList
-    int isize() const
+    [[nodiscard]] int isize() const noexcept
     {
         return static_cast<int>(this->size());
     }
@@ -175,45 +212,32 @@ template <> struct EPVector<bool> : std::vector<std::uint8_t>
 
 template <typename T> using SimpleArray1D = EPVector<T>;
 
-template <typename T> inline bool allocated(EPVector<T> const &v)
+template <typename T> [[nodiscard]] bool allocated(EPVector<T> const &v) noexcept
 {
-    return v.size();
+    return v.allocated();
 }
 
-template <typename T> [[nodiscard]] auto isize(const EPVector<T> &v)
+template <typename T> [[nodiscard]] auto isize(const EPVector<T> &v) noexcept
 {
     return v.isize();
 }
 
-
-inline bool all(EPVector<bool> const &values)
+[[nodiscard]] inline bool all(EPVector<bool> const &values) noexcept
 {
-    if (values.empty()) return true;
-    for (auto v : values) {
-        if (!v) return false;
-    }
-    return true;
+    return std::all_of(begin(values), end(values), [](const bool val) { return val; });
 }
 
-inline bool any(EPVector<bool> const &values)
+[[nodiscard]] inline bool any(EPVector<bool> const &values) noexcept
 {
-    if (values.empty()) return false;
-    for (auto v : values) {
-        if (v) return true;
-    }
-    return false;
+    return std::any_of(begin(values), end(values), [](const bool val){ return val; });
 }
 
-inline std::size_t count(EPVector<bool> const &values)
+[[nodiscard]] inline std::size_t count(EPVector<bool> const &values) noexcept
 {
-    std::size_t c(0u);
-    for (auto v : values) {
-        if (v) ++c;
-    }
-    return c;
+    return std::count(begin(values), end(values), true);
 }
 
-template <typename T> inline EPVector<T> pack(EPVector<T> const &v, EPVector<bool> const &mask)
+template <typename T> [[nodiscard]] EPVector<T> pack(EPVector<T> const &v, EPVector<bool> const &mask)
 {
     EPVector<T> r;
     r.reserve(mask.size());
@@ -225,7 +249,7 @@ template <typename T> inline EPVector<T> pack(EPVector<T> const &v, EPVector<boo
     return r;
 }
 
-template <typename T> inline Array1D<T> pack(Array1<T> const &a, EPVector<bool> const &mask)
+template <typename T> [[nodiscard]] Array1D<T> pack(Array1<T> const &a, EPVector<bool> const &mask)
 {
     Array1D<T> r;
     r.reserve(mask.size());
@@ -237,17 +261,17 @@ template <typename T> inline Array1D<T> pack(Array1<T> const &a, EPVector<bool> 
     return r;
 }
 
-template <typename T> inline T magnitude_squared(const EPVector<T> &v)
+template <typename T> [[nodiscard]] T magnitude_squared(const EPVector<T> &v)
 {
     return std::inner_product(v.begin(), v.end(), v.begin(), T{});
 }
 
-template <typename T, typename V> inline T dot(const EPVector<T> &u, const V &v)
+template <typename T, typename V> [[nodiscard]] T dot(const EPVector<T> &u, const V &v)
 {
     return std::inner_product(u.begin(), u.end(), v.begin(), T{});
 }
 
-template <typename Element, typename Member> inline Member maxval(EPVector<Element> const &a, Member Element::*pmem)
+template <typename Element, typename Member> [[nodiscard]] Member maxval(EPVector<Element> const &a, Member Element::*pmem)
 {
     Member v(a.empty() ? std::numeric_limits<Member>::lowest() : a(1).*pmem);
     for (int i = 2, e = a.isize(); i <= e; ++i) {
@@ -256,7 +280,17 @@ template <typename Element, typename Member> inline Member maxval(EPVector<Eleme
     return v;
 }
 
-template <typename T> inline T maxval(EPVector<T> const &a)
+// Sum of All Members of a Container
+template<typename Element, typename Member> inline Member sum(EPVector<Element> const &c, Member Element::*pmem)
+{
+    Member s(0);
+    for (const auto &elem : c) {
+        s += elem.*pmem;
+    }
+    return s;
+}
+
+template <typename T> [[nodiscard]] T maxval(EPVector<T> const &a)
 {
     auto max = std::max_element(a.begin(), a.end());
     if (max == a.end()) {
