@@ -767,8 +767,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataMstBal->HConvInFD.allocate(6);
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
-    state->dataSurface->SurfMovInsulHInt.dimension(state->dataSurface->TotSurfaces, 0.0);
-    state->dataSurface->SurfMovInsulIntPresent.dimension(state->dataSurface->TotSurfaces, false);
 
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
@@ -806,8 +804,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataMstBal->HConvInFD.deallocate();
     state->dataMstBal->RhoVaporAirIn.deallocate();
     state->dataMstBal->HMassConvInFD.deallocate();
-    state->dataSurface->SurfMovInsulHInt.deallocate();
-    state->dataSurface->SurfMovInsulIntPresent.deallocate();
     state->dataHeatBalFanSys->ZoneLatentGain.deallocate();
     state->dataHeatBal->ZoneWinHeatGain.deallocate();
     state->dataHeatBal->ZoneWinHeatGainRep.deallocate();
@@ -1307,9 +1303,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataMstBal->HConvInFD.allocate(6);
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
-    state->dataSurface->SurfMovInsulHInt.dimension(state->dataSurface->TotSurfaces, 0.0);
-    state->dataSurface->SurfMovInsulIntPresent.dimension(state->dataSurface->TotSurfaces, false);
-    state->dataSurface->SurfMovInsulHExt.dimension(state->dataSurface->TotSurfaces, 0.0);
 
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
@@ -1882,9 +1875,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataMstBal->HConvInFD.allocate(6);
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
-    state->dataSurface->SurfMovInsulHInt.dimension(state->dataSurface->TotSurfaces, 0.0);
-    state->dataSurface->SurfMovInsulIntPresent.dimension(state->dataSurface->TotSurfaces, false);
-    state->dataSurface->SurfMovInsulHExt.dimension(state->dataSurface->TotSurfaces, 0.0);
 
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
@@ -2460,9 +2450,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataMstBal->HConvInFD.allocate(6);
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
-    state->dataSurface->SurfMovInsulHInt.dimension(state->dataSurface->TotSurfaces, 0.0);
-    state->dataSurface->SurfMovInsulHExt.dimension(state->dataSurface->TotSurfaces, 0.0);
-    state->dataSurface->SurfMovInsulIntPresent.dimension(state->dataSurface->TotSurfaces, false);
 
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
@@ -2502,9 +2489,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataMstBal->HConvInFD.deallocate();
     state->dataMstBal->RhoVaporAirIn.deallocate();
     state->dataMstBal->HMassConvInFD.deallocate();
-    state->dataSurface->SurfMovInsulHInt.deallocate();
-    state->dataSurface->SurfMovInsulHExt.deallocate();
-    state->dataSurface->SurfMovInsulIntPresent.deallocate();
     state->dataHeatBalFanSys->ZoneLatentGain.deallocate();
     state->dataHeatBal->ZoneWinHeatGain.deallocate();
     state->dataHeatBal->ZoneWinHeatGainRep.deallocate();

@@ -1420,6 +1420,9 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     state.dataHeatBalSurf->SurfOpaqInitialDifSolInAbs.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfWinInitialDifSolInTrans.dimension(state.dataSurface->TotSurfaces, 0.0);
 
+    state.dataHeatBalSurf->SurfNetLWRadToSurf.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfOpaqQRadSWLightsInAbs.dimension(state.dataSurface->TotSurfaces, 0.0);
+
     state.dataHeatBalSurf->QH.dimension(2, Construction::MaxCTFTerms, state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->THM.dimension(2, Construction::MaxCTFTerms, state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->QHM.dimension(2, Construction::MaxCTFTerms, state.dataSurface->TotSurfaces, 0.0);
@@ -1469,10 +1472,16 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     state.dataMstBal->HGrndFD.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataMstBal->HAirFD.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-    state.dataHeatBalSurf->SurfNetLWRadToSurf.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->SurfOpaqQRadSWLightsInAbs.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSurface->SurfSkySolarInc.dimension(state.dataSurface->TotSurfaces, 0);
     state.dataSurface->SurfGndSolarInc.dimension(state.dataSurface->TotSurfaces, 0);
+
+    // allocate movable insulation arrays
+    state.dataSurface->SurfMovInsulIntPresent.dimension(state.dataSurface->TotSurfaces, false);
+    state.dataSurface->SurfMovInsulIntPresentPrevTS.dimension(state.dataSurface->TotSurfaces, false);
+    state.dataSurface->SurfMovInsulHExt.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataSurface->SurfMovInsulAbsExt.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataSurface->SurfMovInsulHInt.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataSurface->SurfMovInsulAbsInt.dimension(state.dataSurface->TotSurfaces, 0.0);
 
     DisplayString(state, "Setting up Surface Reporting Variables");
 

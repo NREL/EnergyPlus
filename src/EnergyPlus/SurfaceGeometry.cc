@@ -891,12 +891,7 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfBmToDiffReflFacObs.dimension(state.dataSurface->TotSurfaces, 0.0);
         state.dataSurface->SurfBmToDiffReflFacGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
         state.dataSurface->SurfSkyDiffReflFacGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->SurfMovInsulIntPresent.dimension(state.dataSurface->TotSurfaces, false);
-        state.dataSurface->SurfMovInsulIntPresentPrevTS.dimension(state.dataSurface->TotSurfaces, false);
-        state.dataSurface->SurfMovInsulHExt.dimension(state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->SurfMovInsulAbsExt.dimension(state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->SurfMovInsulHInt.dimension(state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->SurfMovInsulAbsInt.dimension(state.dataSurface->TotSurfaces, 0.0);
+
         // TODO: these are solar shading arrays
         state.dataSurface->SurfWinA.dimension(CFSMAXNL + 1, state.dataSurface->TotSurfaces, 0.0);
         state.dataSurface->SurfWinADiffFront.dimension(CFSMAXNL + 1, state.dataSurface->TotSurfaces, 0.0);
