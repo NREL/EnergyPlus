@@ -9873,6 +9873,7 @@ namespace AirflowNetworkBalanceManager {
                 state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * AirDensity / state.dataEnvrn->StdRhoAir;
             Real64 stdDensAFNNatVentVolume =
                 state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilVolume * AirDensity / state.dataEnvrn->StdRhoAir;
+            state.dataHeatBal->ZonePreDefRep(i).AFNVentVolStdDen = stdDensAFNNatVentVolume;
             state.dataHeatBal->ZonePreDefRep(i).AFNVentVolTotalStdDen += stdDensAFNNatVentVolume;
             state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalStdDen += stdDensAFNInfilVolume;
             if (state.dataHeatBal->ZonePreDefRep(i).isOccupied) {

@@ -6363,7 +6363,10 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
                 }
 
                 // Infiltration
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzInfil, Zone(iZone).Name, ZonePreDefRep(iZone).InfilVolTotalStdDen + ZonePreDefRep(iZone).AFNInfilVolTotalStdDen);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaTaBzInfil,
+                                 Zone(iZone).Name,
+                                 ZonePreDefRep(iZone).InfilVolTotalStdDen + ZonePreDefRep(iZone).AFNInfilVolTotalStdDen);
                 totalInfilVol += (ZonePreDefRep(iZone).InfilVolTotalStdDen + ZonePreDefRep(iZone).AFNInfilVolTotalStdDen) * zoneMult;
 
                 // Total ventilation and infiltration
