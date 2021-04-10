@@ -517,9 +517,8 @@ void CalcEQLWindowSHGCAndTransNormal(EnergyPlusData &state,
     HCOUT = 15.0;
     if (FS.L(1).LTYPE == LayerType::ltyROLLB || FS.L(1).LTYPE == LayerType::ltyDRAPE || FS.L(1).LTYPE == LayerType::ltyINSCRN ||
         FS.L(1).LTYPE == LayerType::ltyVBHOR ||
-        FS.L(1).LTYPE ==
-            LayerType::ltyVBVER) { // Exterior Roller Blind Present | Exterior Drape Fabric | Exterior Insect Screen Present | Exterior Venetian
-                                   // Blind Present
+        FS.L(1).LTYPE == LayerType::ltyVBVER) { // Exterior Roller Blind Present | Exterior Drape Fabric | Exterior Insect Screen Present | Exterior
+                                                // Venetian Blind Present
         // Reduced convection coefficient due to external attachment
         HCOUT = 12.25;
     }
