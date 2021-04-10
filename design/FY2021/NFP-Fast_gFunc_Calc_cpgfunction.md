@@ -173,7 +173,8 @@ object, the “g-function calculation model name”, with values of:
 - UBHWTcalc for the new calculation method that utilizes uniform borehole wall
 temperature boundary conditions.
 
-Sample IDF and IDD follow with changes marked in red:
+Sample IDF and IDD follow, new lines are marked with ">" at the beginning of 
+the line:
 
 ```
 !!! IDF example using GHE:Vertical:Array input !!!
@@ -188,10 +189,10 @@ GroundHeatExchanger:System,
   2.5,                     !- Ground Thermal Conductivity {W/m-K}
   2.5E+06,                 !- Ground Thermal Heat Capacity {J/m3-K}
   ,                        !- GHE:Vertical:ResponseFactors Object Name
-  UHFcalc,                 !- g-function Calculation Model Name
+  >UHFcalc,                 !- g-function Calculation Model Name
   GHE-Array;               !- GHE:Vertical:Array Object Name
 ```
-<span style="color:red">UHFcalc, !- g-function Calculation Model Name</span>
+
 
 ```
 !!! IDF example using GHE:Vertical:Single input !!!
@@ -206,12 +207,12 @@ GroundHeatExchanger:System,
     2.5,                     !- Ground Thermal Conductivity {W/m-K}
     2.5E+06,                 !- Ground Thermal Heat Capacity {J/m3-K}
     ,                        !- GHE:Vertical:ResponseFactors Object Name
-    UHFcalc,                 !- g-function Calculation Model Name
+    >UHFcalc,                 !- g-function Calculation Model Name
     ,                        !- GHE:Vertical:Array Object Name
     BH1,                     !- GHE:Vertical:Single Object Name 1
     BH2;                     !- GHE:Vertical:Single Object Name 2
 ```
-<span style="color:red">UHFcalc, !- g-function Calculation Model Name</span>
+
 
 ```
 !!! IDD Modifications !!!
@@ -219,8 +220,8 @@ GroundHeatExchanger:System,
 GroundHeatExchanger:System,
     \memo Models vertical ground heat exchangers systems using the response factor approach
     \memo developed by Eskilson. Response factors are calculated using a finite line source
-    \memo model assuming uniform heat flux at the borehole wall if UHFcalc is specified,
-    \memo or uniform borehole wall temperature if UBHWTcalc is specified.
+    >\memo model assuming uniform heat flux at the borehole wall if UHFcalc is specified,
+    >\memo or uniform borehole wall temperature if UBHWTcalc is specified.
     \extensible:1
     \min-fields 9
     A1,   \field Name
@@ -230,7 +231,7 @@ GroundHeatExchanger:System,
     A6, \field GHE:Vertical:ResponseFactors Object Name
         \type object-list
         \object-list GroundHeatExchangerVerticalResponseFactorNames
-    A7, \field g-function Calculation Model Name
+    >A7, \field g-function Calculation Model Name
         \type choice
         \key UHFcalc
         \key UBHWTcalc
@@ -239,16 +240,6 @@ GroundHeatExchanger:System,
         \object-list GroundHeatExchangerVerticalArrayNames
     ...
 ```
-<span style="color:red">\memo model assuming uniform heat flux at the borehole
-wall if UHFcalc is specified,</span>
-
-<span style="color:red">\memo or uniform borehole wall temperature if UBHWTcalc
-is specified.</span>
-
-<span style="color:red">A7, \field g-function Calculation Model Name
-        \type choice
-        \key UHFcalc
-        \key UBHWTcalc</span>
 
 ## Engineering Reference Documentation
 
