@@ -67,8 +67,14 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
+#include <EnergyPlus/RoomAirModelManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+
+
 
 using namespace EnergyPlus;
 using namespace DataEnvironment;
@@ -357,4 +363,110 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
 
     EXPECT_NEAR(24.397538, state->dataLoopNodes->Node(2).Temp, 0.00001);
     EXPECT_NEAR(0.0024802305, state->dataLoopNodes->Node(2).HumRat, 0.000001);
+}
+TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
+{
+    // different names between internal gain objects and room air objects for internal gains result in fatal error from GetInternalGainDeviceIndex function.
+    bool ErrorsFound(false);
+    std::string const idf_objects = delimited_string({
+
+        "Zone,living_unit1;",
+        "ScheduleTypeLimits,Fraction,0.0,1.0,Continuous,Dimensionless;",
+        "Schedule:Constant,sch,,1.0;",
+        "People,",
+        "  people_unit1,            !- Name",
+        "  living_unit1,            !- Zone or ZoneList Name",
+        "  sch,           !- Number of People Schedule Name",
+        "  People,                  !- Number of People Calculation Method",
+        "  3,                       !- Number of People",
+        "  ,                        !- People per Zone Floor Area {person / m2}",
+        "  ,                        !- Zone Floor Area per Person {m2 / person}",
+        "  0,                       !- Fraction Radiant",
+        " autocalculate,           !- Sensible Heat Fraction",
+        " sch,            !- Activity Level Schedule Name",
+        " ;                        !- Carbon Dioxide Generation Rate {m3 / s - W}",
+
+
+        "Lights,",
+        "  Living Hardwired Lighting1,  !- Name",
+        "  living_unit1,            !- Zone or ZoneList Name",
+        "  sch,  !- Schedule Name",
+        "  Watts/Area,              !- Design Level Calculation Method",
+        "  ,                        !- Lighting Level {W}",
+        "  28.8472799167821,        !- Watts per Zone Floor Area {W / m2}",
+        "  ,                        !- Watts per Person {W / person}",
+        "  0,                       !- Return Air Fraction",
+        "  0.6,                     !- Fraction Radiant",
+        "  0.2,                     !- Fraction Visible",
+        "  0;                       !- Fraction Replaceable",
+        " ElectricEquipment,",
+        "  Electric Equipment 1,  !- Name",
+        "  living_unit1,               !- Zone or ZoneList Name",
+        "  sch,               !- Schedule Name",
+        "  EquipmentLevel,          !- Design Level Calculation Method",
+        "  150.0,                   !- Design Level {W}",
+        "  ,                        !- Watts per Zone Floor Area {W/m2}",
+        "  ,                        !- Watts per Person {W/person}",
+        "  0.0000,                  !- Fraction Latent",
+        "  0.5000,                  !- Fraction Radiant",
+        "  0.0000;                  !- Fraction Lost",
+
+       "RoomAirModelType,",
+       " RoomAirWithAirflowNetwork,  !- Name",
+       " living_unit1,            !- Zone Name",
+       " AirflowNetwork,          !- Room - Air Modeling Type",
+       " DIRECT;                  !- Air Temperature Coupling Strategy",
+
+       "RoomAir:Node:AirflowNetwork,",
+       " Node1,                   !- Name",
+       " living_unit1,            !- Zone Name",
+       " 1,                    !- Fraction of Zone Air Volume",
+       " unit1_List,   !- RoomAir : Node : AirflowNetwork : AdjacentSurfaceList Name",
+       " Node1_Gain,              !- RoomAir : Node : AirflowNetwork : InternalGains Name",
+       " Node1_HVAC;              !- RoomAir:Node:AirflowNetwork:HVACEquipment Name",
+
+       "RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,",
+       " unit1_List,   !- Name"
+       " unit1;        !- Surface 1 Name"
+
+       "RoomAir:Node:AirflowNetwork:InternalGains,",
+       " Node1_Gain,              !- Name",
+       " People,                  !- Internal Gain Object 1 Type",
+       " living_unit1 People,     !- Internal Gain Object 1 Name",
+       " 1,                    !- Fraction of Gains to Node 1",
+       " Lights,                  !- Internal Gain Object 2 Type",
+       " living_unit1 Lights,     !- Internal Gain Object 2 Name",
+       " 1,                    !- Fraction of Gains to Node 2",
+       " ElectricEquipment,       !- Internal Gain Object 3 Type",
+       " living_unit1 Equip,      !- Internal Gain Object 3 Name",
+       " 1;                    !- Fraction of Gains to Node 3",
+
+       " RoomAirSettings:AirflowNetwork,",
+       "  living_unit1,            !- Name",
+       "  living_unit1,            !- Zone Name",
+       "  Node1,            !- Control Point RoomAirflowNetwork : Node Name",
+       "  Node1;                   !- RoomAirflowNetwork : Node Name 1",
+    
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_FALSE(has_err_output());
+ 
+    ErrorsFound = false;
+    state->dataGlobal->NumOfTimeStepInHour = 1;    
+    state->dataGlobal->MinutesPerTimeStep = 60;    
+    ScheduleManager::ProcessScheduleInput(*state);
+
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+
+    ErrorsFound = false; 
+    state->dataRoomAirMod->AirModel.allocate(1);
+    state->dataRoomAirMod->AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::AirflowNetwork;
+    RoomAirModelManager::GetRoomAirflowNetworkData(*state, ErrorsFound);
+
+    EXPECT_TRUE(ErrorsFound); 
 }

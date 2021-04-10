@@ -8078,6 +8078,9 @@ namespace InternalHeatGains {
                 DeviceIndex = DeviceNum;
                 break;
             }
+            else {
+                ErrorFound = true;
+            }
         }
     }
 
