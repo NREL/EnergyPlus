@@ -146,8 +146,8 @@ namespace EnergyPlus {
 // 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "RoomAir:Node:AirflowNetwork:InternalGains" );
 // 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "AirflowNetwork:MultiZone:Component:DetailedOpening"
 // ); 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,
-// "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit" ); 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,
-// "HeatPump:WaterToWater:ParameterEstimation:Cooling"
+// "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit" ); 		total +=
+// state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "HeatPump:WaterToWater:ParameterEstimation:Cooling"
 // ); 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "WaterHeater:Stratified" );
 // 	}
 
@@ -172,8 +172,8 @@ namespace EnergyPlus {
 // 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "RoomAir:Node:AirflowNetwork:InternalGainss" );
 // 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "AirflowNetwork:MultiZone:Component:DetailedOpenings"
 // ); 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,
-// "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFits" ); 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,
-// "HeatPump:WaterToWater:ParameterEstimation:Coolings"
+// "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFits" ); 		total +=
+// state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "HeatPump:WaterToWater:ParameterEstimation:Coolings"
 // ); 		total += state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state,  "WaterHeater:Stratifieds" );
 // 	}
 
