@@ -82,10 +82,10 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataEnvrn->StdRhoAir = 1.2;
     // call simulate to trigger sizing call
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(*state, "MyFan"));
-    DataLoopNode::Node(1).Press = 101325.0;
-    DataLoopNode::Node(1).Temp = 24.0;
-    HVACFan::fanObjs[0]->simulate(*state, _, _, _, _);
+    state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "MyFan"));
+    state->dataLoopNodes->Node(1).Press = 101325.0;
+    state->dataLoopNodes->Node(1).Temp = 24.0;
+    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _, _, _);
 
     // this global state is what would be set up by E+ currently
     static std::string const routineName("HeatingCapacitySizingGauntlet");
@@ -312,7 +312,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(4250.0, sizedValue, 0.01);
-    sizer.autoSizedValue = 0.0;        // reset for next test
+    sizer.autoSizedValue = 0.0;             // reset for next test
     state->dataSize->DataCoolCoilCap = 0.0; // reset for next test
 
     state->dataSize->ZoneEqSizing(1).HeatingCapacity = true;
@@ -396,7 +396,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
@@ -651,7 +651,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_HeatingEmpirical), "MyDXCoil", printFlag, routineName);
+    sizer.initializeWithinEP(
+        *this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_HeatingEmpirical), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);

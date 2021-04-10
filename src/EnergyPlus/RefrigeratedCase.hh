@@ -1865,6 +1865,10 @@ struct RefrigeratedCaseData : BaseGlobalStruct
     bool InitRefrigerationPlantConnectionsMyBeginEnvrnFlag = true;
     bool FigureRefrigerationZoneGainsMyEnvrnFlag = true;
 
+    Real64 MyCurrentTimeSaved = 0.0;   // Used to determine whether the zone time step is a repetition
+    Real64 MyStepStartTimeSaved = 0.0; // Used to determine whether the system time step is a repetition
+    Real64 TimeStepFraction = 0.0;     // Used to calculate my current time
+
     void clear_state() override
     {
         this->NumRefrigeratedRacks = 0;
@@ -1946,6 +1950,10 @@ struct RefrigeratedCaseData : BaseGlobalStruct
         this->InitRefrigerationMyBeginEnvrnFlag = true;
         this->InitRefrigerationPlantConnectionsMyBeginEnvrnFlag = true;
         this->FigureRefrigerationZoneGainsMyEnvrnFlag = true;
+
+        this->MyCurrentTimeSaved = 0.0;   // Used to determine whether the zone time step is a repetition
+        this->MyStepStartTimeSaved = 0.0; // Used to determine whether the system time step is a repetition
+        this->TimeStepFraction = 0.0;     // Used to calculate my current time
     }
 };
 

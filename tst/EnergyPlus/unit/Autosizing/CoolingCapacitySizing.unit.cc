@@ -83,10 +83,10 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataEnvrn->StdRhoAir = 1.2;
     // call simulate to trigger sizing call
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(*state, "MyFan"));
-    DataLoopNode::Node(1).Press = 101325.0;
-    DataLoopNode::Node(1).Temp = 24.0;
-    HVACFan::fanObjs[0]->simulate(*state, _, _, _, _);
+    state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "MyFan"));
+    state->dataLoopNodes->Node(1).Press = 101325.0;
+    state->dataLoopNodes->Node(1).Temp = 24.0;
+    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _, _, _);
 
     // this global state is what would be set up by E+ currently
     static std::string const routineName("CoolingCapacitySizingGauntlet");
@@ -300,7 +300,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
@@ -374,12 +374,12 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0;             // reset for next test
 
     // add fan heat
-    Fans::Fan.allocate(1);
-    Fans::Fan(1).DeltaPress = 600.0;
-    Fans::Fan(1).MotEff = 0.9;
-    Fans::Fan(1).FanEff = 0.6;
-    Fans::Fan(1).MotInAirFrac = 0.5;
-    Fans::Fan(1).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
+    state->dataFans->Fan.allocate(1);
+    state->dataFans->Fan(1).DeltaPress = 600.0;
+    state->dataFans->Fan(1).MotEff = 0.9;
+    state->dataFans->Fan(1).FanEff = 0.6;
+    state->dataFans->Fan(1).MotInAirFrac = 0.5;
+    state->dataFans->Fan(1).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
     state->dataAirSystemsData->PrimaryAirSystems(1).SupFanNum = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
     state->dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
@@ -396,7 +396,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(4740.64, sizedValue, 0.01);                              // change in capacity because precool conditions mixed with return
     EXPECT_NEAR(158.33, sizer.primaryAirSystem(1).FanDesCoolLoad, 0.01); // air loop fan heat is saved in sizer class
-    EXPECT_NEAR(state->dataSize->DataCoilSizingAirInTemp, 23.44, 0.01);       // does not include fan heat because PrimaryAirSys fan place not set
+    EXPECT_NEAR(state->dataSize->DataCoilSizingAirInTemp, 23.44, 0.01);  // does not include fan heat because PrimaryAirSys fan place not set
     EXPECT_EQ(1.0, state->dataSize->DataFracOfAutosizedCoolingCapacity);
     sizer.autoSizedValue = 0.0; // reset for next test
     Real64 unScaledCapacity = sizedValue;
@@ -416,8 +416,8 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(unScaledCapacity * 0.5, sizedValue, 0.01);               // change in capacity because precool conditions mixed with return
     EXPECT_NEAR(158.33, sizer.primaryAirSystem(1).FanDesCoolLoad, 0.01); // air loop fan heat is saved in sizer class
-    EXPECT_EQ(1.0, state->dataSize->DataFracOfAutosizedCoolingCapacity);      // Data global is not affected
-    EXPECT_NEAR(state->dataSize->DataCoilSizingAirInTemp, 24.22, 0.01);       // does include fan heat becase PrimaryAirSys fan place is set
+    EXPECT_EQ(1.0, state->dataSize->DataFracOfAutosizedCoolingCapacity); // Data global is not affected
+    EXPECT_NEAR(state->dataSize->DataCoilSizingAirInTemp, 24.22, 0.01);  // does include fan heat becase PrimaryAirSys fan place is set
     EXPECT_EQ(0.5, sizer.dataFracOfAutosizedCoolingCapacity);            // sizer class holds fractional value
     sizer.autoSizedValue = 0.0;                                          // reset for next test
 

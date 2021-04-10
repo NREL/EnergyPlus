@@ -45,48 +45,125 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus Headers
-#include <EnergyPlus/DataShadowingCombinations.hh>
+#ifndef PsychCacheData_hh_INCLUDED
+#define PsychCacheData_hh_INCLUDED
+
+#include <EnergyPlus/Data/BaseData.hh>
 
 namespace EnergyPlus {
 
-namespace DataShadowingCombinations {
+constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychrometric routines that
 
-    // Module containing the data dealing with shadowing combinations
+#ifdef EP_nocache_Psychrometrics
+#undef EP_cache_PsyTwbFnTdbWPb
+#undef EP_cache_PsyPsatFnTemp
+#undef EP_cache_PsyTsatFnPb
+#undef EP_cache_PsyTsatFnHPb
+#else
+#define EP_cache_PsyTwbFnTdbWPb
+#define EP_cache_PsyPsatFnTemp
+#define EP_cache_PsyTsatFnPb
+#define EP_cache_PsyTsatFnHPb
+#endif
 
-    // MODULE INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   July 2007; Moved from SolarShading
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+#ifdef EP_cache_PsyTwbFnTdbWPb
+struct cached_twb_t
+{
+    // Members
+    Int64 iTdb;
+    Int64 iW;
+    Int64 iPb;
+    Real64 Twb;
 
-    // PURPOSE OF THIS MODULE:
-    // <description>
+    // Default Constructor
+    cached_twb_t() : iTdb(0), iW(0), iPb(0), Twb(0.0)
+    {
+    }
+};
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+struct cached_tsat_h_pb
+{
+    // Members
+    Int64 iH;
+    Int64 iPb;
+    Real64 Tsat;
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
+    // Default Constructor
+    cached_tsat_h_pb() : iH(0), iPb(0), Tsat(0.0)
+    {
+    }
+};
+#endif
+#ifdef EP_cache_PsyPsatFnTemp
+struct cached_psat_t
+{
+    // Members
+    Int64 iTdb;
+    Real64 Psat;
 
-    // REFERENCES:
-    // na
+    // Default Constructor
+    cached_psat_t() : iTdb(-1000), Psat(0.0)
+    {
+    }
+};
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+struct cached_tsat_pb
+{
+    // Members
+    Int64 iPb;
+    Real64 Tsat;
 
-    // OTHER NOTES:
-    // na
+    // Default Constructor
+    cached_tsat_pb() : iPb(-1000), Tsat(0.0)
+    {
+    }
+};
+#endif
 
-    // USE STATEMENTS:
-    // <use statements for data only modules>
-    // <use statements for access to subroutines in other modules>
+struct PsychrometricCacheData : BaseGlobalStruct
+{
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
+#ifdef EP_cache_PsyTwbFnTdbWPb
+    Array1D<cached_twb_t> cached_Twb; // DIMENSION(0:twbcache_size)
+#endif
+#ifdef EP_cache_PsyPsatFnTemp
+    Array1D<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+    Array1D<cached_tsat_pb> cached_Tsat; // DIMENSION(0:tsatcache_size)
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+    Array1D<cached_tsat_h_pb> cached_Tsat_HPb; // DIMENSION(0:tsat_hbp_cache_size)
+#endif
 
-    // DERIVED TYPE DEFINITIONS:
+#ifdef EP_psych_stats
+    Array1D<Int64> NumTimesCalled = Array1D<Int64>(NumPsychMonitors, 0);
+    Array1D_int NumIterations = Array1D_int(NumPsychMonitors, 0);
+#endif
 
-    // MODULE VARIABLE DECLARATIONS:
-
-    // Object Data
-    Array1D<ShadowingCombinations> ShadowComb;
-
-} // namespace DataShadowingCombinations
+    void clear_state() override
+    {
+#ifdef EP_cache_PsyTwbFnTdbWPb
+        cached_Twb.clear();
+#endif
+#ifdef EP_cache_PsyPsatFnTemp
+        cached_Psat.clear();
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+        cached_Tsat.clear();
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+        cached_Tsat_HPb.clear();
+#endif
+#ifdef EP_psych_stats
+        NumTimesCalled = Array1D<Int64>(NumPsychMonitors, 0);
+        NumIterations = Array1D_int(NumPsychMonitors, 0);
+#endif
+    }
+};
 
 } // namespace EnergyPlus
+
+#endif // PsychCacheData_hh_INCLUDED

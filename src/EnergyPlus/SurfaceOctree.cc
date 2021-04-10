@@ -238,7 +238,4 @@ bool SurfaceOctreeCube::contains(Vertex const &l, Vertex const &u, Surface const
 std::uint8_t const SurfaceOctreeCube::maxDepth_ = 255u;                   // Max tree depth
 SurfaceOctreeCube::size_type const SurfaceOctreeCube::maxSurfaces_ = 10u; // Max surfaces in a cube before subdividing
 
-// Globals
-SurfaceOctreeCube surfaceOctree;
-
 } // namespace EnergyPlus

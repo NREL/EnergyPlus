@@ -88,8 +88,8 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
     int OutletNode = 2;
     state->dataVentilatedSlab->VentSlab(Item).FanOutletNode = FanOutletNode;
     state->dataVentilatedSlab->VentSlab(Item).RadInNode = OutletNode;
-    Node.allocate(2);
-    Node(OutletNode).MassFlowRate = 0.5;
+    state->dataLoopNodes->Node.allocate(2);
+    state->dataLoopNodes->Node(OutletNode).MassFlowRate = 0.5;
 
     // Calcs being tested
     //	VentSlab( Item ).HeatCoilPower = max( 0.0, QUnitOut );
@@ -100,10 +100,10 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
     //	PowerMet = QUnitOut;
 
     // Sensible Heating
-    Node(FanOutletNode).Temp = 15.0;
-    Node(FanOutletNode).HumRat = 0.003;
-    Node(OutletNode).Temp = 20.0;
-    Node(OutletNode).HumRat = 0.003;
+    state->dataLoopNodes->Node(FanOutletNode).Temp = 15.0;
+    state->dataLoopNodes->Node(FanOutletNode).HumRat = 0.003;
+    state->dataLoopNodes->Node(OutletNode).Temp = 20.0;
+    state->dataLoopNodes->Node(OutletNode).HumRat = 0.003;
     CalcVentilatedSlabCoilOutput(*state, Item, PowerMet, LatOutputProvided);
 
     EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).HeatCoilPower > 0.0);
@@ -114,10 +114,10 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
     EXPECT_TRUE(PowerMet > 0.0);
 
     // Sensible Cooling
-    Node(FanOutletNode).Temp = 25.0;
-    Node(FanOutletNode).HumRat = 0.003;
-    Node(OutletNode).Temp = 20.0;
-    Node(OutletNode).HumRat = 0.003;
+    state->dataLoopNodes->Node(FanOutletNode).Temp = 25.0;
+    state->dataLoopNodes->Node(FanOutletNode).HumRat = 0.003;
+    state->dataLoopNodes->Node(OutletNode).Temp = 20.0;
+    state->dataLoopNodes->Node(OutletNode).HumRat = 0.003;
     CalcVentilatedSlabCoilOutput(*state, Item, PowerMet, LatOutputProvided);
 
     EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).HeatCoilPower == 0.0);
@@ -128,10 +128,10 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
     EXPECT_TRUE(PowerMet < 0.0);
 
     // Sensible and Latent Cooling
-    Node(FanOutletNode).Temp = 25.0;
-    Node(FanOutletNode).HumRat = 0.008;
-    Node(OutletNode).Temp = 20.0;
-    Node(OutletNode).HumRat = 0.003;
+    state->dataLoopNodes->Node(FanOutletNode).Temp = 25.0;
+    state->dataLoopNodes->Node(FanOutletNode).HumRat = 0.008;
+    state->dataLoopNodes->Node(OutletNode).Temp = 20.0;
+    state->dataLoopNodes->Node(OutletNode).HumRat = 0.003;
     CalcVentilatedSlabCoilOutput(*state, Item, PowerMet, LatOutputProvided);
 
     EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).HeatCoilPower == 0.0);
@@ -140,7 +140,6 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
     EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).LateCoolCoilPower > 0.0);
     EXPECT_TRUE(LatOutputProvided < 0.0);
     EXPECT_TRUE(PowerMet < 0.0);
-
 }
 
 TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
@@ -2310,7 +2309,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(*state);  // read schedule data
+    ProcessScheduleInput(*state);               // read schedule data
 
     ErrorsFound = false;
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound); // read project control data

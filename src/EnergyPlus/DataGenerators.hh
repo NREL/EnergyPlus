@@ -61,27 +61,31 @@ namespace EnergyPlus {
 namespace DataGenerators {
 
     // MODULE PARAMETER DEFINITIONS:
-    enum class CurveMode {
+    enum class CurveMode
+    {
         Unassigned,
         Normalized, // mode where efficiency curves are modifier curves
         Direct      // mode where efficiency curves are direct
     };
 
-    enum class SkinLoss {
+    enum class SkinLoss
+    {
         Unassigned,
         ConstantRate,
-        UADT,          // UAdelta T mode for skin losses
+        UADT,             // UAdelta T mode for skin losses
         QuadraticFuelNdot // Quadratic function of fuel flow for skin losses
     };
 
-    enum class AirSupRateMode {
+    enum class AirSupRateMode
+    {
         Unassigned,
         QuadraticFuncofNdot,  // function of fuel rate mode for air flow
         ConstantStoicsAirRat, // Constant air ratio in stoics with fuel constituents
         QuadraticFuncofPel    // function of electric power mode
     };
 
-    enum class RecoverMode {
+    enum class RecoverMode
+    {
         Unassigned,
         NoRecoveryOnAirIntake,  // mode for controlling intake air heat recovery
         RecoverBurnInvertBatt,  // mode for controlling intake air heat recovery
@@ -91,19 +95,22 @@ namespace DataGenerators {
         RecoverBattery          // mode for controlling intake air heat recovery
     };
 
-    enum class ConstituentMode {
+    enum class ConstituentMode
+    {
         Unassigned,
         RegularAir,
         UserDefinedConstituents
     };
 
-    enum class FuelTemperatureMode {
+    enum class FuelTemperatureMode
+    {
         Unassigned,
         FuelInTempFromNode,
         FuelInTempSchedule
     };
 
-    enum class WaterTemperatureMode {
+    enum class WaterTemperatureMode
+    {
         Unassigned,
         WaterInReformMains,
         WaterInReformAirNode,
@@ -111,13 +118,15 @@ namespace DataGenerators {
         WaterInReformSchedule
     };
 
-    enum class InverterEfficiencyMode {
+    enum class InverterEfficiencyMode
+    {
         Unassigned,
         Constant,
         Quadratic
     };
 
-    enum class ExhaustGasHX {
+    enum class ExhaustGasHX
+    {
         Unassigned,
         FixedEffectiveness,   // exhaust gas HX modeling mode
         LMTDempiricalUAeff,   // exhaust gas HX modeling mode
@@ -125,29 +134,33 @@ namespace DataGenerators {
         Condensing            // exhaust gas HX modeling mode
     };
 
-    enum class ElectricalStorage {
+    enum class ElectricalStorage
+    {
         Unassigned,
-        SimpleEffConstraints,         // electrical storage modeling mode
-        LeadAcidBatterySaupe,         // electrical storage modeling mode
-        LeadAcidBatterManwellMcGowan  // electrical storage modeling mode
+        SimpleEffConstraints,        // electrical storage modeling mode
+        LeadAcidBatterySaupe,        // electrical storage modeling mode
+        LeadAcidBatterManwellMcGowan // electrical storage modeling mode
     };
 
-    enum class LossDestination {
+    enum class LossDestination
+    {
         Unassigned,
         SurroundingZone,
         AirInletForFC
     };
 
-    enum class OperatingMode {
+    enum class OperatingMode
+    {
         Unassigned,
-        OpModeOff,      // CHP operating mode OFF
-        OpModeStandby,  // CHP operating mode Stand By
-        OpModeWarmUp,   // CHP operating mode Warm Up or start up
-        OpModeNormal,   // CHP operating mode Normal
-        OpModeCoolDown  // CHP operating mode Cool down or shut down
+        OpModeOff,     // CHP operating mode OFF
+        OpModeStandby, // CHP operating mode Stand By
+        OpModeWarmUp,  // CHP operating mode Warm Up or start up
+        OpModeNormal,  // CHP operating mode Normal
+        OpModeCoolDown // CHP operating mode Cool down or shut down
     };
 
-    enum class FuelMode {
+    enum class FuelMode
+    {
         Unassigned,
         fuelModeGaseousConstituents,
         fuelModeGenericLiquid
@@ -156,7 +169,8 @@ namespace DataGenerators {
     Real64 constexpr MinProductGasTemp(-100.0); // Minimum bound on search for product gas temps
     Real64 constexpr MaxProductGasTemp(2000.0); // Maximum bound on search for product gas temps
 
-    enum class ThermodynamicMode {
+    enum class ThermodynamicMode
+    {
         Unassigned,
         NISTShomate,
         NASAPolynomial
@@ -164,19 +178,19 @@ namespace DataGenerators {
 
     Real64 constexpr RinKJperMolpK(0.0083145); // R is ideal gas constant (kJ/mol-K)
     Real64 constexpr InitHRTemp(50.0);         // Initialization temperature for heat recovery water
-    Real64 constexpr ImBalanceTol(0.00001); // used as fraction of electrical power at power module
+    Real64 constexpr ImBalanceTol(0.00001);    // used as fraction of electrical power at power module
 
     struct GeneratorFuelSupplyDataStruct
     {
         // Members
         // user input data
-        std::string Name;     // name of this fuel supply module
-        DataGenerators::FuelTemperatureMode FuelTempMode;     // temperature of fuel node
-        DataGenerators::FuelMode FuelTypeMode;     // type of fuel, gasous or liquid
-        std::string NodeName; // node name for temperature at input
-        int NodeNum;          // node number for temperature at input
-        int SchedNum;         // fuel temperature at input
-        int CompPowerCurveID; // "pointer" to compressor power cubic curve
+        std::string Name;                                 // name of this fuel supply module
+        DataGenerators::FuelTemperatureMode FuelTempMode; // temperature of fuel node
+        DataGenerators::FuelMode FuelTypeMode;            // type of fuel, gasous or liquid
+        std::string NodeName;                             // node name for temperature at input
+        int NodeNum;                                      // node number for temperature at input
+        int SchedNum;                                     // fuel temperature at input
+        int CompPowerCurveID;                             // "pointer" to compressor power cubic curve
         Real64 CompPowerLossFactor;
         int NumConstituents = 0; // number of constituents in fue supply
         Array1D_string ConstitName;
@@ -200,10 +214,10 @@ namespace DataGenerators {
 
         // Default Constructor
         GeneratorFuelSupplyDataStruct()
-            : FuelTempMode(DataGenerators::FuelTemperatureMode::Unassigned), FuelTypeMode(DataGenerators::FuelMode::Unassigned), NodeNum(0), SchedNum(0), CompPowerCurveID(0), CompPowerLossFactor(0.0), ConstitName(14),
-              ConstitMolalFract(14, 0.0), GasLibID(14, 0), LHV(0.0), LHVJperkg(0.0), LHVliquid(0.0), HHV(0.0), MW(0.0), eCO2(0.0),
-              KmolPerSecToKgPerSec(0.0), StoicOxygenRate(0.0), TfuelIntoCompress(0.0), TfuelIntoFCPM(0.0), PfuelCompEl(0.0), QskinLoss(0.0),
-              CO2ProductGasCoef(0.0), H2OProductGasCoef(0.0)
+            : FuelTempMode(DataGenerators::FuelTemperatureMode::Unassigned), FuelTypeMode(DataGenerators::FuelMode::Unassigned), NodeNum(0),
+              SchedNum(0), CompPowerCurveID(0), CompPowerLossFactor(0.0), ConstitName(14), ConstitMolalFract(14, 0.0), GasLibID(14, 0), LHV(0.0),
+              LHVJperkg(0.0), LHVliquid(0.0), HHV(0.0), MW(0.0), eCO2(0.0), KmolPerSecToKgPerSec(0.0), StoicOxygenRate(0.0), TfuelIntoCompress(0.0),
+              TfuelIntoFCPM(0.0), PfuelCompEl(0.0), QskinLoss(0.0), CO2ProductGasCoef(0.0), H2OProductGasCoef(0.0)
         {
         }
     };
@@ -237,9 +251,9 @@ namespace DataGenerators {
 
         // Default Constructor
         GasPropertyDataStruct()
-            : StdRefMolarEnthOfForm(0.0), ThermoMode(DataGenerators::ThermodynamicMode::Unassigned), ShomateA(0.0), ShomateB(0.0), ShomateC(0.0), ShomateD(0.0), ShomateE(0.0), ShomateF(0.0),
-              ShomateG(0.0), ShomateH(0.0), NumCarbons(0.0), NumHydrogens(0.0), NumOxygens(0.0), MolecularWeight(0.0), NASA_A1(0.0), NASA_A2(0.0),
-              NASA_A3(0.0), NASA_A4(0.0), NASA_A5(0.0), NASA_A6(0.0), NASA_A7(0.0)
+            : StdRefMolarEnthOfForm(0.0), ThermoMode(DataGenerators::ThermodynamicMode::Unassigned), ShomateA(0.0), ShomateB(0.0), ShomateC(0.0),
+              ShomateD(0.0), ShomateE(0.0), ShomateF(0.0), ShomateG(0.0), ShomateH(0.0), NumCarbons(0.0), NumHydrogens(0.0), NumOxygens(0.0),
+              MolecularWeight(0.0), NASA_A1(0.0), NASA_A2(0.0), NASA_A3(0.0), NASA_A4(0.0), NASA_A5(0.0), NASA_A6(0.0), NASA_A7(0.0)
         {
         }
     };
@@ -302,23 +316,30 @@ namespace DataGenerators {
               WarmUpByEngineTemp(true), StartUpTimeDelay(0.0), WarmUpDelay(0.0), StartUpFuel(0.0), StartUpElectConsum(0.0), StartUpElectProd(0.0),
               ShutDownFuel(0.0), ShutDownElectConsum(0.0), PcoolDown(0.0), CoolDownDelay(0.0), NumCyclesInit(0), NumRunHoursInit(0.0), Pstandby(0.0),
               MCeng(0.0), MCcw(0.0), kf(0.0), TnomEngOp(0.0), kp(0.0), MandatoryFullCoolDown(false), WarmRestartOkay(true), AvailabilitySchedID(0),
-              CurrentOpMode(DataGenerators::OperatingMode::OpModeOff), LastOpMode(DataGenerators::OperatingMode::OpModeOff), FractionalDayofLastShutDown(0.0), FractionalDayofLastStartUp(0.0), HasBeenOn(false),
-              DuringStartUp(false), DuringShutDown(false), FuelMdotLastTimestep(0.0), PelLastTimeStep(0.0), NumCycles(0),
-              PLRforSubtimestepStartUp(0.0), PLRforSubtimestepShutDown(0.0), ElectEffNom(0.0), ThermEffNom(0.0), QdotHXMax(0.0), QdotHXMin(0.0),
-              QdotHXOpt(0.0)
+              CurrentOpMode(DataGenerators::OperatingMode::OpModeOff), LastOpMode(DataGenerators::OperatingMode::OpModeOff),
+              FractionalDayofLastShutDown(0.0), FractionalDayofLastStartUp(0.0), HasBeenOn(false), DuringStartUp(false), DuringShutDown(false),
+              FuelMdotLastTimestep(0.0), PelLastTimeStep(0.0), NumCycles(0), PLRforSubtimestepStartUp(0.0), PLRforSubtimestepShutDown(0.0),
+              ElectEffNom(0.0), ThermEffNom(0.0), QdotHXMax(0.0), QdotHXMin(0.0), QdotHXOpt(0.0)
         {
         }
     };
 
 } // namespace DataGenerators
 
-struct GeneratorsData : BaseGlobalStruct {
+struct GeneratorsData : BaseGlobalStruct
+{
     int NumFuelConstit = 0;
     int NumGeneratorFuelSups = 0;
-    int NumGensWDynamics = 0;  // number of dynamics controls for generators
+    int NumGensWDynamics = 0; // number of dynamics controls for generators
     Array1D<DataGenerators::GasPropertyDataStruct> GasPhaseThermoChemistryData;
     Array1D<DataGenerators::GeneratorFuelSupplyDataStruct> FuelSupply; // fuel supply (reused across various)
     Array1D<DataGenerators::GeneratorDynamicsManagerStruct> GeneratorDynamics;
+
+    int InletCWnode = 0; // cooling water inlet node ID
+    bool InternalFlowControl = false;
+    Real64 TcwIn = 0.0;          // inlet cooling water temperature (C)
+    Real64 TrialMdotcw = 0.0;    // test or estimate of what the plant flows are going to be (kg/s)
+    Real64 LimitMinMdotcw = 0.0; // lower limit for cooling water flow for generatior operation (kg/s)
 
     void clear_state() override
     {
@@ -328,6 +349,11 @@ struct GeneratorsData : BaseGlobalStruct {
         GasPhaseThermoChemistryData.deallocate();
         FuelSupply.deallocate();
         GeneratorDynamics.deallocate();
+        this->InletCWnode = 0;
+        this->InternalFlowControl = false;
+        this->TcwIn = 0.0;
+        this->TrialMdotcw = 0.0;
+        this->LimitMinMdotcw = 0.0;
     }
 };
 

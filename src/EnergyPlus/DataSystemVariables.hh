@@ -78,19 +78,21 @@ namespace DataSystemVariables {
     // MODULE VARIABLE DECLARATIONS:
 
     // Shading methods
-    enum class ShadingMethod {PolygonClipping, PixelCounting, Scheduled, Imported};
+    enum class ShadingMethod
+    {
+        PolygonClipping,
+        PixelCounting,
+        Scheduled,
+        Imported
+    };
 
     // Functions
 
     void CheckForActualFileName(EnergyPlusData &state,
                                 std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
-                                std::string &foundFileName,             // Blank if not found.
-                                const std::string contextString = std::string()
-    );
-
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
+                                std::string &foundFileName,               // Blank if not found.
+                                const std::string contextString = std::string());
 
     void processEnvironmentVariables(EnergyPlusData &state);
 
@@ -98,6 +100,7 @@ namespace DataSystemVariables {
 
 struct SystemVarsData : BaseGlobalStruct
 {
+    bool firstTime = true;
 
     int const iASCII_CR = 13;   // endline value when just CR instead of CR/LF
     int const iUnicode_end = 0; // endline value when Unicode file
@@ -165,6 +168,8 @@ struct SystemVarsData : BaseGlobalStruct
         FullAnnualRun = false;
         DeveloperFlag = false;
         TimingFlag = false;
+
+        firstTime = true;
 
         SutherlandHodgman = true;
         SlaterBarsky = false;

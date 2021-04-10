@@ -1078,20 +1078,18 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    using namespace EnergyPlus::DataIPShortCuts;
-
-    lNumericFieldBlanks.allocate(1000);
-    lAlphaFieldBlanks.allocate(1000);
-    cAlphaFieldNames.allocate(1000);
-    cNumericFieldNames.allocate(1000);
-    cAlphaArgs.allocate(1000);
-    rNumericArgs.allocate(1000);
-    lNumericFieldBlanks = false;
-    lAlphaFieldBlanks = false;
-    cAlphaFieldNames = " ";
-    cNumericFieldNames = " ";
-    cAlphaArgs = " ";
-    rNumericArgs = 0.0;
+    state->dataIPShortCut->lNumericFieldBlanks.allocate(1000);
+    state->dataIPShortCut->lAlphaFieldBlanks.allocate(1000);
+    state->dataIPShortCut->cAlphaFieldNames.allocate(1000);
+    state->dataIPShortCut->cNumericFieldNames.allocate(1000);
+    state->dataIPShortCut->cAlphaArgs.allocate(1000);
+    state->dataIPShortCut->rNumericArgs.allocate(1000);
+    state->dataIPShortCut->lNumericFieldBlanks = false;
+    state->dataIPShortCut->lAlphaFieldBlanks = false;
+    state->dataIPShortCut->cAlphaFieldNames = " ";
+    state->dataIPShortCut->cNumericFieldNames = " ";
+    state->dataIPShortCut->cAlphaArgs = " ";
+    state->dataIPShortCut->rNumericArgs = 0.0;
 
     bool localErrorsFound = false;
     // Read objects
@@ -1117,18 +1115,18 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
 
     state->dataHeatBal->Zone(2).HasWindow = true;
     state->dataHeatBal->Zone(4).HasWindow = true;
-    EnergyPlus::DataHeatBalSurface::TempSurfIn.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBalSurf->TempSurfIn.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->HConvIn.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->HConvIn = 0.1;
-    DataHeatBalSurface::TempSurfIn = 25.00;
+    state->dataHeatBalSurf->TempSurfIn = 25.00;
     int surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001", state->dataSurface->Surface);
-    DataHeatBalSurface::TempSurfIn(surfNum) = 25.92;
+    state->dataHeatBalSurf->TempSurfIn(surfNum) = 25.92;
     surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001:WIN001", state->dataSurface->Surface);
-    DataHeatBalSurface::TempSurfIn(surfNum) = 25.92;
+    state->dataHeatBalSurf->TempSurfIn(surfNum) = 25.92;
     surfNum = UtilityRoutines::FindItemInList("ZN002:WALL004", state->dataSurface->Surface);
-    DataHeatBalSurface::TempSurfIn(surfNum) = 26.99;
+    state->dataHeatBalSurf->TempSurfIn(surfNum) = 26.99;
     surfNum = UtilityRoutines::FindItemInList("ZN004:WALL001:WIN001", state->dataSurface->Surface);
-    DataHeatBalSurface::TempSurfIn(surfNum) = 22.99;
+    state->dataHeatBalSurf->TempSurfIn(surfNum) = 22.99;
     state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->MAT = 23.0;
@@ -1151,5 +1149,4 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     state->dataThermalChimneys->ThermalChimneySys(1).EMSAirFlowRateValue = 0.01;
     ThermalChimney::CalcThermalChimney(*state);
     EXPECT_NEAR(state->dataThermalChimneys->ThermalChimneyReport(1).OverallTCVolumeFlow, 0.01, 0.0001);
-
 }

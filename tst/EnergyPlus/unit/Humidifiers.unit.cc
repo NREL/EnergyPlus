@@ -74,9 +74,9 @@ TEST_F(EnergyPlusFixture, Humidifiers_Sizing)
 {
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurSysNum = 1;
-    NumElecSteamHums = 0;
-    NumGasSteamHums = 1;
-    NumHumidifiers = 1;
+    state->dataHumidifiers->NumElecSteamHums = 0;
+    state->dataHumidifiers->NumGasSteamHums = 1;
+    state->dataHumidifiers->NumHumidifiers = 1;
 
     HumidifierData thisHum;
 
@@ -109,9 +109,9 @@ TEST_F(EnergyPlusFixture, Humidifiers_AutoSizing)
 {
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurSysNum = 1;
-    NumElecSteamHums = 0;
-    NumGasSteamHums = 1;
-    NumHumidifiers = 1;
+    state->dataHumidifiers->NumElecSteamHums = 0;
+    state->dataHumidifiers->NumGasSteamHums = 1;
+    state->dataHumidifiers->NumHumidifiers = 1;
 
     HumidifierData thisHum;
 
@@ -149,14 +149,14 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
 {
     HumidifierData thisHum;
 
-    TimeStepSys = 0.25;
+    state->dataHVACGlobal->TimeStepSys = 0.25;
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurSysNum = 1;
 
-    NumElecSteamHums = 0;
-    NumGasSteamHums = 1;
-    NumHumidifiers = 1;
-    Humidifier.allocate(NumGasSteamHums);
+    state->dataHumidifiers->NumElecSteamHums = 0;
+    state->dataHumidifiers->NumGasSteamHums = 1;
+    state->dataHumidifiers->NumHumidifiers = 1;
+    state->dataHumidifiers->Humidifier.allocate(state->dataHumidifiers->NumGasSteamHums);
     thisHum.HumType_Code = 2;
     thisHum.NomCapVol = 4.00E-5;
     thisHum.NomPower = 103710.0;
@@ -193,7 +193,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
     thisHum.CalcGasSteamHumidifier(*state, 0.040000010708118504);
     EXPECT_DOUBLE_EQ(103710.42776358133, thisHum.GasUseRate);
 
-    thisHum.ReportHumidifier();
+    thisHum.ReportHumidifier(*state);
     EXPECT_DOUBLE_EQ(93339384.987223208, thisHum.GasUseEnergy);
 }
 
@@ -229,8 +229,8 @@ TEST_F(EnergyPlusFixture, Humidifiers_GetHumidifierInput)
     ASSERT_TRUE(process_idf(idf_objects));
 
     GetHumidifierInput(*state);
-    ASSERT_EQ(1, NumHumidifiers);
-    EXPECT_EQ(1, Humidifier(1).EfficiencyCurvePtr);
+    ASSERT_EQ(1, state->dataHumidifiers->NumHumidifiers);
+    EXPECT_EQ(1, state->dataHumidifiers->Humidifier(1).EfficiencyCurvePtr);
 }
 
 TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
@@ -239,14 +239,14 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
 
     HumidifierData thisHum;
 
-    TimeStepSys = 0.25;
+    state->dataHVACGlobal->TimeStepSys = 0.25;
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurSysNum = 1;
 
-    NumElecSteamHums = 0;
-    NumGasSteamHums = 1;
-    NumHumidifiers = 1;
-    Humidifier.allocate(NumGasSteamHums);
+    state->dataHumidifiers->NumElecSteamHums = 0;
+    state->dataHumidifiers->NumGasSteamHums = 1;
+    state->dataHumidifiers->NumHumidifiers = 1;
+    state->dataHumidifiers->Humidifier.allocate(state->dataHumidifiers->NumGasSteamHums);
     thisHum.HumType_Code = 2;
     thisHum.NomCapVol = 4.00E-5;
     thisHum.NomCap = 4.00E-2;

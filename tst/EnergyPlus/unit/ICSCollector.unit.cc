@@ -84,7 +84,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     int ConstrNum;
     int MatNum;
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -120,8 +120,8 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataHeatBal->Zone.allocate(ZoneNum);
     state->dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo = ASHRAESimple;
     // allocate surface temperature variable data
-    TH.allocate(NumOfSurf, 1, 2);
-    TH(SurfNum, 1, 1) = 22.0;
+    state->dataHeatBalSurf->TH.allocate(NumOfSurf, 1, 2);
+    state->dataHeatBalSurf->TH(SurfNum, 1, 1) = 22.0;
     // allocate solar incident radiation variable data
     state->dataHeatBal->SurfQRadSWOutIncident.allocate(1);
     state->dataHeatBal->SurfQRadSWOutIncident(1) = 0.0;
@@ -150,9 +150,27 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Real64 VdotBouyRpt;          // gap buoyancy driven volume flow rate [m3/s]
 
     // call to test fix to resolve crash
-    CalcPassiveExteriorBaffleGap(*state, state->dataSurface->ExtVentedCavity(1).SurfPtrs, VentArea, Cv, Cd, HdeltaNPL, SolAbs,
-                                 AbsExt, Tilt, AspRat, GapThick, Roughness, QdotSource, TsBaffle, TaGap, HcGapRpt, HrGapRpt, IscRpt,
-                                 MdotVentRpt, VdotWindRpt, VdotBouyRpt);
+    CalcPassiveExteriorBaffleGap(*state,
+                                 state->dataSurface->ExtVentedCavity(1).SurfPtrs,
+                                 VentArea,
+                                 Cv,
+                                 Cd,
+                                 HdeltaNPL,
+                                 SolAbs,
+                                 AbsExt,
+                                 Tilt,
+                                 AspRat,
+                                 GapThick,
+                                 Roughness,
+                                 QdotSource,
+                                 TsBaffle,
+                                 TaGap,
+                                 HcGapRpt,
+                                 HrGapRpt,
+                                 IscRpt,
+                                 MdotVentRpt,
+                                 VdotWindRpt,
+                                 VdotBouyRpt);
 
     EXPECT_NEAR(21.862, TsBaffle, 0.001);
     EXPECT_NEAR(1.692, HcGapRpt, 0.001);
@@ -167,6 +185,6 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataSurface->ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
     state->dataSurface->ExtVentedCavity.deallocate();
     state->dataHeatBal->Zone.deallocate();
-    TH.deallocate();
+    state->dataHeatBalSurf->TH.deallocate();
     state->dataHeatBal->SurfQRadSWOutIncident.deallocate();
 }

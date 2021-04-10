@@ -95,7 +95,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
 
     state->dataFans->NumFans = 2;
-    Fan.allocate(state->dataFans->NumFans);
+    state->dataFans->Fan.allocate(state->dataFans->NumFans);
     state->dataFaultsMgr->FaultsFouledAirFilters.allocate(state->dataFans->NumFans);
 
     // Inputs: fan curve
@@ -114,18 +114,18 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     // Inputs:
     FanNum = 1;
-    Fan(FanNum).FanName = "Fan_1";
-    Fan(FanNum).FanType = "Fan:VariableVolume";
-    Fan(FanNum).MaxAirFlowRate = 18.194;
-    Fan(FanNum).DeltaPress = 1017.59;
+    state->dataFans->Fan(FanNum).FanName = "Fan_1";
+    state->dataFans->Fan(FanNum).FanType = "Fan:VariableVolume";
+    state->dataFans->Fan(FanNum).MaxAirFlowRate = 18.194;
+    state->dataFans->Fan(FanNum).DeltaPress = 1017.59;
     state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_1";
     state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanCurvePtr = CurveNum;
 
     FanNum = 2;
-    Fan(FanNum).FanName = "Fan_2";
-    Fan(FanNum).FanType = "Fan:VariableVolume";
-    Fan(FanNum).MaxAirFlowRate = 18.194;
-    Fan(FanNum).DeltaPress = 1017.59 * 1.2;
+    state->dataFans->Fan(FanNum).FanName = "Fan_2";
+    state->dataFans->Fan(FanNum).FanType = "Fan:VariableVolume";
+    state->dataFans->Fan(FanNum).MaxAirFlowRate = 18.194;
+    state->dataFans->Fan(FanNum).DeltaPress = 1017.59 * 1.2;
     state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_2";
     state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanCurvePtr = CurveNum;
 
@@ -141,7 +141,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     // Clean up
     state->dataCurveManager->PerfCurve.deallocate();
-    Fan.deallocate();
+    state->dataFans->Fan.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve_AutosizedFan)
@@ -212,7 +212,6 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
         "  Dimensionless;           !- Output Unit Type",
     });
 
-
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -231,7 +230,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     // We expect this one to throw, I changed the fan design pressure to 400, and made it non autosized.
     int FanNum = 1;
     EXPECT_NO_THROW(Fans::SizeFan(*state, FanNum));
-    EXPECT_DOUBLE_EQ(0.114, Fans::Fan(FanNum).MaxAirFlowRate);
+    EXPECT_DOUBLE_EQ(0.114, state->dataFans->Fan(FanNum).MaxAirFlowRate);
 }
 
 TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve_NonAutosizedFan)
@@ -301,7 +300,6 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
         "  Dimensionless;           !- Output Unit Type",
     });
 
-
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -320,7 +318,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     // We expect this one to throw, I changed the fan design pressure to 400, and made it non autosized.
     int FanNum = 1;
     EXPECT_ANY_THROW(Fans::SizeFan(*state, FanNum));
-    EXPECT_DOUBLE_EQ(0.114, Fans::Fan(FanNum).MaxAirFlowRate);
+    EXPECT_DOUBLE_EQ(0.114, state->dataFans->Fan(FanNum).MaxAirFlowRate);
     std::string const error_string = delimited_string({
         "   ** Severe  ** FaultModel:Fouling:AirFilter = \"FAN CV FOULING AIR FILTER\"",
         "   **   ~~~   ** Invalid Fan Curve Name = \"FOULED FAN CURVE\" does not cover ",
@@ -331,7 +329,6 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
         "   ..... Last severe error=FaultModel:Fouling:AirFilter = \"FAN CV FOULING AIR FILTER\"",
     });
     compare_err_stream(error_string, true);
-
 }
 
 TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFlowReduction)
@@ -350,7 +347,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
 
     state->dataFans->NumFans = 1;
-    Fan.allocate(state->dataFans->NumFans);
+    state->dataFans->Fan.allocate(state->dataFans->NumFans);
 
     // Inputs: fan curve
     CurveNum = 1;
@@ -368,20 +365,24 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
 
     // Inputs: fans
     FanNum = 1;
-    Fan(FanNum).FanName = "Fan_1";
-    Fan(FanNum).FanType = "Fan:VariableVolume";
-    Fan(FanNum).MaxAirFlowRate = 18.194;
-    Fan(FanNum).DeltaPress = 1017.59;
+    state->dataFans->Fan(FanNum).FanName = "Fan_1";
+    state->dataFans->Fan(FanNum).FanType = "Fan:VariableVolume";
+    state->dataFans->Fan(FanNum).MaxAirFlowRate = 18.194;
+    state->dataFans->Fan(FanNum).DeltaPress = 1017.59;
 
     // Run and Check
     FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(*state,
-        Fan(FanNum).FanName, Fan(FanNum).MaxAirFlowRate, Fan(FanNum).DeltaPress, FanFaultyDeltaPressInc * Fan(FanNum).DeltaPress, CurveNum);
+                                                        state->dataFans->Fan(FanNum).FanName,
+                                                        state->dataFans->Fan(FanNum).MaxAirFlowRate,
+                                                        state->dataFans->Fan(FanNum).DeltaPress,
+                                                        FanFaultyDeltaPressInc * state->dataFans->Fan(FanNum).DeltaPress,
+                                                        CurveNum);
 
     EXPECT_NEAR(3.845, FanDesignFlowRateDec, 0.005);
 
     // Clean up
     state->dataCurveManager->PerfCurve.deallocate();
-    Fan.deallocate();
+    state->dataFans->Fan.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT)
@@ -391,66 +392,36 @@ TEST_F(EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT)
     //     to the corresponding coil controller
 
     std::string const idf_objects = delimited_string({
-        "                                                              ",
-        "FaultModel:TemperatureSensorOffset:CoilSupplyAir,             ",
-        "   Fault_SAT_CoolCoil1,!- Name                                ",
-        "   ,                   !- Availability Schedule Name          ",
-        "   ,                   !- Severity Schedule Name              ",
-        "   Coil:Cooling:Water, !- Coil Object Type                    ",
-        "   Chilled Water Coil, !- Coil Object Name                    ",
-        "   CW Coil Controller, !- Water Coil Controller Name          ",
-        "   2.0;                !- Reference Sensor Offset {deltaC}    ",
-        "                                                              ",
-        "Coil:Cooling:Water,                                           ",
-        "   Chilled Water Coil, !- Name                                ",
-        "   AvailSched,         !- Availability Schedule Name          ",
-        "   autosize,           !- Design Water Flow Rate {m3/s}       ",
-        "   autosize,           !- Design Air Flow Rate {m3/s}         ",
-        "   autosize,           !- Design Inlet Water Temperature {C}  ",
-        "   autosize,           !- Design Inlet Air Temperature {C}    ",
-        "   autosize,           !- Design Outlet Air Temperature {C}   ",
-        "   autosize,           !- Design Inlet Air Humidity Ratio {-} ",
-        "   autosize,           !- Design Outlet Air Humidity Ratio {-}",
-        "   Water Inlet Node,   !- Water Inlet Node Name               ",
-        "   Water Outlet Node,  !- Water Outlet Node Name              ",
-        "   Air Inlet Node,     !- Air Inlet Node Name                 ",
-        "   Air Outlet Node,    !- Air Outlet Node Name                ",
-        "   SimpleAnalysis,     !- Type of Analysis                    ",
-        "   CrossFlow;          !- Heat Exchanger Configuration        ",
-        "                                                              ",
-        "Controller:WaterCoil,                                         ",
-        "   CW Coil Controller, !- Name                                ",
-        "   HumidityRatio,      !- Control Variable                    ",
-        "   Reverse,            !- Action                              ",
-        "   FLOW,               !- Actuator Variable                   ",
-        "   Air Outlet Node,    !- Sensor Node Name                    ",
-        "   Water Inlet Node,   !- Actuator Node Name                  ",
-        "   autosize,           !- Controller Convergence Tolerance {C}",
-        "   autosize,           !- Maximum Actuated Flow {m3/s}        ",
-        "   0.0;                !- Minimum Actuated Flow {m3/s}        ",
-        "                                                              ",
-        "SetpointManager:Scheduled,                                    ",
-        "   HumRatSPManager,    !- Name                                ",
-        "   HumidityRatio,      !- Control Variable                    ",
-        "   HumRatioSched,      !- Schedule Name                       ",
-        "   Air Outlet Node;    !- Setpoint Node or NodeList Name      ",
-        "                                                              ",
-        "Schedule:Compact,                                             ",
-        "   HumRatioSched,      !- Name                                ",
-        "   Any Number,         !- Schedule Type Limits Name           ",
-        "   Through: 12/31,     !- Field 1                             ",
-        "   For: AllDays,       !- Field 2                             ",
-        "   Until: 24:00, 0.015;!- Field 3                             ",
-        "Schedule:Compact,                                             ",
-        "   AvailSched,         !- Name                                ",
-        "   Fraction,           !- Schedule Type Limits Name           ",
-        "   Through: 12/31,     !- Field 1                             ",
-        "   For: AllDays,       !- Field 2                             ",
-        "   Until: 24:00, 1.0;  !- Field 3                             ",
-        "                                                              ",
-        "AirLoopHVAC:ControllerList,                                   ",
-        "   CW Coil Controller, !- Name                                ",
-        "   Controller:WaterCoil,!- Controller 1 Object Type           ",
+        "                                                              ", "FaultModel:TemperatureSensorOffset:CoilSupplyAir,             ",
+        "   Fault_SAT_CoolCoil1,!- Name                                ", "   ,                   !- Availability Schedule Name          ",
+        "   ,                   !- Severity Schedule Name              ", "   Coil:Cooling:Water, !- Coil Object Type                    ",
+        "   Chilled Water Coil, !- Coil Object Name                    ", "   CW Coil Controller, !- Water Coil Controller Name          ",
+        "   2.0;                !- Reference Sensor Offset {deltaC}    ", "                                                              ",
+        "Coil:Cooling:Water,                                           ", "   Chilled Water Coil, !- Name                                ",
+        "   AvailSched,         !- Availability Schedule Name          ", "   autosize,           !- Design Water Flow Rate {m3/s}       ",
+        "   autosize,           !- Design Air Flow Rate {m3/s}         ", "   autosize,           !- Design Inlet Water Temperature {C}  ",
+        "   autosize,           !- Design Inlet Air Temperature {C}    ", "   autosize,           !- Design Outlet Air Temperature {C}   ",
+        "   autosize,           !- Design Inlet Air Humidity Ratio {-} ", "   autosize,           !- Design Outlet Air Humidity Ratio {-}",
+        "   Water Inlet Node,   !- Water Inlet Node Name               ", "   Water Outlet Node,  !- Water Outlet Node Name              ",
+        "   Air Inlet Node,     !- Air Inlet Node Name                 ", "   Air Outlet Node,    !- Air Outlet Node Name                ",
+        "   SimpleAnalysis,     !- Type of Analysis                    ", "   CrossFlow;          !- Heat Exchanger Configuration        ",
+        "                                                              ", "Controller:WaterCoil,                                         ",
+        "   CW Coil Controller, !- Name                                ", "   HumidityRatio,      !- Control Variable                    ",
+        "   Reverse,            !- Action                              ", "   FLOW,               !- Actuator Variable                   ",
+        "   Air Outlet Node,    !- Sensor Node Name                    ", "   Water Inlet Node,   !- Actuator Node Name                  ",
+        "   autosize,           !- Controller Convergence Tolerance {C}", "   autosize,           !- Maximum Actuated Flow {m3/s}        ",
+        "   0.0;                !- Minimum Actuated Flow {m3/s}        ", "                                                              ",
+        "SetpointManager:Scheduled,                                    ", "   HumRatSPManager,    !- Name                                ",
+        "   HumidityRatio,      !- Control Variable                    ", "   HumRatioSched,      !- Schedule Name                       ",
+        "   Air Outlet Node;    !- Setpoint Node or NodeList Name      ", "                                                              ",
+        "Schedule:Compact,                                             ", "   HumRatioSched,      !- Name                                ",
+        "   Any Number,         !- Schedule Type Limits Name           ", "   Through: 12/31,     !- Field 1                             ",
+        "   For: AllDays,       !- Field 2                             ", "   Until: 24:00, 0.015;!- Field 3                             ",
+        "Schedule:Compact,                                             ", "   AvailSched,         !- Name                                ",
+        "   Fraction,           !- Schedule Type Limits Name           ", "   Through: 12/31,     !- Field 1                             ",
+        "   For: AllDays,       !- Field 2                             ", "   Until: 24:00, 1.0;  !- Field 3                             ",
+        "                                                              ", "AirLoopHVAC:ControllerList,                                   ",
+        "   CW Coil Controller, !- Name                                ", "   Controller:WaterCoil,!- Controller 1 Object Type           ",
         "   CW Coil Controller; !- Controller 1 Name                   ",
     });
 
@@ -467,8 +438,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT)
     // Check
     EXPECT_EQ(2.0, state->dataFaultsMgr->FaultsCoilSATSensor(1).Offset);
     EXPECT_EQ("COIL:COOLING:WATER", state->dataFaultsMgr->FaultsCoilSATSensor(1).CoilType);
-    EXPECT_TRUE(HVACControllers::ControllerProps(1).FaultyCoilSATFlag);
-    EXPECT_EQ(1, HVACControllers::ControllerProps(1).FaultyCoilSATIndex);
+    EXPECT_TRUE(state->dataHVACControllers->ControllerProps(1).FaultyCoilSATFlag);
+    EXPECT_EQ(1, state->dataHVACControllers->ControllerProps(1).FaultyCoilSATIndex);
 }
 
 TEST_F(EnergyPlusFixture, FaultsManager_FaultChillerSWTSensor_CalFaultChillerSWT)
@@ -667,7 +638,6 @@ TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
     EXPECT_EQ(state->dataMixedAir->OAController(2).EconmizerFaultNum(2), 5);
 }
 
-
 TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_CoilNotFound)
 {
     // Test that an error is raised when coil not found
@@ -700,7 +670,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_CoilNotFound)
         "   **  Fatal  ** CheckAndReadFaults: Errors found in getting FaultModel input data. Preceding condition(s) cause termination.",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=1",
-        "   ..... Last severe error=FaultModel:Fouling:Coil = \"FOULEDHEATINGCOIL\". Referenced Coil named \"NON EXISTENT COOLING COIL\" was not found.",
+        "   ..... Last severe error=FaultModel:Fouling:Coil = \"FOULEDHEATINGCOIL\". Referenced Coil named \"NON EXISTENT COOLING COIL\" was not "
+        "found.",
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
@@ -872,20 +843,19 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataHVACGlobals::TimeStepSys = 1;
+    state->dataHVACGlobal->TimeStepSys = 1;
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
 
-    ScheduleManager::ProcessScheduleInput(*state);  // read schedule data
+    ScheduleManager::ProcessScheduleInput(*state); // read schedule data
     int avaiSchedIndex = ScheduleManager::GetScheduleIndex(*state, "AVAILSCHED");
     EXPECT_EQ(1, avaiSchedIndex);
     int severitySchedIndex = ScheduleManager::GetScheduleIndex(*state, "SEVERITYSCHED");
     EXPECT_EQ(2, severitySchedIndex);
 
-
     // Readin inputs
-    //SetPointManager::GetSetPointManagerInputs();
-    //HVACControllers::GetControllerInput();
+    // SetPointManager::GetSetPointManagerInputs();
+    // HVACControllers::GetControllerInput();
 
     // Run
     ASSERT_NO_THROW(FaultsManager::CheckAndReadFaults(*state));
@@ -901,17 +871,16 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     // This should also have called WaterCoil::GetWaterCoilInput
     EXPECT_EQ(3, state->dataWaterCoils->NumWaterCoils);
 
-
     // Check that fault association actually happened
     {
         int CoilNum = 1;
         int FaultIndex = 1;
         EXPECT_EQ("AHU HW HEATING COIL", state->dataWaterCoils->WaterCoil(CoilNum).Name);
         EXPECT_NEAR(6.64, state->dataWaterCoils->WaterCoil(CoilNum).UACoil, 0.0001);
-        EXPECT_EQ(state->dataWaterCoils->WaterCoil_SimpleHeating, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num);
+        EXPECT_EQ(DataPlant::TypeOf_CoilWaterSimpleHeating, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType);
 
         EXPECT_EQ(CoilNum, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilNum);
-        EXPECT_EQ(state->dataWaterCoils->WaterCoil_SimpleHeating, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoiledType);
+        EXPECT_EQ(DataPlant::TypeOf_CoilWaterSimpleHeating, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoiledType);
 
         EXPECT_TRUE(state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
         EXPECT_EQ(FaultIndex, state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);
@@ -936,10 +905,10 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
         int CoilNum = 2;
         int FaultIndex = 2;
         EXPECT_EQ("AHU CHW COOLING COIL", state->dataWaterCoils->WaterCoil(CoilNum).Name);
-        EXPECT_EQ(state->dataWaterCoils->WaterCoil_Cooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num);
+        EXPECT_EQ(DataPlant::TypeOf_CoilWaterCooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType);
 
         EXPECT_EQ(CoilNum, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilNum);
-        EXPECT_EQ(state->dataWaterCoils->WaterCoil_Cooling, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoiledType);
+        EXPECT_EQ(DataPlant::TypeOf_CoilWaterCooling, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoiledType);
 
         EXPECT_TRUE(state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
         EXPECT_EQ(FaultIndex, state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);
@@ -958,8 +927,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
         EXPECT_NEAR(0.1, state->dataFaultsMgr->FouledCoils(FaultIndex).Aratio, 0.0001);
 
         // Check calculation
-        //Real64 waterTerm = 0.0005 / (100.0*0.1); // Rf_water/A_water = Rfw / (Aout * Aratio)
-        //Real64 airTerm = 0.0001 / 100.0;         // Rf_air/A_air = Rfa / Aout
+        // Real64 waterTerm = 0.0005 / (100.0*0.1); // Rf_water/A_water = Rfw / (Aout * Aratio)
+        // Real64 airTerm = 0.0001 / 100.0;         // Rf_air/A_air = Rfa / Aout
         // Expected FaultFrac * (waterTerm + airTerm)
         // Real64 expectedFoulingFactor = 0.75 * (waterTerm + airTerm);
         // EXPECT_NEAR(expectedFoulingFactor, FaultsManager::FouledCoils(FaultIndex).CalFaultyCoilFoulingFactor(), 0.0001);
@@ -969,12 +938,11 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     {
         int CoilNum = 3;
         EXPECT_EQ("AHU CHW COIL WITH NO FAULT", state->dataWaterCoils->WaterCoil(CoilNum).Name);
-        EXPECT_EQ(state->dataWaterCoils->WaterCoil_Cooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num);
+        EXPECT_EQ(DataPlant::TypeOf_CoilWaterCooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType);
 
         EXPECT_FALSE(state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
         EXPECT_EQ(0, state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);
     }
-
 }
 
 } // namespace EnergyPlus

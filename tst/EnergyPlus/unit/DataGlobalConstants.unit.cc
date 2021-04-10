@@ -161,4 +161,3 @@ TEST_F(EnergyPlusFixture, DataGlobalConstants_GetResourceTypeChar)
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::None), "Unknown");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::None), "Unknown");
 }
-

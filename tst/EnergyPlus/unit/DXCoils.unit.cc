@@ -225,14 +225,14 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     state->dataEnvrn->OutHumRat = 0.0114507065;
     state->dataEnvrn->OutBaroPress = 98200.0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    MSHPMassFlowRateLow = 0.2339 * state->dataEnvrn->StdRhoAir;
-    MSHPMassFlowRateHigh = 0.2924 * state->dataEnvrn->StdRhoAir;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = 0.2339 * state->dataEnvrn->StdRhoAir;
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = 0.2924 * state->dataEnvrn->StdRhoAir;
 
     int CoilIndex = 1;
     state->dataHeatBal->HeatReclaimDXCoil.allocate(2);
-    state->dataDXCoils->DXCoil(CoilIndex).InletAirMassFlowRate = MSHPMassFlowRateLow;
-    state->dataDXCoils->DXCoil(CoilIndex).MSRatedAirMassFlowRate(1) = MSHPMassFlowRateLow;
-    state->dataDXCoils->DXCoil(CoilIndex).MSRatedAirMassFlowRate(2) = MSHPMassFlowRateHigh;
+    state->dataDXCoils->DXCoil(CoilIndex).InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateLow;
+    state->dataDXCoils->DXCoil(CoilIndex).MSRatedAirMassFlowRate(1) = state->dataHVACGlobal->MSHPMassFlowRateLow;
+    state->dataDXCoils->DXCoil(CoilIndex).MSRatedAirMassFlowRate(2) = state->dataHVACGlobal->MSHPMassFlowRateHigh;
     state->dataDXCoils->DXCoil(CoilIndex).InletAirTemp = 16.1; // 97% RH - inlet is right up against the saturation curve
     state->dataDXCoils->DXCoil(CoilIndex).InletAirEnthalpy = 45158.16;
     state->dataDXCoils->DXCoil(CoilIndex).InletAirHumRat = 0.01145065;
@@ -250,7 +250,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(1);
     state->dataDXCoils->DXCoilFanOpMode.allocate(1);
 
-    DataLoopNode::Node.allocate(1);
+    state->dataLoopNodes->Node.allocate(1);
     state->dataDXCoils->DXCoil(CoilIndex).AirOutNode = 1;
 
     Real64 SpeedRatio = 0.0;
@@ -263,7 +263,10 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
 
     Real64 TdbAtOutlet = PsyTdbFnHW(state->dataDXCoils->DXCoil(CoilIndex).OutletAirEnthalpy, state->dataDXCoils->DXCoil(CoilIndex).OutletAirHumRat);
     Real64 tSatAtOutlet = PsyTsatFnHPb(*state, state->dataDXCoils->DXCoil(CoilIndex).OutletAirEnthalpy, state->dataEnvrn->OutBaroPress);
-    Real64 rhAtOutlet = PsyRhFnTdbWPb(*state, state->dataDXCoils->DXCoil(CoilIndex).OutletAirTemp, state->dataDXCoils->DXCoil(CoilIndex).OutletAirHumRat, state->dataEnvrn->OutBaroPress);
+    Real64 rhAtOutlet = PsyRhFnTdbWPb(*state,
+                                      state->dataDXCoils->DXCoil(CoilIndex).OutletAirTemp,
+                                      state->dataDXCoils->DXCoil(CoilIndex).OutletAirHumRat,
+                                      state->dataEnvrn->OutBaroPress);
 
     // air outlet condition is right next to the saturation curve
     EXPECT_DOUBLE_EQ(TdbAtOutlet, tSatAtOutlet); // Tdb higher than TSat by 1.8E-15 C
@@ -418,7 +421,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.DefrostStrategy = Resistive;
     Coil.Name = "DX Heating coil";
     Coil.NumOfSpeeds = 2;
-    DataLoopNode::Node.allocate(1);
+    state->dataLoopNodes->Node.allocate(1);
     Coil.AirOutNode = 1;
 
     Coil.MSRatedTotCap.allocate(Coil.NumOfSpeeds);
@@ -659,8 +662,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     // Set up inlet air conditions.
     Coil.InletAirMassFlowRate = Coil.MSRatedAirMassFlowRate(1);
-    MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
-    MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(2);
+    state->dataHVACGlobal->MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(2);
     state->dataEnvrn->OutHumRat = 0.002;
     state->dataEnvrn->OutBaroPress = 101325; // sea level
     Coil.InletAirTemp = 20;
@@ -676,14 +679,16 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     // Defroster on
     state->dataEnvrn->OutDryBulbTemp = -5.0; // cold
     CalcMultiSpeedDXCoilHeating(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0);
-    Real64 COPwoDefrost = Coil.MSRatedCOP(SpeedNum) / (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
+    Real64 COPwoDefrost = Coil.MSRatedCOP(SpeedNum) /
+                          (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
     Real64 COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
     EXPECT_LT(COPwDefrost, COPwoDefrost);
 
     // Defroster off
     state->dataEnvrn->OutDryBulbTemp = 5.0; // not cold enough for defroster
     CalcMultiSpeedDXCoilHeating(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0);
-    COPwoDefrost = Coil.MSRatedCOP(SpeedNum) / (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
+    COPwoDefrost = Coil.MSRatedCOP(SpeedNum) /
+                   (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
     COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
     EXPECT_DOUBLE_EQ(COPwoDefrost, COPwDefrost);
 
@@ -693,14 +698,16 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     // Defroster on
     state->dataEnvrn->OutDryBulbTemp = -5.0; // cold
     CalcMultiSpeedDXCoilHeating(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0);
-    COPwoDefrost = Coil.MSRatedCOP(SpeedNum) / (CurveValue(*state, nEIRfT1, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF1, 1));
+    COPwoDefrost = Coil.MSRatedCOP(SpeedNum) /
+                   (CurveValue(*state, nEIRfT1, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF1, 1));
     COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
     EXPECT_LT(COPwDefrost, COPwoDefrost);
 
     // Defroster off
     state->dataEnvrn->OutDryBulbTemp = 5.0; // not cold enough for defroster
     CalcMultiSpeedDXCoilHeating(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0);
-    COPwoDefrost = Coil.MSRatedCOP(SpeedNum) / (CurveValue(*state, nEIRfT1, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF1, 1));
+    COPwoDefrost = Coil.MSRatedCOP(SpeedNum) /
+                   (CurveValue(*state, nEIRfT1, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF1, 1));
     COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
     EXPECT_DOUBLE_EQ(COPwoDefrost, COPwDefrost);
 
@@ -785,7 +792,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
     Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
     Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
-    DataLoopNode::Node.allocate(1);
+    state->dataLoopNodes->Node.allocate(1);
     Coil.AirOutNode = 1;
 
     Coil.RatedSHR(1) = 1.0;
@@ -914,14 +921,16 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     // Defrost Off
     state->dataEnvrn->OutDryBulbTemp = -5.0; // cold
     CalcDXHeatingCoil(*state, DXCoilNum, PLR, FanOpMode);
-    Real64 COPwoDefrost = Coil.RatedCOP(1) / (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
+    Real64 COPwoDefrost =
+        Coil.RatedCOP(1) / (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
     Real64 COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
     EXPECT_LT(COPwDefrost, COPwoDefrost);
 
     // Defrost On
     state->dataEnvrn->OutDryBulbTemp = 5.0; // not as cold
     CalcDXHeatingCoil(*state, DXCoilNum, PLR, FanOpMode);
-    COPwoDefrost = Coil.RatedCOP(1) / (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
+    COPwoDefrost =
+        Coil.RatedCOP(1) / (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
     COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
     EXPECT_DOUBLE_EQ(COPwoDefrost, COPwDefrost);
 }
@@ -1312,13 +1321,14 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     state->dataEnvrn->OutDryBulbTemp = 35;
     state->dataEnvrn->OutHumRat = 0.0128;
     state->dataEnvrn->OutBaroPress = 101325;
-    state->dataEnvrn->OutWetBulbTemp = PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, state->dataEnvrn->OutBaroPress);
+    state->dataEnvrn->OutWetBulbTemp =
+        PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, state->dataEnvrn->OutBaroPress);
 
     state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(1) = state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(1) * 1.2;
     state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2) = state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(2) * 1.2;
     state->dataDXCoils->DXCoil(1).InletAirMassFlowRate = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2);
-    MSHPMassFlowRateLow = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(1);
-    MSHPMassFlowRateHigh = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2);
+    state->dataHVACGlobal->MSHPMassFlowRateLow = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(1);
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2);
 
     state->dataDXCoils->DXCoil(1).InletAirTemp = 25.0;
     state->dataDXCoils->DXCoil(1).InletAirHumRat = 0.005;
@@ -1330,7 +1340,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     state->dataDXCoils->DXCoil(1).MSRatedCBF(2) = 0.0408;
 
     CalcMultiSpeedDXCoilCooling(*state, 1, 1, 1, 2, 1, 1, 0);
-    EXPECT_EQ(0, MSHPWasteHeat);
+    EXPECT_EQ(0, state->dataHVACGlobal->MSHPWasteHeat);
 
     // Case 3 heat recovery is true and no waste heat function cuvre
     state->dataDXCoils->DXCoil(1).MSWasteHeat(1) = 0;
@@ -1339,7 +1349,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
 
     CalcMultiSpeedDXCoilCooling(*state, 1, 1, 1, 2, 1, 1, 0);
 
-    EXPECT_NEAR(1302.748, MSHPWasteHeat, 0.001);
+    EXPECT_NEAR(1302.748, state->dataHVACGlobal->MSHPWasteHeat, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
@@ -1471,7 +1481,8 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
     Real64 const RatedInletAirHumRat(0.01125); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
     std::string const CallingRoutine("DXCoil_ValidateADPFunction");
 
-    Real64 CBF_calculated = CalcCBF(*state, state->dataDXCoils->DXCoil(1).DXCoilType,
+    Real64 CBF_calculated = CalcCBF(*state,
+                                    state->dataDXCoils->DXCoil(1).DXCoilType,
                                     state->dataDXCoils->DXCoil(1).Name,
                                     RatedInletAirTemp,
                                     RatedInletAirHumRat,
@@ -1487,7 +1498,8 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
     state->dataDXCoils->DXCoil(1).RatedSHR(1) = AutoSize;
 
     SizeDXCoil(*state, 1);
-    CBF_calculated = CalcCBF(*state, state->dataDXCoils->DXCoil(1).DXCoilType,
+    CBF_calculated = CalcCBF(*state,
+                             state->dataDXCoils->DXCoil(1).DXCoilType,
                              state->dataDXCoils->DXCoil(1).Name,
                              RatedInletAirTemp,
                              RatedInletAirHumRat,
@@ -1503,7 +1515,8 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
     state->dataDXCoils->DXCoil(1).RatedSHR(1) = AutoSize;
 
     SizeDXCoil(*state, 1);
-    CBF_calculated = CalcCBF(*state, state->dataDXCoils->DXCoil(1).DXCoilType,
+    CBF_calculated = CalcCBF(*state,
+                             state->dataDXCoils->DXCoil(1).DXCoilType,
                              state->dataDXCoils->DXCoil(1).Name,
                              RatedInletAirTemp,
                              RatedInletAirHumRat,
@@ -2062,8 +2075,8 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
 
 TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
 {
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     std::string const idf_objects = delimited_string({
 
@@ -2200,7 +2213,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     state->dataSize->NumSysSizInput = 1;
 
     state->dataEnvrn->StdBaroPress = 101325.0;
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     // Need this to prevent crash in Sizers
     state->dataSize->UnitarySysEqSizing.allocate(1);
@@ -2291,13 +2304,13 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
         }
     }
 
-    EnergyPlus::sqlite->sqliteCommit();
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }
 
 TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
 {
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     std::string const idf_objects = delimited_string({
 
@@ -2426,7 +2439,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     state->dataSize->NumSysSizInput = 1;
 
     state->dataEnvrn->StdBaroPress = 101325.0;
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     // Need this to prevent crash in Sizers
     state->dataSize->UnitarySysEqSizing.allocate(1);
@@ -2506,7 +2519,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
         }
     }
 
-    EnergyPlus::sqlite->sqliteCommit();
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }
 
 TEST_F(EnergyPlusFixture, TestMultiSpeedHeatingCoilSizingOutput)
@@ -3122,10 +3135,20 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilTabularReporting)
     Real64 RatedSensCapacity = state->dataDXCoils->DXCoil(1).RatedTotCap(1) * state->dataDXCoils->DXCoil(1).RatedSHR(1);
     EXPECT_EQ(10237.271253024948, RatedSensCapacity);
     // check tabular outputs
-    PreDefTableEntry(*state, state->dataOutRptPredefined->pdch2CoilFinalTotalCap, "Coil Final Gross Total Capacity [W]", state->dataDXCoils->DXCoil(1).RatedTotCap(1), 3);
-    PreDefTableEntry(*state, state->dataOutRptPredefined->pdch2CoilFinalSensCap, "Coil Final Gross Sensible Capacity [W]", state->dataDXCoils->DXCoil(1).RatedTotCap(1) * state->dataDXCoils->DXCoil(1).RatedSHR(1), 3);
-    EXPECT_EQ("14067.411", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdch2CoilFinalTotalCap, "Coil Final Gross Total Capacity [W]"));
-    EXPECT_EQ("10237.271", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdch2CoilFinalSensCap, "Coil Final Gross Sensible Capacity [W]"));
+    PreDefTableEntry(*state,
+                     state->dataOutRptPredefined->pdch2CoilFinalTotalCap,
+                     "Coil Final Gross Total Capacity [W]",
+                     state->dataDXCoils->DXCoil(1).RatedTotCap(1),
+                     3);
+    PreDefTableEntry(*state,
+                     state->dataOutRptPredefined->pdch2CoilFinalSensCap,
+                     "Coil Final Gross Sensible Capacity [W]",
+                     state->dataDXCoils->DXCoil(1).RatedTotCap(1) * state->dataDXCoils->DXCoil(1).RatedSHR(1),
+                     3);
+    EXPECT_EQ("14067.411",
+              RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdch2CoilFinalTotalCap, "Coil Final Gross Total Capacity [W]"));
+    EXPECT_EQ("10237.271",
+              RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdch2CoilFinalSensCap, "Coil Final Gross Sensible Capacity [W]"));
 }
 
 TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
@@ -3511,7 +3534,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
 
     state->dataEnvrn->StdBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     // set system sizing parameters
     state->dataSize->CurZoneEqNum = 0;
@@ -3763,7 +3786,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
 
     state->dataEnvrn->StdBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     // set system sizing parameters
     state->dataSize->CurZoneEqNum = 0;
@@ -3966,7 +3989,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     state->dataDXCoils->NumDXCoils = 1;
     state->dataCurveManager->NumCurves = 2;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
-    DataLoopNode::Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(state->dataDXCoils->NumDXCoils).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(state->dataDXCoils->NumDXCoils).PerfMode(1).FieldNames.allocate(20);
@@ -3981,8 +4004,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     auto &Coil = state->dataDXCoils->DXCoil(DXCoilNum);
     auto &constantcurve1 = state->dataCurveManager->PerfCurve(1);
     auto &constantcurve2 = state->dataCurveManager->PerfCurve(2);
-    auto &AirInletNode = DataLoopNode::Node(1);
-    auto &AirOutletNode = DataLoopNode::Node(2);
+    auto &AirInletNode = state->dataLoopNodes->Node(1);
+    auto &AirOutletNode = state->dataLoopNodes->Node(2);
     // set coil parameters
     Coil.DXCoilType_Num = CoilDX_CoolingSingleSpeed;
     Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -4102,10 +4125,10 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     int DXCoilNum(1);
     state->dataDXCoils->NumDXCoils = 1;
     state->dataCurveManager->NumCurves = 2;
-    DataHVACGlobals::MSHPMassFlowRateLow = 0.6;
-    DataHVACGlobals::MSHPMassFlowRateHigh = 1.0;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = 0.6;
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = 1.0;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
-    DataLoopNode::Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode(1).FieldNames.allocate(17);
@@ -4119,8 +4142,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     auto &Coil = state->dataDXCoils->DXCoil(1);
     auto &constantcurve1 = state->dataCurveManager->PerfCurve(1);
     auto &constantcurve2 = state->dataCurveManager->PerfCurve(2);
-    auto &AirInletNode = DataLoopNode::Node(1);
-    auto &AirOutletNode = DataLoopNode::Node(2);
+    auto &AirInletNode = state->dataLoopNodes->Node(1);
+    auto &AirOutletNode = state->dataLoopNodes->Node(2);
 
     Coil.DXCoilType_Num = CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
@@ -4186,9 +4209,9 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     // set coil parameter
     Coil.MSRatedTotCap(1) = 10710.0; // 60 % of full capacity
     Coil.MSRatedTotCap(2) = 17850.0; // 5 ton capcity
-    Coil.InletAirMassFlowRate = DataHVACGlobals::MSHPMassFlowRateHigh;
-    Coil.MSRatedAirMassFlowRate(1) = DataHVACGlobals::MSHPMassFlowRateLow;
-    Coil.MSRatedAirMassFlowRate(2) = DataHVACGlobals::MSHPMassFlowRateHigh;
+    Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateHigh;
+    Coil.MSRatedAirMassFlowRate(1) = state->dataHVACGlobal->MSHPMassFlowRateLow;
+    Coil.MSRatedAirMassFlowRate(2) = state->dataHVACGlobal->MSHPMassFlowRateHigh;
     Coil.MSRatedCBF(1) = 0.0;
     Coil.MSRatedCBF(2) = 0.0;
     Coil.MSWasteHeat(1) = 0;
@@ -4232,10 +4255,11 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_DOUBLE_EQ(AirInletNode.HumRat, AirOutletNode.HumRat); // dry cooling only
     ;
     // check against hand calculation at low speed
-    Real64 results_totaloutput = MSHPMassFlowRateLow * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
-                                                        Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
-    Real64 results_sensibleoutput =
-        MSHPMassFlowRateLow * (1.00484e3 + min(AirInletNode.HumRat, AirOutletNode.HumRat) * 1.85895e3) * (AirInletNode.Temp - AirOutletNode.Temp);
+    Real64 results_totaloutput = state->dataHVACGlobal->MSHPMassFlowRateLow * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
+                                                                               Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
+    Real64 results_sensibleoutput = state->dataHVACGlobal->MSHPMassFlowRateLow *
+                                    (1.00484e3 + min(AirInletNode.HumRat, AirOutletNode.HumRat) * 1.85895e3) *
+                                    (AirInletNode.Temp - AirOutletNode.Temp);
     Real64 results_latentoutput = results_totaloutput - results_sensibleoutput;
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
@@ -4250,10 +4274,10 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_DOUBLE_EQ(AirInletNode.HumRat, AirOutletNode.HumRat); // dry cooling only
     ;
     // check against hand calculation
-    results_totaloutput = MSHPMassFlowRateHigh * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
-                                                  Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
-    results_sensibleoutput =
-        MSHPMassFlowRateHigh * (1.00484e3 + min(AirInletNode.HumRat, AirOutletNode.HumRat) * 1.85895e3) * (AirInletNode.Temp - AirOutletNode.Temp);
+    results_totaloutput = state->dataHVACGlobal->MSHPMassFlowRateHigh * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
+                                                                         Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
+    results_sensibleoutput = state->dataHVACGlobal->MSHPMassFlowRateHigh * (1.00484e3 + min(AirInletNode.HumRat, AirOutletNode.HumRat) * 1.85895e3) *
+                             (AirInletNode.Temp - AirOutletNode.Temp);
     results_latentoutput = results_totaloutput - results_sensibleoutput;
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
@@ -4278,10 +4302,10 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(0.0081800569931542392, AirOutletNode.HumRat, 0.00001);   // cooling and dehumidification
     ;
     // check against hand calculation at low speed
-    results_totaloutput = MSHPMassFlowRateLow * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
-                                                 Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
-    results_sensibleoutput =
-        MSHPMassFlowRateLow * (1.00484e3 + min(AirInletNode.HumRat, AirOutletNode.HumRat) * 1.85895e3) * (AirInletNode.Temp - AirOutletNode.Temp);
+    results_totaloutput = state->dataHVACGlobal->MSHPMassFlowRateLow * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
+                                                                        Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
+    results_sensibleoutput = state->dataHVACGlobal->MSHPMassFlowRateLow * (1.00484e3 + min(AirInletNode.HumRat, AirOutletNode.HumRat) * 1.85895e3) *
+                             (AirInletNode.Temp - AirOutletNode.Temp);
     results_latentoutput = results_totaloutput - results_sensibleoutput;
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
@@ -4297,10 +4321,10 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(0.0081800569931542392, AirOutletNode.HumRat, 0.00001);   // cooling and dehumidification
     ;
     // check against hand calculation
-    results_totaloutput = MSHPMassFlowRateHigh * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
-                                                  Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
-    results_sensibleoutput =
-        MSHPMassFlowRateHigh * (1.00484e3 + min(AirInletNode.HumRat, AirOutletNode.HumRat) * 1.85895e3) * (AirInletNode.Temp - AirOutletNode.Temp);
+    results_totaloutput = state->dataHVACGlobal->MSHPMassFlowRateHigh * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
+                                                                         Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
+    results_sensibleoutput = state->dataHVACGlobal->MSHPMassFlowRateHigh * (1.00484e3 + min(AirInletNode.HumRat, AirOutletNode.HumRat) * 1.85895e3) *
+                             (AirInletNode.Temp - AirOutletNode.Temp);
     results_latentoutput = results_totaloutput - results_sensibleoutput;
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
