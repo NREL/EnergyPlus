@@ -888,10 +888,9 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfBmToDiffReflFacObs.dimension(state.dataSurface->TotSurfaces, 0.0);
         state.dataSurface->SurfBmToDiffReflFacGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
         state.dataSurface->SurfSkyDiffReflFacGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->SurfWinA.dimension(CFSMAXNL + 1, state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->SurfWinADiffFront.dimension(CFSMAXNL + 1, state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->SurfWinADiffBack.dimension(CFSMAXNL + 1, state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->SurfWinACFOverlap.dimension(state.dataHeatBal->MaxSolidWinLayers, state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfWinA.dimension( state.dataSurface->TotSurfaces, CFSMAXNL + 1,0.0);
+        state.dataSurface->SurfWinADiffFront.dimension(state.dataSurface->TotSurfaces, CFSMAXNL + 1, 0.0);
+        state.dataSurface->SurfWinACFOverlap.dimension(state.dataSurface->TotSurfaces, state.dataHeatBal->MaxSolidWinLayers, 0.0);
     }
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
@@ -12969,8 +12968,6 @@ namespace SurfaceGeometry {
             state.dataConstruction->Construct(ConstrNewSh).AbsDiffShade = 0.0;
             state.dataConstruction->Construct(ConstrNewSh).AbsDiffBackShade = 0.0;
             state.dataConstruction->Construct(ConstrNewSh).ShadeAbsorpThermal = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).AbsBeamCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).AbsBeamBackCoef = 0.0;
             state.dataConstruction->Construct(ConstrNewSh).AbsBeamShadeCoef = 0.0;
             state.dataConstruction->Construct(ConstrNewSh).TransDiff = 0.0;
             state.dataConstruction->Construct(ConstrNewSh).TransDiffVis = 0.0;
@@ -12991,6 +12988,13 @@ namespace SurfaceGeometry {
             state.dataConstruction->Construct(ConstrNewSh).TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
             state.dataConstruction->Construct(ConstrNewSh).TypeIsWindow = true;
             state.dataConstruction->Construct(ConstrNewSh).IsUsed = true;
+
+            for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
+                for (int index = 1; index <= DataSurfaces::MaxPolyCoeff; ++index) {
+                    state.dataConstruction->Construct(ConstrNewSh).AbsBeamCoef(Layer)(index) = 0.0;
+                    state.dataConstruction->Construct(ConstrNewSh).AbsBeamBackCoef(Layer)(index) = 0.0;
+                }
+            }
         }
     }
 
@@ -13209,8 +13213,6 @@ namespace SurfaceGeometry {
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsDiffShade = 0.0;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsDiffBackShade = 0.0;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).ShadeAbsorpThermal = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsBeamCoef = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsBeamBackCoef = 0.0;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsBeamShadeCoef = 0.0;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TransDiff = 0.0;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TransDiffVis = 0.0;
@@ -13228,6 +13230,12 @@ namespace SurfaceGeometry {
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileMullionOrientation = 0;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileGlazingSysWidth = 0.0;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileGlazingSysHeight = 0.0;
+            for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
+                for (int index = 1; index <= DataSurfaces::MaxPolyCoeff; ++index) {
+                    state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsBeamCoef(Layer)(index) = 0.0;
+                    state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsBeamBackCoef(Layer)(index) = 0.0;
+                }
+            }
         }
         return (newConstruct);
     }

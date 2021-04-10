@@ -882,7 +882,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     TRMIN = root_4(rmir / DataGlobalConstants::StefanBoltzmann); // TODO check model equation.
 
     NL = state.dataWindowEquivLayer->CFS(EQLNum).NL;
-    QAllSWwinAbs({1, NL + 1}) = state.dataHeatBal->SurfWinQRadSWwinAbs({1, NL + 1}, SurfNum);
+    QAllSWwinAbs({1, NL + 1}) = state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, {1, NL + 1});
     //  Solve energy balance(s) for temperature at each node/layer and
     //  heat flux, including components, between each pair of nodes/layers
     ASHWAT_ThermalCalc(state,
