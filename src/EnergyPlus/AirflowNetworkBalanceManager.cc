@@ -7494,9 +7494,9 @@ namespace AirflowNetworkBalanceManager {
             Real64 V = 0;
             // Forced convection
             if (ZoneNum > 0) {
-                Real64 ACH = GetZoneInfilAirChangeRate(state, ZoneNum); // Zone air change rate [1/hr]
-                Real64 Vol = Zone(ZoneNum).Volume;                      // Zone volume [m3]
-                V = pow(Vol, 0.333) * ACH / 3600;                       // Average air speed in zone [m/s]
+                Real64 ACH = GetZoneOutdoorAirChangeRate(state, ZoneNum); // Zone air change rate [1/hr]
+                Real64 Vol = Zone(ZoneNum).Volume;                        // Zone volume [m3]
+                V = pow(Vol, 0.333) * ACH / 3600;                         // Average air speed in zone [m/s]
             } else {
                 V = state.dataEnvrn->WindSpeed;
             }
@@ -12785,7 +12785,7 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    Real64 GetZoneInfilAirChangeRate(EnergyPlusData &state, int const ZoneNum) // hybrid ventilation system controlled zone number
+    Real64 GetZoneOutdoorAirChangeRate(EnergyPlusData &state, int const ZoneNum) // hybrid ventilation system controlled zone number
     {
 
         // SUBROUTINE INFORMATION:
