@@ -6237,6 +6237,9 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
             if (!(state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
                   state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS)) {
                 ZonePreDefRep(iZone).AFNInfilVolTotalStdDen = 0.0;
+                ZonePreDefRep(iZone).AFNVentVolTotalStdDen = 0.0;
+                ZonePreDefRep(iZone).AFNInfilVolTotalOccStdDen = 0.0;
+                ZonePreDefRep(iZone).AFNVentVolTotalOccStdDen = 0.0;
                 ZonePreDefRep(iZone).AFNInfilVolMin = 0.0;
                 ZonePreDefRep(iZone).AFNInfilVolTotalOcc = 0.0;
             }
