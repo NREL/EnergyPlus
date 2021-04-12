@@ -98,12 +98,12 @@ namespace Pumps {
 
     enum class iPumpType : int
     {
-        Unassigned = 0,
-        VarSpeed = 101,
-        ConSpeed = 102,
-        Cond = 103,
-        Bank_VarSpeed = 104,
-        Bank_ConSpeed = 105
+        Unassigned = -1,
+        VarSpeed = 0,
+        ConSpeed = 1,
+        Cond = 2,
+        Bank_VarSpeed = 3,
+        Bank_ConSpeed = 4
     };
 
     enum powerSizingMethodEnum
