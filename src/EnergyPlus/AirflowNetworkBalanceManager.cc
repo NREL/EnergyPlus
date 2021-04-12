@@ -9852,27 +9852,25 @@ namespace AirflowNetworkBalanceManager {
             AirDensity = PsyRhoAirFnPbTdbW(
                 state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(i), state.dataHeatBalFanSys->ZoneAirHumRatAvg(i));
 
-            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume =
-                (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp / CpAir / AirDensity) * ReportingConstant;
-            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilAirChangeRate =
-                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume / (TimeStepSys * Zone(i).Volume);
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilMass =
                 (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp / CpAir) * ReportingConstant;
-            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilVolume =
-                (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMVCp / CpAir / AirDensity) * ReportingConstant;
-            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilAirChangeRate =
-                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilVolume / (TimeStepSys * Zone(i).Volume);
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume =
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilMass / AirDensity;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilAirChangeRate =
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume / (TimeStepSys * Zone(i).Volume);
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilMass =
                 (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMVCp / CpAir) * ReportingConstant;
-            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixVolume =
-                (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp / CpAir / AirDensity) * ReportingConstant;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilVolume =
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilMass / AirDensity;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilAirChangeRate =
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilVolume / (TimeStepSys * Zone(i).Volume);
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixMass =
                 (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp / CpAir) * ReportingConstant;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixVolume =
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixMass / AirDensity;
             // save values for predefined report
-            Real64 stdDensAFNInfilVolume =
-                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * AirDensity / state.dataEnvrn->StdRhoAir;
-            Real64 stdDensAFNNatVentVolume =
-                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilVolume * AirDensity / state.dataEnvrn->StdRhoAir;
+            Real64 stdDensAFNInfilVolume = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilMass / state.dataEnvrn->StdRhoAir;
+            Real64 stdDensAFNNatVentVolume = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilMass / state.dataEnvrn->StdRhoAir;
             state.dataHeatBal->ZonePreDefRep(i).AFNVentVolStdDen = stdDensAFNNatVentVolume;
             state.dataHeatBal->ZonePreDefRep(i).AFNVentVolTotalStdDen += stdDensAFNNatVentVolume;
             state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalStdDen += stdDensAFNInfilVolume;
