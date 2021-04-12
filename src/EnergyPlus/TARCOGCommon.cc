@@ -70,17 +70,6 @@ namespace TARCOGCommon {
     // PURPOSE OF THIS MODULE:
     // A module which contains common TARCOG functions and subroutines
 
-    bool IsShadingLayer(const EnergyPlus::TARCOGParams::TARCOGLayerType layertype)
-    {
-
-        // Using/Aliasing
-        using namespace TARCOGParams;
-
-        return layertype == TARCOGLayerType::VENETBLIND_HORIZ || layertype == TARCOGLayerType::VENETBLIND_VERT ||
-               layertype == TARCOGLayerType::WOVSHADE || layertype == TARCOGLayerType::PERFORATED || layertype == TARCOGLayerType::BSDF ||
-               layertype == TARCOGLayerType::DIFFSHADE;
-    }
-
     Real64 LDSumMax(Real64 const Width, Real64 const Height)
     {
         // LDSumMax function calculates sum part of equation for maximum deflection
