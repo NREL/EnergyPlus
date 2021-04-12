@@ -1102,7 +1102,10 @@ namespace TarcogShading {
                 Ar_eff(i) = 0.0;
                 Atop_eff(i) = Atop(i);
                 Abot_eff(i) = Abot(i);
-            } else if ((LayerType(i) == TARCOGLayerType::PERFORATED) || (LayerType(i) == TARCOGLayerType::DIFFSHADE) || (LayerType(i) == TARCOGLayerType::BSDF) || (LayerType(i) == TARCOGLayerType::WOVSHADE)) {
+            } else if BITF_TEST_ANY(BITF(LayerType(i)), BITF(TARCOGLayerType::PERFORATED) |
+                                                             BITF(TARCOGLayerType::DIFFSHADE)|
+                                                             BITF(TARCOGLayerType::BSDF)|
+                                                             BITF(TARCOGLayerType::WOVSHADE)) {
                 Ah_eff(i) = width * height * C1_SHADE * pow((Ah(i) / (width * height)), C2_SHADE);
                 Al_eff(i) = Al(i) * C3_SHADE;
                 Ar_eff(i) = Ar(i) * C3_SHADE;

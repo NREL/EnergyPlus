@@ -8877,8 +8877,8 @@ namespace HeatBalanceManager {
                                          state.dataIPShortCut->rNumericArgs(10)));
             }
 
-            if (state.dataHeatBal->ComplexShade(Loop).LayerType == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ ||
-                state.dataHeatBal->ComplexShade(Loop).LayerType == TARCOGParams::TARCOGLayerType::VENETBLIND_VERT) {
+            if (BITF_TEST_ANY(BITF(state.dataHeatBal->ComplexShade(Loop).LayerType),
+                              BITF(TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ) | BITF(TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ))) {
                 if (state.dataIPShortCut->rNumericArgs(11) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(state,

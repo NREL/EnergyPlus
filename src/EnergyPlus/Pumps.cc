@@ -1175,8 +1175,8 @@ void GetPumpInput(EnergyPlusData &state)
     }
 
     for (PumpNum = 1; PumpNum <= state.dataPumps->NumPumps; ++PumpNum) { // CurrentModuleObject='Pumps'
-        if (state.dataPumps->PumpEquip(PumpNum).PumpType == iPumpType::VarSpeed ||
-            state.dataPumps->PumpEquip(PumpNum).PumpType == iPumpType::ConSpeed || state.dataPumps->PumpEquip(PumpNum).PumpType == iPumpType::Cond) {
+        if (BITF_TEST_ANY(BITF(state.dataPumps->PumpEquip(PumpNum).PumpType),
+                          BITF(iPumpType::VarSpeed) | BITF(iPumpType::ConSpeed) | BITF(iPumpType::Cond))) {
 
             SetupOutputVariable(state,
                                 "Pump Electricity Energy",
@@ -1233,8 +1233,9 @@ void GetPumpInput(EnergyPlusData &state)
                                 "Average",
                                 state.dataPumps->PumpEquip(PumpNum).Name);
         }
-        if (state.dataPumps->PumpEquip(PumpNum).PumpType == iPumpType::Bank_VarSpeed ||
-            state.dataPumps->PumpEquip(PumpNum).PumpType == iPumpType::Bank_ConSpeed) { // CurrentModuleObject='HeaderedPumps'
+        if (BITF_TEST_ANY(BITF(state.dataPumps->PumpEquip(PumpNum).PumpType),
+                           BITF(iPumpType::Bank_VarSpeed) | BITF(iPumpType::Bank_ConSpeed)))
+        { // CurrentModuleObject='HeaderedPumps'
 
             SetupOutputVariable(state,
                                 "Pump Electricity Energy",
@@ -1947,9 +1948,9 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     // Other components on this branch will request flow for this branch
 
     //  ! If this is a variable speed pump
-    if ((state.dataPumps->PumpEquip(PumpNum).PumpType == iPumpType::VarSpeed) || (state.dataPumps->PumpEquip(PumpNum).PumpType == iPumpType::Bank_VarSpeed) ||
-        (state.dataPumps->PumpEquip(PumpNum).PumpType == iPumpType::Cond)) {
-
+    if (BITF_TEST_ANY(BITF(state.dataPumps->PumpEquip(PumpNum).PumpType),
+                      BITF(iPumpType::VarSpeed) | BITF(iPumpType::Bank_VarSpeed) | BITF(iPumpType::Cond)))
+    {
         if (state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum)
                 .LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSideNum)
                 .Branch(state.dataPumps->PumpEquip(PumpNum).BranchNum)
@@ -1999,7 +2000,7 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     //****************************!
     {
         auto const SELECT_CASE_var(state.dataPumps->PumpEquip(PumpNum).PumpType);
-        if ((SELECT_CASE_var == iPumpType::Bank_VarSpeed) || (SELECT_CASE_var == iPumpType::Bank_ConSpeed)) {
+        if (BITF_TEST_ANY(BITF(SELECT_CASE_var), BITF(iPumpType::Bank_VarSpeed) | BITF(iPumpType::Bank_ConSpeed))) {
             // previously, pumps did whatever they wanted
             // because of this a constant speed pump bank could adjust the flow rate as-desired
             //  even if it was not allowed
@@ -2041,8 +2042,7 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     //****************************!
     //***** CALCULATE POWER (1) **!
     //****************************!
-    if (PumpType == iPumpType::ConSpeed || PumpType == iPumpType::VarSpeed || PumpType == iPumpType::Cond) {
-
+    if (BITF_TEST_ANY(BITF(PumpType), BITF(iPumpType::ConSpeed) | BITF(iPumpType::VarSpeed) | BITF(iPumpType::VarSpeed))) {
         VolFlowRate = state.dataPumps->PumpMassFlowRate / LoopDensity;
         PartLoadRatio = min(1.0, (VolFlowRate / state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate));
         FracFullLoadPower = state.dataPumps->PumpEquip(PumpNum).PartLoadCoef(1) +
@@ -2051,7 +2051,7 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
                             state.dataPumps->PumpEquip(PumpNum).PartLoadCoef(4) * pow_3(PartLoadRatio);
         state.dataPumps->Power = FracFullLoadPower * state.dataPumps->PumpEquip(PumpNum).NomPowerUse;
 
-    } else if (PumpType == iPumpType::Bank_ConSpeed || PumpType == iPumpType::Bank_VarSpeed) {
+    } else if BITF_TEST_ANY(BITF(PumpType), BITF(iPumpType::Bank_ConSpeed) | BITF(iPumpType::Bank_VarSpeed)) {
 
         // now just assume the last one is (or is not) running at part load
         // if it is actually at full load, the calculations work out to PLR = 1
@@ -2427,9 +2427,9 @@ void ReportPumps(EnergyPlusData &state, int const PumpNum)
         state.dataPumps->PumpEquipReport(PumpNum).ShaftPower = state.dataPumps->ShaftPower;
         state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluidEnergy =
             state.dataPumps->PumpHeattoFluid * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        if (PumpType == iPumpType::ConSpeed || PumpType == iPumpType::VarSpeed || PumpType == iPumpType::Cond) {
+        if (BITF_TEST_ANY(BITF(PumpType), BITF(iPumpType::ConSpeed) | BITF(iPumpType::VarSpeed) | BITF(iPumpType::VarSpeed))) {
             state.dataPumps->PumpEquipReport(PumpNum).NumPumpsOperating = 1;
-        } else if (PumpType == iPumpType::Bank_ConSpeed || PumpType == iPumpType::Bank_VarSpeed) {
+        } else if BITF_TEST_ANY(BITF(PumpType), BITF(iPumpType::Bank_ConSpeed) | BITF(iPumpType::Bank_VarSpeed)) {
             state.dataPumps->PumpEquipReport(PumpNum).NumPumpsOperating = state.dataPumps->NumPumpsRunning;
         }
         state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainRate = state.dataPumps->Power - state.dataPumps->PumpHeattoFluid;
