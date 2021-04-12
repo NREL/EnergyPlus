@@ -91,9 +91,9 @@ namespace StandardRatings {
 
     // Defrost control  (heat pump only)
     enum class HPdefrostControl : int {
-        Unassigned = 0,
-        Timed = 1,   // defrost cycle is timed
-        OnDemand = 2 // defrost cycle occurs only when required
+        Unassigned = -1,
+        Timed = 0,   // defrost cycle is timed
+        OnDemand = 1 // defrost cycle occurs only when required
     };
 
     extern Array1D_int const TotalNumOfTemperatureBins; // Total number of temperature
