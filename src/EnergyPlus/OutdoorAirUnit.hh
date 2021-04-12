@@ -70,20 +70,20 @@ namespace OutdoorAirUnit {
 
     enum class CompType : int
     {
-        Unassigned = 0,
-        WaterCoil_SimpleCool = 1,
-        WaterCoil_Cooling = 2,
-        WaterCoil_SimpleHeat = 3,
-        SteamCoil_AirHeat = 4,
+        Unassigned = -1,
+        WaterCoil_SimpleCool = 0,
+        WaterCoil_Cooling = 1,
+        WaterCoil_SimpleHeat = 2,
+        SteamCoil_AirHeat = 3,
+        Coil_ElectricHeat = 4,
         WaterCoil_DetailedCool = 5,
         WaterCoil_CoolingHXAsst = 6,
-        Coil_ElectricHeat = 7,
-        Coil_GasHeat = 8,
-        DXSystem = 9,
-        HeatXchngr = 10,
-        Desiccant = 11,
-        DXHeatPumpSystem = 12,
-        UnitarySystemModel = 13
+        Coil_GasHeat = 7,
+        DXSystem = 8,
+        HeatXchngr = 9,
+        Desiccant = 10,
+        DXHeatPumpSystem = 11,
+        UnitarySystemModel = 12
     };
 
     enum class Control
@@ -275,7 +275,7 @@ namespace OutdoorAirUnit {
                                  std::string const &EquipType, // the component type
                                  std::string const &EquipName, // the component Name
                                  int EquipNum,
-                                 int CompTypeNum, // Component Type -- Integerized for this module
+                                 CompType CompTypeNum, // Component Type -- Integerized for this module
                                  bool FirstHVACIteration,
                                  int &CompIndex,
                                  bool Sim // if TRUE, simulate component

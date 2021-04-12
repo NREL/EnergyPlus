@@ -2146,7 +2146,7 @@ namespace OutdoorAirUnit {
                                     EquipType,
                                     EquipName,
                                     EquipNum,
-                                    static_cast<int>(OutAirUnit(OAUnitNum).OAEquip(EquipNum).ComponentType_Num),
+                                    OutAirUnit(OAUnitNum).OAEquip(EquipNum).ComponentType_Num,
                                     FirstHVACIteration,
                                     OutAirUnit(OAUnitNum).OAEquip(EquipNum).ComponentIndex,
                                     Sim);
@@ -2160,7 +2160,7 @@ namespace OutdoorAirUnit {
                                  std::string const &EquipType, // the component type
                                  std::string const &EquipName, // the component Name
                                  int const EquipNum,
-                                 [[maybe_unused]] int const CompTypeNum, // Component Type -- Integerized for this module
+                                 [[maybe_unused]] CompType const CompTypeNum, // Component Type -- Integerized for this module
                                  bool const FirstHVACIteration,
                                  int &CompIndex,
                                  bool const Sim // if TRUE, simulate component
@@ -2579,7 +2579,7 @@ namespace OutdoorAirUnit {
         int InletNode;
         int OutletNode;
         Real64 QCompReq; // Actual equipment load
-        int CoilTypeNum;
+        CompType CoilTypeNum;
         Real64 CoilAirOutTemp;
         int CompoNum;
 
@@ -2588,7 +2588,7 @@ namespace OutdoorAirUnit {
         CoilIndex = 0;
         OAUnitNum = CompNum;
         CompoNum = EquipIndex;
-        CoilTypeNum = static_cast<int>(OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentType_Num);
+        CoilTypeNum = OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentType_Num;
         OpMode = OutAirUnit(OAUnitNum).OperatingMode;
         CoilAirOutTemp = OutAirUnit(OAUnitNum).CompOutSetTemp;
         DrawFan = OutAirUnit(OAUnitNum).FanEffect;
@@ -2599,8 +2599,8 @@ namespace OutdoorAirUnit {
         }
 
         {
-            auto const SELECT_CASE_var(CoilTypeNum);
-            if (SELECT_CASE_var == static_cast<int>(CompType::Coil_ElectricHeat)) {
+            CompType const SELECT_CASE_var(CoilTypeNum);
+            if (SELECT_CASE_var == CompType::Coil_ElectricHeat) {
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
                 OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
                 if ((OpMode == Operation::NeutralMode) || (OpMode == Operation::CoolingMode) ||
@@ -2626,7 +2626,7 @@ namespace OutdoorAirUnit {
                 LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
                                          PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
 
-            } else if (SELECT_CASE_var == static_cast<int>(CompType::Coil_GasHeat)) { // 'Coil:Heating:Steam'
+            } else if (SELECT_CASE_var == CompType::Coil_GasHeat) { // 'Coil:Heating:Steam'
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
                 OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
                 if ((OpMode == Operation::NeutralMode) || (OpMode == Operation::CoolingMode) ||
@@ -2652,7 +2652,7 @@ namespace OutdoorAirUnit {
                 LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
                                          PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
 
-            } else if (SELECT_CASE_var == static_cast<int>(CompType::SteamCoil_AirHeat)) { // 'Coil:Heating:Steam'
+            } else if (SELECT_CASE_var == CompType::SteamCoil_AirHeat) { // 'Coil:Heating:Steam'
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
                 OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
                 if ((OpMode == Operation::NeutralMode) || (OpMode == Operation::CoolingMode) ||
@@ -2675,7 +2675,7 @@ namespace OutdoorAirUnit {
                 LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
                                          PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
 
-            } else if (SELECT_CASE_var == static_cast<int>(CompType::WaterCoil_SimpleHeat)) { // 'Coil:Heating:Water')
+            } else if (SELECT_CASE_var == CompType::WaterCoil_SimpleHeat) { // 'Coil:Heating:Water')
                 SimulateWaterCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
                 OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
@@ -2683,7 +2683,7 @@ namespace OutdoorAirUnit {
                 LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
                                          PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
 
-            } else if (SELECT_CASE_var == static_cast<int>(CompType::WaterCoil_Cooling)) { // 'Coil:Cooling:Water'
+            } else if (SELECT_CASE_var == CompType::WaterCoil_Cooling) { // 'Coil:Cooling:Water'
                 SimulateWaterCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
                 OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
@@ -2691,7 +2691,7 @@ namespace OutdoorAirUnit {
                 LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
                                          PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
 
-            } else if (SELECT_CASE_var == static_cast<int>(CompType::WaterCoil_DetailedCool)) {
+            } else if (SELECT_CASE_var == CompType::WaterCoil_DetailedCool) {
                 SimulateWaterCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
                 OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
@@ -2699,7 +2699,7 @@ namespace OutdoorAirUnit {
                 LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
                                          PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
 
-            } else if (SELECT_CASE_var == static_cast<int>(CompType::WaterCoil_CoolingHXAsst)) {
+            } else if (SELECT_CASE_var == CompType::WaterCoil_CoolingHXAsst) {
                 SimHXAssistedCoolingCoil(
                     state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, 1, 0.0, CoilIndex, ContFanCycCoil);
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
