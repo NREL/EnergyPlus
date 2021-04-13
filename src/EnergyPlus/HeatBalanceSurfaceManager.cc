@@ -7921,7 +7921,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                     state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) = state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area *
                                                                                state.dataConstruction->Construct(surface.Construction).TransDiff;
                 } else {                                                // Regular window
-                    if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
+                    //if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
                         if (state.dataSurface->SurfWinStormWinFlag(surfNum) == 1) ConstrNum = surface.StormWinConstruction;
                         // Get outside convection coeff for exterior window here to avoid calling
                         // InitExteriorConvectionCoeff from CalcWindowHeatBalance, which avoids circular reference
@@ -8001,7 +8001,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                             state, surfNum, state.dataHeatBalSurf->HcExtSurf(surfNum), state.dataHeatBalSurf->TempSurfInTmp(surfNum), TH11);
 
                         state.dataHeatBalSurf->TempSurfIn(surfNum) = state.dataHeatBalSurf->TempSurfInTmp(surfNum);
-                    }
+                    //}
                 }
             }
 
