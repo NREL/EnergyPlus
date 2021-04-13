@@ -5842,8 +5842,9 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
             {
                 auto const SELECT_CASE_var(Surface(SurfNum).ExtBoundCond);
 
-                if (SELECT_CASE_var == Ground) { // Surface in contact with ground
-
+                if (Surface(SurfNum).TOutsideEMSOverrideOn) {
+                    state.dataHeatBalSurf->TH(1, 1, SurfNum) = Surface(SurfNum).TOutsideEMSOverrideValue;
+                } else if (SELECT_CASE_var == Ground) { // Surface in contact with ground
                     state.dataHeatBalSurf->TH(1, 1, SurfNum) = state.dataEnvrn->GroundTemp;
 
                     // Set the only radiant system heat balance coefficient that is non-zero for this case
@@ -6785,6 +6786,12 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
             auto const &construct(state.dataConstruction->Construct(ConstrNum));
             Real64 const MAT_zone(state.dataHeatBalFanSys->MAT(ZoneNum));
             Real64 const HConvIn_surf(state.dataMstBal->HConvInFD(SurfNum) = state.dataHeatBal->HConvIn(SurfNum));
+
+            if (surface.TInsideEMSOverrideOn) {
+                state.dataHeatBalSurf->TempSurfInTmp(SurfNum) = surface.TInsideEMSOverrideValue;
+                state.dataHeatBalSurf->TempSurfIn(SurfNum) = surface.TInsideEMSOverrideValue;
+                continue;
+            }
 
             if (surface.ExtBoundCond == SurfNum) {
                 // CR6869 -- let Window HB take care of it      IF (Surface(SurfNum)%ExtBoundCond == SurfNum) THEN
@@ -7743,6 +7750,13 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                 //                                        + IterDampConst * TempInsOld(SurfNum)+ IsNotAdiabatic*IsNotSource*construct.CTFCross(0)
                 //                                        * TH11) * TempDiv;
 
+                if (Surface(surfNum).TInsideEMSOverrideOn) {
+                    // Is TempSurfInTmp important, or is it really temporary storage?
+                    state.dataHeatBalSurf->TempSurfInTmp(surfNum) = Surface(surfNum).TInsideEMSOverrideValue;
+                    state.dataHeatBalSurf->TempSurfIn(surfNum) = Surface(surfNum).TInsideEMSOverrideValue;
+                    continue;
+                }
+
                 // Calculate the current inside surface temperature
                 state.dataHeatBalSurf->TempSurfInTmp(surfNum) =
                     (state.dataHeatBalSurf->IsNotPoolSurf(surfNum) *
@@ -7907,7 +7921,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                     state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) = state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area *
                                                                                state.dataConstruction->Construct(surface.Construction).TransDiff;
                 } else {                                                // Regular window
-                    if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
+                    //if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
                         if (state.dataSurface->SurfWinStormWinFlag(surfNum) == 1) ConstrNum = surface.StormWinConstruction;
                         // Get outside convection coeff for exterior window here to avoid calling
                         // InitExteriorConvectionCoeff from CalcWindowHeatBalance, which avoids circular reference
@@ -7987,7 +8001,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                             state, surfNum, state.dataHeatBalSurf->HcExtSurf(surfNum), state.dataHeatBalSurf->TempSurfInTmp(surfNum), TH11);
 
                         state.dataHeatBalSurf->TempSurfIn(surfNum) = state.dataHeatBalSurf->TempSurfInTmp(surfNum);
-                    }
+                    //}
                 }
             }
 

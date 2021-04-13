@@ -75,7 +75,6 @@ ENERGYPLUSLIB_API void callbackEndOfAfterComponentGetInput(EnergyPlusState state
 ENERGYPLUSLIB_API void callbackUnitarySystemSizing(EnergyPlusState state, const std::function<void(EnergyPlusState)> &f);
 ENERGYPLUSLIB_API void registerStdOutCallback(EnergyPlusState state, std::function<void(const std::string &)>);
 ENERGYPLUSLIB_API void registerExternalHVACManager(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
-// ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
 
 extern "C" {
 
