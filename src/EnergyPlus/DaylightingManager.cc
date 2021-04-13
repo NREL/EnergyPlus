@@ -8119,7 +8119,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                             (1.0 - ReflGlDiffDiffFront * ReflBlDiffDiffBack) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                         } else { // Between-glass blind
-                            t1 = POLYF(COSB, state.dataConstruction->Construct(IConst).tBareVisCoef({1, 6}, 1));
+                            t1 = POLYF(COSB, state.dataConstruction->Construct(IConst).tBareVisCoef(1));
                             td2 = state.dataConstruction->Construct(IConst).tBareVisDiff(2);
                             rbd1 = state.dataConstruction->Construct(IConst).rbBareVisDiff(1);
                             rfd2 = state.dataConstruction->Construct(IConst).rfBareVisDiff(2);
@@ -8131,7 +8131,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                 TransMult(JB) =
                                     t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * state.dataSurface->SurfWinLightWellEff(IWin);
                             } else { // 3 glass layers; blind between layers 2 and 3
-                                t2 = POLYF(COSB, state.dataConstruction->Construct(IConst).tBareVisCoef({1, 6}, 2));
+                                t2 = POLYF(COSB, state.dataConstruction->Construct(IConst).tBareVisCoef(2));
                                 td3 = state.dataConstruction->Construct(IConst).tBareVisDiff(3);
                                 rfd3 = state.dataConstruction->Construct(IConst).rfBareVisDiff(3);
                                 rbd2 = state.dataConstruction->Construct(IConst).rbBareVisDiff(2);
@@ -8339,14 +8339,14 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                             state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                         } else { // Between-glass blind
-                            t1 = POLYF(COSBSun, state.dataConstruction->Construct(IConst).tBareVisCoef({1, 6}, 1));
+                            t1 = POLYF(COSBSun, state.dataConstruction->Construct(IConst).tBareVisCoef(1));
                             tfshBd = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
                             rfshB = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
                             if (state.dataConstruction->Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
                                 TransMult(JB) =
                                     t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * state.dataSurface->SurfWinLightWellEff(IWin);
                             } else { // 3 glass layers; blind between layers 2 and 3
-                                t2 = POLYF(COSBSun, state.dataConstruction->Construct(IConst).tBareVisCoef({1, 6}, 2));
+                                t2 = POLYF(COSBSun, state.dataConstruction->Construct(IConst).tBareVisCoef(2));
                                 TransMult(JB) = t1 * t2 * (tfshBd * (1.0 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) * td3 *
                                                 state.dataSurface->SurfWinLightWellEff(IWin);
                             }

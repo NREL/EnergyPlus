@@ -82,6 +82,7 @@ namespace DataSurfaces {
     // MODULE PARAMETER DEFINITIONS:
     constexpr int MaxSlatAngs(19);
     constexpr int MaxProfAngs(37);
+    constexpr int MaxPolyCoeff(6);
 
     // Parameters to indicate surface shape for use with the Surface
     // derived type (see below):
@@ -1370,7 +1371,6 @@ struct SurfacesData : BaseGlobalStruct
     // Surface Window Heat Balance
     Array2D<Real64> SurfWinA;          // Time step value of factor for beam absorbed in window glass layers
     Array2D<Real64> SurfWinADiffFront;
-    Array2D<Real64> SurfWinADiffBack;
     Array2D<Real64> SurfWinACFOverlap; // Time step value of factor for beam absorbed in window glass layers which comes from other windows
                                        // It happens sometimes that beam enters one window and hits back ofsecond window. It is used in complex fenestration only
     Array1D<Real64> SurfWinTransSolar; // Exterior beam plus diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
@@ -1654,7 +1654,6 @@ struct SurfacesData : BaseGlobalStruct
 
         this->SurfWinA.deallocate();
         this->SurfWinADiffFront.deallocate();
-        this->SurfWinADiffBack.deallocate();
         this->SurfWinACFOverlap.deallocate();
         this->AirSkyRadSplit.deallocate();
         this->SUNCOSHR = Array2D<Real64>(24, 3, 0.0);

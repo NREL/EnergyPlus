@@ -6298,8 +6298,8 @@ namespace HeatBalanceManager {
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
                 auto &thisConstruct(thisSurface.Construction);
                 if (!state.dataConstruction->Construct(thisConstruct).WindowTypeBSDF) {
-                    state.dataHeatBal->SurfWinFenLaySurfTempFront(1, SurfNum) = state.dataHeatBalSurf->TH(1, 1, SurfNum);
-                    state.dataHeatBal->SurfWinFenLaySurfTempBack(state.dataConstruction->Construct(thisConstruct).TotLayers, SurfNum) =
+                    state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, 1) = state.dataHeatBalSurf->TH(1, 1, SurfNum);
+                    state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, state.dataConstruction->Construct(thisConstruct).TotLayers) =
                         state.dataHeatBalSurf->TH(2, 1, SurfNum);
                 }
             }
@@ -7250,8 +7250,6 @@ namespace HeatBalanceManager {
                 state.dataConstruction->Construct(ConstrNum).AbsDiffShade = 0.0;
                 state.dataConstruction->Construct(ConstrNum).AbsDiffBackShade = 0.0;
                 state.dataConstruction->Construct(ConstrNum).ShadeAbsorpThermal = 0.0;
-                state.dataConstruction->Construct(ConstrNum).AbsBeamCoef = 0.0;
-                state.dataConstruction->Construct(ConstrNum).AbsBeamBackCoef = 0.0;
                 state.dataConstruction->Construct(ConstrNum).AbsBeamShadeCoef = 0.0;
                 state.dataConstruction->Construct(ConstrNum).AbsDiffIn = 0.0;
                 state.dataConstruction->Construct(ConstrNum).AbsDiffOut = 0.0;
@@ -7269,6 +7267,13 @@ namespace HeatBalanceManager {
                 state.dataConstruction->Construct(ConstrNum).TotLayers = NGlass(IGlSys) + NGaps(IGlSys);
                 state.dataConstruction->Construct(ConstrNum).TotGlassLayers = NGlass(IGlSys);
                 state.dataConstruction->Construct(ConstrNum).TotSolidLayers = NGlass(IGlSys);
+
+                for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
+                    for (int index = 1; index <= DataSurfaces::MaxPolyCoeff; ++index) {
+                        state.dataConstruction->Construct(ConstrNum).AbsBeamCoef(Layer)(index) = 0.0;
+                        state.dataConstruction->Construct(ConstrNum).AbsBeamBackCoef(Layer)(index) = 0.0;
+                    }
+                }
 
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
                     state.dataConstruction->Construct(ConstrNum).LayerPoint(2 * IGlass - 1) = MaterNumSysGlass(IGlass, IGlSys);
@@ -7403,7 +7408,7 @@ namespace HeatBalanceManager {
                 W5LsqFit(CosPhiIndepVar, Tvis, 6, 1, 10, state.dataConstruction->Construct(ConstrNum).TransVisBeamCoef);
                 W5LsqFit(CosPhiIndepVar, Rfsol, 6, 1, 10, state.dataConstruction->Construct(ConstrNum).ReflSolBeamFrontCoef);
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
-                    W5LsqFit(CosPhiIndepVar, AbsSol(_, IGlass), 6, 1, 10, state.dataConstruction->Construct(ConstrNum).AbsBeamCoef(_, IGlass));
+                    W5LsqFit(CosPhiIndepVar, AbsSol(_, IGlass), 6, 1, 10, state.dataConstruction->Construct(ConstrNum).AbsBeamCoef(IGlass));
                 }
 
                 // For comparing fitted vs. input distribution in incidence angle
@@ -7412,7 +7417,7 @@ namespace HeatBalanceManager {
                     tvisFit(IPhi) = POLYF(CosPhi(IPhi), state.dataConstruction->Construct(ConstrNum).TransVisBeamCoef);
                     rfsolFit(IPhi) = POLYF(CosPhi(IPhi), state.dataConstruction->Construct(ConstrNum).ReflSolBeamFrontCoef);
                     for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
-                        solabsFit(IGlass, IPhi) = POLYF(CosPhi(IPhi), state.dataConstruction->Construct(ConstrNum).AbsBeamCoef({1, 6}, IGlass));
+                        solabsFit(IGlass, IPhi) = POLYF(CosPhi(IPhi), state.dataConstruction->Construct(ConstrNum).AbsBeamCoef(IGlass));
                     }
                 }
                 // end
