@@ -4543,6 +4543,7 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
 
                 Surface(SurfNum).Construction = Surface(SurfNum).EMSConstructionOverrideValue;
                 state.dataConstruction->Construct(Surface(SurfNum).Construction).IsUsed = true;
+                state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
 
             } else { // have not checked yet or is not okay, so see if we need to warn about incompatible
                 if (!state.dataRuntimeLang->EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) {
