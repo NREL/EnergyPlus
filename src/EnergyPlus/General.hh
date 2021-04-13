@@ -212,7 +212,7 @@ namespace General {
                               Real64 SlatThickness   // Slat thickness (m)
     );
 
-    constexpr Real64 POLYF(Real64 const X,         // Cosine of angle of incidence
+    constexpr Real64 POLYF(Real64 const X,          // Cosine of angle of incidence
                            Array1D<Real64> const &A // Polynomial coefficients
     )
     {
