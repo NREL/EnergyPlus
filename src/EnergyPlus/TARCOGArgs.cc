@@ -425,7 +425,7 @@ int ArgCheck(EnergyPlusData &state,
             return ArgCheck;
         }
 
-        if BITF_NOT_TEST_ANY(BITF(LayerType(i)), BITF(TARCOGLayerType::SPECULAR) |
+        if BITF_TEST_NONE(BITF(LayerType(i)), BITF(TARCOGLayerType::SPECULAR) |
                                                    BITF(TARCOGLayerType::WOVSHADE) |
                                                    BITF(TARCOGLayerType::VENETBLIND_HORIZ) |
                                                    BITF(TARCOGLayerType::PERFORATED) |

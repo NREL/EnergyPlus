@@ -58,7 +58,7 @@
 
 #define BITF(B) (1 << (int(B)))
 #define BITF_TEST_ANY(V, B) (((V) & (B)) != 0)
-#define BITF_NOT_TEST_ANY(V, B) (((V) & (B)) == 0)
+#define BITF_TEST_NONE(V, B) (((V) & (B)) == 0)
 
 namespace EnergyPlus {
 
