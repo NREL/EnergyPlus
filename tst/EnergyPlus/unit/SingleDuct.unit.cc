@@ -2814,3 +2814,166 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
     EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriDryBulb, state->dataSize->FinalSysSizing(1).HeatOutTemp, 0.0000001);
     EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriHumRat, state->dataSize->FinalSysSizing(1).HeatOutHumRat, 0.0000001);
 }
+
+TEST_F(EnergyPlusFixture, VAVConstantVolTU_NoReheat_Sizing)
+{
+    std::string const idf_objects = delimited_string({
+        "  Zone,",
+        "    Zone 1;                !- Name",
+        "ZoneHVAC:EquipmentConnections,",
+        "    Zone 1,                !- Zone Name",
+        "    Zone 1 Equipment,             !- Zone Conditioning Equipment List Name",
+        "    Zone 1 Supply Inlet,       !- Zone Air Inlet Node or NodeList Name",
+        "    ,      !- Zone Air Exhaust Node or NodeList Name",
+        "    Zone 1 Air Node,           !- Zone Air Node Name",
+        "    Zone 1 Return Node;       !- Zone Return Air Node Name",
+        "ZoneHVAC:EquipmentList,",
+        "    Zone 1 Equipment,             !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    Zone 1 ADU,            !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "ZoneHVAC:AirDistributionUnit,",
+        "    Zone 1 ADU,    !- Name",
+        "    Zone 1 Supply Inlet,     !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        "    Zone 1 TU NoReheat;           !- Air Terminal Name",
+        "AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+        "    Zone 1 TU NoReheat,       !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    Zone 1 TU Air Inlet,     !- Air Inlet Node Name",
+        "    Zone 1 Supply Inlet,     !- Air Outlet Node Name",
+        "    1.0;                     !- Maximum Air Flow Rate {m3/s}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitSizing.allocate(1);
+    state->dataSize->FinalZoneSizing.allocate(1);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
+    SingleDuct::GetSysInput(*state);
+    EXPECT_TRUE(compare_err_stream(""));
+
+    int SysNum = 1;
+
+    // test air flow sizing of TU with hard sized input for Maximum Air Flow Rate {m3/s}
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataSize->CurTermUnitSizingNum = 1;
+    state->dataSize->TermUnitFinalZoneSizing(1).NonAirSysDesHeatVolFlow = 0.5;
+    state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
+    // constant volume TUs should have ZoneMinAirFracDes = 1 (now set correctly in GetSysInput)
+    EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
+    // if ZoneMinAirFracDes = 0, TermUnitSizing(1).AirVolFlow would = 0.5 (NonAirSysDesHeatVolFlow)
+    // since ZoneMinAirFracDes = 1, TermUnitSizing(1).AirVolFlow = hard sized value (i.e., 1.0)
+    EXPECT_EQ(1.0, state->dataSize->TermUnitSizing(1).AirVolFlow);
+}
+
+TEST_F(EnergyPlusFixture, VAVConstantVolTU_Reheat_Sizing)
+{
+    std::string const idf_objects = delimited_string({
+        "  Zone,",
+        "    Zone 1;                !- Name",
+        "ZoneHVAC:EquipmentConnections,",
+        "    Zone 1,                !- Zone Name",
+        "    Zone 1 Equipment,             !- Zone Conditioning Equipment List Name",
+        "    Zone 1 Supply Inlet,       !- Zone Air Inlet Node or NodeList Name",
+        "    ,      !- Zone Air Exhaust Node or NodeList Name",
+        "    Zone 1 Air Node,           !- Zone Air Node Name",
+        "    Zone 1 Return Node;       !- Zone Return Air Node Name",
+        "ZoneHVAC:EquipmentList,",
+        "    Zone 1 Equipment,             !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    Zone 1 ADU,            !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "ZoneHVAC:AirDistributionUnit,",
+        "    Zone 1 ADU,    !- Name",
+        "    Zone 1 Supply Inlet,     !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:Reheat,  !- Air Terminal Object Type",
+        "    Zone 1 TU Reheat;        !- Air Terminal Name",
+        "AirTerminal:SingleDuct:ConstantVolume:Reheat,",
+        "    Zone 1 TU Reheat,        !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    Zone 1 Supply Inlet,     !- Air Outlet Node Name",
+        "    Zone 1 TU Air Inlet,     !- Air Inlet Node Name",
+        "    1.0,                     !- Maximum Air Flow Rate {m3/s}",
+        "    Coil:Heating:Electric,   !- Reheat Coil Object Type",
+        "    Zone 1 Reheat Coil;      !- Reheat Coil Name",
+        "Coil:Heating:Electric,",
+        "    Zone 1 Reheat Coil,      !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    1,                       !- Efficiency",
+        "    Autosize,                !- Nominal Capacity of the Coil {W}",
+        "    Zone 1 VAV Reheat Coil Air Inlet,  !- Air Inlet Node Name",
+        "    Zone 1 Supply Inlet,     !- Air Outlet Node Name",
+        "    ;                        !- Temperature Setpoint Node Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitSizing.allocate(1);
+    state->dataSize->FinalZoneSizing.allocate(1);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
+    SingleDuct::GetSysInput(*state);
+    EXPECT_TRUE(compare_err_stream(""));
+
+    int SysNum = 1;
+
+    // test air flow sizing of TU with hard sized input for Maximum Air Flow Rate {m3/s}
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataSize->CurTermUnitSizingNum = 1;
+    state->dataSize->TermUnitFinalZoneSizing(1).NonAirSysDesHeatVolFlow = 0.5;
+    state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
+    // constant volume TUs should have ZoneMinAirFracDes = 1 (now set correctly in GetSysInput)
+    EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
+    // if ZoneMinAirFracDes = 0, TermUnitSizing(1).AirVolFlow would = 0.5 (NonAirSysDesHeatVolFlow)
+    // since ZoneMinAirFracDes = 1, TermUnitSizing(1).AirVolFlow = hard sized value (i.e., 1.0)
+    EXPECT_EQ(1.0, state->dataSize->TermUnitSizing(1).AirVolFlow);
+
+    // size heating coil
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing(1).DesHeatCoilInTempTU = 21.0;
+    state->dataSize->TermUnitFinalZoneSizing(1).DesHeatCoilInHumRatTU = 0.006;
+    state->dataSize->TermUnitFinalZoneSizing(1).HeatDesTemp = 31.0;
+    state->dataSize->TermUnitFinalZoneSizing(1).HeatDesHumRat = 0.006;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    state->dataSize->TermUnitSingDuct = true;
+    Real64 coilInTemp = state->dataSize->TermUnitFinalZoneSizing(1).DesHeatCoilInTempTU;
+    Real64 coilOutTemp = state->dataSize->TermUnitFinalZoneSizing(1).HeatDesTemp;
+    Real64 desCoilAirMassFlow = state->dataSize->TermUnitFinalZoneSizing(1).NonAirSysDesHeatVolFlow;
+    Real64 actualCoilAirFlow = state->dataSize->TermUnitSizing(1).AirVolFlow;
+    Real64 CpAir = Psychrometrics::PsyCpAirFnW(state->dataSize->TermUnitFinalZoneSizing(1).HeatDesHumRat);
+    Real64 desCoilSize = CpAir * state->dataEnvrn->StdRhoAir * desCoilAirMassFlow * (coilOutTemp - coilInTemp);
+    Real64 actualCoilSize = CpAir * state->dataEnvrn->StdRhoAir * actualCoilAirFlow * (coilOutTemp - coilInTemp);
+
+    bool FirstHVACIteration = true;
+    state->dataSingleDuct->sd_airterminal(SysNum).SimConstVol(*state,
+                                                              FirstHVACIteration,
+                                                              state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum,
+                                                              state->dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum);
+    // TUSizing.AirVolFlow gets set like this. If ZoneMinAirFracDes = 0, then autosized air flow is passed to heating coil
+    // this->MaxAirVolFlowRate = 1.0 here which is set by user. This is a factor of 2 higher than design/auosized value
+    // TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
+    //     max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
+    //         this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
+
+    EXPECT_GT(actualCoilSize, desCoilSize);
+    EXPECT_NEAR(actualCoilSize, 12192.0, 0.1);
+    EXPECT_NEAR(actualCoilSize, 2.0 * desCoilSize, 0.1); // heating coil is twice the size of autosized value
+}
