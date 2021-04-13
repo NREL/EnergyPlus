@@ -6544,8 +6544,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                         if (ANY_SHADE(ShadeFlag) || ShadeFlag == WinShadingType::SwitchableGlazing) {
                             // Shade or switchable glazing on
                             for (int Lay = 1; Lay <= NGlass; ++Lay) {
-                                AbWinSh(Lay) =
-                                    POLYF(CosInc, state.dataConstruction->Construct(ConstrNumSh).AbsBeamCoef(Lay)) * CosInc * FracSunLit;
+                                AbWinSh(Lay) = POLYF(CosInc, state.dataConstruction->Construct(ConstrNumSh).AbsBeamCoef(Lay)) * CosInc * FracSunLit;
                                 ADiffWinSh(Lay) = state.dataConstruction->Construct(ConstrNumSh).AbsDiff(Lay);
                             }
                             if (ShadeFlag == WinShadingType::IntShade) { // Exterior beam absorbed by INTERIOR SHADE
@@ -6680,11 +6679,17 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                             } else if (ShadeFlag == WinShadingType::BGBlind) {
                                 // Between-glass blind o
                                 // Isolated glass and blind properties at current incidence angle, profile angle and slat angle
-                                Real64 t1 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).tBareSolCoef(1)); // Bare-glass beam solar transmittance for glass layers 1,2 and 3
+                                Real64 t1 = POLYF(CosInc,
+                                                  state.dataConstruction->Construct(ConstrNum).tBareSolCoef(
+                                                      1)); // Bare-glass beam solar transmittance for glass layers 1,2 and 3
                                 Real64 t2 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).tBareSolCoef(2));
-                                Real64 af1 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).afBareSolCoef(1)); // Bare-glass beam solar front absorptance for glass layers 1,2 and 3
+                                Real64 af1 = POLYF(CosInc,
+                                                   state.dataConstruction->Construct(ConstrNum).afBareSolCoef(
+                                                       1)); // Bare-glass beam solar front absorptance for glass layers 1,2 and 3
                                 Real64 af2 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).afBareSolCoef(2));
-                                Real64 ab1 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).abBareSolCoef(1)); // Bare-glass beam solar back absorptance for glass layers 1,2 and 3
+                                Real64 ab1 = POLYF(CosInc,
+                                                   state.dataConstruction->Construct(ConstrNum).abBareSolCoef(
+                                                       1)); // Bare-glass beam solar back absorptance for glass layers 1,2 and 3
                                 Real64 ab2 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).abBareSolCoef(2));
                                 Real64 rf2 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).rfBareSolCoef(2));
                                 Real64 td1 = state.dataConstruction->Construct(ConstrNum).tBareSolDiff(
@@ -7586,10 +7591,14 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                                         Real64 RhoBlDiffFront = FrontDiffDiffRefl; // Glazing system solar back beam-beam reflectance
                                         Real64 RGlBack = POLYF(CosIncBack,
-                                                               state.dataConstruction->Construct(ConstrNumBack).ReflSolBeamBackCoef); // Glazing system back diffuse solar reflectance
+                                                               state.dataConstruction->Construct(ConstrNumBack)
+                                                                   .ReflSolBeamBackCoef); // Glazing system back diffuse solar reflectance
                                         Real64 RGlDiffBack = state.dataConstruction->Construct(ConstrNumBack).ReflectSolDiffBack;
                                         for (int Lay = 1; Lay <= NBackGlass; ++Lay) {
-                                            Real64 AbWinBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).AbsBeamBackCoef(Lay)); // Factor for back beam radiation absorbed in window glass layer
+                                            Real64 AbWinBack =
+                                                POLYF(CosIncBack,
+                                                      state.dataConstruction->Construct(ConstrNumBack)
+                                                          .AbsBeamBackCoef(Lay)); // Factor for back beam radiation absorbed in window glass layer
                                             Real64 AGlDiffBack = state.dataConstruction->Construct(ConstrNumBack)
                                                                      .AbsDiffBack(Lay); // Glass layer back diffuse solar absorptance
                                             state.dataSolarShading->AbsBeamWin(Lay) =
@@ -7828,10 +7837,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                             ABlBack = t2k * (abshBk + tbshBBk * rb1k * afshBk + rbshBk * rfd2k * abshdk + tbshBdk * rbd1k * afshdk);
                                         } else { // NBackGlass = 3
                                             Real64 t3k = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).tBareSolCoef(3));
-                                            Real64 af3k =
-                                                POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).afBareSolCoef(3));
-                                            Real64 ab3k =
-                                                POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).abBareSolCoef(3));
+                                            Real64 af3k = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).afBareSolCoef(3));
+                                            Real64 ab3k = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).abBareSolCoef(3));
                                             Real64 afd3k = state.dataConstruction->Construct(ConstrNumBack).afBareSolDiff(3);
                                             Real64 rfd3k = state.dataConstruction->Construct(ConstrNumBack).rfBareSolDiff(3);
                                             state.dataSolarShading->AbsBeamWin(3) =
@@ -7875,8 +7882,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     Real64 RScBack = state.dataHeatBal->SurfaceScreens(ScNumBack).ReflectSolBeamFront;
                                     Real64 RScDifBack = state.dataHeatBal->SurfaceScreens(ScNumBack).DifReflect;
                                     for (int Lay = 1; Lay <= NBackGlass; ++Lay) {
-                                        Real64 AbWinBack =
-                                            POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).AbsBeamBackCoef(Lay));
+                                        Real64 AbWinBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).AbsBeamBackCoef(Lay));
                                         Real64 AGlDiffFront = state.dataConstruction->Construct(ConstrNumBack).AbsDiff(Lay);
                                         state.dataSolarShading->AbsBeamWin(Lay) =
                                             AbWinBack + (TGlBmBack * AGlDiffFront * RScBack / (1.0 - RScDifBack * RGlDiffFront));
@@ -8653,7 +8659,8 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
                         auto AbWinBeam = aLayer->getAbsorptanceLayer(Lay, Side::Front, ScatteringSimple::Direct, Theta, Phi) *
                                          window.OutProjSLFracMult(state.dataGlobal->HourOfDay);
                         auto AbWinDiffFront = aLayer->getAbsorptanceLayer(Lay, Side::Front, ScatteringSimple::Diffuse, Theta, Phi);
-//                        auto AbWinDiffBack = aLayer->getAbsorptanceLayer(Lay, Side::Back, ScatteringSimple::Diffuse, Theta, Phi);
+                        //                        auto AbWinDiffBack = aLayer->getAbsorptanceLayer(Lay, Side::Back, ScatteringSimple::Diffuse, Theta,
+                        //                        Phi);
 
                         // Simon: This should not be multiplied with cosine of incident angle. This however gives same
                         // results as BSDF and Winkelmann models.
