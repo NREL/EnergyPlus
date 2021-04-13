@@ -5563,14 +5563,19 @@ namespace HeatBalanceManager {
                 }
                 state.dataHeatBalMgr->ChangeSet = true;
             }
-        }
-        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
-            if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1 && state.dataSurface->SurfWinWindowModelType(SurfNum) == DataSurfaces::Window5DetailedModel) {
-                state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->SurfWinStormWinConstr(SurfNum);
-            } else {
-                state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+                int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
+                int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
+                for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                    if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1 && state.dataSurface->SurfWinWindowModelType(SurfNum) == DataSurfaces::Window5DetailedModel) {
+                        state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->SurfWinStormWinConstr(SurfNum);
+                    } else {
+                        state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+                    }
+                }
             }
         }
+
 
         if (state.dataGlobal->BeginSimFlag && state.dataGlobal->DoWeathSim && state.dataSysVars->ReportExtShadingSunlitFrac) {
             OpenShadingFile(state);
