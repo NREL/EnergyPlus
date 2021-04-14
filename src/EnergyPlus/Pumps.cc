@@ -1175,8 +1175,10 @@ void GetPumpInput(EnergyPlusData &state)
     }
 
     for (PumpNum = 1; PumpNum <= state.dataPumps->NumPumps; ++PumpNum) { // CurrentModuleObject='Pumps'
-        if (BITF_TEST_ANY(BITF(state.dataPumps->PumpEquip(PumpNum).PumpType),
-                          BITF(iPumpType::VarSpeed) | BITF(iPumpType::ConSpeed) | BITF(iPumpType::Cond))) {
+        switch (state.dataPumps->PumpEquip(PumpNum).PumpType) {
+        case (iPumpType::VarSpeed):
+        case (iPumpType::ConSpeed):
+        case (iPumpType::Cond): {
 
             SetupOutputVariable(state,
                                 "Pump Electricity Energy",
@@ -1232,9 +1234,10 @@ void GetPumpInput(EnergyPlusData &state)
                                 "System",
                                 "Average",
                                 state.dataPumps->PumpEquip(PumpNum).Name);
-        }
-        if (BITF_TEST_ANY(BITF(state.dataPumps->PumpEquip(PumpNum).PumpType),
-                          BITF(iPumpType::Bank_VarSpeed) | BITF(iPumpType::Bank_ConSpeed))) { // CurrentModuleObject='HeaderedPumps'
+        } break;
+
+        case (iPumpType::Bank_VarSpeed):
+        case (iPumpType::Bank_ConSpeed): { // CurrentModuleObject='HeaderedPumps'
 
             SetupOutputVariable(state,
                                 "Pump Electricity Energy",
@@ -1297,6 +1300,10 @@ void GetPumpInput(EnergyPlusData &state)
                                 "System",
                                 "Average",
                                 state.dataPumps->PumpEquip(PumpNum).Name);
+        } break;
+        default: {
+            ShowFatalError(state, format("Invalid Pump Type = {}", state.dataPumps->PumpEquip(PumpNum).PumpType));
+        } break;
         }
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
