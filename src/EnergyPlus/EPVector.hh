@@ -51,6 +51,8 @@
 #include <numeric>
 #include <vector>
 
+#include <EnergyPlus/EnergyPlus.hh>
+
 namespace EnergyPlus {
 
 template <typename T> struct EPVector : private std::vector<T>
