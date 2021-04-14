@@ -3108,7 +3108,7 @@ namespace WindowComplexManager {
             // if (dir.ne.0.0d0) then
             for (IGlass = 1; IGlass <= nlayer; ++IGlass) {
                 // IF (dir > 0.0D0 ) THEN
-                asol(IGlass) = state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum);
+                asol(IGlass) = state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass);
                 // ELSE
                 //  asol(IGLASS) = 0.0D0
                 // ENDIF
@@ -3515,8 +3515,8 @@ namespace WindowComplexManager {
                 state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k) = theta(2 * k);
 
                 // temperatures for reporting
-                state.dataHeatBal->SurfWinFenLaySurfTempFront(k, SurfNum) = theta(2 * k - 1) - DataGlobalConstants::KelvinConv;
-                state.dataHeatBal->SurfWinFenLaySurfTempBack(k, SurfNum) = theta(2 * k) - DataGlobalConstants::KelvinConv;
+                state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, k) = theta(2 * k - 1) - DataGlobalConstants::KelvinConv;
+                state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, k) = theta(2 * k) - DataGlobalConstants::KelvinConv;
                 // thetas(k) = theta(k)
             }
         }

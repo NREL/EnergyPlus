@@ -48,11 +48,12 @@
 #include <assert.h>
 #include <stdio.h>
 // #include <stdlib.h>
-#include <string.h>
 #include <EnergyPlus/api/autosizing.h>
 #include <EnergyPlus/api/state.h>
+#include <string.h>
 
-int runSuccess() {
+int runSuccess()
+{
     EnergyPlusState st = stateNew();
     Sizer s = sizerHeatingAirflowUANew();
     sizerHeatingAirflowUAInitializeForZone(st, s, HeatingAirflowUAZoneTerminal, 0.0, 500, 0.0);
@@ -65,7 +66,7 @@ int runSuccess() {
     }
     char *messages = sizerGetLastErrorMessages(s);
     if (strlen(messages) != 0) {
-       // free(messages);
+        // free(messages);
         return 1;
     }
     sizerHeatingAirflowUAInitializeForZone(st, s, HeatingAirflowUAZoneInductionUnit, 0.0, 500, 1.0);
@@ -95,11 +96,12 @@ int runSuccess() {
         return 1;
     }
     sizerHeatingAirflowUADelete(s);
-   // free(messages);
+    // free(messages);
     return 0;
 }
 
-int main() {
+int main()
+{
     int retVal;
     retVal = runSuccess();
     assert(retVal == 0);
