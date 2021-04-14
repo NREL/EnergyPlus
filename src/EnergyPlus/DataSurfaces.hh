@@ -1590,7 +1590,7 @@ struct SurfacesData : BaseGlobalStruct
 
     EPVector<DataSurfaces::SurfaceData> Surface;
     EPVector<DataSurfaces::SurfaceWindowCalc> SurfaceWindow;
-    EPVector<DataSurfaces::FrameDividerProperties> FrameDivider;
+    Array1D<DataSurfaces::FrameDividerProperties> FrameDivider;
     EPVector<DataSurfaces::StormWindowData> StormWindow;
     EPVector<DataSurfaces::WindowShadingControlData> WindowShadingControl;
     EPVector<DataSurfaces::OSCData> OSC;

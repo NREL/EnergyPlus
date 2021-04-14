@@ -56,7 +56,6 @@ namespace EnergyPlus {
 
 template <typename T> struct EPVector : private std::vector<T>
 {
-    using std::vector<T>::vector;
     using std::vector<T>::size;
     using std::vector<T>::operator[];
     using std::vector<T>::empty;
@@ -74,22 +73,19 @@ template <typename T> struct EPVector : private std::vector<T>
 
     [[nodiscard]] T &operator()(std::size_t n)
     {
-        return this->at(n - 1);
+        return (*this)[n - 1];
     }
 
     [[nodiscard]] const T &operator()(std::size_t n) const
     {
-        return this->at(n - 1);
+        return (*this)[n - 1];
     }
 
-    void allocate(int size)
+    void allocate(std::size_t size)
     {
+        m_allocated = true;
         this->resize(size);
-    }
-
-    void redimension(int size)
-    {
-        this->resize(size);
+        std::fill(begin(), end(), T{});
     }
 
     void deallocate() noexcept
@@ -99,18 +95,19 @@ template <typename T> struct EPVector : private std::vector<T>
 
     [[nodiscard]] bool allocated() const noexcept
     {
-        return !this->empty();
+        return m_allocated || !this->empty();
     }
 
     // operator= used for initialization of the vector
-    void operator=(T v)
+    void operator=(const T &v)
     {
         std::fill(this->begin(), this->end(), v);
     }
 
     // dimension is often used to initalize the vector instead of allocate + operator=
-    void dimension(int size, const T v)
+    void dimension(std::size_t size, const T &v)
     {
+        this->clear();
         this->resize(size, v);
     }
 
@@ -119,11 +116,13 @@ template <typename T> struct EPVector : private std::vector<T>
     {
         return static_cast<int>(this->size());
     }
+
+  private:
+    bool m_allocated{false};
 };
 
 template <> struct EPVector<bool> : private std::vector<std::uint8_t>
 {
-    using std::vector<std::uint8_t>::vector;
     using std::vector<std::uint8_t>::size;
     using std::vector<std::uint8_t>::operator[];
     using std::vector<std::uint8_t>::empty;
@@ -139,30 +138,28 @@ template <> struct EPVector<bool> : private std::vector<std::uint8_t>
     using value_type = std::uint8_t;
     using size_type = typename std::vector<std::uint8_t>::size_type;
 
-    [[nodiscard]] std::uint8_t &operator()(std::size_t n)
+    [[nodiscard]] std::uint8_t &operator()(std::size_t n) noexcept
     {
-        return this->at(n - 1);
+        return (*this)[n - 1];
     }
 
-    [[nodiscard]] const std::uint8_t &operator()(std::size_t n) const
+    [[nodiscard]] const std::uint8_t &operator()(std::size_t n) const noexcept
     {
-        return this->at(n - 1);
+        return (*this)[n - 1];
     }
 
     [[nodiscard]] bool allocated() const noexcept
     {
-        return !this->empty();
+        return m_allocated || !this->empty();
     }
 
-    void allocate(int size)
+    void allocate(std::size_t size)
     {
+        m_allocated = true;
         this->resize(size);
+        std::fill(begin(), end(), T{});
     }
 
-    void redimension(int size)
-    {
-        this->resize(size);
-    }
 
     void deallocate() noexcept
     {
@@ -176,8 +173,9 @@ template <> struct EPVector<bool> : private std::vector<std::uint8_t>
     }
 
     // dimension is often used to initalize the vector instead of allocate + operator=
-    void dimension(int size, const bool v)
+    void dimension(std::size_t size, const bool v)
     {
+        this->clear();
         this->resize(size, v);
     }
 
@@ -186,6 +184,9 @@ template <> struct EPVector<bool> : private std::vector<std::uint8_t>
     {
         return static_cast<int>(this->size());
     }
+
+  private:
+    bool m_allocated{false};
 };
 
 template <typename T> [[nodiscard]] bool allocated(EPVector<T> const &v) noexcept

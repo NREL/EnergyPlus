@@ -421,13 +421,13 @@ struct AirSystemsData : BaseGlobalStruct
 {
 
     EPVector<DataAirSystems::DefinePrimaryAirSystem> PrimaryAirSystems;
-    EPVector<DataAirSystems::ConnectionPoint> DemandSideConnect;               // Connections between loops
-    EPVector<DataAirSystems::ConnectZoneComp> ZoneCompToPlant;                 // Connections between loops
-    EPVector<DataAirSystems::ConnectZoneSubComp> ZoneSubCompToPlant;           // Connections between loops
-    EPVector<DataAirSystems::ConnectZoneSubSubComp> ZoneSubSubCompToPlant;     // Connections between loops
-    EPVector<DataAirSystems::ConnectAirSysComp> AirSysCompToPlant;             // Connections between loops
-    EPVector<DataAirSystems::ConnectAirSysSubComp> AirSysSubCompToPlant;       // Connections between loops
-    EPVector<DataAirSystems::ConnectAirSysSubSubComp> AirSysSubSubCompToPlant; // Connections between loops
+    Array1D<DataAirSystems::ConnectionPoint> DemandSideConnect;               // Connections between loops
+    Array1D<DataAirSystems::ConnectZoneComp> ZoneCompToPlant;                 // Connections between loops
+    Array1D<DataAirSystems::ConnectZoneSubComp> ZoneSubCompToPlant;           // Connections between loops
+    Array1D<DataAirSystems::ConnectZoneSubSubComp> ZoneSubSubCompToPlant;     // Connections between loops
+    Array1D<DataAirSystems::ConnectAirSysComp> AirSysCompToPlant;             // Connections between loops
+    Array1D<DataAirSystems::ConnectAirSysSubComp> AirSysSubCompToPlant;       // Connections between loops
+    Array1D<DataAirSystems::ConnectAirSysSubSubComp> AirSysSubSubCompToPlant; // Connections between loops
 
     void clear_state() override
     {

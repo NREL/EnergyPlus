@@ -953,8 +953,8 @@ struct WeatherManagerData : BaseGlobalStruct
     WeatherManager::MissingDataCounts Missed;              // NOLINT(cert-err58-cpp)
     WeatherManager::RangeDataCounts OutOfRange;            // NOLINT(cert-err58-cpp)
     EPVector<WeatherManager::DesignDayData> DesDayInput;    // Design day Input Data NOLINT(cert-err58-cpp)
-    EPVector<WeatherManager::EnvironmentData> Environment;  // Environment data NOLINT(cert-err58-cpp)
-    EPVector<WeatherManager::RunPeriodData> RunPeriodInput; // NOLINT(cert-err58-cpp)
+    Array1D<WeatherManager::EnvironmentData> Environment;  // Environment data NOLINT(cert-err58-cpp)
+    Array1D<WeatherManager::RunPeriodData> RunPeriodInput; // NOLINT(cert-err58-cpp)
     std::unordered_map<std::string, std::string> RunPeriodInputUniqueNames;
     EPVector<WeatherManager::RunPeriodData> RunPeriodDesignInput; // NOLINT(cert-err58-cpp)
     std::unordered_map<std::string, std::string> RunPeriodDesignInputUniqueNames;

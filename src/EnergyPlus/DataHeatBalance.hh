@@ -2191,7 +2191,7 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::MixingData> Mixing;
     EPVector<DataHeatBalance::MixingData> CrossMixing;
     EPVector<DataHeatBalance::MixingData> RefDoorMixing;
-    EPVector<DataHeatBalance::WindowBlindProperties> Blind;
+    Array1D<DataHeatBalance::WindowBlindProperties> Blind;
     EPVector<DataHeatBalance::WindowComplexShade> ComplexShade;
     EPVector<DataHeatBalance::WindowThermalModelParams> WindowThermalModel;
     EPVector<DataHeatBalance::SurfaceScreenProperties> SurfaceScreens;
