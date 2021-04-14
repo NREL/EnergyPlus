@@ -2440,10 +2440,20 @@ void ReportPumps(EnergyPlusData &state, int const PumpNum)
         state.dataPumps->PumpEquipReport(PumpNum).ShaftPower = state.dataPumps->ShaftPower;
         state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluidEnergy =
             state.dataPumps->PumpHeattoFluid * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        if (BITF_TEST_ANY(BITF(PumpType), BITF(iPumpType::ConSpeed) | BITF(iPumpType::VarSpeed) | BITF(iPumpType::VarSpeed))) {
+        switch (PumpType) {
+        case (iPumpType::ConSpeed):
+        case (iPumpType::VarSpeed):
+        case (iPumpType::Cond):
             state.dataPumps->PumpEquipReport(PumpNum).NumPumpsOperating = 1;
-        } else if BITF_TEST_ANY (BITF(PumpType), BITF(iPumpType::Bank_ConSpeed) | BITF(iPumpType::Bank_VarSpeed)) {
+            break;
+
+        case (iPumpType::Bank_ConSpeed):
+        case (iPumpType::Bank_VarSpeed):
             state.dataPumps->PumpEquipReport(PumpNum).NumPumpsOperating = state.dataPumps->NumPumpsRunning;
+            break;
+        default:
+            ShowFatalError(state, format("Invalid Pump Type = {}", PumpType));
+            break;
         }
         state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainRate = state.dataPumps->Power - state.dataPumps->PumpHeattoFluid;
         state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainEnergy =
