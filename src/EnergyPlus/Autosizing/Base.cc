@@ -236,7 +236,7 @@ void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
                 }
             }
         }
-        if (this->unitarySysEqSizing.allocated())
+        if (allocated(this->unitarySysEqSizing))
             this->airLoopSysFlag =
                 this->unitarySysEqSizing(this->curSysNum).CoolingCapacity || this->unitarySysEqSizing(this->curSysNum).HeatingCapacity;
         if (this->curOASysNum > 0) {
@@ -245,7 +245,7 @@ void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
     }
 
     if (this->curZoneEqNum > 0) {
-        if (this->zoneEqSizing.allocated()) {
+        if (allocated(this->zoneEqSizing)) {
             this->sizingDesValueFromParent = this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent;
         }
         if (this->zoneSizingRunDone) {

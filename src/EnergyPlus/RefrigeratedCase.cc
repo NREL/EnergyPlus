@@ -9441,19 +9441,20 @@ void InitRefrigeration(EnergyPlusData &state)
         // Can arrive here when load call to refrigeration looks for cases/walkin systems and usetimestep is false
         if ((!state.dataRefrigCase->UseSysTimeStep) &&
             ((state.dataRefrigCase->NumSimulationCases > 0) || (state.dataRefrigCase->NumSimulationWalkIns > 0))) {
-            for (int i = state.dataHeatBal->RefrigCaseCredit.l(), e = state.dataHeatBal->RefrigCaseCredit.u(); i <= e; ++i) {
-                state.dataHeatBal->RefrigCaseCredit(i).reset();
+
+            for (auto &credit : state.dataHeatBal->RefrigCaseCredit) {
+                credit.reset();
             }
-            for (int i = CaseWIZoneReport.l(), e = CaseWIZoneReport.u(); i <= e; ++i) {
-                CaseWIZoneReport(i).reset();
+            for (auto &zoneReport : CaseWIZoneReport) {
+                zoneReport.reset();
             }
         }
     }
 
     if (state.dataRefrigCase->NumSimulationCases > 0) {
         // RefrigCase ALLOCATED to NumSimulationCases
-        for (int i = RefrigCase.l(), e = RefrigCase.u(); i <= e; ++i) {
-            RefrigCase(i).reset_init();
+        for (auto &refrig : RefrigCase) {
+            refrig.reset_init();
         }
     } // NumSimulationCases
 

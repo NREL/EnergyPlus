@@ -376,14 +376,14 @@ namespace General {
                                   bool &errFlag                             // Error flag set to true if error found here.
     );
 
-    template <typename T, class = typename std::enable_if<!std::is_same<T, std::string>::value>::type>
+    template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     inline void CheckCreatedZoneItemName(EnergyPlusData &state,
                                          std::string const &calledFrom,                  // routine called from
                                          std::string const &CurrentObject,               // object being parsed
                                          std::string const &ZoneName,                    // Zone Name associated
                                          std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
                                          std::string const &ItemName,                    // Item name (People, Lights, etc object)
-                                         Array1<T> const &Items,                         // Items to check for duplication Names
+                                         Container const &Items,                         // Items to check for duplication Names
                                          int const NumItems,                             // Number of items in ItemNames array
                                          std::string &ResultName,                        // Resultant name
                                          bool &errFlag                                   // Error flag set to true if error found here.
