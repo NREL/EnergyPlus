@@ -768,7 +768,7 @@ target_link_libraries(
          airflownetworklib
          ssc)
 
-target_link_libraries(energypluslib PRIVATE project_options project_fp_options project_warnings)
+target_link_libraries(energypluslib PRIVATE project_options project_fp_options project_warnings cpp_pch_files)
 
 if(OPENGL_FOUND)
   target_link_libraries(energypluslib PUBLIC penumbra)
