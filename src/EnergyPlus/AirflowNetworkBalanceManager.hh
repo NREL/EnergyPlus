@@ -59,6 +59,7 @@
 #include "AirflowNetwork/Elements.hpp"
 #include "AirflowNetwork/Solver.hpp"
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -228,7 +229,7 @@ struct AirflowNetworkBalanceManagerData : BaseGlobalStruct
     void initialize(EnergyPlusData &state);
     void calculateWindPressureCoeffs(EnergyPlusData &state);
 
-    Array1D<AirflowNetworkBalanceManager::OccupantVentilationControlProp> OccupantVentilationControl;
+    EPVector<AirflowNetworkBalanceManager::OccupantVentilationControlProp> OccupantVentilationControl;
     Array1D_int SplitterNodeNumbers;
     int AirflowNetworkNumOfExtSurfaces = 0;
     // Inverse matrix
@@ -298,17 +299,17 @@ struct AirflowNetworkBalanceManagerData : BaseGlobalStruct
     int ErrIndexLowPre = 0;
 
     // Object Data
-    Array1D<AirflowNetworkBalanceManager::AirflowNetworkReportVars> AirflowNetworkZnRpt;
+    EPVector<AirflowNetworkBalanceManager::AirflowNetworkReportVars> AirflowNetworkZnRpt;
     std::unordered_map<std::string, std::string> UniqueAirflowNetworkSurfaceName;
 
     // AirflowNetwork::Solver solver;
 
     // Output and reporting
-    Array1D<AirflowNetwork::AirflowNetworkExchangeProp> exchangeData;
-    Array1D<AirflowNetwork::AirflowNetworkExchangeProp> multiExchangeData;
-    Array1D<AirflowNetwork::AirflowNetworkLinkReportData> linkReport;
-    Array1D<AirflowNetwork::AirflowNetworkNodeReportData> nodeReport;
-    Array1D<AirflowNetwork::AirflowNetworkLinkReportData> linkReport1;
+    EPVector<AirflowNetwork::AirflowNetworkExchangeProp> exchangeData;
+    EPVector<AirflowNetwork::AirflowNetworkExchangeProp> multiExchangeData;
+    EPVector<AirflowNetwork::AirflowNetworkLinkReportData> linkReport;
+    EPVector<AirflowNetwork::AirflowNetworkNodeReportData> nodeReport;
+    EPVector<AirflowNetwork::AirflowNetworkLinkReportData> linkReport1;
 
     // used to be statics
     Array1D<bool> onceZoneFlag;

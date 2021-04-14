@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 
@@ -2168,58 +2169,58 @@ struct HeatBalanceData : BaseGlobalStruct
     std::vector<int> AirBoundaryMixingZone2;  // Air boundary simple mixing zone 2
     std::vector<int> AirBoundaryMixingSched;  // Air boundary simple mixing schedule index
     std::vector<Real64> AirBoundaryMixingVol; // Air boundary simple mixing volume flow rate [m3/s]
-    Array1D<DataHeatBalance::ZonePreDefRepType> ZonePreDefRep;
+    EPVector<DataHeatBalance::ZonePreDefRepType> ZonePreDefRep;
     DataHeatBalance::ZonePreDefRepType BuildingPreDefRep;
-    Array1D<DataHeatBalance::ZoneSimData> ZoneIntGain;
-    Array1D<DataHeatBalance::GapSupportPillar> SupportPillar;
-    Array1D<DataHeatBalance::GapDeflectionState> DeflectionState;
-    Array1D<DataHeatBalance::SpectralDataProperties> SpectralData;
-    Array1D<DataHeatBalance::ZoneData> Zone;
-    Array1D<DataHeatBalance::ZoneListData> ZoneList;
-    Array1D<DataHeatBalance::ZoneGroupData> ZoneGroup;
-    Array1D<DataHeatBalance::PeopleData> People;
-    Array1D<DataHeatBalance::LightsData> Lights;
-    Array1D<DataHeatBalance::ZoneEquipData> ZoneElectric;
-    Array1D<DataHeatBalance::ZoneEquipData> ZoneGas;
-    Array1D<DataHeatBalance::ZoneEquipData> ZoneOtherEq;
-    Array1D<DataHeatBalance::ZoneEquipData> ZoneHWEq;
-    Array1D<DataHeatBalance::ZoneEquipData> ZoneSteamEq;
-    Array1D<DataHeatBalance::ITEquipData> ZoneITEq;
-    Array1D<DataHeatBalance::BBHeatData> ZoneBBHeat;
-    Array1D<DataHeatBalance::InfiltrationData> Infiltration;
-    Array1D<DataHeatBalance::VentilationData> Ventilation;
-    Array1D<DataHeatBalance::ZoneAirBalanceData> ZoneAirBalance;
-    Array1D<DataHeatBalance::MixingData> Mixing;
-    Array1D<DataHeatBalance::MixingData> CrossMixing;
-    Array1D<DataHeatBalance::MixingData> RefDoorMixing;
+    EPVector<DataHeatBalance::ZoneSimData> ZoneIntGain;
+    EPVector<DataHeatBalance::GapSupportPillar> SupportPillar;
+    EPVector<DataHeatBalance::GapDeflectionState> DeflectionState;
+    EPVector<DataHeatBalance::SpectralDataProperties> SpectralData;
+    EPVector<DataHeatBalance::ZoneData> Zone;
+    EPVector<DataHeatBalance::ZoneListData> ZoneList;
+    EPVector<DataHeatBalance::ZoneGroupData> ZoneGroup;
+    EPVector<DataHeatBalance::PeopleData> People;
+    EPVector<DataHeatBalance::LightsData> Lights;
+    EPVector<DataHeatBalance::ZoneEquipData> ZoneElectric;
+    EPVector<DataHeatBalance::ZoneEquipData> ZoneGas;
+    EPVector<DataHeatBalance::ZoneEquipData> ZoneOtherEq;
+    EPVector<DataHeatBalance::ZoneEquipData> ZoneHWEq;
+    EPVector<DataHeatBalance::ZoneEquipData> ZoneSteamEq;
+    EPVector<DataHeatBalance::ITEquipData> ZoneITEq;
+    EPVector<DataHeatBalance::BBHeatData> ZoneBBHeat;
+    EPVector<DataHeatBalance::InfiltrationData> Infiltration;
+    EPVector<DataHeatBalance::VentilationData> Ventilation;
+    EPVector<DataHeatBalance::ZoneAirBalanceData> ZoneAirBalance;
+    EPVector<DataHeatBalance::MixingData> Mixing;
+    EPVector<DataHeatBalance::MixingData> CrossMixing;
+    EPVector<DataHeatBalance::MixingData> RefDoorMixing;
     Array1D<DataHeatBalance::WindowBlindProperties> Blind;
-    Array1D<DataHeatBalance::WindowComplexShade> ComplexShade;
-    Array1D<DataHeatBalance::WindowThermalModelParams> WindowThermalModel;
-    Array1D<DataHeatBalance::SurfaceScreenProperties> SurfaceScreens;
-    Array1D<DataHeatBalance::ScreenTransData> ScreenTrans;
-    Array1D<DataHeatBalance::ZoneCatEUseData> ZoneIntEEuse;
-    Array1D<DataHeatBalance::RefrigCaseCreditData> RefrigCaseCredit;
-    Array1D<DataHeatBalance::HeatReclaimDataBase> HeatReclaimRefrigeratedRack;
-    Array1D<DataHeatBalance::HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
-    Array1D<DataHeatBalance::HeatReclaimDataBase> HeatReclaimDXCoil;
-    Array1D<DataHeatBalance::HeatReclaimDataBase> HeatReclaimVS_DXCoil;
-    Array1D<DataHeatBalance::HeatReclaimDataBase> HeatReclaimSimple_WAHPCoil;
-    Array1D<DataHeatBalance::AirReportVars> ZnAirRpt;
-    Array1D<DataHeatBalance::TCGlazingsType> TCGlazings;
-    Array1D<DataHeatBalance::ZoneEquipData> ZoneCO2Gen;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> PeopleObjects;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> LightsObjects;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> ZoneElectricObjects;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> ZoneGasObjects;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> HotWaterEqObjects;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> SteamEqObjects;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> OtherEqObjects;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> InfiltrationObjects;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> VentilationObjects;
-    Array1D<DataHeatBalance::ZoneReportVars> ZnRpt;
-    Array1D<DataHeatBalance::ZoneMassConservationData> MassConservation;
+    EPVector<DataHeatBalance::WindowComplexShade> ComplexShade;
+    EPVector<DataHeatBalance::WindowThermalModelParams> WindowThermalModel;
+    EPVector<DataHeatBalance::SurfaceScreenProperties> SurfaceScreens;
+    EPVector<DataHeatBalance::ScreenTransData> ScreenTrans;
+    EPVector<DataHeatBalance::ZoneCatEUseData> ZoneIntEEuse;
+    EPVector<DataHeatBalance::RefrigCaseCreditData> RefrigCaseCredit;
+    EPVector<DataHeatBalance::HeatReclaimDataBase> HeatReclaimRefrigeratedRack;
+    EPVector<DataHeatBalance::HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
+    EPVector<DataHeatBalance::HeatReclaimDataBase> HeatReclaimDXCoil;
+    EPVector<DataHeatBalance::HeatReclaimDataBase> HeatReclaimVS_DXCoil;
+    EPVector<DataHeatBalance::HeatReclaimDataBase> HeatReclaimSimple_WAHPCoil;
+    EPVector<DataHeatBalance::AirReportVars> ZnAirRpt;
+    EPVector<DataHeatBalance::TCGlazingsType> TCGlazings;
+    EPVector<DataHeatBalance::ZoneEquipData> ZoneCO2Gen;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> PeopleObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> LightsObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ZoneElectricObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ZoneGasObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> HotWaterEqObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> SteamEqObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> OtherEqObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> InfiltrationObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> VentilationObjects;
+    EPVector<DataHeatBalance::ZoneReportVars> ZnRpt;
+    EPVector<DataHeatBalance::ZoneMassConservationData> MassConservation;
     DataHeatBalance::ZoneAirMassFlowConservation ZoneAirMassFlow;
-    Array1D<DataHeatBalance::ZoneLocalEnvironmentData> ZoneLocalEnvironment;
+    EPVector<DataHeatBalance::ZoneLocalEnvironmentData> ZoneLocalEnvironment;
     bool MundtFirstTimeFlag = true;
 
     void clear_state() override
