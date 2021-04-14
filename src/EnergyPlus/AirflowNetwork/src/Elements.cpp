@@ -3105,7 +3105,7 @@ namespace AirflowNetwork {
 
         if (state.dataLoopNodes->Node(InletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
-            if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrlExhaust) {
+            if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrl::Exhaust) {
                 F[0] = state.dataAirflowNetwork->ExhaustFanMassFlowRate;
             } else {
                 F[0] = state.dataLoopNodes->Node(InletNode).MassFlowRate;
@@ -3231,7 +3231,7 @@ namespace AirflowNetwork {
 
         if (state.dataLoopNodes->Node(InletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
-            if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrlExhaust) {
+            if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrl::Exhaust) {
                 F[0] = state.dataAirflowNetwork->ExhaustFanMassFlowRate;
             } else {
                 F[0] = state.dataLoopNodes->Node(InletNode).MassFlowRate;
@@ -3587,7 +3587,7 @@ namespace AirflowNetwork {
         if (state.dataLoopNodes->Node(OutletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
             DF[0] = 0.0;
-            if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrlRelief) {
+            if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrl::Relief) {
                 F[0] = state.dataAirflowNetwork->ReliefMassFlowRate;
             } else {
                 F[0] = state.dataLoopNodes->Node(OutletNode).MassFlowRate;

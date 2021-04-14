@@ -4181,9 +4181,9 @@ namespace AirflowNetworkBalanceManager {
                 {
                     auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(Alphas(3)));
                     if (SELECT_CASE_var == "AIRFLOWNETWORK:MULTIZONE:COMPONENT:ZONEEXHAUSTFAN") {
-                        state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet = PressureCtrlExhaust;
+                        state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet = PressureCtrl::Exhaust;
                     } else if (SELECT_CASE_var == "AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:RELIEFAIRFLOW") {
-                        state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet = PressureCtrlRelief;
+                        state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet = PressureCtrl::Relief;
                     } else { // Error
                         ShowSevereError(state,
                                         RoutineName + CurrentModuleObject + " object, The entered choice for " + cAlphaFields(3) +
@@ -4197,7 +4197,7 @@ namespace AirflowNetworkBalanceManager {
                     }
                 }
 
-                if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrlExhaust) {
+                if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrl::Exhaust) {
                     // This is not great
                     bool is_EXF{false};
                     auto afe = solver.elements.find(Alphas(4));
@@ -4210,7 +4210,7 @@ namespace AirflowNetworkBalanceManager {
                         ErrorsFound = true;
                     }
                 }
-                if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrlRelief) {
+                if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrl::Relief) {
                     // This is not great
                     bool is_REL{false};
                     auto afe = solver.elements.find(Alphas(4));
@@ -6719,7 +6719,7 @@ namespace AirflowNetworkBalanceManager {
             Par = 0.0;
         }
 
-        state.dataAirflowNetwork->PressureSetFlag = 0;
+        state.dataAirflowNetwork->PressureSetFlag = AirflowNetwork::PressureCtrl::Unassigned;
 
         if (state.dataAirflowNetworkBalanceManager->NumOfPressureControllers == 1) {
             if (state.dataAirflowNetwork->PressureControllerData(1).AvailSchedPtr == DataGlobalConstants::ScheduleAlwaysOn) {
@@ -6729,16 +6729,16 @@ namespace AirflowNetworkBalanceManager {
                     state.dataAirflowNetwork->PressureSetFlag = state.dataAirflowNetwork->PressureControllerData(1).ControlTypeSet;
                 }
             }
-            if (state.dataAirflowNetwork->PressureSetFlag > 0) {
+            if (static_cast<int>(state.dataAirflowNetwork->PressureSetFlag) > -1) {
                 PressureSet = GetCurrentScheduleValue(state, state.dataAirflowNetwork->PressureControllerData(1).PresSetpointSchedPtr);
             }
         }
         auto &solver = state.dataAFNSolver->solver;
         solver.initialize(state);
 
-        if (!(state.dataAirflowNetwork->PressureSetFlag > 0 && state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
+        if (!(static_cast<int>(state.dataAirflowNetwork->PressureSetFlag) > -1 && state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
             solver.airmov(state);
-        } else if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrlExhaust) {
+        } else if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrl::Exhaust) {
             AirLoopNum = state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->PressureControllerData(1).AFNNodeNum).AirLoopNum;
             MinExhaustMassFlowrate = 2.0 * VerySmallMassFlow;
             MaxExhaustMassFlowrate = Node(state.dataAirflowNetwork->PressureControllerData(1).OANodeNum).MassFlowRate;
@@ -6958,11 +6958,11 @@ namespace AirflowNetworkBalanceManager {
 
         PressureSet = Par(1);
 
-        if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrlExhaust) {
+        if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrl::Exhaust) {
             state.dataAirflowNetwork->ExhaustFanMassFlowRate = ControllerMassFlowRate;
         }
 
-        if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrlRelief) {
+        if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrl::Relief) {
             state.dataAirflowNetwork->ReliefMassFlowRate = ControllerMassFlowRate;
         }
         auto &solver = state.dataAFNSolver->solver;
@@ -11973,7 +11973,7 @@ namespace AirflowNetworkBalanceManager {
                         if (state.dataZoneEquip->ZoneEquipConfig(j).InletNodeAirLoopNum(k) > 0) {
                             state.dataAirflowNetwork->PressureControllerData(i).AirLoopNum =
                                 state.dataZoneEquip->ZoneEquipConfig(j).InletNodeAirLoopNum(k);
-                            if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrlRelief) {
+                            if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrl::Relief) {
                                 state.dataAirflowNetwork->PressureControllerData(i).OANodeNum =
                                     state.dataAirSystemsData->PrimaryAirSystems(state.dataAirflowNetwork->PressureControllerData(i).AirLoopNum)
                                         .OAMixOAInNodeNum;
@@ -11984,7 +11984,7 @@ namespace AirflowNetworkBalanceManager {
                                     }
                                 }
                             }
-                            if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrlExhaust) {
+                            if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrl::Exhaust) {
                                 state.dataAirflowNetwork->PressureControllerData(i).OANodeNum =
                                     state.dataZoneEquip->ZoneEquipConfig(state.dataAirflowNetwork->PressureControllerData(i).ZoneNum).ExhaustNode(1);
                                 for (n = 1; n <= state.dataAirflowNetwork->AirflowNetworkNumOfExhFan; ++n) {

@@ -463,7 +463,7 @@ namespace AirflowNetwork {
 
         // Initialize pressure for pressure control and for Initialization Type = LinearInitializationMethod
         if ((state.dataAirflowNetwork->AirflowNetworkSimu.InitFlag == 0) ||
-            (state.dataAirflowNetwork->PressureSetFlag > 0 && state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
+            (static_cast<int>(state.dataAirflowNetwork->PressureSetFlag) > -1 && state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
             for (n = 1; n <= NetworkNumOfNodes; ++n) {
                 if (state.dataAirflowNetwork->AirflowNetworkNodeData(n).NodeTypeNum == 0) PZ(n) = 0.0;
             }
