@@ -2594,114 +2594,129 @@ namespace OutdoorAirUnit {
         }
 
         {
-            CompType const SELECT_CASE_var(CoilTypeNum);
-            if (SELECT_CASE_var == CompType::Coil_ElectricHeat) {
-                InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
-                OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
-                if ((OpMode == Operation::NeutralMode) || (OpMode == Operation::CoolingMode) ||
-                    (state.dataLoopNodes->Node(InletNode).Temp > CoilAirOutTemp)) {
-                    QCompReq = 0.0;
-                } else {
-                    CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(InletNode).HumRat);
-                    QCompReq = state.dataLoopNodes->Node(InletNode).MassFlowRate * CpAirZn *
-                               ((CoilAirOutTemp - state.dataLoopNodes->Node(InletNode).Temp) - FanEffect);
-                    if (std::abs(QCompReq) < SmallLoad) QCompReq = 0.0;
+            switch (CoilTypeNum) {
+            case (CompType::Coil_ElectricHeat): {
+                    InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
+                    OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
+                    if ((OpMode == Operation::NeutralMode) || (OpMode == Operation::CoolingMode) ||
+                        (state.dataLoopNodes->Node(InletNode).Temp > CoilAirOutTemp)) {
+                        QCompReq = 0.0;
+                    } else {
+                        CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(InletNode).HumRat);
+                        QCompReq = state.dataLoopNodes->Node(InletNode).MassFlowRate * CpAirZn *
+                                   ((CoilAirOutTemp - state.dataLoopNodes->Node(InletNode).Temp) - FanEffect);
+                        if (std::abs(QCompReq) < SmallLoad) QCompReq = 0.0;
+                    }
+
+                    if (QCompReq <= 0.0) {
+                        QCompReq = 0.0; // a heating coil can only heat, not cool
+                        state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
+                        state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat;
+                        state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                    }
+                    HeatingCoils::SimulateHeatingCoilComponents(
+                        state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, QCompReq, CoilIndex);
+
+                    AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                    LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
+                                             PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
+
                 }
+                    break;
+                case (CompType::Coil_GasHeat): { // 'Coil:Heating:Steam'
+                    InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
+                    OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
+                    if ((OpMode == Operation::NeutralMode) || (OpMode == Operation::CoolingMode) ||
+                        (state.dataLoopNodes->Node(InletNode).Temp > CoilAirOutTemp)) {
+                        QCompReq = 0.0;
+                    } else {
+                        state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                        CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(InletNode).HumRat);
+                        QCompReq = state.dataLoopNodes->Node(InletNode).MassFlowRate * CpAirZn *
+                                   ((CoilAirOutTemp - state.dataLoopNodes->Node(InletNode).Temp) - FanEffect);
+                        if (std::abs(QCompReq) < SmallLoad) QCompReq = 0.0;
+                    }
+                    if (QCompReq <= 0.0) {
+                        QCompReq = 0.0; // a heating coil can only heat, not cool
+                        state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
+                        state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat;
+                        state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                    }
+                    HeatingCoils::SimulateHeatingCoilComponents(
+                        state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, QCompReq, CoilIndex);
 
-                if (QCompReq <= 0.0) {
-                    QCompReq = 0.0; // a heating coil can only heat, not cool
-                    state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
-                    state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat;
-                    state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                    AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                    LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
+                                             PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
+
                 }
-                HeatingCoils::SimulateHeatingCoilComponents(
-                    state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, QCompReq, CoilIndex);
+                    break;
+                case (CompType::SteamCoil_AirHeat): { // 'Coil:Heating:Steam'
+                    InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
+                    OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
+                    if ((OpMode == Operation::NeutralMode) || (OpMode == Operation::CoolingMode) ||
+                        (state.dataLoopNodes->Node(InletNode).Temp > CoilAirOutTemp)) {
+                        QCompReq = 0.0;
+                    } else {
+                        CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(InletNode).HumRat);
+                        QCompReq = state.dataLoopNodes->Node(InletNode).MassFlowRate * CpAirZn *
+                                   ((CoilAirOutTemp - state.dataLoopNodes->Node(InletNode).Temp) - FanEffect);
+                        if (std::abs(QCompReq) < SmallLoad) QCompReq = 0.0;
+                    }
+                    if (QCompReq <= 0.0) {
+                        QCompReq = 0.0; // a heating coil can only heat, not cool
+                        state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
+                        state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat;
+                        state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                    }
+                    SimulateSteamCoilComponents(
+                        state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex, QCompReq);
+                    AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                    LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
+                                             PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
 
-                AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-                LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
-                                         PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
-
-            } else if (SELECT_CASE_var == CompType::Coil_GasHeat) { // 'Coil:Heating:Steam'
-                InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
-                OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
-                if ((OpMode == Operation::NeutralMode) || (OpMode == Operation::CoolingMode) ||
-                    (state.dataLoopNodes->Node(InletNode).Temp > CoilAirOutTemp)) {
-                    QCompReq = 0.0;
-                } else {
-                    state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-                    CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(InletNode).HumRat);
-                    QCompReq = state.dataLoopNodes->Node(InletNode).MassFlowRate * CpAirZn *
-                               ((CoilAirOutTemp - state.dataLoopNodes->Node(InletNode).Temp) - FanEffect);
-                    if (std::abs(QCompReq) < SmallLoad) QCompReq = 0.0;
                 }
-                if (QCompReq <= 0.0) {
-                    QCompReq = 0.0; // a heating coil can only heat, not cool
-                    state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
-                    state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat;
-                    state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                    break;
+                case(CompType::WaterCoil_SimpleHeat): { // 'Coil:Heating:Water')
+                    SimulateWaterCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
+                    InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
+                    OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
+                    AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                    LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
+                                             PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
+
                 }
-                HeatingCoils::SimulateHeatingCoilComponents(
-                    state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, QCompReq, CoilIndex);
+                    break;
+                case (CompType::WaterCoil_Cooling): { // 'Coil:Cooling:Water'
+                    SimulateWaterCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
+                    InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
+                    OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
+                    AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                    LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
+                                             PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
 
-                AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-                LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
-                                         PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
-
-            } else if (SELECT_CASE_var == CompType::SteamCoil_AirHeat) { // 'Coil:Heating:Steam'
-                InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
-                OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
-                if ((OpMode == Operation::NeutralMode) || (OpMode == Operation::CoolingMode) ||
-                    (state.dataLoopNodes->Node(InletNode).Temp > CoilAirOutTemp)) {
-                    QCompReq = 0.0;
-                } else {
-                    CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(InletNode).HumRat);
-                    QCompReq = state.dataLoopNodes->Node(InletNode).MassFlowRate * CpAirZn *
-                               ((CoilAirOutTemp - state.dataLoopNodes->Node(InletNode).Temp) - FanEffect);
-                    if (std::abs(QCompReq) < SmallLoad) QCompReq = 0.0;
                 }
-                if (QCompReq <= 0.0) {
-                    QCompReq = 0.0; // a heating coil can only heat, not cool
-                    state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
-                    state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat;
-                    state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                    break;
+                case(CompType::WaterCoil_DetailedCool): {
+                    SimulateWaterCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
+                    InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
+                    OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
+                    AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                    LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
+                                             PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
+
                 }
-                SimulateSteamCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex, QCompReq);
-                AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-                LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
-                                         PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
-
-            } else if (SELECT_CASE_var == CompType::WaterCoil_SimpleHeat) { // 'Coil:Heating:Water')
-                SimulateWaterCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
-                InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
-                OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
-                AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-                LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
-                                         PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
-
-            } else if (SELECT_CASE_var == CompType::WaterCoil_Cooling) { // 'Coil:Cooling:Water'
-                SimulateWaterCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
-                InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
-                OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
-                AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-                LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
-                                         PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
-
-            } else if (SELECT_CASE_var == CompType::WaterCoil_DetailedCool) {
-                SimulateWaterCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
-                InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
-                OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
-                AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-                LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
-                                         PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
-
-            } else if (SELECT_CASE_var == CompType::WaterCoil_CoolingHXAsst) {
-                SimHXAssistedCoolingCoil(
-                    state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, 1, 0.0, CoilIndex, ContFanCycCoil);
-                InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
-                OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
-                AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-                LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
-                                         PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
+                break;
+                case(CompType::WaterCoil_CoolingHXAsst): {
+                    SimHXAssistedCoolingCoil(
+                        state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, 1, 0.0, CoilIndex, ContFanCycCoil);
+                    InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
+                    OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
+                    AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                    LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
+                                             PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
+                }
+                    break;
             }
         }
     }
