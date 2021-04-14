@@ -229,8 +229,7 @@ namespace Psychrometrics {
                 if (!PsyReportIt(Loop)) continue;
                 const auto istring = fmt::to_string(state.dataPsychCache->NumTimesCalled(Loop));
                 if (state.dataPsychCache->NumIterations(Loop) > 0) {
-                    AverageIterations =
-                        double(state.dataPsychCache->NumIterations(Loop)) / double(state.dataPsychCache->NumTimesCalled(Loop));
+                    AverageIterations = double(state.dataPsychCache->NumIterations(Loop)) / double(state.dataPsychCache->NumTimesCalled(Loop));
                     print(auditFile, "{},{},{:.2R}\n", PsyRoutineNames(Loop), istring, AverageIterations);
                 } else {
                     print(auditFile, "{},{}\n", PsyRoutineNames(Loop), istring);
@@ -707,7 +706,7 @@ namespace Psychrometrics {
 #else
 
     Real64 PsyPsatFnTemp(EnergyPlusData &state,
-                         Real64 const T,               // dry-bulb temperature {C}
+                         Real64 const T,                                // dry-bulb temperature {C}
                          [[maybe_unused]] std::string const &CalledFrom // routine this function was called from (error messages)
     )
 #endif
