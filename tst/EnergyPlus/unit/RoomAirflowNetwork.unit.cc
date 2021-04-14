@@ -75,8 +75,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 
-
-
 using namespace EnergyPlus;
 using namespace DataEnvironment;
 using namespace EnergyPlus::DataSizing;
@@ -295,15 +293,15 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataMstBal->HMassConvInFD(1) =
         state->dataHeatBal->HConvIn(1) /
         ((PsyRhoAirFnPbTdbW(
-            *state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) +
-            state->dataMstBal->RhoVaporAirIn(1)) *
-            PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
+              *state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) +
+          state->dataMstBal->RhoVaporAirIn(1)) *
+         PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
     state->dataMstBal->HMassConvInFD(2) =
         state->dataHeatBal->HConvIn(2) /
         ((PsyRhoAirFnPbTdbW(
-            *state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) +
-            state->dataMstBal->RhoVaporAirIn(2)) *
-            PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
+              *state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) +
+          state->dataMstBal->RhoVaporAirIn(2)) *
+         PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
 
     RoomAirNode = 1;
     auto &thisRAFN(state->dataRoomAirflowNetModel->RAFN(ZoneNum));
@@ -367,46 +365,47 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
 }
 TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
 {
-    // different names between internal gain objects and room air objects for internal gains result in fatal error from GetInternalGainDeviceIndex function.
+    // different names between internal gain objects and room air objects for internal gains result in fatal error from GetInternalGainDeviceIndex
+    // function.
     bool ErrorsFound(false);
     std::string const idf_objects = delimited_string({
 
-     "Zone,living_unit1;",
+        "Zone,living_unit1;",
 
-     "BuildingSurface:Detailed,",
-     "    unit1,           !- Name",
-     "    Wall,                    !- Surface Type",
-     "    PARTITION,               !- Construction Name",
-     "    living_unit1,               !- Zone Name",
-     "    Outdoors,                !- Outside Boundary Condition",
-     "    ,                        !- Outside Boundary Condition Object",
-     "    SunExposed,              !- Sun Exposure",
-     "    WindExposed,             !- Wind Exposure",
-     "    0.5000000,               !- View Factor to Ground",
-     "    4,                       !- Number of Vertices",
-     "    0,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-     "    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
-     "    6.096000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
-     "    6.096000,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "    unit1,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    PARTITION,               !- Construction Name",
+        "    living_unit1,               !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
 
-     "Construction,",
-     "    PARTITION,             !- Name",
-     "    GYP BOARD;  !- Outside Layer",
+        "Construction,",
+        "    PARTITION,             !- Name",
+        "    GYP BOARD;  !- Outside Layer",
 
-     "Material,",
-     "    GYP BOARD,  !- Name",
-     "    Smooth,                  !- Roughness",
-     "    1.9050000E-02,           !- Thickness {m}",
-     "    0.7264224,               !- Conductivity {W/m-K}",
-     "    1601.846,                !- Density {kg/m3}",
-     "    836.8000,                !- Specific Heat {J/kg-K}",
-     "    0.9000000,               !- Thermal Absorptance",
-     "    0.9200000,               !- Solar Absorptance",
-     "    0.9200000;               !- Visible Absorptance",
+        "Material,",
+        "    GYP BOARD,  !- Name",
+        "    Smooth,                  !- Roughness",
+        "    1.9050000E-02,           !- Thickness {m}",
+        "    0.7264224,               !- Conductivity {W/m-K}",
+        "    1601.846,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance",
 
-     "Schedule:Constant,sch_act,,120.0;",
-     "Schedule:Constant,sch,,1.0;",
-     "People,",
+        "Schedule:Constant,sch_act,,120.0;",
+        "Schedule:Constant,sch,,1.0;",
+        "People,",
         "  people_unit1,            !- Name",
         "  living_unit1,            !- Zone or ZoneList Name",
         "  sch,           !- Number of People Schedule Name",
@@ -419,7 +418,7 @@ TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
         " sch_act,            !- Activity Level Schedule Name",
         " ;                        !- Carbon Dioxide Generation Rate {m3 / s - W}",
 
-     "Lights,",
+        "Lights,",
         "  Living Hardwired Lighting1,  !- Name",
         "  living_unit1,            !- Zone or ZoneList Name",
         "  sch,  !- Schedule Name",
@@ -431,7 +430,7 @@ TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
         "  0.6,                     !- Fraction Radiant",
         "  0.2,                     !- Fraction Visible",
         "  0;                       !- Fraction Replaceable",
-     " ElectricEquipment,",
+        " ElectricEquipment,",
         "  Electric Equipment 1,  !- Name",
         "  living_unit1,               !- Zone or ZoneList Name",
         "  sch,               !- Schedule Name",
@@ -443,43 +442,43 @@ TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
         "  0.5000,                  !- Fraction Radiant",
         "  0.0000;                  !- Fraction Lost",
 
-     "RoomAirModelType,",
-       " RoomAirWithAirflowNetwork,  !- Name",
-       " living_unit1,            !- Zone Name",
-       " AirflowNetwork,          !- Room - Air Modeling Type",
-       " DIRECT;                  !- Air Temperature Coupling Strategy",
+        "RoomAirModelType,",
+        " RoomAirWithAirflowNetwork,  !- Name",
+        " living_unit1,            !- Zone Name",
+        " AirflowNetwork,          !- Room - Air Modeling Type",
+        " DIRECT;                  !- Air Temperature Coupling Strategy",
 
-     "RoomAir:Node:AirflowNetwork,",
-       " Node1,                   !- Name",
-       " living_unit1,            !- Zone Name",
-       " 1,                    !- Fraction of Zone Air Volume",
-       " unit1_List,   !- RoomAir : Node : AirflowNetwork : AdjacentSurfaceList Name",
-       " Node1_Gain,              !- RoomAir : Node : AirflowNetwork : InternalGains Name",
-       " Node1_HVAC;              !- RoomAir:Node:AirflowNetwork:HVACEquipment Name",
+        "RoomAir:Node:AirflowNetwork,",
+        " Node1,                   !- Name",
+        " living_unit1,            !- Zone Name",
+        " 1,                    !- Fraction of Zone Air Volume",
+        " unit1_List,   !- RoomAir : Node : AirflowNetwork : AdjacentSurfaceList Name",
+        " Node1_Gain,              !- RoomAir : Node : AirflowNetwork : InternalGains Name",
+        " Node1_HVAC;              !- RoomAir:Node:AirflowNetwork:HVACEquipment Name",
 
-     "RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,",
-       " unit1_List,   !- Name",
-       " unit1;        !- Surface 1 Name",
+        "RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,",
+        " unit1_List,   !- Name",
+        " unit1;        !- Surface 1 Name",
 
-     "RoomAir:Node:AirflowNetwork:InternalGains,",
-       " Node1_Gain,              !- Name",
-       " People,                  !- Internal Gain Object 1 Type",
-       " living_unit1 People,     !- Internal Gain Object 1 Name",
-       " 1,                    !- Fraction of Gains to Node 1",
-       " Lights,                  !- Internal Gain Object 2 Type",
-       " living_unit1 Lights,     !- Internal Gain Object 2 Name",
-       " 1,                    !- Fraction of Gains to Node 2",
-       " ElectricEquipment,       !- Internal Gain Object 3 Type",
-       " living_unit1 Equip,      !- Internal Gain Object 3 Name",
-       " 1;                    !- Fraction of Gains to Node 3",
+        "RoomAir:Node:AirflowNetwork:InternalGains,",
+        " Node1_Gain,              !- Name",
+        " People,                  !- Internal Gain Object 1 Type",
+        " living_unit1 People,     !- Internal Gain Object 1 Name",
+        " 1,                    !- Fraction of Gains to Node 1",
+        " Lights,                  !- Internal Gain Object 2 Type",
+        " living_unit1 Lights,     !- Internal Gain Object 2 Name",
+        " 1,                    !- Fraction of Gains to Node 2",
+        " ElectricEquipment,       !- Internal Gain Object 3 Type",
+        " living_unit1 Equip,      !- Internal Gain Object 3 Name",
+        " 1;                    !- Fraction of Gains to Node 3",
 
-     "RoomAirSettings:AirflowNetwork,",
-       "  living_unit1,            !- Name",
-       "  living_unit1,            !- Zone Name",
-       "  Node1,            !- Control Point RoomAirflowNetwork : Node Name",
-       "  Node1;                   !- RoomAirflowNetwork : Node Name 1",
+        "RoomAirSettings:AirflowNetwork,",
+        "  living_unit1,            !- Name",
+        "  living_unit1,            !- Zone Name",
+        "  Node1,            !- Control Point RoomAirflowNetwork : Node Name",
+        "  Node1;                   !- RoomAirflowNetwork : Node Name 1",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
@@ -520,7 +519,7 @@ TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
     EXPECT_TRUE(ErrorsFound);
 
     std::string const error_string =
-        delimited_string({ "   ** Severe  ** GetRoomAirflowNetworkData: Invalid Internal Gain Object Name = LIVING_UNIT1 PEOPLE",
+        delimited_string({"   ** Severe  ** GetRoomAirflowNetworkData: Invalid Internal Gain Object Name = LIVING_UNIT1 PEOPLE",
                           "   **   ~~~   ** Entered in RoomAir:Node:AirflowNetwork:InternalGains = NODE1_GAIN",
                           "   **   ~~~   ** Internal gain did not match correctly",
                           "   ** Severe  ** GetRoomAirflowNetworkData: Invalid Internal Gain Object Name = LIVING_UNIT1 LIGHTS",
@@ -528,7 +527,7 @@ TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
                           "   **   ~~~   ** Internal gain did not match correctly",
                           "   ** Severe  ** GetRoomAirflowNetworkData: Invalid Internal Gain Object Name = LIVING_UNIT1 EQUIP",
                           "   **   ~~~   ** Entered in RoomAir:Node:AirflowNetwork:InternalGains = NODE1_GAIN",
-                          "   **   ~~~   ** Internal gain did not match correctly" });
+                          "   **   ~~~   ** Internal gain did not match correctly"});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
