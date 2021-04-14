@@ -2042,7 +2042,7 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     //****************************!
     //***** CALCULATE POWER (1) **!
     //****************************!
-    if (BITF_TEST_ANY(BITF(PumpType), BITF(iPumpType::ConSpeed) | BITF(iPumpType::VarSpeed) | BITF(iPumpType::VarSpeed))) {
+    if (BITF_TEST_ANY(BITF(PumpType), BITF(iPumpType::ConSpeed) | BITF(iPumpType::VarSpeed) | BITF(iPumpType::Cond))) {
         VolFlowRate = state.dataPumps->PumpMassFlowRate / LoopDensity;
         PartLoadRatio = min(1.0, (VolFlowRate / state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate));
         FracFullLoadPower = state.dataPumps->PumpEquip(PumpNum).PartLoadCoef(1) +
