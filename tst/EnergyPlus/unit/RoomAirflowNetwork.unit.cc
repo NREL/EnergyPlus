@@ -295,15 +295,15 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataMstBal->HMassConvInFD(1) =
         state->dataHeatBal->HConvIn(1) /
         ((PsyRhoAirFnPbTdbW(
-              *state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) +
-          state->dataMstBal->RhoVaporAirIn(1)) *
-         PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
+            *state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) +
+            state->dataMstBal->RhoVaporAirIn(1)) *
+            PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
     state->dataMstBal->HMassConvInFD(2) =
         state->dataHeatBal->HConvIn(2) /
         ((PsyRhoAirFnPbTdbW(
-              *state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) +
-          state->dataMstBal->RhoVaporAirIn(2)) *
-         PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
+            *state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) +
+            state->dataMstBal->RhoVaporAirIn(2)) *
+            PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
 
     RoomAirNode = 1;
     auto &thisRAFN(state->dataRoomAirflowNetModel->RAFN(ZoneNum));
@@ -418,7 +418,7 @@ TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
         " autocalculate,           !- Sensible Heat Fraction",
         " sch_act,            !- Activity Level Schedule Name",
         " ;                        !- Carbon Dioxide Generation Rate {m3 / s - W}",
-        
+
      "Lights,",
         "  Living Hardwired Lighting1,  !- Name",
         "  living_unit1,            !- Zone or ZoneList Name",
@@ -478,15 +478,15 @@ TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
        "  living_unit1,            !- Zone Name",
        "  Node1,            !- Control Point RoomAirflowNetwork : Node Name",
        "  Node1;                   !- RoomAirflowNetwork : Node Name 1",
-    
+
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
- 
+
     ErrorsFound = false;
-    state->dataGlobal->NumOfTimeStepInHour = 1;    
-    state->dataGlobal->MinutesPerTimeStep = 60;    
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(*state);
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
@@ -513,14 +513,14 @@ TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
-    ErrorsFound = false; 
+    ErrorsFound = false;
     state->dataRoomAirMod->AirModel.allocate(1);
     state->dataRoomAirMod->AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::AirflowNetwork;
     RoomAirModelManager::GetRoomAirflowNetworkData(*state, ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
 
     std::string const error_string =
-        delimited_string({"   ** Severe  ** GetRoomAirflowNetworkData: Invalid Internal Gain Object Name = LIVING_UNIT1 PEOPLE",
+        delimited_string({ "   ** Severe  ** GetRoomAirflowNetworkData: Invalid Internal Gain Object Name = LIVING_UNIT1 PEOPLE",
                           "   **   ~~~   ** Entered in RoomAir:Node:AirflowNetwork:InternalGains = NODE1_GAIN",
                           "   **   ~~~   ** Internal gain did not match correctly",
                           "   ** Severe  ** GetRoomAirflowNetworkData: Invalid Internal Gain Object Name = LIVING_UNIT1 LIGHTS",
@@ -529,6 +529,6 @@ TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
                           "   ** Severe  ** GetRoomAirflowNetworkData: Invalid Internal Gain Object Name = LIVING_UNIT1 EQUIP",
                           "   **   ~~~   ** Entered in RoomAir:Node:AirflowNetwork:InternalGains = NODE1_GAIN",
                           "   **   ~~~   ** Internal gain did not match correctly" });
-   
+
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
