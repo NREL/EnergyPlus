@@ -59,36 +59,40 @@ struct AirflowNetworkData;
 
 namespace AirflowNetwork {
 
-    enum VentControlType // TODO: make enum class
+    enum VentControlType // TODO: make enum class, since this enum is used in SetupOutputVariable()
     {
-        None = 0,  // Wrong input
-        Temp = 1,  // Temperature venting control
-        Enth = 2,  // Enthalpy venting control
-        Const = 3, // Constant venting control
-        ASH55 = 4,
-        CEN15251 = 5,
-        NoVent = 6,    // No venting
-        ZoneLevel = 7, // ZoneLevel control for a heat transfer subsurface
-        AdjTemp = 8,   // Temperature venting control based on adjacent zone conditions
-        AdjEnth = 9    // Enthalpy venting control based on adjacent zone conditions
+        Invalid = -1,
+        None,  // Wrong input
+        Temp,  // Temperature venting control
+        Enth,  // Enthalpy venting control
+        Const, // Constant venting control
+        ASH55,
+        CEN15251,
+        NoVent,    // No venting
+        ZoneLevel, // ZoneLevel control for a heat transfer subsurface
+        AdjTemp,   // Temperature venting control based on adjacent zone conditions
+        AdjEnth    // Enthalpy venting control based on adjacent zone conditions
     };
 
-    enum OpenStatus // TODO: make enum class
+    enum OpenStatus // TODO: make enum class, since this enum is used in SetupOutputVariable()
     {
-        FreeOperation = 0,     // Free operation
-        MinCheckForceOpen = 1, // Force open when opening elapsed time is less than minimum opening time
-        MinCheckForceClose = 2 // Force open when closing elapsed time is less than minimum closing time
+        Uninitialized = -1,
+        FreeOperation,     // Free operation
+        MinCheckForceOpen, // Force open when opening elapsed time is less than minimum opening time
+        MinCheckForceClose // Force open when closing elapsed time is less than minimum closing time
     };
 
     enum ProbabilityCheck // TODO: make enum class
     {
-        NoAction = 0,    // No action from probability check
-        ForceChange = 1, // Force open or close from probability check
-        KeepStatus = 2   // Keep status at the previous time step from probability check
+        Unassigned = -1,
+        NoAction,    // No action from probability check
+        ForceChange, // Force open or close from probability check
+        KeepStatus   // Keep status at the previous time step from probability check
     };
 
     enum class EquivRec
     {
+        Unassigned = -1,
         Height,          // Effective rectangle polygonal height selection
         BaseAspectRatio, // Effective rectangle base surface aspect ratio selection
         UserAspectRatio  // Effective rectangle user input aspect ratio selection

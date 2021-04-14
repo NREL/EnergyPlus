@@ -13089,16 +13089,16 @@ namespace AirflowNetworkBalanceManager {
 
         if (TimeOpenDuration > 0) {
             if (TimeOpenDuration >= MinOpeningTime) {
-                OpeningStatus = OpenStatus::FreeOperation; // free operation
+                OpeningStatus = static_cast<int>(OpenStatus::FreeOperation); // free operation
             } else {
-                OpeningStatus = OpenStatus::MinCheckForceOpen; // forced to open
+                OpeningStatus = static_cast<int>(OpenStatus::MinCheckForceOpen); // forced to open
             }
         }
         if (TimeCloseDuration > 0) {
             if (TimeCloseDuration >= MinClosingTime) {
-                OpeningStatus = OpenStatus::FreeOperation; // free operation
+                OpeningStatus = static_cast<int>(OpenStatus::FreeOperation); // free operation
             } else {
-                OpeningStatus = OpenStatus::MinCheckForceClose; // forced to close
+                OpeningStatus = static_cast<int>(OpenStatus::MinCheckForceClose); // forced to close
             }
         }
 
