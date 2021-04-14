@@ -60,8 +60,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/EPVector.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -792,7 +792,6 @@ namespace WeatherManager {
 
 } // namespace WeatherManager
 
-
 struct WeatherManagerData : BaseGlobalStruct
 {
 
@@ -952,16 +951,16 @@ struct WeatherManagerData : BaseGlobalStruct
                                          // Number of Days since last snow | Albedo | Rain/Liquid Precipitation (mm)
     WeatherManager::MissingDataCounts Missed;              // NOLINT(cert-err58-cpp)
     WeatherManager::RangeDataCounts OutOfRange;            // NOLINT(cert-err58-cpp)
-    EPVector<WeatherManager::DesignDayData> DesDayInput;    // Design day Input Data NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::DesignDayData> DesDayInput;   // Design day Input Data NOLINT(cert-err58-cpp)
     Array1D<WeatherManager::EnvironmentData> Environment;  // Environment data NOLINT(cert-err58-cpp)
     Array1D<WeatherManager::RunPeriodData> RunPeriodInput; // NOLINT(cert-err58-cpp)
     std::unordered_map<std::string, std::string> RunPeriodInputUniqueNames;
     EPVector<WeatherManager::RunPeriodData> RunPeriodDesignInput; // NOLINT(cert-err58-cpp)
     std::unordered_map<std::string, std::string> RunPeriodDesignInputUniqueNames;
     EPVector<WeatherManager::TypicalExtremeData> TypicalExtremePeriods; // NOLINT(cert-err58-cpp)
-    WeatherManager::DaylightSavingPeriodData EPWDST;                   // Daylight Saving Period Data from EPW file NOLINT(cert-err58-cpp)
-    WeatherManager::DaylightSavingPeriodData IDFDST;                   // Daylight Saving Period Data from IDF file NOLINT(cert-err58-cpp)
-    WeatherManager::DaylightSavingPeriodData DST;                      // Daylight Saving Period Data, if active NOLINT(cert-err58-cpp)
+    WeatherManager::DaylightSavingPeriodData EPWDST;                    // Daylight Saving Period Data from EPW file NOLINT(cert-err58-cpp)
+    WeatherManager::DaylightSavingPeriodData IDFDST;                    // Daylight Saving Period Data from IDF file NOLINT(cert-err58-cpp)
+    WeatherManager::DaylightSavingPeriodData DST;                       // Daylight Saving Period Data, if active NOLINT(cert-err58-cpp)
     EPVector<WeatherManager::WeatherProperties> WPSkyTemperature;       // NOLINT(cert-err58-cpp)
     EPVector<WeatherManager::SpecialDayData> SpecialDays;               // NOLINT(cert-err58-cpp)
     EPVector<WeatherManager::DataPeriodData> DataPeriods;               // NOLINT(cert-err58-cpp)

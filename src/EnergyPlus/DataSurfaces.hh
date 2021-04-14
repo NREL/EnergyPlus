@@ -1472,8 +1472,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinProfileAngHor;                 // Horizontal beam solar profile angle (degrees)
     Array1D<Real64> SurfWinProfileAngVert;                // Vertical beam solar profile angle (degrees)
     EPVector<DataSurfaces::WinShadingType> SurfWinShadingFlag; // -1: window has no shading device
-    Array1D<bool> SurfWinShadingFlagEMSOn;                    // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
-    Array1D<int> SurfWinShadingFlagEMSValue;                  // EMS control value for Shading Flag
+    Array1D<bool> SurfWinShadingFlagEMSOn;                     // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
+    Array1D<int> SurfWinShadingFlagEMSValue;                   // EMS control value for Shading Flag
     Array1D<int>
         SurfWinStormWinFlag; // -1: Storm window not applicable; 0: Window has storm window but it is off 1: Window has storm window and it is on
     Array1D<int> SurfWinStormWinFlagPrevDay; // Previous time step value of StormWinFlag

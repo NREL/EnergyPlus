@@ -49,8 +49,8 @@
 #define EnergyPlus_SurfaceOctree_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/EPVector.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1.fwd.hh>

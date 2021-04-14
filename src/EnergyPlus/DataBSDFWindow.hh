@@ -56,8 +56,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/EPVector.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -430,8 +430,8 @@ struct BSDFWindowData : BaseGlobalStruct
     int TotThermalModels = 0;    // Number of thermal models
 
     // calculation
-    Array3D<Real64> SUNCOSTS = Array3D<Real64>(60, 24, 3);    // Timestep values of solar direction cosines
-    Array2D<Real64> BSDFTempMtrx;                             // Temporary matrix for holding axisymmetric input
+    Array3D<Real64> SUNCOSTS = Array3D<Real64>(60, 24, 3);     // Timestep values of solar direction cosines
+    Array2D<Real64> BSDFTempMtrx;                              // Temporary matrix for holding axisymmetric input
     EPVector<DataBSDFWindow::BSDFWindowGeomDescr> ComplexWind; // Window geometry structure: set in CalcPerSolarBeam/SolarShading
 
     void clear_state() override

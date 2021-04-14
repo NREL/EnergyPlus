@@ -177,7 +177,6 @@ namespace WindTurbine {
 struct WindTurbineData : BaseGlobalStruct
 {
 
-
     int NumWindTurbines; // Total wind turbine statements in inputs
     bool GetInputFlag;
     bool MyOneTimeFlag;

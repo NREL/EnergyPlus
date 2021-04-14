@@ -548,7 +548,6 @@ namespace WaterCoils {
 
 } // namespace WaterCoils
 
-
 struct WaterCoilsData : BaseGlobalStruct
 {
 

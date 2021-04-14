@@ -59,8 +59,8 @@
 #include "AirflowNetwork/Elements.hpp"
 #include "AirflowNetwork/Solver.hpp"
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/EPVector.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -221,7 +221,6 @@ namespace AirflowNetworkBalanceManager {
     };
 
 } // namespace AirflowNetworkBalanceManager
-
 
 struct AirflowNetworkBalanceManagerData : BaseGlobalStruct
 {
