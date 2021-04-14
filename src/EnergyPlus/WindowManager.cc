@@ -2386,6 +2386,7 @@ namespace WindowManager {
                         // Use the new TC window construction
                         ConstrNum = IDConst(iMinDT(1));
                         surface.Construction = ConstrNum;
+                        state.dataSurface->SurfActiveConstruction(SurfNum) = ConstrNum;
                         state.dataSurface->SurfWinSpecTemp(SurfNum) =
                             state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).TCLayer).SpecTemp;
                     }

@@ -990,6 +990,7 @@ namespace DaylightingDevices {
                         state.dataSurface->Surface(SurfNum).BaseSurf = SurfNum;
                         state.dataSurface->Surface(SurfNum).HeatTransSurf = true;
                         state.dataSurface->Surface(SurfNum).Construction = ConstrNum; // Kludge to allow shading surface to be a heat transfer surface
+                        state.dataSurface->SurfActiveConstruction(SurfNum) = ConstrNum;
                         state.dataConstruction->Construct(ConstrNum).IsUsed = true;
                     }
                 }
