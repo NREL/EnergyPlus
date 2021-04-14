@@ -2388,21 +2388,21 @@ void hatter(EnergyPlusData &state,
 void effectiveLayerCond(EnergyPlusData &state,
                         int const nlayer,
                         const Array1D<TARCOGLayerType> &LayerType, // Layer type
-                        const Array1D<Real64> &scon,              // Layer thermal conductivity
-                        const Array1D<Real64> &thick,             // Layer thickness
-                        Array2A_int const iprop,                  // Gas type in gaps
-                        Array2A<Real64> const frct,               // Fraction of gas
-                        const Array1D_int &nmix,                  // Gas mixture
-                        const Array1D<Real64> &pressure,          // Gas pressure [Pa]
-                        const Array1D<Real64> &wght,              // Molecular weight
-                        Array2A<Real64> const gcon,               // Gas specific conductivity
-                        Array2A<Real64> const gvis,               // Gas specific viscosity
-                        Array2A<Real64> const gcp,                // Gas specific heat
-                        const Array1D<Real64> &EffectiveOpenness, // Layer effective openneess [m2]
-                        Array1D<Real64> &theta,                   // Layer surface tempeartures [K]
-                        Array1D<Real64> &sconScaled,              // Layer conductivity divided by thickness
-                        int &nperr,                               // Error message flag
-                        std::string &ErrorMessage                 // Error message
+                        const Array1D<Real64> &scon,               // Layer thermal conductivity
+                        const Array1D<Real64> &thick,              // Layer thickness
+                        Array2A_int const iprop,                   // Gas type in gaps
+                        Array2A<Real64> const frct,                // Fraction of gas
+                        const Array1D_int &nmix,                   // Gas mixture
+                        const Array1D<Real64> &pressure,           // Gas pressure [Pa]
+                        const Array1D<Real64> &wght,               // Molecular weight
+                        Array2A<Real64> const gcon,                // Gas specific conductivity
+                        Array2A<Real64> const gvis,                // Gas specific viscosity
+                        Array2A<Real64> const gcp,                 // Gas specific heat
+                        const Array1D<Real64> &EffectiveOpenness,  // Layer effective openneess [m2]
+                        Array1D<Real64> &theta,                    // Layer surface tempeartures [K]
+                        Array1D<Real64> &sconScaled,               // Layer conductivity divided by thickness
+                        int &nperr,                                // Error message flag
+                        std::string &ErrorMessage                  // Error message
 )
 {
     for (auto i = 1; i <= nlayer; ++i) {

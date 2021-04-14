@@ -90,7 +90,8 @@ namespace StandardRatings {
     // Std. AHRI AHRI 340/360 Dry-bulb Temp at reduced capacity, <= 0.444
 
     // Defrost control  (heat pump only)
-    enum class HPdefrostControl : int {
+    enum class HPdefrostControl : int
+    {
         Unassigned = -1,
         Timed = 0,   // defrost cycle is timed
         OnDemand = 1 // defrost cycle occurs only when required
@@ -204,9 +205,9 @@ namespace StandardRatings {
         Optional<Real64 const> OATempCompressorOn =
             _, // The outdoor temperature when the compressor is automatically turned //Autodesk:OPTIONAL Used without PRESENT check
         Optional_bool_const OATempCompressorOnOffBlank =
-            _,                                 // Flag used to determine low temperature cut out factor //Autodesk:OPTIONAL Used without PRESENT check
+            _, // Flag used to determine low temperature cut out factor //Autodesk:OPTIONAL Used without PRESENT check
         Optional<HPdefrostControl> DefrostControl = _, // defrost control; 1=timed, 2=on-demand //Autodesk:OPTIONAL Used without PRESENT check
-        Optional_bool_const ASHRAE127StdRprt = _ // true if user wishes to report ASHRAE 127 standard ratings
+        Optional_bool_const ASHRAE127StdRprt = _       // true if user wishes to report ASHRAE 127 standard ratings
     );
 
     void SingleSpeedDXHeatingCoilStandardRatings(

@@ -778,9 +778,9 @@ namespace StandardRatings {
         Optional<Real64 const>
             OATempCompressorOn, // The outdoor temperature when the compressor is automatically turned //Autodesk:OPTIONAL Used without PRESENT check
         Optional_bool_const
-            OATempCompressorOnOffBlank,      // Flag used to determine low temperature cut out factor //Autodesk:OPTIONAL Used without PRESENT check
-        Optional<HPdefrostControl> DefrostControl,   // defrost control; 1=timed, 2=on-demand //Autodesk:OPTIONAL Used without PRESENT check
-        Optional_bool_const ASHRAE127StdRprt // true if user wishes to report ASHRAE 127 standard ratings
+            OATempCompressorOnOffBlank, // Flag used to determine low temperature cut out factor //Autodesk:OPTIONAL Used without PRESENT check
+        Optional<HPdefrostControl> DefrostControl, // defrost control; 1=timed, 2=on-demand //Autodesk:OPTIONAL Used without PRESENT check
+        Optional_bool_const ASHRAE127StdRprt       // true if user wishes to report ASHRAE 127 standard ratings
     )
     {
 
@@ -2037,7 +2037,7 @@ namespace StandardRatings {
         Optional<Real64 const> MinOATCompressor,                   // Minimum OAT for heat pump compressor operation [C]
         Optional<Real64 const> OATempCompressorOn,                 // The outdoor temperature when the compressor is automatically turned
         Optional_bool_const OATempCompressorOnOffBlank,            // Flag used to determine low temperature cut out factor
-        Optional<HPdefrostControl> DefrostControl                          // defrost control; 1=timed, 2=on-demand
+        Optional<HPdefrostControl> DefrostControl                  // defrost control; 1=timed, 2=on-demand
     )
     {
 

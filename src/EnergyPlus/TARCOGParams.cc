@@ -63,6 +63,4 @@ namespace EnergyPlus::TARCOGParams {
 // PURPOSE OF THIS MODULE:
 // Module which contains common TARCOG parameters and constants
 
-
 } // namespace EnergyPlus::TARCOGParams
-

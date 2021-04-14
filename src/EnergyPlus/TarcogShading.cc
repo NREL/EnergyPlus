@@ -1063,21 +1063,21 @@ namespace TarcogShading {
         qv = dens2 * cp2 * speed * s * L * (Tenv - Tgapout) / (H * L);
     }
 
-    void updateEffectiveMultipliers(int const nlayer,                // Number of layers
-                                    Real64 const width,              // IGU width [m]
-                                    Real64 const height,             // IGU height [m]
-                                    const Array1D<Real64> &Atop,     // Top openning area [m2]
-                                    const Array1D<Real64> &Abot,     // Bottom openning area [m2]
-                                    const Array1D<Real64> &Al,       // Left side openning area [m2]
-                                    const Array1D<Real64> &Ar,       // Right side openning area [m2]
-                                    const Array1D<Real64> &Ah,       // Front side openning area [m2]
-                                    Array1D<Real64> &Atop_eff,       // Output - Effective top openning area [m2]
-                                    Array1D<Real64> &Abot_eff,       // Output - Effective bottom openning area [m2]
-                                    Array1D<Real64> &Al_eff,         // Output - Effective left side openning area [m2]
-                                    Array1D<Real64> &Ar_eff,         // Output - Effective right side openning area [m2]
-                                    Array1D<Real64> &Ah_eff,         // Output - Effective front side openning area [m2]
-                                    const Array1D<TARCOGLayerType> &LayerType,    // Layer type
-                                    const Array1D<Real64> &SlatAngle // Venetian layer slat angle [deg]
+    void updateEffectiveMultipliers(int const nlayer,                          // Number of layers
+                                    Real64 const width,                        // IGU width [m]
+                                    Real64 const height,                       // IGU height [m]
+                                    const Array1D<Real64> &Atop,               // Top openning area [m2]
+                                    const Array1D<Real64> &Abot,               // Bottom openning area [m2]
+                                    const Array1D<Real64> &Al,                 // Left side openning area [m2]
+                                    const Array1D<Real64> &Ar,                 // Right side openning area [m2]
+                                    const Array1D<Real64> &Ah,                 // Front side openning area [m2]
+                                    Array1D<Real64> &Atop_eff,                 // Output - Effective top openning area [m2]
+                                    Array1D<Real64> &Abot_eff,                 // Output - Effective bottom openning area [m2]
+                                    Array1D<Real64> &Al_eff,                   // Output - Effective left side openning area [m2]
+                                    Array1D<Real64> &Ar_eff,                   // Output - Effective right side openning area [m2]
+                                    Array1D<Real64> &Ah_eff,                   // Output - Effective front side openning area [m2]
+                                    const Array1D<TARCOGLayerType> &LayerType, // Layer type
+                                    const Array1D<Real64> &SlatAngle           // Venetian layer slat angle [deg]
     )
     {
         for (int i = 1; i <= nlayer; ++i) {
@@ -1102,10 +1102,9 @@ namespace TarcogShading {
                 Ar_eff(i) = 0.0;
                 Atop_eff(i) = Atop(i);
                 Abot_eff(i) = Abot(i);
-            } else if BITF_TEST_ANY(BITF(LayerType(i)), BITF(TARCOGLayerType::PERFORATED) |
-                                                             BITF(TARCOGLayerType::DIFFSHADE)|
-                                                             BITF(TARCOGLayerType::BSDF)|
-                                                             BITF(TARCOGLayerType::WOVSHADE)) {
+            } else if BITF_TEST_ANY (BITF(LayerType(i)),
+                                     BITF(TARCOGLayerType::PERFORATED) | BITF(TARCOGLayerType::DIFFSHADE) | BITF(TARCOGLayerType::BSDF) |
+                                         BITF(TARCOGLayerType::WOVSHADE)) {
                 Ah_eff(i) = width * height * C1_SHADE * pow((Ah(i) / (width * height)), C2_SHADE);
                 Al_eff(i) = Al(i) * C3_SHADE;
                 Ar_eff(i) = Ar(i) * C3_SHADE;

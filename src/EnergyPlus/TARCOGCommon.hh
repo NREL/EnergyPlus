@@ -74,9 +74,9 @@ namespace TARCOGCommon {
         // Using/Aliasing
         using namespace TARCOGParams;
 
-        return BITF_TEST_ANY(BITF(layertype), BITF(TARCOGLayerType::VENETBLIND_HORIZ) | BITF(TARCOGLayerType::VENETBLIND_VERT) |
-            BITF(TARCOGLayerType::WOVSHADE) | BITF(TARCOGLayerType::PERFORATED) | BITF(TARCOGLayerType::BSDF) |
-            BITF(TARCOGLayerType::DIFFSHADE));
+        return BITF_TEST_ANY(BITF(layertype),
+                             BITF(TARCOGLayerType::VENETBLIND_HORIZ) | BITF(TARCOGLayerType::VENETBLIND_VERT) | BITF(TARCOGLayerType::WOVSHADE) |
+                                 BITF(TARCOGLayerType::PERFORATED) | BITF(TARCOGLayerType::BSDF) | BITF(TARCOGLayerType::DIFFSHADE));
     }
 
     Real64 LDSumMax(Real64 Width, Real64 Height);

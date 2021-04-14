@@ -3205,7 +3205,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                 ShowContinueError(state,
                                   "...illegal " + cAlphaFieldNames(7) +
-                                  " type for this object = " + state.dataCurveManager->PerfCurve(indexOUCondTempCurve).ObjectType);
+                                      " type for this object = " + state.dataCurveManager->PerfCurve(indexOUCondTempCurve).ObjectType);
                 ShowContinueError(state, "... Curve type must be Quadratic.");
                 ErrorsFound = true;
             }
