@@ -157,7 +157,7 @@ template <> struct EPVector<bool> : private std::vector<std::uint8_t>
     {
         m_allocated = true;
         this->resize(size);
-        std::fill(begin(), end(), T{});
+        std::fill(begin(), end(), false);
     }
 
 
