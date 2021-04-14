@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -91,18 +92,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
     state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceLast = 1;
 
     state->dataSurface->SurfMovInsulAbsExt(1) = 0.0;
-    HeatBalanceManager::EvalOutsideMovableInsulation(*state);
+    HeatBalanceSurfaceManager::EvalOutsideMovableInsulation(*state);
     EXPECT_EQ(0.75, state->dataSurface->SurfMovInsulAbsExt(1));
     EXPECT_EQ(0.8, state->dataSurface->SurfMovInsulHExt(1));
 
     state->dataSurface->SurfMovInsulAbsExt(1) = 0.0;
     state->dataMaterial->Material(1).Group = DataHeatBalance::WindowGlass;
-    HeatBalanceManager::EvalOutsideMovableInsulation(*state);
+    HeatBalanceSurfaceManager::EvalOutsideMovableInsulation(*state);
     EXPECT_EQ(0.55, state->dataSurface->SurfMovInsulAbsExt(1));
 
     state->dataSurface->SurfMovInsulAbsExt(1) = 0.0;
     state->dataMaterial->Material(1).Group = DataHeatBalance::GlassEquivalentLayer;
-    HeatBalanceManager::EvalOutsideMovableInsulation(*state);
+    HeatBalanceSurfaceManager::EvalOutsideMovableInsulation(*state);
     EXPECT_EQ(0.55, state->dataSurface->SurfMovInsulAbsExt(1));
 }
 
@@ -132,19 +133,19 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulati
     state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceLast = 1;
 
     state->dataSurface->SurfMovInsulAbsInt(1) = 0.0;
-    HeatBalanceManager::EvalInsideMovableInsulation(*state);
+    HeatBalanceSurfaceManager::EvalInsideMovableInsulation(*state);
     EXPECT_EQ(0.75, state->dataSurface->SurfMovInsulAbsInt(1));
     EXPECT_EQ(0.8, state->dataSurface->SurfMovInsulHInt(1));
     EXPECT_EQ(true, state->dataSurface->SurfMovInsulIntPresent(1));
 
     state->dataSurface->SurfMovInsulAbsInt(1) = 0.0;
     state->dataMaterial->Material(1).Group = DataHeatBalance::WindowGlass;
-    HeatBalanceManager::EvalInsideMovableInsulation(*state);
+    HeatBalanceSurfaceManager::EvalInsideMovableInsulation(*state);
     EXPECT_EQ(0.55, state->dataSurface->SurfMovInsulAbsInt(1));
 
     state->dataSurface->SurfMovInsulAbsInt(1) = 0.0;
     state->dataMaterial->Material(1).Group = DataHeatBalance::GlassEquivalentLayer;
-    HeatBalanceManager::EvalInsideMovableInsulation(*state);
+    HeatBalanceSurfaceManager::EvalInsideMovableInsulation(*state);
     EXPECT_EQ(0.55, state->dataSurface->SurfMovInsulAbsInt(1));
 }
 TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGlazingTest)

@@ -404,6 +404,12 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
         InitThermalAndFluxHistories(state); // Set initial temperature and flux histories
     }
 
+    // Calc movable insulation properties
+    if (state.dataSurface->AnyMovableInsulation) {
+        EvalOutsideMovableInsulation(state);
+        EvalInsideMovableInsulation(state);
+    }
+
     // There are no daily initializations done in this portion of the surface heat balance
 
     // There are no hourly initializations done in this portion of the surface heat balance
@@ -2303,6 +2309,55 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
     }
 }
 
+void EvalOutsideMovableInsulation(EnergyPlusData &state)
+{
+    // This subroutine determines whether or not outside movable insulation on opaque surfaces is present at the current time.
+    // The SurfNum is passed in and then the rest of the parameters are set if movable insulation is present.
+    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+        int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
+        for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
+            Real64 MovInsulSchedVal = GetCurrentScheduleValue(state, state.dataSurface->Surface(SurfNum).SchedMovInsulExt);
+            if (MovInsulSchedVal <= 0) continue;
+
+            auto const MaterialIndex(state.dataSurface->Surface(SurfNum).MaterialMovInsulExt);
+            auto const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex).Group);
+
+            state.dataSurface->SurfMovInsulHExt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex).Resistance);
+            if (MaterialGroupNum == DataHeatBalance::WindowGlass || MaterialGroupNum == DataHeatBalance::GlassEquivalentLayer) {
+                state.dataSurface->SurfMovInsulAbsExt(SurfNum) = max(0.0, 1.0 - state.dataMaterial->Material(MaterialIndex).Trans -
+                                                                          state.dataMaterial->Material(MaterialIndex).ReflectSolBeamFront);
+            } else {
+                state.dataSurface->SurfMovInsulAbsExt(SurfNum) = state.dataMaterial->Material(MaterialIndex).AbsorpSolar;
+            }
+        }
+    }
+}
+
+void EvalInsideMovableInsulation(EnergyPlusData &state)
+{
+    // This subroutine determines whether or not inside movable insulation is present at the current time.
+    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+        int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
+        for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
+            Real64 MovInsulSchedVal = GetCurrentScheduleValue(state, state.dataSurface->Surface(SurfNum).SchedMovInsulInt);
+            if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
+                state.dataSurface->SurfMovInsulIntPresent(SurfNum) = false;
+                continue;
+            }
+            auto const MaterialIndex(state.dataSurface->Surface(SurfNum).MaterialMovInsulInt);
+            auto const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex).Group);
+            state.dataSurface->SurfMovInsulIntPresent(SurfNum) = true;
+            state.dataSurface->SurfMovInsulHInt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex).Resistance);
+            if (MaterialGroupNum == DataHeatBalance::WindowGlass || MaterialGroupNum == DataHeatBalance::GlassEquivalentLayer) {
+                state.dataSurface->SurfMovInsulAbsInt(SurfNum) = max(0.0, 1.0 - state.dataMaterial->Material(MaterialIndex).Trans - state.dataMaterial->Material(MaterialIndex).ReflectSolBeamFront);
+            } else {
+                state.dataSurface->SurfMovInsulAbsInt(SurfNum) = state.dataMaterial->Material(MaterialIndex).AbsorpSolar;
+            }
+        }
+    }
+}
 void InitSolarHeatGains(EnergyPlusData &state)
 {
 
