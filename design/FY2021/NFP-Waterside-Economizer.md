@@ -5,7 +5,10 @@ NFP Waterside Economizer
 
  - Original Date - 1/13/21
  - Revision Date - 1/20/21 to address comments
- 
+
+**B. Nigusse, FSEC/UCF**
+ - Revision Date - 4/13/21 expand design document and scope review
+
 
 **Task Description**:
 
@@ -19,7 +22,7 @@ Manufacturers have a configuration option that includes free cooling using a coo
 
 Brent 1/15/21
 
-I would suggest to change CoilSystem:Cooling:DX to CoilSystem:Cooling and the allow that parent to use chilled water coils.  Seems hard to justify yet-another-coil-system object.  Or add the controls needed to unitary system and model with two unitary objects in series.
+I would suggest to change CoilSystem:Cooling:DX to CoilSystem:Cooling and allow that parent to use chilled water coils.  Seems hard to justify yet-another-coil-system object.  Or add the controls needed to unitary system and model with two unitary objects in series.
 
 MJWitte 1/19/21
 
@@ -36,9 +39,10 @@ RR: Yes, MultiMode would be used for the HX. If that choice were used the HX wou
 
 MJWitte: Or HeatExchangerControl or ActivateHeatExchanger. I think including HeatExchanger in the option name is good. If some other way of controlling humidity comes along then a new option can be added.
 
+
 ## Overview ##
 
-The waterside economizer is used as a pre-cooling coil in packaged DX equipment. 
+The waterside economizer is used as a pre-cooling coil in packaged DX equipment.
 
 **The following description was excerpt from Trane Product Catalog PKG-PRC024D-EN**.
 
@@ -71,14 +75,8 @@ The economizer acts as the first stage of cooling. If the economizer is unable t
 **Discharge Air Cooling Setpoint** The Discharge Air Cooling Setpoint default valve of 55 degrees and the unit will control to this value when in the cooling mode. The setpoint can be adjusted 3 different ways.
 
  - Reset Based on Return Air Temperature: The Discharge Air Temperature can be reset based off the return air temperature which will work to keep this temepature between its heating and cooling setpoints.
- - Reset Based on Zone Temperature:
-The Discharge Air Temperature can be reset based off the return air temperature which will work
-to keep this temepature between its heating and cooling setpoints.
-
- - Reset Based on Zone Temperature: Zone reset is applied to the zone(s) in a building that tends to overcool or overheat. The supply air
-temperature setpoint is adjusted based on the temperature of the critical zone(s).This can have the
-effect of improving comfort and/or lowering energy usage.The user-defined parameters are the
-same as for outdoor air reset.
+ - Reset Based on Zone Temperature: The Discharge Air Temperature can be reset based off the return air temperature which will work to keep this temepature between its heating and cooling setpoints.
+ - Reset Based on Zone Temperature: Zone reset is applied to the zone(s) in a building that tends to overcool or overheat. The supply air temperature setpoint is adjusted based on the temperature of the critical zone(s).This can have the effect of improving comfort and/or lowering energy usage.The user-defined parameters are the same as for outdoor air reset.
 
 **End Trane Product Catalog excerpt**.
 
@@ -105,7 +103,7 @@ The waterside economizer is simply a water coil with special controls. The coil 
 
     CoilSystem:Cooling:Water:HeatExchangerAssisted,
     A2 , \field Heat Exchanger Object Type
-        \key HeatExchanger:AirToAir:FlatPlate
+         \key HeatExchanger:AirToAir:FlatPlate
          \key HeatExchanger:AirToAir:SensibleAndLatent
     A4 , \field Cooling Coil Object Type
          \key Coil:Cooling:Water
@@ -122,7 +120,7 @@ The waterside economizer is simply a water coil with special controls. The coil 
 
 It may be time to begin consolodating these exising wrappers as done with the Coil:Cooling:DX object. The name would simply be CoilSystem and contain any type of coil with an optional heat exchangera available for cooling coils. This big of a change may be too big for this task, however, keeping this in mind for this new object is highly desireable.
 
-Instead of incorporating a waterside economizer coil object into a packaged system, a generic method of providing free cooling is discussed here. The new object would be configured as a condenser plant demand side component and placed upstream of any existing coil types. A new wrapper will be developed to include the water coils. This wrapper could be specific to a new waterside economizer coil object or be more generic to allow branch water coils to be simulated without using the Controller:WaterCoil object. The more generic method is described here.
+**Instead of incorporating a waterside economizer coil object into a packaged system, a generic method of providing free cooling is discussed here. The new object would be configured as a condenser plant demand side component and placed upstream of any existing coil types. A new wrapper will be developed to include the water coils. This wrapper could be specific to a new waterside economizer coil object or be more generic to allow branch water coils to be simulated without using the Controller:WaterCoil object. The more generic method is described here.**
 
 **Note**: This new object may also be used on the demand side of a cooling plant to support existing coil types.
 
@@ -134,7 +132,7 @@ Instead of incorporating a waterside economizer coil object into a packaged syst
         \memo and its associated controls. This control object supports the
         \memo available water coil types and may be placed directly on an
         \memo air loop branch or in an outdoor air equipment list.
-        \min-fields 7
+        \min-fields 6
     A1, \field Name
         \required-field
         \reference WaterCoilSystemName
@@ -143,18 +141,18 @@ Instead of incorporating a waterside economizer coil object into a packaged syst
         \reference validBranchEquipmentNames
         \reference-class-name validOASysEquipmentTypes
         \reference validOASysEquipmentNames
-    A2, \field Availability Schedule Name
+    A2, \field Cooling Coil System Inlet Node Name
+        \required-field
+        \type node
+    A3, \field Cooling Coil System Outlet Node Name
+        \required-field
+        \type node
+    A4, \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0
         \note means the system is available.
         \note If this field is blank, the system is always available.
         \type object-list
         \object-list ScheduleNames
-    A3, \field Cooling Coil System Inlet Node Name
-        \required-field
-        \type node
-    A4, \field Cooling Coil System Outlet Node Name
-        \required-field
-        \type node
     A5, \field Cooling Coil Object Type
         \type choice
         \required-field
@@ -165,7 +163,7 @@ Instead of incorporating a waterside economizer coil object into a packaged syst
         \required-field
         \type object-list
         \object-list CoolingCoilsWater
-    A7, \field Minimum Air To Water Temperature Offset
+    N1, \field Minimum Air To Water Temperature Offset
         \note Coil will turn on as required when inlet air temperature is above
         \note water temperature by amount of offset. To model a waterside
         \note economizer connect to condenser loop and increase offset as desired.
@@ -173,7 +171,7 @@ Instead of incorporating a waterside economizer coil object into a packaged syst
         \units C
         \minimum 0.0
         \default 0.0
-    A8, \field Dehumidification Control Type
+    A7, \field Dehumidification Control Type
         \type choice
         \key None
         \key HeatExchangerControl
@@ -193,7 +191,7 @@ Instead of incorporating a waterside economizer coil object into a packaged syst
         \note SetpointManager:MultiZone:Humidity:Maximum, or
         \note SetpointManager:MultiZone:MaximumHumidity:Average, and
         \note SetpointManager:OutdoorAirPretreat (optional) objects.
-    A9, \field Run on Sensible Load
+    A8, \field Run on Sensible Load
         \type choice
         \key Yes
         \key No
@@ -201,7 +199,7 @@ Instead of incorporating a waterside economizer coil object into a packaged syst
         \note If Yes, unit will run if there is a sensible load.
         \note If No, unit will not run if there is only a sensible load.
         \note Dehumidification controls will be active if specified.
-    A10; \field Run on Latent Load
+    A9; \field Run on Latent Load
         \type choice
         \key Yes
         \key No
@@ -227,7 +225,16 @@ Add new IO section for new object.
 
 ## Outputs Description ##
 
-Same as water coils.
+	Cooling Coil Water Flow Rate
+	Cooling Coil Water Flow Fraction
+	Cooling Coil Total Cooling Rate
+	Cooling Coil Total Cooling Energy
+	Cooling Coil Source Side Heat Transfer Energy
+	Cooling Coil Sensible Cooling Rate
+	Cooling Coil Sensible Cooling Energy
+	Cooling Coil Latent Cooling Rate
+	Cooling Coil Latent Cooling Energy
+	Cooling Coil Water-Side Economizer Status
 
 ## Engineering Reference ##
 
@@ -243,7 +250,7 @@ None.
 
 ## Design Document ##
 
-The UnitarySystem is the only air-side parent that uses the pointer/factory method. The pointer if of the class HVACSystemData.
+The UnitarySystem is the only air-side parent that uses the pointer/factory method. The pointer of the class HVACSystemData. The same appraoach will be used for CoilWaterSystems.
 
 SimAirServingZones::SimAirLoopComponent
 
@@ -256,26 +263,27 @@ SimAirServingZones::SimAirLoopComponent
                              HVACSystemData *CompPointer); // HVACSystemData pointer
 
 
-EnergyPlusData.cc
+### EnergyPlusData ###
+EnergyPlusData
 
 
-    namespace EnergyPlus {
+namespace EnergyPlus {
 
     EnergyPlusData::EnergyPlusData() {
         // todo, try to eliminate the need for the singleton
         IOFiles::setSingleton(&files);
 
-        this->dataAirflowNetworkBalanceManager = 
-             std::make_unique<AirflowNetworkBalanceManagerData>();
+        this->dataAirflowNetworkBalanceManager =
+              std::make_unique<AirflowNetworkBalanceManagerData>();
         this->dataAirLoop = std::make_unique<DataAirLoopData>();
         this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
         this->dataAirSystemsData = std::make_unique<AirSystemsData>();
 
-    New pointer:
- 
-        this->dataCoilSystemsData = std::make_unique<CoilSystemsData>();
+        **New pointer:**
+
+        this->dataCoilWaterSystems = std::make_unique<CoilWaterSystemsData>();
         ...
-    }
+    } // EnergyPlusData::EnergyPlusData()
 
 
     void EnergyPlusData::clear_state() {
@@ -284,51 +292,121 @@ EnergyPlusData.cc
         this->dataAirLoopHVACDOAS->clear_state();
         this->dataAirSystemsData->clear_state();
 
-    New clear_state call:
+        **New clear_state call:**
 
-        this->dataCoilSystemsData->clear_state();
+        this->dataCoilWaterSystems->clear_state();
         ...
     }
-    }
-    
+} // namespace EnergyPlus
+
+### CoilWaterSystems ###
+New header file:
+
 CoilWaterSystems.hh
 
     New classes:
 
+namespace CoilWaterSystems {
+
+    enum class CCoils
+    {
+        Unassigned,
+        Simple,
+        Detailed,
+        HXAssist
+    };
+
+    enum class DehumCtrlType : int
+    {
+        None,
+        CoolReheat,
+        HeatExchangerControl
+    };
+
+    struct CoilSysCoolingWaterInputSpecification
+    {
+        std::string name;
+        std::string cooling_coil_system_inlet_node_name;
+        std::string cooling_coil_system_outlet_node_name;
+        std::string availability_schedule_name;
+        std::string cooling_coil_object_type;
+        std::string cooling_coil_name;
+        Real64 minimum_air_to_water_temperature_offset;
+        std::string dehumidification_control_type;
+        std::string run_on_sensible_load;
+        std::string run_on_latent_load;
+    };
 
     struct CoilWaterSys : HVACSystemData
     {
-        enum classes
-        member variables
-        member functions
-        
-    Public:
-        
-        external variables
-        external functions
-        
-         CoilWaterSys(); // constructor
+        // member variables
+        CoilSysCoolingWaterInputSpecification original_input_specs;
+
+        std::string name;              // name of water coooling coil
+        bool myOneTimeInitFlag = true; // executed only once flag
+        int coilWaterSysIndex = 0;     // index of coil system cooling water object
+        int airInletNodeIndex = 0;     // cooling coil system inlet node name
+        int airOutletNodeIndex = 0;    // cooling coil system outlet node name
+        int availScheduleIndex = 0;    // index of availability schedule
+        CCoils waterCoolingCoilType;   // type of water coooling coil type
+        std::string coolingCoilName;   // type of water coooling coil name
+        int coolingCoilType_Num = 0;   // water cooling coil type number (Coil_CoolingWater, Coil_CoolingWaterDetailed, CoilWater_CoolingHXAssisted)
+        Real64 minAirToWaterTempOffset = 0.0; // entering air to entering water temperature offset
+        int coolingCoilIndex = 0;             // index of coil cooling water
+        DehumCtrlType dehumControlType;       // dehumidification control type
+        bool runOnSensibleLoad = true;        // true if this system runs to meet a sensible load
+        bool runOnLatentLoad = false;         // true if this system runs to meet a latent-only load
+
+        bool myPlantScanFlag = true;       // one time plant scan flag
+        Real64 maxCoolCoilFluidFlow = 0.0; // maximum coil water flow rate
+        int waterInletNodeIndex = 0;       // index of water coil entering node
+        int waterOutletNodeIndex = 0;      // index of water coil leaving node
+        int coolCoilLoopNum = 0;           // index plant loop (condenser loop)
+        int coolCoilLoopSide = 0;          // index plant loop side
+        int coolCoilBranchNum = 0;         // index plant loop branch
+        int coolCoilCompNum = 0;           // index of water coil on a branch
+
+        // CoilWaterSys() = default;
+        // member functions
+        static void getInput(EnergyPlusData &state);
+        void instantiateFromInputSpec(EnergyPlusData &state, const CoilSysCoolingWaterInputSpecification &input_data);
+        void setOutputReportVariables(EnergyPlus::EnergyPlusData &state);
+        void initCoilWaterSystems(EnergyPlusData &state, int const AirLoopNum);
+        void controlCoilWaterSystems(EnergyPlusData &state, int const AirLoopNum, bool const FirstHVACIteration);
+        static Real64 coolWaterTempResidual(EnergyPlusData &state, Real64 const WaterFlowFraction, std::vector<Real64> const &Par);
+        static Real64 coolWaterHumRatResidual(EnergyPlusData &state, Real64 const WaterFlowFraction, std::vector<Real64> const &Par);
+        static Real64 HXAssistedCoolCoilHRResidual(EnergyPlusData &state, Real64 const WaterFlowFraction, std::vector<Real64> const &Par);
+        static Real64 HXAssistedCoolCoilTempResidual(EnergyPlusData &state, Real64 const WaterFlowFraction, std::vector<Real64> const &Par);
+        void reportCoilWaterSystems(EnergyPlus::EnergyPlusData &state);
+
+    public:
+        // external variables
+        // external functions
+
+        CoilWaterSys(); // constructor
 
         ~CoilWaterSys() // destructor
         {
         }
 
-        static void getCoilWaterSystemInputData(EnergyPlusData &state,
-                                                std::string const &Name,
-                                                bool const ZoneEquipment,
-                                                int const ZoneOAUnitNum,
-                                                bool &errorsFound);
+        static void getInputData(EnergyPlusData &state);
 
-    Note the same pointer class is used for factory call for this new coil object.
+        static HVACSystemData *
+            factory(EnergyPlusData &state, int const object_type_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
-        static HVACSystemData *factory(EnergyPlusData &state,
-                                       int const object_type_of_num,
-                                       std::string const objectName,
-                                       bool const ZoneEquipment,
-                                       int const ZoneOAUnitNum);
-
-    Note same argument list as HVACSystemData:simulate even though all arguments
-    will not be used at this time:
+        void simulateSys(EnergyPlusData &state,
+                         std::string const &Name,
+                         bool const firstHVACIteration,
+                         int const &AirLoopNum,
+                         int &CompIndex,
+                         bool &HeatActive,
+                         bool &CoolActive,
+                         int const OAUnitNum,         // system is OutdoorAirUnit
+                         Real64 const OAUCoilOutTemp, // Tinlet OutdoorAirUnit
+                         bool const ZoneEquipment,    // TRUE if zone equipment
+                         Real64 &sysOutputProvided,   // supply node sensible output
+                         Real64 &latOutputProvided    // supply node latent output
+        );
 
         void simulate(EnergyPlusData &state,
                       std::string const &Name,
@@ -342,31 +420,54 @@ CoilWaterSystems.hh
                       bool const ZoneEquipment,    // TRUE if zone equipment
                       Real64 &sysOutputProvided,   // supply node sensible output
                       Real64 &latOutputProvided    // supply node latent output
-        );
+                      ) override;
+
+
+    }; // struct CoilWaterSys : HVACSystemData
+
+} // namespace CoilWaterSystems
+
+struct CoilWaterSystemsData : BaseGlobalStruct
+{
+
+    std::vector<CoilWaterSystems::CoilWaterSys> coilWaterSys;
+    std::string const coilSysCoolingWaterObjectName = "CoilSystem:Cooling:Water";
+    int numCoilWaterSystems = 0;
+    bool initCoilWaterSystemsErrFlag = true;
+    bool coilWaterSystemsGetInputFlag = true;
+    int CoolingCoilIndex = 0;          // index of water coooling coil
+    int waterInletNodeIndex = 0;       // index of water entering node of a water cooling coil
+    bool myOneTimeFlag = true;         // one time flag
+    bool mySetPointCheckFlag = true;   // one time setpoint check flag
+    bool getInputOnceFlag = true;      // get input flag
+    bool economizerFlag = false;       // holds air loop economizer status
+    bool waterCoilDisableFlag = false; // true if coil water inlet temp > coil air inlet temp - minus offset
+    bool initCoilWaterSysErrFlag = false;
+    int const On = 1; // normal water coil operation, always on
+
+    void clear_state() override
+    {
+        coilWaterSys.clear();
+        numCoilWaterSystems = 0;
+        coilWaterSystemsGetInputFlag = true;
+        initCoilWaterSystemsErrFlag = true;
+        CoolingCoilIndex = 0;
+        waterInletNodeIndex = 0;
+        myOneTimeFlag = true;
+        mySetPointCheckFlag = true;
+        getInputOnceFlag = true;
+        economizerFlag = false;
+        waterCoilDisableFlag = false;
+        initCoilWaterSysErrFlag = false;
     }
 
-
-
-    struct CoilWaterSystemsData : BaseGlobalStruct {
-
-        int numCoilWaterSystems = 0;
-        bool initCoilWaterSystemsErrFlag = false;
-
-        bool getInputOnceFlag = true;
-        bool getMSHPInputOnceFlag = true;
-
-        std::vector<UnitarySystems::UnitarySys> coilSys;
-
-        void clear_state() override
-        {
-            clear state variables
-        }
-
-        // Default Constructor
-        CoilWaterSystemsData() = default;
-    }
+    // Default Constructor
+    CoilWaterSystemsData() = default;
 };
 
+
+### SimAirServingZones::GetAirPathData ###
+Adds a "CoilSystem:Cooling:Water" coil type and a pointer to the airpath data
 
 SimAirServingZones::GetAirPathData
 
@@ -391,13 +492,13 @@ SimAirServingZones::GetAirPathData
                                 Branch(BranchNum).Comp(CompNum).Name,
                             false,
                             0);
-                                                
-    New factory call:
+
+    **New factory call:**
 
     } else if (componentType == "COILSYSTEM:COOLING:WATER") {
         state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).
             Comp(CompNum).CompType_Num = CoilWaterSystem;
-        CoilWaterSystems::CoilSys thisSys;
+        CoilWaterSystems::CoilWaterSys thisSys;
         state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).
             Comp(CompNum).compPointer =
             thisSys.factory(state,
@@ -406,11 +507,19 @@ SimAirServingZones::GetAirPathData
                                 Branch(BranchNum).Comp(CompNum).Name,
                             false,
                             0);
-                                                
 
+    } else {}...
+
+### SimAirServingZones::SimAirLoopComponent ###
+
+Adds new simulate call using override for HVACSystemData::simulate:
 
 SimAirServingZones::SimAirLoopComponent
-                                                
+        {
+            auto const SELECT_CASE_var(CompType_Num);
+
+            ...
+
             } else if (SELECT_CASE_var == DXSystem) { // CoilSystem:Cooling:DX'
                 SimDXCoolingSystem(state, CompName, FirstHVACIteration,
                                    AirLoopNum, CompIndex, _, _, QActual);
@@ -442,7 +551,7 @@ SimAirServingZones::SimAirLoopComponent
                                       sensOut,
                                       latOut);
 
-    New simulate call using override for HVACSystemData::simulate:
+            **New simulate call for CoilWaterSystem using override for HVACSystemData::simulate:**
 
             } else if (SELECT_CASE_var == CoilWaterSystem) {
                 // 'CoilSystem:Cooling:Water'
@@ -462,4 +571,225 @@ SimAirServingZones::SimAirLoopComponent
                                       latOut);
 
 
-Similar configuration in MixedAir.cc
+Add component type for 'CoilSystem:Cooling:Water' in Primary Air Loop
+    constexpr int Fan_System_Object(28);
+    constexpr int UnitarySystemModel(29);
+    constexpr int ZoneVRFasAirLoopEquip(30);
+
+    Add component type here
+    constexpr int CoilWaterSystems(31);
+
+### CoilWaterSystems.cc ###
+New file:
+
+    void CoilWaterSys::simulate(EnergyPlusData &state,
+                                std::string const &Name,
+                                bool const FirstHVACIteration,
+                                int const &AirLoopNum,
+                                int &CompIndex,
+                                bool &HeatActive,
+                                bool &CoolActive,
+                                int const ZoneOAUnitNum,
+                                Real64 const OAUCoilOutTemp,
+                                bool const ZoneEquipment,
+                                Real64 &sysOutputProvided,
+                                Real64 &latOutputProvided)
+    {
+
+
+		Get Input Here
+
+	    if (this->myOneTimeInitFlag) {
+		    set report variables here
+            this->setOutputReportVariables(state);
+            this->myOneTimeInitFlag = false;
+        }
+
+        init water systems coils
+        this->initCoilWaterSystems(state, AirLoopNum, FirstHVACIteration);
+
+		control water systems coils
+        this->controlCoilWaterSystems(state, AirLoopNum, FirstHVACIteration);
+
+        report the current output:
+        this->reportCoilWaterSystems(state, AirLoopNum);
+
+    }
+
+	void CoilWaterSys::initCoilWaterSystems(EnergyPlusData &state,
+	                                        int const AirLoopNum)
+	{
+		check if there is a setpoint on the coil air outlet node
+
+		get setpoint value each iteration for temperature or humidity ratio setpoints
+
+		initialize cooling coil water flow rates on the demand side of condenser loop
+		at the beginning of each environment
+
+		set the waster-side econmizer enable/disbale flag
+
+	}
+
+    void CoilWaterSys::controlWaterCoolingCoil(EnergyPlusData &state,
+	                                           int const AirLoopNum,
+                                               bool const FirstHVACIteration
+    )
+	{
+	    determines coil water flow rate that meets the temperature or humidity setpoint
+	    for each water coil type. Uses regulafolsi to compute coil water flow fraction
+
+		implementation steps:
+		(1) check the coil is available and air flow rate is not zero
+		(2) check the water-side economizer enabling falg
+		(3) check the control type: RunOnSensibleLoad or RunOnLatentLoad
+		(4) do calculation for each control type and for each cooling coil type
+		(5) First: do temperature control calculation
+		(6) check if dehumid control is active and check if desired HumRat is met
+		(7) Second: do HumRat control calculation if the desired HumRat is not met
+		(8) save output variables
+
+	}
+
+    void CoilWaterSys::setupOutputVariables(EnergyPlus::EnergyPlusData &state)
+    {
+	    Adds the following report variables
+
+		Cooling Coil Water Flow Rate
+		Cooling Coil Water Flow Fraction
+		Cooling Coil Total Cooling Rate
+		Cooling Coil Total Cooling Energy
+		Cooling Coil Source Side Heat Transfer Energy
+		Cooling Coil Sensible Cooling Rate
+		Cooling Coil Sensible Cooling Energy
+	    Cooling Coil Water-Side Economizer Status
+	}
+
+	Real64 CoilWaterSys::calcCoilWaterSystemTempResidual(EnergyPlusData &state,
+	             Real64 const WaterFlowFraction, std::vector<Real64> const &Par)
+	{}
+
+	Real64 CoilWaterSys::calcCoilWaterSystemHumRatResidual(EnergyPlusData &state,
+	             Real64 const WaterFlowFraction, std::vector<Real64> const &Par)
+	{}
+
+	void CoilWaterSys::reportCoilWaterSystems(EnergyPlusData &state,
+	                                          int const AirLoopNum)
+    {
+	     update report variables for water cooling coils
+	}
+
+
+### DataPlant.cc ###
+    Add "CoilSystem:Cooling:Water" system cooling coil to the 1D String lists:
+
+	SimPlantEquipTypes
+	ccSimPlantEquipTypes
+	ValidLoopEquipTypes
+
+	Change NumSimPlantEquipTypes(96) to NumSimPlantEquipTypes(97);
+
+	Add parameter index for "CoilSystem:Cooling:Water" component
+    constexpr int TypeOf_CoilSystemCoolingWater(97);
+
+    Set loop type to "Condenser" for now
+	LoopType::Condenser
+
+
+    for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum)
+	                                  .Branch(BranchNum).TotalComponents; ++CompNum) {
+					// set up some references
+					auto &this_comp_type(CompTypes(CompNum));
+					auto &this_comp(state.dataPlnt->PlantLoop(LoopNum)
+						  .LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
+					...
+
+				   } else if (UtilityRoutines::SameString(this_comp_type,
+				        "Coil:Cooling:Water")) {
+						this_comp.TypeOf_Num = TypeOf_CoilWaterCooling;
+						this_comp.CurOpSchemeType = DemandOpSchemeType;
+					} else if (UtilityRoutines::SameString(this_comp_type,
+			            "Coil:Cooling:Water:DetailedGeometry")) {
+						this_comp.TypeOf_Num = TypeOf_CoilWaterDetailedFlatCooling;
+						this_comp.CurOpSchemeType = DemandOpSchemeType;
+					} else if (UtilityRoutines::SameString(this_comp_type,
+					    "Coil:Heating:Water")) {
+						this_comp.TypeOf_Num = TypeOf_CoilWaterSimpleHeating;
+						this_comp.CurOpSchemeType = DemandOpSchemeType;
+					} else if (UtilityRoutines::SameString(this_comp_type,
+					    "Coil:Heating:Steam")) {
+						this_comp.TypeOf_Num = TypeOf_CoilSteamAirHeating;
+						this_comp.CurOpSchemeType = DemandOpSchemeType;
+
+                    **New demand side condenser equipment "CoilSystem:Cooling:Water"**
+
+					} else if (UtilityRoutines::SameString(this_comp_type,
+					    "CoilSystem:Cooling:Water")) {
+						this_comp.TypeOf_Num = TypeOf_CoilSystemCoolingWater;
+						this_comp.CurOpSchemeType = DemandOpSchemeType;
+					...
+
+
+
+### MixedAir.cc ###
+
+Add similate calling point under SimOAComponent() function
+
+    {
+        auto const SELECT_CASE_var(CompTypeNum);
+
+        if (SELECT_CASE_var == OAMixer_Num) { // 'OutdoorAir:Mixer'
+            if (Sim) {
+                SimOAMixer(state, CompName, FirstHVACIteration, CompIndex);
+            }
+
+        ...
+
+        } else if (SELECT_CASE_var == UnitarySystemModel) { // AirLoopHVAC:UnitarySystem
+            if (Sim) {
+            }
+            if (state.dataMixedAir->MyOneTimeCheckUnitarySysFlag(OASysNum)) {
+            }
+
+		**New simulate call for CoilWaterSystem**
+		} else if (SELECT_CASE_var == CoilWaterSystem) { // // 'CoilSystem:Cooling:Water'
+
+	            if (Sim) {
+                bool HeatingActive = false;
+                bool CoolingActive = false;
+                Real64 OAUCoilOutTemp = 0.0;
+                bool ZoneEquipFlag = false;
+                Real64 sensOut = 0.0;
+                Real64 latOut = 0.0;
+                state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(state,
+                                                                                            CompName,
+                                                                                            FirstHVACIteration,
+                                                                                            AirLoopNum,
+                                                                                            CompIndex,
+                                                                                            HeatingActive,
+                                                                                            CoolingActive,
+                                                                                            CompIndex,
+                                                                                            OAUCoilOutTemp,
+                                                                                            ZoneEquipFlag,
+                                                                                            sensOut,
+                                                                                            latOut);
+            }
+
+        } else if (SELECT_CASE_var == DXHeatPumpSystem) {
+            if (Sim) {
+                SimDXHeatPumpSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex);
+            }
+            OAHeatingCoil = true;
+        }
+
+		...
+
+    }
+
+Add component type for 'CoilSystem:Cooling:Water' in Mixed Air
+    constexpr int Fan_System_Object(22);
+    constexpr int UnitarySystemModel(23);
+    constexpr int VRFTerminalUnit(24);
+
+    Add component type here
+    constexpr int CoilWaterSystems(25);
+
