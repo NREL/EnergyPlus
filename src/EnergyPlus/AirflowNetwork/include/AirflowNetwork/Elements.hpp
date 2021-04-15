@@ -61,9 +61,8 @@ namespace AirflowNetwork {
 
     enum VentControlType // TODO: make enum class, since this enum is used in SetupOutputVariable()
     {
-        Invalid = -1,
-        None,  // Wrong input
-        Temp,  // Temperature venting control
+        None = -1,  // Wrong input
+        Temp = 1,  // Temperature venting control
         Enth,  // Enthalpy venting control
         Const, // Constant venting control
         ASH55,
@@ -93,7 +92,7 @@ namespace AirflowNetwork {
     enum class EquivRec
     {
         Unassigned = -1,
-        Height,          // Effective rectangle polygonal height selection
+        Height = 1,          // Effective rectangle polygonal height selection
         BaseAspectRatio, // Effective rectangle base surface aspect ratio selection
         UserAspectRatio  // Effective rectangle user input aspect ratio selection
     };
