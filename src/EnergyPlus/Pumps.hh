@@ -96,7 +96,7 @@ namespace Pumps {
     extern std::string const cPumpBank_VarSpeed;
     extern std::string const cPumpBank_ConSpeed;
 
-    enum class pumpType : int
+    enum class PumpType : int
     {
         Unassigned = -1,
         VarSpeed = 0,
@@ -106,7 +106,7 @@ namespace Pumps {
         Bank_ConSpeed = 4
     };
 
-    enum powerSizingMethodEnum
+    enum class PowerSizingMethod
     {
         sizePowerPerFlow,
         sizePowerPerFlowPerPressure
@@ -145,7 +145,7 @@ namespace Pumps {
         std::string Name;               // user identifier
         std::string PumpSchedule;       // Schedule to modify the design nominal capacity of the pump
         std::string PressureCurve_Name; // - placeholder for pump curve name
-        pumpType PumpType;              // pump type enumerator, based on local parameter values, used to identify
+        PumpType pumpType;              // pump type enumerator, based on local parameter values, used to identify
         // index in the cPumpTypes string array to do error reporting
         int TypeOf_Num;                              // pump type of number in reference to the dataplant values
         int LoopNum;                                 // loop where pump is located
@@ -177,7 +177,7 @@ namespace Pumps {
         Real64 EMSPressureOverrideValue;             // EMS value to use for pressure [Pa]
         Real64 NomPowerUse;                          // design nominal capacity of Pump
         bool NomPowerUseWasAutoSized;                // true if power was autosize on input
-        powerSizingMethodEnum powerSizingMethod;     // which method is used for sizing nominal power use
+        PowerSizingMethod powerSizingMethod;         // which method is used for sizing nominal power use
         Real64 powerPerFlowScalingFactor;            // design electric power per unit flow rate
         Real64 powerPerFlowPerPressureScalingFactor; // design shaft power per unit flow rate per unit head
         Real64 MotorEffic;                           // efficiency of the motor
@@ -208,13 +208,13 @@ namespace Pumps {
 
         // Default Constructor
         PumpSpecs()
-            : PumpType(pumpType::Unassigned), TypeOf_Num(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
+            : pumpType(PumpType::Unassigned), TypeOf_Num(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
               PumpControl(PumpControlType::Unassigned), PumpScheduleIndex(0), InletNodeNum(0), OutletNodeNum(0),
               SequencingScheme(PumpBankControlSeq::Unassigned), FluidIndex(0), NumPumpsInBank(0), PowerErrIndex1(0), PowerErrIndex2(0),
               MinVolFlowRateFrac(0.0), NomVolFlowRate(0.0), NomVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0), EMSMassFlowOverrideOn(false),
               EMSMassFlowValue(0.0), NomSteamVolFlowRate(0.0), NomSteamVolFlowRateWasAutoSized(false), MinVolFlowRate(0.0),
               minVolFlowRateWasAutosized(false), MassFlowRateMin(0.0), NomPumpHead(0.0), EMSPressureOverrideOn(false), EMSPressureOverrideValue(0.0),
-              NomPowerUse(0.0), NomPowerUseWasAutoSized(false), powerSizingMethod(sizePowerPerFlowPerPressure),
+              NomPowerUse(0.0), NomPowerUseWasAutoSized(false), powerSizingMethod(PowerSizingMethod::sizePowerPerFlowPerPressure),
               powerPerFlowScalingFactor(348701.1),            // 22 W/gpm
               powerPerFlowPerPressureScalingFactor(1 / 0.78), // legacy impeller efficiency
               MotorEffic(0.0), PumpEffic(0.0), FracMotorLossToFluid(0.0), Energy(0.0), Power(0.0), PartLoadCoef(4, 0.0), PressureCurve_Index(0),
