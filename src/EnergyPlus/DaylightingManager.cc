@@ -3288,8 +3288,8 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
     Real64 SpecReflectance; // Specular reflectance of a reflecting surface
     Real64 TVisRefl;        // Bare window vis trans for reflected beam
     //  (times light well efficiency, if appropriate)
-    Real64 PHSUNrefl;  // Altitude angle of reflected sun (radians)
-    Real64 THSUNrefl;  // Azimuth anggle of reflected sun (radians)
+    Real64 PHSUNrefl; // Altitude angle of reflected sun (radians)
+    Real64 THSUNrefl; // Azimuth anggle of reflected sun (radians)
 
     bool hitIntWinDisk; // True iff ray from ref pt to sun passes thru an int window
     bool hitIntObsDisk; // True iff ray from ref pt to sun hits an interior obstruction
@@ -6181,7 +6181,7 @@ void DayltgInteriorIllum(EnergyPlusData &state, int &ZoneNum) // Zone number
     int ISWFLG; // Switchable glazing flag: =1 if one or more windows in a zone
     //  has switchable glazing that adjusts visible transmittance to just meet
     //  daylighting setpoint; =0 otherwise.
-    int ICtrl;        // Window shading control pointer
+    int ICtrl; // Window shading control pointer
     Array1D<Real64> TVIS1(state.dataDaylightingData->ZoneDaylight(ZoneNum)
                               .ShadeDeployOrderExtWins.size()); // Visible transmittance at normal incidence of unswitched glazing
     Array1D<Real64> TVIS2(state.dataDaylightingData->ZoneDaylight(ZoneNum)
@@ -7615,10 +7615,10 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     // unused  REAL(r64)         :: HitPointLumFrClearSky     ! Luminance of obstruction from clear sky (cd/m2)
     // unused  REAL(r64)         :: HitPointLumFrOvercSky     ! Luminance of obstruction from overcast sky (cd/m2)
     // unused  REAL(r64)         :: HitPointLumFrSun          ! Luminance of obstruction from sun (cd/m2)
-    int ICtrl;        // Window control pointer
-    int JSH;          // Shading index: JSH=1 is bare window, JSH=2 is shaded window
-    Real64 COSBSun;   // Cosine of angle of incidence of direct sun on window
-    Real64 TVISBSun;  // Window's visible transmittance at COSBSun
+    int ICtrl;       // Window control pointer
+    int JSH;         // Shading index: JSH=1 is bare window, JSH=2 is shaded window
+    Real64 COSBSun;  // Cosine of angle of incidence of direct sun on window
+    Real64 TVISBSun; // Window's visible transmittance at COSBSun
     //  (times light well efficiency, if appropriate)
     Real64 ZSU1; // Transmitted direct normal illuminance (lux)
     //  CHARACTER(len=32) :: ShType                    ! Window shading device type

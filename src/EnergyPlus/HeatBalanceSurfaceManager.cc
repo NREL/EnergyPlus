@@ -225,7 +225,7 @@ void ManageSurfaceHeatBalance(EnergyPlusData &state)
     if (state.dataHeatBal->AnyCondFD) {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             int const ConstrNum = Surface(SurfNum).Construction;
-            if (ConstrNum <= 0) continue; // Shading surface, not really a heat transfer surface
+            if (ConstrNum <= 0) continue;                                            // Shading surface, not really a heat transfer surface
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue; //  Windows simulated in Window module
             if (Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
             state.dataHeatBalFiniteDiffMgr->SurfaceFD(SurfNum).UpdateMoistureBalance();
@@ -3875,7 +3875,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
             state.dataHeatBal->SurfInitialDifSolInAbsReport(SurfNum) = 0.0;
             state.dataHeatBal->SurfWinInitialDifSolInTransReport(SurfNum) = 0.0;
             state.dataHeatBal->SurfWinInitialDifSolInTransReport(SurfNum) +=
-                    state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(SurfNum) * Surface(SurfNum).Area;
+                state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(SurfNum) * Surface(SurfNum).Area;
             if (state.dataSurface->SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
                 int const ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
                 int TotGlassLayers;
