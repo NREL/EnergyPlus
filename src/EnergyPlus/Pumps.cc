@@ -2409,8 +2409,8 @@ void ReportPumps(EnergyPlusData &state, int const PumpNum)
     // This subroutine sets the pump reporting variables.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int InletNode;      // pump inlet node number
-    int OutletNode;     // pump outlet node number
+    int InletNode;     // pump inlet node number
+    int OutletNode;    // pump outlet node number
     pumpType PumpType; // Current pump type
 
     PumpType = state.dataPumps->PumpEquip(PumpNum).PumpType;
