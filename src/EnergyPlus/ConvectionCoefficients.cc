@@ -319,10 +319,11 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
 
             // apply the convection coefficient adjustment ratio for exterior windows
             if ((Surface(SurfNum).Class == SurfaceClass::Window) && (Surface(SurfNum).ExtBoundCond == ExternalEnvironment)) {
-                Real64 Ufactor = state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).SimpleWindowUfactor;
+                Real64 Ufactor =
+                    state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).SimpleWindowUfactor;
                 Real64 UfactorUpper = Real64(7.0);
                 if (Ufactor > UfactorUpper) {
-                    Real64 adjRatio = Ufactor/UfactorUpper;
+                    Real64 adjRatio = Ufactor / UfactorUpper;
                     state.dataHeatBal->HConvIn(SurfNum) = state.dataHeatBal->HConvIn(SurfNum) * adjRatio;
                 }
             }
