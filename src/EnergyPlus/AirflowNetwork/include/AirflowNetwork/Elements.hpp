@@ -76,7 +76,7 @@ namespace AirflowNetwork {
     enum OpenStatus // TODO: make enum class, since this enum is used in SetupOutputVariable()
     {
         Uninitialized = -1,
-        FreeOperation,     // Free operation
+        FreeOperation = 1,     // Free operation
         MinCheckForceOpen, // Force open when opening elapsed time is less than minimum opening time
         MinCheckForceClose // Force open when closing elapsed time is less than minimum closing time
     };
@@ -84,7 +84,7 @@ namespace AirflowNetwork {
     enum ProbabilityCheck // TODO: make enum class
     {
         Unassigned = -1,
-        NoAction,    // No action from probability check
+        NoAction = 1,    // No action from probability check
         ForceChange, // Force open or close from probability check
         KeepStatus   // Keep status at the previous time step from probability check
     };
@@ -107,7 +107,7 @@ namespace AirflowNetwork {
     enum class iComponentTypeNum : int
     {
         Unassigned = -1,
-        DOP,  // Detailed large opening component
+        DOP = 1,  // Detailed large opening component
         SOP,  // Simple opening component
         SCR,  // Surface crack component
         SEL,  // Surface effective leakage ratio component
@@ -132,7 +132,7 @@ namespace AirflowNetwork {
     enum class ComponentType
     {
         Unassigned = -1,
-        DOP, // Detailed large opening component
+        DOP = 1, // Detailed large opening component
         SOP,     // Simple opening component
         SCR,     // Surface crack component
         SEL,     // Surface effective leakage ratio component
@@ -158,7 +158,7 @@ namespace AirflowNetwork {
     enum class iEPlusComponentType : int
     {
         Unassigned = -1,
-        SCN, // Supply connection
+        SCN = 1, // Supply connection
         RCN, // Return connection
         RHT, // Reheat terminal
         FAN, // Fan
@@ -171,7 +171,7 @@ namespace AirflowNetwork {
     enum class iEPlusNodeType : int
     {
         Unassigned = -1,
-        ZIN,  // Zone inlet node
+        ZIN = 1,  // Zone inlet node
         ZOU,  // Zone outlet node
         SPL,  // Splitter node
         MIX,  // Mixer node
@@ -190,22 +190,21 @@ namespace AirflowNetwork {
     enum class iWPCCntr : int
     {
         Unassigned = -1,
-        Input,
+        Input = 1,
         SurfAvg
     };
 
     enum class PressureCtrl
     {
         Unassigned = -1,
-        Exhaust,
+        Exhaust = 1,
         Relief
     };
 
     enum class AirflowNetworkControl
     {
         Unassigned = -1,
-        None,               // No AirflowNetwork and SIMPLE
-        Simple,             // Simple calculations only
+        Simple = 1,         // Simple calculations only
         Multizone,          // Perform multizone calculations only
         NoneADS,            // Perform distribution system during system on time only
         SimpleADS,          // Perform distribution system during system on time and simple calculations during off time
@@ -231,7 +230,8 @@ namespace AirflowNetwork {
     {
         enum class Solver
         {
-            SkylineLU,
+            Unassigned = -1,
+            SkylineLU = 1,
             ConjugateGradient
         };
         // Members
