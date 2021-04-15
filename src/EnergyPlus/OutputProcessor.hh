@@ -63,6 +63,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -1114,7 +1115,7 @@ struct OutputProcessorData : BaseGlobalStruct
     Array1D<OutputProcessor::ReqReportVariables> ReqRepVars;
     Array1D<OutputProcessor::MeterArrayType> VarMeterArrays;
     Array1D<OutputProcessor::MeterType> EnergyMeters;
-    Array1D<OutputProcessor::EndUseCategoryType> EndUseCategory;
+    EPVector<OutputProcessor::EndUseCategoryType> EndUseCategory;
     std::unordered_map<std::string, std::string> UniqueMeterNames;
     char stamp[OutputProcessor::N_WriteTimeStampFormatData];
     char s_WriteReportRealData[129];

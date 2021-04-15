@@ -197,9 +197,6 @@ void ManageSurfaceHeatBalance(EnergyPlusData &state)
 
     auto &Surface(state.dataSurface->Surface);
 
-    int SurfNum;
-    int ConstrNum;
-
     if (state.dataHeatBalSurfMgr->ManageSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Surfaces");
     InitSurfaceHeatBalance(state); // Initialize all heat balance related parameters
 
@@ -226,9 +223,9 @@ void ManageSurfaceHeatBalance(EnergyPlusData &state)
     }
 
     if (state.dataHeatBal->AnyCondFD) {
-        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
-            ConstrNum = Surface(SurfNum).Construction;
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            int const ConstrNum = Surface(SurfNum).Construction;
+            if (ConstrNum <= 0) continue;                                            // Shading surface, not really a heat transfer surface
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue; //  Windows simulated in Window module
             if (Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
             state.dataHeatBalFiniteDiffMgr->SurfaceFD(SurfNum).UpdateMoistureBalance();
@@ -676,7 +673,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
             // Outside surface temp of "normal" windows not needed in Window5 calculation approach
             // Window layer temperatures are calculated in CalcHeatBalanceInsideSurf
 
-            int ConstrNum = surface.Construction;
+            int const ConstrNum = surface.Construction;
             auto const &construct(state.dataConstruction->Construct(ConstrNum));
             if (construct.NumCTFTerms > 1) { // COMPUTE CONSTANT PORTION OF CONDUCTIVE FLUXES.
 
@@ -1339,8 +1336,8 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     state.dataHeatBalSurfMgr->RefAirTemp.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-    state.dataHeatBal->SurfWinQRadSWwinAbs.dimension(DataWindowEquivalentLayer::CFSMAXNL + 1, state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBal->SurfWinInitialDifSolwinAbs.dimension(DataWindowEquivalentLayer::CFSMAXNL, state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBal->SurfWinQRadSWwinAbs.dimension(state.dataSurface->TotSurfaces, DataWindowEquivalentLayer::CFSMAXNL + 1, 0.0);
+    state.dataHeatBal->SurfWinInitialDifSolwinAbs.dimension(state.dataSurface->TotSurfaces, DataWindowEquivalentLayer::CFSMAXNL, 0.0);
     state.dataHeatBalSurf->SurfQRadSWOutMvIns.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBal->SurfQRadThermInAbs.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -2420,7 +2417,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
         }
         for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL + 1; Lay++) {
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) = 0.0;
+                state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) = 0.0;
             }
         }
     }
@@ -2541,12 +2538,12 @@ void InitSolarHeatGains(EnergyPlusData &state)
             }
             for (int Lay = 1; Lay <= state.dataHeatBal->MaxSolidWinLayers; Lay++) {
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum) = 0.0;
+                    state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay) = 0.0;
                 }
             }
             for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL; Lay++) {
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    state.dataHeatBal->SurfWinInitialDifSolwinAbs(Lay, SurfNum) = 0.0;
+                    state.dataHeatBal->SurfWinInitialDifSolwinAbs(SurfNum, Lay) = 0.0;
                 }
             }
         }
@@ -2570,7 +2567,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                 state.dataHeatBal->SurfQRadSWOutIncident(SurfDome) = 0.0;
                 state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfDome) = 0.0;
                 for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL + 1; Lay++) {
-                    state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfDome) = 0.0;
+                    state.dataHeatBal->SurfWinQRadSWwinAbs(SurfDome, Lay) = 0.0;
                 }
             }
         }
@@ -2802,10 +2799,9 @@ void InitSolarHeatGains(EnergyPlusData &state)
             }
         }
         for (int PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
-            int SurfNum = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser; // TDD: Diffuser object number
-            int SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;    // TDD: DOME object number
-            int ConstrNum = Surface(SurfNum).Construction;
-            if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
+            int const SurfNum = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser; // TDD: Diffuser object number
+            int const SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;    // TDD: DOME object number
+            int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
 
             // Reconstruct the beam, sky, and ground radiation transmittance of just the TDD:DOME and TDD pipe
             // by dividing out diffuse solar transmittance of TDD:DIFFUSER
@@ -2856,8 +2852,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
             int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
             int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
-                int ConstrNum = Surface(SurfNum).Construction;
-                if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
+                int const ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
                 if (Surface(SurfNum).ExtSolar) {
                     // Exclude special shading surfaces which required QRadSWOut calculations above
                     int RoughIndexMovInsul = 0; // Roughness index of movable insulation
@@ -2913,8 +2908,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
                     if (Surface(SurfNum).MaterialMovInsulExt > 0) EvalOutsideMovableInsulation(state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
 
-                    int ConstrNum = Surface(SurfNum).Construction;
-                    if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
+                    int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
                     if (RoughIndexMovInsul <= 0) {                     // No movable insulation present
                         Real64 CosInc = currCosInc(SurfNum);           // Cosine of incidence angle of beam solar on glass
                         Real64 BeamSolar = currBeamSolar(SurfNum);     // Local variable for BeamSolarRad
@@ -2932,9 +2926,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
                             if (IS_SHADED(ShadeFlag)) { // Shaded window
 
-                                int ConstrNumSh = Surface(SurfNum).activeShadedConstruction; // Shaded window construction
-                                if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1)
-                                    ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
+                                int const ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum); // Shaded window construction
 
                                 if (ANY_SHADE_SCREEN(ShadeFlag)) { // Shade/screen on
                                     for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
@@ -3022,8 +3014,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
                             state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) = 0.0;
                             for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
-                                state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) =
-                                    AbsDiffWin(Lay) * (SkySolarInc + GndSolarInc) + state.dataSurface->SurfWinA(Lay, SurfNum) * BeamSolar;
+                                state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) =
+                                    AbsDiffWin(Lay) * (SkySolarInc + GndSolarInc) + state.dataSurface->SurfWinA(SurfNum, Lay) * BeamSolar;
                                 // SurfWinA is from InteriorSolarDistribution
                                 if (ANY_BLIND(ShadeFlag)) {
                                     int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
@@ -3048,18 +3040,18 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                             AbsDiffGlassLayGnd = state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffGnd(1, Lay);
                                             AbsDiffGlassLaySky = state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffSky(1, Lay);
                                         }
-                                        state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) =
+                                        state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) =
                                             SkySolarInc * (0.5 * ACosTlt * AbsDiffGlassLayGnd + (1.0 - 0.5 * ACosTlt) * AbsDiffGlassLaySky) +
                                             GndSolarInc * ((1.0 - 0.5 * ACosTlt) * AbsDiffGlassLayGnd + 0.5 * ACosTlt * AbsDiffGlassLaySky) +
-                                            state.dataSurface->SurfWinA(Lay, SurfNum) * BeamSolar;
+                                            state.dataSurface->SurfWinA(SurfNum, Lay) * BeamSolar;
                                     }
                                 }
                                 // Total solar absorbed in solid layer (W), for reporting
-                                state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum) =
-                                    state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
+                                state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay) =
+                                    state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) * Surface(SurfNum).Area;
 
                                 // Total solar absorbed in all glass layers (W), for reporting
-                                state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) += state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum);
+                                state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) += state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay);
                             }
                             state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy(SurfNum) =
                                 state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) * state.dataGlobal->TimeStepZoneSec;
@@ -3070,7 +3062,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             //   inExtWindowModel->isExternalLibraryModel() ) {
                             //   TotSolidLay = Construct( ConstrNum ).TotSolidLayers;
                             //   for ( Lay = 1; Lay <= TotSolidLay; ++Lay ) {
-                            //     QRadSWwinAbs( Lay, SurfNum ) = SurfWinA( Lay, SurfNum ) *
+                            //     QRadSWwinAbs( Lay, SurfNum ) = SurfWinA(SurfNum, Lay) *
                             //       ( QRadSWOutIncident( SurfNum ) + QS( Surface( SurfNum ).Zone ) );
                             //   }
                         } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
@@ -3086,28 +3078,28 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
                             for (int Lay = 1; Lay <= TotSolidLay; ++Lay) {
                                 if (SurfSolAbs != 0) {
-                                    state.dataSurface->SurfWinA(Lay, SurfNum) =
+                                    state.dataSurface->SurfWinA(SurfNum, Lay) =
                                         GetCurrentScheduleValue(state, state.dataSurface->FenLayAbsSSG(SurfSolAbs).SchedPtrs(Lay));
                                     // ABWin(Lay) = SurfWinA(SurfNum,Lay)
-                                    state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) = state.dataSurface->SurfWinA(Lay, SurfNum);
+                                    state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) = state.dataSurface->SurfWinA(SurfNum, Lay);
                                 } else {
                                     // Several notes about this equation.  First part is accounting for duffuse solar radiation for the ground
                                     // and from the sky.  Second item (SurfWinA(SurfNum,Lay) * BeamSolar) is accounting for absorbed solar
                                     // radiation originating from beam on exterior side.  Third item (SurfWinACFOverlap(SurfNum,Lay)) is
                                     // accounting for absorptances from beam hitting back of the window which passes through rest of exterior
                                     // windows
-                                    state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) =
+                                    state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) =
                                         state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.State(CurrentState).WinSkyFtAbs(Lay) * SkySolarInc +
                                         state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.State(CurrentState).WinSkyGndAbs(Lay) * GndSolarInc +
-                                        state.dataSurface->SurfWinA(Lay, SurfNum) * BeamSolar +
-                                        state.dataSurface->SurfWinACFOverlap(Lay, SurfNum) * BeamSolar;
+                                        state.dataSurface->SurfWinA(SurfNum, Lay) * BeamSolar +
+                                        state.dataSurface->SurfWinACFOverlap(SurfNum, Lay) * BeamSolar;
                                 }
                                 // Total solar absorbed in solid layer (W), for reporting
-                                state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum) =
-                                    state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
+                                state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay) =
+                                    state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) * Surface(SurfNum).Area;
 
                                 // Total solar absorbed in all glass layers (W), for reporting
-                                state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) += state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum);
+                                state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) += state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay);
                             }
                             state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy(SurfNum) =
                                 state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) * state.dataGlobal->TimeStepZoneSec;
@@ -3124,15 +3116,15 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 // (3) diffuse short wave incident on the inside face of the fenestration.  The short wave internal sources
                                 //     include light, ...
                                 AbsDiffWin(Lay) = state.dataConstruction->Construct(ConstrNum).AbsDiffFrontEQL(Lay);
-                                state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) =
-                                    state.dataSurface->SurfWinA(Lay, SurfNum) * BeamSolar + AbsDiffWin(Lay) * (SkySolarInc + GndSolarInc);
+                                state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) =
+                                    state.dataSurface->SurfWinA(SurfNum, Lay) * BeamSolar + AbsDiffWin(Lay) * (SkySolarInc + GndSolarInc);
 
                                 // Total solar absorbed in solid layer (W), for reporting
-                                state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum) =
-                                    state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
+                                state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay) =
+                                    state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) * Surface(SurfNum).Area;
 
                                 // Total solar absorbed in all glass layers (W), for reporting
-                                state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) += state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum);
+                                state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) += state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay);
                             }
 
                             state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy(SurfNum) =
@@ -3155,15 +3147,15 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
                                 Real64 AbWinDiff = aLayer->getAbsorptanceLayer(Lay, Side::Front, ScatteringSimple::Diffuse, Theta, Phi);
 
-                                state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) =
-                                    AbWinDiff * (SkySolarInc + GndSolarInc) + state.dataSurface->SurfWinA(Lay, SurfNum) * BeamSolar;
+                                state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) =
+                                    AbWinDiff * (SkySolarInc + GndSolarInc) + state.dataSurface->SurfWinA(SurfNum, Lay) * BeamSolar;
 
                                 // Total solar absorbed in solid layer (W), for reporting
-                                state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum) =
-                                    state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
+                                state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay) =
+                                    state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) * Surface(SurfNum).Area;
 
                                 // Total solar absorbed in all glass layers (W), for reporting
-                                state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) += state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum);
+                                state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) += state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay);
                             }
                         }
 
@@ -3426,17 +3418,17 @@ void InitSolarHeatGains(EnergyPlusData &state)
             }         // end of surface window loop
         }             // end of zone loop
         for (int PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
-            int SurfNum = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome; // TDD: DOME object number
-            int ConstrNum = Surface(SurfNum).Construction;
-            int TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers; // Number of glass layers
+            int const SurfNum = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome; // TDD: DOME object number
+            int const ConstrNum = Surface(SurfNum).Construction;
+            int const TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers; // Number of glass layers
             state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) = 0.0;
             for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
                 AbsDiffWin(Lay) = state.dataConstruction->Construct(ConstrNum).AbsDiff(Lay);
-                state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) = AbsDiffWin(Lay) * (currSkySolarInc(SurfNum) + currGndSolarInc(SurfNum)) +
-                                                                       state.dataSurface->SurfWinA(Lay, SurfNum) * currBeamSolar(SurfNum);
-                state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum) =
-                    state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
-                state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) += state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum);
+                state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) = AbsDiffWin(Lay) * (currSkySolarInc(SurfNum) + currGndSolarInc(SurfNum)) +
+                                                                       state.dataSurface->SurfWinA(SurfNum, Lay) * currBeamSolar(SurfNum);
+                state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay) =
+                    state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) * Surface(SurfNum).Area;
+                state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) += state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay);
                 state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy(SurfNum) =
                     state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) * state.dataGlobal->TimeStepZoneSec;
             }
@@ -3572,7 +3564,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
         int const radEnclosureNum = state.dataHeatBal->Zone(zoneNum).RadiantEnclosureNum;
         int const solEnclosureNum = state.dataHeatBal->Zone(zoneNum).SolarEnclosureNum;
         for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
-            int ConstrNum = Surface(SurfNum).Construction;
+            int const ConstrNum = Surface(SurfNum).Construction;
 
             Real64 AbsIntSurf = state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar; // Inside opaque surface solar absorptance
             Real64 AbsIntSurfVis =
@@ -3621,15 +3613,11 @@ void InitIntSolarDistribution(EnergyPlusData &state)
         int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
         int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
         for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) { // Window
-            int ConstrNum = Surface(SurfNum).Construction;
+            int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
 
             if (state.dataSurface->SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
+                int const ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
 
-                int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
-                if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) {
-                    ConstrNum = Surface(SurfNum).StormWinConstruction;
-                    ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
-                }
                 int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                 WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
 
@@ -3653,14 +3641,14 @@ void InitIntSolarDistribution(EnergyPlusData &state)
 
                 if (NOT_SHADED(ShadeFlag)) { // No window shading
                     for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
-                        state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) +=
+                        state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) +=
                             state.dataHeatBal->QS(solEnclosureNum) * state.dataConstruction->Construct(ConstrNum).AbsDiffBack(IGlass);
                     }
                 } else if (ConstrNumSh != 0 && ShadeFlag != WinShadingType::SwitchableGlazing) {
                     // Interior, exterior or between-glass shade, screen or blind in place
                     for (int IGlass = 1; IGlass <= state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers; ++IGlass) {
                         if (ANY_SHADE_SCREEN(ShadeFlag)) {
-                            state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) +=
+                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) +=
                                 state.dataHeatBal->QS(solEnclosureNum) * state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(IGlass);
                         } else if (BITF_TEST_ANY(BITF(ShadeFlag), BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind))) {
                             Real64 BlAbsDiffBk; // Glass layer back diffuse solar absorptance when blind in place
@@ -3674,7 +3662,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                             } else {
                                 BlAbsDiffBk = state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffBack(1, IGlass);
                             }
-                            state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) += state.dataHeatBal->QS(solEnclosureNum) * BlAbsDiffBk;
+                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) += state.dataHeatBal->QS(solEnclosureNum) * BlAbsDiffBk;
                         }
                     }
                     if (ShadeFlag == WinShadingType::IntShade) {
@@ -3719,7 +3707,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 } else if (ShadeFlag == WinShadingType::SwitchableGlazing) { // Switchable glazing
                     for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
 
-                        state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) +=
+                        state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) +=
                             state.dataHeatBal->QS(solEnclosureNum) * InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum),
                                                                               state.dataConstruction->Construct(ConstrNum).AbsDiffBack(IGlass),
                                                                               state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(IGlass));
@@ -3810,7 +3798,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 // Radiations absorbed by the window layers coming from zone side
                 int EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
                 for (int Lay = 1; Lay <= state.dataWindowEquivLayer->CFS(EQLNum).NL; ++Lay) {
-                    state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) +=
+                    state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) +=
                         state.dataHeatBal->QS(solEnclosureNum) * state.dataConstruction->Construct(ConstrNum).AbsDiffBackEQL(Lay);
                 }
                 // Window frame has not been included for equivalent layer model yet
@@ -3823,7 +3811,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 if (state.dataSurface->SurfWinWindowModelType(SurfNumAdjZone) != WindowEQLModel) {
                     int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                     for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
-                        state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNumAdjZone) +=
+                        state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNumAdjZone, IGlass) +=
                             state.dataHeatBal->QS(solEnclosureNum) *
                             state.dataConstruction->Construct(Surface(SurfNumAdjZone).Construction).AbsDiff(IGlass);
                         // Note that AbsDiff rather than AbsDiffBack is used in the above since the
@@ -3831,10 +3819,10 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                         // zone's window.
                     }
                 } else { // IF (SurfaceWindow(SurfNumAdjZone)%WindowModelType == WindowEQLModel) THEN
-                    ConstrNum = Surface(SurfNumAdjZone).Construction;
-                    int EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
+                    int const AdjConstrNum = Surface(SurfNumAdjZone).Construction;
+                    int const EQLNum = state.dataConstruction->Construct(AdjConstrNum).EQLConsPtr;
                     for (int Lay = 1; Lay <= state.dataWindowEquivLayer->CFS(EQLNum).NL; ++Lay) {
-                        state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNumAdjZone) +=
+                        state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNumAdjZone, Lay) +=
                             state.dataHeatBal->QS(solEnclosureNum) * state.dataConstruction->Construct(ConstrNum).AbsDiffFrontEQL(Lay);
                         // Note that AbsDiffFrontEQL rather than AbsDiffBackEQL is used in the above
                         // since the radiation from the current zone is incident on the outside of the
@@ -3844,25 +3832,21 @@ void InitIntSolarDistribution(EnergyPlusData &state)
             }
 
             if (state.dataSurface->SurfWinWindowModelType(SurfNum) == Window5DetailedModel) {
-                int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
-                if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) {
-                    ConstrNum = Surface(SurfNum).StormWinConstruction;
-                    ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
-                }
+                int const ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
                 int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                 WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
                 if (NOT_SHADED(ShadeFlag)) { // No window shading
                     for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
-                        state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) += state.dataHeatBal->SurfWinInitialDifSolwinAbs(IGlass, SurfNum);
+                        state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) += state.dataHeatBal->SurfWinInitialDifSolwinAbs(SurfNum, IGlass);
                     }
                 } else if (ShadeFlag == WinShadingType::SwitchableGlazing) { // Switchable glazing
                     for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
-                        state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) += state.dataHeatBal->SurfWinInitialDifSolwinAbs(IGlass, SurfNum);
+                        state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) += state.dataHeatBal->SurfWinInitialDifSolwinAbs(SurfNum, IGlass);
                     }
                 } else {
                     // Interior, exterior or between-glass shade, screen or blind in place
                     for (int IGlass = 1; IGlass <= state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers; ++IGlass) {
-                        state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) += state.dataHeatBal->SurfWinInitialDifSolwinAbs(IGlass, SurfNum);
+                        state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) += state.dataHeatBal->SurfWinInitialDifSolwinAbs(SurfNum, IGlass);
                     }
                     if (ANY_SHADE_SCREEN(ShadeFlag)) {
                         state.dataSurface->SurfWinIntSWAbsByShade(SurfNum) += state.dataSurface->SurfWinInitialDifSolAbsByShade(SurfNum);
@@ -3873,7 +3857,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
             } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
                 int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                 for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
-                    state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) += state.dataHeatBal->SurfWinInitialDifSolwinAbs(IGlass, SurfNum);
+                    state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) += state.dataHeatBal->SurfWinInitialDifSolwinAbs(SurfNum, IGlass);
                 }
             } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
 
@@ -3881,7 +3865,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 int EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
 
                 for (int Lay = 1; Lay <= state.dataWindowEquivLayer->CFS(EQLNum).NL; ++Lay) {
-                    state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) += state.dataHeatBal->SurfWinInitialDifSolwinAbs(Lay, SurfNum);
+                    state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) += state.dataHeatBal->SurfWinInitialDifSolwinAbs(SurfNum, Lay);
                 }
             }
 
@@ -3893,11 +3877,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
             state.dataHeatBal->SurfWinInitialDifSolInTransReport(SurfNum) +=
                 state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(SurfNum) * Surface(SurfNum).Area;
             if (state.dataSurface->SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
-                int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
-                if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) {
-                    ConstrNum = Surface(SurfNum).StormWinConstruction;
-                    ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
-                }
+                int const ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
                 int TotGlassLayers;
                 if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
                     TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotSolidLayers;
@@ -3909,38 +3889,38 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                     for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
                         // Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
                         state.dataHeatBal->SurfInitialDifSolInAbsReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinInitialDifSolwinAbs(IGlass, SurfNum) * Surface(SurfNum).Area;
+                            state.dataHeatBal->SurfWinInitialDifSolwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
                         // Total Shortwave Radiation Absorbed on Inside of Surface[W]
                         state.dataHeatBal->SurfSWInAbsTotalReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) * Surface(SurfNum).Area;
+                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
                         // Total Shortwave Absorbed:All Glass Layers[W]
                         state.dataHeatBal->SurfWinSWwinAbsTotalReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) * Surface(SurfNum).Area;
+                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
                     }
                 } else if (ShadeFlag == WinShadingType::SwitchableGlazing) { // Switchable glazing
                     for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
                         // Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
                         state.dataHeatBal->SurfInitialDifSolInAbsReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinInitialDifSolwinAbs(IGlass, SurfNum) * Surface(SurfNum).Area;
+                            state.dataHeatBal->SurfWinInitialDifSolwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
                         // Total Shortwave Radiation Absorbed on Inside of Surface[W]
                         state.dataHeatBal->SurfSWInAbsTotalReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) * Surface(SurfNum).Area;
+                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
                         // Total Shortwave Absorbed:All Glass Layers[W]
                         state.dataHeatBal->SurfWinSWwinAbsTotalReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) * Surface(SurfNum).Area;
+                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
                     }
                 } else {
                     // Interior, exterior or between-glass shade, screen or blind in place
                     for (int IGlass = 1; IGlass <= state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers; ++IGlass) {
                         // Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
                         state.dataHeatBal->SurfInitialDifSolInAbsReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinInitialDifSolwinAbs(IGlass, SurfNum) * Surface(SurfNum).Area;
+                            state.dataHeatBal->SurfWinInitialDifSolwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
                         // Total Shortwave Radiation Absorbed on Inside of Surface[W]
                         state.dataHeatBal->SurfSWInAbsTotalReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) * Surface(SurfNum).Area;
+                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
                         // Total Shortwave Absorbed:All Glass Layers[W]
                         state.dataHeatBal->SurfWinSWwinAbsTotalReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) * Surface(SurfNum).Area;
+                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
                     }
                 }    // End of shading flag check
             } else { // IF (SurfaceWindow(SurfNum)%WindowModelType == WindowEQLModel) THEN
@@ -3948,13 +3928,13 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 for (int Lay = 1; Lay <= state.dataWindowEquivLayer->CFS(EQLNum).NL; ++Lay) {
                     // Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
                     state.dataHeatBal->SurfInitialDifSolInAbsReport(SurfNum) +=
-                        state.dataHeatBal->SurfWinInitialDifSolwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
+                        state.dataHeatBal->SurfWinInitialDifSolwinAbs(SurfNum, Lay) * Surface(SurfNum).Area;
                     // Total Shortwave Radiation Absorbed on Inside of Surface[W]
                     state.dataHeatBal->SurfSWInAbsTotalReport(SurfNum) +=
-                        state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
+                        state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) * Surface(SurfNum).Area;
                     // Total Shortwave Absorbed:All solid Layers[W]
                     state.dataHeatBal->SurfWinSWwinAbsTotalReport(SurfNum) +=
-                        state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
+                        state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) * Surface(SurfNum).Area;
                 }
             }
         } // End of window
@@ -3997,7 +3977,7 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
         int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
         for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
-            int ConstrNum = Surface(SurfNum).Construction;
+            int const ConstrNum = Surface(SurfNum).Construction;
             state.dataHeatBal->ITABSF(SurfNum) = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
             Real64 HMovInsul = 0.0;                                              // Conductance of movable insulation
             Real64 AbsInt;                                                       // Solar absorptance of movable insulation
@@ -4045,7 +4025,7 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
         for (int const SurfNum : thisEnclosure.SurfacePtr) {
 
             if (!Surface(SurfNum).HeatTransSurf) continue;
-            int ConstrNum = Surface(SurfNum).Construction;
+            int const ConstrNum = Surface(SurfNum).Construction;
             WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
             if (ShadeFlag != WinShadingType::SwitchableGlazing) {
                 SUM1 += Surface(SurfNum).Area * state.dataHeatBal->ITABSF(SurfNum);
@@ -4067,7 +4047,7 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
                     DividerThermAbs = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
                 if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                     // Interior shade or blind in place
-                    int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+                    int const ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                     if (state.dataSurface->SurfWinHasShadeOrBlindLayer(SurfNum)) {
                         // Shade layer material number
                         int MatNumSh =
@@ -4165,7 +4145,7 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
         Real64 SUM1 = 0.0; // Intermediate calculation value for solar absorbed and transmitted
 
         for (int const SurfNum : state.dataViewFactor->ZoneSolarInfo(enclosureNum).SurfacePtr) {
-            int ConstrNum = Surface(SurfNum).Construction;
+            int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
             if (state.dataConstruction->Construct(ConstrNum).TransDiff <= 0.0) {
                 // Opaque surface
                 Real64 AbsIntSurf = state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar; // Inside surface short-wave absorptance
@@ -4181,13 +4161,7 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
                 if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) {
                     WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
                     Real64 AbsDiffTotWin = 0.0; // Sum of window layer short-wave absorptances
-
-                    int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
-                    if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) {
-                        ConstrNum = Surface(SurfNum).StormWinConstruction;
-                        ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
-                    }
-
+                    int const ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
                     Real64 SwitchFac = state.dataSurface->SurfWinSwitchingFactor(SurfNum);
 
                     // Sum of absorptances of glass layers
@@ -4569,6 +4543,7 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
 
                 Surface(SurfNum).Construction = Surface(SurfNum).EMSConstructionOverrideValue;
                 state.dataConstruction->Construct(Surface(SurfNum).Construction).IsUsed = true;
+                state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
 
             } else { // have not checked yet or is not okay, so see if we need to warn about incompatible
                 if (!state.dataRuntimeLang->EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) {
@@ -5819,7 +5794,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
             // Window layer temperatures are calculated in CalcHeatBalanceInsideSurf
 
             // Initializations for this surface
-            int ConstrNum = Surface(SurfNum).Construction;
+            int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
             Real64 HMovInsul = 0.0; // "Convection" coefficient of movable insulation
             Real64 HSky = 0.0;      // "Convection" coefficient from sky to surface
             Real64 HGround = 0.0;   // "Convection" coefficient from ground to surface
@@ -6157,8 +6132,6 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                         CalcEcoRoof(state, SurfNum, zoneNum, ConstrNum, TempExt);
                         continue;
                     }
-
-                    if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
                     // Roughness index of the exterior surface
                     int RoughSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
                     // Thermal absoptance of the exterior surface
@@ -6221,7 +6194,6 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                                 state.dataMstBal->HAirFD(SurfNum) = state.dataHeatBalSurf->HAirExtSurf(SurfNum);
                             }
                             // end HAMT
-
                             if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
                                 // Set variables used in the FD moisture balance
                                 state.dataMstBal->TempOutsideAirFD(SurfNum) = TempExt;
@@ -7095,7 +7067,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
         for (int SurfNum : HTWindowSurfs) {
             auto &surface(Surface(SurfNum));
             Real64 &TH11(state.dataHeatBalSurf->TH(1, 1, SurfNum));
-            int ConstrNum = surface.Construction; // Not const, because storm window may change this
+            int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum); // Not const, because storm window may change this
             auto const &construct(state.dataConstruction->Construct(ConstrNum));
             if (state.dataSurface->SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                 // Lookup up the TDD:DOME object
@@ -7109,7 +7081,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                 //   = QRadSWwinAbs(SurfNum,1)/2.0
                 Real64 const HConvIn_surf(state.dataMstBal->HConvInFD(SurfNum) = state.dataHeatBal->HConvIn(SurfNum));
                 state.dataHeatBalSurf->TempSurfIn(SurfNum) = state.dataHeatBalSurf->TempSurfInTmp(SurfNum) =
-                    (state.dataHeatBal->SurfQRadThermInAbs(SurfNum) + state.dataHeatBal->SurfWinQRadSWwinAbs(1, SurfNum) / 2.0 +
+                    (state.dataHeatBal->SurfQRadThermInAbs(SurfNum) + state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, 1) / 2.0 +
                      state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(SurfNum) + HConvIn_surf * state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) +
                      state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum) + IterDampConst * state.dataHeatBalSurf->TempInsOld(SurfNum) +
                      Ueff * state.dataHeatBalSurf->TH(1, 1, domeNum)) /
@@ -7147,7 +7119,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                     state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area * state.dataConstruction->Construct(surface.Construction).TransDiff;
             } else {                                                // Regular window
                 if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
-                    if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = surface.StormWinConstruction;
                     // Get outside convection coeff for exterior window here to avoid calling
                     // InitExteriorConvectionCoeff from CalcWindowHeatBalance, which avoids circular reference
                     // (HeatBalanceSurfaceManager USEing and WindowManager and
@@ -7158,7 +7129,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                         auto const shading_flag(state.dataSurface->SurfWinShadingFlag(SurfNum));
                         if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(shading_flag)) {
                             // Exterior shade in place
-                            int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+                            int const ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                             if (ConstrNumSh != 0) {
                                 RoughSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1)).Roughness;
                                 EmisOut = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1)).AbsorpThermal;
@@ -7854,7 +7825,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
             for (int surfNum = firstWindowSurf; surfNum <= lastWindowSurf; ++surfNum) {
                 auto &surface(Surface(surfNum));
                 Real64 &TH11(state.dataHeatBalSurf->TH(1, 1, surfNum));
-                int ConstrNum = surface.Construction; // Not const, because storm window may change this
+                int const ConstrNum = state.dataSurface->SurfActiveConstruction(surfNum);
                 auto const &construct(state.dataConstruction->Construct(ConstrNum));
                 if (state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                     // Lookup up the TDD:DOME object
@@ -7868,7 +7839,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                     //   = QRadSWwinAbs(surfNum,1)/2.0
                     Real64 const HConvIn_surf(state.dataMstBal->HConvInFD(surfNum) = state.dataHeatBal->HConvIn(surfNum));
                     state.dataHeatBalSurf->TempSurfIn(surfNum) = state.dataHeatBalSurf->TempSurfInTmp(surfNum) =
-                        (state.dataHeatBal->SurfQRadThermInAbs(surfNum) + state.dataHeatBal->SurfWinQRadSWwinAbs(1, surfNum) / 2.0 +
+                        (state.dataHeatBal->SurfQRadThermInAbs(surfNum) + state.dataHeatBal->SurfWinQRadSWwinAbs(surfNum, 1) / 2.0 +
                          state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(surfNum) +
                          HConvIn_surf * state.dataHeatBalSurfMgr->RefAirTemp(surfNum) + state.dataHeatBalSurf->SurfNetLWRadToSurf(surfNum) +
                          IterDampConst * state.dataHeatBalSurf->TempInsOld(surfNum) + Ueff * state.dataHeatBalSurf->TH(1, 1, domeNum)) /
@@ -7908,7 +7879,6 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                                                                state.dataConstruction->Construct(surface.Construction).TransDiff;
                 } else {                                                // Regular window
                     if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
-                        if (state.dataSurface->SurfWinStormWinFlag(surfNum) == 1) ConstrNum = surface.StormWinConstruction;
                         // Get outside convection coeff for exterior window here to avoid calling
                         // InitExteriorConvectionCoeff from CalcWindowHeatBalance, which avoids circular reference
                         // (HeatBalanceSurfaceManager USEing and WindowManager and
@@ -7920,7 +7890,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                             auto const shading_flag(state.dataSurface->SurfWinShadingFlag(surfNum));
                             if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(shading_flag)) {
                                 // Exterior shade in place
-                                int ConstrNumSh = Surface(surfNum).activeShadedConstruction;
+                                int const ConstrNumSh = Surface(surfNum).activeShadedConstruction;
                                 if (ConstrNumSh != 0) {
                                     RoughSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1)).Roughness;
                                     EmisOut =
@@ -8425,11 +8395,11 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
         // *QsrcHist(1,SurfNum)                     &
         //+Construct(ConstrNum)%CTFSourceIn(0) &   TDDs cannot be radiant systems
         // *QsrcHist(1,SurfNum)                &
-        TH11 = (state.dataHeatBal->SurfWinQRadSWwinAbs(1, SurfNum) / 2.0 + state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +
+        TH11 = (state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, 1) / 2.0 + state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +
                 (state.dataHeatBalSurf->HcExtSurf(SurfNum) + state.dataHeatBalSurf->HAirExtSurf(SurfNum)) * TempExt +
                 state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) + state.dataHeatBalSurf->HSkyExtSurf(SurfNum) * TSky +
                 state.dataHeatBalSurf->HGrdExtSurf(SurfNum) * TGround +
-                F1 * (state.dataHeatBal->SurfWinQRadSWwinAbs(1, SurfNum2) / 2.0 + state.dataHeatBal->SurfQRadThermInAbs(SurfNum2) +
+                F1 * (state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum2, 1) / 2.0 + state.dataHeatBal->SurfQRadThermInAbs(SurfNum2) +
                       state.dataHeatBal->HConvIn(SurfNum2) * state.dataHeatBalFanSys->MAT(ZoneNum2) +
                       state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum2))) /
                (Ueff + state.dataHeatBalSurf->HcExtSurf(SurfNum) + state.dataHeatBalSurf->HAirExtSurf(SurfNum) +
