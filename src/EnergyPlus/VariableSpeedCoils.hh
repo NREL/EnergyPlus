@@ -595,7 +595,7 @@ struct VariableSpeedCoilsData : BaseGlobalStruct
     Real64 VSHPWHHeatingCapacity = 0.0; // Used by Heat Pump:Water Heater object as total water heating capacity [W]
     Real64 VSHPWHHeatingCOP = 0.0;      // Used by Heat Pump:Water Heater object as water heating COP [W/W]
 
-    Array1D<VariableSpeedCoils::VariableSpeedCoilData> VarSpeedCoil;
+    EPVector<VariableSpeedCoils::VariableSpeedCoilData> VarSpeedCoil;
     bool firstTime = true;
 
     Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag

@@ -2573,6 +2573,12 @@ The AirflowNetwork linkage used in following output variables includes surfaces 
 \item
   HVAC,Average,AFN Zone Infiltration Air Change Rate {[}ach{]}
 \item
+  HVAC,Sum,AFN Zone Ventilation Volume {[}m3{]}
+\item
+  HVAC,Sum,AFN Zone Ventilation Mass {[}kg{]}
+\item
+  HVAC,Average,AFN Zone Ventilation Air Change Rate {[}ach{]}
+\item
   HVAC,Sum,AFN Zone Mixing Volume {[}m3{]}
 \item
   HVAC,Sum,AFN Zone Mixing Mass {[}kg{]}
@@ -3113,15 +3119,27 @@ The total convective sensible heat loss, in Joules to the zone air corresponding
 
 \paragraph{AFN Zone Infiltration Volume {[}m3{]}}\label{afn-zone-infiltration-volume-m3}
 
-The volume of outdoor air flow into the zone from window/door openings and cracks in the exterior surfaces of the zone (i.e., the sum of ventilation and crack flows from the exterior into the zone). The zone air density is used to calculate the zone infiltration volume based on the mass flow rate. Note that AirflowNetwork Zone Infiltration Volume will be zero if all of the flows through the zone's exterior surfaces are out of the zone. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the infiltration volume calculated during the fan on and off periods for the simulation timestep.
+The volume of outdoor air flow into the zone from window/door cracks in the exterior surfaces of the zone from both AirflowNetwork:MultiZone:Surface:Crack and AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea only averaged over the reporting period (i.e., the sum of infiltration and crack flows from the exterior into the zone). The zone air density is used to calculate the zone infiltration volume based on the mass flow rate. Note that AirflowNetwork Zone Infiltration Volume will be zero if all of the flows through the zone's exterior surfaces are out of the zone. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the infiltration volume calculated during the fan on and off periods for the simulation timestep.
 
 \paragraph{AFN Zone Infiltration Mass {[}kg{]}}\label{afn-zone-infiltration-mass-kg}
 
-The mass of air corresponding to the AirflowNetwork Zone Infiltration Volume. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the infiltration mass calculated during the fan on and off periods for the simulation timestep.
+The mass of air corresponding to the AirflowNetwork Zone Infiltration Volume from both AirflowNetwork:MultiZone:Surface:Crack and AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea only averaged over the reporting period. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the infiltration mass calculated during the fan on and off periods for the simulation timestep.
 
 \paragraph{AFN Zone Infiltration Air Change Rate {[}ach{]}}\label{afn-zone-infiltration-air-change-rate-ach}
 
-The number of air changes per hour produced by outdoor air flow into the zone from window/door openings and cracks in the exterior surfaces of the zone (i.e.~the sum of ventilation and crack flows from the exterior into the zone). The target zone air density is used to calculate the zone infiltration air change rate based on the mass flow rate Note that, like Zone Infiltration Volume, Zone Infiltration Air Change Rate will be zero if all flows through the zone's exterior surfaces are out of the zone. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the infiltration air change rate calculated during the fan on and off periods for the simulation timestep.
+The number of air changes per hour produced by outdoor air flow into the zone from window/door cracks in the exterior surfaces of the zone from both AirflowNetwork:MultiZone:Surface:Crack and AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea only averaged over the reporting period (i.e.~the sum of infiltration and crack flows from the exterior into the zone). The target zone air density is used to calculate the zone infiltration air change rate based on the mass flow rate Note that, like Zone Infiltration Volume, Zone Infiltration Air Change Rate will be zero if all flows through the zone's exterior surfaces are out of the zone. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the infiltration air change rate calculated during the fan on and off periods for the simulation timestep.
+
+\paragraph{AFN Zone Ventilation Volume {[}m3{]}}\label{afn-zone-ventilation-volume-m3}
+
+The volume of outdoor air flow into the zone from window/door openings in the exterior surfaces of the zone from AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:SimpleOpening, and AirflowNetwork:MultiZone:Component:HorizontalOpening only averaged over the reporting period (i.e., the sum of ventilation and opening flows from the exterior into the zone). The zone air density is used to calculate the zone ventilation volume based on the mass flow rate. Note that AirflowNetwork Zone Ventilation Volume will be zero if all of the flows through the zone's exterior surfaces are out of the zone. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the ventilation volume calculated during the fan on and off periods for the simulation timestep.
+
+\paragraph{AFN Zone Ventilation Mass {[}kg{]}}\label{afn-zone-ventilation-mass-kg}
+
+The mass of air corresponding to the AirflowNetwork Zone Ventilation Volume from AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:SimpleOpening, and AirflowNetwork:MultiZone:Component:HorizontalOpening only averaged over the reporting period. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the ventilation mass calculated during the fan on and off periods for the simulation timestep.
+
+\paragraph{AFN Zone Ventilation Air Change Rate {[}ach{]}}\label{afn-zone-ventilation-air-change-rate-ach}
+
+The number of air changes per hour produced by outdoor air flow into the zone from window/door openings in the exterior surfaces of the zone from AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:SimpleOpening, and AirflowNetwork:MultiZone:Component:HorizontalOpening only averaged over the reporting period (i.e.~the sum of ventilation and opening flows from the exterior into the zone). The target zone air density is used to calculate the zone ventilation air change rate based on the mass flow rate Note that, like Zone Ventilation Volume, Zone Ventilation Air Change Rate will be zero if all flows through the zone's exterior surfaces are out of the zone. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the ventilation air change rate calculated during the fan on and off periods for the simulation timestep.
 
 \paragraph{AFN Zone Mixing Volume {[}m3{]}}\label{afn-zone-mixing-volume-m3}
 
