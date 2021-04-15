@@ -96,7 +96,7 @@ namespace Pumps {
     extern std::string const cPumpBank_VarSpeed;
     extern std::string const cPumpBank_ConSpeed;
 
-    enum class iPumpType : int
+    enum class pumpType : int
     {
         Unassigned = -1,
         VarSpeed = 0,
@@ -145,7 +145,7 @@ namespace Pumps {
         std::string Name;               // user identifier
         std::string PumpSchedule;       // Schedule to modify the design nominal capacity of the pump
         std::string PressureCurve_Name; // - placeholder for pump curve name
-        iPumpType PumpType;             // pump type enumerator, based on local parameter values, used to identify
+        pumpType PumpType;             // pump type enumerator, based on local parameter values, used to identify
         // index in the cPumpTypes string array to do error reporting
         int TypeOf_Num;                              // pump type of number in reference to the dataplant values
         int LoopNum;                                 // loop where pump is located
@@ -208,7 +208,7 @@ namespace Pumps {
 
         // Default Constructor
         PumpSpecs()
-            : PumpType(iPumpType::Unassigned), TypeOf_Num(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
+            : PumpType(pumpType::Unassigned), TypeOf_Num(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
               PumpControl(PumpControlType::Unassigned), PumpScheduleIndex(0), InletNodeNum(0), OutletNodeNum(0),
               SequencingScheme(PumpBankControlSeq::Unassigned), FluidIndex(0), NumPumpsInBank(0), PowerErrIndex1(0), PowerErrIndex2(0),
               MinVolFlowRateFrac(0.0), NomVolFlowRate(0.0), NomVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0), EMSMassFlowOverrideOn(false),
