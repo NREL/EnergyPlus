@@ -678,8 +678,6 @@ namespace DataSurfaces {
         int activeShadedConstruction;              // The currently active shaded construction (windows only)
         std::vector<int> shadedConstructionList;   // List of shaded constructions that correspond with window shading controls (windows only - same
                                                    // indexes as windowShadingControlList)
-        int StormWinConstruction;                  // Construction with storm window (windows only)
-        int activeStormWinShadedConstruction;      // The currently active shaded construction with storm window (windows only)
         std::vector<int> shadedStormWinConstructionList; // List of shaded constructions with storm window that correspond with window shading
                                                          // controls (windows only - same indexes as windowShadingControlList)
         int FrameDivider;                                // Pointer to frame and divider information (windows only)
@@ -775,11 +773,11 @@ namespace DataSurfaces {
               Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0), lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0),
               NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0), CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true),
               IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0), shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0),
-              activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), StormWinConstruction(0),
-              activeStormWinShadedConstruction(0), FrameDivider(0), Multiplier(1.0), Shelf(0), TAirRef(ZoneMeanAirTemp), OutDryBulbTemp(0.0),
-              OutDryBulbTempEMSOverrideOn(false), OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0), OutWetBulbTempEMSOverrideOn(false),
-              OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0), WindSpeedEMSOverrideOn(false), WindSpeedEMSOverrideValue(0.0),
-              ViewFactorGroundEMSOverrideOn(false), ViewFactorGroundEMSOverrideValue(0.0),
+              activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), FrameDivider(0), Multiplier(1.0), Shelf(0),
+              TAirRef(ZoneMeanAirTemp), OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false), OutDryBulbTempEMSOverrideValue(0.0),
+              OutWetBulbTemp(0.0), OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0),
+              WindSpeedEMSOverrideOn(false), WindSpeedEMSOverrideValue(0.0), ViewFactorGroundEMSOverrideOn(false),
+              ViewFactorGroundEMSOverrideValue(0.0),
 
               WindDir(0.0), WindDirEMSOverrideOn(false), WindDirEMSOverrideValue(0.0),
 
@@ -1580,10 +1578,13 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinFrameHeatGain;
     Array1D<Real64> SurfWinFrameHeatLoss;
     Array1D<Real64> SurfWinDividerHeatLoss;
-    Array1D<Real64> SurfWinTCLayerTemp;     // The temperature of the thermochromic layer of the window
-    Array1D<Real64> SurfWinSpecTemp;        // The specification temperature of the TC layer glass Added for W6 integration June 2010
-    Array1D<Real64> SurfWinWindowModelType; // if set to WindowBSDFModel, then uses BSDF methods
-    Array1D<Real64> SurfWinTDDPipeNum;      // Tubular daylighting device pipe number for TDD domes and diffusers
+    Array1D<Real64> SurfWinTCLayerTemp;           // The temperature of the thermochromic layer of the window
+    Array1D<Real64> SurfWinSpecTemp;              // The specification temperature of the TC layer glass Added for W6 integration June 2010
+    Array1D<Real64> SurfWinWindowModelType;       // if set to WindowBSDFModel, then uses BSDF methods
+    Array1D<Real64> SurfWinTDDPipeNum;            // Tubular daylighting device pipe number for TDD domes and diffusers
+    Array1D<int> SurfWinStormWinConstr;           // Construction with storm window (windows only)
+    Array1D<int> SurfActiveConstruction;          // The currently active construction with or without storm window
+    Array1D<int> SurfWinActiveShadedConstruction; // The currently active shaded construction with or without storm window (windows only)
 
     bool AnyHeatBalanceInsideSourceTerm = false;  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
     bool AnyHeatBalanceOutsideSourceTerm = false; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
@@ -1852,6 +1853,9 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWinSpecTemp.deallocate();
         this->SurfWinWindowModelType.deallocate();
         this->SurfWinTDDPipeNum.deallocate();
+        this->SurfWinStormWinConstr.deallocate();
+        this->SurfActiveConstruction.deallocate();
+        this->SurfWinActiveShadedConstruction.deallocate();
         this->AnyHeatBalanceInsideSourceTerm = false;
         this->AnyHeatBalanceOutsideSourceTerm = false;
         this->Surface.deallocate();
