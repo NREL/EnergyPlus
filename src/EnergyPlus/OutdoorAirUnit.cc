@@ -2673,24 +2673,8 @@ namespace OutdoorAirUnit {
                                          PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
 
             } break;
-            case (CompType::WaterCoil_SimpleHeat): { // 'Coil:Heating:Water')
-                SimulateWaterCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
-                InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
-                OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
-                AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-                LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
-                                         PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
-
-            } break;
-            case (CompType::WaterCoil_Cooling): { // 'Coil:Cooling:Water'
-                SimulateWaterCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
-                InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
-                OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
-                AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-                LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
-                                         PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
-
-            } break;
+            case (CompType::WaterCoil_SimpleHeat): // 'Coil:Heating:Water')
+            case (CompType::WaterCoil_Cooling):    // 'Coil:Cooling:Water'
             case (CompType::WaterCoil_DetailedCool): {
                 SimulateWaterCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
@@ -2709,6 +2693,9 @@ namespace OutdoorAirUnit {
                 LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
                                          PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
             } break;
+            default:
+                ShowFatalError(state, format("Invalid Coil Type = {}", CoilTypeNum)); // validate
+                break;
             }
         }
     }
