@@ -9626,7 +9626,8 @@ void WindowShadingManager(EnergyPlusData &state)
             if (!state.dataSurface->Surface(ISurf).shadedStormWinConstructionList.empty() &&
                 indexWindowShadingControl <= state.dataSurface->Surface(ISurf).shadedStormWinConstructionList.size() - 1) {
                 if (state.dataSurface->SurfWinStormWinFlag(ISurf) == 1) {
-                    state.dataSurface->SurfWinActiveShadedConstruction(ISurf) = state.dataSurface->Surface(ISurf).shadedStormWinConstructionList[indexWindowShadingControl];
+                    state.dataSurface->SurfWinActiveShadedConstruction(ISurf) =
+                        state.dataSurface->Surface(ISurf).shadedStormWinConstructionList[indexWindowShadingControl];
                 }
             }
 
@@ -11541,7 +11542,7 @@ void ComputeWinShadeAbsorpFactors(EnergyPlusData &state)
                 //  removed that is absorbed
                 if (ANY_SHADE(state.dataSurface->WindowShadingControl(WinShadeCtrlNum).ShadingType)) {
                     int const ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction; // Window construction number with shade
-                    int TotLay = state.dataConstruction->Construct(ConstrNumSh).TotLayers;          // Total layers in a construction
+                    int TotLay = state.dataConstruction->Construct(ConstrNumSh).TotLayers;                // Total layers in a construction
 
                     if (state.dataSurface->WindowShadingControl(WinShadeCtrlNum).ShadingType == WinShadingType::IntShade) {
                         MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay); // Interior shade
