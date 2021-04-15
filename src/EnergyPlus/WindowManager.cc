@@ -1778,8 +1778,8 @@ namespace WindowManager {
         DifOverrideCount = 0;
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfWinSolarDiffusing(SurfNum) = false;
-            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window && state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment &&
-                state.dataSurface->SurfWinStormWinConstr(SurfNum) == 0) {
+            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window &&
+                state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment && state.dataSurface->SurfWinStormWinConstr(SurfNum) == 0) {
                 ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
                 MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
                 if (state.dataMaterial->Material(MatNum).SolarDiffusing) {
@@ -2243,10 +2243,7 @@ namespace WindowManager {
         int BlNum;      // Window blind number
         int SurfNumAdj; // An interzone surface's number in the adjacent zone
         int ZoneNumAdj; // An interzone surface's adjacent zone number
-        int ConstrNum;  // Construction number
-        // unused INTEGER           :: ConstrNumSh                  ! Shaded construction number
-        int IConst; // Construction number
-        int TotLay; // Total number of layers in a construction
+        int TotLay;     // Total number of layers in a construction
         //   (sum of solid layers and gap layers)
         int TotGlassLay;          // Total number of glass layers in a construction
         int Lay;                  // Layer number
@@ -2302,6 +2299,7 @@ namespace WindowManager {
         // Shorthand references
         auto &window(state.dataSurface->SurfaceWindow(SurfNum));
         auto &surface(state.dataSurface->Surface(SurfNum));
+        int ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
 
         if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
 
@@ -2311,7 +2309,6 @@ namespace WindowManager {
             CalcComplexWindowThermal(
                 state, SurfNum, temp, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, DataBSDFWindow::noCondition);
 
-            ConstrNum = surface.Construction;
             TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
             state.dataWindowManager->ngllayer =
                 state.dataConstruction->Construct(ConstrNum).TotSolidLayers; // Simon: This is necessary to keep for frame calculations
@@ -2359,9 +2356,6 @@ namespace WindowManager {
             }
 
         } else { // regular window, not BSDF, not EQL Window
-
-            ConstrNum = state.dataSurface->SurfWinActiveConstruction(SurfNum);
-
             // Added for thermochromic windows
             state.dataWindowManager->locTCFlag = (state.dataConstruction->Construct(ConstrNum).TCFlag == 1);
 
@@ -2392,6 +2386,7 @@ namespace WindowManager {
                         // Use the new TC window construction
                         ConstrNum = IDConst(iMinDT(1));
                         surface.Construction = ConstrNum;
+                        state.dataSurface->SurfActiveConstruction(SurfNum) = ConstrNum;
                         state.dataSurface->SurfWinSpecTemp(SurfNum) =
                             state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).TCLayer).SpecTemp;
                     }
@@ -2520,7 +2515,7 @@ namespace WindowManager {
             //   and glass 2, gap 2 is between glass 2 and blind/shade, and gap 3 is between
             //   blind/shade and glass 3.
 
-            IConst = ConstrNum;
+            int IConst = ConstrNum;
             if (ANY_SHADE_SCREEN(ShadeFlag) || ANY_BLIND(ShadeFlag)) {
                 IConst = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
             }
@@ -3249,9 +3244,7 @@ namespace WindowManager {
         Real64 ConvHeatGainFrZoneSideOfShade; // Convective heat gain to zone from side of interior shade facing zone (W)
         Real64 ConvHeatGainFrZoneSideOfGlass; // Convective heat gain to zone from side of glass facing zone when
         //  no interior shade/blind is present (W)
-        Real64 IncidentSolar; // Solar incident on outside of window (W)
-        int ConstrNum;        // Construction number, bare and with shading device
-        int ConstrNumSh;
+        Real64 IncidentSolar;         // Solar incident on outside of window (W)
         Real64 TransDiff;             // Diffuse shortwave transmittance
         Real64 FacRhoIR25;            // Intermediate variable
         Real64 FacRhoIR63;            // Intermediate variable
@@ -3909,8 +3902,8 @@ namespace WindowManager {
 
             // Correct WinHeatGain for interior diffuse shortwave (solar and shortwave from lights) transmitted
             // back out window
-            ConstrNum = state.dataSurface->SurfWinActiveConstruction(SurfNum);
-            ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
+            int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
+            int const ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
 
             TransDiff = state.dataConstruction->Construct(ConstrNum).TransDiff; // Default value for TransDiff here
             if (NOT_SHADED(ShadeFlag)) {

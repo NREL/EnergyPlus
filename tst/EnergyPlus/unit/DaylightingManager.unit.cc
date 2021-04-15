@@ -855,9 +855,6 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     ScheduleManager::UpdateScheduleValues(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
-    for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
-        state->dataSurface->SurfWinActiveConstruction(SurfNum) = state->dataSurface->Surface(SurfNum).Construction;
-    }
 
     GetDaylightingParametersInput(*state);
     compare_err_stream("");
@@ -2131,9 +2128,6 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     ScheduleManager::UpdateScheduleValues(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
-    for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
-        state->dataSurface->SurfWinActiveConstruction(SurfNum) = state->dataSurface->Surface(SurfNum).Construction;
-    }
 
     GetDaylightingParametersInput(*state);
     compare_err_stream("");

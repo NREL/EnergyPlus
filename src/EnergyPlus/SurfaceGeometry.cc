@@ -261,7 +261,7 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinWindowModelType.dimension(NumSurfaces, Window5DetailedModel);
         state.dataSurface->SurfWinTDDPipeNum.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinStormWinConstr.dimension(NumSurfaces, 0);
-        state.dataSurface->SurfWinActiveConstruction.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfActiveConstruction.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinActiveShadedConstruction.dimension(NumSurfaces, 0);
     }
 
@@ -2588,6 +2588,11 @@ namespace SurfaceGeometry {
         int NumDElightCmplxFen = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Daylighting:DElight:ComplexFenestration");
         if (TotShadSurf > 0 && (NumDElightCmplxFen > 0 || DaylightingManager::doesDayLightingUseDElight(state))) {
             ShowWarningError(state, RoutineName + "When using DElight daylighting the presence of exterior shading surfaces is ignored.");
+        }
+
+        // Initialize run time surface arrays
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+            state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
         }
     }
 
