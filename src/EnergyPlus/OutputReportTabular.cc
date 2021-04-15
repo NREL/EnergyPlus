@@ -6237,6 +6237,9 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
             if (!(state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
                   state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS)) {
                 ZonePreDefRep(iZone).AFNInfilVolTotalStdDen = 0.0;
+                ZonePreDefRep(iZone).AFNVentVolTotalStdDen = 0.0;
+                ZonePreDefRep(iZone).AFNInfilVolTotalOccStdDen = 0.0;
+                ZonePreDefRep(iZone).AFNVentVolTotalOccStdDen = 0.0;
                 ZonePreDefRep(iZone).AFNInfilVolMin = 0.0;
                 ZonePreDefRep(iZone).AFNInfilVolTotalOcc = 0.0;
             }
@@ -6362,15 +6365,20 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
                                      3);
                 }
 
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzInfil, Zone(iZone).Name, ZonePreDefRep(iZone).InfilVolTotalStdDen);
-                totalInfilVol += ZonePreDefRep(iZone).InfilVolTotalStdDen * zoneMult;
+                // Infiltration
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaTaBzInfil,
+                                 Zone(iZone).Name,
+                                 ZonePreDefRep(iZone).InfilVolTotalStdDen + ZonePreDefRep(iZone).AFNInfilVolTotalStdDen);
+                totalInfilVol += (ZonePreDefRep(iZone).InfilVolTotalStdDen + ZonePreDefRep(iZone).AFNInfilVolTotalStdDen) * zoneMult;
 
                 // Total ventilation and infiltration
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchOaTaBzTotVentInfil,
                                  Zone(iZone).Name,
                                  ZonePreDefRep(iZone).MechVentVolTotalStdDen + ZonePreDefRep(iZone).SimpVentVolTotalStdDen +
-                                     ZonePreDefRep(iZone).AFNInfilVolTotalStdDen + ZonePreDefRep(iZone).InfilVolTotalStdDen);
+                                     ZonePreDefRep(iZone).AFNVentVolTotalStdDen + ZonePreDefRep(iZone).AFNInfilVolTotalStdDen +
+                                     ZonePreDefRep(iZone).InfilVolTotalStdDen);
 
                 // Dynamic target ventilation Voz-dyn
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzDynTrgVent, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTotal);

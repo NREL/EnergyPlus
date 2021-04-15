@@ -1574,13 +1574,14 @@ namespace DataHeatBalance {
         Real64 MechVentVolTotalStdDen;    // volume for mechanical ventilation of outside air for entire simulation at standard density
         Real64 MechVentVolTotalOccStdDen; // volume for mechanical ventilation of outside air for entire simulation during occupied at std
         Real64 InfilVolTotalStdDen;       // volume for infiltration of outside air for entire simulation at standard density
-        Real64 InfilVolTotalOccStdDen;    // volume for infiltration of outside air for entire simulation standard density
-        Real64 AFNInfilVolTotalStdDen;    // volume for infiltration of outside air for entire simulation at standard density
-        Real64 AFNInfilVolTotalOccStdDen; // volume for infiltration of outside air for entire simulation during occupied at std density
-        Real64 AFNVentVolTotalStdDen;     // current volume flow rate for natural ventilation at standard density
-        Real64 AFNVentVolTotalOccStdDen;  // current volume flow rate for natural ventilation during occupied at standard density
-        Real64 SimpVentVolTotalStdDen;    // volume for simple 'ZoneVentilation' of outside air for entire simulation at std density
-        Real64 SimpVentVolTotalOccStdDen; // volume for simple 'ZoneVentilation' of outside air for entire simulation during occupied std
+        Real64 InfilVolTotalOccStdDen;    // volume for infiltration of outside air for entire simulation during occupied standard density
+        Real64 AFNInfilVolTotalStdDen;    // volume for AFN infiltration of outside air for entire simulation at standard density
+        Real64 AFNInfilVolTotalOccStdDen; // volume for AFN infiltration of outside air for entire simulation during occupied at std density
+        Real64 AFNVentVolStdDen;          // volume flow rate for natural ventilation at standard density
+        Real64 AFNVentVolTotalStdDen;     // volume for natural ventilation for entire simulation at standard density
+        Real64 AFNVentVolTotalOccStdDen;  // volume for natural ventilatiofor entire simulation n during occupied at standard density
+        Real64 SimpVentVolTotalStdDen;    // volume for simple 'ZoneVentilation' for entire simulation at standard density
+        Real64 SimpVentVolTotalOccStdDen; // volume for simple 'ZoneVentilation' for entire simulation during occupied at standard density
         Real64 VozMin;                    // minimum outdoor zone ventilation
         Real64 VozTargetTotal;            // volume for target Voz-dyn for entire simulation at std density
         Real64 VozTargetTotalOcc;         // volume for target Voz-dyn for entire simulation during occupied
@@ -1668,20 +1669,21 @@ namespace DataHeatBalance {
             : isOccupied(false), NumOcc(0.0), NumOccAccum(0.0), NumOccAccumTime(0.0), TotTimeOcc(0.0), MechVentVolTotalOcc(0.0),
               MechVentVolMin(9.9e9), InfilVolTotalOcc(0.0), InfilVolMin(9.9e9), AFNInfilVolTotalOcc(0.0), AFNInfilVolMin(9.9e9),
               SimpVentVolTotalOcc(0.0), SimpVentVolMin(9.9e9), MechVentVolTotalStdDen(0.0), MechVentVolTotalOccStdDen(0.0), InfilVolTotalStdDen(0.0),
-              InfilVolTotalOccStdDen(0.0), AFNInfilVolTotalStdDen(0.0), AFNInfilVolTotalOccStdDen(0.0), AFNVentVolTotalStdDen(0.0),
-              AFNVentVolTotalOccStdDen(0.0), SimpVentVolTotalStdDen(0.0), SimpVentVolTotalOccStdDen(0.0), VozMin(0.0), VozTargetTotal(0.0),
-              VozTargetTotalOcc(0.0), VozTargetTimeBelow(0.0), VozTargetTimeAt(0.0), VozTargetTimeAbove(0.0), VozTargetTimeBelowOcc(0.0),
-              VozTargetTimeAtOcc(0.0), VozTargetTimeAboveOcc(0.0), TotVentTimeNonZeroUnocc(0.0), SHGSAnZoneEqHt(0.0), SHGSAnZoneEqCl(0.0),
-              SHGSAnHvacATUHt(0.0), SHGSAnHvacATUCl(0.0), SHGSAnSurfHt(0.0), SHGSAnSurfCl(0.0), SHGSAnPeoplAdd(0.0), SHGSAnLiteAdd(0.0),
-              SHGSAnEquipAdd(0.0), SHGSAnWindAdd(0.0), SHGSAnIzaAdd(0.0), SHGSAnInfilAdd(0.0), SHGSAnOtherAdd(0.0), SHGSAnEquipRem(0.0),
-              SHGSAnWindRem(0.0), SHGSAnIzaRem(0.0), SHGSAnInfilRem(0.0), SHGSAnOtherRem(0.0), clPtTimeStamp(0), clPeak(0.0), SHGSClHvacHt(0.0),
-              SHGSClHvacCl(0.0), SHGSClHvacATUHt(0.0), SHGSClHvacATUCl(0.0), SHGSClSurfHt(0.0), SHGSClSurfCl(0.0), SHGSClPeoplAdd(0.0),
-              SHGSClLiteAdd(0.0), SHGSClEquipAdd(0.0), SHGSClWindAdd(0.0), SHGSClIzaAdd(0.0), SHGSClInfilAdd(0.0), SHGSClOtherAdd(0.0),
-              SHGSClEquipRem(0.0), SHGSClWindRem(0.0), SHGSClIzaRem(0.0), SHGSClInfilRem(0.0), SHGSClOtherRem(0.0), htPtTimeStamp(0), htPeak(0.0),
-              SHGSHtHvacHt(0.0), SHGSHtHvacCl(0.0), SHGSHtHvacATUHt(0.0), SHGSHtHvacATUCl(0.0), SHGSHtSurfHt(0.0), SHGSHtSurfCl(0.0),
-              SHGSHtPeoplAdd(0.0), SHGSHtLiteAdd(0.0), SHGSHtEquipAdd(0.0), SHGSHtWindAdd(0.0), SHGSHtIzaAdd(0.0), SHGSHtInfilAdd(0.0),
-              SHGSHtOtherAdd(0.0), SHGSHtEquipRem(0.0), SHGSHtWindRem(0.0), SHGSHtIzaRem(0.0), SHGSHtInfilRem(0.0), SHGSHtOtherRem(0.0),
-              emiEnvelopConv(0.0), emiZoneExfiltration(0.0), emiZoneExhaust(0.0), emiHVACRelief(0.0), emiHVACReject(0.0), emiTotHeat(0.0)
+              InfilVolTotalOccStdDen(0.0), AFNInfilVolTotalStdDen(0.0), AFNInfilVolTotalOccStdDen(0.0), AFNVentVolStdDen(0.0),
+              AFNVentVolTotalStdDen(0.0), AFNVentVolTotalOccStdDen(0.0), SimpVentVolTotalStdDen(0.0), SimpVentVolTotalOccStdDen(0.0), VozMin(0.0),
+              VozTargetTotal(0.0), VozTargetTotalOcc(0.0), VozTargetTimeBelow(0.0), VozTargetTimeAt(0.0), VozTargetTimeAbove(0.0),
+              VozTargetTimeBelowOcc(0.0), VozTargetTimeAtOcc(0.0), VozTargetTimeAboveOcc(0.0), TotVentTimeNonZeroUnocc(0.0), SHGSAnZoneEqHt(0.0),
+              SHGSAnZoneEqCl(0.0), SHGSAnHvacATUHt(0.0), SHGSAnHvacATUCl(0.0), SHGSAnSurfHt(0.0), SHGSAnSurfCl(0.0), SHGSAnPeoplAdd(0.0),
+              SHGSAnLiteAdd(0.0), SHGSAnEquipAdd(0.0), SHGSAnWindAdd(0.0), SHGSAnIzaAdd(0.0), SHGSAnInfilAdd(0.0), SHGSAnOtherAdd(0.0),
+              SHGSAnEquipRem(0.0), SHGSAnWindRem(0.0), SHGSAnIzaRem(0.0), SHGSAnInfilRem(0.0), SHGSAnOtherRem(0.0), clPtTimeStamp(0), clPeak(0.0),
+              SHGSClHvacHt(0.0), SHGSClHvacCl(0.0), SHGSClHvacATUHt(0.0), SHGSClHvacATUCl(0.0), SHGSClSurfHt(0.0), SHGSClSurfCl(0.0),
+              SHGSClPeoplAdd(0.0), SHGSClLiteAdd(0.0), SHGSClEquipAdd(0.0), SHGSClWindAdd(0.0), SHGSClIzaAdd(0.0), SHGSClInfilAdd(0.0),
+              SHGSClOtherAdd(0.0), SHGSClEquipRem(0.0), SHGSClWindRem(0.0), SHGSClIzaRem(0.0), SHGSClInfilRem(0.0), SHGSClOtherRem(0.0),
+              htPtTimeStamp(0), htPeak(0.0), SHGSHtHvacHt(0.0), SHGSHtHvacCl(0.0), SHGSHtHvacATUHt(0.0), SHGSHtHvacATUCl(0.0), SHGSHtSurfHt(0.0),
+              SHGSHtSurfCl(0.0), SHGSHtPeoplAdd(0.0), SHGSHtLiteAdd(0.0), SHGSHtEquipAdd(0.0), SHGSHtWindAdd(0.0), SHGSHtIzaAdd(0.0),
+              SHGSHtInfilAdd(0.0), SHGSHtOtherAdd(0.0), SHGSHtEquipRem(0.0), SHGSHtWindRem(0.0), SHGSHtIzaRem(0.0), SHGSHtInfilRem(0.0),
+              SHGSHtOtherRem(0.0), emiEnvelopConv(0.0), emiZoneExfiltration(0.0), emiZoneExhaust(0.0), emiHVACRelief(0.0), emiHVACReject(0.0),
+              emiTotHeat(0.0)
         {
         }
     };
