@@ -216,7 +216,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
-    state->dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControl::None;
+    state->dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControl::Unassigned;
 
     state->dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
 
@@ -370,7 +370,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataHeatBalFanSys->MDotOA.allocate(1);
     state->dataHeatBalFanSys->MDotOA(1) = 0.0;
 
-    state->dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControl::None;
+    state->dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControl::Unassigned;
 
     state->dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
 
@@ -557,7 +557,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
-    state->dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControl::None;
+    state->dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControl::Unassigned;
 
     state->dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
 
@@ -765,7 +765,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
-    state->dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControl::None;
+    state->dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControl::Unassigned;
 
     state->dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
 

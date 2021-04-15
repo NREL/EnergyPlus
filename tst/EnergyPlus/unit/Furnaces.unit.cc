@@ -371,7 +371,7 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
 
     EXPECT_EQ(1.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
 
-    state->dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControl::None;
+    state->dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControl::Unassigned;
     state->dataFurnaces->Furnace.deallocate();
 }
 

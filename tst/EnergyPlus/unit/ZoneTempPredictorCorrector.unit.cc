@@ -159,7 +159,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataHeatBalFanSys->SumHmARa.allocate(1);
     state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(1);
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(1);
-    state->dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControl::None;
+    state->dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControl::Unassigned;
     state->dataHeatBalFanSys->MDotOA.allocate(1);
 
     state->dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
