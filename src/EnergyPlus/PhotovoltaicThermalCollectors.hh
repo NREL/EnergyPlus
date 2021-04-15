@@ -209,11 +209,11 @@ namespace PhotovoltaicThermalCollectors {
 
         void calculate(EnergyPlusData &state);
 
-       void SimplePVTcalculate();
+       void SimplePVTcalculate(EnergyPlusData &state);
 
-       void BIPVTcalculate();
+       void BIPVTcalculate(EnergyPlusData &state);
 
-       void BIPVT_MaxHeatGain_calculate();
+       void BIPVT_MaxHeatGain_calculate(EnergyPlusData &state);
 
        void solve_lin_sys_back_sub(Real64 jj[9], Real64 f[3], Real64 (&y)[3]);
 
@@ -227,11 +227,14 @@ namespace PhotovoltaicThermalCollectors {
 
     void GetPVTcollectorsInput(EnergyPlusData &state);
 
-    void GetPVTSimpleCollectorsInput(int NumSimplePVTPerform, Array1D<SimplePVTModelStruct> &tmpSimplePVTperf);
+    void GetPVTSimpleCollectorsInput(EnergyPlusData &state, int NumSimplePVTPerform, Array1D<SimplePVTModelStruct> &tmpSimplePVTperf);
 
-    void GetBIPVTCollectorsInput(int NumBIPVTPerform, Array1D<BIPVTModelStruct> &tmpBIPVTperf);
+    void GetBIPVTCollectorsInput(EnergyPlusData &state, int NumBIPVTPerform, Array1D<BIPVTModelStruct> &tmpBIPVTperf);
 
-    void GetMainPVTInput(int NumPVT, Array1D<PVTCollectorStruct> &PVT, Array1D<SimplePVTModelStruct> tmpSimplePVTperf, Array1D<BIPVTModelStruct> tmpBIPVTperf);
+    void GetMainPVTInput(EnergyPlusData &state, int NumPVT,
+                         Array1D<PVTCollectorStruct> &PVT,
+                         Array1D<SimplePVTModelStruct> tmpSimplePVTperf,
+                         Array1D<BIPVTModelStruct> tmpBIPVTperf);
 
     //void simPVTfromOASys(int index, bool FirstHVACIteration);
 
