@@ -2824,6 +2824,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
     state->dataSurface->SurfWinTransSolar = 0.0;
     state->dataHeatBal->QS = 0.0;
+    
 
     Real64 inSurfTemp;
     Real64 outSurfTemp;
