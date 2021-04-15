@@ -108,7 +108,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
     //  Calculation Code in BEST", BSO internal document,
     //  May/June 1996.
     // Strand, R.K. "Heat Source Transfer Functions and Their
-    //  Applicatoin to Low Temperature Radiant Heating System",
+    //  Application to Low Temperature Radiant Heating System",
     //  Ph.D. Dissertation, Department of Mechanical and
     //  Industrial Engineering, University of Illinois at
     //  Urbana-Champaign, 1995.
@@ -864,17 +864,13 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                 // be computed in TransFuncCoeffs.
                 DisplayString(state, "Calculating CTFs for \"" + this->Name + "\"");
 
-                //          CALL DisplayNumberAndString(ConstrNum,'Matrix exponential for Construction #')
                 this->calculateExponentialMatrix(); // Compute exponential of AMat
 
-                //          CALL DisplayNumberAndString(ConstrNum,'Invert Matrix for Construction #')
                 this->calculateInverseMatrix(); // Compute inverse of AMat
 
-                //          CALL DisplayNumberAndString(ConstrNum,'Gamma calculation for Construction #')
                 this->calculateGammas();
                 // Compute "gamma"s from AMat, AExp, and AInv
 
-                //          CALL DisplayNumberAndString(ConstrNum,'Compute CTFs for Construction #')
                 this->calculateFinalCoefficients(); // Compute CTFs
 
                 // Now check to see if the number of transfer functions
@@ -957,7 +953,6 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                     DoCTFErrorReport = true;
                     ErrorsFound = true;
                     break;
-                    //            CALL ShowFatalError(state, 'Program terminated for reasons listed (InitConductionTransferFunctions) ')
                 }
 
             } // ... end of CTF calculation loop.
