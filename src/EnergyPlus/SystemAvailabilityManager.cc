@@ -4449,7 +4449,8 @@ namespace SystemAvailabilityManager {
             }
 
             if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr > 0 &&
-                state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
+                    static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
                 ShowSevereError(state,
                                 RoutineName + cCurrentModuleObject + "=\"" +
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
@@ -4460,12 +4461,12 @@ namespace SystemAvailabilityManager {
             }
 
             if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr == 0) {
-                if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) <= static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
                     ShowWarningError(state,
                                      RoutineName + cCurrentModuleObject + "=\"" +
                                          state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
                     ShowContinueError(state, "The Airflow Network model is not available for Hybrid Ventilation Control.");
-                } else if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+                } else if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControl::SimpleADS) {
                     ShowWarningError(state,
                                      RoutineName + cCurrentModuleObject + "=\"" +
                                          state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
@@ -5030,7 +5031,7 @@ namespace SystemAvailabilityManager {
                     ACH = 0.0;
                     HybridVentModeOA = true;
                     if (!state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
-                        if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) <= static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
                             HybridVentModeOA = false;
                         }
                     }

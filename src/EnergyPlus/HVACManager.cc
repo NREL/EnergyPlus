@@ -257,7 +257,7 @@ void ManageHVAC(EnergyPlusData &state)
     ManageHybridVentilation(state);
 
     CalcAirFlowSimple(state);
-    if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+    if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
         state.dataAirflowNetwork->RollBackFlag = false;
         ManageAirflowNetworkBalance(state, false);
     }
@@ -318,7 +318,8 @@ void ManageHVAC(EnergyPlusData &state)
 
             ManageHybridVentilation(state);
             CalcAirFlowSimple(state, SysTimestepLoop);
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
+                static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
                 state.dataAirflowNetwork->RollBackFlag = false;
                 ManageAirflowNetworkBalance(state, false);
             }
@@ -1874,7 +1875,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
     if (FirstHVACIteration) {
         state.dataHVACMgr->RepIterAir = 0;
         // Call AirflowNetwork simulation to calculate air flows and pressures
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
             ManageAirflowNetworkBalance(state, FirstHVACIteration);
         }
         ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
@@ -1900,7 +1901,8 @@ void SimSelectedEquipment(EnergyPlusData &state,
             ++IterAir; // Increment the iteration counter
             // Call AirflowNetwork simulation to calculate air flows and pressures
             ResimulateAirZone = false;
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
+                static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
                 ManageAirflowNetworkBalance(state, FirstHVACIteration, IterAir, ResimulateAirZone);
             }
             if (SimAirLoops) {
@@ -1926,7 +1928,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
             state.dataHVACMgr->FlowMaxAvailAlreadyReset = false;
 
             //      IterAir = IterAir + 1   ! Increment the iteration counter
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
                 if (ResimulateAirZone) { // Need to make sure that SimAirLoop and SimZoneEquipment are simulated
                     SimAirLoops = true;  // at min three times using ONOFF fan with the AirflowNetwork model
                     SimZoneEquipment = true;
@@ -2346,16 +2348,16 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     auto &TimeStepSys(state.dataHVACGlobal->TimeStepSys);
 
     // Ensure no airflownetwork and simple calculations
-    if (state.dataAirflowNetwork->SimulateAirflowNetwork == 0) return;
+    if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControl::Unassigned) return;
 
-    if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) ReportAirflowNetwork(state);
+    if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) ReportAirflowNetwork(state);
 
     // Reports zone exhaust loss by exhaust fans
     for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
         CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
         H2OHtOfVap = PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
         ADSCorrectionFactor = 1.0;
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControl::SimpleADS) {
             if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
                 state.dataAirflowNetwork->AirflowNetworkZoneFlag(ZoneLoop)) {
                 ADSCorrectionFactor = 0.0;
@@ -2384,8 +2386,8 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     }
 
     // Report results for SIMPLE option only
-    if (!(state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimple ||
-          state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS))
+    if (!(state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControl::Simple ||
+          state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControl::SimpleADS))
         return;
 
     if (state.dataHVACMgr->ReportAirHeatBalanceFirstTimeFlag) {
@@ -2399,7 +2401,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         // Break the infiltration load into heat gain and loss components
         ADSCorrectionFactor = 1.0;
 
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControl::SimpleADS) {
             // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(ZoneLoop)) ADSCorrectionFactor=0
             if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
                 state.dataAirflowNetwork->AirflowNetworkZoneFlag(ZoneLoop))

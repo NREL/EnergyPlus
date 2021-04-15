@@ -648,7 +648,7 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
     SumMCpT = state.dataHeatBalFanSys->MCPTI(ZoneNum) + state.dataHeatBalFanSys->MCPTV(ZoneNum) + state.dataHeatBalFanSys->MCPTM(ZoneNum) +
               state.dataHeatBalFanSys->MCPTE(ZoneNum) + state.dataHeatBalFanSys->MCPTC(ZoneNum) +
               state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
-    if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone) {
+    if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControl::Multizone) {
         SumMCp = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp +
                  state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp;
         SumMCpT = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT +

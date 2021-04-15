@@ -202,27 +202,29 @@ namespace AirflowNetwork {
         Relief
     };
 
-    // DERIVED TYPE DEFINITIONS:
+    enum class AirflowNetworkControl
+    {
+        Unassigned = -1,
+        None,               // No AirflowNetwork and SIMPLE
+        Simple,             // Simple calculations only
+        Multizone,          // Perform multizone calculations only
+        NoneADS,            // Perform distribution system during system on time only
+        SimpleADS,          // Perform distribution system during system on time and simple calculations during off time
+        MultiADS            // Perform distribution system during system on time and multizone calculations during off time
+    
+    };
 
-    // MODULE VARIABLE DECLARATIONS:
     // Node simulation variable in air distribution system
     // Link simulation variable in air distribution system
     // Sensible and latent exchange variable in air distribution system
 
-    // Vent Control  DistSys Control  Flag    Description
-    //  NONE           NONE           0      No AirflowNetwork and SIMPLE
-    //  SIMPLE         NONE           1      Simple calculations only
-    //  MULTIZONE      NONE           2      Perform multizone calculations only
-    //  NONE           DISTSYS        3      Perform distribution system during system on time only
-    //  SIMPLE         DISTSYS        4      Perform distribution system during system on time and simple calculations during off time
-    //  MULTIZONE      DISTSYS        5      Perform distribution system during system on time and multizone calculations during off time
-
-    int constexpr AirflowNetworkControlSimple(1);    // Simple calculations only
-    int constexpr AirflowNetworkControlMultizone(2); // Perform multizone calculations only
-    int constexpr AirflowNetworkControlSimpleADS(4); // Perform distribution system during system
-    // on time and simple calculations during off time
-    int constexpr AirflowNetworkControlMultiADS(5); // Perform distribution system during system on time
-                                                    // and multizone calculations during off time
+    // Vent Control  DistSys Control     Description
+    //  NONE           NONE             No AirflowNetwork and SIMPLE
+    //  SIMPLE         NONE             Simple calculations only
+    //  MULTIZONE      NONE             Perform multizone calculations only
+    //  NONE           DISTSYS          Perform distribution system during system on time only
+    //  SIMPLE         DISTSYS          Perform distribution system during system on time and simple calculations during off time
+    //  MULTIZONE      DISTSYS          Perform distribution system during system on time and multizone calculations during off time
 
     // Types
 
@@ -1633,7 +1635,7 @@ namespace AirflowNetwork {
 struct AirflowNetworkData : BaseGlobalStruct
 {
 
-    int SimulateAirflowNetwork = 1;
+    AirflowNetwork::AirflowNetworkControl SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControl::Simple;
     Array1D_bool AirflowNetworkZoneFlag;
     int NumOfNodesMultiZone = 0;    // Number of nodes for multizone calculation
     int NumOfNodesDistribution = 0; // Number of nodes for distribution system calculation
@@ -1716,7 +1718,7 @@ struct AirflowNetworkData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->SimulateAirflowNetwork = 1;
+        this->SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControl::Simple;
         this->AirflowNetworkNodeSimu.clear();
         this->AirflowNetworkLinkSimu.clear();
         this->AirflowNetworkZoneFlag.clear();

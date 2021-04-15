@@ -4144,8 +4144,8 @@ namespace HVACMultiSpeedHeatPump {
             MSHPHeatRecovery(state, MSHeatPumpNum);
         }
 
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControl::MultiADS ||
+            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControl::SimpleADS) {
             state.dataAirLoop->AirLoopAFNInfo(state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOnMassFlowrate =
                 state.dataHVACMultiSpdHP->CompOnMassFlow;
             state.dataAirLoop->AirLoopAFNInfo(state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOffMassFlowrate =

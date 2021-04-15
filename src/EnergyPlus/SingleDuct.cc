@@ -2733,7 +2733,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     if (FirstHVACIteration) {
         // The first time through set the mass flow rate to the Max
         if ((state.dataLoopNodes->Node(InletNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-            if (!(state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
+            if (!(static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone) &&
                   state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
                 state.dataLoopNodes->Node(InletNode).MassFlowRate = this->AirMassFlowRateMax;
             }
@@ -2741,7 +2741,8 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
             state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
         }
         if ((state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-            if (!(state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
+            if (!(static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
+                      static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone) &&
                   state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
                 if (this->SysType_Num == SysType::SingleDuctConstVolNoReheat) {
                     if (this->NoOAFlowInputFromUser) {
@@ -2764,7 +2765,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
         }
 
         if ((state.dataLoopNodes->Node(InletNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-            if (!(state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
+            if (!(static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone) &&
                   state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
                 state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail =
                     this->AirMassFlowRateMax * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
@@ -3846,7 +3847,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
         MassFlow = max(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMinAvail);
         MassFlow = min(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
 
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
+        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone) &&
             state.dataAirflowNetwork->AirflowNetworkFanActivated && state.dataAirflowNetwork->VAVTerminalRatio > 0.0) {
             MassFlow *= state.dataAirflowNetwork->VAVTerminalRatio;
             if (MassFlow > state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate) {
@@ -3883,7 +3884,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
         }
 
         // the AirflowNetwork model overrids the mass flow rate value
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
+        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone) &&
             state.dataAirflowNetwork->AirflowNetworkFanActivated && state.dataAirflowNetwork->VAVTerminalRatio > 0.0) {
             MassFlow *= state.dataAirflowNetwork->VAVTerminalRatio;
             if (MassFlow > state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate) {
@@ -3987,7 +3988,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
         MassFlow = min(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
         MassFlow = max(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMinAvail);
 
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
+        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone) &&
             state.dataAirflowNetwork->AirflowNetworkFanActivated && state.dataAirflowNetwork->VAVTerminalRatio > 0.0) {
             MassFlow *= state.dataAirflowNetwork->VAVTerminalRatio;
             if (MassFlow > state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate) {

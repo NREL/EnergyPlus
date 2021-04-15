@@ -412,8 +412,8 @@ void GetAirPathData(EnergyPlusData &state)
     state.dataAirLoop->AirLoopFlow.allocate(NumPrimaryAirSys);
     state.dataConvergeParams->AirLoopConvergence.allocate(NumPrimaryAirSys);
     state.dataSize->UnitarySysEqSizing.allocate(NumPrimaryAirSys);
-    if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-        state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+    if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControl::MultiADS ||
+        state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControl::SimpleADS) {
         state.dataAirLoop->AirLoopAFNInfo.allocate(NumPrimaryAirSys);
     }
 

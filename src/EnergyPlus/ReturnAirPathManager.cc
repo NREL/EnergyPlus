@@ -255,7 +255,7 @@ namespace ReturnAirPathManager {
                 if (SELECT_CASE_var == ZoneMixer_Type) { // 'AirLoopHVAC:ZoneMixer'
 
                     if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
-                          state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
+                          static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone))) {
                         SimAirMixer(state,
                                     state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
                                     state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));

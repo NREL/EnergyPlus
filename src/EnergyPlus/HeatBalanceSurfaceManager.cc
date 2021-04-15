@@ -8169,7 +8169,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, S
                         } else {
                             ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", zone.InternalHeatGains));
                         }
-                        if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) <= static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
                             ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", zone.NominalInfilVent));
                             ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", zone.NominalMixing));
                         } else {
@@ -8213,7 +8213,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, S
                         } else {
                             ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", zone.InternalHeatGains));
                         }
-                        if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) <= static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
                             ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", zone.NominalInfilVent));
                             ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", zone.NominalMixing));
                         } else {
@@ -8269,7 +8269,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, S
                     } else {
                         ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", zone.InternalHeatGains / zone.FloorArea));
                     }
-                    if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                    if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) <= static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
                         ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", zone.NominalInfilVent));
                         ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", zone.NominalMixing));
                     } else {
@@ -8294,7 +8294,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, S
                     } else {
                         ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", zone.InternalHeatGains / zone.FloorArea));
                     }
-                    if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                    if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) <= static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
                         ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", zone.NominalInfilVent));
                         ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", zone.NominalMixing));
                     } else {

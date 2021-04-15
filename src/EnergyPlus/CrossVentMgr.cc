@@ -931,7 +931,7 @@ namespace CrossVentMgr {
                      state.dataHeatBalFanSys->MCPTE(ZoneNum) + state.dataHeatBalFanSys->MCPTC(ZoneNum) +
                      state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
 
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControl::Multizone) {
             MCp_Total = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp +
                         state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp;
             MCpT_Total = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT +
