@@ -1892,8 +1892,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     state->dataConstruction->Construct(2).TotLayers = SurfsForRegWindow;
     state->dataConstruction->Construct(3).TotLayers = 1;
 
-    state->dataHeatBal->SurfWinFenLaySurfTempFront.dimension(10, state->dataSurface->TotSurfaces, 0.0);
-    state->dataHeatBal->SurfWinFenLaySurfTempBack.dimension(10, state->dataSurface->TotSurfaces, 0.0);
+    state->dataHeatBal->SurfWinFenLaySurfTempFront.dimension(state->dataSurface->TotSurfaces, 10, 0.0);
+    state->dataHeatBal->SurfWinFenLaySurfTempBack.dimension(state->dataSurface->TotSurfaces, 10, 0.0);
     state->dataHeatBalSurf->TH.dimension(2, Construction::MaxCTFTerms, state->dataSurface->TotSurfaces, 0.0);
 
     state->dataHeatBalSurf->TH(1, 1, 1) = 21.0;
@@ -1912,12 +1912,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempBack(1, 1), ZeroResult, 0.0001);
 
     // Second surface is a window so these should be set
-    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempFront(1, 2), state->dataHeatBalSurf->TH(1, 1, 2), 0.0001);
-    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempBack(SurfsForRegWindow, 2), state->dataHeatBalSurf->TH(2, 1, 2), 0.0001);
+    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempFront(2, 1), state->dataHeatBalSurf->TH(1, 1, 2), 0.0001);
+    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempBack(2, SurfsForRegWindow), state->dataHeatBalSurf->TH(2, 1, 2), 0.0001);
 
     // Third surface is a window but is also a BSDF (complex window) so these should NOT be set
-    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempFront(1, 3), ZeroResult, 0.0001);
-    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempBack(1, 3), ZeroResult, 0.0001);
+    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempFront(3, 1), ZeroResult, 0.0001);
+    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempBack(3, 1), ZeroResult, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmBisectionInputTest)

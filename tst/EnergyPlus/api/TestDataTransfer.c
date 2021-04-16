@@ -78,7 +78,8 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
     printf("Actuated Dew Point temp value is: %8.4f \n", dp_temp);
 }
 
-int main(int argc, const char * argv[]) {
+int main(int argc, const char *argv[])
+{
     EnergyPlusState state = stateNew();
     callbackEndOfZoneTimeStepAfterZoneReporting(state, afterZoneTimeStepHandler);
     requestVariable(state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");

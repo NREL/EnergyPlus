@@ -6623,8 +6623,10 @@ void CalcZoneSums(EnergyPlusData &state,
          state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
         // Multizone airflow calculated in AirflowNetwork
         SumMCp = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp +
+                 state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCp +
                  state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp;
         SumMCpT = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT +
+                  state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCpT +
                   state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCpT;
     }
 
@@ -6943,8 +6945,11 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
         (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
          state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
         // Multizone airflow calculated in AirflowNetwork
-        SumMCpDtInfil = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT -
-                        state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp * MAT(ZoneNum);
+        SumMCpDtInfil = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT +
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCpT -
+                        (state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp +
+                         state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCp) *
+                            state.dataHeatBalFanSys->MAT(ZoneNum);
         SumMCpDTzones = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCpT -
                         state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp * MAT(ZoneNum);
     }

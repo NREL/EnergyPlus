@@ -121,9 +121,9 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 evap_condenser_effectiveness = 0.0;
 
     // stuff getting assigned by the parent mode
-    Real64 parentModeRatedGrossTotalCap = 0.0;
-    Real64 parentModeRatedEvapAirFlowRate = 0.0;
-    Real64 parentModeRatedCondAirFlowRate = 0.0;
+    Real64 parentModeRatedGrossTotalCap = 0.0;   // [W]
+    Real64 parentModeRatedEvapAirFlowRate = 0.0; // [m3/s]
+    Real64 parentModeRatedCondAirFlowRate = 0.0; // [m3/s]
     int parentOperatingMode = 0;
     Real64 parentModeTimeForCondensateRemoval = 0.0;
     Real64 parentModeEvapRateRatio = 0.0;
@@ -134,13 +134,13 @@ struct CoilCoolingDXCurveFitSpeed
     // speed class objects
     Real64 ambPressure = 0.0; // outdoor pressure {Pa]
     Real64 PLR = 0.0;
-    Real64 AirFF = 0.0;             // ratio of air mass flow rate to rated air mass flow rate
-    Real64 fullLoadPower = 0.0;     // full load power at speed {W}
-    Real64 fullLoadWasteHeat = 0.0; // full load waste heat at speed {W}
-    Real64 RTF = 0.0;               // coil runtime fraction at speed
-    Real64 AirMassFlow = 0.0;       // coil inlet air mass flow rate {kg/s}
-    Real64 evap_air_flow_rate = 0.0;
-    Real64 condenser_air_flow_rate = 0.0;
+    Real64 AirFF = 0.0;                   // ratio of air mass flow rate to rated air mass flow rate
+    Real64 fullLoadPower = 0.0;           // full load power at speed {W}
+    Real64 fullLoadWasteHeat = 0.0;       // full load waste heat at speed {W}
+    Real64 RTF = 0.0;                     // coil runtime fraction at speed
+    Real64 AirMassFlow = 0.0;             // coil inlet air mass flow rate {kg/s}
+    Real64 evap_air_flow_rate = 0.0;      // evaporator air volume flow rate [m3/s]
+    Real64 condenser_air_flow_rate = 0.0; // condenser air volume flow rate [m3/s]
     Real64 active_fraction_of_face_coil_area = 0.0;
     bool adjustForFaceArea = false;
     Real64 ratedLatentCapacity = 0.0; // Latent capacity at rated conditions {W}
