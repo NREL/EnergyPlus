@@ -7496,6 +7496,9 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
     }
 
     for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
+        // Reset zone convergence flags
+        state.dataHeatBal->ZoneInsideSurfConverged(zoneNum) = false;
+
         // loop over all heat transfer surface except TDD Dome.
         int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceFirst;
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
@@ -7671,6 +7674,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 
         // Loop over non-window surfaces
         for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
+            if (state.dataHeatBal->ZoneInsideSurfConverged(zoneNum)) continue;
             int const firstNonWinSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
             int const lastNonWinSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             Real64 const iterDampConstant = IterDampConst; // local for vectorization
@@ -8016,17 +8020,25 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 
         // Convergence check - Loop through all relevant non-window surfaces to check for convergence...
         Real64 MaxDelTemp = 0.0; // Maximum change in surface temperature for any opaque surface from one iteration to the next
+        Converged = true;
         for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
+            if (state.dataHeatBal->ZoneInsideSurfConverged(zoneNum)) continue;
+            Real64 zoneMaxDelTemp = 0.0;
             int const firstNonWinSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
             int const lastNonWinSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             for (int surfNum = firstNonWinSurf; surfNum <= lastNonWinSurf; ++surfNum) {
                 Real64 delta = state.dataHeatBalSurf->TempSurfIn(surfNum) - state.dataHeatBalSurf->TempInsOld(surfNum);
                 Real64 absDif = std::abs(delta);
-                MaxDelTemp = std::max(absDif, MaxDelTemp);
+                //MaxDelTemp = std::max(absDif, MaxDelTemp);
+                zoneMaxDelTemp = std::max(absDif, zoneMaxDelTemp);
             }
+            MaxDelTemp = std::max(zoneMaxDelTemp, MaxDelTemp);
+            if (zoneMaxDelTemp <= state.dataHeatBal->MaxAllowedDelTemp) state.dataHeatBal->ZoneInsideSurfConverged(zoneNum) = true;
+            if (!state.dataHeatBal->ZoneInsideSurfConverged(zoneNum)) Converged = false;
+
         } // ...end of loop to check for convergence
 
-        if (MaxDelTemp <= state.dataHeatBal->MaxAllowedDelTemp) Converged = true;
+        //if (MaxDelTemp <= state.dataHeatBal->MaxAllowedDelTemp) Converged = true;
 
 #ifdef EP_Count_Calls
         state.dataTimingsData->NumMaxInsideSurfIterations =

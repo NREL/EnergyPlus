@@ -4972,6 +4972,7 @@ namespace HeatBalanceManager {
         state.dataViewFactor->ZoneRadiantInfo.allocate(state.dataGlobal->NumOfZones);
         state.dataViewFactor->ZoneSolarInfo.allocate(state.dataGlobal->NumOfZones);
         state.dataDaylightingData->ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->ZoneInsideSurfConverged.allocate(state.dataGlobal->NumOfZones);
 
         ZoneLoop = 0;
 
@@ -5029,6 +5030,8 @@ namespace HeatBalanceManager {
             } else {
                 state.dataHeatBal->Zone(Loop).isNominalControlled = false;
             }
+            // Initialize ZoneInsideSurfConverged initially
+            state.dataHeatBal->ZoneInsideSurfConverged(Loop) = false;
         }
 
         // Get ZONE LIST objects
