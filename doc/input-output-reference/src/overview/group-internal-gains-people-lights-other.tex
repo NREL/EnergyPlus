@@ -933,9 +933,9 @@ The coefficient C\(_{1}\) in the equation for (Return Air Fraction)\(_{calculate
 
 The coefficient C\(_{2}\) in the equation for (Return Air Fraction)\(_{calculated}\). Its units are 1/\(^{O}\)C.
 
-\paragraph{Field: Return Air Heat Gain Node Name}\label{field-return-air-heat-gain-node-name}
+\paragraph{Field: Return Air Heat Gain Node or NodeList Name}\label{field-return-air-heat-gain-node-nodelist-name}
 
-Name of the return air node for this heat gain. If left blank, it defaults to the first return air node for the zone containing this Lights object. Leave blank when using a \hyperref[zonelist]{ZoneList} name.
+Name of the return air node or nodelist for this heat gain. If left blank, it defaults to the first return air node for the zone containing this Lights object. Leave blank when using a \hyperref[zonelist]{ZoneList} name. When a NodeList name is entered, the NodeList can include a zone return node name and a zone exhaust node name. The zone exhaust node name will be used for an inlet air node name of a zone HVAC equipment, so that the equipment can draw air from the return node, instead of an exhaust node. The inlet air properties is combined properties with mixing mass flow rates of both nodes and added lights heat gain.
 
 \begin{figure}[hbtp] % fig 52
 \centering

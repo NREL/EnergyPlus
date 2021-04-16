@@ -780,11 +780,13 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeInletNum.allocate(NumNodes);
             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).FixedReturnFlow.allocate(NumNodes);
             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodePlenumNum.allocate(NumNodes);
-            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode = 0;           // initialize to zero here
-            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeAirLoopNum = 0; // initialize to zero here
-            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeInletNum = 0;   // initialize to zero here
-            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).FixedReturnFlow = false;  // initialize to false here
-            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodePlenumNum = 0;  // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeExhaustNodeNum.allocate(NumNodes);
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode = 0;               // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeAirLoopNum = 0;     // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeInletNum = 0;       // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).FixedReturnFlow = false;      // initialize to false here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodePlenumNum = 0;      // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeExhaustNodeNum = 0; // initialize to zero here
 
             for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode(NodeNum) = NodeNums(NodeNum);

@@ -1677,8 +1677,82 @@ namespace InternalHeatGains {
                         }
                     }
                     if (state.dataHeatBal->Lights(Loop).ZonePtr > 0) {
-                        state.dataHeatBal->Lights(Loop).ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone(
+                        int ThisOne = 0;
+                        int ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone(
                             state, state.dataHeatBal->Zone(state.dataHeatBal->Lights(Loop).ZonePtr).Name, retNodeName);
+                        if (ZoneReturnNum == 0) {
+                            ThisOne = UtilityRoutines::FindItemInList(retNodeName, state.dataNodeInputMgr->NodeLists);
+                            if (ThisOne > 0) {
+                                if (state.dataNodeInputMgr->NodeLists(ThisOne).NumOfNodesInList == 1) {
+                                    ZoneReturnNum =
+                                        DataZoneEquipment::GetReturnNumForZone(state,
+                                                                               state.dataHeatBal->Zone(state.dataHeatBal->Lights(Loop).ZonePtr).Name,
+                                                                               state.dataNodeInputMgr->NodeLists(ThisOne).NodeNames(1));
+                                }
+                                bool returnNodeFlag = false;
+                                bool exhaustNodeFlag = false;
+                                if (state.dataNodeInputMgr->NodeLists(ThisOne).NumOfNodesInList == 2) {
+                                    for (int NodeNum = 1; NodeNum <= state.dataNodeInputMgr->NodeLists(ThisOne).NumOfNodesInList; ++NodeNum) {
+                                        for (int RNodeNum = 1;
+                                             RNodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Lights(Loop).ZonePtr).NumReturnNodes;
+                                             ++RNodeNum) {
+                                            if (returnNodeFlag) continue;
+                                            if (state.dataNodeInputMgr->NodeLists(ThisOne).NodeNumbers(NodeNum) ==
+                                                state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Lights(Loop).ZonePtr).ReturnNode(RNodeNum)) {
+                                                ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone(
+                                                    state,
+                                                    state.dataHeatBal->Zone(state.dataHeatBal->Lights(Loop).ZonePtr).Name,
+                                                    state.dataNodeInputMgr->NodeLists(ThisOne).NodeNames(NodeNum));
+                                                state.dataHeatBal->Lights(Loop).ZoneReturnNum = ZoneReturnNum;
+                                                returnNodeFlag = true;
+                                                break;
+                                            }
+                                        }
+                                        for (int ENodeNum = 1;
+                                             ENodeNum <=
+                                             state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Lights(Loop).ZonePtr).NumExhaustNodes;
+                                             ++ENodeNum) {
+                                            if (state.dataNodeInputMgr->NodeLists(ThisOne).NodeNumbers(NodeNum) ==
+                                                state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Lights(Loop).ZonePtr).ExhaustNode(ENodeNum)) {
+                                                state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum =
+                                                    state.dataNodeInputMgr->NodeLists(ThisOne).NodeNumbers(NodeNum);
+                                                exhaustNodeFlag = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if (returnNodeFlag && exhaustNodeFlag) {
+                                        state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Lights(Loop).ZonePtr)
+                                            .ReturnNodeExhaustNodeNum(state.dataHeatBal->Lights(Loop).ZoneReturnNum) =
+                                            state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum;
+                                    }
+                                    if (!returnNodeFlag) {
+                                        ShowSevereError(state,
+                                                        RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                            state.dataIPShortCut->cAlphaFieldNames(7) + " =" + AlphaName(7));
+                                        ShowContinueError(state, "No matching Zone Return Air Node is listed in NodeList.");
+                                        ErrorsFound = true;
+                                    }
+                                    if (!exhaustNodeFlag) {
+                                        ShowSevereError(state,
+                                                        RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                            state.dataIPShortCut->cAlphaFieldNames(7) + " =" + AlphaName(7));
+                                        ShowContinueError(state, "No matching Zone Exhaust Air Node is listed in NodeList.");
+                                        ErrorsFound = true;
+                                    }
+                                }
+                                if (state.dataNodeInputMgr->NodeLists(ThisOne).NumOfNodesInList > 2) {
+                                    ShowSevereError(state,
+                                                    RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid nodelists" +
+                                                        state.dataIPShortCut->cAlphaFieldNames(7) + " =" + AlphaName(7) +
+                                                        " with Number of nodes > 2");
+                                    ShowContinueError(state, "The nodelist should have two names only as Return Node and Exhaust Node. The ");
+                                    ErrorsFound = true;
+                                }
+                            }
+                        } else {
+                            state.dataHeatBal->Lights(Loop).ZoneReturnNum = ZoneReturnNum;
+                        }
                     }
 
                     if ((state.dataHeatBal->Lights(Loop).ZoneReturnNum == 0) && (state.dataHeatBal->Lights(Loop).FractionReturnAir > 0.0) &&

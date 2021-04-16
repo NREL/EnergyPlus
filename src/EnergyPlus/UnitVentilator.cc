@@ -91,6 +91,7 @@
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/ZonePlenum.hh>
 
 namespace EnergyPlus {
 
@@ -1027,16 +1028,33 @@ namespace UnitVentilator {
                             break;
                         }
                     }
+                    if (!ZoneNodeNotFound) break;
                 }
                 if (ZoneNodeNotFound) {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + " = \"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
-                                        "\". Unit ventilator air inlet node name must be the same as a zone exhaust node name.");
-                    ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state,
-                                      "..Unit ventilator air inlet node name = " +
-                                          state.dataLoopNodes->NodeID(state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode));
-                    ErrorsFound = true;
+                    bool InletNodeFound = false;
+                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
+                        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                        for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumReturnNodes; ++NodeNum) {
+                            InletNodeFound = ZonePlenum::ValidateInducedNode(state,
+                                                                             state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode,
+                                                                             state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ReturnNode(NodeNum));
+                            if (InletNodeFound) break;
+                        }
+                        if (InletNodeFound) break;
+                    }
+                    if (!InletNodeFound) {
+                        ShowSevereError(
+                            state,
+                            CurrentModuleObject + " = \"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
+                                "\". Unit ventilator air inlet node name must be the same either as a zone exhaust node name or an induce "
+                                "air node in ZoePlenum.");
+                        ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
+                        ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
+                        ShowContinueError(state,
+                                          "..Unit ventilator unit air inlet node name = " +
+                                              state.dataLoopNodes->NodeID(state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode));
+                        ErrorsFound = true;
+                    }
                 }
                 // check that unit ventilator air outlet node is the same as a zone inlet node.
                 ZoneNodeNotFound = true;
@@ -1126,6 +1144,7 @@ namespace UnitVentilator {
                                 break;
                             }
                         }
+                        if (!ZoneNodeNotFound) break;
                     }
                     if (ZoneNodeNotFound) {
                         ShowSevereError(state,
@@ -1136,7 +1155,44 @@ namespace UnitVentilator {
                                           "..Air terminal mixer outlet node name = " +
                                               state.dataLoopNodes->NodeID(state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerOutNode));
                         ErrorsFound = true;
-                    }
+                    } else {
+                        bool ExhastNodeNotFound = true;
+                        // check exhaust node
+                        for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
+                            if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode ==
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
+                                ExhastNodeNotFound = false;
+                                break;
+                            }
+                        }
+                        // check induce node
+                        if (ExhastNodeNotFound) {
+                            bool InletNodeFound = false;
+                            for (NodeNum = 1;
+                                 NodeNum <=
+                                 state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumReturnNodes;
+                                 ++NodeNum) {
+                                InletNodeFound = ZonePlenum::ValidateInducedNode(state,
+                                                                                 state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode,
+                                                                                 state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ReturnNode(NodeNum));
+                                if (InletNodeFound) break;
+                            }
+                            if (!InletNodeFound) {
+                                ShowSevereError(
+                                    state, RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
+                                ShowContinueError(
+                                    state,
+                                    "..UnitVentilator inlet node name must be the same as either a zone exhaust node name or an induced "
+                                    "air node in ZonePlenum.");
+                                ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
+                                ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
+                                ShowContinueError(state,
+                                                  "..UnitVentilator inlet node name = " +
+                                                      state.dataLoopNodes->NodeID(state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode));
+                                ErrorsFound = true;
+                            }
+                        }
+                   }
                 }
             }
             {

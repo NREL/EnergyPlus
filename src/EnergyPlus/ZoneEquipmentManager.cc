@@ -4850,22 +4850,23 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
     using InternalHeatGains::SumAllReturnAirLatentGains;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 QRetAir;         // Heat to return air from lights
-    Real64 CpAir;           // Air heat capacity [J/kg-K]
-    Real64 TempRetAir;      // Return air temperature [C]
-    Real64 TempZoneAir;     // Zone air temperature [C]
-    int ZoneNum;            // Controlled zone number
-    int ActualZoneNum;      // Zone number
-    int ZoneNode;           // Node number of controlled zone
-    int ReturnNode;         // Node number of controlled zone's return air
-    int SurfNum;            // Surface number
-    Real64 MassFlowRA;      // Return air mass flow [kg/s]
-    Real64 FlowThisTS;      // Window gap air mass flow [kg/s]
-    Real64 WinGapFlowToRA;  // Mass flow to return air from all airflow windows in zone [kg/s]
-    Real64 WinGapFlowTtoRA; // Sum of mass flow times outlet temp for all airflow windows in zone [(kg/s)-C]
-    Real64 WinGapTtoRA;     // Temp of outlet flow mixture to return air from all airflow windows in zone [C]
-    Real64 H2OHtOfVap;      // Heat of vaporization of water (W/kg)
-    Real64 ZoneMult;        // zone multiplier
+    Real64 QRetAir;           // Heat to return air from lights
+    Real64 CpAir;             // Air heat capacity [J/kg-K]
+    Real64 TempRetAir;        // Return air temperature [C]
+    Real64 TempZoneAir;       // Zone air temperature [C]
+    int ZoneNum;              // Controlled zone number
+    int ActualZoneNum;        // Zone number
+    int ZoneNode;             // Node number of controlled zone
+    int ReturnNode;           // Node number of controlled zone's return air
+    int ReturnNodeExhaustNum; // Asscoaited exhaust node number, corresponding to the return node
+    int SurfNum;              // Surface number
+    Real64 MassFlowRA;        // Return air mass flow [kg/s]
+    Real64 FlowThisTS;        // Window gap air mass flow [kg/s]
+    Real64 WinGapFlowToRA;    // Mass flow to return air from all airflow windows in zone [kg/s]
+    Real64 WinGapFlowTtoRA;   // Sum of mass flow times outlet temp for all airflow windows in zone [(kg/s)-C]
+    Real64 WinGapTtoRA;       // Temp of outlet flow mixture to return air from all airflow windows in zone [C]
+    Real64 H2OHtOfVap;        // Heat of vaporization of water (W/kg)
+    Real64 ZoneMult;          // zone multiplier
     Real64 SumRetAirLatentGainRate;
 
     for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -4879,6 +4880,7 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
         ZoneMult = state.dataHeatBal->Zone(ActualZoneNum).Multiplier * state.dataHeatBal->Zone(ActualZoneNum).ListMultiplier;
         for (int nodeCount = 1; nodeCount <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++nodeCount) {
             ReturnNode = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(nodeCount);
+            ReturnNodeExhaustNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeExhaustNodeNum(nodeCount);
 
             // RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
             // Add sensible heat gain from refrigerated cases with under case returns
@@ -4890,6 +4892,9 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
             // Correct step through the SysDepZoneLoads variable.
 
             MassFlowRA = state.dataLoopNodes->Node(ReturnNode).MassFlowRate / ZoneMult;
+            if (ReturnNodeExhaustNum > 0 && state.dataLoopNodes->Node(ReturnNodeExhaustNum).MassFlowRate > 0.0) {
+                MassFlowRA += state.dataLoopNodes->Node(ReturnNodeExhaustNum).MassFlowRate;
+            }
 
             // user defined room air model may feed temp that differs from zone node
             if (allocated(state.dataRoomAirMod->AirPatternZoneInfo)) {
@@ -4957,6 +4962,9 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
                         }
                     } else {
                         state.dataLoopNodes->Node(ReturnNode).Temp = TempRetAir;
+                    }
+                    if (ReturnNodeExhaustNum > 0 && state.dataLoopNodes->Node(ReturnNodeExhaustNum).MassFlowRate > 0.0 && QRetAir > 0.0) {
+                        state.dataLoopNodes->Node(ReturnNodeExhaustNum).Temp = TempRetAir;
                     }
                 } else { // No return air flow
                     // Assign all heat-to-return from window gap airflow to zone air

@@ -67,7 +67,7 @@ This alpha field contains the identifying zone name where the thermostat control
 
 \paragraph{Field: Dehumidification Control Type}\label{field-dehumidification-control-type-001}
 
-This alpha field contains the type of dehumidification control. The following options are valid for this field:
+When the UnitarySystem is used to serve a zone as a zone equipment unit, this node name must be either the name of a zone air exhaust node (Ref. \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}) to draw air from a zone directly or the name of one of induced nodes (Ref. \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum}) to draw air from a return plenum, when the zone return node is connected to a return plenum.
 
 \textbf{None} - meet sensible load only, no active dehumidification control. None is required when Control Type = SingleZoneVAV.
 
