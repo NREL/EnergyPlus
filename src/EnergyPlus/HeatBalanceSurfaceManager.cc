@@ -2960,7 +2960,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 if (Surface(SurfNum).ExtSolar || state.dataSurface->SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
                     // Exclude special shading surfaces which required QRadSWOut calculations above
-                    int const ConstrNum = state.dataSurface->SurfWinActiveConstruction(SurfNum);
+                    int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
                     Real64 CosInc = currCosInc(SurfNum);           // Cosine of incidence angle of beam solar on glass
                     Real64 BeamSolar = currBeamSolar(SurfNum);     // Local variable for BeamSolarRad
                     Real64 SkySolarInc = currSkySolarInc(SurfNum); // Sky diffuse solar incident on a surface
