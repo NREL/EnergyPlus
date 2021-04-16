@@ -88,7 +88,7 @@
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include <energyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZonePlenum.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::BranchInputManager;
