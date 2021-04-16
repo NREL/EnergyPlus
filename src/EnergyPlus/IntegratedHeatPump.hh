@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -342,7 +343,7 @@ struct IntegratedHeatPumpGlobalData : BaseGlobalStruct
 {
 
     bool GetCoilsInputFlag = true;
-    Array1D<IntegratedHeatPump::IntegratedHeatPumpData> IntegratedHeatPumps;
+    EPVector<IntegratedHeatPump::IntegratedHeatPumpData> IntegratedHeatPumps;
 
     void clear_state() override
     {
