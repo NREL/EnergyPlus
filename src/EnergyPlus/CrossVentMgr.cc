@@ -933,8 +933,10 @@ namespace CrossVentMgr {
 
         if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone) {
             MCp_Total = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp +
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCp +
                         state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp;
             MCpT_Total = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT +
+                         state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCpT +
                          state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCpT;
         }
 

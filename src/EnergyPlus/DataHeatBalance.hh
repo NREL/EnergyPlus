@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 
@@ -1574,13 +1575,14 @@ namespace DataHeatBalance {
         Real64 MechVentVolTotalStdDen;    // volume for mechanical ventilation of outside air for entire simulation at standard density
         Real64 MechVentVolTotalOccStdDen; // volume for mechanical ventilation of outside air for entire simulation during occupied at std
         Real64 InfilVolTotalStdDen;       // volume for infiltration of outside air for entire simulation at standard density
-        Real64 InfilVolTotalOccStdDen;    // volume for infiltration of outside air for entire simulation standard density
-        Real64 AFNInfilVolTotalStdDen;    // volume for infiltration of outside air for entire simulation at standard density
-        Real64 AFNInfilVolTotalOccStdDen; // volume for infiltration of outside air for entire simulation during occupied at std density
-        Real64 AFNVentVolTotalStdDen;     // current volume flow rate for natural ventilation at standard density
-        Real64 AFNVentVolTotalOccStdDen;  // current volume flow rate for natural ventilation during occupied at standard density
-        Real64 SimpVentVolTotalStdDen;    // volume for simple 'ZoneVentilation' of outside air for entire simulation at std density
-        Real64 SimpVentVolTotalOccStdDen; // volume for simple 'ZoneVentilation' of outside air for entire simulation during occupied std
+        Real64 InfilVolTotalOccStdDen;    // volume for infiltration of outside air for entire simulation during occupied standard density
+        Real64 AFNInfilVolTotalStdDen;    // volume for AFN infiltration of outside air for entire simulation at standard density
+        Real64 AFNInfilVolTotalOccStdDen; // volume for AFN infiltration of outside air for entire simulation during occupied at std density
+        Real64 AFNVentVolStdDen;          // volume flow rate for natural ventilation at standard density
+        Real64 AFNVentVolTotalStdDen;     // volume for natural ventilation for entire simulation at standard density
+        Real64 AFNVentVolTotalOccStdDen;  // volume for natural ventilatiofor entire simulation n during occupied at standard density
+        Real64 SimpVentVolTotalStdDen;    // volume for simple 'ZoneVentilation' for entire simulation at standard density
+        Real64 SimpVentVolTotalOccStdDen; // volume for simple 'ZoneVentilation' for entire simulation during occupied at standard density
         Real64 VozMin;                    // minimum outdoor zone ventilation
         Real64 VozTargetTotal;            // volume for target Voz-dyn for entire simulation at std density
         Real64 VozTargetTotalOcc;         // volume for target Voz-dyn for entire simulation during occupied
@@ -1668,20 +1670,21 @@ namespace DataHeatBalance {
             : isOccupied(false), NumOcc(0.0), NumOccAccum(0.0), NumOccAccumTime(0.0), TotTimeOcc(0.0), MechVentVolTotalOcc(0.0),
               MechVentVolMin(9.9e9), InfilVolTotalOcc(0.0), InfilVolMin(9.9e9), AFNInfilVolTotalOcc(0.0), AFNInfilVolMin(9.9e9),
               SimpVentVolTotalOcc(0.0), SimpVentVolMin(9.9e9), MechVentVolTotalStdDen(0.0), MechVentVolTotalOccStdDen(0.0), InfilVolTotalStdDen(0.0),
-              InfilVolTotalOccStdDen(0.0), AFNInfilVolTotalStdDen(0.0), AFNInfilVolTotalOccStdDen(0.0), AFNVentVolTotalStdDen(0.0),
-              AFNVentVolTotalOccStdDen(0.0), SimpVentVolTotalStdDen(0.0), SimpVentVolTotalOccStdDen(0.0), VozMin(0.0), VozTargetTotal(0.0),
-              VozTargetTotalOcc(0.0), VozTargetTimeBelow(0.0), VozTargetTimeAt(0.0), VozTargetTimeAbove(0.0), VozTargetTimeBelowOcc(0.0),
-              VozTargetTimeAtOcc(0.0), VozTargetTimeAboveOcc(0.0), TotVentTimeNonZeroUnocc(0.0), SHGSAnZoneEqHt(0.0), SHGSAnZoneEqCl(0.0),
-              SHGSAnHvacATUHt(0.0), SHGSAnHvacATUCl(0.0), SHGSAnSurfHt(0.0), SHGSAnSurfCl(0.0), SHGSAnPeoplAdd(0.0), SHGSAnLiteAdd(0.0),
-              SHGSAnEquipAdd(0.0), SHGSAnWindAdd(0.0), SHGSAnIzaAdd(0.0), SHGSAnInfilAdd(0.0), SHGSAnOtherAdd(0.0), SHGSAnEquipRem(0.0),
-              SHGSAnWindRem(0.0), SHGSAnIzaRem(0.0), SHGSAnInfilRem(0.0), SHGSAnOtherRem(0.0), clPtTimeStamp(0), clPeak(0.0), SHGSClHvacHt(0.0),
-              SHGSClHvacCl(0.0), SHGSClHvacATUHt(0.0), SHGSClHvacATUCl(0.0), SHGSClSurfHt(0.0), SHGSClSurfCl(0.0), SHGSClPeoplAdd(0.0),
-              SHGSClLiteAdd(0.0), SHGSClEquipAdd(0.0), SHGSClWindAdd(0.0), SHGSClIzaAdd(0.0), SHGSClInfilAdd(0.0), SHGSClOtherAdd(0.0),
-              SHGSClEquipRem(0.0), SHGSClWindRem(0.0), SHGSClIzaRem(0.0), SHGSClInfilRem(0.0), SHGSClOtherRem(0.0), htPtTimeStamp(0), htPeak(0.0),
-              SHGSHtHvacHt(0.0), SHGSHtHvacCl(0.0), SHGSHtHvacATUHt(0.0), SHGSHtHvacATUCl(0.0), SHGSHtSurfHt(0.0), SHGSHtSurfCl(0.0),
-              SHGSHtPeoplAdd(0.0), SHGSHtLiteAdd(0.0), SHGSHtEquipAdd(0.0), SHGSHtWindAdd(0.0), SHGSHtIzaAdd(0.0), SHGSHtInfilAdd(0.0),
-              SHGSHtOtherAdd(0.0), SHGSHtEquipRem(0.0), SHGSHtWindRem(0.0), SHGSHtIzaRem(0.0), SHGSHtInfilRem(0.0), SHGSHtOtherRem(0.0),
-              emiEnvelopConv(0.0), emiZoneExfiltration(0.0), emiZoneExhaust(0.0), emiHVACRelief(0.0), emiHVACReject(0.0), emiTotHeat(0.0)
+              InfilVolTotalOccStdDen(0.0), AFNInfilVolTotalStdDen(0.0), AFNInfilVolTotalOccStdDen(0.0), AFNVentVolStdDen(0.0),
+              AFNVentVolTotalStdDen(0.0), AFNVentVolTotalOccStdDen(0.0), SimpVentVolTotalStdDen(0.0), SimpVentVolTotalOccStdDen(0.0), VozMin(0.0),
+              VozTargetTotal(0.0), VozTargetTotalOcc(0.0), VozTargetTimeBelow(0.0), VozTargetTimeAt(0.0), VozTargetTimeAbove(0.0),
+              VozTargetTimeBelowOcc(0.0), VozTargetTimeAtOcc(0.0), VozTargetTimeAboveOcc(0.0), TotVentTimeNonZeroUnocc(0.0), SHGSAnZoneEqHt(0.0),
+              SHGSAnZoneEqCl(0.0), SHGSAnHvacATUHt(0.0), SHGSAnHvacATUCl(0.0), SHGSAnSurfHt(0.0), SHGSAnSurfCl(0.0), SHGSAnPeoplAdd(0.0),
+              SHGSAnLiteAdd(0.0), SHGSAnEquipAdd(0.0), SHGSAnWindAdd(0.0), SHGSAnIzaAdd(0.0), SHGSAnInfilAdd(0.0), SHGSAnOtherAdd(0.0),
+              SHGSAnEquipRem(0.0), SHGSAnWindRem(0.0), SHGSAnIzaRem(0.0), SHGSAnInfilRem(0.0), SHGSAnOtherRem(0.0), clPtTimeStamp(0), clPeak(0.0),
+              SHGSClHvacHt(0.0), SHGSClHvacCl(0.0), SHGSClHvacATUHt(0.0), SHGSClHvacATUCl(0.0), SHGSClSurfHt(0.0), SHGSClSurfCl(0.0),
+              SHGSClPeoplAdd(0.0), SHGSClLiteAdd(0.0), SHGSClEquipAdd(0.0), SHGSClWindAdd(0.0), SHGSClIzaAdd(0.0), SHGSClInfilAdd(0.0),
+              SHGSClOtherAdd(0.0), SHGSClEquipRem(0.0), SHGSClWindRem(0.0), SHGSClIzaRem(0.0), SHGSClInfilRem(0.0), SHGSClOtherRem(0.0),
+              htPtTimeStamp(0), htPeak(0.0), SHGSHtHvacHt(0.0), SHGSHtHvacCl(0.0), SHGSHtHvacATUHt(0.0), SHGSHtHvacATUCl(0.0), SHGSHtSurfHt(0.0),
+              SHGSHtSurfCl(0.0), SHGSHtPeoplAdd(0.0), SHGSHtLiteAdd(0.0), SHGSHtEquipAdd(0.0), SHGSHtWindAdd(0.0), SHGSHtIzaAdd(0.0),
+              SHGSHtInfilAdd(0.0), SHGSHtOtherAdd(0.0), SHGSHtEquipRem(0.0), SHGSHtWindRem(0.0), SHGSHtIzaRem(0.0), SHGSHtInfilRem(0.0),
+              SHGSHtOtherRem(0.0), emiEnvelopConv(0.0), emiZoneExfiltration(0.0), emiZoneExhaust(0.0), emiHVACRelief(0.0), emiHVACReject(0.0),
+              emiTotHeat(0.0)
         {
         }
     };
@@ -2167,58 +2170,58 @@ struct HeatBalanceData : BaseGlobalStruct
     std::vector<int> AirBoundaryMixingZone2;  // Air boundary simple mixing zone 2
     std::vector<int> AirBoundaryMixingSched;  // Air boundary simple mixing schedule index
     std::vector<Real64> AirBoundaryMixingVol; // Air boundary simple mixing volume flow rate [m3/s]
-    Array1D<DataHeatBalance::ZonePreDefRepType> ZonePreDefRep;
+    EPVector<DataHeatBalance::ZonePreDefRepType> ZonePreDefRep;
     DataHeatBalance::ZonePreDefRepType BuildingPreDefRep;
-    Array1D<DataHeatBalance::ZoneSimData> ZoneIntGain;
-    Array1D<DataHeatBalance::GapSupportPillar> SupportPillar;
-    Array1D<DataHeatBalance::GapDeflectionState> DeflectionState;
-    Array1D<DataHeatBalance::SpectralDataProperties> SpectralData;
-    Array1D<DataHeatBalance::ZoneData> Zone;
-    Array1D<DataHeatBalance::ZoneListData> ZoneList;
-    Array1D<DataHeatBalance::ZoneGroupData> ZoneGroup;
-    Array1D<DataHeatBalance::PeopleData> People;
-    Array1D<DataHeatBalance::LightsData> Lights;
-    Array1D<DataHeatBalance::ZoneEquipData> ZoneElectric;
-    Array1D<DataHeatBalance::ZoneEquipData> ZoneGas;
-    Array1D<DataHeatBalance::ZoneEquipData> ZoneOtherEq;
-    Array1D<DataHeatBalance::ZoneEquipData> ZoneHWEq;
-    Array1D<DataHeatBalance::ZoneEquipData> ZoneSteamEq;
-    Array1D<DataHeatBalance::ITEquipData> ZoneITEq;
-    Array1D<DataHeatBalance::BBHeatData> ZoneBBHeat;
-    Array1D<DataHeatBalance::InfiltrationData> Infiltration;
-    Array1D<DataHeatBalance::VentilationData> Ventilation;
-    Array1D<DataHeatBalance::ZoneAirBalanceData> ZoneAirBalance;
-    Array1D<DataHeatBalance::MixingData> Mixing;
-    Array1D<DataHeatBalance::MixingData> CrossMixing;
-    Array1D<DataHeatBalance::MixingData> RefDoorMixing;
+    EPVector<DataHeatBalance::ZoneSimData> ZoneIntGain;
+    EPVector<DataHeatBalance::GapSupportPillar> SupportPillar;
+    EPVector<DataHeatBalance::GapDeflectionState> DeflectionState;
+    EPVector<DataHeatBalance::SpectralDataProperties> SpectralData;
+    EPVector<DataHeatBalance::ZoneData> Zone;
+    EPVector<DataHeatBalance::ZoneListData> ZoneList;
+    EPVector<DataHeatBalance::ZoneGroupData> ZoneGroup;
+    EPVector<DataHeatBalance::PeopleData> People;
+    EPVector<DataHeatBalance::LightsData> Lights;
+    EPVector<DataHeatBalance::ZoneEquipData> ZoneElectric;
+    EPVector<DataHeatBalance::ZoneEquipData> ZoneGas;
+    EPVector<DataHeatBalance::ZoneEquipData> ZoneOtherEq;
+    EPVector<DataHeatBalance::ZoneEquipData> ZoneHWEq;
+    EPVector<DataHeatBalance::ZoneEquipData> ZoneSteamEq;
+    EPVector<DataHeatBalance::ITEquipData> ZoneITEq;
+    EPVector<DataHeatBalance::BBHeatData> ZoneBBHeat;
+    EPVector<DataHeatBalance::InfiltrationData> Infiltration;
+    EPVector<DataHeatBalance::VentilationData> Ventilation;
+    EPVector<DataHeatBalance::ZoneAirBalanceData> ZoneAirBalance;
+    EPVector<DataHeatBalance::MixingData> Mixing;
+    EPVector<DataHeatBalance::MixingData> CrossMixing;
+    EPVector<DataHeatBalance::MixingData> RefDoorMixing;
     Array1D<DataHeatBalance::WindowBlindProperties> Blind;
-    Array1D<DataHeatBalance::WindowComplexShade> ComplexShade;
-    Array1D<DataHeatBalance::WindowThermalModelParams> WindowThermalModel;
-    Array1D<DataHeatBalance::SurfaceScreenProperties> SurfaceScreens;
-    Array1D<DataHeatBalance::ScreenTransData> ScreenTrans;
-    Array1D<DataHeatBalance::ZoneCatEUseData> ZoneIntEEuse;
-    Array1D<DataHeatBalance::RefrigCaseCreditData> RefrigCaseCredit;
-    Array1D<DataHeatBalance::HeatReclaimDataBase> HeatReclaimRefrigeratedRack;
-    Array1D<DataHeatBalance::HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
-    Array1D<DataHeatBalance::HeatReclaimDataBase> HeatReclaimDXCoil;
-    Array1D<DataHeatBalance::HeatReclaimDataBase> HeatReclaimVS_DXCoil;
-    Array1D<DataHeatBalance::HeatReclaimDataBase> HeatReclaimSimple_WAHPCoil;
-    Array1D<DataHeatBalance::AirReportVars> ZnAirRpt;
-    Array1D<DataHeatBalance::TCGlazingsType> TCGlazings;
-    Array1D<DataHeatBalance::ZoneEquipData> ZoneCO2Gen;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> PeopleObjects;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> LightsObjects;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> ZoneElectricObjects;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> ZoneGasObjects;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> HotWaterEqObjects;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> SteamEqObjects;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> OtherEqObjects;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> InfiltrationObjects;
-    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> VentilationObjects;
-    Array1D<DataHeatBalance::ZoneReportVars> ZnRpt;
-    Array1D<DataHeatBalance::ZoneMassConservationData> MassConservation;
+    EPVector<DataHeatBalance::WindowComplexShade> ComplexShade;
+    EPVector<DataHeatBalance::WindowThermalModelParams> WindowThermalModel;
+    EPVector<DataHeatBalance::SurfaceScreenProperties> SurfaceScreens;
+    EPVector<DataHeatBalance::ScreenTransData> ScreenTrans;
+    EPVector<DataHeatBalance::ZoneCatEUseData> ZoneIntEEuse;
+    EPVector<DataHeatBalance::RefrigCaseCreditData> RefrigCaseCredit;
+    EPVector<DataHeatBalance::HeatReclaimDataBase> HeatReclaimRefrigeratedRack;
+    EPVector<DataHeatBalance::HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
+    EPVector<DataHeatBalance::HeatReclaimDataBase> HeatReclaimDXCoil;
+    EPVector<DataHeatBalance::HeatReclaimDataBase> HeatReclaimVS_DXCoil;
+    EPVector<DataHeatBalance::HeatReclaimDataBase> HeatReclaimSimple_WAHPCoil;
+    EPVector<DataHeatBalance::AirReportVars> ZnAirRpt;
+    EPVector<DataHeatBalance::TCGlazingsType> TCGlazings;
+    EPVector<DataHeatBalance::ZoneEquipData> ZoneCO2Gen;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> PeopleObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> LightsObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ZoneElectricObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ZoneGasObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> HotWaterEqObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> SteamEqObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> OtherEqObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> InfiltrationObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> VentilationObjects;
+    EPVector<DataHeatBalance::ZoneReportVars> ZnRpt;
+    EPVector<DataHeatBalance::ZoneMassConservationData> MassConservation;
     DataHeatBalance::ZoneAirMassFlowConservation ZoneAirMassFlow;
-    Array1D<DataHeatBalance::ZoneLocalEnvironmentData> ZoneLocalEnvironment;
+    EPVector<DataHeatBalance::ZoneLocalEnvironmentData> ZoneLocalEnvironment;
     bool MundtFirstTimeFlag = true;
 
     void clear_state() override
