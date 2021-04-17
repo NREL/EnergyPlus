@@ -101,10 +101,10 @@ struct CoilCoolingDXCurveFitOperatingMode
                            bool const singleMode);
 
     std::string name;
-    Real64 ratedGrossTotalCap = 0.0;
-    Real64 ratedEvapAirFlowRate = 0.0;
-    Real64 ratedCondAirFlowRate = 0.0;
-    Real64 ratedEvapAirMassFlowRate = 0.0;
+    Real64 ratedGrossTotalCap = 0.0;       // [W]
+    Real64 ratedEvapAirFlowRate = 0.0;     // [m3/s]
+    Real64 ratedCondAirFlowRate = 0.0;     // [m3/s]
+    Real64 ratedEvapAirMassFlowRate = 0.0; // [kg/s]
     bool ratedGrossTotalCapIsAutosized = false;
     bool ratedEvapAirFlowRateIsAutosized = false;
 
