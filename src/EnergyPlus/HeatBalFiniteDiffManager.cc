@@ -2325,6 +2325,7 @@ namespace HeatBalFiniteDiffManager {
         state.dataHeatBalSurf->SurfOpaqInsFaceConduction(Surf) = QNetSurfInside * surface.Area; // for reporting as in CTF, PT
     }
 
+    // todo - function not used
     void CheckFDSurfaceTempLimits(EnergyPlusData &state,
                                   int const SurfNum,            // surface number
                                   Real64 const CheckTemperature // calculated temperature, not reset
@@ -2354,7 +2355,7 @@ namespace HeatBalFiniteDiffManager {
         if (state.dataGlobal->WarmupFlag) ++state.dataHeatBalFiniteDiffMgr->WarmupSurfTemp;
         if (!state.dataGlobal->WarmupFlag || state.dataHeatBalFiniteDiffMgr->WarmupSurfTemp > 10 || state.dataGlobal->DisplayExtraWarnings) {
             if (CheckTemperature < MinSurfaceTempLimit) {
-                if (state.dataSurface->Surface(SurfNum).LowTempErrCount == 0) {
+                if (state.dataSurface->SurfLowTempErrCount(SurfNum) == 0) {
                     ShowSevereMessage(state,
                                       format("Temperature (low) out of bounds [{:.2R}] for zone=\"{}\", for surface=\"{}\"",
                                              CheckTemperature,
@@ -2389,7 +2390,7 @@ namespace HeatBalFiniteDiffManager {
                     ShowRecurringSevereErrorAtEnd(state,
                                                   "Temperature (low) out of bounds for zone=" + state.dataHeatBal->Zone(ZoneNum).Name +
                                                       " for surface=" + state.dataSurface->Surface(SurfNum).Name,
-                                                  state.dataSurface->Surface(SurfNum).LowTempErrCount,
+                                                  state.dataSurface->SurfLowTempErrCount(SurfNum),
                                                   CheckTemperature,
                                                   CheckTemperature,
                                                   _,
@@ -2399,7 +2400,7 @@ namespace HeatBalFiniteDiffManager {
                     ShowRecurringSevereErrorAtEnd(state,
                                                   "Temperature (low) out of bounds for zone=" + state.dataHeatBal->Zone(ZoneNum).Name +
                                                       " for surface=" + state.dataSurface->Surface(SurfNum).Name,
-                                                  state.dataSurface->Surface(SurfNum).LowTempErrCount,
+                                                  state.dataSurface->SurfLowTempErrCount(SurfNum),
                                                   CheckTemperature,
                                                   CheckTemperature,
                                                   _,
@@ -2407,7 +2408,7 @@ namespace HeatBalFiniteDiffManager {
                                                   "C");
                 }
             } else {
-                if (state.dataSurface->Surface(SurfNum).HighTempErrCount == 0) {
+                if (state.dataSurface->SurfHighTempErrCount(SurfNum) == 0) {
                     ShowSevereMessage(state,
                                       format("Temperature (high) out of bounds ({:.2R}] for zone=\"{}\", for surface=\"{}\"",
                                              CheckTemperature,
@@ -2442,7 +2443,7 @@ namespace HeatBalFiniteDiffManager {
                     ShowRecurringSevereErrorAtEnd(state,
                                                   "Temperature (high) out of bounds for zone=" + state.dataHeatBal->Zone(ZoneNum).Name +
                                                       " for surface=" + state.dataSurface->Surface(SurfNum).Name,
-                                                  state.dataSurface->Surface(SurfNum).HighTempErrCount,
+                                                  state.dataSurface->SurfHighTempErrCount(SurfNum),
                                                   CheckTemperature,
                                                   CheckTemperature,
                                                   _,
@@ -2452,7 +2453,7 @@ namespace HeatBalFiniteDiffManager {
                     ShowRecurringSevereErrorAtEnd(state,
                                                   "Temperature (high) out of bounds for zone=" + state.dataHeatBal->Zone(ZoneNum).Name +
                                                       " for surface=" + state.dataSurface->Surface(SurfNum).Name,
-                                                  state.dataSurface->Surface(SurfNum).HighTempErrCount,
+                                                  state.dataSurface->SurfHighTempErrCount(SurfNum),
                                                   CheckTemperature,
                                                   CheckTemperature,
                                                   _,

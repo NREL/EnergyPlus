@@ -1452,7 +1452,14 @@ namespace SurfaceGeometry {
         //    After reordering, MovedSurfs should equal TotSurfaces
 
         MovedSurfs = 0;
+        // todo - move allocation to property functions
         state.dataSurface->Surface.allocate(state.dataSurface->TotSurfaces); // Allocate the Surface derived type appropriately
+        state.dataSurface->SurfShadowSurfPossibleObstruction.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfShadowSurfRecSurfNum.allocate(state.dataSurface->TotSurfaces);
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            state.dataSurface->SurfShadowSurfPossibleObstruction(SurfNum) = false;
+            state.dataSurface->SurfShadowSurfRecSurfNum(SurfNum) = 0;
+        }
         Array1D<bool> SurfaceTmpClassMoved;                                  // Tmp class is moved
         SurfaceTmpClassMoved.dimension(state.dataSurface->TotSurfaces, false);
 
@@ -2425,7 +2432,7 @@ namespace SurfaceGeometry {
         // Set flag that determines whether a surface can be an exterior obstruction
         // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            state.dataSurface->Surface(SurfNum).ShadowSurfPossibleObstruction = false;
+            state.dataSurface->SurfShadowSurfPossibleObstruction(SurfNum) = false;
             if (state.dataSurface->Surface(SurfNum).HeatTransSurf) {
                 state.dataSurface->AllHTSurfaceList.push_back(SurfNum);
                 int const zoneNum(state.dataSurface->Surface(SurfNum).Zone);
@@ -2478,7 +2485,7 @@ namespace SurfaceGeometry {
             // Exclude air boundary surfaces
             if (state.dataSurface->Surface(SurfNum).IsAirBoundarySurf) continue;
 
-            state.dataSurface->Surface(SurfNum).ShadowSurfPossibleObstruction = true;
+            state.dataSurface->SurfShadowSurfPossibleObstruction(SurfNum) = true;
         }
 
         // Check for IRT surfaces in invalid places.

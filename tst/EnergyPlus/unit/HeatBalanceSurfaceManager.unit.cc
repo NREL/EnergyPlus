@@ -167,10 +167,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 {
 
     Real64 surfTemp;
-    DataSurfaces::SurfaceData testSurface;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->SurfLowTempErrCount.allocate(1);
+    state->dataSurface->SurfHighTempErrCount.allocate(1);
     DataHeatBalance::ZoneData testZone;
     int cntWarmupSurfTemp = 0;
-    testSurface.Name = "TestSurface";
+    Surface(1).Name = "TestSurface";
     testZone.Name = "TestZone";
     testZone.InternalHeatGains = 2.5;
     testZone.NominalInfilVent = 0.5;
@@ -179,23 +181,23 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     // no error
     surfTemp = 26;
     state->dataGlobal->WarmupFlag = true;
-    testSurface.LowTempErrCount = 0;
-    testSurface.HighTempErrCount = 0;
+    state->dataSurface->SurfLowTempErrCount(1) = 0;
+    state->dataSurface->SurfHighTempErrCount(1) = 0;
     testZone.TempOutOfBoundsReported = true;
     testZone.FloorArea = 1000;
     testZone.IsControlled = true;
-    TestSurfTempCalcHeatBalanceInsideSurf(*state, surfTemp, testSurface, testZone, cntWarmupSurfTemp);
+    TestSurfTempCalcHeatBalanceInsideSurf(*state, surfTemp, 1, testZone, cntWarmupSurfTemp);
     EXPECT_TRUE(compare_err_stream("", true));
 
     // to hot - first time
     surfTemp = 201;
     state->dataGlobal->WarmupFlag = false;
-    testSurface.LowTempErrCount = 0;
-    testSurface.HighTempErrCount = 0;
+    state->dataSurface->SurfLowTempErrCount(1) = 0;
+    state->dataSurface->SurfHighTempErrCount(1) = 0;
     testZone.TempOutOfBoundsReported = false;
     testZone.FloorArea = 1000;
     testZone.IsControlled = true;
-    TestSurfTempCalcHeatBalanceInsideSurf(*state, surfTemp, testSurface, testZone, cntWarmupSurfTemp);
+    TestSurfTempCalcHeatBalanceInsideSurf(*state, surfTemp, 1, testZone, cntWarmupSurfTemp);
     std::string const error_string01 =
         delimited_string({"   ** Severe  ** Temperature (high) out of bounds (201.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
                           "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
@@ -210,12 +212,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     // to hot - subsequent times
     surfTemp = 201;
     state->dataGlobal->WarmupFlag = false;
-    testSurface.LowTempErrCount = 0;
-    testSurface.HighTempErrCount = 0;
+    state->dataSurface->SurfLowTempErrCount(1) = 0;
+    state->dataSurface->SurfHighTempErrCount(1) = 0;
     testZone.TempOutOfBoundsReported = true;
     testZone.FloorArea = 1000;
     testZone.IsControlled = true;
-    TestSurfTempCalcHeatBalanceInsideSurf(*state, surfTemp, testSurface, testZone, cntWarmupSurfTemp);
+    TestSurfTempCalcHeatBalanceInsideSurf(*state, surfTemp, 1, testZone, cntWarmupSurfTemp);
     std::string const error_string02 = delimited_string({
         "   ** Severe  ** Temperature (high) out of bounds (201.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
         "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
@@ -226,12 +228,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     // to cold - first time
     surfTemp = -101;
     state->dataGlobal->WarmupFlag = false;
-    testSurface.LowTempErrCount = 0;
-    testSurface.HighTempErrCount = 0;
+    state->dataSurface->SurfLowTempErrCount(1) = 0;
+    state->dataSurface->SurfHighTempErrCount(1) = 0;
     testZone.TempOutOfBoundsReported = false;
     testZone.FloorArea = 1000;
     testZone.IsControlled = true;
-    TestSurfTempCalcHeatBalanceInsideSurf(*state, surfTemp, testSurface, testZone, cntWarmupSurfTemp);
+    TestSurfTempCalcHeatBalanceInsideSurf(*state, surfTemp, 1, testZone, cntWarmupSurfTemp);
     std::string const error_string03 =
         delimited_string({"   ** Severe  ** Temperature (low) out of bounds [-101.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
                           "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
@@ -246,12 +248,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     // to cold - subsequent times
     surfTemp = -101;
     state->dataGlobal->WarmupFlag = false;
-    testSurface.LowTempErrCount = 0;
-    testSurface.HighTempErrCount = 0;
+    state->dataSurface->SurfLowTempErrCount(1) = 0;
+    state->dataSurface->SurfHighTempErrCount(1) = 0;
     testZone.TempOutOfBoundsReported = true;
     testZone.FloorArea = 1000;
     testZone.IsControlled = true;
-    TestSurfTempCalcHeatBalanceInsideSurf(*state, surfTemp, testSurface, testZone, cntWarmupSurfTemp);
+    TestSurfTempCalcHeatBalanceInsideSurf(*state, surfTemp, 1, testZone, cntWarmupSurfTemp);
     std::string const error_string04 =
         delimited_string({"   ** Severe  ** Temperature (low) out of bounds [-101.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
                           "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00"});
@@ -1346,7 +1348,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     // Test if local value used in surface hc calculation
     // Surface(1) - local; Surface(2) - global;
     for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
-        state->dataSurface->Surface(SurfNum).ExtConvCoeff = -1;
+        state->dataSurface->state.dataSurface->SurfExtConvCoeff(SurfNum) = -1;
     }
     CalcHeatBalanceOutsideSurf(*state);
     Real64 HExt_Expect_Surf1 = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(5, 1.5);
@@ -1900,7 +1902,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     for (SurfNum = 1; SurfNum <= 6; SurfNum++) {
         state->dataHeatBalSurf->TH(1, 1, SurfNum) = 20;           // Surf temp
         state->dataSurface->Surface(SurfNum).OutDryBulbTemp = 22; // Air temp
-        state->dataSurface->Surface(SurfNum).ExtConvCoeff = -6;
+        state->dataSurface->state.dataSurface->SurfExtConvCoeff(SurfNum) = -6;
         state->dataSurface->AirSkyRadSplit(SurfNum) = 1.0;
     }
     CalcHeatBalanceOutsideSurf(*state);
@@ -2464,7 +2466,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     SolarShading::DetermineShadowingCombinations(*state);
     InitSurfaceHeatBalance(*state);
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
-        state->dataSurface->Surface(SurfNum).ExtConvCoeff = -1;
+        state->dataSurface->state.dataSurface->SurfExtConvCoeff(SurfNum) = -1;
     }
     // Test Additional Heat Source Calculation
     CalcHeatBalanceOutsideSurf(*state);

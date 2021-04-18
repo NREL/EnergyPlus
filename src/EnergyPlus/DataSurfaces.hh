@@ -555,92 +555,72 @@ namespace DataSurfaces {
         // Members
         std::string Name;                 // User supplied name of the surface (must be unique)
         int Construction;                 // Pointer to the construction in the Construct derived type
-        bool EMSConstructionOverrideON;   // if true, EMS is calling to override the construction value
-        int EMSConstructionOverrideValue; // pointer value to use for Construction when overridden
         int ConstructionStoredInputValue; // holds the original value for Construction per surface input
         SurfaceClass Class;
+
         // Geometry related parameters
-        SurfaceShape Shape; // Surface shape (Triangle=1,Quadrilateral=2,Rectangle=3,
-        //                Rectangular Window/Door=4,Rectangular Overhang=5,
-        //                Rectangular Left Fin=6,Rectangular Right Fin=7,
-        //                Triangular Window=8)
+        SurfaceShape Shape;       // Surface shape (Triangle=1,Quadrilateral=2,Rectangle=3,
+                                  // Rectangular Window/Door=4,Rectangular Overhang=5,
+                                  // Rectangular Left Fin=6,Rectangular Right Fin=7,
+                                  // Triangular Window=8)
         int Sides;                // Number of side/vertices for this surface (based on Shape)
         Real64 Area;              // Surface area of the surface (less any subsurfaces) {m2}
         Real64 GrossArea;         // Surface area of the surface (including subsurfaces) {m2}
-        Real64 NetAreaShadowCalc; // Area of a wall/floor/ceiling less subsurfaces assuming
-        //  all windows, if present, have unity multiplier.
-        // Wall/floor/ceiling/roof areas that include windows include
-        //  frame (unity) areas.
-        // Areas of Windows including divider (unity) area.
-        // These areas are used in shadowing / sunlit area calculations.
-        Real64 Perimeter; // Perimeter length of the surface {m}
-        Real64 Azimuth;   // Direction the surface outward normal faces (degrees) or FACING
-        Real64 Height;    // Height of the surface (m)
-        Real64 Reveal;    // Depth of the window reveal (m) if this surface is a window
-        Real64 Tilt;      // Angle (deg) between the ground outward normal and the surface outward normal
-        Real64 Width;     // Width of the surface (m)
+        Real64 NetAreaShadowCalc; // Area of a wall/floor/ceiling less subsurfaces assuming all windows, if present, have unity multiplier.
+                                  // Wall/floor/ceiling/roof areas that include windows include frame (unity) areas.
+                                  // Areas of Windows including divider (unity) area.
+                                  // These areas are used in shadowing / sunlit area calculations.
+        Real64 Perimeter;         // Perimeter length of the surface {m}
+        Real64 Azimuth;           // Direction the surface outward normal faces (degrees) or FACING
+        Real64 Height;            // Height of the surface (m)
+        Real64 Reveal;            // Depth of the window reveal (m) if this surface is a window
+        Real64 Tilt;              // Angle (deg) between the ground outward normal and the surface outward normal
+        Real64 Width;             // Width of the surface (m)
+
         // Boundary conditions and interconnections
-        bool HeatTransSurf;                // True if surface is a heat transfer surface,
-        int OutsideHeatSourceTermSchedule; // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
-        int InsideHeatSourceTermSchedule;  // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
-        // False if a (detached) shadowing (sub)surface
+        bool HeatTransSurf;                       // True if surface is a heat transfer surface,
+        int OutsideHeatSourceTermSchedule;        // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
+        int InsideHeatSourceTermSchedule;         // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
+                                                  // False if a (detached) shadowing (sub)surface
         iHeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
         std::string BaseSurfName;                 // Name of BaseSurf
-        int BaseSurf;                             // "Base surface" for this surface.  Applies mainly to subsurfaces
-        // in which case it points back to the base surface number.
-        // Equals 0 for detached shading.
-        // BaseSurf equals surface number for all other surfaces.
-        int NumSubSurfaces;   // Number of subsurfaces this surface has (doors/windows)
-        std::string ZoneName; // User supplied name of the Zone
-        int Zone;             // Interior environment or zone the surface is a part of
-        // Note that though attached shading surfaces are part of a zone, this
-        // value is 0 there to facilitate using them as detached surfaces (more
-        // accurate shading.
-        std::string ExtBoundCondName; // Name for the Outside Environment Object
-        int ExtBoundCond;             // For an "interzone" surface, this is the adjacent surface number.
-        // for an internal/adiabatic surface this is the current surface number.
-        // Otherwise, 0=external environment, -1=ground,
-        // -2=other side coefficients (OSC--won't always use CTFs)
-        // -3=other side conditions model
-        // During input, interim values of UnreconciledZoneSurface ("Surface") and
-        // UnenteredAdjacentZoneSurface ("Zone") are used until reconciled.
-        int LowTempErrCount;
-        int HighTempErrCount;
-        bool ExtSolar; // True if the "outside" of the surface is exposed to solar
-        bool ExtWind;  // True if the "outside" of the surface is exposed to wind
-        // Heat transfer coefficients
-        int IntConvCoeff; // Interior Convection Coefficient pointer (different data structure)
-        // when being overridden
-        bool EMSOverrideIntConvCoef;   // if true, EMS is calling to override interior convection coefficeint
-        Real64 EMSValueForIntConvCoef; // Value EMS is calling to use for interior convection coefficient [W/m2-K]
-        int ExtConvCoeff;              // Exterior Convection Coefficient pointer (different data structure)
-        // when being overridden
-        bool EMSOverrideExtConvCoef;   // if true, EMS is calling to override exterior convection coefficeint
-        Real64 EMSValueForExtConvCoef; // Value EMS is calling to use for exterior convection coefficient [W/m2-K]
-        Real64 ViewFactorGround;       // View factor to the ground from the exterior of the surface
-        //   for diffuse solar radiation
-        Real64 ViewFactorSky; // View factor to the sky from the exterior of the surface
-        //   for diffuse solar radiation
-        Real64 ViewFactorGroundIR; // View factor to the ground and shadowing surfaces from the
-        //    exterior of the surface for IR radiation
-        Real64 ViewFactorSkyIR; // View factor to the sky from the exterior of the surface for IR radiation
-        // Special/optional other side coefficients (OSC)
-        int OSCPtr;  // Pointer to OSC data structure
-        int OSCMPtr; // "Pointer" to OSCM data structure (other side conditions from a model)
+        int BaseSurf;                  // "Base surface" for this surface. Applies mainly to subsurfaces in which case it points back to the base surface number.
+                                       // Equals 0 for detached shading. BaseSurf equals surface number for all other surfaces.
+        int NumSubSurfaces;            // Number of subsurfaces this surface has (doors/windows)
+        std::string ZoneName;          // User supplied name of the Zone
+        int Zone;                      // Interior environment or zone the surface is a part of
+                                       // Note that though attached shading surfaces are part of a zone, this
+                                       // value is 0 there to facilitate using them as detached surfaces (more accurate shading.
+        std::string ExtBoundCondName;  // Name for the Outside Environment Object
+        int ExtBoundCond;              // For an "interzone" surface, this is the adjacent surface number.
+                                       // for an internal/adiabatic surface this is the current surface number.
+                                       // Otherwise, 0=external environment, -1=ground,
+                                       // -2=other side coefficients (OSC--won't always use CTFs)
+                                       // -3=other side conditions model
+                                       // During input, interim values of UnreconciledZoneSurface ("Surface") and
+                                       // UnenteredAdjacentZoneSurface ("Zone") are used until reconciled.
+        bool ExtSolar;                 // True if the "outside" of the surface is exposed to solar
+        bool ExtWind;                  // True if the "outside" of the surface is exposed to wind Heat transfer coefficients
+        Real64 ViewFactorGround;       // View factor to the ground from the exterior of the surface for diffuse solar radiation
+        Real64 ViewFactorSky;          // View factor to the sky from the exterior of the surface for diffuse solar radiation
+        Real64 ViewFactorGroundIR;     // View factor to the ground and shadowing surfaces from the exterior of the surface for IR radiation
+        Real64 ViewFactorSkyIR;        // View factor to the sky from the exterior of the surface for IR radiation Special/optional other side coefficients (OSC)
+        int OSCPtr;                    // Pointer to OSC data structure
+        int OSCMPtr;                   // "Pointer" to OSCM data structure (other side conditions from a model)
+
         // Optional parameters specific to shadowing surfaces and subsurfaces (detached shading, overhangs, wings, etc.)
         int SchedShadowSurfIndex;   // Schedule for a shadowing (sub)surface
         bool ShadowSurfSchedVaries; // true if the scheduling (transmittance) on a shading surface varies.
         bool ShadowingSurf;         // True if a surface is a shadowing surface
         bool IsTransparent;         // True if the schedule values are always 1.0 (or the minimum is 1.0)
         Real64 SchedMinValue;       // Schedule minimum value.
+
         // Optional parameters specific to solar reflection from surfaces
         Real64 ShadowSurfDiffuseSolRefl;    // Diffuse solar reflectance of opaque portion
         Real64 ShadowSurfDiffuseVisRefl;    // Diffuse visible reflectance of opaque portion
         Real64 ShadowSurfGlazingFrac;       // Glazing fraction
         int ShadowSurfGlazingConstruct;     // Glazing construction number
-        bool ShadowSurfPossibleObstruction; // True if a surface can be an exterior obstruction
-        bool ShadowSurfPossibleReflector;   // True if a surface can be an exterior reflector, not used!
-        int ShadowSurfRecSurfNum;           // Receiving surface number
+
         // Optional movable insulation parameters
         int MaterialMovInsulExt;       // Pointer to the material used for exterior movable insulation
         int MaterialMovInsulInt;       // Pointer to the material used for interior movable insulation
@@ -648,6 +628,7 @@ namespace DataSurfaces {
         int SchedMovInsulInt;          // Schedule for interior movable insulation
         bool MovInsulIntPresent;       // True when movable insulation is present
         bool MovInsulIntPresentPrevTS; // True when movable insulation was present during the previous time step
+
         // Vertices
         Array1D<Vector> NewVertex;
         Vertices Vertex; // Surface Vertices are represented by Number of Sides and Vector (type)
@@ -667,10 +648,12 @@ namespace DataSurfaces {
         bool VerticesProcessed;           // true if vertices have been processed (only used for base surfaces)
         Real64 XShift;                    // relative coordinate shift data - used by child subsurfaces
         Real64 YShift;                    // relative coordinate shift data - used by child subsurfaces
+
         // Precomputed parameters for PierceSurface performance
         ShapeCat shapeCat;   // Shape category
         Plane plane;         // Plane
         Surface2D surface2d; // 2D projected surface for efficient intersection testing
+
         // Window Parameters (when surface is Window)
         int activeWindowShadingControl;            // Active window shading control (windows only)
         std::vector<int> windowShadingControlList; // List of possible window shading controls
@@ -682,6 +665,7 @@ namespace DataSurfaces {
                                                          // controls (windows only - same indexes as windowShadingControlList)
         int FrameDivider;                                // Pointer to frame and divider information (windows only)
         Real64 Multiplier;                               // Multiplies glazed area, frame area and divider area (windows only)
+
         // Daylighting pointers
         int Shelf;   // Pointer to daylighting shelf
         int TAirRef; // Flag for reference air temperature
@@ -693,20 +677,9 @@ namespace DataSurfaces {
         // Default value is 'ZoneMeanAirTemp' and value for each particular surface will be changed only if
         // the inlet-dependent convection algorithm and/or nodal and zonal air models are used.
         Real64 OutDryBulbTemp;                 // Surface outside dry bulb air temperature, for surface heat balance (C)
-        bool OutDryBulbTempEMSOverrideOn;      // if true, EMS is calling to override the surface's outdoor air temp
-        Real64 OutDryBulbTempEMSOverrideValue; // value to use for EMS override of outdoor air drybulb temp (C)
         Real64 OutWetBulbTemp;                 // Surface outside wet bulb air temperature, for surface heat balance (C)
-        bool OutWetBulbTempEMSOverrideOn;      // if true, EMS is calling to override the surface's outdoor wetbulb
-        Real64 OutWetBulbTempEMSOverrideValue; // value to use for EMS override of outdoor air wetbulb temp (C)
         Real64 WindSpeed;                      // Surface outside wind speed, for surface heat balance (m/s)
-        bool WindSpeedEMSOverrideOn;
-        Real64 WindSpeedEMSOverrideValue;
-        bool ViewFactorGroundEMSOverrideOn;      // if true, EMS is calling to override the surface's view factor to ground
-        Real64 ViewFactorGroundEMSOverrideValue; // value to use for EMS override of the surface's view factor to ground
-
         Real64 WindDir;                    // Surface outside wind direction, for surface heat balance and ventilation(degree)
-        bool WindDirEMSOverrideOn;         // if true, EMS is calling to override the surface's outside wind direction
-        Real64 WindDirEMSOverrideValue;    // value to use for EMS override of the surface's outside wind speed
         bool SchedExternalShadingFrac;     // true if the external shading is scheduled or calculated externally to be imported
         int ExternalShadingSchInd;         // Schedule for a the external shading
         bool HasSurroundingSurfProperties; // true if surrounding surfaces properties are listed for an external surface
@@ -727,6 +700,7 @@ namespace DataSurfaces {
         int ICSPtr;             // Index to ICS collector
         // TH added 3/26/2010
         bool MirroredSurf; // True if it is a mirrored surface
+
         // additional attributes for convection correlations
         int IntConvClassification;       // current classification for inside face air flow regime and surface orientation
         int IntConvHcModelEq;            // current convection model for inside face
@@ -759,27 +733,23 @@ namespace DataSurfaces {
 
         // Default Constructor
         SurfaceData()
-            : Construction(0), EMSConstructionOverrideON(false), EMSConstructionOverrideValue(0), ConstructionStoredInputValue(0),
+            : Construction(0), ConstructionStoredInputValue(0),
               Class(SurfaceClass::None), Shape(SurfaceShape::None), Sides(0), Area(0.0), GrossArea(0.0), NetAreaShadowCalc(0.0), Perimeter(0.0),
               Azimuth(0.0), Height(0.0), Reveal(0.0), Tilt(0.0), Width(0.0), HeatTransSurf(false), OutsideHeatSourceTermSchedule(0),
               InsideHeatSourceTermSchedule(0), HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0),
-              ExtBoundCond(0), LowTempErrCount(0), HighTempErrCount(0), ExtSolar(false), ExtWind(false), IntConvCoeff(0),
-              EMSOverrideIntConvCoef(false), EMSValueForIntConvCoef(0.0), ExtConvCoeff(0), EMSOverrideExtConvCoef(false), EMSValueForExtConvCoef(0.0),
+              ExtBoundCond(0), ExtSolar(false), ExtWind(false),
               ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0), OSCMPtr(0),
               SchedShadowSurfIndex(0), ShadowSurfSchedVaries(false), ShadowingSurf(false), IsTransparent(false), SchedMinValue(0.0),
               ShadowSurfDiffuseSolRefl(0.0), ShadowSurfDiffuseVisRefl(0.0), ShadowSurfGlazingFrac(0.0), ShadowSurfGlazingConstruct(0),
-              ShadowSurfPossibleObstruction(true), ShadowSurfPossibleReflector(false), ShadowSurfRecSurfNum(0), MaterialMovInsulExt(0),
+              MaterialMovInsulExt(0),
               MaterialMovInsulInt(0), SchedMovInsulExt(0), SchedMovInsulInt(0), MovInsulIntPresent(false), MovInsulIntPresentPrevTS(false),
               Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0), lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0),
               NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0), CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true),
               IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0), shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0),
               activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), FrameDivider(0), Multiplier(1.0), Shelf(0),
-              TAirRef(ZoneMeanAirTemp), OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false), OutDryBulbTempEMSOverrideValue(0.0),
-              OutWetBulbTemp(0.0), OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0),
-              WindSpeedEMSOverrideOn(false), WindSpeedEMSOverrideValue(0.0), ViewFactorGroundEMSOverrideOn(false),
-              ViewFactorGroundEMSOverrideValue(0.0),
-
-              WindDir(0.0), WindDirEMSOverrideOn(false), WindDirEMSOverrideValue(0.0),
+              TAirRef(ZoneMeanAirTemp), OutDryBulbTemp(0.0),
+              OutWetBulbTemp(0.0),WindSpeed(0.0),
+              WindDir(0.0),
 
               SchedExternalShadingFrac(false), ExternalShadingSchInd(0), HasSurroundingSurfProperties(false), SurroundingSurfacesNum(0),
               HasLinkedOutAirNode(false), LinkedOutAirNode(0), PenumbraID(-1),
@@ -1375,6 +1345,34 @@ struct SurfacesData : BaseGlobalStruct
     std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
     std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
 
+    // Surface EMS
+    Array1D<bool> SurfEMSConstructionOverrideON; // if true, EMS is calling to override the construction value
+    Array1D<int> SurfEMSConstructionOverrideValue; // pointer value to use for Construction when overridden
+    Array1D<bool> SurfEMSOverrideIntConvCoef; // if true, EMS is calling to override the interior convection coefficient value
+    Array1D<Real64> SurfEMSValueForIntConvCoef; // Value EMS is calling to use for interior convection coefficient [W/m2-K]
+    Array1D<bool> SurfEMSOverrideExtConvCoef; // if true, EMS is calling to override the exterior convection coefficient value
+    Array1D<Real64> SurfEMSValueForExtConvCoef; // Value EMS is calling to use for exterior convection coefficient [W/m2-K]
+    Array1D<bool> SurfOutDryBulbTempEMSOverrideOn; // if true, EMS is calling to override the surface's outdoor air temp
+    Array1D<Real64> SurfOutDryBulbTempEMSOverrideValue; // value to use for EMS override of outdoor air drybulb temp (C)
+    Array1D<bool> SurfOutWetBulbTempEMSOverrideOn; // if true, EMS is calling to override the surface's outdoor wetbulb temp
+    Array1D<Real64> SurfOutWetBulbTempEMSOverrideValue; // value to use for EMS override of outdoor air wetbulb temp (C)
+    Array1D<bool> SurfWindSpeedEMSOverrideOn; //  if true, EMS is calling to override the surface's outdoor wind speed
+    Array1D<Real64> SurfWindSpeedEMSOverrideValue; // value to use for EMS override of outdoor wind speed (m/s)
+    Array1D<bool> SurfViewFactorGroundEMSOverrideOn; // if true, EMS is calling to override the surface's view factor to ground
+    Array1D<Real64> SurfViewFactorGroundEMSOverrideValue; // value to use for EMS override of surface's view factor to ground
+    Array1D<bool> SurfWindDirEMSOverrideOn; // if true, EMS is calling to override the outside wind direction
+    Array1D<Real64> SurfWindDirEMSOverrideValue; // value to use for EMS override of outside wind direction (deg)
+
+    // Surface Properties
+    Array1D<int> SurfLowTempErrCount;
+    Array1D<int> SurfHighTempErrCount;
+    Array1D<Real64> SurfIntConvCoeff; // Interior Convection Coefficient pointer (different data structure) when being overridden
+    Array1D<Real64> SurfExtConvCoeff; // Exterior Convection Coefficient pointer (different data structure) when being overridden
+
+    // Surface Shadow Properties
+    Array1D<bool> SurfShadowSurfPossibleObstruction; // True if a surface can be an exterior obstruction
+    Array1D<int> SurfShadowSurfRecSurfNum;  // Receiving surface number
+
     // Surface Window Heat Balance
     Array1D<Real64> SurfWinTransSolar; // Exterior beam plus diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
     Array1D<Real64> SurfWinBmSolar;    // Exterior beam solar transmitted through window, or window plus blind, into zone (W)
@@ -1674,6 +1672,30 @@ struct SurfacesData : BaseGlobalStruct
         this->AllHTNonWindowSurfaceList.clear();
         this->AllHTWindowSurfaceList.clear();
         this->AllSurfaceListReportOrder.clear();
+        this->SurfEMSConstructionOverrideON.deallocate();
+        this->SurfEMSConstructionOverrideValue.deallocate();
+        this->SurfEMSOverrideIntConvCoef.deallocate();
+        this->SurfEMSValueForIntConvCoef.deallocate();
+        this->SurfEMSOverrideExtConvCoef.deallocate();
+        this->SurfEMSValueForExtConvCoef.deallocate();
+        this->SurfOutDryBulbTempEMSOverrideOn.deallocate();
+        this->SurfOutDryBulbTempEMSOverrideValue.deallocate();
+        this->SurfOutWetBulbTempEMSOverrideOn.deallocate();
+        this->SurfOutWetBulbTempEMSOverrideValue.clear();
+        this->SurfWindSpeedEMSOverrideOn.deallocate();
+        this->SurfWindSpeedEMSOverrideValue.deallocate();
+        this->SurfViewFactorGroundEMSOverrideOn.deallocate();
+        this->SurfViewFactorGroundEMSOverrideValue.deallocate();
+        this->SurfWindDirEMSOverrideOn.deallocate();
+        this->SurfWindDirEMSOverrideValue.deallocate();
+
+        this->SurfLowTempErrCount.deallocate();
+        this->SurfHighTempErrCount.deallocate();
+        this->SurfIntConvCoeff.deallocate();
+        this->SurfExtConvCoeff.deallocate();
+        this->SurfShadowSurfPossibleObstruction.deallocate();
+        this->SurfShadowSurfRecSurfNum.deallocate();
+
         this->SurfWinTransSolar.deallocate();
         this->SurfWinBmSolar.deallocate();
         this->SurfWinBmBmSolar.deallocate();

@@ -3135,7 +3135,7 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
             if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
 
                 for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                    if (state.dataSurface->Surface(ObsSurfNum).ShadowSurfPossibleObstruction) {
+                    if (state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) {
                         PierceSurface(state, ObsSurfNum, GroundHitPt, URay, ObsHitPt, hitObs); // Check if ray pierces surface
                         if (hitObs) break;
                     }
@@ -3144,8 +3144,10 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
             } else { // Surface octree search
 
                 // Lambda function for the octree to test for surface hit
-                auto surfaceHit = [&GroundHitPt, &hitObs, &URay, &ObsHitPt](SurfaceData const &surface) -> bool {
-                    if (surface.ShadowSurfPossibleObstruction) {
+                auto surfaceHit = [&state, &GroundHitPt, &hitObs, &URay, &ObsHitPt](SurfaceData const &surface) -> bool {
+                    // todo - how to find index of object objArr
+                    int ObsSurfNum = UtilityRoutines::FindItemInList(surface.Name, state.dataSurface->Surface);
+                    if (state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) {
                         PierceSurface(surface, GroundHitPt, URay, ObsHitPt, hitObs); // Check if ray pierces surface
                         return hitObs;                                               // Ray pierces surface
                     } else {
@@ -3500,7 +3502,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             // Sun reaches ground point if vector from this point to the sun is unobstructed
                             hitObs = false;
                             for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                                if (!state.dataSurface->Surface(ObsSurfNum).ShadowSurfPossibleObstruction) continue;
+                                if (!state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) continue;
                                 PierceSurface(state, ObsSurfNum, GroundHitPt, SUNCOS_iHour, ObsHitPt, hitObs);
                                 if (hitObs) break;
                             }
@@ -3707,7 +3709,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
 
         if (state.dataSurface->CalcSolRefl) {
             // Receiving surface number corresponding this window
-            RecSurfNum = state.dataSurface->Surface(IWin2).ShadowSurfRecSurfNum;
+            RecSurfNum = state.dataSurface->SurfShadowSurfRecSurfNum(IWin2);
             if (RecSurfNum > 0) { // interior windows do not apply
                 if (state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NumPossibleObs > 0) {
                     // This window has associated obstructions that could reflect beam onto the window
@@ -3767,7 +3769,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             if (state.dataSurface->Surface(ReflSurfNum).Class == SurfaceClass::Window) {
                                 // Reflecting surface is a window.
                                 // Receiving surface number for this reflecting window.
-                                ReflSurfRecNum = state.dataSurface->Surface(ReflSurfNum).ShadowSurfRecSurfNum;
+                                ReflSurfRecNum = state.dataSurface->SurfShadowSurfRecSurfNum(ReflSurfNum);
                                 if (ReflSurfRecNum > 0) {
                                     // Loop over possible obstructions for this reflecting window
                                     for (int loop2 = 1, loop2_end = state.dataSolarReflectionManager->SolReflRecSurf(ReflSurfRecNum).NumPossibleObs;
@@ -3782,7 +3784,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             } else {
                                 // Reflecting surface is a building shade
                                 for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                                    if (!state.dataSurface->Surface(ObsSurfNum).ShadowSurfPossibleObstruction) continue;
+                                    if (!state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) continue;
                                     if (ObsSurfNum == ReflSurfNum) continue;
                                     PierceSurface(state, ObsSurfNum, HitPtRefl, RAYCOS, HitPtObs, hitObs);
                                     if (hitObs) break;
@@ -5874,7 +5876,7 @@ void DayltgHitObstruction(EnergyPlusData &state,
 
         for (int ISurf = 1; ISurf <= state.dataSurface->TotSurfaces; ++ISurf) {
             auto const &surface(state.dataSurface->Surface(ISurf));
-            if (!surface.ShadowSurfPossibleObstruction) continue;
+            if (!state.dataSurface->SurfShadowSurfPossibleObstruction(ISurf)) continue;
             IType = surface.Class;
             if ((IType == SurfaceClass::Wall || IType == SurfaceClass::Roof || IType == SurfaceClass::Floor) && (ISurf != window_iBaseSurf)) {
                 PierceSurface(state, ISurf, R1, RN, DayltgHitObstructionHP, hit);
@@ -5904,7 +5906,8 @@ void DayltgHitObstruction(EnergyPlusData &state,
 
         // Lambda function for the octree to test for surface hit and update transmittance if hit
         auto solarTransmittance = [=, &state, &R1, &RN, &hit, &ObTrans](SurfaceData const &surface) -> bool {
-            if (!surface.ShadowSurfPossibleObstruction) return false; // Do Consider separate octree without filtered surfaces
+            int ObsSurfNum = UtilityRoutines::FindItemInList(surface.Name, state.dataSurface->Surface);
+            if (state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) return false; // Do Consider separate octree without filtered surfaces
             auto const sClass(surface.Class);
             if ((sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && (&surface != window_base_p)) {
                 PierceSurface(surface, R1, RN, state.dataDaylightingManager->DayltgHitObstructionHP, hit);
@@ -7853,7 +7856,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     // Sun reaches ground point if vector from this point to the sun is unobstructed
                     hitObs = false;
                     for (ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                        if (!state.dataSurface->Surface(ObsSurfNum).ShadowSurfPossibleObstruction) continue;
+                        if (!state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) continue;
                         PierceSurface(state, ObsSurfNum, DayltgInterReflectedIllumGroundHitPt, SUNCOS_IHR, DayltgInterReflectedIllumObsHitPt, hitObs);
                         if (hitObs) break;
                     }
@@ -8621,7 +8624,7 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
             // Sun reaches ground point if vector from this point to the sun is unobstructed
             hitObs = false;
             for (ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                if (!state.dataSurface->Surface(ObsSurfNum).ShadowSurfPossibleObstruction) continue;
+                if (!state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) continue;
                 if (CalledFrom == DataDaylighting::iCalledFor::RefPoint) {
                     ComplexFenestrationLuminancesGroundHitPt(1) =
                         state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).GndPt(iGndElem, WinEl).x;
@@ -9225,7 +9228,7 @@ void DayltgClosestObstruction(EnergyPlusData &state,
     if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
 
         for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-            if (state.dataSurface->Surface(ObsSurfNum).ShadowSurfPossibleObstruction) {
+            if (state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) {
                 // Determine if this ray hits the surface and, if so, get the distance from the receiving point to the hit
                 PierceSurface(state, ObsSurfNum, RecPt, RayVec, HitPt, hit);
                 if (hit) { // Ray pierces surface
@@ -9254,7 +9257,8 @@ void DayltgClosestObstruction(EnergyPlusData &state,
 
         // Lambda function for the octree to test for surface hit
         auto surfaceHit = [=, &state, &RecPt, &RayVec, &hit, &NearestHitDistance_sq, &nearestHitSurface, &NearestHitPt](SurfaceData const &surface) {
-            if (surface.ShadowSurfPossibleObstruction) {
+            int ObsSurfNum = UtilityRoutines::FindItemInList(surface.Name, state.dataSurface->Surface);
+            if (state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) {
                 // Determine if this ray hits the surface and, if so, get the distance from the receiving point to the hit
                 PierceSurface(surface, RecPt, RayVec, state.dataDaylightingManager->HitPt, hit); // Check if ray pierces surface
                 if (hit) {                                                                       // Ray pierces surface
@@ -9340,7 +9344,7 @@ void DayltgSurfaceLumFromSun(EnergyPlusData &state,
     // Sun reaches ReflHitPt if vector from ReflHitPt to sun is unobstructed
     hitObs = false;
     for (ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-        if (!state.dataSurface->Surface(ObsSurfNum).ShadowSurfPossibleObstruction) continue;
+        if (!state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) continue;
         // Exclude as a possible obstructor ReflSurfNum and its base surface (if it has one)
         if (ObsSurfNum == ReflSurfNum || ObsSurfNum == state.dataSurface->Surface(ReflSurfNum).BaseSurf) continue;
         PierceSurface(state, ObsSurfNum, ReflHitPt, SUNCOS_IHR, DayltgSurfaceLumFromSunObsHitPt, hitObs);

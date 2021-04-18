@@ -185,12 +185,20 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
     }
 
     if (state.dataGlobal->BeginEnvrnFlag && state.dataConvectionCoefficient->MyEnvirnFlag) {
-        if (std::any_of(Surface.begin(),
-                        Surface.end(),
-                        [](DataSurfaces::SurfaceData const &e) { return e.IntConvCoeff == DataHeatBalance::AdaptiveConvectionAlgorithm; }) ||
-            std::any_of(Zone.begin(), Zone.end(), [](DataHeatBalance::ZoneData const &e) {
-                return e.InsideConvectionAlgo == DataHeatBalance::AdaptiveConvectionAlgorithm;
-            })) {
+        bool anyAdaptiveConvectionAlgorithm = false;
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (state.dataSurface->SurfIntConvCoeff(SurfNum) == DataHeatBalance::AdaptiveConvectionAlgorithm) {
+                anyAdaptiveConvectionAlgorithm = true;
+                break;
+            }
+        }
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            if (state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo == DataHeatBalance::AdaptiveConvectionAlgorithm) {
+                anyAdaptiveConvectionAlgorithm = true;
+                break;
+            }
+        }
+        if (anyAdaptiveConvectionAlgorithm) {
             // need to clear out node conditions because dynamic assignments will be affected
             if (state.dataLoopNodes->NumOfNodes > 0 && allocated(state.dataLoopNodes->Node)) {
                 for (auto &e : state.dataLoopNodes->Node) {
@@ -257,10 +265,10 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
 
             int algoNum;
             bool standardAlgo;
-            if (Surface(SurfNum).IntConvCoeff <= -1) { // Set by user using one of the standard algorithms...
-                algoNum = std::abs(Surface(SurfNum).IntConvCoeff);
+            if (state.dataSurface->SurfIntConvCoeff(SurfNum) <= -1) { // Set by user using one of the standard algorithms...
+                algoNum = std::abs(state.dataSurface->SurfIntConvCoeff(SurfNum));
                 standardAlgo = true;
-            } else if (Surface(SurfNum).IntConvCoeff == 0) { // Not set by user, uses Zone Setting
+            } else if (state.dataSurface->SurfIntConvCoeff(SurfNum) == 0) { // Not set by user, uses Zone Setting
                 algoNum = Zone(ZoneNum).InsideConvectionAlgo;
                 standardAlgo = true;
             } else {
@@ -309,10 +317,10 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                     state.dataHeatBal->HConvIn(SurfNum) = state.dataHeatBal->LowHConvLimit;
             }
 
-            if (Surface(SurfNum).EMSOverrideIntConvCoef) {
-                state.dataHeatBal->HConvIn(SurfNum) = Surface(SurfNum).EMSValueForIntConvCoef;
+            if (state.dataSurface->SurfEMSOverrideIntConvCoef(SurfNum)) {
+                state.dataHeatBal->HConvIn(SurfNum) = state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum);
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                    Real64 hConst = Surface(SurfNum).EMSValueForIntConvCoef;
+                    Real64 hConst = state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum);
                     state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(hConst);
                 }
             }
@@ -414,10 +422,10 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
 
     int algoNum;
     bool standardAlgo;
-    if (Surface(SurfNum).ExtConvCoeff <= -1) { // Set by user using one of the standard algorithms...
-        algoNum = std::abs(Surface(SurfNum).ExtConvCoeff);
+    if (state.dataSurface->SurfExtConvCoeff(SurfNum) <= -1) { // Set by user using one of the standard algorithms...
+        algoNum = std::abs(state.dataSurface->SurfExtConvCoeff(SurfNum));
         standardAlgo = true;
-    } else if (Surface(SurfNum).ExtConvCoeff == 0) { // Not set by user, uses Zone Setting
+    } else if (state.dataSurface->SurfExtConvCoeff(SurfNum) == 0) { // Not set by user, uses Zone Setting
         algoNum = Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo;
         standardAlgo = true;
     } else {
@@ -590,11 +598,11 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
         HExt = SetExtConvectionCoeff(state, SurfNum);
     }
 
-    if (Surface(SurfNum).EMSOverrideExtConvCoef) {
-        HExt = Surface(SurfNum).EMSValueForExtConvCoef;
+    if (state.dataSurface->SurfEMSOverrideExtConvCoef(SurfNum)) {
+        HExt = state.dataSurface->SurfEMSValueForExtConvCoef(SurfNum);
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_ZERO;
-            Real64 hConst = Surface(SurfNum).EMSValueForExtConvCoef;
+            Real64 hConst = state.dataSurface->SurfEMSValueForExtConvCoef(SurfNum);
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(hConst);
         }
     }
@@ -1351,12 +1359,12 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             ShowContinueError(state, "Check Input Entered :" + Alphas(Ptr + 1));
                             ErrorsFound = true;
                         }
-                        if (Surface(Found).ExtConvCoeff != 0) {
+                        if (state.dataSurface->SurfExtConvCoeff(Found) != 0) {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                             ShowContinueError(state, "Duplicate (Outside) assignment attempt");
                             ErrorsFound = true;
                         } else {
-                            Surface(Found).ExtConvCoeff = PotentialAssignedValue;
+                            state.dataSurface->SurfExtConvCoeff(Found) = PotentialAssignedValue;
                         }
                     }
 
@@ -1457,12 +1465,12 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             }
                         }
                     }
-                    if (Surface(Found).IntConvCoeff != 0) {
+                    if (state.dataSurface->SurfIntConvCoeff(Found) != 0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate (inside)");
                         ShowContinueError(state, "Duplicate (Inside) assignment attempt.");
                         ErrorsFound = true;
                     } else {
-                        Surface(Found).IntConvCoeff = PotentialAssignedValue;
+                        state.dataSurface->SurfIntConvCoeff(Found) = PotentialAssignedValue;
                     }
 
                 } else if (SELECT_CASE_var == std::string()) { // Blank
@@ -1958,7 +1966,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                 SurfacesOfType = true;
                 if (ConvectionType == "OUTSIDE") {
                     if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (Surface(SurfNum).ExtConvCoeff != 0) {
+                    if (state.dataSurface->SurfExtConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -1967,10 +1975,10 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountOutside;
                         }
                     } else {
-                        Surface(SurfNum).ExtConvCoeff = Value;
+                        state.dataSurface->SurfExtConvCoeff(SurfNum) = Value;
                     }
                 } else {
-                    if (Surface(SurfNum).IntConvCoeff != 0) {
+                    if (state.dataSurface->SurfIntConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -1979,7 +1987,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountInside;
                         }
                     } else {
-                        Surface(SurfNum).IntConvCoeff = Value;
+                        state.dataSurface->SurfIntConvCoeff(SurfNum) = Value;
                     }
                 }
             }
@@ -2006,7 +2014,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                 SurfacesOfType = true;
                 if (ConvectionType == "OUTSIDE") {
                     if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (Surface(SurfNum).ExtConvCoeff != 0) {
+                    if (state.dataSurface->SurfExtConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2015,10 +2023,10 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountOutside;
                         }
                     } else {
-                        Surface(SurfNum).ExtConvCoeff = Value;
+                        state.dataSurface->SurfExtConvCoeff(SurfNum) = Value;
                     }
                 } else {
-                    if (Surface(SurfNum).IntConvCoeff != 0) {
+                    if (state.dataSurface->SurfIntConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2027,7 +2035,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountInside;
                         }
                     } else {
-                        Surface(SurfNum).IntConvCoeff = Value;
+                        state.dataSurface->SurfIntConvCoeff(SurfNum) = Value;
                     }
                 }
             }
@@ -2054,7 +2062,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                 SurfacesOfType = true;
                 if (ConvectionType == "OUTSIDE") {
                     if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (Surface(SurfNum).ExtConvCoeff != 0) {
+                    if (state.dataSurface->SurfExtConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2063,10 +2071,10 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountOutside;
                         }
                     } else {
-                        Surface(SurfNum).ExtConvCoeff = Value;
+                        state.dataSurface->SurfExtConvCoeff(SurfNum) = Value;
                     }
                 } else {
-                    if (Surface(SurfNum).IntConvCoeff != 0) {
+                    if (state.dataSurface->SurfIntConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2075,7 +2083,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountInside;
                         }
                     } else {
-                        Surface(SurfNum).IntConvCoeff = Value;
+                        state.dataSurface->SurfIntConvCoeff(SurfNum) = Value;
                     }
                 }
             }
@@ -2102,7 +2110,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                 SurfacesOfType = true;
                 if (ConvectionType == "OUTSIDE") {
                     if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (Surface(SurfNum).ExtConvCoeff != 0) {
+                    if (state.dataSurface->SurfExtConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2111,10 +2119,10 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountOutside;
                         }
                     } else {
-                        Surface(SurfNum).ExtConvCoeff = Value;
+                        state.dataSurface->SurfExtConvCoeff(SurfNum) = Value;
                     }
                 } else {
-                    if (Surface(SurfNum).IntConvCoeff != 0) {
+                    if (state.dataSurface->SurfIntConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2123,7 +2131,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountInside;
                         }
                     } else {
-                        Surface(SurfNum).IntConvCoeff = Value;
+                        state.dataSurface->SurfIntConvCoeff(SurfNum) = Value;
                     }
                 }
             }
@@ -2150,7 +2158,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                 SurfacesOfType = true;
                 if (ConvectionType == "OUTSIDE") {
                     if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (Surface(SurfNum).ExtConvCoeff != 0) {
+                    if (state.dataSurface->SurfExtConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2159,10 +2167,10 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountOutside;
                         }
                     } else {
-                        Surface(SurfNum).ExtConvCoeff = Value;
+                        state.dataSurface->SurfExtConvCoeff(SurfNum) = Value;
                     }
                 } else {
-                    if (Surface(SurfNum).IntConvCoeff != 0) {
+                    if (state.dataSurface->SurfIntConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2171,7 +2179,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountInside;
                         }
                     } else {
-                        Surface(SurfNum).IntConvCoeff = Value;
+                        state.dataSurface->SurfIntConvCoeff(SurfNum) = Value;
                     }
                 }
             }
@@ -2197,7 +2205,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                 SurfacesOfType = true;
                 if (ConvectionType == "OUTSIDE") {
                     if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (Surface(SurfNum).ExtConvCoeff != 0) {
+                    if (state.dataSurface->SurfExtConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2206,10 +2214,10 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountOutside;
                         }
                     } else {
-                        Surface(SurfNum).ExtConvCoeff = Value;
+                        state.dataSurface->SurfExtConvCoeff(SurfNum) = Value;
                     }
                 } else {
-                    if (Surface(SurfNum).IntConvCoeff != 0) {
+                    if (state.dataSurface->SurfIntConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2218,7 +2226,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountInside;
                         }
                     } else {
-                        Surface(SurfNum).IntConvCoeff = Value;
+                        state.dataSurface->SurfIntConvCoeff(SurfNum) = Value;
                     }
                 }
             }
@@ -2245,7 +2253,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                 SurfacesOfType = true;
                 if (ConvectionType == "OUTSIDE") {
                     if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (Surface(SurfNum).ExtConvCoeff != 0) {
+                    if (state.dataSurface->SurfExtConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2254,10 +2262,10 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountOutside;
                         }
                     } else {
-                        Surface(SurfNum).ExtConvCoeff = Value;
+                        state.dataSurface->SurfExtConvCoeff(SurfNum) = Value;
                     }
                 } else {
-                    if (Surface(SurfNum).IntConvCoeff != 0) {
+                    if (state.dataSurface->SurfIntConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2266,7 +2274,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountInside;
                         }
                     } else {
-                        Surface(SurfNum).IntConvCoeff = Value;
+                        state.dataSurface->SurfIntConvCoeff(SurfNum) = Value;
                     }
                 }
             }
@@ -2293,7 +2301,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                 SurfacesOfType = true;
                 if (ConvectionType == "OUTSIDE") {
                     if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (Surface(SurfNum).ExtConvCoeff != 0) {
+                    if (state.dataSurface->SurfExtConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2302,10 +2310,10 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountOutside;
                         }
                     } else {
-                        Surface(SurfNum).ExtConvCoeff = Value;
+                        state.dataSurface->SurfExtConvCoeff(SurfNum) = Value;
                     }
                 } else {
-                    if (Surface(SurfNum).IntConvCoeff != 0) {
+                    if (state.dataSurface->SurfIntConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2314,7 +2322,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountInside;
                         }
                     } else {
-                        Surface(SurfNum).IntConvCoeff = Value;
+                        state.dataSurface->SurfIntConvCoeff(SurfNum) = Value;
                     }
                 }
             }
@@ -2341,7 +2349,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                 SurfacesOfType = true;
                 if (ConvectionType == "OUTSIDE") {
                     if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (Surface(SurfNum).ExtConvCoeff != 0) {
+                    if (state.dataSurface->SurfExtConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2350,10 +2358,10 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountOutside;
                         }
                     } else {
-                        Surface(SurfNum).ExtConvCoeff = Value;
+                        state.dataSurface->SurfExtConvCoeff(SurfNum) = Value;
                     }
                 } else {
-                    if (Surface(SurfNum).IntConvCoeff != 0) {
+                    if (state.dataSurface->SurfIntConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2362,7 +2370,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountInside;
                         }
                     } else {
-                        Surface(SurfNum).IntConvCoeff = Value;
+                        state.dataSurface->SurfIntConvCoeff(SurfNum) = Value;
                     }
                 }
             }
@@ -2389,7 +2397,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                 SurfacesOfType = true;
                 if (ConvectionType == "OUTSIDE") {
                     if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (Surface(SurfNum).ExtConvCoeff != 0) {
+                    if (state.dataSurface->SurfExtConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2398,10 +2406,10 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountOutside;
                         }
                     } else {
-                        Surface(SurfNum).ExtConvCoeff = Value;
+                        state.dataSurface->SurfExtConvCoeff(SurfNum) = Value;
                     }
                 } else {
-                    if (Surface(SurfNum).IntConvCoeff != 0) {
+                    if (state.dataSurface->SurfIntConvCoeff(SurfNum) != 0) {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
                                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
@@ -2410,7 +2418,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                             ++SurfaceCountInside;
                         }
                     } else {
-                        Surface(SurfNum).IntConvCoeff = Value;
+                        state.dataSurface->SurfIntConvCoeff(SurfNum) = Value;
                     }
                 }
             }
@@ -2670,7 +2678,7 @@ void CalcDetailedHcInForDVModel(EnergyPlusData &state,
             state.dataRoomAirMod->AirModel(Surface(SurfNum).Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
 
             // Set HConvIn using the proper correlation based on DeltaTemp and CosTiltSurf
-            if (Surface(SurfNum).IntConvCoeff != 0) {
+            if (state.dataSurface->SurfIntConvCoeff(SurfNum) != 0) {
 
                 HcIn(SurfNum) = SetIntConvectionCoeff(state, SurfNum);
 
@@ -2685,7 +2693,7 @@ void CalcDetailedHcInForDVModel(EnergyPlusData &state,
             Hf = 4.3 * Vhc()(Surface(SurfNum).Zone);
 
             // Set HConvIn using the proper correlation based on DeltaTemp and CosTiltSurf
-            if (Surface(SurfNum).IntConvCoeff != 0) {
+            if (state.dataSurface->SurfIntConvCoeff(SurfNum) != 0) {
 
                 HcIn(SurfNum) = SetIntConvectionCoeff(state, SurfNum);
 
@@ -3252,10 +3260,10 @@ Real64 SetExtConvectionCoeff(EnergyPlusData &state, int const SurfNum) // Surfac
     auto &Surface(state.dataSurface->Surface);
 
     {
-        auto const SELECT_CASE_var(state.dataSurface->UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).OverrideType);
+        auto const SELECT_CASE_var(state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeff(SurfNum)).OverrideType);
 
         if (SELECT_CASE_var == ConvCoefValue) {
-            HExt = state.dataSurface->UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).OverrideValue;
+            HExt = state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeff(SurfNum)).OverrideValue;
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_ZERO;
                 state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(HExt);
@@ -3263,7 +3271,7 @@ Real64 SetExtConvectionCoeff(EnergyPlusData &state, int const SurfNum) // Surfac
             Surface(SurfNum).OutConvHfModelEq = HcExt_UserValue; // reporting
             Surface(SurfNum).OutConvHnModelEq = HcExt_None;      // reporting
         } else if (SELECT_CASE_var == ConvCoefSchedule) {
-            HExt = GetCurrentScheduleValue(state, state.dataSurface->UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).ScheduleIndex);
+            HExt = GetCurrentScheduleValue(state, state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeff(SurfNum)).ScheduleIndex);
             // Need to check for validity
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_ZERO;
@@ -3273,19 +3281,19 @@ Real64 SetExtConvectionCoeff(EnergyPlusData &state, int const SurfNum) // Surfac
             Surface(SurfNum).OutConvHnModelEq = HcExt_None;         // reporting
         } else if (SELECT_CASE_var == ConvCoefUserCurve) {
             CalcUserDefinedOutsideHcModel(
-                state, SurfNum, state.dataSurface->UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).UserCurveIndex, HExt);
+                state, SurfNum, state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeff(SurfNum)).UserCurveIndex, HExt);
             // Kiva convection handled in function above
             Surface(SurfNum).OutConvHfModelEq = HcExt_UserCurve; // reporting
             Surface(SurfNum).OutConvHnModelEq = HcExt_None;      // reporting
         } else if (SELECT_CASE_var == ConvCoefSpecifiedModel) {
             EvaluateExtHcModels(state,
                                 SurfNum,
-                                state.dataSurface->UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq,
-                                state.dataSurface->UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq,
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeff(SurfNum)).HcModelEq,
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeff(SurfNum)).HcModelEq,
                                 HExt);
             // Kiva convection handled in function above
-            Surface(SurfNum).OutConvHfModelEq = state.dataSurface->UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq; // reporting
-            Surface(SurfNum).OutConvHnModelEq = state.dataSurface->UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq; // reporting
+            Surface(SurfNum).OutConvHfModelEq = state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeff(SurfNum)).HcModelEq; // reporting
+            Surface(SurfNum).OutConvHnModelEq = state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeff(SurfNum)).HcModelEq; // reporting
         } else {
             assert(false);
         }
@@ -3322,16 +3330,16 @@ Real64 SetIntConvectionCoeff(EnergyPlusData &state, int const SurfNum) // Surfac
     auto &Surface(state.dataSurface->Surface);
 
     {
-        auto const SELECT_CASE_var(state.dataSurface->UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).OverrideType);
+        auto const SELECT_CASE_var(state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeff(SurfNum)).OverrideType);
 
         if (SELECT_CASE_var == ConvCoefValue) {
-            HInt = state.dataSurface->UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).OverrideValue;
+            HInt = state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeff(SurfNum)).OverrideValue;
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(HInt);
             }
             Surface(SurfNum).IntConvHcModelEq = HcInt_UserValue; // reporting
         } else if (SELECT_CASE_var == ConvCoefSchedule) {
-            HInt = GetCurrentScheduleValue(state, state.dataSurface->UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).ScheduleIndex);
+            HInt = GetCurrentScheduleValue(state, state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeff(SurfNum)).ScheduleIndex);
             // Need to check for validity
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(HInt);
@@ -3339,13 +3347,13 @@ Real64 SetIntConvectionCoeff(EnergyPlusData &state, int const SurfNum) // Surfac
             Surface(SurfNum).IntConvHcModelEq = HcInt_UserSchedule; // reporting
         } else if (SELECT_CASE_var == ConvCoefUserCurve) {
             CalcUserDefinedInsideHcModel(
-                state, SurfNum, state.dataSurface->UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).UserCurveIndex, HInt);
+                state, SurfNum, state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeff(SurfNum)).UserCurveIndex, HInt);
             // Kiva convection handled in function above
             Surface(SurfNum).IntConvHcModelEq = HcInt_UserCurve; // reporting
         } else if (SELECT_CASE_var == ConvCoefSpecifiedModel) {
-            EvaluateIntHcModels(state, SurfNum, state.dataSurface->UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).HcModelEq, HInt);
+            EvaluateIntHcModels(state, SurfNum, state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeff(SurfNum)).HcModelEq, HInt);
             // Kiva convection handled in function above
-            Surface(SurfNum).IntConvHcModelEq = state.dataSurface->UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).HcModelEq;
+            Surface(SurfNum).IntConvHcModelEq = state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeff(SurfNum)).HcModelEq;
         } else {
             assert(false);
         }
@@ -3509,7 +3517,7 @@ void CalcISO15099WindowIntConvCoeff(EnergyPlusData &state,
         CalcISO15099WindowIntConvCoeff(state, SurfaceTemperature, AirTemperature, AirHumRat, Height, TiltDeg, sineTilt);
 
     // EMS override point (Violates Standard 15099?  throw warning? scary.
-    if (Surface(SurfNum).EMSOverrideIntConvCoef) state.dataHeatBal->HConvIn(SurfNum) = Surface(SurfNum).EMSValueForIntConvCoef;
+    if (state.dataSurface->SurfEMSOverrideIntConvCoef(SurfNum)) state.dataHeatBal->HConvIn(SurfNum) = state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum);
 
     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
     if (state.dataHeatBal->HConvIn(SurfNum) < state.dataHeatBal->LowHConvLimit)
@@ -4073,11 +4081,11 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
             print(state.files.eio,
                   Format_901,
                   Surface(SurfLoop).Name,
-                  Surface(SurfLoop).ExtConvCoeff,
+                  state.dataSurface->SurfExtConvCoeff(SurfLoop),
                   Surface(SurfLoop).OutConvFaceArea,
                   Surface(SurfLoop).OutConvFacePerimeter,
                   Surface(SurfLoop).OutConvFaceHeight,
-                  Surface(SurfLoop).IntConvCoeff,
+                  state.dataSurface->SurfIntConvCoeff(SurfLoop),
                   Surface(SurfLoop).IntConvZoneWallHeight,
                   Surface(SurfLoop).IntConvZonePerimLength,
                   Surface(SurfLoop).IntConvZoneHorizHydrDiam,

@@ -2459,7 +2459,7 @@ namespace WindowManager {
 
             // Reset hcin if necessary since too small a value sometimes causes non-convergence
             // of window layer heat balance solution.
-            if (surface.IntConvCoeff == 0) {
+            if (state.dataSurface->SurfIntConvCoeff(SurfNum) == 0) {
                 if (state.dataWindowManager->hcin <=
                     state.dataHeatBal->LowHConvLimit) { // may be redundent now, check is also in HeatBalanceConvectionCoeffs.cc
                     //  hcin = 3.076d0  !BG this is rather high value and abrupt change. changed to set to lower limit
@@ -3319,8 +3319,8 @@ namespace WindowManager {
             }
 
             // call for new interior film coeff (since it is temperature dependent) if using Detailed inside coef model
-            if (((state.dataSurface->Surface(SurfNum).IntConvCoeff == 0) && (state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo == ASHRAETARP)) ||
-                (state.dataSurface->Surface(SurfNum).IntConvCoeff == -2)) {
+            if (((state.dataSurface->SurfIntConvCoeff(SurfNum) == 0) && (state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo == ASHRAETARP)) ||
+                (state.dataSurface->SurfIntConvCoeff(SurfNum) == -2)) {
                 // coef model is "detailed" and not prescribed by user
                 // need to find inside face index, varies with shade/blind etc.
                 if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {

@@ -236,12 +236,12 @@ namespace SolarReflectionManager {
         //  Shading surfaces are always not exposed to solar (ExtSolar = False)
         RecSurfNum = 0;
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            state.dataSurface->Surface(SurfNum).ShadowSurfRecSurfNum = 0;
+            state.dataSurface->SurfShadowSurfRecSurfNum(SurfNum) = 0;
             if (state.dataSurface->Surface(SurfNum).ExtSolar) {
                 ++RecSurfNum;
                 state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).SurfNum = SurfNum;
                 state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).SurfName = state.dataSurface->Surface(SurfNum).Name;
-                state.dataSurface->Surface(SurfNum).ShadowSurfRecSurfNum = RecSurfNum;
+                state.dataSurface->SurfShadowSurfRecSurfNum(SurfNum) = RecSurfNum;
 
                 // Warning if any receiving surface vertex is below ground level, taken to be at Z = 0 in absolute coords
                 for (loop = 1; loop <= state.dataSurface->Surface(SurfNum).Sides; ++loop) {
@@ -991,8 +991,7 @@ namespace SolarReflectionManager {
                                 if (state.dataSurface->Surface(ReflSurfNum).Class == SurfaceClass::Window) { // Reflecting surface is a window
                                     // Receiving surface number for this window
                                     int const ReflSurfRecNum =
-                                        state.dataSurface->Surface(ReflSurfNum)
-                                            .ShadowSurfRecSurfNum; // Receiving surface number corresponding to a reflecting surface number
+                                        state.dataSurface->SurfShadowSurfRecSurfNum(ReflSurfNum); // Receiving surface number corresponding to a reflecting surface number
                                     if (ReflSurfRecNum > 0) {
                                         // Loop over possible obstructions for this window
                                         for (int loop2 = 1,
@@ -1012,7 +1011,7 @@ namespace SolarReflectionManager {
                                     }
                                 } else { // Reflecting surface is a building shade
                                     for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                                        if (!state.dataSurface->Surface(ObsSurfNum).ShadowSurfPossibleObstruction) continue;
+                                        if (!state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) continue;
                                         if (ObsSurfNum == ReflSurfNum) continue;
 
                                         // TH2 CR8959 -- Skip mirrored surfaces
@@ -1231,7 +1230,7 @@ namespace SolarReflectionManager {
                                 for (state.dataSolarReflectionManager->iObsSurfNum = 1;
                                      state.dataSolarReflectionManager->iObsSurfNum <= state.dataSurface->TotSurfaces;
                                      ++state.dataSolarReflectionManager->iObsSurfNum) {
-                                    if (!state.dataSurface->Surface(state.dataSolarReflectionManager->iObsSurfNum).ShadowSurfPossibleObstruction)
+                                    if (!state.dataSurface->SurfShadowSurfPossibleObstruction(state.dataSolarReflectionManager->iObsSurfNum))
                                         continue;
                                     // Horizontal roof surfaces cannot be obstructions for rays from ground
                                     if (state.dataSurface->Surface(state.dataSolarReflectionManager->iObsSurfNum).Tilt < 5.0) continue;

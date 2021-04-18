@@ -217,6 +217,42 @@ namespace HeatBalanceManager {
         }
 
         bool anyRan;
+        if (state.dataGlobal->BeginSimFlag) {
+            state.dataSurface->SurfEMSConstructionOverrideON.allocate(state.dataSurface->TotSurfaces);
+            state.dataSurface->SurfEMSConstructionOverrideValue.allocate(state.dataSurface->TotSurfaces);
+            state.dataSurface->SurfEMSOverrideIntConvCoef.allocate(state.dataSurface->TotSurfaces);
+            state.dataSurface->SurfEMSValueForIntConvCoef.allocate(state.dataSurface->TotSurfaces);
+            state.dataSurface->SurfEMSOverrideExtConvCoef.allocate(state.dataSurface->TotSurfaces);
+            state.dataSurface->SurfEMSValueForExtConvCoef.allocate(state.dataSurface->TotSurfaces);
+            state.dataSurface->SurfOutDryBulbTempEMSOverrideOn.allocate(state.dataSurface->TotSurfaces);
+            state.dataSurface->SurfOutDryBulbTempEMSOverrideValue.allocate(state.dataSurface->TotSurfaces);
+            state.dataSurface->SurfOutWetBulbTempEMSOverrideOn.allocate(state.dataSurface->TotSurfaces);
+            state.dataSurface->SurfOutWetBulbTempEMSOverrideValue.allocate(state.dataSurface->TotSurfaces);
+            state.dataSurface->SurfWindSpeedEMSOverrideOn.allocate(state.dataSurface->TotSurfaces);
+            state.dataSurface->SurfWindSpeedEMSOverrideValue.allocate(state.dataSurface->TotSurfaces);
+            state.dataSurface->SurfViewFactorGroundEMSOverrideOn.allocate(state.dataSurface->TotSurfaces);
+            state.dataSurface->SurfViewFactorGroundEMSOverrideValue.allocate(state.dataSurface->TotSurfaces);
+            state.dataSurface->SurfWindDirEMSOverrideOn.allocate(state.dataSurface->TotSurfaces);
+            state.dataSurface->SurfWindDirEMSOverrideValue.allocate(state.dataSurface->TotSurfaces);
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+                state.dataSurface->SurfEMSConstructionOverrideON(SurfNum) = false;
+                state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum) = 0.0;
+                state.dataSurface->SurfEMSOverrideIntConvCoef(SurfNum) = false;
+                state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum) = 0.0;
+                state.dataSurface->SurfEMSOverrideExtConvCoef(SurfNum) = false;
+                state.dataSurface->SurfEMSValueForExtConvCoef(SurfNum) = 0.0;
+                state.dataSurface->SurfOutDryBulbTempEMSOverrideOn(SurfNum) = false;
+                state.dataSurface->SurfOutDryBulbTempEMSOverrideValue(SurfNum) = 0.0;
+                state.dataSurface->SurfOutWetBulbTempEMSOverrideOn(SurfNum) = false;
+                state.dataSurface->SurfOutWetBulbTempEMSOverrideValue(SurfNum) = 0.0;
+                state.dataSurface->SurfWindSpeedEMSOverrideOn(SurfNum) = false;
+                state.dataSurface->SurfWindSpeedEMSOverrideValue(SurfNum) = 0.0;
+                state.dataSurface->SurfViewFactorGroundEMSOverrideOn(SurfNum) = false;
+                state.dataSurface->SurfViewFactorGroundEMSOverrideValue(SurfNum) = 0.0;
+                state.dataSurface->SurfWindDirEMSOverrideOn(SurfNum) = false;
+                state.dataSurface->SurfWindDirEMSOverrideValue(SurfNum) = 0.0;
+            }
+        }
         ManageEMS(state,
                   EMSManager::EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance,
                   anyRan,
