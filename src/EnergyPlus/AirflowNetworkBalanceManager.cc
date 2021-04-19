@@ -6370,6 +6370,27 @@ namespace AirflowNetworkBalanceManager {
                                 "Average",
                                 Zone(i).Name);
             SetupOutputVariable(state,
+                                "AFN Zone Ventilation Volume",
+                                OutputProcessor::Unit::m3,
+                                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilVolume,
+                                "System",
+                                "Sum",
+                                Zone(i).Name);
+            SetupOutputVariable(state,
+                                "AFN Zone Ventilation Mass",
+                                OutputProcessor::Unit::kg,
+                                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilMass,
+                                "System",
+                                "Sum",
+                                Zone(i).Name);
+            SetupOutputVariable(state,
+                                "AFN Zone Ventilation Air Change Rate",
+                                OutputProcessor::Unit::ach,
+                                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilAirChangeRate,
+                                "System",
+                                "Average",
+                                Zone(i).Name);
+            SetupOutputVariable(state,
                                 "AFN Zone Mixing Volume",
                                 OutputProcessor::Unit::m3,
                                 state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixVolume,
@@ -7473,9 +7494,9 @@ namespace AirflowNetworkBalanceManager {
             Real64 V = 0;
             // Forced convection
             if (ZoneNum > 0) {
-                Real64 ACH = GetZoneInfilAirChangeRate(state, ZoneNum); // Zone air change rate [1/hr]
-                Real64 Vol = Zone(ZoneNum).Volume;                      // Zone volume [m3]
-                V = pow(Vol, 0.333) * ACH / 3600;                       // Average air speed in zone [m/s]
+                Real64 ACH = GetZoneOutdoorAirChangeRate(state, ZoneNum); // Zone air change rate [1/hr]
+                Real64 Vol = Zone(ZoneNum).Volume;                        // Zone volume [m3]
+                V = pow(Vol, 0.333) * ACH / 3600;                         // Average air speed in zone [m/s]
             } else {
                 V = state.dataEnvrn->WindSpeed;
             }
@@ -9464,6 +9485,9 @@ namespace AirflowNetworkBalanceManager {
             e.InfilVolume = 0.0;
             e.InfilMass = 0.0;
             e.InfilAirChangeRate = 0.0;
+            e.VentilVolume = 0.0;
+            e.VentilMass = 0.0;
+            e.VentilAirChangeRate = 0.0;
             e.MixVolume = 0.0;
             e.MixMass = 0.0;
         }
@@ -9828,30 +9852,42 @@ namespace AirflowNetworkBalanceManager {
             AirDensity = PsyRhoAirFnPbTdbW(
                 state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(i), state.dataHeatBalFanSys->ZoneAirHumRatAvg(i));
 
-            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume =
-                (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp / CpAir / AirDensity) * ReportingConstant;
-            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilAirChangeRate =
-                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume / (TimeStepSys * Zone(i).Volume);
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilMass =
                 (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp / CpAir) * ReportingConstant;
-            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixVolume =
-                (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp / CpAir / AirDensity) * ReportingConstant;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume =
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilMass / AirDensity;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilAirChangeRate =
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume / (TimeStepSys * Zone(i).Volume);
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilMass =
+                (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMVCp / CpAir) * ReportingConstant;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilVolume =
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilMass / AirDensity;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilAirChangeRate =
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilVolume / (TimeStepSys * Zone(i).Volume);
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixMass =
                 (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp / CpAir) * ReportingConstant;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixVolume =
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixMass / AirDensity;
             // save values for predefined report
-            Real64 StdDensInfilVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp / CpAir / state.dataEnvrn->StdRhoAir) *
-                                        ReportingConstant; // compute volume using standard density air
-            // MJWToDo - Separate AFN Vent and InfilVolFlow
-            state.dataHeatBal->ZonePreDefRep(i).AFNVentVolTotalStdDen += 0.0;
-            state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalStdDen += StdDensInfilVolume;
+            Real64 stdDensAFNInfilVolume = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilMass / state.dataEnvrn->StdRhoAir;
+            Real64 stdDensAFNNatVentVolume = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilMass / state.dataEnvrn->StdRhoAir;
+            state.dataHeatBal->ZonePreDefRep(i).AFNVentVolStdDen = stdDensAFNNatVentVolume;
+            state.dataHeatBal->ZonePreDefRep(i).AFNVentVolTotalStdDen += stdDensAFNNatVentVolume;
+            state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalStdDen += stdDensAFNInfilVolume;
             if (state.dataHeatBal->ZonePreDefRep(i).isOccupied) {
-                state.dataHeatBal->ZonePreDefRep(i).AFNVentVolTotalOccStdDen += 0.0;
-                state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalOccStdDen += StdDensInfilVolume;
+                state.dataHeatBal->ZonePreDefRep(i).AFNVentVolTotalOccStdDen += stdDensAFNNatVentVolume;
+                state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalOccStdDen += stdDensAFNInfilVolume;
                 state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalOcc +=
-                    state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
-                if (state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume < state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolMin) {
+                    (state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume +
+                     state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilVolume) *
+                    Zone(i).Multiplier * Zone(i).ListMultiplier;
+                if ((state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume +
+                     state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilVolume) <
+                    state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolMin) {
                     state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolMin =
-                        state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
+                        (state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume +
+                         state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilVolume) *
+                        Zone(i).Multiplier * Zone(i).ListMultiplier;
                 }
             }
 
@@ -9999,6 +10035,8 @@ namespace AirflowNetworkBalanceManager {
         for (auto &e : state.dataAirflowNetworkBalanceManager->exchangeData) {
             e.SumMCp = 0.0;
             e.SumMCpT = 0.0;
+            e.SumMVCp = 0.0;
+            e.SumMVCpT = 0.0;
             e.SumMHr = 0.0;
             e.SumMHrW = 0.0;
             e.SumMMCp = 0.0;
@@ -10033,10 +10071,20 @@ namespace AirflowNetworkBalanceManager {
                     // Find a linkage from outdoors to this zone
                     Tamb = Zone(ZN1).OutDryBulbTemp;
                     CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
-                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMCp +=
-                        state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 * CpAir;
-                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMCpT +=
-                        state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 * CpAir * Tamb;
+                    if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum)
+                                .CompTypeNum == iComponentTypeNum::SCR ||
+                        state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum)
+                                .CompTypeNum == iComponentTypeNum::SEL) {
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMCp +=
+                            state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 * CpAir;
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMCpT +=
+                            state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 * CpAir * Tamb;
+                    } else {
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMVCp +=
+                            state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 * CpAir;
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMVCpT +=
+                            state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 * CpAir * Tamb;
+                    }
                     state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMHr += state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2;
                     state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMHrW +=
                         state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 * state.dataEnvrn->OutHumRat;
@@ -10053,10 +10101,20 @@ namespace AirflowNetworkBalanceManager {
                     // Find a linkage from outdoors to this zone
                     Tamb = Zone(ZN2).OutDryBulbTemp;
                     CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
-                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMCp +=
-                        state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW * CpAir;
-                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMCpT +=
-                        state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW * CpAir * Tamb;
+                    if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum)
+                                .CompTypeNum == iComponentTypeNum::SCR ||
+                        state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum)
+                                .CompTypeNum == iComponentTypeNum::SEL) {
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMCp +=
+                            state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW * CpAir;
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMCpT +=
+                            state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW * CpAir * Tamb;
+                    } else {
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMVCp +=
+                            state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW * CpAir;
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMVCpT +=
+                            state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW * CpAir * Tamb;
+                    }
                     state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMHr += state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW;
                     state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMHrW +=
                         state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW * state.dataEnvrn->OutHumRat;
@@ -10579,6 +10637,8 @@ namespace AirflowNetworkBalanceManager {
                     state.dataAirflowNetworkBalanceManager->exchangeData(i).TotalLat *= OnOffFanRunTimeFraction;
                     state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp *= OnOffFanRunTimeFraction;
                     state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCpT *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMVCp *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMVCpT *= OnOffFanRunTimeFraction;
                     state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMHr *= OnOffFanRunTimeFraction;
                     state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMHrW *= OnOffFanRunTimeFraction;
                     state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp *= OnOffFanRunTimeFraction;
@@ -10600,6 +10660,10 @@ namespace AirflowNetworkBalanceManager {
                             state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMCp * (1.0 - OnOffFanRunTimeFraction);
                         state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCpT +=
                             state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMCpT * (1.0 - OnOffFanRunTimeFraction);
+                        state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMVCp +=
+                            state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMVCp * (1.0 - OnOffFanRunTimeFraction);
+                        state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMVCpT +=
+                            state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMVCpT * (1.0 - OnOffFanRunTimeFraction);
                         state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMHr +=
                             state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMHr * (1.0 - OnOffFanRunTimeFraction);
                         state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMHrW +=
@@ -12719,7 +12783,7 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    Real64 GetZoneInfilAirChangeRate(EnergyPlusData &state, int const ZoneNum) // hybrid ventilation system controlled zone number
+    Real64 GetZoneOutdoorAirChangeRate(EnergyPlusData &state, int const ZoneNum) // hybrid ventilation system controlled zone number
     {
 
         // SUBROUTINE INFORMATION:
@@ -12745,8 +12809,10 @@ namespace AirflowNetworkBalanceManager {
         CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
         RhoAir = PsyRhoAirFnPbTdbW(
             state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
-        InfilVolume =
-            (state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp / CpAir / RhoAir) * TimeStepSys * DataGlobalConstants::SecInHour;
+        InfilVolume = ((state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp +
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCp) /
+                       CpAir / RhoAir) *
+                      TimeStepSys * DataGlobalConstants::SecInHour;
         ACH = InfilVolume / (TimeStepSys * state.dataHeatBal->Zone(ZoneNum).Volume);
 
         return ACH;
