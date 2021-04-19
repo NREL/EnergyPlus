@@ -638,6 +638,7 @@ namespace HVACVariableRefrigerantFlow {
         int VRFTUOAMixerOANodeNum;           // OA node number for this TU's OA mixer
         int VRFTUOAMixerRelNodeNum;          // Relief node number for this TU's OA mixer
         int VRFTUOAMixerRetNodeNum;          // Return node number for this TU's OA mixer
+        int VRFTUOAMixerMixedNodeNum;        // Mixed node number for this TU's OA mixer
         Real64 MaxCoolAirVolFlow;            // supply air volumetric flow rate during cooling operation [m3/s]
         Real64 MaxHeatAirVolFlow;            // supply air volumetric flow rate during heating operation [m3/s]
         Real64 MaxNoCoolAirVolFlow;          // supply air volumetric flow rate when no cooling [m3/s]
@@ -755,10 +756,10 @@ namespace HVACVariableRefrigerantFlow {
         // Default Constructor
         VRFTerminalUnitEquipment()
             : VRFTUType_Num(0), SchedPtr(-1), VRFSysNum(0), TUListIndex(0), IndexToTUInTUList(0), ZoneNum(0), ZoneAirNode(0), VRFTUInletNodeNum(0),
-              VRFTUOutletNodeNum(0), VRFTUOAMixerOANodeNum(0), VRFTUOAMixerRelNodeNum(0), VRFTUOAMixerRetNodeNum(0), MaxCoolAirVolFlow(0.0),
-              MaxHeatAirVolFlow(0.0), MaxNoCoolAirVolFlow(0.0), MaxNoHeatAirVolFlow(0.0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0),
-              MaxNoCoolAirMassFlow(0.0), MaxNoHeatAirMassFlow(0.0), CoolOutAirVolFlow(0.0), HeatOutAirVolFlow(0.0), NoCoolHeatOutAirVolFlow(0.0),
-              CoolOutAirMassFlow(0.0), HeatOutAirMassFlow(0.0), NoCoolHeatOutAirMassFlow(0.0), MinOperatingPLR(1.0E-20),
+              VRFTUOutletNodeNum(0), VRFTUOAMixerOANodeNum(0), VRFTUOAMixerRelNodeNum(0), VRFTUOAMixerRetNodeNum(0), VRFTUOAMixerMixedNodeNum(0),
+              MaxCoolAirVolFlow(0.0), MaxHeatAirVolFlow(0.0), MaxNoCoolAirVolFlow(0.0), MaxNoHeatAirVolFlow(0.0), MaxCoolAirMassFlow(0.0),
+              MaxHeatAirMassFlow(0.0), MaxNoCoolAirMassFlow(0.0), MaxNoHeatAirMassFlow(0.0), CoolOutAirVolFlow(0.0), HeatOutAirVolFlow(0.0),
+              NoCoolHeatOutAirVolFlow(0.0), CoolOutAirMassFlow(0.0), HeatOutAirMassFlow(0.0), NoCoolHeatOutAirMassFlow(0.0), MinOperatingPLR(1.0E-20),
               SuppHeatCoilFluidMaxFlow(0.0), DesignSuppHeatingCapacity(0.0), MaxSATFromSuppHeatCoil(0.0), MaxOATSuppHeatingCoil(0.0),
               SuppHeatPartLoadRatio(0.0), SuppHeatingCoilLoad(0.0), fanType_Num(0), FanOpModeSchedPtr(0), FanAvailSchedPtr(-1), FanIndex(0),
               FanPower(0.0), OpMode(0), FanPlace(0), ActualFanVolFlowRate(0.0), OAMixerIndex(0), OAMixerUsed(false), CoolCoilIndex(0),
@@ -896,6 +897,8 @@ namespace HVACVariableRefrigerantFlow {
 
     void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound // flag for errors in GetInput
     );
+
+    void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &ErrorsFound);
 
     void InitVRF(EnergyPlusData &state, int VRFTUNum, int ZoneNum, bool FirstHVACIteration, Real64 &OnOffAirFlowRatio, Real64 &QZnReq);
 
