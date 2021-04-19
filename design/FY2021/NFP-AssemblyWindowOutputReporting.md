@@ -53,6 +53,12 @@ window.vt(), window.uValue(), window.SHGC() methods will be used for calculating
 the overall window properties. Converting the current frame information into frame
 information compatible with the WCE will need to be done.
 
+The WCE procedure is described in the 
+[WINDOW Technical Documentation -Chapter 2 and 3](https://windows.lbl.gov/sites/default/files/Downloads/WINDOW%20Technical%20Documentation.pdf)
+and the general procedures are described in 
+[NFRC 100](https://nfrccommunity.org/store/viewproduct.aspx?id=1380591)
+ and [NFRC 200](https://nfrccommunity.org/store/viewproduct.aspx?id=1402116).
+
 The output will be new columns in the Exterior Fenestration and Interior Fenestration 
 tables of the Envelope Summary report.
 
@@ -584,7 +590,11 @@ output files are as described above.
 
 ## References ##
 
+[WINDOW Technical Documentation -Chapter 2 and 3](https://windows.lbl.gov/sites/default/files/Downloads/WINDOW%20Technical%20Documentation.pdf)
 
+[ANSI/NFRC 100-2020](https://nfrccommunity.org/store/viewproduct.aspx?id=1380591) Procedure for Determining Fenestration Product U-factors
+
+[ANSI/NFRC 200-2020](https://nfrccommunity.org/store/viewproduct.aspx?id=1402116) Procedure for Determining Fenestration Product Solar Heat Gain Coefficient and Visible Transmittance at Normal Incidence 
 
 
 
