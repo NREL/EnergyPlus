@@ -63,17 +63,7 @@ set(src
   src/ObjexxFCL/Array5D.hh
   src/ObjexxFCL/Array5S.fwd.hh
   src/ObjexxFCL/Array5S.hh
-  src/ObjexxFCL/Array6.all.fwd.hh
-  src/ObjexxFCL/Array6.all.hh
-  src/ObjexxFCL/Array6.fwd.hh
-  src/ObjexxFCL/Array6.hh
-  src/ObjexxFCL/Array6A.fwd.hh
-  src/ObjexxFCL/Array6A.hh
-  src/ObjexxFCL/Array6D.fwd.hh
-  src/ObjexxFCL/Array6D.hh
-  src/ObjexxFCL/Array6S.fwd.hh
-  src/ObjexxFCL/Array6S.hh
-  src/ObjexxFCL/ArrayInitializer.fwd.hh
+        src/ObjexxFCL/ArrayInitializer.fwd.hh
   src/ObjexxFCL/ArrayInitializer.hh
   src/ObjexxFCL/ArrayRS.fwd.hh
   src/ObjexxFCL/ArrayRS.hh
@@ -203,9 +193,7 @@ set( test_src
   tst/unit/Array4S.unit.cc
   tst/unit/Array5.unit.cc
   tst/unit/Array5S.unit.cc
-  tst/unit/Array6.unit.cc
-  tst/unit/Array6S.unit.cc
-  tst/unit/ArrayInitializer.unit.cc
+        tst/unit/ArrayInitializer.unit.cc
   tst/unit/ArrayS.unit.cc
         tst/unit/bit.unit.cc
   tst/unit/byte.unit.cc

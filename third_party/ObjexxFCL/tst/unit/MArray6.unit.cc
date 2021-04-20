@@ -20,7 +20,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/MArray6.hh>
-#include <ObjexxFCL/Array6D.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 #include "ObjexxFCL.unit.hh"
 

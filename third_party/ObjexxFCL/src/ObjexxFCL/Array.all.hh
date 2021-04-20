@@ -19,7 +19,6 @@
 #include <ObjexxFCL/Array3.all.hh>
 #include <ObjexxFCL/Array4.all.hh>
 #include <ObjexxFCL/Array5.all.hh>
-#include <ObjexxFCL/Array6.all.hh>
 #include <ObjexxFCL/Array.functions.hh>
 
 #endif // ObjexxFCL_Array_all_hh_INCLUDED

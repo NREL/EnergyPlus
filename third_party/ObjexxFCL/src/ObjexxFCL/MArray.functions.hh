@@ -25,7 +25,6 @@
 #include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Array4D.hh>
 #include <ObjexxFCL/Array5D.hh>
-#include <ObjexxFCL/Array6D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // C++ Headers
