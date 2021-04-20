@@ -62,15 +62,14 @@ namespace DataHVACControllers {
 
     int constexpr ControllerSimple_Type(1);
 
-    // Controller action used in modules HVACControllers and ZoneControllers
-    enum class ControllerAction
+    enum class ControllerAction     // Controller action used in modules HVACControllers and ZoneControllers
     {
         NoAction = -1,
         ReverseAction,
         NormalAction
     };
 
-    enum class ControllerMode // Controller mode used in modules HVACControllers and ZoneControllers
+    enum class ControllerMode       // Controller mode used in modules HVACControllers and ZoneControllers
     {
         invalid = -1,               // Controller error. E.g., bad action
         None,                       // Controller mode not yet determined
@@ -83,7 +82,6 @@ namespace DataHVACControllers {
   
     int constexpr iFirstMode(static_cast<int>(ControllerMode::invalid)); // First operating mode in range
     int constexpr iLastMode(static_cast<int>(ControllerMode::MaxActive)); // Last operating mode in range
-
 
     enum class ControllerOperation          // Controller operation used in module HVACControllers
     {
@@ -101,16 +99,11 @@ namespace DataHVACControllers {
         Fail,               // Indicates that warm restart failed
         Success             // Indicates that warm restart was successful
     };
-    
-    int constexpr iControllerWarmRestartNone(-1);   
-    int constexpr iControllerWarmRestartFail(0);    
-    int constexpr iControllerWarmRestartSuccess(1); 
 
 } // namespace DataHVACControllers
 
 struct HVACCtrlData : BaseGlobalStruct
 {
-
     Array1D_string const ControllerTypes = Array1D_string(1, std::string("Controller:WaterCoil"));
     Array1D_string const ActionTypes = Array1D_string({-1, 1}, {"No action", "Reverse action", "Normal action"});
     Array1D_string const ControllerModeTypes = Array1D_string({-1, 5},

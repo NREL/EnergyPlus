@@ -2791,7 +2791,7 @@ void SimAirLoop(EnergyPlusData &state,
                                   state.dataSimAirServingZones->NumCallsSAL2);
 
         // Update air loop trackers
-        state.dataSimAirServingZones->WarmRestartStatusSAL = iControllerWarmRestartSuccess;
+        state.dataSimAirServingZones->WarmRestartStatusSAL = ControllerWarmRestart::Success;
         AirLoopNumCalls += state.dataSimAirServingZones->NumCallsSAL2;
         AirLoopIterMax = max(AirLoopIterMax, state.dataSimAirServingZones->IterMaxSAL2);
         AirLoopIterTot += state.dataSimAirServingZones->IterTotSAL2;
@@ -2807,7 +2807,7 @@ void SimAirLoop(EnergyPlusData &state,
                                     state.dataSimAirServingZones->NumCallsSAL2);
 
             // Update air loop trackers
-            state.dataSimAirServingZones->WarmRestartStatusSAL = iControllerWarmRestartFail;
+            state.dataSimAirServingZones->WarmRestartStatusSAL = DataHVACControllers::ControllerWarmRestart::Fail;
             AirLoopNumCalls += state.dataSimAirServingZones->NumCallsSAL2;
             AirLoopIterMax = max(AirLoopIterMax, state.dataSimAirServingZones->IterMaxSAL2);
             AirLoopIterTot += state.dataSimAirServingZones->IterTotSAL2;

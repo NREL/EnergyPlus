@@ -2112,7 +2112,7 @@ void ExitCalcController(EnergyPlusData &state,
 
 void TrackAirLoopControllers(EnergyPlusData &state,
                              int const AirLoopNum,
-                             int const WarmRestartStatus,
+                             ControllerWarmRestart const WarmRestartStatus,
                              int const AirLoopIterMax,
                              int const AirLoopIterTot,
                              int const AirLoopNumCalls)
@@ -2153,9 +2153,9 @@ void TrackAirLoopControllers(EnergyPlusData &state,
 
     {
         auto const SELECT_CASE_var(WarmRestartStatus);
-        if (SELECT_CASE_var == iControllerWarmRestartSuccess) {
+        if (SELECT_CASE_var == ControllerWarmRestart::Success) {
             ++AirLoopStats(AirLoopNum).NumSuccessfulWarmRestarts;
-        } else if (SELECT_CASE_var == iControllerWarmRestartFail) {
+        } else if (SELECT_CASE_var == ControllerWarmRestart::Fail) {
             ++AirLoopStats(AirLoopNum).NumFailedWarmRestarts;
         } else {
             // Nothing to do if no speculative warm restart used

@@ -250,7 +250,7 @@ namespace HVACControllers {
                            int &ControllerIndex,
                            bool FirstHVACIteration,
                            int AirLoopNum, // unused1208
-                           ControllerOperation Operation,
+                           DataHVACControllers::ControllerOperation Operation,
                            bool &IsConvergedFlag,
                            bool &IsUpToDateFlag,
                            bool &BypassOAController,
@@ -296,7 +296,7 @@ namespace HVACControllers {
         EnergyPlusData &state, int ControlNum, Real64 NextActuatedValue, ControllerMode Mode, bool &IsConvergedFlag, bool &IsUpToDateFlag);
 
     void TrackAirLoopControllers(
-        EnergyPlusData &state, int AirLoopNum, int WarmRestartStatus, int AirLoopIterMax, int AirLoopIterTot, int AirLoopNumCalls);
+        EnergyPlusData &state, int AirLoopNum, DataHVACControllers::ControllerWarmRestart WarmRestartStatus, int AirLoopIterMax, int AirLoopIterTot, int AirLoopNumCalls);
 
     void TrackAirLoopController(EnergyPlusData &state,
                                 int AirLoopNum,       // Air loop index
@@ -326,7 +326,7 @@ namespace HVACControllers {
                                    int ControlNum,
                                    bool FirstHVACIteration,
                                    int AirLoopPass,
-                                   ControllerOperation Operation, // Operation to execute
+                                   DataHVACControllers::ControllerOperation Operation, // Operation to execute
                                    bool IsConvergedFlag);
 
     std::string CreateHVACTimeString(EnergyPlusData &state);
