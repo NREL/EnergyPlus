@@ -23,14 +23,12 @@ namespace ObjexxFCL {
 // Forward
 template< typename > class Sticky;
 class byte;
-class ubyte;
 
 // Types
 typedef  byte  sbyte;
 typedef  Sticky< bool >                Sticky_bool;
 typedef  Sticky< byte >                Sticky_byte;
 typedef  Sticky< sbyte >               Sticky_sbyte;
-typedef  Sticky< ubyte >               Sticky_ubyte;
 typedef  Sticky< short int >           Sticky_short;
 typedef  Sticky< int >                 Sticky_int;
 typedef  Sticky< long int >            Sticky_long;
@@ -58,7 +56,6 @@ typedef  Sticky< std::string >         Sticky_string;
 typedef  Sticky< bool const >                Sticky_bool_const;
 typedef  Sticky< byte const >                Sticky_byte_const;
 typedef  Sticky< sbyte const >               Sticky_sbyte_const;
-typedef  Sticky< ubyte const >               Sticky_ubyte_const;
 typedef  Sticky< short int const >           Sticky_short_const;
 typedef  Sticky< int const >                 Sticky_int_const;
 typedef  Sticky< long int const >            Sticky_long_const;

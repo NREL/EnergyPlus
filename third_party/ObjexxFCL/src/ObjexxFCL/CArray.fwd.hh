@@ -23,14 +23,12 @@ namespace ObjexxFCL {
 // Forward
 template< typename > class CArray;
 class byte;
-class ubyte;
 
 // Types
 typedef  byte  sbyte;
 typedef  CArray< bool >                CArray_bool;
 typedef  CArray< byte >                CArray_byte;
 typedef  CArray< sbyte >               CArray_sbyte;
-typedef  CArray< ubyte >               CArray_ubyte;
 typedef  CArray< short int >           CArray_short;
 typedef  CArray< int >                 CArray_int;
 typedef  CArray< long int >            CArray_long;

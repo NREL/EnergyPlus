@@ -23,14 +23,12 @@ namespace ObjexxFCL {
 // Forward
 template< typename > class Vector4;
 class byte;
-class ubyte;
 
 // Types
 typedef  byte  sbyte;
 typedef  Vector4< bool >                Vector4_bool;
 typedef  Vector4< byte >                Vector4_byte;
 typedef  Vector4< sbyte >               Vector4_sbyte;
-typedef  Vector4< ubyte >               Vector4_ubyte;
 typedef  Vector4< short int >           Vector4_short;
 typedef  Vector4< int >                 Vector4_int;
 typedef  Vector4< long int >            Vector4_long;

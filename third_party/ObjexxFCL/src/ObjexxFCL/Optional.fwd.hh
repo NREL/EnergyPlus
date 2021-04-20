@@ -23,14 +23,12 @@ namespace ObjexxFCL {
 // Forward
 template< typename, typename = void > class Optional;
 class byte;
-class ubyte;
 
 // Types
 typedef  byte  sbyte;
 typedef  Optional< bool >                Optional_bool;
 typedef  Optional< byte >                Optional_byte;
 typedef  Optional< sbyte >               Optional_sbyte;
-typedef  Optional< ubyte >               Optional_ubyte;
 typedef  Optional< short int >           Optional_short;
 typedef  Optional< int >                 Optional_int;
 typedef  Optional< long int >            Optional_long;
@@ -58,7 +56,6 @@ typedef  Optional< std::string >         Optional_string;
 typedef  Optional< bool const >                Optional_bool_const;
 typedef  Optional< byte const >                Optional_byte_const;
 typedef  Optional< sbyte const >               Optional_sbyte_const;
-typedef  Optional< ubyte const >               Optional_ubyte_const;
 typedef  Optional< short int const >           Optional_short_const;
 typedef  Optional< int const >                 Optional_int_const;
 typedef  Optional< long int const >            Optional_long_const;

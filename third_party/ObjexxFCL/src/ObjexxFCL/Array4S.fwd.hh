@@ -23,14 +23,12 @@ namespace ObjexxFCL {
 // Forward
 template< typename > class Array4S;
 class byte;
-class ubyte;
 
 // Types
 typedef  byte  sbyte;
 typedef  Array4S< bool >                Array4S_bool;
 typedef  Array4S< byte >                Array4S_byte;
 typedef  Array4S< sbyte >               Array4S_sbyte;
-typedef  Array4S< ubyte >               Array4S_ubyte;
 typedef  Array4S< short int >           Array4S_short;
 typedef  Array4S< int >                 Array4S_int;
 typedef  Array4S< long int >            Array4S_long;

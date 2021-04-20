@@ -34,7 +34,6 @@
 #include <ObjexxFCL/sbyte.fwd.hh>
 #include <ObjexxFCL/SetWrapper.fwd.hh>
 #include <ObjexxFCL/Stream.fwd.hh>
-#include <ObjexxFCL/ubyte.fwd.hh>
 #include <ObjexxFCL/Write.fwd.hh>
 
 #endif // ObjexxFCL_ObjexxFCL_fwd_hh_INCLUDED

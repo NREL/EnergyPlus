@@ -23,14 +23,12 @@ namespace ObjexxFCL {
 // Forward
 template< typename > class Array2A;
 class byte;
-class ubyte;
 
 // Types
 typedef  byte  sbyte;
 typedef  Array2A< bool >                Array2A_bool;
 typedef  Array2A< byte >                Array2A_byte;
 typedef  Array2A< sbyte >               Array2A_sbyte;
-typedef  Array2A< ubyte >               Array2A_ubyte;
 typedef  Array2A< short int >           Array2A_short;
 typedef  Array2A< int >                 Array2A_int;
 typedef  Array2A< long int >            Array2A_long;

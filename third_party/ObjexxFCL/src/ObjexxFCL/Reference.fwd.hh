@@ -23,14 +23,12 @@ namespace ObjexxFCL {
 // Forward
 template< typename > class Reference;
 class byte;
-class ubyte;
 
 // Types
 typedef  byte  sbyte;
 typedef  Reference< bool >                Reference_bool;
 typedef  Reference< byte >                Reference_byte;
 typedef  Reference< sbyte >               Reference_sbyte;
-typedef  Reference< ubyte >               Reference_ubyte;
 typedef  Reference< short int >           Reference_short;
 typedef  Reference< int >                 Reference_int;
 typedef  Reference< long int >            Reference_long;
@@ -58,7 +56,6 @@ typedef  Reference< std::string >         Reference_string;
 typedef  Reference< bool const >                Reference_bool_const;
 typedef  Reference< byte const >                Reference_byte_const;
 typedef  Reference< sbyte const >               Reference_sbyte_const;
-typedef  Reference< ubyte const >               Reference_ubyte_const;
 typedef  Reference< short int const >           Reference_short_const;
 typedef  Reference< int const >                 Reference_int_const;
 typedef  Reference< long int const >            Reference_long_const;

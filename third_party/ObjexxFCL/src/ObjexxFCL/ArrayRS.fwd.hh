@@ -23,14 +23,12 @@ namespace ObjexxFCL {
 // Forward
 template< typename, int > class ArrayRS;
 class byte;
-class ubyte;
 
 // Types
 typedef  byte  sbyte;
 template< int Rank > using ArrayRS_bool       = ArrayRS< bool, Rank >;
 template< int Rank > using ArrayRS_byte       = ArrayRS< byte, Rank >;
 template< int Rank > using ArrayRS_sbyte      = ArrayRS< sbyte, Rank >;
-template< int Rank > using ArrayRS_ubyte      = ArrayRS< ubyte, Rank >;
 template< int Rank > using ArrayRS_short      = ArrayRS< short int, Rank >;
 template< int Rank > using ArrayRS_int        = ArrayRS< int, Rank >;
 template< int Rank > using ArrayRS_long       = ArrayRS< long int, Rank >;

@@ -23,14 +23,12 @@ namespace ObjexxFCL {
 // Forward
 template< typename, typename = void > class Required;
 class byte;
-class ubyte;
 
 // Types
 typedef  byte  sbyte;
 typedef  Required< bool >                Required_bool;
 typedef  Required< byte >                Required_byte;
 typedef  Required< sbyte >               Required_sbyte;
-typedef  Required< ubyte >               Required_ubyte;
 typedef  Required< short int >           Required_short;
 typedef  Required< int >                 Required_int;
 typedef  Required< long int >            Required_long;
@@ -58,7 +56,6 @@ typedef  Required< std::string >         Required_string;
 typedef  Required< bool const >                Required_bool_const;
 typedef  Required< byte const >                Required_byte_const;
 typedef  Required< sbyte const >               Required_sbyte_const;
-typedef  Required< ubyte const >               Required_ubyte_const;
 typedef  Required< short int const >           Required_short_const;
 typedef  Required< int const >                 Required_int_const;
 typedef  Required< long int const >            Required_long_const;

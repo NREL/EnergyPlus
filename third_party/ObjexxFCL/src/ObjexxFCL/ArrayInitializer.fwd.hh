@@ -23,14 +23,12 @@ namespace ObjexxFCL {
 // Forward
 template< typename > class ArrayInitializer;
 class byte;
-class ubyte;
 
 // Types
 typedef  byte  sbyte;
 typedef  ArrayInitializer< bool >                ArrayInitializer_bool;
 typedef  ArrayInitializer< byte >                ArrayInitializer_byte;
 typedef  ArrayInitializer< sbyte >               ArrayInitializer_sbyte;
-typedef  ArrayInitializer< ubyte >               ArrayInitializer_ubyte;
 typedef  ArrayInitializer< short int >           ArrayInitializer_short;
 typedef  ArrayInitializer< int >                 ArrayInitializer_int;
 typedef  ArrayInitializer< long int >            ArrayInitializer_long;

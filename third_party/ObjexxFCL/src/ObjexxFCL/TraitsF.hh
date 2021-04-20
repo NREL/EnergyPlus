@@ -25,7 +25,6 @@ namespace ObjexxFCL {
 
 // Forward
 class byte;
-class ubyte;
 
 // TraitsF
 template< typename T >
@@ -63,16 +62,6 @@ template<>
 struct TraitsF< byte >
 {
 	typedef  byte  traits_type;
-	typedef  std::size_t  Size;
-
-	static Size const w = 15; // Field width
-};
-
-// TraitsF: ubyte Specialization
-template<>
-struct TraitsF< ubyte >
-{
-	typedef  ubyte  traits_type;
 	typedef  std::size_t  Size;
 
 	static Size const w = 15; // Field width

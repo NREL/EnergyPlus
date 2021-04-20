@@ -15,7 +15,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/byte.hh>
-#include <ObjexxFCL/ubyte.hh>
 
 // C++ Headers
 #include <complex>
@@ -314,49 +313,6 @@ template<>
 struct TypeTraits< byte >
 {
 	typedef  byte  traits_type;
-	typedef  std::size_t  Size;
-
-	// Initial Value
-	static
-	traits_type
-	initial_value()
-	{
-		return traits_type(); // Use default constructor
-	}
-
-	// Debug Value
-	static
-	traits_type
-	debug_value()
-	{
-		return std::numeric_limits< traits_type >::max();
-	}
-
-	// Initial Array Value
-	static
-	traits_type
-	initial_array_value()
-	{
-#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
-		return debug_value();
-#else
-		return initial_value();
-#endif
-	}
-
-	static std::streamsize const precision = 0; // Precision
-	static Size const width = 7; // Field width
-	static int const iwidth = 7; // Field width
-	static Size const loc_2_crossover = 300u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
-};
-
-// TypeTraits: Type Traits ubyte Specialization
-template<>
-struct TypeTraits< ubyte >
-{
-	typedef  ubyte  traits_type;
 	typedef  std::size_t  Size;
 
 	// Initial Value
