@@ -74,15 +74,9 @@ set(src
   src/ObjexxFCL/CArray.hh
   src/ObjexxFCL/CArrayA.fwd.hh
   src/ObjexxFCL/CArrayA.hh
-  src/ObjexxFCL/CArrayP.fwd.hh
-  src/ObjexxFCL/CArrayP.hh
         src/ObjexxFCL/char.functions.cc
   src/ObjexxFCL/char.functions.hh
-  src/ObjexxFCL/Chunk.hh
-  src/ObjexxFCL/ChunkExponent.hh
-  src/ObjexxFCL/ChunkVector.fwd.hh
-  src/ObjexxFCL/ChunkVector.hh
-  src/ObjexxFCL/command.cc
+        src/ObjexxFCL/command.cc
   src/ObjexxFCL/command.hh
   src/ObjexxFCL/Cstring.cc
   src/ObjexxFCL/Cstring.fwd.hh

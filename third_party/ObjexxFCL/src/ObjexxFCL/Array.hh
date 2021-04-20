@@ -1265,13 +1265,6 @@ public: // Predicate
 		return ( capacity_ != npos );
 	}
 
-	// Data Size Unbounded?
-	bool
-	capacity_unbounded() const
-	{
-		return ( capacity_ == npos );
-	}
-
 	// Active Array Empty?
 	bool
 	empty() const
@@ -1310,28 +1303,6 @@ public: // Predicate
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			if ( data_[ i ] != T( 0 ) ) return false;
-		}
-		return true;
-	}
-
-	// Uniform Valued?
-	bool
-	is_uniform() const
-	{
-		if ( size_ <= 1 ) return true;
-		T const & t( data_[ 0 ] );
-		for ( size_type i = 1; i < size_; ++i ) {
-			if ( data_[ i ] != t ) return false;
-		}
-		return true;
-	}
-
-	// Uniform Valued with Specified Value?
-	bool
-	is_uniform( T const & t ) const
-	{
-		for ( size_type i = 0; i < size_; ++i ) {
-			if ( data_[ i ] != t ) return false;
 		}
 		return true;
 	}
@@ -1539,14 +1510,6 @@ public: // Modifier
 		if ( data_ ) std::fill_n( data_, size_, T( 0 ) );
 	}
 
-	// Assign Zero to all Elements
-	//  Can't be virtual (for covariant return) or will try to instantiate for all value types
-	void
-	to_zero()
-	{
-		if ( data_ ) std::fill_n( data_, size_, T( 0 ) );
-	}
-
 	// Invert (Elemental)
 	void
 	invert()
@@ -1556,29 +1519,6 @@ public: // Modifier
 			assert( data_[ i ] != T( 0 ) );
 			data_[ i ] = one / data_[ i ];
 		}
-	}
-
-	// Copy Array Data from Source
-	template< typename U >
-	void
-	data_copy_from( U const * source, size_type const size )
-	{
-		if ( data_ ) std::memcpy( data_, source, std::min( size, size_ ) );
-	}
-
-	// Swap Data of Same Size Arrays
-	void
-	data_swap( Array & v )
-	{
-		using std::swap;
-		assert( owner_ );
-		assert( v.owner_ );
-		assert( size_ == v.size_ );
-		swap( capacity_, v.capacity_ );
-		swap( mem_, v.mem_ );
-		swap( data_, v.data_ );
-		swap( shift_, v.shift_ );
-		swap( sdata_, v.sdata_ );
 	}
 
 public: // Comparison: Predicate
@@ -3512,22 +3452,6 @@ read_binary( std::istream & stream, Array< T > & a )
 	return stream;
 }
 
-// Write an Array to a Binary File
-template< typename T >
-inline
-std::ostream &
-write_binary( std::ostream & stream, Array< T > const & a )
-{
-	std::size_t const n( a.size() );
-	if ( stream && ( n > 0u ) ) {
-		std::size_t const type_size( sizeof( T ) / sizeof( std::ostream::char_type ) );
-		for ( std::size_t i = 0; i < n; ++i ) {
-			stream.write( ( std::ostream::char_type const * )&a[ i ], type_size );
-			if ( ! stream ) break;
-		}
-	}
-	return stream;
-}
 
 namespace fmt {
 
