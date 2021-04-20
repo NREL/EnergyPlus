@@ -19,7 +19,6 @@
 #include <ObjexxFCL/BArray.hh>
 #include <ObjexxFCL/AlignedAllocator.hh>
 #include <ObjexxFCL/ArrayS.hh>
-#include <ObjexxFCL/ArrayTail.hh>
 #include <ObjexxFCL/CArrayA.hh>
 #include <ObjexxFCL/InitializerSentinel.hh>
 #include <ObjexxFCL/MArray.hh>
@@ -78,7 +77,6 @@ protected: // Types
 public: // Types
 
 	typedef  Array< T >  Base;
-	typedef  ArrayTail< T >  Tail;
 	typedef  AlignedAllocator< T >  Aligned;
 	typedef  TypeTraits< T >  Traits;
 	typedef  ArrayInitializer< T >  Initializer;
@@ -378,16 +376,6 @@ protected: // Creation
 		assert( a.contiguous() );
 	}
 
-	// Tail Proxy Constructor
-	Array( Tail const & s, ProxySentinel const & ) :
-	 owner_( false ),
-	 capacity_( s.size() ),
-	 size_( capacity_ ),
-	 mem_( nullptr ),
-	 data_( s.data_ ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
-	{}
 
 	// Value Proxy Constructor
 	Array( T const & t, ProxySentinel const & ) :
@@ -3054,30 +3042,7 @@ protected: // Methods
 		sdata_ = data_ - shift_;
 	}
 
-	// Attach Proxy/Argument Array to Const Tail
-	template< int shift >
-	void
-	attach( Tail const & s )
-	{
-		assert( ! owner_ );
-		capacity_ = s.size();
-		size_ = capacity_;
-		data_ = s.data_;
-		shift_ = shift;
-		sdata_ = data_ - shift_;
-	}
 
-	// Attach Proxy/Argument Array to Tail
-	template< int shift >
-	void
-	attach( Tail & s )
-	{
-		assert( ! owner_ );
-		capacity_ = size_ = s.size();
-		data_ = s.data_;
-		shift_ = shift;
-		sdata_ = data_ - shift_;
-	}
 
 	// Attach Proxy/Argument Array to Const Value
 	template< int shift >

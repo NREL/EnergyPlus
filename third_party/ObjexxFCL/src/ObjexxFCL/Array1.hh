@@ -51,7 +51,6 @@ protected: // Types
 public: // Types
 
 	typedef  typename Super::Base  Base;
-	typedef  typename Super::Tail  Tail;
 	typedef  typename Super::IR  IR;
 	typedef  typename Super::IS  IS;
 	typedef  typename Super::DS  DS;
@@ -240,12 +239,6 @@ protected: // Creation
 	 I_( a.isize() )
 	{}
 
-	// Tail Proxy Constructor
-	Array1( Tail const & s, ProxySentinel const & proxy ) :
-	 Super( s, proxy ),
-	 I_( s.isize() )
-	{}
-
 	// Value Proxy Constructor
 	Array1( T const & t, ProxySentinel const & proxy ) :
 	 Super( t, proxy ),
@@ -267,12 +260,6 @@ protected: // Creation
 	// Base + IndexRange Proxy Constructor
 	Array1( Base const & a, IR const & I, ProxySentinel const & proxy ) :
 	 Super( a, proxy ),
-	 I_( I )
-	{}
-
-	// Tail + IndexRange Proxy Constructor
-	Array1( Tail const & s, IR const & I, ProxySentinel const & proxy ) :
-	 Super( s, proxy ),
 	 I_( I )
 	{}
 
@@ -1180,21 +1167,6 @@ public: // Subscript
 		return i - shift_;
 	}
 
-	// Const Tail Starting at array( i )
-	Tail const
-	a( int const i ) const
-	{
-		assert( contains( i ) );
-		return Tail( static_cast< T const * >( sdata_ + i ), ( size_ != npos ? size_ - ( i - shift_ ) : npos ) );
-	}
-
-	// Tail Starting at array( i )
-	Tail
-	a( int const i )
-	{
-		assert( contains( i ) );
-		return Tail( sdata_ + i, ( size_ != npos ? size_ - ( i - shift_ ) : npos ) );
-	}
 
 public: // Slice Proxy Generators
 

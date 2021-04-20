@@ -48,7 +48,6 @@ protected: // Types
 public: // Types
 
 	typedef  typename Super::Base  Base;
-	typedef  typename Super::Tail  Tail;
 	typedef  typename Super::IR  IR;
 	typedef  typename Super::IS  IS;
 	typedef  typename Super::DS  DS;
@@ -244,17 +243,6 @@ protected: // Creation
 	 z3_( 1u )
 	{}
 
-	// Tail Proxy Constructor
-	Array3( Tail const & s, ProxySentinel const & proxy ) :
-	 Super( s, proxy ),
-	 I1_( s.isize() ),
-	 I2_( 1 ),
-	 I3_( 1 ),
-	 z1_( I1_.size() ),
-	 z2_( 1u ),
-	 z3_( 1u )
-	{}
-
 	// Value Proxy Constructor
 	Array3( T const & t, ProxySentinel const & proxy ) :
 	 Super( t, proxy ),
@@ -291,17 +279,6 @@ protected: // Creation
 	// Base + IndexRange Proxy Constructor
 	Array3( Base const & a, IR const & I1, IR const & I2, IR const & I3, ProxySentinel const & proxy ) :
 	 Super( a, proxy ),
-	 I1_( I1 ),
-	 I2_( I2 ),
-	 I3_( I3 ),
-	 z1_( I1_.size() ),
-	 z2_( I2_.size() ),
-	 z3_( I3_.size() )
-	{}
-
-	// Tail + IndexRange Proxy Constructor
-	Array3( Tail const & s, IR const & I1, IR const & I2, IR const & I3, ProxySentinel const & proxy ) :
-	 Super( s, proxy ),
 	 I1_( I1 ),
 	 I2_( I2 ),
 	 I3_( I3 ),
@@ -972,24 +949,6 @@ public: // Subscript
 	index( int const i1, int const i2, int const i3 ) const
 	{
 		return ( ( ( ( i1 * z2_ ) + i2 ) * z3_ ) + i3 ) - shift_;
-	}
-
-	// Const Tail Starting at array( i1, i2, i3 )
-	Tail const
-	a( int const i1, int const i2, int const i3 ) const
-	{
-		assert( contains( i1, i2, i3 ) );
-		size_type const offset( ( ( ( ( i1 * z2_ ) + i2 ) * z3_ ) + i3 ) - shift_ );
-		return Tail( static_cast< T const * >( data_ + offset ), ( size_ != npos ? size_ - offset : npos ) );
-	}
-
-	// Tail Starting at array( i1, i2, i3 )
-	Tail
-	a( int const i1, int const i2, int const i3 )
-	{
-		assert( contains( i1, i2, i3 ) );
-		size_type const offset( ( ( ( ( i1 * z2_ ) + i2 ) * z3_ ) + i3 ) - shift_ );
-		return Tail( data_ + offset, ( size_ != npos ? size_ - offset : npos ) );
 	}
 
 public: // Slice Proxy Generators

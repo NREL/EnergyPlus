@@ -32,7 +32,6 @@ private: // Types
 public: // Types
 
 	typedef  typename Super::Base  Base;
-	typedef  typename Super::Tail  Tail;
 	typedef  typename Super::IR  IR;
 
 	// STL Style
@@ -111,13 +110,6 @@ public: // Creation
 		shift_set( 1 );
 	}
 
-	// Tail Constructor
-	Array1A( Tail const & s ) :
-	 Super( s, ProxySentinel() )
-	{
-		shift_set( 1 );
-	}
-
 	// Value Constructor
 	Array1A( T const & t ) :
 	 Super( t, ProxySentinel() )
@@ -149,13 +141,6 @@ public: // Creation
 	// Base + IndexRange Constructor
 	Array1A( Base const & a, IR const & I ) :
 	 Super( a, I, ProxySentinel() )
-	{
-		dimension_argument();
-	}
-
-	// Tail + IndexRange Constructor
-	Array1A( Tail const & s, IR const & I ) :
-	 Super( s, I, ProxySentinel() )
 	{
 		dimension_argument();
 	}
@@ -896,24 +881,6 @@ public: // Modifier
 	{
 		Base::attach< 1 >( a );
 		I_ = a.isize();
-		return *this;
-	}
-
-	// Attach to Tail
-	Array1A &
-	attach( Tail const & s )
-	{
-		Base::attach< 1 >( s );
-		I_ = s.isize();
-		return *this;
-	}
-
-	// Attach to Non-Const Tail
-	Array1A &
-	attach( Tail & s )
-	{
-		Base::attach< 1 >( s );
-		I_ = s.isize();
 		return *this;
 	}
 

@@ -48,7 +48,6 @@ protected: // Types
 public: // Types
 
 	typedef  typename Super::Base  Base;
-	typedef  typename Super::Tail  Tail;
 	typedef  typename Super::IR  IR;
 	typedef  typename Super::IS  IS;
 	typedef  typename Super::DS  DS;
@@ -316,22 +315,6 @@ protected: // Creation
 	 z6_( 1u )
 	{}
 
-	// Tail Proxy Constructor
-	Array6( Tail const & s, ProxySentinel const & proxy ) :
-	 Super( s, proxy ),
-	 I1_( s.isize() ),
-	 I2_( 1 ),
-	 I3_( 1 ),
-	 I4_( 1 ),
-	 I5_( 1 ),
-	 I6_( 1 ),
-	 z1_( I1_.size() ),
-	 z2_( 1u ),
-	 z3_( 1u ),
-	 z4_( 1u ),
-	 z5_( 1u ),
-	 z6_( 1u )
-	{}
 
 	// Value Proxy Constructor
 	Array6( T const & t, ProxySentinel const & proxy ) :
@@ -401,22 +384,6 @@ protected: // Creation
 	 z6_( I6_.size() )
 	{}
 
-	// Tail + IndexRange Proxy Constructor
-	Array6( Tail const & s, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6, ProxySentinel const & proxy ) :
-	 Super( s, proxy ),
-	 I1_( I1 ),
-	 I2_( I2 ),
-	 I3_( I3 ),
-	 I4_( I4 ),
-	 I5_( I5 ),
-	 I6_( I6 ),
-	 z1_( I1_.size() ),
-	 z2_( I2_.size() ),
-	 z3_( I3_.size() ),
-	 z4_( I4_.size() ),
-	 z5_( I5_.size() ),
-	 z6_( I6_.size() )
-	{}
 
 	// Value + IndexRange Proxy Constructor
 	Array6( T const & t, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6, ProxySentinel const & proxy ) :
@@ -1272,24 +1239,6 @@ public: // Subscript
 	index( int const i1, int const i2, int const i3, int const i4, int const i5, int const i6 ) const
 	{
 		return ( ( ( ( ( ( ( ( ( ( i1 * z2_ ) + i2 ) * z3_ ) + i3 ) * z4_ ) + i4 ) * z5_ ) + i5 ) * z6_ ) + i6 ) - shift_;
-	}
-
-	// Const Tail Starting at array( i1, i2, i3, i4, i5, i6 )
-	Tail const
-	a( int const i1, int const i2, int const i3, int const i4, int const i5, int const i6 ) const
-	{
-		assert( contains( i1, i2, i3, i4, i5, i6 ) );
-		size_type const offset( ( ( ( ( ( ( ( ( ( ( i1 * z2_ ) + i2 ) * z3_ ) + i3 ) * z4_ ) + i4 ) * z5_ ) + i5 ) * z6_ ) + i6 ) - shift_ );
-		return Tail( static_cast< T const * >( data_ + offset ), ( size_ != npos ? size_ - offset : npos ) );
-	}
-
-	// Tail Starting at array( i1, i2, i3, i4, i5, i6 )
-	Tail
-	a( int const i1, int const i2, int const i3, int const i4, int const i5, int const i6 )
-	{
-		assert( contains( i1, i2, i3, i4, i5, i6 ) );
-		size_type const offset( ( ( ( ( ( ( ( ( ( ( i1 * z2_ ) + i2 ) * z3_ ) + i3 ) * z4_ ) + i4 ) * z5_ ) + i5 ) * z6_ ) + i6 ) - shift_ );
-		return Tail( data_ + offset, ( size_ != npos ? size_ - offset : npos ) );
 	}
 
 public: // Slice Proxy Generators

@@ -49,7 +49,6 @@ protected: // Types
 public: // Types
 
 	typedef  typename Super::Base  Base;
-	typedef  typename Super::Tail  Tail;
 	typedef  typename Super::IR  IR;
 	typedef  typename Super::IS  IS;
 	typedef  typename Super::DS  DS;
@@ -221,15 +220,6 @@ protected: // Creation
 	 z2_( 1u )
 	{}
 
-	// Tail Proxy Constructor
-	Array2( Tail const & s, ProxySentinel const & proxy ) :
-	 Super( s, proxy ),
-	 I1_( s.isize() ),
-	 I2_( 1 ),
-	 z1_( I1_.size() ),
-	 z2_( 1u )
-	{}
-
 	// Value Proxy Constructor
 	Array2( T const & t, ProxySentinel const & proxy ) :
 	 Super( t, proxy ),
@@ -260,15 +250,6 @@ protected: // Creation
 	// Base + IndexRange Proxy Constructor
 	Array2( Base const & a, IR const & I1, IR const & I2, ProxySentinel const & proxy ) :
 	 Super( a, proxy ),
-	 I1_( I1 ),
-	 I2_( I2 ),
-	 z1_( I1_.size() ),
-	 z2_( I2_.size() )
-	{}
-
-	// Tail + IndexRange Proxy Constructor
-	Array2( Tail const & s, IR const & I1, IR const & I2, ProxySentinel const & proxy ) :
-	 Super( s, proxy ),
 	 I1_( I1 ),
 	 I2_( I2 ),
 	 z1_( I1_.size() ),
@@ -873,24 +854,6 @@ public: // Subscript
 	index( int const i1, int const i2 ) const
 	{
 		return ( ( i1 * z2_ ) + i2 ) - shift_;
-	}
-
-	// Const Tail Starting at array( i1, i2 )
-	Tail const
-	a( int const i1, int const i2 ) const
-	{
-		assert( contains( i1, i2 ) );
-		size_type const offset( ( ( i1 * z2_ ) + i2 ) - shift_ );
-		return Tail( static_cast< T const * >( data_ + offset ), ( size_ != npos ? size_ - offset : npos ) );
-	}
-
-	// Tail Starting at array( i1, i2 )
-	Tail
-	a( int const i1, int const i2 )
-	{
-		assert( contains( i1, i2 ) );
-		size_type const offset( ( ( i1 * z2_ ) + i2 ) - shift_ );
-		return Tail( data_ + offset, ( size_ != npos ? size_ - offset : npos ) );
 	}
 
 public: // Slice Proxy Generators

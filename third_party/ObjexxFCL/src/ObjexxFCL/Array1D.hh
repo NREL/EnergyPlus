@@ -40,7 +40,6 @@ private: // Friend
 public: // Types
 
 	typedef  typename Super::Base  Base;
-	typedef  typename Super::Tail  Tail;
 	typedef  typename Super::Traits  Traits;
 	typedef  typename Super::IR  IR;
 	typedef  typename Super::Initializer  Initializer;
@@ -1252,23 +1251,6 @@ public: // Assignment: Value
 		return *this;
 	}
 
-public: // Subscript
-
-	// Const Tail Starting at array( i )
-	Tail const
-	a( int const i ) const
-	{
-		assert( contains( i ) );
-		return Tail( static_cast< T const * >( sdata_ + i ), size_ - ( i - shift_ ) );
-	}
-
-	// Tail Starting at array( i )
-	Tail
-	a( int const i )
-	{
-		assert( contains( i ) );
-		return Tail( sdata_ + i, size_ - ( i - shift_ ) );
-	}
 
 public: // Predicate
 

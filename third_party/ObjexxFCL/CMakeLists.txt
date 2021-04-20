@@ -82,8 +82,6 @@ set(src
   src/ObjexxFCL/ArrayS.functions.hh
   src/ObjexxFCL/ArrayS.fwd.hh
   src/ObjexxFCL/ArrayS.hh
-  src/ObjexxFCL/ArrayTail.fwd.hh
-  src/ObjexxFCL/ArrayTail.hh
         src/ObjexxFCL/BArray.cc
   src/ObjexxFCL/BArray.fwd.hh
   src/ObjexxFCL/BArray.hh
