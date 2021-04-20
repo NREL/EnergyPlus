@@ -154,6 +154,8 @@ protected:
         state->dataLoopNodes->Node.allocate(50);
         state->dataLoopNodes->NodeID.allocate(50);
 
+        state->dataHeatBalFanSys->TempControlType.allocate(numZones);
+        state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
         state->dataHeatBal->Zone.allocate(numZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(numZones);
         state->dataZoneEquip->ZoneEquipList.allocate(numZones);
@@ -422,7 +424,7 @@ protected:
         int VRFTUOutletNodeNum = 31;
         int VRFTUOAMixerOANodeNum = 32;
         int VRFTUOAMixerRelNodeNum = 33;
-        int VRFTUOAMixerRetNodeNum = 34;
+        int VRFTUOAMixerRetNodeNum = VRFTUInletNodeNum;
         int VRFTUOAMixerMixNodeNum = 35;
         int coolCoilAirInNode = VRFTUOAMixerMixNodeNum;
         int coolCoilAirOutNode = 36;
@@ -445,6 +447,7 @@ protected:
         VRFTU.VRFTUOAMixerOANodeNum = VRFTUOAMixerOANodeNum;
         VRFTU.VRFTUOAMixerRelNodeNum = VRFTUOAMixerRelNodeNum;
         VRFTU.VRFTUOAMixerRetNodeNum = VRFTUOAMixerRetNodeNum;
+        VRFTU.VRFTUOAMixerMixedNodeNum = VRFTUOAMixerMixNodeNum;
         VRFTU.MaxCoolAirVolFlow = DataSizing::AutoSize;
         VRFTU.MaxHeatAirVolFlow = DataSizing::AutoSize;
         VRFTU.MaxNoCoolAirVolFlow = DataSizing::AutoSize;
@@ -545,7 +548,7 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(curSysNum).SchedPtr).CurrentValue = 1.0; // enable the VRF condenser
     state->dataScheduleMgr->Schedule(thisTU.SchedPtr).CurrentValue = 1.0;                                    // enable the terminal unit
     state->dataScheduleMgr->Schedule(thisTU.FanAvailSchedPtr).CurrentValue = 1.0;                            // turn on fan
-    state->dataScheduleMgr->Schedule(thisTU.FanOpModeSchedPtr).CurrentValue = 0.0;                           // set cycling fan operating mode
+    state->dataScheduleMgr->Schedule(thisTU.FanOpModeSchedPtr).CurrentValue = 1.0;                           // set constant fan operating mode
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputRequired = 0.0; // set load = 0
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToCoolSP = 0.0;
@@ -557,12 +560,13 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
 
     int VRFTUOAMixerOANodeNum = thisTU.VRFTUOAMixerOANodeNum;
     int VRFTUOAMixerRetNodeNum = thisTU.VRFTUOAMixerRetNodeNum;
+    // set mixer OA node conditions
     state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp = 35.0;
     state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat = 0.01;
     state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Enthalpy =
         PsyHFnTdbW(state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp, state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat);
     state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Press = state->dataEnvrn->OutBaroPress;
-
+    // set mixer return node conditions (needed for mixer mixing calculation)
     state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Temp = 24.0;
     state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).HumRat = 0.01;
     state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Enthalpy =
@@ -583,7 +587,8 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).TempSetPoint = 20.0; // select 20 C as TU outlet set point temperature
 
     InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
-
+    thisTU.NoCoolHeatOutAirMassFlow = 0.0;
+    // the above needs correcting for air loop equipment. OA flow should be set to 0 if autosized as it is here.
     ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFCond);
     EXPECT_TRUE(thisTU.isInAirLoop);          // initialization found TU in main air loop
     EXPECT_TRUE(thisTU.isSetPointControlled); // initialization found TU is set point controlled
@@ -598,7 +603,7 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
     EXPECT_LT(QZnReq, 0.0);                                                              // cooling load exists
     EXPECT_TRUE(thisTU.coolSPActive);                                                    // cooling set point control active
-    EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).Temp, 24.0, 0.01); // verify outlet node is not at set point = 20
+    EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.coolCoilAirInNode).Temp, 24.0, 0.001); // verify mixer outlet node is not at set point = 20
 
     SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     EXPECT_LT(SysOutputProvided, 0.0);
@@ -608,6 +613,10 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     tuInletNode.Temp = 18.0;
     tuInletNode.HumRat = 0.007;
     tuInletNode.Enthalpy = PsyHFnTdbW(tuInletNode.Temp, tuInletNode.HumRat);
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp = 15.0;
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat = 0.01;
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Enthalpy =
+        PsyHFnTdbW(state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp, state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat);
     state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Temp = 18.0;
     state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).HumRat = 0.007;
     state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Enthalpy =
@@ -621,13 +630,14 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     EXPECT_FALSE(thisTU.coolSPActive);                                                   // verify cooling set point control is not active
     EXPECT_TRUE(thisTU.heatSPActive);                                                    // verify heating set point control is active
     EXPECT_NEAR(18.0, tuInletNode.Temp, 0.001);                                          // verify TU inlet node = 18
-    EXPECT_NEAR(18.0, state->dataLoopNodes->Node(thisTU.coolCoilAirInNode).Temp, 0.001); // verify cooling coil inlet node = 18
+    EXPECT_NEAR(18.0, state->dataLoopNodes->Node(thisTU.coolCoilAirInNode).Temp, 0.001); // verify mixer outlet node = 18
     SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     EXPECT_GT(SysOutputProvided, 0.0);                                                                      // TU provides heating
     EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).Temp, thisTU.coilTempSetPoint, 0.01); // TU outlet is at SP target
     EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).Temp, 20.0, 0.01);
 
     // switch to load based control
+    state->dataLoopNodes->Node(curZoneNum).Temp = 20.0; // set zone temp in heating mode
     thisTU.isSetPointControlled = false;
     thisTU.ZoneAirNode = 1;
     thisTU.ZoneNum = 1;
@@ -646,15 +656,36 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     EXPECT_NEAR(SysOutputProvided, QZnReq, 1.0);
 
+    state->dataEnvrn->OutDryBulbTemp = 30.0;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp = 30.0;
+    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Temp = 24.0;
+    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).HumRat = 0.007;
+    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Enthalpy =
+        PsyHFnTdbW(state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Temp, state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).HumRat);
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp = 30.0;
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat = 0.01;
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Enthalpy =
+        PsyHFnTdbW(state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp, state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat);
+    state->dataLoopNodes->Node(curZoneNum).Temp = 24.0;                                             // set zone temp in cooling mode
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputRequired = -1000.0; // set cooling load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToCoolSP = -1000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToHeatSP = -2000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).OutputRequiredToCoolingSP = -1000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).OutputRequiredToHeatingSP = -2000.0;
     InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
     EXPECT_LT(QZnReq, 0.0);
     EXPECT_TRUE(state->dataHVACVarRefFlow->CoolingLoad(curSysNum));
     EXPECT_FALSE(state->dataHVACVarRefFlow->HeatingLoad(curSysNum));
     SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     EXPECT_NEAR(SysOutputProvided, QZnReq, 1.0);
+
+    // Test node connection function
+    EXPECT_FALSE(ErrorsFound);
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);     // nodes are connected correctly
+    thisTU.VRFTUInletNodeNum += 1; // change index of inlet node
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
 }
 
 //*****************VRF-FluidTCtrl Model
