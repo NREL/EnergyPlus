@@ -33,30 +33,6 @@ same_type_as( A const &, B const & )
 	return std::is_same< A, B >::value;
 }
 
-template< class A, class B >
-inline
-bool
-SAME_TYPE_AS( A const &, B const & )
-{
-	return std::is_same< A, B >::value;
-}
-
-template< class A, class B >
-inline
-bool
-extends_type_of( A const &, B const & )
-{
-	return std::is_same< A, B >::value || std::is_base_of< B, A >::value;
-}
-
-template< class A, class B >
-inline
-bool
-EXTENDS_TYPE_OF( A const &, B const & )
-{
-	return std::is_same< A, B >::value || std::is_base_of< B, A >::value;
-}
-
 // is_a: Type Test for const Reference Argument
 template< class B, class A >
 inline

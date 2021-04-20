@@ -1721,23 +1721,6 @@ public: // Comparison: Count
 
 // Functions
 
-// Make an MArray5
-template< class A, typename T >
-inline
-MArray5< A, T >
-make_MArray5( A & a, T A::value_type::* pmem )
-{
-	return MArray5< A, T >( a, pmem );
-}
-
-// Make an MArray5
-template< class A, typename T >
-inline
-MArray5< A, T >
-MA5( A & a, T A::value_type::* pmem )
-{
-	return MArray5< A, T >( a, pmem );
-}
 
 // Conformable?
 template< typename Aa, typename Ta, typename Ab, typename Tb >

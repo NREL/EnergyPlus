@@ -485,15 +485,6 @@ PRESENT( Optional< T > const & o )
 	return o.present();
 }
 
-// Optional Maker
-template< typename T >
-inline
-Optional< T >
-make_Optional( T const & val )
-{
-	return Optional< T >( val );
-}
-
 } // ObjexxFCL
 
 #endif // ObjexxFCL_Optional_hh_INCLUDED

@@ -1588,24 +1588,6 @@ public: // Comparison: Count
 
 // Functions
 
-// Make an MArray4
-template< class A, typename T >
-inline
-MArray4< A, T >
-make_MArray4( A & a, T A::value_type::* pmem )
-{
-	return MArray4< A, T >( a, pmem );
-}
-
-// Make an MArray4
-template< class A, typename T >
-inline
-MArray4< A, T >
-MA4( A & a, T A::value_type::* pmem )
-{
-	return MArray4< A, T >( a, pmem );
-}
-
 // Conformable?
 template< typename Aa, typename Ta, typename Ab, typename Tb >
 inline

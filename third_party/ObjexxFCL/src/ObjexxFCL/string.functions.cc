@@ -166,17 +166,6 @@ uppercase( std::string & s )
 	return s;
 }
 
-// Left Justify a string
-std::string &
-ljustify( std::string & s )
-{
-	std::string::size_type const off( s.find_first_not_of( ' ' ) );
-	if ( ( off > 0 ) && ( off != std::string::npos ) ) {
-		s.erase( 0, off ).append( off, ' ' );
-	}
-	return s;
-}
-
 // Right Justify a string
 std::string &
 rjustify( std::string & s )
@@ -195,22 +184,6 @@ trim( std::string & s )
 {
 	if ( ! s.empty() ) {
 		std::string::size_type const ie( s.find_last_not_of( ' ' ) );
-		if ( ie == std::string::npos ) { // Blank string: return empty string
-			s.clear();
-		} else if ( ie + 1 < s.length() ) { // Trim tail
-			s.erase( ie + 1 );
-		}
-	}
-	return s;
-}
-
-// Trim Trailing Whitespace from a string
-std::string &
-trim_whitespace( std::string & s )
-{
-	static std::string const WHITE( " \t\0", 3 );
-	if ( ! s.empty() ) {
-		std::string::size_type const ie( s.find_last_not_of( WHITE ) );
 		if ( ie == std::string::npos ) { // Blank string: return empty string
 			s.clear();
 		} else if ( ie + 1 < s.length() ) { // Trim tail
@@ -306,56 +279,6 @@ rstrip( std::string & s )
 	if ( ! s.empty() ) {
 		std::string::size_type const ie( s.find_last_not_of( ' ' ) );
 		if ( ie == std::string::npos ) { // All of string is ' '
-			s.clear();
-		} else {
-			if ( ie < s.length() - 1 ) s.erase( ie + 1 );
-		}
-	}
-	return s;
-}
-
-// Strip Whitespace from a string's Tails
-std::string &
-strip_whitespace( std::string & s )
-{
-	static std::string const WHITE( " \t\0", 3 );
-	if ( ! s.empty() ) {
-		std::string::size_type const ib( s.find_first_not_of( WHITE ) );
-		std::string::size_type const ie( s.find_last_not_of( WHITE ) );
-		if ( ( ib == std::string::npos ) || ( ie == std::string::npos ) ) { // All of string is WHITE
-			s.clear();
-		} else {
-			if ( ie < s.length() - 1 ) s.erase( ie + 1 );
-			if ( ib > 0 ) s.erase( 0, ib );
-		}
-	}
-	return s;
-}
-
-// Strip Whitespace from a string's Left Tail
-std::string &
-lstrip_whitespace( std::string & s )
-{
-	static std::string const WHITE( " \t\0", 3 );
-	if ( ! s.empty() ) {
-		std::string::size_type const ib( s.find_first_not_of( WHITE ) );
-		if ( ib == std::string::npos ) { // All of string is WHITE
-			s.clear();
-		} else if ( ib > 0 ) {
-			s.erase( 0, ib );
-		}
-	}
-	return s;
-}
-
-// Strip Whitespace from a string's Right Tail
-std::string &
-rstrip_whitespace( std::string & s )
-{
-	static std::string const WHITE( " \t\0", 3 );
-	if ( ! s.empty() ) {
-		std::string::size_type const ie( s.find_last_not_of( WHITE ) );
-		if ( ie == std::string::npos ) { // All of string is WHITE
 			s.clear();
 		} else {
 			if ( ie < s.length() - 1 ) s.erase( ie + 1 );
@@ -662,42 +585,6 @@ stripped_whitespace( std::string const & s )
 			return std::string(); // Return empty string
 		} else {
 			return s.substr( ib, ie - ib + 1 );
-		}
-	}
-}
-
-// Whitespace Stripped from a string's Left Tail Copy of a string
-std::string
-lstripped_whitespace( std::string const & s )
-{
-	static std::string const WHITE( " \t\0", 3 );
-	if ( s.empty() ) {
-		return s;
-	} else {
-		std::string::size_type const ib( s.find_first_not_of( WHITE ) );
-		if ( ib == std::string::npos ) { // All of string is WHITE
-			return std::string(); // Return empty string
-		} else if ( ib > 0 ) {
-			return s.substr( ib );
-		} else {
-			return s;
-		}
-	}
-}
-
-// Whitespace Stripped from a string's Right Tail Copy of a string
-std::string
-rstripped_whitespace( std::string const & s )
-{
-	static std::string const WHITE( " \t\0", 3 );
-	if ( s.empty() ) {
-		return s;
-	} else {
-		std::string::size_type const ie( s.find_last_not_of( WHITE ) );
-		if ( ie == std::string::npos ) { // All of string is WHITE
-			return std::string(); // Return empty string
-		} else {
-			return s.substr( 0, ie + 1 );
 		}
 	}
 }

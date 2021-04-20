@@ -57,9 +57,7 @@ set(src
   src/ObjexxFCL/Array5.all.hh
   src/ObjexxFCL/Array5.fwd.hh
   src/ObjexxFCL/Array5.hh
-  src/ObjexxFCL/Array5A.fwd.hh
-  src/ObjexxFCL/Array5A.hh
-  src/ObjexxFCL/Array5D.fwd.hh
+        src/ObjexxFCL/Array5D.fwd.hh
   src/ObjexxFCL/Array5D.hh
   src/ObjexxFCL/Array5S.fwd.hh
   src/ObjexxFCL/Array5S.hh
@@ -149,12 +147,9 @@ set(src
   src/ObjexxFCL/Reference.hh
   src/ObjexxFCL/Required.fwd.hh
   src/ObjexxFCL/Required.hh
-        src/ObjexxFCL/rvalue_cast.hh
-  src/ObjexxFCL/sbyte.fwd.hh
+        src/ObjexxFCL/sbyte.fwd.hh
   src/ObjexxFCL/sbyte.hh
-  src/ObjexxFCL/SetWrapper.fwd.hh
-  src/ObjexxFCL/SetWrapper.hh
-  src/ObjexxFCL/Sticky.fwd.hh
+        src/ObjexxFCL/Sticky.fwd.hh
   src/ObjexxFCL/Sticky.hh
         src/ObjexxFCL/string.constants.cc
   src/ObjexxFCL/string.constants.hh
@@ -163,13 +158,10 @@ set(src
   src/ObjexxFCL/time.cc
   src/ObjexxFCL/time.hh
   src/ObjexxFCL/TraitsA.hh
-  src/ObjexxFCL/TraitsB.hh
-  src/ObjexxFCL/TraitsE.hh
+        src/ObjexxFCL/TraitsE.hh
   src/ObjexxFCL/TraitsF.hh
-  src/ObjexxFCL/TraitsG.hh
-  src/ObjexxFCL/TraitsI.hh
-  src/ObjexxFCL/TraitsLD.hh
-  src/ObjexxFCL/TypeTraits.hh
+        src/ObjexxFCL/TraitsI.hh
+        src/ObjexxFCL/TypeTraits.hh
         src/ObjexxFCL/Vector2.fwd.hh
   src/ObjexxFCL/Vector2.hh
   src/ObjexxFCL/Vector3.fwd.hh

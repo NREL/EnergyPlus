@@ -103,37 +103,6 @@ is_consonant( std::string const & s )
 	}
 }
 
-// string is Vowels?
-inline
-bool
-is_vowel( std::string const & s )
-{
-	static std::string const vowels( "aeiou" );
-	if ( s.empty() ) {
-		return false;
-	} else {
-		for ( char const c : s ) {
-			if ( vowels.find( std::tolower( c ) ) == std::string::npos ) return false;
-		}
-		return true;
-	}
-}
-
-// string is Alphanumeric?
-inline
-bool
-is_alpha_numeric( std::string const & s )
-{
-	if ( s.empty() ) {
-		return false;
-	} else {
-		for ( char const c : s ) {
-			if ( std::isalnum( c ) == 0 ) return false;
-		}
-		return true;
-	}
-}
-
 // string is Digits?
 inline
 bool
@@ -1900,18 +1869,6 @@ lstrip( std::string & s );
 // Strip Space from a string's Right Tail
 std::string &
 rstrip( std::string & s );
-
-// Strip Whitespace from a string's Tails
-std::string &
-strip_whitespace( std::string & s );
-
-// Strip Whitespace from a string's Left Tail
-std::string &
-lstrip_whitespace( std::string & s );
-
-// Strip Whitespace from a string's Right Tail
-std::string &
-rstrip_whitespace( std::string & s );
 
 // Pad a string to a Specified Length
 inline

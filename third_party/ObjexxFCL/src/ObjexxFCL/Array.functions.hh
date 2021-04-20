@@ -713,207 +713,6 @@ bit_or( Array5< T > const & a, Array5< T > const & b )
 	return r;
 }
 
-// Bitwise Xor /////
-
-template< typename T >
-inline
-Array1D< T >
-bit_xor( Array1< T > const & a, T const & b )
-{
-	assert( a.size_bounded() );
-	Array1D< T > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] ^= b;
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array2D< T >
-bit_xor( Array2< T > const & a, T const & b )
-{
-	assert( a.size_bounded() );
-	Array2D< T > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] ^= b;
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array3D< T >
-bit_xor( Array3< T > const & a, T const & b )
-{
-	assert( a.size_bounded() );
-	Array3D< T > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] ^= b;
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array4D< T >
-bit_xor( Array4< T > const & a, T const & b )
-{
-	assert( a.size_bounded() );
-	Array4D< T > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] ^= b;
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array5D< T >
-bit_xor( Array5< T > const & a, T const & b )
-{
-	assert( a.size_bounded() );
-	Array5D< T > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] ^= b;
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array1D< T >
-bit_xor( T const & a, Array1< T > const & b )
-{
-	assert( a.size_bounded() );
-	Array1D< T > r( b );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] ^= a;
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array2D< T >
-bit_xor( T const & a, Array2< T > const & b )
-{
-	assert( a.size_bounded() );
-	Array2D< T > r( b );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] ^= a;
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array3D< T >
-bit_xor( T const & a, Array3< T > const & b )
-{
-	assert( a.size_bounded() );
-	Array3D< T > r( b );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] ^= a;
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array4D< T >
-bit_xor( T const & a, Array4< T > const & b )
-{
-	assert( a.size_bounded() );
-	Array4D< T > r( b );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] ^= a;
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array5D< T >
-bit_xor( T const & a, Array5< T > const & b )
-{
-	assert( a.size_bounded() );
-	Array5D< T > r( b );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] ^= a;
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array1D< T >
-bit_xor( Array1< T > const & a, Array1< T > const & b )
-{
-	assert( a.size_bounded() );
-	assert( conformable( a, b ) );
-	Array1D< T > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] ^= b[ i ];
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array2D< T >
-bit_xor( Array2< T > const & a, Array2< T > const & b )
-{
-	assert( a.size_bounded() );
-	assert( conformable( a, b ) );
-	Array2D< T > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] ^= b[ i ];
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array3D< T >
-bit_xor( Array3< T > const & a, Array3< T > const & b )
-{
-	assert( a.size_bounded() );
-	assert( conformable( a, b ) );
-	Array3D< T > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] ^= b[ i ];
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array4D< T >
-bit_xor( Array4< T > const & a, Array4< T > const & b )
-{
-	assert( a.size_bounded() );
-	assert( conformable( a, b ) );
-	Array4D< T > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] ^= b[ i ];
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array5D< T >
-bit_xor( Array5< T > const & a, Array5< T > const & b )
-{
-	assert( a.size_bounded() );
-	assert( conformable( a, b ) );
-	Array5D< T > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] ^= b[ i ];
-	}
-	return r;
-}
 
 // pow /////
 
@@ -1751,33 +1550,6 @@ reshape2( Array< T > const & a, Array1< I > const & shape )
 
 template< typename T, typename I >
 inline
-Array3D< T >
-reshape3( Array< T > const & a, Array1< I > const & shape )
-{
-	assert( shape.size() == 3 );
-	return Array3D< T >( shape[ 0 ], shape[ 1 ], shape[ 2 ], a );
-}
-
-template< typename T, typename I >
-inline
-Array4D< T >
-reshape4( Array< T > const & a, Array1< I > const & shape )
-{
-	assert( shape.size() == 4 );
-	return Array4D< T >( shape[ 0 ], shape[ 1 ], shape[ 2 ], shape[ 3 ], a );
-}
-
-template< typename T, typename I >
-inline
-Array5D< T >
-reshape5( Array< T > const & a, Array1< I > const & shape )
-{
-	assert( shape.size() == 5 );
-	return Array5D< T >( shape[ 0 ], shape[ 1 ], shape[ 2 ], shape[ 3 ], shape[ 4 ], a );
-}
-
-template< typename T, typename I >
-inline
 Array1D< T >
 reshape1( std::initializer_list< T > const & l, Array1< I > const & shape )
 {
@@ -1792,33 +1564,6 @@ reshape2( std::initializer_list< T > const & l, Array1< I > const & shape )
 {
 	assert( shape.size() == 2 );
 	return Array2D< T >( shape[ 0 ], shape[ 1 ], l );
-}
-
-template< typename T, typename I >
-inline
-Array3D< T >
-reshape3( std::initializer_list< T > const & l, Array1< I > const & shape )
-{
-	assert( shape.size() == 3 );
-	return Array3D< T >( shape[ 0 ], shape[ 1 ], shape[ 2 ], l );
-}
-
-template< typename T, typename I >
-inline
-Array4D< T >
-reshape4( std::initializer_list< T > const & l, Array1< I > const & shape )
-{
-	assert( shape.size() == 4 );
-	return Array4D< T >( shape[ 0 ], shape[ 1 ], shape[ 2 ], shape[ 3 ], l );
-}
-
-template< typename T, typename I >
-inline
-Array5D< T >
-reshape5( std::initializer_list< T > const & l, Array1< I > const & shape )
-{
-	assert( shape.size() == 5 );
-	return Array5D< T >( shape[ 0 ], shape[ 1 ], shape[ 2 ], shape[ 3 ], shape[ 4 ], l );
 }
 
 template< typename T, typename I >
@@ -1841,33 +1586,6 @@ reshape2( Array< T > const & a, std::initializer_list< I > const & shape )
 
 template< typename T, typename I >
 inline
-Array3D< T >
-reshape3( Array< T > const & a, std::initializer_list< I > const & shape )
-{
-	assert( shape.size() == 3 );
-	return Array3D< T >( shape.begin()[ 0 ], shape.begin()[ 1 ], shape.begin()[ 2 ], a );
-}
-
-template< typename T, typename I >
-inline
-Array4D< T >
-reshape4( Array< T > const & a, std::initializer_list< I > const & shape )
-{
-	assert( shape.size() == 4 );
-	return Array4D< T >( shape.begin()[ 0 ], shape.begin()[ 1 ], shape.begin()[ 2 ], shape.begin()[ 3 ], a );
-}
-
-template< typename T, typename I >
-inline
-Array5D< T >
-reshape5( Array< T > const & a, std::initializer_list< I > const & shape )
-{
-	assert( shape.size() == 5 );
-	return Array5D< T >( shape.begin()[ 0 ], shape.begin()[ 1 ], shape.begin()[ 2 ], shape.begin()[ 3 ], shape.begin()[ 4 ], a );
-}
-
-template< typename T, typename I >
-inline
 Array1D< T >
 reshape1( std::initializer_list< T > const & l, std::initializer_list< I > const & shape )
 {
@@ -1882,33 +1600,6 @@ reshape2( std::initializer_list< T > const & l, std::initializer_list< I > const
 {
 	assert( shape.size() == 2 );
 	return Array2D< T >( shape.begin()[ 0 ], shape.begin()[ 1 ], l );
-}
-
-template< typename T, typename I >
-inline
-Array3D< T >
-reshape3( std::initializer_list< T > const & l, std::initializer_list< I > const & shape )
-{
-	assert( shape.size() == 3 );
-	return Array3D< T >( shape.begin()[ 0 ], shape.begin()[ 1 ], shape.begin()[ 2 ], l );
-}
-
-template< typename T, typename I >
-inline
-Array4D< T >
-reshape4( std::initializer_list< T > const & l, std::initializer_list< I > const & shape )
-{
-	assert( shape.size() == 4 );
-	return Array4D< T >( shape.begin()[ 0 ], shape.begin()[ 1 ], shape.begin()[ 2 ], shape.begin()[ 3 ], l );
-}
-
-template< typename T, typename I >
-inline
-Array5D< T >
-reshape5( std::initializer_list< T > const & l, std::initializer_list< I > const & shape )
-{
-	assert( shape.size() == 5 );
-	return Array5D< T >( shape.begin()[ 0 ], shape.begin()[ 1 ], shape.begin()[ 2 ], shape.begin()[ 3 ], shape.begin()[ 4 ], l );
 }
 
 // pack /////
@@ -3685,62 +3376,6 @@ matmul( Array2< bool > const & a, Array2< bool > const & b, std::size_t const cr
 	}
 }
 
-// Matrix Product of 2D Arrays with Right Array Transposed
-template< typename T >
-inline
-Array2D< T >
-matmul_T( Array2< T > const & a, Array2< T > const & b )
-{
-	assert( a.size_bounded() );
-	assert( b.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as( a.size() );
-	size_type const bs1( b.size1() );
-	assert( as2 == b.size2() );
-	Array2D< T > m( static_cast< int >( as1 ), static_cast< int >( bs1 ) );
-	for ( size_type l1 = 0, l = 0; l1 < as; l1 += as2 ) {
-		for ( size_type l2 = 0, lb = 0; l2 < bs1; ++l2, ++l ) {
-			T d( 0 );
-			for ( size_type la = l1, la_end = l1 + as2; la < la_end; ++la, ++lb ) {
-				d += a[ la ] * b[ lb ];
-			}
-			m[ l ] = d;
-		}
-	}
-	return m;
-}
-
-// Matrix Product of 2D Boolean Arrays with Right Array Transposed
-inline
-Array2D< bool >
-matmul_T( Array2< bool > const & a, Array2< bool > const & b )
-{
-	assert( a.size_bounded() );
-	assert( b.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as( a.size() );
-	size_type const bs1( b.size1() );
-	assert( as2 == b.size2() );
-	Array2D< bool > m( static_cast< int >( as1 ), static_cast< int >( bs1 ) );
-	for ( size_type l1 = 0, l = 0; l1 < as; l1 += as2 ) {
-		for ( size_type l2 = 0, lb = 0; l2 < bs1; ++l2, ++l ) {
-			bool d( false );
-			for ( size_type la = l1, la_end = l1 + as2; la < la_end; ++la, ++lb ) {
-				if ( a[ la ] && b[ lb ] ) {
-					d = true;
-					break;
-				}
-			}
-			m[ l ] = d;
-		}
-	}
-	return m;
-}
-
 // merge /////
 
 // Merge Scalars
@@ -4210,22 +3845,6 @@ merge( T const & a, Array5< T > const & b, Array5< bool > const & mask )
 		m[ l ] = ( mask[ l ] ? a : b[ l ] );
 	}
 	return m;
-}
-
-// Subscript Array Generators /////
-
-// Subscripted Array
-template< typename T >
-inline
-Array1D< T >
-array_sub( Array1< T > const & a, Array1< int > const & sub )
-{
-	assert( sub.size_bounded() );
-	Array1D< T > r( sub.isize() );
-	for ( int i = sub.l(), e = sub.u(), k = 1; i <= e; ++i, ++k ) {
-		r( k ) = a( sub( i ) );
-	}
-	return r;
 }
 
 } // ObjexxFCL
