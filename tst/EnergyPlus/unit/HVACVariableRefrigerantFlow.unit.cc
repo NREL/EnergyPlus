@@ -683,7 +683,27 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     EXPECT_FALSE(ErrorsFound);
     CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);     // nodes are connected correctly
-    thisTU.VRFTUInletNodeNum += 1; // change index of inlet node
+    thisTU.VRFTUInletNodeNum += 1; // change index of comp node
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.VRFTUOutletNodeNum -= 1; // revert previous change
+    thisTU.coolCoilAirInNode += 1;  // change index of comp node
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.coolCoilAirInNode -= 1;  // revert previous change
+    thisTU.coolCoilAirOutNode -= 1; // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.coolCoilAirOutNode += 1; // revert previous change
+    thisTU.heatCoilAirInNode -= 1;  // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.heatCoilAirInNode += 1;  // revert previous change
+    thisTU.heatCoilAirOutNode -= 1; // change index of comp node (watch for array bounds)
     CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
     EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
 }
@@ -4217,6 +4237,35 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
               0.0); // flow should be = 0 for cycling fan mode
     EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate,
               0.0); // flow should be = 0 for cycling fan mode
+
+    // Test node connection function
+    auto &thisTU = state->dataHVACVarRefFlow->VRFTU(VRFTUNum);
+    EXPECT_FALSE(ErrorsFound);
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);      // nodes are connected correctly
+    thisTU.VRFTUOutletNodeNum += 1; // change index of comp node
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.VRFTUOutletNodeNum -= 1; // revert previous change
+    thisTU.coolCoilAirInNode += 1;  // change index of comp node
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.coolCoilAirInNode -= 1;  // revert previous change
+    thisTU.coolCoilAirOutNode -= 1; // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.coolCoilAirOutNode += 1; // revert previous change
+    thisTU.heatCoilAirInNode -= 1;  // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.heatCoilAirInNode += 1;  // revert previous change
+    thisTU.heatCoilAirOutNode -= 1; // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)

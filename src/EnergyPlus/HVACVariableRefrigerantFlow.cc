@@ -5781,6 +5781,31 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
             }
             ErrorsFound = true;
         }
+        if (FanPlace == DataHVACGlobals::DrawThru) {
+            if (fanOutletNode != VRFTUOutletNodeNum) {
+                ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+                ShowContinueError(state,
+                                  "... For draw through fan and no supplemental heating coil the fan outlet node name must "
+                                  "match the terminal unit outlet node name.");
+                if (fanOutletNode > 0 && VRFTUOutletNodeNum > 0) {
+                    ShowContinueError(state, "... Fan outlet node name = " + nodeID(fanOutletNode) + ".");
+                    ShowContinueError(state, "... Terminal unit outlet node name = " + nodeID(VRFTUOutletNodeNum) + ".");
+                }
+                ErrorsFound = true;
+            }
+        }
+    } else if (FanPlace == DataHVACGlobals::DrawThru) {
+        if (fanOutletNode != VRFTUOutletNodeNum) {
+            ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+            ShowContinueError(state,
+                              "... For blow through fan and no supplemental heating coil the fan outlet node name must "
+                              "match the terminal unit outlet node name.");
+            if (fanOutletNode > 0 && VRFTUOutletNodeNum > 0) {
+                ShowContinueError(state, "... Fan outlet node name = " + nodeID(fanOutletNode) + ".");
+                ShowContinueError(state, "... Terminal unit outlet node name = " + nodeID(VRFTUOutletNodeNum) + ".");
+            }
+            ErrorsFound = true;
+        }
     }
 }
 
