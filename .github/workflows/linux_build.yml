@@ -68,6 +68,7 @@ jobs:
                 -DOPENGL_REQUIRED=OFF \
                 -DUSE_PSYCH_STATS=ON \
                 -DUSE_PSYCH_ERRORS=OFF \
+                -DENABLE_PCH=OFF \
                 ../
 
       - name: Build EnergyPlus
