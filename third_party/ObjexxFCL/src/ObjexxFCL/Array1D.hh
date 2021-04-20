@@ -1760,14 +1760,6 @@ public: // std::vector-like API
 		return *this;
 	}
 
-	// Shrink Capacity to Size
-	Array1D &
-	shrink_to_fit()
-	{
-		Base::shrink_capacity();
-		return *this;
-	}
-
 protected: // Functions
 
 	// Dimension by IndexRange
@@ -3725,42 +3717,6 @@ cross_product( Array1S< T > const & a, Array1S< T > const & b )
 template< typename T >
 inline
 Array1D< T >
-cross3( Array1< T > const & a, Array1< T > const & b )
-{
-	return cross( a, b );
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Array1D< T >
-cross3( Array1S< T > const & a, Array1< T > const & b )
-{
-	return cross( a, b );
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Array1D< T >
-cross3( Array1< T > const & a, Array1S< T > const & b )
-{
-	return cross( a, b );
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Array1D< T >
-cross3( Array1S< T > const & a, Array1S< T > const & b )
-{
-	return cross( a, b );
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Array1D< T >
 Array_cross( Array1< T > const & a, Vector3< T > const & b )
 {
 	assert( a.size() == 3u );
@@ -3783,24 +3739,6 @@ Array_cross( Vector3< T > const & a, Array1< T > const & b )
 	c[ 1 ] = ( a.z * b[ 0 ] ) - ( a.x * b[ 2 ] );
 	c[ 2 ] = ( a.x * b[ 1 ] ) - ( a.y * b[ 0 ] );
 	return c;
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Array1D< T >
-Array_cross3( Array1< T > const & a, Vector3< T > const & b )
-{
-	return Array_cross( a, b );
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Array1D< T >
-Array_cross3( Vector3< T > const & a, Array1< T > const & b )
-{
-	return Array_cross( a, b );
 }
 
 // Cross Product of 3-Tuples
@@ -3829,24 +3767,6 @@ Vector_cross( Vector3< T > const & a, Array1< T > const & b )
 	c.y = ( a.z * b[ 0 ] ) - ( a.x * b[ 2 ] );
 	c.z = ( a.x * b[ 1 ] ) - ( a.y * b[ 0 ] );
 	return c;
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Vector3< T >
-Vector_cross3( Array1< T > const & a, Vector3< T > const & b )
-{
-	return Vector_cross( a, b );
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Vector3< T >
-Vector_cross3( Vector3< T > const & a, Array1< T > const & b )
-{
-	return Vector_cross( a, b );
 }
 
 } // ObjexxFCL

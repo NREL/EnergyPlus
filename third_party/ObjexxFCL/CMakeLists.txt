@@ -37,9 +37,7 @@ set(src
   src/ObjexxFCL/Array3.all.hh
   src/ObjexxFCL/Array3.fwd.hh
   src/ObjexxFCL/Array3.hh
-  src/ObjexxFCL/Array3A.fwd.hh
-  src/ObjexxFCL/Array3A.hh
-  src/ObjexxFCL/Array3D.fwd.hh
+        src/ObjexxFCL/Array3D.fwd.hh
   src/ObjexxFCL/Array3D.hh
   src/ObjexxFCL/Array3S.fwd.hh
   src/ObjexxFCL/Array3S.hh
@@ -47,9 +45,7 @@ set(src
   src/ObjexxFCL/Array4.all.hh
   src/ObjexxFCL/Array4.fwd.hh
   src/ObjexxFCL/Array4.hh
-  src/ObjexxFCL/Array4A.fwd.hh
-  src/ObjexxFCL/Array4A.hh
-  src/ObjexxFCL/Array4D.fwd.hh
+        src/ObjexxFCL/Array4D.fwd.hh
   src/ObjexxFCL/Array4D.hh
   src/ObjexxFCL/Array4S.fwd.hh
   src/ObjexxFCL/Array4S.hh

@@ -859,13 +859,6 @@ public: // Predicate
 		return ( z1_ == z2_ );
 	}
 
-	// Square and Equal Dimensions?
-	bool
-	equal_square_dimensions() const
-	{
-		return ( I1_ == I2_ );
-	}
-
 	// Symmetric?
 	bool
 	symmetric() const
@@ -1078,18 +1071,6 @@ public: // Modifier
 		return *this;
 	}
 
-	// Set Diagonal of Matrix to a Uniform Value
-	Array2 &
-	set_diagonal( T const & d )
-	{
-		assert( square() );
-		Array2 & A( *this ); // Shorthand name
-		for ( size_type l = 0, l_inc = z1_ + 1; l < size_; l += l_inc ) {
-			A[ l ] = d;
-		}
-		return *this;
-	}
-
 	// Transpose
 	Array2 &
 	transpose()
@@ -1104,59 +1085,6 @@ public: // Modifier
 		}
 		return *this;
 	}
-
-	// Right Multiply By Array
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array2 &
-	right_multiply_by( Array2< U > const & a )
-	{
-		size_type const as2( a.z2_ );
-		assert( z2_ == a.z1_ );
-		assert( a.z1_ == as2 ); // Square so that this array's dimensions aren't changed
-		Array2 & t( *this ); // Shorthand name for this array
-		T * const r( new T[ z2_ ] ); // Temporary row
-		for ( size_type i = 0; i < z1_; ++i ) {
-			for ( size_type j = 0, lt_beg = i * z2_, lt_end = lt_beg + z2_; j < as2; ++j ) {
-				T d( 0 );
-				for ( size_type lt = lt_beg, la = j; lt < lt_end; ++lt, la += as2 ) {
-					d += t[ lt ] * a[ la ];
-				}
-				r[ j ] = d;
-			}
-			for ( size_type l = 0, lt = i * z2_; l < z2_; ++l, ++lt ) { // Copy in the new row
-				t[ lt ] = r[ l ];
-			}
-		}
-		delete[] r;
-		return *this;
-	}
-
-	// Right Multiply By Transpose of Array
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array2 &
-	right_multiply_by_transpose( Array2< U > const & a )
-	{
-		size_type const as1( a.z1_ );
-		assert( z2_ == a.z2_ );
-		assert( as1 == a.z2_ ); // Square so that this array's dimensions aren't changed
-		Array2 & t( *this ); // Shorthand name for this array
-		T * const r( new T[ z2_ ] ); // Temporary row
-		for ( size_type i = 0; i < z1_; ++i ) {
-			for ( size_type j = 0, lt_beg = i * z2_, lt_end = lt_beg + z2_, la = 0; j < as1; ++j ) {
-				T d( 0 );
-				for ( size_type lt = lt_beg; lt < lt_end; ++lt, ++la ) {
-					d += t[ lt ] * a[ la ];
-				}
-				r[ j ] = d;
-			}
-			for ( size_type l = 0, lt = i * z2_; l < z2_; ++l, ++lt ) { // Copy in the new row
-				t[ lt ] = r[ l ];
-			}
-		}
-		delete[] r;
-		return *this;
-	}
-
 
 public: // Comparison: Predicate
 

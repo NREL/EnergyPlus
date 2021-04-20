@@ -3126,27 +3126,6 @@ dot_product( MArray1< A, bool > const & a, Array1S< bool > const & b )
 template< typename T >
 inline
 T
-cross2( Array1S< T > const & a, Array1S< T > const & b )
-{
-	assert( conformable( a, b ) );
-	assert( a.size() == 2u );
-	return ( a[ 0 ] * b[ 1 ] ) - ( a[ 1 ] * b[ 0 ] );
-}
-
-// Cross Product of 2-Tuples
-template< typename T >
-inline
-T
-cross2( Array1S< T > const & a, Vector2< T > const & b )
-{
-	assert( a.size() == 2u );
-	return ( a[ 0 ] * b.y ) - ( a[ 1 ] * b.x );
-}
-
-// Cross Product of 2-Tuples
-template< typename T >
-inline
-T
 cross2( Vector2< T > const & a, Array1S< T > const & b )
 {
 	return cross2( b, a );
@@ -3200,23 +3179,6 @@ read_binary( std::istream & stream, Array1S< T > & a )
 		std::size_t const type_size( sizeof( T ) / sizeof( std::istream::char_type ) );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			stream.read( ( std::istream::char_type * )&a( i ), type_size );
-			if ( ! stream ) break;
-		}
-	}
-	return stream;
-}
-
-// Write an Array1S to a Binary File
-template< typename T >
-inline
-std::ostream &
-write_binary( std::ostream & stream, Array1S< T > const & a )
-{
-	std::size_t const n( a.size() );
-	if ( stream && ( n > 0u ) ) {
-		std::size_t const type_size( sizeof( T ) / sizeof( std::ostream::char_type ) );
-		for ( int i = 1, e = a.u(); i <= e; ++i ) {
-			stream.write( ( std::ostream::char_type const * )&a( i ), type_size );
 			if ( ! stream ) break;
 		}
 	}

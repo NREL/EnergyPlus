@@ -1429,18 +1429,6 @@ public: // Inspector
 		return std::sqrt( length_sq );
 	}
 
-	// Length Squared
-	T
-	length_squared() const
-	{
-		T length_sq( T( 0 ) );
-		for ( int i = l(), e = u(); i <= e; ++i ) {
-			T const length_i( sdata_[ i ] );
-			length_sq += length_i * length_i;
-		}
-		return length_sq;
-	}
-
 public: // Modifier
 
 	// Clear
@@ -3426,27 +3414,6 @@ bool
 dot_product( MArray1< A, bool > const & a, Array1< bool > const & b )
 {
 	return dot( b, a );
-}
-
-// Cross Product of 2-Tuples
-template< typename T >
-inline
-T
-cross2( Array1< T > const & a, Array1< T > const & b )
-{
-	assert( conformable( a, b ) );
-	assert( a.size() == 2u );
-	return ( a[ 0 ] * b[ 1 ] ) - ( a[ 1 ] * b[ 0 ] );
-}
-
-// Cross Product of 2-Tuples
-template< typename T >
-inline
-T
-cross2( Array1< T > const & a, Vector2< T > const & b )
-{
-	assert( a.size() == 2u );
-	return ( a[ 0 ] * b.y ) - ( a[ 1 ] * b.x );
 }
 
 // Cross Product of 2-Tuples
