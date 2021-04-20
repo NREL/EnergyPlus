@@ -3,7 +3,7 @@ Assembly Window Output Reporting
 
 **Jason Glazer, GARD Analytics**
 
- - April 16, 2021
+ - April 20, 2021
  
 
 ## Justification for New Feature ##
@@ -42,7 +42,12 @@ None yet.
 ## Overview ##
 
 Use the updated Windows Calculation Engine to compute the overall assembly 
-U-factor, SHGC, and VT for fenestration.
+U-factor, SHGC, and VT for fenestration. 
+
+Since NFRC rates window assemblies at certain sizes, the user will specify 
+the type of window based on the list from 
+[NFRC 100](https://nfrccommunity.org/store/viewproduct.aspx?id=1380591) 
+when specifying the WindowProperty:FrameAndDivider.
 
 ## Approach ##
 
@@ -60,7 +65,52 @@ and the general procedures are described in
  and [NFRC 200](https://nfrccommunity.org/store/viewproduct.aspx?id=1402116).
 
 The output will be new columns in the Exterior Fenestration and Interior Fenestration 
-tables of the Envelope Summary report.
+tables of the Envelope Summary report. The new columns would show the overall assembly
+U-factor, SHGC, and VT for NFRC rated window sizes as well as the NFRC product type. 
+For each NRFC product type a rated size is used to compute the overall assembly 
+u-factor, SHGC and VT. The sizes for each NFRC product type are shown in the NFRC 
+100 Table 4-3, reproduced below.
+
+![NFRC100-Table4-3](NFRC100-Table4-3.PNG)
+
+A new field will be added to WindowProperty:FrameAndDivider to indicate the NFRC product
+type. The default value for this field will be Curtain Wall which is one of the most common
+commerical window types.
+
+In order to understand when the assembly outputs should be shown, some simulations were 
+performed to identify when the envelope summary report was populated:
+
+- WindowMaterial:Glazing, WindowMaterial:Gas
+
+- Construction:WindowEquivalentLayer, WindowMaterial:Glazing:EquivalentLayer, 
+WindowMaterial:Gap:EquivalentLayer, WindowMaterial:Shade:EquivalentLayer, 
+WindowMaterial:Screen:EquivalentLayer**
+
+- Construction:ComplexFenestrationState, Matrix:TwoDimension, 
+WindowMaterial:Glazing, WindowMaterial:Gap
+
+- Construction:ComplexFenestrationState, Matrix:TwoDimension, 
+WindowMaterial:Glazing, WindowMaterial:Gap, WindowProperty:FrameAndDivider
+
+- Construction:WindowDataFile/ Window5DataFile.dat**
+
+- WindowMaterial:SimpleGlazingSystem
+
+- WindowMaterial:GlazingGroup:Thermochromic
+
+- WindowMaterial:Glazing:RefractionExtinctionMethod
+
+All cases shown created the proper columns in the Exterior Fenestration table of the 
+Envelope Summary report with and without WindowProperty:FrameAndDivider except the two shown 
+with double-asterisks. In those cases, the addition of the WindowProperty:FrameAndDivider
+resulted in an error being generated. 
+
+The error with Construction:WindowEquivalentLayer with an WindowProperty:FrameAndDivider 
+indicated that it was not supported. The error with Construction:WindowDataFile
+and WindowProperty:FrameAndDivider showed that the frame was going to be repalced 
+with what was present in the Window5DataFile.dat file. Those errors seem reasonable
+and will not be addressed.
+
 
 ## Testing/Validation/Data Sources ##
 
@@ -69,6 +119,27 @@ Comparing results with the values from WINDOW program.
 ## Input Output Reference Documentation ##
 
 The only change the input output reference is shown below with underlines:
+
+1.10.59 WindowProperty:FrameAndDivider
+
+...
+
+<ins>Field: NFRC Product Type for Assembly Calculations
+
+The selection made for this field corresponds to NFRC 100 "Procedure for 
+Determining Fenestration Product U-factors" product types which are used when 
+computing the overall u-factor, SHGC, and visual transmittance. The default is 
+CurtainWall. The options are: CasementDouble, CasementSingle, DualAction, 
+Fixed, Garage, Greenhouse, HingedEscape, HorizontalSlider, Jal, Pivoted, 
+Projecting, DoorSidelite, Skylight, SlidingPatioDoor, CurtainWall, 
+SpandrelPanel, SideHingedDoor, DoorTransom, TropicalAwning, 
+TubularDaylightingDevice, and VerticalSlider. The sizes used in the calculation
+of the overall u-factor, overall SHGC, and overall VT are based on NFRC 
+100 Table 4-3, reproduced below.
+</ins>
+
+![NFRC100-Table4-3](NFRC100-Table4-3.PNG)
+ 
 
 7.4.1.1.5 Envelope Summary
 The Envelope Summary report (key: EnvelopeSummary) produces a report that 
@@ -81,14 +152,45 @@ direction.
 * Fenestration which includes all non-opaque surfaces and includes the name of 
 the construction, areas (glass, frame, divider, single opening, multiplied 
 openings), glass U-Factor, glass SHGC (the solar heat gain coeﬀicient based on 
-summer conditions), glass visible transmittance, <ins>assembly U-Factor, assembly 
-SHGC, assembly visible transmittance,</ins> conductance (frame, divider), indication 
-of shade control, the name of the parent surface, azimuth, tilt, cardinal 
-direction. <ins>The assembly result include the effect of the frame and divider.</ins>
+summer conditions), glass visible transmittance, <ins>NFRC Product Type, assembly
+U-Factor, assembly SHGC, assembly visible transmittance,</ins> conductance 
+(frame, divider), indication of shade control, the name of the parent surface, 
+azimuth, tilt, cardinal direction. <ins>The assembly result include the effect
+of the frame and divider.</ins>
 
 ## Input Description ##
 
-No input changes are expected.
+The  only input change is to provide the user a way to specify the NFRC product type so
+that the assembly u-factor, SHGC and VT are computed for a standard NFRC size.
+
+```
+WindowProperty:FrameAndDivider,
+...
+  A3,  \field NFRC Product Type for Assembly Calculations
+       \type choice
+       \key CasementDouble
+       \key CasementSingle
+       \key DualAction
+       \key Fixed
+       \key Garage
+       \key Greenhouse
+       \key HingedEscape
+       \key HorizontalSlider
+       \key Jal
+       \key Pivoted
+       \key Projecting
+       \key DoorSidelite
+       \key Skylight
+       \key SlidingPatioDoor
+       \key CurtainWall
+       \key SpandrelPanel
+       \key SideHingedDoor
+       \key DoorTransom
+       \key TropicalAwning
+       \key TubularDaylightingDevice
+       \key VerticalSlider
+       \default CurtainWall
+```
 
 ## Outputs Description ##
 
@@ -338,6 +440,7 @@ The new columns are propsed to be added after the glass only u-factor, SHGC and 
     <td align="right">Glass U-Factor [W/m2-K]</td>
     <td align="right">Glass SHGC</td>
     <td align="right">Glass Visible Transmittance</td>
+    <td align="right">NFRC Product Type</td>
     <td align="right">Assembly U-Factor [W/m2-K]</td>
     <td align="right">Assembly SHGC</td>
     <td align="right">Assembly Visible Transmittance</td>
@@ -360,6 +463,7 @@ The new columns are propsed to be added after the glass only u-factor, SHGC and 
     <td align="right">       2.720</td>
     <td align="right">       0.764</td>
     <td align="right">       0.812</td>
+    <td align="right"> CurtainWall</td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
@@ -382,6 +486,7 @@ The new columns are propsed to be added after the glass only u-factor, SHGC and 
     <td align="right">       5.894</td>
     <td align="right">       0.716</td>
     <td align="right">       0.611</td>
+    <td align="right"> CurtainWall</td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
@@ -404,6 +509,7 @@ The new columns are propsed to be added after the glass only u-factor, SHGC and 
     <td align="right">       2.720</td>
     <td align="right">       0.764</td>
     <td align="right">       0.812</td>
+    <td align="right"> CurtainWall</td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
@@ -426,6 +532,7 @@ The new columns are propsed to be added after the glass only u-factor, SHGC and 
     <td align="right">       2.720</td>
     <td align="right">       0.764</td>
     <td align="right">       0.812</td>
+    <td align="right"> CurtainWall</td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
@@ -448,6 +555,7 @@ The new columns are propsed to be added after the glass only u-factor, SHGC and 
     <td align="right">       5.894</td>
     <td align="right">       0.716</td>
     <td align="right">       0.611</td>
+    <td align="right"> CurtainWall</td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
@@ -470,6 +578,7 @@ The new columns are propsed to be added after the glass only u-factor, SHGC and 
     <td align="right">       2.720</td>
     <td align="right">       0.764</td>
     <td align="right">       0.812</td>
+    <td align="right"> CurtainWall</td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
@@ -495,6 +604,7 @@ The new columns are propsed to be added after the glass only u-factor, SHGC and 
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
+    <td align="right">       ---  </td>
     <td align="right">&nbsp;</td>
     <td align="right">&nbsp;</td>
     <td align="right">&nbsp;</td>
@@ -514,6 +624,7 @@ The new columns are propsed to be added after the glass only u-factor, SHGC and 
     <td align="right">       3.391</td>
     <td align="right">       0.754</td>
     <td align="right">       0.769</td>
+    <td align="right">       ---  </td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
@@ -539,6 +650,7 @@ The new columns are propsed to be added after the glass only u-factor, SHGC and 
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
+    <td align="right">       ---  </td>
     <td align="right">&nbsp;</td>
     <td align="right">&nbsp;</td>
     <td align="right">&nbsp;</td>
@@ -559,6 +671,7 @@ The new columns are propsed to be added after the glass only u-factor, SHGC and 
     <td align="right">Glass U-Factor [W/m2-K]</td>
     <td align="right">Glass SHGC</td>
     <td align="right">Glass Visible Transmittance</td>
+    <td align="right">NFRC Product Type</td>
     <td align="right">Assembly U-Factor [W/m2-K]</td>
     <td align="right">Assembly SHGC</td>
     <td align="right">Assembly Visible Transmittance</td>
@@ -572,6 +685,7 @@ The new columns are propsed to be added after the glass only u-factor, SHGC and 
     <td align="right">-</td>
     <td align="right">-</td>
     <td align="right">-</td>
+    <td align="right"> CurtainWall</td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
     <td align="right">       ---  </td>
@@ -579,14 +693,30 @@ The new columns are propsed to be added after the glass only u-factor, SHGC and 
   </tr>
 </table>
 
+In addition the EIO report includes the WindowConstruction data if the following is included in the IDF file
+
+Output:Constructions,Constructions;
+
+and currently produces:
+
+! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},SHGC,Solar Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence
+ WindowConstruction,DBL CLR 3MM/13MM AIR,6,3,VerySmooth,2.720,0.764,0.705,0.812
+
+this will be enhanced to produce: 
+
+! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},SHGC,Solar Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence, NFRC Product Type, Assembly U-Factor, Assembly SHGC, Assembly Visible Transmittance
+ WindowConstruction,DBL CLR 3MM/13MM AIR,6,3,VerySmooth,2.720,0.764,0.705,0.812,CurtainWall, ---, ---, ---
+
+
 ## Engineering Reference ##
 
 No changes expected in the engineering reference.
 
 ## Example File and Transition Changes ##
 
-No example file or input transition changes. Output changes to the tabular 
-output files are as described above.
+All example files that use WindowProperty:FrameAndDivider will have the new field added.
+
+Output changes to the tabular output files are as described above.
 
 ## References ##
 
