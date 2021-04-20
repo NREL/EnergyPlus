@@ -61,22 +61,22 @@ namespace AirflowNetwork {
 
     enum VentControlType // TODO: make enum class, since this enum is used in SetupOutputVariable()
     {
-        None = -1,  // Wrong input
-        Temp = 1,  // Temperature venting control
-        Enth,  // Enthalpy venting control
-        Const, // Constant venting control
+        None = -1,       // Wrong input
+        Temp,            // Temperature venting control
+        Enth,            // Enthalpy venting control
+        Const,           // Constant venting control
         ASH55,
         CEN15251,
-        NoVent,    // No venting
-        ZoneLevel, // ZoneLevel control for a heat transfer subsurface
-        AdjTemp,   // Temperature venting control based on adjacent zone conditions
-        AdjEnth    // Enthalpy venting control based on adjacent zone conditions
+        NoVent,          // No venting
+        ZoneLevel,       // ZoneLevel control for a heat transfer subsurface
+        AdjTemp,         // Temperature venting control based on adjacent zone conditions
+        AdjEnth          // Enthalpy venting control based on adjacent zone conditions
     };
 
-    enum OpenStatus // TODO: make enum class, since this enum is used in SetupOutputVariable()
+    enum OpenStatus      // TODO: make enum class, since this enum is used in SetupOutputVariable()
     {
         Uninitialized = -1,
-        FreeOperation = 1,     // Free operation
+        FreeOperation,     // Free operation
         MinCheckForceOpen, // Force open when opening elapsed time is less than minimum opening time
         MinCheckForceClose // Force open when closing elapsed time is less than minimum closing time
     };
@@ -84,7 +84,7 @@ namespace AirflowNetwork {
     enum ProbabilityCheck // TODO: make enum class
     {
         Unassigned = -1,
-        NoAction = 1,    // No action from probability check
+        NoAction,    // No action from probability check
         ForceChange, // Force open or close from probability check
         KeepStatus   // Keep status at the previous time step from probability check
     };
@@ -92,7 +92,7 @@ namespace AirflowNetwork {
     enum class EquivRec
     {
         Unassigned = -1,
-        Height = 1,          // Effective rectangle polygonal height selection
+        Height,          // Effective rectangle polygonal height selection
         BaseAspectRatio, // Effective rectangle base surface aspect ratio selection
         UserAspectRatio  // Effective rectangle user input aspect ratio selection
     };
@@ -107,7 +107,7 @@ namespace AirflowNetwork {
     enum class iComponentTypeNum : int
     {
         Unassigned = -1,
-        DOP = 1,  // Detailed large opening component
+        DOP,  // Detailed large opening component
         SOP,  // Simple opening component
         SCR,  // Surface crack component
         SEL,  // Surface effective leakage ratio component
@@ -132,7 +132,7 @@ namespace AirflowNetwork {
     enum class ComponentType
     {
         Unassigned = -1,
-        DOP = 1, // Detailed large opening component
+        DOP, // Detailed large opening component
         SOP,     // Simple opening component
         SCR,     // Surface crack component
         SEL,     // Surface effective leakage ratio component
@@ -158,7 +158,7 @@ namespace AirflowNetwork {
     enum class iEPlusComponentType : int
     {
         Unassigned = -1,
-        SCN = 1, // Supply connection
+        SCN, // Supply connection
         RCN, // Return connection
         RHT, // Reheat terminal
         FAN, // Fan
@@ -171,7 +171,7 @@ namespace AirflowNetwork {
     enum class iEPlusNodeType : int
     {
         Unassigned = -1,
-        ZIN = 1,  // Zone inlet node
+        ZIN,  // Zone inlet node
         ZOU,  // Zone outlet node
         SPL,  // Splitter node
         MIX,  // Mixer node
@@ -190,21 +190,21 @@ namespace AirflowNetwork {
     enum class iWPCCntr : int
     {
         Unassigned = -1,
-        Input = 1,
+        Input,
         SurfAvg
     };
 
     enum class PressureCtrl
     {
         Unassigned = -1,
-        Exhaust = 1,
+        Exhaust,
         Relief
     };
 
     enum class AirflowNetworkControl
     {
         Unassigned = -1,
-        Simple = 1,         // Simple calculations only
+        Simple,             // Simple calculations only
         Multizone,          // Perform multizone calculations only
         NoneADS,            // Perform distribution system during system on time only
         SimpleADS,          // Perform distribution system during system on time and simple calculations during off time
