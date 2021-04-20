@@ -59,8 +59,6 @@ set(src
   src/ObjexxFCL/Array5.hh
         src/ObjexxFCL/Array5D.fwd.hh
   src/ObjexxFCL/Array5D.hh
-  src/ObjexxFCL/Array5S.fwd.hh
-  src/ObjexxFCL/Array5S.hh
         src/ObjexxFCL/ArrayInitializer.fwd.hh
   src/ObjexxFCL/ArrayInitializer.hh
   src/ObjexxFCL/ArrayRS.fwd.hh
@@ -116,17 +114,7 @@ set(src
   src/ObjexxFCL/MArray.hh
   src/ObjexxFCL/MArray1.fwd.hh
   src/ObjexxFCL/MArray1.hh
-  src/ObjexxFCL/MArray2.fwd.hh
-  src/ObjexxFCL/MArray2.hh
-  src/ObjexxFCL/MArray3.fwd.hh
-  src/ObjexxFCL/MArray3.hh
-  src/ObjexxFCL/MArray4.fwd.hh
-  src/ObjexxFCL/MArray4.hh
-  src/ObjexxFCL/MArray5.fwd.hh
-  src/ObjexxFCL/MArray5.hh
-  src/ObjexxFCL/MArray6.fwd.hh
-  src/ObjexxFCL/MArray6.hh
-  src/ObjexxFCL/MArrayR.fwd.hh
+        src/ObjexxFCL/MArrayR.fwd.hh
   src/ObjexxFCL/MArrayR.hh
   src/ObjexxFCL/member.functions.hh
   src/ObjexxFCL/noexcept.hh
@@ -182,7 +170,6 @@ set( test_src
   tst/unit/Array4.unit.cc
   tst/unit/Array4S.unit.cc
   tst/unit/Array5.unit.cc
-  tst/unit/Array5S.unit.cc
         tst/unit/ArrayInitializer.unit.cc
   tst/unit/ArrayS.unit.cc
         tst/unit/bit.unit.cc
@@ -205,11 +192,6 @@ set( test_src
   tst/unit/main.cc
   tst/unit/MArray.unit.cc
   tst/unit/MArray1.unit.cc
-  tst/unit/MArray2.unit.cc
-  tst/unit/MArray3.unit.cc
-  tst/unit/MArray4.unit.cc
-  tst/unit/MArray5.unit.cc
-  tst/unit/MArray6.unit.cc
   tst/unit/member.functions.unit.cc
   tst/unit/numeric.unit.cc
   tst/unit/ObjexxFCL.unit.hh

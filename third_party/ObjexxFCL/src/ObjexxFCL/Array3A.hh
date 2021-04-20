@@ -221,15 +221,6 @@ public: // Assignment: Array
 		return *this;
 	}
 
-	// MArray Assignment Template
-	template< class A, typename M >
-	Array3A &
-	operator =( MArray3< A, M > const & a )
-	{
-		Super::operator =( a );
-		return *this;
-	}
-
 	// Initializer List Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	Array3A &
@@ -311,41 +302,6 @@ public: // Assignment: Array
 		return *this;
 	}
 
-	// += MArray Template
-	template< class A, typename M >
-	Array3A &
-	operator +=( MArray3< A, M > const & a )
-	{
-		Super::operator +=( a );
-		return *this;
-	}
-
-	// -= MArray Template
-	template< class A, typename M >
-	Array3A &
-	operator -=( MArray3< A, M > const & a )
-	{
-		Super::operator -=( a );
-		return *this;
-	}
-
-	// *= MArray Template
-	template< class A, typename M >
-	Array3A &
-	operator *=( MArray3< A, M > const & a )
-	{
-		Super::operator *=( a );
-		return *this;
-	}
-
-	// /= MArray Template
-	template< class A, typename M >
-	Array3A &
-	operator /=( MArray3< A, M > const & a )
-	{
-		Super::operator /=( a );
-		return *this;
-	}
 
 public: // Assignment: Array: Logical
 
@@ -380,24 +336,6 @@ public: // Assignment: Array: Logical
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	Array3A &
 	or_equals( Array3S< U > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
-
-	// &&= MArray Template
-	template< class A, typename M >
-	Array3A &
-	and_equals( MArray3< A, M > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= MArray Template
-	template< class A, typename M >
-	Array3A &
-	or_equals( MArray3< A, M > const & a )
 	{
 		Super::or_equals( a );
 		return *this;
