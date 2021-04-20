@@ -18,7 +18,6 @@
 #include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Array3S.hh>
 #include <ObjexxFCL/Array4S.hh>
-#include <ObjexxFCL/Array5S.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
@@ -105,25 +104,6 @@ all( Array4S< bool > const & a )
 	return true;
 }
 
-inline
-bool
-all( Array5S< bool > const & a )
-{
-	if ( a.empty() ) return true;
-	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
-						if ( ! a( i1, i2, i3, i4, i5 ) ) return false;
-					}
-				}
-			}
-		}
-	}
-	return true;
-}
-
 // any /////
 
 inline
@@ -182,25 +162,6 @@ any( Array4S< bool > const & a )
 	return false;
 }
 
-inline
-bool
-any( Array5S< bool > const & a )
-{
-	if ( a.empty() ) return false;
-	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
-						if ( a( i1, i2, i3, i4, i5 ) ) return true;
-					}
-				}
-			}
-		}
-	}
-	return false;
-}
-
 // abs /////
 
 template< typename T >
@@ -251,18 +212,6 @@ abs( Array4S< T > const & a )
 	return r;
 }
 
-template< typename T >
-inline
-Array5D< T >
-abs( Array5S< T > const & a )
-{
-	Array5D< T > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = std::abs( r[ i ] );
-	}
-	return r;
-}
-
 // Negation /////
 
 inline
@@ -303,17 +252,6 @@ Array4D< bool >
 operator !( Array4S< bool > const & a )
 {
 	Array4D< bool > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = ! r[ i ];
-	}
-	return r;
-}
-
-inline
-Array5D< bool >
-operator !( Array5S< bool > const & a )
-{
-	Array5D< bool > r( a );
 	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = ! r[ i ];
 	}
@@ -368,19 +306,6 @@ bit_not( Array4S< T > const & a )
 {
 	assert( a.size_bounded() );
 	Array4D< T > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = ~r[ i ];
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array5D< T >
-bit_not( Array5S< T > const & a )
-{
-	assert( a.size_bounded() );
-	Array5D< T > r( a );
 	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = ~r[ i ];
 	}
@@ -443,19 +368,6 @@ bit_and( Array4S< T > const & a, T const & b )
 
 template< typename T >
 inline
-Array5D< T >
-bit_and( Array5S< T > const & a, T const & b )
-{
-	assert( a.size_bounded() );
-	Array5D< T > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] &= b;
-	}
-	return r;
-}
-
-template< typename T >
-inline
 Array1D< T >
 bit_and( T const & a, Array1S< T > const & b )
 {
@@ -500,19 +412,6 @@ bit_and( T const & a, Array4S< T > const & b )
 {
 	assert( a.size_bounded() );
 	Array4D< T > r( b );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] &= a;
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array5D< T >
-bit_and( T const & a, Array5S< T > const & b )
-{
-	assert( a.size_bounded() );
-	Array5D< T > r( b );
 	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] &= a;
 	}
@@ -590,29 +489,6 @@ bit_and( Array4S< T > const & a, Array4S< T > const & b )
 	return r;
 }
 
-template< typename T >
-inline
-Array5D< T >
-bit_and( Array5S< T > const & a, Array5S< T > const & b )
-{
-	assert( a.size_bounded() );
-	assert( conformable( a, b ) );
-	Array5D< T > r( a );
-	BArray::size_type l( 0u );
-	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5, ++l ) {
-						r[ l ] &= b( i1, i2, i3, i4, i5 );
-					}
-				}
-			}
-		}
-	}
-	return r;
-}
-
 // Bitwise Or /////
 
 template< typename T >
@@ -669,19 +545,6 @@ bit_or( Array4S< T > const & a, T const & b )
 
 template< typename T >
 inline
-Array5D< T >
-bit_or( Array5S< T > const & a, T const & b )
-{
-	assert( a.size_bounded() );
-	Array5D< T > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] |= b;
-	}
-	return r;
-}
-
-template< typename T >
-inline
 Array1D< T >
 bit_or( T const & a, Array1S< T > const & b )
 {
@@ -726,19 +589,6 @@ bit_or( T const & a, Array4S< T > const & b )
 {
 	assert( a.size_bounded() );
 	Array4D< T > r( b );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] |= a;
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array5D< T >
-bit_or( T const & a, Array5S< T > const & b )
-{
-	assert( a.size_bounded() );
-	Array5D< T > r( b );
 	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] |= a;
 	}
@@ -816,29 +666,6 @@ bit_or( Array4S< T > const & a, Array4S< T > const & b )
 	return r;
 }
 
-template< typename T >
-inline
-Array5D< T >
-bit_or( Array5S< T > const & a, Array5S< T > const & b )
-{
-	assert( a.size_bounded() );
-	assert( conformable( a, b ) );
-	Array5D< T > r( a );
-	BArray::size_type l( 0u );
-	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5, ++l ) {
-						r[ l ] |= b( i1, i2, i3, i4, i5 );
-					}
-				}
-			}
-		}
-	}
-	return r;
-}
-
 
 // pow /////
 
@@ -884,18 +711,6 @@ Array4D< T >
 pow( Array4S< T > const & a, X const & x )
 {
 	Array4D< T > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = T( std::pow( r[ i ], x ) );
-	}
-	return r;
-}
-
-template< typename T, typename X >
-inline
-Array5D< T >
-pow( Array5S< T > const & a, X const & x )
-{
-	Array5D< T > r( a );
 	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = T( std::pow( r[ i ], x ) );
 	}
@@ -952,18 +767,6 @@ sign( Array4S< T > const & a, X const & x )
 	return r;
 }
 
-template< typename T, typename X >
-inline
-Array5D< T >
-sign( Array5S< T > const & a, X const & x )
-{
-	Array5D< T > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = sign( r[ i ], x );
-	}
-	return r;
-}
-
 template< typename X, typename T >
 inline
 Array1D< X >
@@ -1006,18 +809,6 @@ Array4D< X >
 sign( X const & x, Array4S< T > const & a )
 {
 	Array4D< X > r( a );
-	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = sign( x, r[ i ] );
-	}
-	return r;
-}
-
-template< typename X, typename T >
-inline
-Array5D< X >
-sign( X const & x, Array5S< T > const & a )
-{
-	Array5D< X > r( a );
 	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = sign( x, r[ i ] );
 	}
@@ -1075,25 +866,6 @@ count( Array4S< bool > const & a )
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 					if ( a( i1, i2, i3, i4 ) ) ++c;
-				}
-			}
-		}
-	}
-	return c;
-}
-
-inline
-BArray::size_type
-count( Array5S< bool > const & a )
-{
-	BArray::size_type c( 0u );
-	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
-						if ( a( i1, i2, i3, i4, i5 ) ) ++c;
-					}
 				}
 			}
 		}
@@ -1196,14 +968,6 @@ lbound( Array4S< T > const & )
 
 template< typename T >
 inline
-Array1D< int >
-lbound( Array5S< T > const & )
-{
-	return Array1D< int >( 5, 1 );
-}
-
-template< typename T >
-inline
 int
 lbound( Array1S< T > const &, int const dim )
 {
@@ -1270,28 +1034,6 @@ lbound( Array4S< T > const &, int const dim )
 	}
 }
 
-template< typename T >
-inline
-int
-lbound( Array5S< T > const &, int const dim )
-{
-	switch ( dim ) {
-	case 1:
-		return 1;
-	case 2:
-		return 1;
-	case 3:
-		return 1;
-	case 4:
-		return 1;
-	case 5:
-		return 1;
-	default:
-		assert( false );
-		return 0;
-	}
-}
-
 // ubound /////
 
 template< typename T >
@@ -1324,14 +1066,6 @@ Array1D< int >
 ubound( Array4S< T > const & a )
 {
 	return Array1D< int >( 4, { a.u1(), a.u2(), a.u3(), a.u4() } );
-}
-
-template< typename T >
-inline
-Array1D< int >
-ubound( Array5S< T > const & a )
-{
-	return Array1D< int >( 5, { a.u1(), a.u2(), a.u3(), a.u4(), a.u5() } );
 }
 
 template< typename T >
@@ -1402,28 +1136,6 @@ ubound( Array4S< T > const & a, int const dim )
 	}
 }
 
-template< typename T >
-inline
-int
-ubound( Array5S< T > const & a, int const dim )
-{
-	switch ( dim ) {
-	case 1:
-		return a.u1();
-	case 2:
-		return a.u2();
-	case 3:
-		return a.u3();
-	case 4:
-		return a.u4();
-	case 5:
-		return a.u5();
-	default:
-		assert( false );
-		return 0;
-	}
-}
-
 // shape /////
 
 template< typename T >
@@ -1456,14 +1168,6 @@ Array1D< int >
 shape( Array4S< T > const & a )
 {
 	return Array1D< int >( 4, { a.isize1(), a.isize2(), a.isize3(), a.isize4() } );
-}
-
-template< typename T >
-inline
-Array1D< int >
-shape( Array5S< T > const & a )
-{
-	return Array1D< int >( 5, { a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() } );
 }
 
 // size /////
@@ -1538,28 +1242,6 @@ size( Array4S< T > const & a, int const dim )
 		return a.size3();
 	case 4:
 		return a.size4();
-	default:
-		assert( false );
-		return 0;
-	}
-}
-
-template< typename T >
-inline
-BArray::size_type
-size( Array5S< T > const & a, int const dim )
-{
-	switch ( dim ) {
-	case 1:
-		return a.size1();
-	case 2:
-		return a.size2();
-	case 3:
-		return a.size3();
-	case 4:
-		return a.size4();
-	case 5:
-		return a.size5();
 	default:
 		assert( false );
 		return 0;
@@ -1803,33 +1485,6 @@ pack( Array4S< T > const & a, Array4< bool > const & mask )
 	return r;
 }
 
-template< typename T >
-inline
-Array1D< T >
-pack( Array5S< T > const & a, Array5< bool > const & mask )
-{
-	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
-	size_type n( 0u );
-	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
-		if ( mask[ l ] ) ++n;
-	}
-	Array1D< T > r( static_cast< int >( n ) );
-	size_type l( 0u ), k( 0u );
-	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5, ++l ) {
-						if ( mask[ l ] ) r[ k++ ] = a( i1, i2, i3, i4, i5 );
-					}
-				}
-			}
-		}
-	}
-	return r;
-}
-
 // unpack /////
 
 template< typename T >
@@ -1898,25 +1553,6 @@ unpack( Array1< T > const & a, Array4< bool > const & mask, Array4S< T > const &
 	assert( mask.conformable( f ) );
 	typedef  BArray::size_type  size_type;
 	Array4D< T > r( f );
-	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
-		if ( mask[ l ] ) {
-			r[ l ] = a[ i ];
-			++i;
-		}
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array5D< T >
-unpack( Array1< T > const & a, Array5< bool > const & mask, Array5S< T > const & f )
-{
-	assert( mask.size_bounded() );
-	assert( mask.conformable( f ) );
-	typedef  BArray::size_type  size_type;
-	Array5D< T > r( f );
 	size_type i( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
@@ -2177,26 +1813,6 @@ sum( Array4S< T > const & a )
 template< typename T >
 inline
 T
-sum( Array5S< T > const & a )
-{
-	T r( 0 );
-	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
-						r += a( i1, i2, i3, i4, i5 );
-					}
-				}
-			}
-		}
-	}
-	return r;
-}
-
-template< typename T >
-inline
-T
 sum( Array1S< T > const & a, int const dim )
 {
 	assert( dim == 1 );
@@ -2321,29 +1937,6 @@ sum( Array4S< T > const & a, Array4< bool > const & mask )
 template< typename T >
 inline
 T
-sum( Array5S< T > const & a, Array5< bool > const & mask )
-{
-	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
-	T r( 0 );
-	size_type l( 0u );
-	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5, ++l ) {
-						if ( mask[ l ] ) r += a( i1, i2, i3, i4, i5 );
-					}
-				}
-			}
-		}
-	}
-	return r;
-}
-
-template< typename T >
-inline
-T
 sum_row( Array2S< T > const & a, int const i )
 {
 	T r( 0 );
@@ -2420,26 +2013,6 @@ product( Array4S< T > const & a )
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 					r *= a( i1, i2, i3, i4 );
-				}
-			}
-		}
-	}
-	return r;
-}
-
-template< typename T >
-inline
-T
-product( Array5S< T > const & a )
-{
-	T r( 1 );
-	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
-						r *= a( i1, i2, i3, i4, i5 );
-					}
 				}
 			}
 		}
@@ -2571,29 +2144,6 @@ product( Array4S< T > const & a, Array4< bool > const & mask )
 	return r;
 }
 
-template< typename T >
-inline
-T
-product( Array5S< T > const & a, Array5< bool > const & mask )
-{
-	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
-	T r( 1 );
-	size_type l( 0u );
-	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5, ++l ) {
-						if ( mask[ l ] ) r *= a( i1, i2, i3, i4, i5 );
-					}
-				}
-			}
-		}
-	}
-	return r;
-}
-
 
 template< typename T >
 inline
@@ -2681,26 +2231,6 @@ minval( Array4S< T > const & a )
 	return r;
 }
 
-template< typename T >
-inline
-T
-minval( Array5S< T > const & a )
-{
-	T r( a.empty() ? std::numeric_limits< T >::max() : a( 1, 1, 1, 1, 1 ) );
-	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
-						r = std::min( r, a( i1, i2, i3, i4, i5 ) );
-					}
-				}
-			}
-		}
-	}
-	return r;
-}
-
 // maxval /////
 
 template< typename T >
@@ -2756,26 +2286,6 @@ maxval( Array4S< T > const & a )
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 					r = std::max( r, a( i1, i2, i3, i4 ) );
-				}
-			}
-		}
-	}
-	return r;
-}
-
-template< typename T >
-inline
-T
-maxval( Array5S< T > const & a )
-{
-	T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1, 1, 1, 1, 1 ) );
-	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
-						r = std::max( r, a( i1, i2, i3, i4, i5 ) );
-					}
 				}
 			}
 		}
@@ -2853,30 +2363,6 @@ minloc( Array4S< T > const & a )
 					if ( a( i1, i2, i3, i4 ) < r ) {
 						r = a( i1, i2, i3, i4 );
 						loc = { i1, i2, i3, i4 };
-					}
-				}
-			}
-		}
-	}
-	return loc;
-}
-
-template< typename T >
-inline
-Array1D< int >
-minloc( Array5S< T > const & a )
-{
-	Array1D< int > loc( 5, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
-	T r( a.empty() ? std::numeric_limits< T >::max() : a( 1, 1, 1, 1, 1 ) );
-	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
-						if ( a( i1, i2, i3, i4, i5 ) < r ) {
-							r = a( i1, i2, i3, i4, i5 );
-							loc = { i1, i2, i3, i4, i5 };
-						}
 					}
 				}
 			}
@@ -3055,40 +2541,6 @@ minloc( Array4S< T > const & a, Array4< bool > const & mask )
 	return loc;
 }
 
-template< typename T >
-inline
-Array1D< int >
-minloc( Array5S< T > const & a, Array5< bool > const & mask )
-{
-	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
-	Array1D< int > loc( 5, 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::max() );
-	size_type l( 0u );
-	bool first( true );
-	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5, ++l ) {
-						if ( mask[ l ] ) {
-							if ( first ) {
-								first = false;
-								r = a( i1, i2, i3, i4, i5 );
-								loc = { i1, i2, i3, i4, i5 };
-							} else if ( a( i1, i2, i3, i4, i5 ) < r ) {
-								r = a( i1, i2, i3, i4, i5 );
-								loc = { i1, i2, i3, i4, i5 };
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	return loc;
-}
-
 // maxloc /////
 
 template< typename T >
@@ -3159,30 +2611,6 @@ maxloc( Array4S< T > const & a )
 					if ( a( i1, i2, i3, i4 ) > r ) {
 						r = a( i1, i2, i3, i4 );
 						loc = { i1, i2, i3, i4 };
-					}
-				}
-			}
-		}
-	}
-	return loc;
-}
-
-template< typename T >
-inline
-Array1D< int >
-maxloc( Array5S< T > const & a )
-{
-	Array1D< int > loc( 5, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
-	T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1, 1, 1, 1, 1 ) );
-	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
-						if ( a( i1, i2, i3, i4, i5 ) > r ) {
-							r = a( i1, i2, i3, i4, i5 );
-							loc = { i1, i2, i3, i4, i5 };
-						}
 					}
 				}
 			}
@@ -3352,40 +2780,6 @@ maxloc( Array4S< T > const & a, Array4< bool > const & mask )
 						} else if ( a( i1, i2, i3, i4 ) > r ) {
 							r = a( i1, i2, i3, i4 );
 							loc = { i1, i2, i3, i4 };
-						}
-					}
-				}
-			}
-		}
-	}
-	return loc;
-}
-
-template< typename T >
-inline
-Array1D< int >
-maxloc( Array5S< T > const & a, Array5< bool > const & mask )
-{
-	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
-	Array1D< int > loc( 5, 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0u );
-	bool first( true );
-	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5, ++l ) {
-						if ( mask[ l ] ) {
-							if ( first ) {
-								first = false;
-								r = a( i1, i2, i3, i4, i5 );
-								loc = { i1, i2, i3, i4, i5 };
-							} else if ( a( i1, i2, i3, i4, i5 ) > r ) {
-								r = a( i1, i2, i3, i4, i5 );
-								loc = { i1, i2, i3, i4, i5 };
-							}
 						}
 					}
 				}
@@ -4242,207 +3636,6 @@ merge( T const & a, Array4S< T > const & b, Array4< bool > const & mask )
 			for ( int ib3 = b.l3(), eb3 = b.u3(); ib3 <= eb3; ++ib3 ) {
 				for ( int ib4 = b.l4(), eb4 = b.u4(); ib4 <= eb4; ++ib4, ++l ) {
 					m[ l ] = ( mask[ l ] ? a : b( ib1, ib2, ib3, ib4 ) );
-				}
-			}
-		}
-	}
-	return m;
-}
-
-// Merge 5D Arrays
-template< typename T >
-inline
-Array5D< T >
-merge( Array5S< T > const & a, Array5S< T > const & b, bool const mask )
-{
-	assert( a.size_bounded() );
-	assert( a.conformable( b ) );
-	if ( mask ) {
-		return Array5D< T >( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a ); // 1-based copy of a
-	} else {
-		return Array5D< T >( b.isize1(), b.isize2(), b.isize3(), b.isize4(), b.isize5(), b ); // 1-based copy of b
-	}
-}
-
-// Merge 5D Arrays
-template< typename T >
-inline
-Array5D< T >
-merge( Array5S< T > const & a, Array5< T > const & b, bool const mask )
-{
-	assert( a.size_bounded() );
-	assert( a.conformable( b ) );
-	if ( mask ) {
-		return Array5D< T >( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a ); // 1-based copy of a
-	} else {
-		return Array5D< T >( b.isize1(), b.isize2(), b.isize3(), b.isize4(), b.isize5(), b ); // 1-based copy of b
-	}
-}
-
-// Merge 5D Arrays
-template< typename T >
-inline
-Array5D< T >
-merge( Array5< T > const & a, Array5S< T > const & b, bool const mask )
-{
-	assert( a.size_bounded() );
-	assert( a.conformable( b ) );
-	if ( mask ) {
-		return Array5D< T >( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a ); // 1-based copy of a
-	} else {
-		return Array5D< T >( b.isize1(), b.isize2(), b.isize3(), b.isize4(), b.isize5(), b ); // 1-based copy of b
-	}
-}
-
-// Merge 5D Array + Scalar
-template< typename T >
-inline
-Array5D< T >
-merge( Array5S< T > const & a, T const & b, bool const mask )
-{
-	assert( a.size_bounded() );
-	if ( mask ) {
-		return Array5D< T >( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a ); // 1-based copy of a
-	} else {
-		return Array5D< T >( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), b ); // 1-based copy of b
-	}
-}
-
-// Merge 5D Array + Scalar
-template< typename T >
-inline
-Array5D< T >
-merge( T const & a, Array5S< T > const & b, bool const mask )
-{
-	assert( b.size_bounded() );
-	if ( mask ) {
-		return Array5D< T >( b.isize1(), b.isize2(), b.isize3(), b.isize4(), b.isize5(), a ); // 1-based copy of a
-	} else {
-		return Array5D< T >( b.isize1(), b.isize2(), b.isize3(), b.isize4(), b.isize5(), b ); // 1-based copy of b
-	}
-}
-
-// Merge 5D Arrays
-template< typename T >
-inline
-Array5D< T >
-merge( Array5S< T > const & a, Array5S< T > const & b, Array5< bool > const & mask )
-{
-	typedef  BArray::size_type  size_type;
-	assert( a.size_bounded() );
-	assert( a.conformable( b ) );
-	assert( a.conformable( mask ) );
-	Array5D< T > m( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() );
-	size_type l( 0 );
-	for ( int ia1 = a.l1(), ib1 = b.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1, ++ib1 ) {
-		for ( int ia2 = a.l2(), ib2 = b.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2, ++ib2 ) {
-			for ( int ia3 = a.l3(), ib3 = b.l3(), ea3 = a.u3(); ia3 <= ea3; ++ia3, ++ib3 ) {
-				for ( int ia4 = a.l4(), ib4 = b.l4(), ea4 = a.u4(); ia4 <= ea4; ++ia4, ++ib4 ) {
-					for ( int ia5 = a.l5(), ib5 = b.l5(), ea5 = a.u5(); ia5 <= ea5; ++ia5, ++ib5, ++l ) {
-						m[ l ] = ( mask[ l ] ? a( ia1, ia2, ia3, ia4, ia5 ) : b( ib1, ib2, ib3, ib4, ib5 ) );
-					}
-				}
-			}
-		}
-	}
-	return m;
-}
-
-// Merge 5D Arrays
-template< typename T >
-inline
-Array5D< T >
-merge( Array5S< T > const & a, Array5< T > const & b, Array5< bool > const & mask )
-{
-	typedef  BArray::size_type  size_type;
-	assert( a.size_bounded() );
-	assert( a.conformable( b ) );
-	assert( a.conformable( mask ) );
-	Array5D< T > m( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() );
-	size_type l( 0 );
-	for ( int ia1 = a.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1 ) {
-		for ( int ia2 = a.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2 ) {
-			for ( int ia3 = a.l3(), ea3 = a.u3(); ia3 <= ea3; ++ia3 ) {
-				for ( int ia4 = a.l4(), ea4 = a.u4(); ia4 <= ea4; ++ia4 ) {
-					for ( int ia5 = a.l5(), ea5 = a.u5(); ia5 <= ea5; ++ia5, ++l ) {
-						m[ l ] = ( mask[ l ] ? a( ia1, ia2, ia3, ia4, ia5 ) : b[ l ] );
-					}
-				}
-			}
-		}
-	}
-	return m;
-}
-
-// Merge 5D Arrays
-template< typename T >
-inline
-Array5D< T >
-merge( Array5< T > const & a, Array5S< T > const & b, Array5< bool > const & mask )
-{
-	typedef  BArray::size_type  size_type;
-	assert( a.size_bounded() );
-	assert( a.conformable( b ) );
-	assert( a.conformable( mask ) );
-	Array5D< T > m( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() );
-	size_type l( 0 );
-	for ( int ib1 = b.l1(), eb1 = b.u1(); ib1 <= eb1; ++ib1 ) {
-		for ( int ib2 = b.l2(), eb2 = b.u2(); ib2 <= eb2; ++ib2 ) {
-			for ( int ib3 = b.l3(), eb3 = b.u3(); ib3 <= eb3; ++ib3 ) {
-				for ( int ib4 = b.l4(), eb4 = b.u4(); ib4 <= eb4; ++ib4 ) {
-					for ( int ib5 = b.l5(), eb5 = b.u5(); ib5 <= eb5; ++ib5, ++l ) {
-						m[ l ] = ( mask[ l ] ? a[ l ] : b( ib1, ib2, ib3, ib4, ib5 ) );
-					}
-				}
-			}
-		}
-	}
-	return m;
-}
-
-// Merge 5D Array + Scalar
-template< typename T >
-inline
-Array5D< T >
-merge( Array5S< T > const & a, T const & b, Array5< bool > const & mask )
-{
-	typedef  BArray::size_type  size_type;
-	assert( a.size_bounded() );
-	assert( a.conformable( mask ) );
-	Array5D< T > m( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() );
-	size_type l( 0 );
-	for ( int ia1 = a.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1 ) {
-		for ( int ia2 = a.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2 ) {
-			for ( int ia3 = a.l3(), ea3 = a.u3(); ia3 <= ea3; ++ia3 ) {
-				for ( int ia4 = a.l4(), ea4 = a.u4(); ia4 <= ea4; ++ia4 ) {
-					for ( int ia5 = a.l5(), ea5 = a.u5(); ia5 <= ea5; ++ia5, ++l ) {
-						m[ l ] = ( mask[ l ] ? a( ia1, ia2, ia3, ia4, ia5 ) : b );
-					}
-				}
-			}
-		}
-	}
-	return m;
-}
-
-// Merge 5D Array + Scalar
-template< typename T >
-inline
-Array5D< T >
-merge( T const & a, Array5S< T > const & b, Array5< bool > const & mask )
-{
-	typedef  BArray::size_type  size_type;
-	assert( b.size_bounded() );
-	assert( b.conformable( mask ) );
-	Array5D< T > m( b.isize1(), b.isize2(), b.isize3(), b.isize4(), b.isize5() );
-	size_type l( 0 );
-	for ( int ib1 = b.l1(), eb1 = b.u1(); ib1 <= eb1; ++ib1 ) {
-		for ( int ib2 = b.l2(), eb2 = b.u2(); ib2 <= eb2; ++ib2 ) {
-			for ( int ib3 = b.l3(), eb3 = b.u3(); ib3 <= eb3; ++ib3 ) {
-				for ( int ib4 = b.l4(), eb4 = b.u4(); ib4 <= eb4; ++ib4 ) {
-					for ( int ib5 = b.l5(), eb5 = b.u5(); ib5 <= eb5; ++ib5, ++l ) {
-						m[ l ] = ( mask[ l ] ? a : b( ib1, ib2, ib3, ib4, ib5 ) );
-					}
 				}
 			}
 		}
