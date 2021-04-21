@@ -308,22 +308,25 @@ namespace CostEstimateManager {
                     if ((state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap > 0.0) &&
                         (state.dataCostEstimateManager->CostLineItem(Item).PerEach > 0.0)) {
                         ShowSevereError(state,
-                                        "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
-                                            "\", Coil:DX, too many pricing methods specified");
+                                        format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
+                                               state.dataCostEstimateManager->CostLineItem(Item).LineName,
+                                               SELECT_CASE_var));
                         ErrorsFound = true;
                     }
                     if ((state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap > 0.0) &&
                         (state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP > 0.0)) {
                         ShowSevereError(state,
-                                        "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
-                                            "\", Coil:DX, too many pricing methods specified");
+                                        format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
+                                               state.dataCostEstimateManager->CostLineItem(Item).LineName,
+                                               SELECT_CASE_var));
                         ErrorsFound = true;
                     }
                     if ((state.dataCostEstimateManager->CostLineItem(Item).PerEach > 0.0) &&
                         (state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP > 0.0)) {
                         ShowSevereError(state,
-                                        "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
-                                            "\", Coil:DX, too many pricing methods specified");
+                                        format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
+                                               state.dataCostEstimateManager->CostLineItem(Item).LineName,
+                                               SELECT_CASE_var));
                         ErrorsFound = true;
                     }
                     //  check for wildcard * in object name..
@@ -331,8 +334,9 @@ namespace CostEstimateManager {
 
                     } else if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
                         ShowSevereError(state,
-                                        "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
-                                            "\", Coil:DX: need to specify a Reference Object Name ");
+                                        format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
+                                               state.dataCostEstimateManager->CostLineItem(Item).LineName,
+                                               SELECT_CASE_var));
                         ErrorsFound = true;
 
                     } else { // assume name is probably useful
@@ -347,11 +351,12 @@ namespace CostEstimateManager {
                         }
                         if (!coilFound) {
                             ShowWarningError(state,
-                                             "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
-                                                 "\", Coil:DX, invalid coil specified");
+                                             format("ComponentCost:LineItem: \"{}\", {}, invalid coil specified",
+                                                    state.dataCostEstimateManager->CostLineItem(Item).LineName,
+                                                    SELECT_CASE_var));
                             ShowContinueError(state,
-                                              "Coil Specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName +
-                                                  "\", calculations will not be completed for this item.");
+                                              format("Coil Specified=\"{}\", calculations will not be completed for this item.",
+                                                     state.dataCostEstimateManager->CostLineItem(Item).ParentObjName));
                         }
                     }
 
