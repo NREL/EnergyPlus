@@ -980,6 +980,8 @@ namespace HVACHXAssistedCoolingCoil {
         } else if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num ==
                    DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
             //
+        } else if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
+            //
         }
     }
 
@@ -1031,7 +1033,8 @@ namespace HVACHXAssistedCoolingCoil {
         // Set mass flow rate at inlet of exhaust side of heat exchanger to supply side air mass flow rate entering this compound object
         state.dataLoopNodes->Node(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum).MassFlowRate = AirMassFlow;
 
-        if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ||
+        if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_Cooling ||
+            state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ||
             state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
             CompanionCoilIndexNum = state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex;
         } else {
@@ -1069,7 +1072,34 @@ namespace HVACHXAssistedCoolingCoil {
                             _,
                             state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num);
 
-            if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
+            if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_Cooling) {
+
+                int coolingCoilIndex = state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex;
+
+                int OperationMode = DataHVACGlobals::coilNormalMode;
+                if (state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].SubcoolReheatFlag) {
+                    OperationMode = DataHVACGlobals::coilSubcoolReheatMode;
+                } else if (false /*this.m_DehumidificationMode == 1*/) { //temporily override not to use enhanced mode
+                    OperationMode = DataHVACGlobals::coilEnhancedMode;
+                }
+
+                Real64 CoolingSpeedNum = 1; // need to figure out the Cooling Speed number for the HXAssisted
+                Real64 CoolingSpeedRatio = 0.5; // need to figure out the Cooling Speed Ratio for the HXAssisted
+                bool singleMode = false; // need to figure out the singMode for the HXAssisted
+                Real64 CoilSHR = 0.2; // need a procedure to figure out Coil SHR for the new coiling coil 
+
+                state.dataCoilCooingDX->coilCoolingDXs[state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex].simulate(
+                    state,
+                    OperationMode,
+                    PartLoadRatio, 
+                    CoolingSpeedNum, // temp not fully implemented, trying to figure out the equivalent for HXAssisted
+                    CoolingSpeedRatio, // temp not fully implemented, trying to figure out the equivalent for HXAssisted
+                    FanOpMode,
+                    singleMode, // temp not fully implemented, trying to figure out the equivalent for HXAssisted
+                    CoilSHR //temp not fully implemented,  trying to figure out the equivalent for HXAssisted
+                );
+
+            } else if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
                 SimDXCoil(state,
                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
                           CompOp,
