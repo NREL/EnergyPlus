@@ -113,24 +113,20 @@ public: // Creation
 
 	// Copy Constructor
 	Array1D( Array1D const & a ) :
-	 Super( a ),
-	 initializer_( a.initializer_ )
+	 Super( a )
 	{}
 
 	// Move Constructor
 	Array1D( Array1D && a ) NOEXCEPT :
-	 Super( std::move( a ) ),
-	 initializer_( a.initializer_ )
+	 Super( std::move( a ) )
 	{
-		a.initializer_.clear();
 	}
 
 	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	explicit
 	Array1D( Array1D< U > const & a ) :
-	 Super( a ),
-	 initializer_( a.initializer_ )
+	 Super( a )
 	{}
 
 	// Super Constructor Template
@@ -1186,7 +1182,7 @@ public: // Predicate
 	bool
 	initializer_active() const
 	{
-		return initializer_.active();
+		return false;
 	}
 
 public: // Modifier
@@ -1196,7 +1192,6 @@ public: // Modifier
 	clear()
 	{
 		Super::clear();
-		initializer_.clear();
 		return *this;
 	}
 
@@ -1285,22 +1280,15 @@ public: // Modifier
 		} else if ( I.size() <= capacity_ ) { // Use existing capacity
 			size_type const new_size( I.size() );
 			if ( new_size > size_ ) { // Initialize new tail elements
-				if ( initializer_.active() ) { // Sticky initialize
-					T const fill( initializer_() );
-					for ( size_type i = size_; i < new_size; ++i ) {
-						new ( data_ + i ) T( fill );
-					}
-				} else { // Default initialize
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-					T const fill( Traits::initial_array_value() );
+				T const fill( Traits::initial_array_value() );
 #endif
-					for ( size_type i = size_; i < new_size; ++i ) {
+				for ( size_type i = size_; i < new_size; ++i ) {
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-						new ( data_ + i ) T( fill );
+					new ( data_ + i ) T( fill );
 #else
-						new ( data_ + i ) T;
+					new ( data_ + i ) T;
 #endif
-					}
 				}
 			}
 			std::ptrdiff_t const off( I_.l() - I.l() );
@@ -1331,22 +1319,15 @@ public: // Modifier
 			auto const I_u_( I.u() );
 			auto const u_min_( std::min( u_, I_u_ ) );
 			if ( I_l_ < l_ ) { // Initialize new lower elements
-				if ( initializer_.active() ) { // Sticky initialize
-					T const fill( initializer_() );
-					for ( int i = I_l_, e = std::min( l_ - 1, I_u_ ); i <= e; ++i ) {
-						new ( &o( i ) ) T( fill );
-					}
-				} else { // Default initialize
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-					T const fill( Traits::initial_array_value() );
+				T const fill( Traits::initial_array_value() );
 #endif
-					for ( int i = I_l_, e = std::min( l_ - 1, I_u_ ); i <= e; ++i ) {
+				for ( int i = I_l_, e = std::min( l_ - 1, I_u_ ); i <= e; ++i ) {
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-						new ( &o( i ) ) T( fill );
+					new ( &o( i ) ) T( fill );
 #else
-						new ( &o( i ) ) T;
+					new ( &o( i ) ) T;
 #endif
-					}
 				}
 			}
 			if ( l_max_ <= u_min_ ) { // Ranges overlap
@@ -1355,22 +1336,15 @@ public: // Modifier
 				}
 			}
 			if ( u_ < I_u_ ) { // Initialize new upper elements
-				if ( initializer_.active() ) { // Sticky initialize
-					T const fill( initializer_() );
-					for ( int i = std::max( u_ + 1, I_l_ ); i <= I_u_; ++i ) {
-						new ( &o( i ) ) T( fill );
-					}
-				} else { // Default initialize
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-					T const fill( Traits::initial_array_value() );
+				T const fill( Traits::initial_array_value() );
 #endif
-					for ( int i = std::max( u_ + 1, I_l_ ); i <= I_u_; ++i ) {
+				for ( int i = std::max( u_ + 1, I_l_ ); i <= I_u_; ++i ) {
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-						new ( &o( i ) ) T( fill );
+					new ( &o( i ) ) T( fill );
 #else
-						new ( &o( i ) ) T;
+					new ( &o( i ) ) T;
 #endif
-					}
 				}
 			}
 			swap1( o );
@@ -1499,21 +1473,6 @@ public: // Modifier
 		return *this;
 	}
 
-	// Set Initializer Value
-	Array1D &
-	initializer( T const & t )
-	{
-		initializer_ = t;
-		return *this;
-	}
-
-	// Clear Initializer
-	Array1D &
-	initializer_clear()
-	{
-		initializer_.clear();
-		return *this;
-	}
 
 	// Swap
 	Array1D &
@@ -1521,7 +1480,6 @@ public: // Modifier
 	{
 		using std::swap;
 		swap1( v );
-		swap( initializer_, v.initializer_ );
 		return *this;
 	}
 
@@ -1692,20 +1650,13 @@ protected: // Functions
 	void
 	initialize()
 	{
-		if ( initializer_.active() ) { // Sticky initialize
-			T const fill( initializer_() );
-			for ( size_type i = 0; i < size_; ++i ) {
-				new ( data_ + i ) T( fill );
-			}
-		} else { // Default initialize
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-			std::uninitialized_fill_n( data_, size_, Traits::initial_array_value() );
+		std::uninitialized_fill_n( data_, size_, Traits::initial_array_value() );
 #else
-			for ( size_type i = 0; i < size_; ++i ) {
+		for ( size_type i = 0; i < size_; ++i ) {
 				new ( data_ + i ) T;
 			}
 #endif
-		}
 	}
 
 	// Initialize by Function
@@ -1720,16 +1671,9 @@ protected: // Functions
 	void
 	assign()
 	{
-		if ( initializer_.active() ) { // Sticky initialize
-			T const fill( initializer_() );
-			for ( size_type i = 0; i < size_; ++i ) {
-				data_[ i ] = fill;
-			}
-		} else { // Default initialize
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-			std::fill_n( data_, size_, Traits::initial_array_value() );
+		std::fill_n( data_, size_, Traits::initial_array_value() );
 #endif
-		}
 	}
 
 private: // Functions
@@ -1781,10 +1725,6 @@ private: // Functions
 		if ( size_real( I ) ) initialize();
 		fxn( *this );
 	}
-
-private: // Data
-
-	Initializer initializer_; // Array initializer
 
 }; // Array1D
 
