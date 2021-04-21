@@ -67,6 +67,7 @@ namespace RuntimeLanguageProcessor {
 
     // Using/Aliasing
     using DataRuntimeLanguage::ErlValueType;
+    using DataRuntimeLanguage::Parameters;
 
     int constexpr MaxErrors(20);
 
@@ -153,14 +154,18 @@ namespace RuntimeLanguageProcessor {
     ErlValueType EvaluateExpression(EnergyPlusData &state, int ExpressionNum, bool &seriousErrorFound);
 
     void TodayTomorrowWeather(EnergyPlusData &state,
-                              int FunctionCode,
+                              Parameters FunctionCode,
                               Real64 Operand1,
                               Real64 Operand2,
                               Array2D<Real64> &TodayTomorrowWeatherSource,
                               ErlValueType &ReturnVal);
 
-    void TodayTomorrowWeather(
-        EnergyPlusData &state, int FunctionCode, Real64 Operand1, Real64 Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+    void TodayTomorrowWeather(EnergyPlusData &state,
+                              Parameters FunctionCode,
+                              Real64 Operand1,
+                              Real64 Operand2,
+                              Array2D_bool &TodayTomorrowWeatherSource,
+                              ErlValueType &ReturnVal);
 
     int TodayTomorrowWeather(EnergyPlusData &state, int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value);
 

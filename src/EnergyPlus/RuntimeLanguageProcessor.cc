@@ -2362,120 +2362,184 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
 
                 } else if (SELECT_CASE_var == Parameters::FuncTodayIsRain) {
                     TodayTomorrowWeather(
-                        state, FuncTodayIsRain, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsRain, ReturnValue);
+                        state, Parameters::FuncTodayIsRain, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsRain, ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTodayIsSnow) {
                     TodayTomorrowWeather(
-                        state, FuncTodayIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsSnow, ReturnValue);
+                        state, Parameters::FuncTodayIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsSnow, ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTodayOutDryBulbTemp) {
                     TodayTomorrowWeather(state,
-                                         FuncTodayOutDryBulbTemp,
+                                         Parameters::FuncTodayOutDryBulbTemp,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TodayOutDryBulbTemp,
                                          ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTodayOutDewPointTemp) {
                     TodayTomorrowWeather(state,
-                                         FuncTodayOutDewPointTemp,
+                                         Parameters::FuncTodayOutDewPointTemp,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TodayOutDewPointTemp,
                                          ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTodayOutBaroPress) {
-                    TodayTomorrowWeather(
-                        state, FuncTodayOutBaroPress, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayOutBaroPress, ReturnValue);
+                    TodayTomorrowWeather(state,
+                                         Parameters::FuncTodayOutBaroPress,
+                                         Operand(1).Number,
+                                         Operand(2).Number,
+                                         state.dataWeatherManager->TodayOutBaroPress,
+                                         ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTodayOutRelHum) {
-                    TodayTomorrowWeather(
-                        state, FuncTodayOutRelHum, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayOutRelHum, ReturnValue);
+                    TodayTomorrowWeather(state,
+                                         Parameters::FuncTodayOutRelHum,
+                                         Operand(1).Number,
+                                         Operand(2).Number,
+                                         state.dataWeatherManager->TodayOutRelHum,
+                                         ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTodayWindSpeed) {
-                    TodayTomorrowWeather(
-                        state, FuncTodayWindSpeed, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayWindSpeed, ReturnValue);
+                    TodayTomorrowWeather(state,
+                                         Parameters::FuncTodayWindSpeed,
+                                         Operand(1).Number,
+                                         Operand(2).Number,
+                                         state.dataWeatherManager->TodayWindSpeed,
+                                         ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTodayWindDir) {
-                    TodayTomorrowWeather(
-                        state, FuncTodayWindDir, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayWindDir, ReturnValue);
+                    TodayTomorrowWeather(state,
+                                         Parameters::FuncTodayWindDir,
+                                         Operand(1).Number,
+                                         Operand(2).Number,
+                                         state.dataWeatherManager->TodayWindDir,
+                                         ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTodaySkyTemp) {
-                    TodayTomorrowWeather(
-                        state, FuncTodaySkyTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodaySkyTemp, ReturnValue);
+                    TodayTomorrowWeather(state,
+                                         Parameters::FuncTodaySkyTemp,
+                                         Operand(1).Number,
+                                         Operand(2).Number,
+                                         state.dataWeatherManager->TodaySkyTemp,
+                                         ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTodayHorizIRSky) {
-                    TodayTomorrowWeather(
-                        state, FuncTodayHorizIRSky, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayHorizIRSky, ReturnValue);
+                    TodayTomorrowWeather(state,
+                                         Parameters::FuncTodayHorizIRSky,
+                                         Operand(1).Number,
+                                         Operand(2).Number,
+                                         state.dataWeatherManager->TodayHorizIRSky,
+                                         ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTodayBeamSolarRad) {
-                    TodayTomorrowWeather(
-                        state, FuncTodayBeamSolarRad, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayBeamSolarRad, ReturnValue);
+                    TodayTomorrowWeather(state,
+                                         Parameters::FuncTodayBeamSolarRad,
+                                         Operand(1).Number,
+                                         Operand(2).Number,
+                                         state.dataWeatherManager->TodayBeamSolarRad,
+                                         ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTodayDifSolarRad) {
-                    TodayTomorrowWeather(
-                        state, FuncTodayDifSolarRad, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayDifSolarRad, ReturnValue);
+                    TodayTomorrowWeather(state,
+                                         Parameters::FuncTodayDifSolarRad,
+                                         Operand(1).Number,
+                                         Operand(2).Number,
+                                         state.dataWeatherManager->TodayDifSolarRad,
+                                         ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTodayAlbedo) {
                     TodayTomorrowWeather(
-                        state, FuncTodayAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayAlbedo, ReturnValue);
+                        state, Parameters::FuncTodayAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayAlbedo, ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTodayLiquidPrecip) {
-                    TodayTomorrowWeather(
-                        state, FuncTodayLiquidPrecip, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayLiquidPrecip, ReturnValue);
+                    TodayTomorrowWeather(state,
+                                         Parameters::FuncTodayLiquidPrecip,
+                                         Operand(1).Number,
+                                         Operand(2).Number,
+                                         state.dataWeatherManager->TodayLiquidPrecip,
+                                         ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTomorrowIsRain) {
-                    TodayTomorrowWeather(
-                        state, FuncTomorrowIsRain, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowIsRain, ReturnValue);
+                    TodayTomorrowWeather(state,
+                                         Parameters::FuncTomorrowIsRain,
+                                         Operand(1).Number,
+                                         Operand(2).Number,
+                                         state.dataWeatherManager->TomorrowIsRain,
+                                         ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTomorrowIsSnow) {
-                    TodayTomorrowWeather(
-                        state, FuncTomorrowIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowIsSnow, ReturnValue);
+                    TodayTomorrowWeather(state,
+                                         Parameters::FuncTomorrowIsSnow,
+                                         Operand(1).Number,
+                                         Operand(2).Number,
+                                         state.dataWeatherManager->TomorrowIsSnow,
+                                         ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTomorrowOutDryBulbTemp) {
                     TodayTomorrowWeather(state,
-                                         FuncTomorrowOutDryBulbTemp,
+                                         Parameters::FuncTomorrowOutDryBulbTemp,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowOutDryBulbTemp,
                                          ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTomorrowOutDewPointTemp) {
                     TodayTomorrowWeather(state,
-                                         FuncTomorrowOutDewPointTemp,
+                                         Parameters::FuncTomorrowOutDewPointTemp,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowOutDewPointTemp,
                                          ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTomorrowOutBaroPress) {
                     TodayTomorrowWeather(state,
-                                         FuncTomorrowOutBaroPress,
+                                         Parameters::FuncTomorrowOutBaroPress,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowOutBaroPress,
                                          ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTomorrowOutRelHum) {
-                    TodayTomorrowWeather(
-                        state, FuncTomorrowOutRelHum, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowOutRelHum, ReturnValue);
+                    TodayTomorrowWeather(state,
+                                         Parameters::FuncTomorrowOutRelHum,
+                                         Operand(1).Number,
+                                         Operand(2).Number,
+                                         state.dataWeatherManager->TomorrowOutRelHum,
+                                         ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTomorrowWindSpeed) {
-                    TodayTomorrowWeather(
-                        state, FuncTomorrowWindSpeed, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowWindSpeed, ReturnValue);
+                    TodayTomorrowWeather(state,
+                                         Parameters::FuncTomorrowWindSpeed,
+                                         Operand(1).Number,
+                                         Operand(2).Number,
+                                         state.dataWeatherManager->TomorrowWindSpeed,
+                                         ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTomorrowWindDir) {
-                    TodayTomorrowWeather(
-                        state, FuncTomorrowWindDir, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowWindDir, ReturnValue);
+                    TodayTomorrowWeather(state,
+                                         Parameters::FuncTomorrowWindDir,
+                                         Operand(1).Number,
+                                         Operand(2).Number,
+                                         state.dataWeatherManager->TomorrowWindDir,
+                                         ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTomorrowSkyTemp) {
-                    TodayTomorrowWeather(
-                        state, FuncTomorrowSkyTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowSkyTemp, ReturnValue);
+                    TodayTomorrowWeather(state,
+                                         Parameters::FuncTomorrowSkyTemp,
+                                         Operand(1).Number,
+                                         Operand(2).Number,
+                                         state.dataWeatherManager->TomorrowSkyTemp,
+                                         ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTomorrowHorizIRSky) {
                     TodayTomorrowWeather(state,
-                                         FuncTomorrowHorizIRSky,
+                                         Parameters::FuncTomorrowHorizIRSky,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowHorizIRSky,
                                          ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTomorrowBeamSolarRad) {
                     TodayTomorrowWeather(state,
-                                         FuncTomorrowBeamSolarRad,
+                                         Parameters::FuncTomorrowBeamSolarRad,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowBeamSolarRad,
                                          ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTomorrowDifSolarRad) {
                     TodayTomorrowWeather(state,
-                                         FuncTomorrowDifSolarRad,
+                                         Parameters::FuncTomorrowDifSolarRad,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowDifSolarRad,
                                          ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTomorrowAlbedo) {
-                    TodayTomorrowWeather(
-                        state, FuncTomorrowAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowAlbedo, ReturnValue);
+                    TodayTomorrowWeather(state,
+                                         Parameters::FuncTomorrowAlbedo,
+                                         Operand(1).Number,
+                                         Operand(2).Number,
+                                         state.dataWeatherManager->TomorrowAlbedo,
+                                         ReturnValue);
                 } else if (SELECT_CASE_var == Parameters::FuncTomorrowLiquidPrecip) {
                     TodayTomorrowWeather(state,
-                                         FuncTomorrowLiquidPrecip,
+                                         Parameters::FuncTomorrowLiquidPrecip,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowLiquidPrecip,
@@ -2493,7 +2557,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
 }
 
 void TodayTomorrowWeather(EnergyPlusData &state,
-                          int const FunctionCode,
+                          Parameters const FunctionCode,
                           Real64 const Operand1,
                           Real64 const Operand2,
                           Array2D<Real64> &TodayTomorrowWeatherSource,
@@ -2506,14 +2570,14 @@ void TodayTomorrowWeather(EnergyPlusData &state,
     } else {
         ReturnVal.Type = DataRuntimeLanguage::Value::Error;
         ReturnVal.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}",
-                                 state.dataRuntimeLang->PossibleOperators(FunctionCode).Symbol,
+                                 state.dataRuntimeLang->PossibleOperators(static_cast<int>(FunctionCode)).Symbol,
                                  Operand1,
                                  Operand2);
     }
 }
 
 void TodayTomorrowWeather(EnergyPlusData &state,
-                          int const FunctionCode,
+                          Parameters const FunctionCode,
                           Real64 const Operand1,
                           Real64 const Operand2,
                           Array2D_bool &TodayTomorrowWeatherSource,
@@ -2531,7 +2595,7 @@ void TodayTomorrowWeather(EnergyPlusData &state,
     } else {
         ReturnVal.Type = DataRuntimeLanguage::Value::Error;
         ReturnVal.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}",
-                                 state.dataRuntimeLang->PossibleOperators(FunctionCode).Symbol,
+                                 state.dataRuntimeLang->PossibleOperators(static_cast<int>(FunctionCode)).Symbol,
                                  Operand1,
                                  Operand2);
     }
