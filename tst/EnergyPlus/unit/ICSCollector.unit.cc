@@ -104,7 +104,8 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataSurface->Surface(SurfNum).BaseSurf = SurfNum;
     state->dataSurface->Surface(SurfNum).Zone = ZoneNum;
     state->dataSurface->Surface(SurfNum).IsICS = true;
-    state->dataSurface->state.dataSurface->SurfExtConvCoeff(SurfNum) = 0;
+    state->dataSurface->SurfExtConvCoeff.allocate(NumOfSurf);
+    state->dataSurface->SurfExtConvCoeff(SurfNum) = 0;
     state->dataSurface->Surface(SurfNum).ExtWind = false;
     // allocate construction variable data
     state->dataConstruction->Construct.allocate(ConstrNum);
@@ -127,6 +128,8 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataHeatBal->SurfQRadSWOutIncident(1) = 0.0;
     // set user defined conv. coeff. calculation to false
     state->dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
+    state->dataSurface->SurfEMSOverrideExtConvCoef.allocate(NumOfSurf);
+    state->dataSurface->SurfEMSOverrideExtConvCoef(1) = false;
 
     // SurfPtr( 1 ); // Array of indexes pointing to Surface structure in DataSurfaces
     Real64 const VentArea(0.1);  // Area available for venting the gap [m2]

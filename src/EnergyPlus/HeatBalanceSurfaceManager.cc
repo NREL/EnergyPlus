@@ -7977,7 +7977,6 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
             int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceFirst;
             int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
             for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
-                auto &surface(Surface(surfNum));
                 auto &zone(state.dataHeatBal->Zone(zoneNum));
                 Real64 &TH11(state.dataHeatBalSurf->TH(1, 1, surfNum));
                 Real64 &TH12(state.dataHeatBalSurf->TH(2, 1, surfNum));

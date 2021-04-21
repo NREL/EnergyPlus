@@ -172,7 +172,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataSurface->SurfHighTempErrCount.allocate(1);
     DataHeatBalance::ZoneData testZone;
     int cntWarmupSurfTemp = 0;
-    Surface(1).Name = "TestSurface";
+    state->dataSurface->Surface(1).Name = "TestSurface";
     testZone.Name = "TestZone";
     testZone.InternalHeatGains = 2.5;
     testZone.NominalInfilVent = 0.5;
@@ -737,6 +737,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataSurface->Surface(2).TAirRef = DataSurfaces::AdjacentAirTemp;
     state->dataSurface->Surface(3).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
 
+    state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfEMSOverrideExtConvCoef.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfEMSOverrideIntConvCoef = false;
+    state->dataSurface->SurfEMSOverrideExtConvCoef = false;
+
     state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
     state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
     state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
@@ -1273,6 +1278,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataSurface->Surface(2).TAirRef = DataSurfaces::AdjacentAirTemp;
     state->dataSurface->Surface(3).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
 
+    state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfEMSOverrideExtConvCoef.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfEMSOverrideIntConvCoef = false;
+    state->dataSurface->SurfEMSOverrideExtConvCoef = false;
+
     state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
     state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
     state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
@@ -1348,7 +1358,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     // Test if local value used in surface hc calculation
     // Surface(1) - local; Surface(2) - global;
     for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
-        state->dataSurface->state.dataSurface->SurfExtConvCoeff(SurfNum) = -1;
+        state->dataSurface->SurfExtConvCoeff(SurfNum) = -1;
     }
     CalcHeatBalanceOutsideSurf(*state);
     Real64 HExt_Expect_Surf1 = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(5, 1.5);
@@ -1848,6 +1858,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataSurface->Surface(2).TAirRef = DataSurfaces::AdjacentAirTemp;
     state->dataSurface->Surface(3).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
 
+    state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfEMSOverrideExtConvCoef.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfEMSOverrideIntConvCoef = false;
+    state->dataSurface->SurfEMSOverrideExtConvCoef = false;
+
     state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
     state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
     state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
@@ -1902,7 +1917,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     for (SurfNum = 1; SurfNum <= 6; SurfNum++) {
         state->dataHeatBalSurf->TH(1, 1, SurfNum) = 20;           // Surf temp
         state->dataSurface->Surface(SurfNum).OutDryBulbTemp = 22; // Air temp
-        state->dataSurface->state.dataSurface->SurfExtConvCoeff(SurfNum) = -6;
+        state->dataSurface->SurfExtConvCoeff(SurfNum) = -6;
         state->dataSurface->AirSkyRadSplit(SurfNum) = 1.0;
     }
     CalcHeatBalanceOutsideSurf(*state);
@@ -2414,6 +2429,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataSurface->Surface(2).TAirRef = DataSurfaces::AdjacentAirTemp;
     state->dataSurface->Surface(3).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
 
+    state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfEMSOverrideExtConvCoef.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfEMSOverrideIntConvCoef = false;
+    state->dataSurface->SurfEMSOverrideExtConvCoef = false;
+
     state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
     state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
     state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
@@ -2466,7 +2486,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     SolarShading::DetermineShadowingCombinations(*state);
     InitSurfaceHeatBalance(*state);
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
-        state->dataSurface->state.dataSurface->SurfExtConvCoeff(SurfNum) = -1;
+        state->dataSurface->SurfExtConvCoeff(SurfNum) = -1;
     }
     // Test Additional Heat Source Calculation
     CalcHeatBalanceOutsideSurf(*state);
@@ -3096,6 +3116,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     createFacilityElectricPowerServiceObject(*state);
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
+    state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfEMSOverrideIntConvCoef = false;
 
     InitSurfaceHeatBalance(*state);
 

@@ -5907,7 +5907,7 @@ void DayltgHitObstruction(EnergyPlusData &state,
         // Lambda function for the octree to test for surface hit and update transmittance if hit
         auto solarTransmittance = [=, &state, &R1, &RN, &hit, &ObTrans](SurfaceData const &surface) -> bool {
             int ObsSurfNum = UtilityRoutines::FindItemInList(surface.Name, state.dataSurface->Surface);
-            if (state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) return false; // Do Consider separate octree without filtered surfaces
+            if (!state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) return false; // Do Consider separate octree without filtered surfaces
             auto const sClass(surface.Class);
             if ((sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && (&surface != window_base_p)) {
                 PierceSurface(surface, R1, RN, state.dataDaylightingManager->DayltgHitObstructionHP, hit);

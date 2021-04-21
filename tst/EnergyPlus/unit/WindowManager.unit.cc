@@ -575,6 +575,8 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataSurface->SurfWinGainFrameDividerToZoneRep.allocate(3);
     state->dataSurface->InsideFrameCondensationFlag.allocate(3);
     state->dataSurface->InsideDividerCondensationFlag.allocate(3);
+    state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(3);
+    state->dataSurface->SurfIntConvCoeff.allocate(3);
 
     state->dataHeatBalSurf->QdotConvOutRep.allocate(3);
     state->dataHeatBalSurf->QdotConvOutRepPerArea.allocate(3);
@@ -596,6 +598,8 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
     state->dataSurface->SurfWinTransSolar = 0.0;
     state->dataHeatBal->QS = 0.0;
+    state->dataSurface->SurfIntConvCoeff = 0.0;
+    state->dataSurface->SurfEMSOverrideIntConvCoef = false;
 
     Real64 inSurfTemp;
     Real64 outSurfTemp;
@@ -2803,6 +2807,8 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataSurface->SurfWinGainFrameDividerToZoneRep.allocate(3);
     state->dataSurface->InsideFrameCondensationFlag.allocate(3);
     state->dataSurface->InsideDividerCondensationFlag.allocate(3);
+    state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(3);
+    state->dataSurface->SurfIntConvCoeff.allocate(3);
 
     state->dataHeatBalSurf->QdotConvOutRep.allocate(3);
     state->dataHeatBalSurf->QdotConvOutRepPerArea.allocate(3);
@@ -2824,6 +2830,8 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
     state->dataSurface->SurfWinTransSolar = 0.0;
     state->dataHeatBal->QS = 0.0;
+    state->dataSurface->SurfIntConvCoeff = 0.0;
+    state->dataSurface->SurfEMSOverrideIntConvCoef = false;
 
     Real64 inSurfTemp;
     Real64 outSurfTemp;

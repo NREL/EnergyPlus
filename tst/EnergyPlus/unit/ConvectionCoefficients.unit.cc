@@ -717,6 +717,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     SurfTemp.allocate(1);
     HcIn.allocate(1);
     Vhc.allocate(1);
+    state->dataSurface->SurfIntConvCoeff.allocate(SurfNum);
 
     // Test 1: CalcWaltonUnstableHorizontalOrTilt calculation for Hn
     DeltaTemp = 1.0;
@@ -728,7 +729,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     // Test 2/3: CalcDetailedHcInForDVModel calculation for Hn
     state->dataSurface->Surface(SurfNum).HeatTransSurf = true;
     state->dataSurface->Surface(SurfNum).TAirRef = DataSurfaces::AdjacentAirTemp;
-    state->dataSurface->state.dataSurface->SurfIntConvCoeff(SurfNum) = 0.0;
+    state->dataSurface->SurfIntConvCoeff(SurfNum) = 0.0;
     state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;
@@ -739,7 +740,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
 
     state->dataSurface->Surface(SurfNum).HeatTransSurf = true;
     state->dataSurface->Surface(SurfNum).TAirRef = DataSurfaces::AdjacentAirTemp;
-    state->dataSurface->state.dataSurface->SurfIntConvCoeff(SurfNum) = 0.0;
+    state->dataSurface->SurfIntConvCoeff(SurfNum) = 0.0;
     state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDCV;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;

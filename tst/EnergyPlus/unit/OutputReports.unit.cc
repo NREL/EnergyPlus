@@ -147,6 +147,11 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
     SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                            // expect no errors
 
+    state->dataSurface->SurfExtConvCoeff.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfIntConvCoeff.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfExtConvCoeff = 0.0;
+    state->dataSurface->SurfIntConvCoeff = 0.0;
+
     // reset eio stream
     has_eio_output(true);
 

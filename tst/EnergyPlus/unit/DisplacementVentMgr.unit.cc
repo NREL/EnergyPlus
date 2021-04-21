@@ -159,6 +159,9 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataSurface->Surface(3).Vertex(4).y = -1.48693002;
     state->dataSurface->Surface(3).Vertex(4).z = 8.5343999852;
 
+    state->dataSurface->SurfIntConvCoeff.allocate(TotSurfaces);
+    state->dataSurface->SurfIntConvCoeff = 0.0;
+
     state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
 
