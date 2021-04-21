@@ -631,6 +631,7 @@ namespace CostEstimateManager {
                     SurfMultipleARR.deallocate();
 
                 } else if ((SELECT_CASE_var == "COIL:DX") || (SELECT_CASE_var == "COIL:COOLING:DX:SINGLESPEED")) {
+                    WildcardObjNames = false;
                     thisCoil = 0;
                     //  check for wildcard * in object name..
                     if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
@@ -695,7 +696,7 @@ namespace CostEstimateManager {
                     }
 
                 } else if (SELECT_CASE_var == "COIL:COOLING:DX") {
-
+                    WildcardObjNames = false;
                     auto &parentObjName = state.dataCostEstimateManager->CostLineItem(Item).ParentObjName;
                     bool coilFound = false;
                     thisCoil = 0;
