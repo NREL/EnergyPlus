@@ -165,16 +165,6 @@ public: // Creation
 		initialize( t );
 	}
 
-	// IndexRange + Sticky Initializer Value Constructor
-	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< S > const & s ) :
-	 Super( I1, I2, I3, I4, I5, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		setup_real();
-		initialize( s );
-	}
-
 	// IndexRange + Initializer List Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, std::initializer_list< U > const l ) :
@@ -417,15 +407,6 @@ public: // Modifier
 	initializer( T const & t )
 	{
 		initializer_ = t;
-		return *this;
-	}
-
-	// Set Initializer Sticky Value
-	template< typename S, class = typename std::enable_if< std::is_assignable< T&, S >::value >::type >
-	Array5D &
-	initializer( Sticky< S > const & s )
-	{
-		initializer_ = s;
 		return *this;
 	}
 

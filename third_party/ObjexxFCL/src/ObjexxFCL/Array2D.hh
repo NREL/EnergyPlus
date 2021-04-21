@@ -157,13 +157,6 @@ public: // Creation
 		}
 	}
 
-	// Sticky Initializer Value Constructor
-	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	explicit
-	Array2D( Sticky< S > const & s ) :
-	 initializer_( s )
-	{}
-
 	// IndexRange Constructor
 	Array2D( IR const & I1, IR const & I2 ) :
 	 Super( I1, I2 )
@@ -179,26 +172,6 @@ public: // Creation
 		initialize( t );
 	}
 
-	// IndexRange + Sticky Initializer Value Constructor
-	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array2D( IR const & I1, IR const & I2, Sticky< S > const & s ) :
-	 Super( I1, I2, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		setup_real();
-		initialize( s );
-	}
-
-	// IndexRange + Sticky Initializer Value + Initializer Value Constructor
-	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array2D( IR const & I1, IR const & I2, Sticky< S > const & s, U const & u ) :
-	 Super( I1, I2, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		setup_real();
-		initialize( s );
-		assign( u );
-	}
 
 	// IndexRange + Initializer Function Constructor
 	Array2D( IR const & I1, IR const & I2, InitializerFunction const & fxn ) :
@@ -208,15 +181,6 @@ public: // Creation
 		initialize( fxn );
 	}
 
-	// IndexRange + Sticky Initializer Value + Initializer Function Constructor
-	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array2D( IR const & I1, IR const & I2, Sticky< S > const & s, InitializerFunction const & fxn ) :
-	 Super( I1, I2, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		setup_real();
-		initialize( fxn );
-	}
 
 	// IndexRange + Initializer List Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
@@ -224,18 +188,6 @@ public: // Creation
 	 Super( I1, I2, l )
 	{
 		setup_real();
-	}
-
-	// IndexRange + Sticky Initializer Value + Initializer List Constructor Template
-	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array2D( IR const & I1, IR const & I2, Sticky< S > const & s, std::initializer_list< U > const l ) :
-	 Super( I1, I2, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		assert( size_ == l.size() );
-		setup_real();
-		initialize( s );
-		std::copy( l.begin(), l.end(), data_ );
 	}
 
 	// IndexRange + Super Constructor Template
@@ -246,18 +198,6 @@ public: // Creation
 		assert( conformable( a ) );
 		setup_real();
 		initialize( a );
-	}
-
-	// IndexRange + Sticky Initializer Value + Super Constructor Template
-	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array2D( IR const & I1, IR const & I2, Sticky< S > const & s, Array2< U > const & a ) :
-	 Super( I1, I2, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		assert( conformable( a ) );
-		setup_real();
-		initialize( s );
-		assign( a );
 	}
 
 	// IndexRange + Slice Constructor Template
@@ -754,15 +694,6 @@ public: // Modifier
 	initializer( T const & t )
 	{
 		initializer_ = t;
-		return *this;
-	}
-
-	// Set Initializer Sticky Value
-	template< typename S, class = typename std::enable_if< std::is_assignable< T&, S >::value >::type >
-	Array2D &
-	initializer( Sticky< S > const & s )
-	{
-		initializer_ = s;
 		return *this;
 	}
 

@@ -125,8 +125,6 @@ set(src
   src/ObjexxFCL/Required.hh
         src/ObjexxFCL/sbyte.fwd.hh
   src/ObjexxFCL/sbyte.hh
-        src/ObjexxFCL/Sticky.fwd.hh
-  src/ObjexxFCL/Sticky.hh
         src/ObjexxFCL/string.constants.cc
   src/ObjexxFCL/string.constants.hh
   src/ObjexxFCL/string.functions.cc

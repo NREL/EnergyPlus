@@ -23,7 +23,6 @@
 #include <ObjexxFCL/InitializerSentinel.hh>
 #include <ObjexxFCL/MArray.hh>
 #include <ObjexxFCL/ProxySentinel.hh>
-#include <ObjexxFCL/Sticky.hh>
 #include <ObjexxFCL/TypeTraits.hh>
 #include <ObjexxFCL/Vector2.hh>
 #include <ObjexxFCL/Vector3.hh>

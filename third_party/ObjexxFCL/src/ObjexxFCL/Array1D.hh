@@ -166,13 +166,6 @@ public: // Creation
 		}
 	}
 
-	// Sticky CoeffInitializer Value Constructor
-	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	explicit
-	Array1D( Sticky< S > const & s ) :
-	 initializer_( s )
-	{}
-
 	// IndexRange Constructor
 	explicit
 	Array1D( IR const & I ) :
@@ -189,40 +182,9 @@ public: // Creation
 		initialize( t );
 	}
 
-	// IndexRange + Sticky Initializer Value Constructor
-	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array1D( IR const & I, Sticky< S > const & s ) :
-	 Super( I, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		setup_real();
-		initialize( s );
-	}
-
-	// IndexRange + Sticky Initializer Value + Initializer Value Constructor
-	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array1D( IR const & I, Sticky< S > const & s, U const & u ) :
-	 Super( I, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		setup_real();
-		initialize( s );
-		assign( u );
-	}
-
 	// IndexRange + Initializer Function Constructor
 	Array1D( IR const & I, InitializerFunction const & fxn ) :
 	 Super( I, InitializerSentinel() )
-	{
-		setup_real();
-		initialize( fxn );
-	}
-
-	// IndexRange + Sticky Initializer Value + Initializer Function Constructor
-	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array1D( IR const & I, Sticky< S > const & s, InitializerFunction const & fxn ) :
-	 Super( I, InitializerSentinel() ),
-	 initializer_( s )
 	{
 		setup_real();
 		initialize( fxn );
@@ -236,18 +198,6 @@ public: // Creation
 		setup_real();
 	}
 
-	// IndexRange + Sticky Initializer Value + Initializer List Constructor Template
-	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array1D( IR const & I, Sticky< S > const & s, std::initializer_list< U > const l ) :
-	 Super( I, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		assert( size_ == l.size() );
-		setup_real();
-		initialize( s );
-		std::copy( l.begin(), l.end(), data_ );
-	}
-
 	// IndexRange + Super Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array1D( IR const & I, Array1< U > const & a ) :
@@ -258,17 +208,6 @@ public: // Creation
 		initialize( a );
 	}
 
-	// IndexRange + Sticky Initializer Value + Super Constructor Template
-	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array1D( IR const & I, Sticky< S > const & s, Array1< U > const & a ) :
-	 Super( I, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		assert( conformable( a ) );
-		setup_real();
-		initialize( s );
-		assign( a );
-	}
 
 	// IndexRange + Slice Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
@@ -367,17 +306,6 @@ public: // Creation
 		assert( l.size() == 2 );
 		setup_real();
 		initialize( t );
-	}
-
-	// Initializer List Index Range + Sticky Initializer Value Constructor Template
-	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array1D( std::initializer_list< U > const l, Sticky< S > const & s ) :
-	 Super( IR( l ), InitializerSentinel() ),
-	 initializer_( s )
-	{
-		assert( l.size() == 2 );
-		setup_real();
-		initialize( s );
 	}
 
 	// Initializer List Index Range + Initializer Function Constructor Template
@@ -1576,15 +1504,6 @@ public: // Modifier
 	initializer( T const & t )
 	{
 		initializer_ = t;
-		return *this;
-	}
-
-	// Set Initializer Sticky Value
-	template< typename S, class = typename std::enable_if< std::is_assignable< T&, S >::value >::type >
-	Array1D &
-	initializer( Sticky< S > const & s )
-	{
-		initializer_ = s;
 		return *this;
 	}
 
@@ -3711,62 +3630,6 @@ Array1D< T >
 cross_product( Array1S< T > const & a, Array1S< T > const & b )
 {
 	return cross( a, b );
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Array1D< T >
-Array_cross( Array1< T > const & a, Vector3< T > const & b )
-{
-	assert( a.size() == 3u );
-	Array1D< T > c( 3 );
-	c[ 0 ] = ( a[ 1 ] * b.z ) - ( a[ 2 ] * b.y );
-	c[ 1 ] = ( a[ 2 ] * b.x ) - ( a[ 0 ] * b.z );
-	c[ 2 ] = ( a[ 0 ] * b.y ) - ( a[ 1 ] * b.x );
-	return c;
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Array1D< T >
-Array_cross( Vector3< T > const & a, Array1< T > const & b )
-{
-	assert( b.size() == 3u );
-	Array1D< T > c( 3 );
-	c[ 0 ] = ( a.y * b[ 2 ] ) - ( a.z * b[ 1 ] );
-	c[ 1 ] = ( a.z * b[ 0 ] ) - ( a.x * b[ 2 ] );
-	c[ 2 ] = ( a.x * b[ 1 ] ) - ( a.y * b[ 0 ] );
-	return c;
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Vector3< T >
-Vector_cross( Array1< T > const & a, Vector3< T > const & b )
-{
-	assert( a.size() == 3u );
-	Vector3< T > c;
-	c.x = ( a[ 1 ] * b.z ) - ( a[ 2 ] * b.y );
-	c.y = ( a[ 2 ] * b.x ) - ( a[ 0 ] * b.z );
-	c.z = ( a[ 0 ] * b.y ) - ( a[ 1 ] * b.x );
-	return c;
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Vector3< T >
-Vector_cross( Vector3< T > const & a, Array1< T > const & b )
-{
-	assert( b.size() == 3u );
-	Vector3< T > c;
-	c.x = ( a.y * b[ 2 ] ) - ( a.z * b[ 1 ] );
-	c.y = ( a.z * b[ 0 ] ) - ( a.x * b[ 2 ] );
-	c.z = ( a.x * b[ 1 ] ) - ( a.y * b[ 0 ] );
-	return c;
 }
 
 } // ObjexxFCL

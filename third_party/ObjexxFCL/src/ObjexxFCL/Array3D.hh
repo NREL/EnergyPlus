@@ -166,13 +166,6 @@ public: // Creation
 	}
 
 
-	// Sticky Initializer Value Constructor
-	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	explicit
-	Array3D( Sticky< S > const & s ) :
-	 initializer_( s )
-	{}
-
 	// IndexRange Constructor
 	Array3D( IR const & I1, IR const & I2, IR const & I3 ) :
 	 Super( I1, I2, I3 )
@@ -188,40 +181,9 @@ public: // Creation
 		initialize( t );
 	}
 
-	// IndexRange + Sticky Initializer Value Constructor
-	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array3D( IR const & I1, IR const & I2, IR const & I3, Sticky< S > const & s ) :
-	 Super( I1, I2, I3, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		setup_real();
-		initialize( s );
-	}
-
-	// IndexRange + Sticky Initializer Value + Initializer Value Constructor
-	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array3D( IR const & I1, IR const & I2, IR const & I3, Sticky< S > const & s, U const & u ) :
-	 Super( I1, I2, I3, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		setup_real();
-		initialize( s );
-		assign( u );
-	}
-
 	// IndexRange + Initializer Function Constructor
 	Array3D( IR const & I1, IR const & I2, IR const & I3, InitializerFunction const & fxn ) :
 	 Super( I1, I2, I3, InitializerSentinel() )
-	{
-		setup_real();
-		initialize( fxn );
-	}
-
-	// IndexRange + Sticky Initializer Value + Initializer Function Constructor
-	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array3D( IR const & I1, IR const & I2, IR const & I3, Sticky< S > const & s, InitializerFunction const & fxn ) :
-	 Super( I1, I2, I3, InitializerSentinel() ),
-	 initializer_( s )
 	{
 		setup_real();
 		initialize( fxn );
@@ -235,18 +197,6 @@ public: // Creation
 		setup_real();
 	}
 
-	// IndexRange + Sticky Initializer Value + Initializer List Constructor Template
-	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array3D( IR const & I1, IR const & I2, IR const & I3, Sticky< S > const & s, std::initializer_list< U > const l ) :
-	 Super( I1, I2, I3, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		assert( size_ == l.size() );
-		setup_real();
-		initialize( s );
-		std::copy( l.begin(), l.end(), data_ );
-	}
-
 	// IndexRange + Super Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array3D( IR const & I1, IR const & I2, IR const & I3, Array3< U > const & a ) :
@@ -255,18 +205,6 @@ public: // Creation
 		assert( conformable( a ) );
 		setup_real();
 		initialize( a );
-	}
-
-	// IndexRange + Sticky Initializer Value + Super Constructor Template
-	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array3D( IR const & I1, IR const & I2, IR const & I3, Sticky< S > const & s, Array3< U > const & a ) :
-	 Super( I1, I2, I3, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		assert( conformable( a ) );
-		setup_real();
-		initialize( s );
-		assign( a );
 	}
 
 	// IndexRange + Slice Constructor Template
@@ -752,15 +690,6 @@ public: // Modifier
 	initializer( T const & t )
 	{
 		initializer_ = t;
-		return *this;
-	}
-
-	// Set Initializer Sticky Value
-	template< typename S, class = typename std::enable_if< std::is_assignable< T&, S >::value >::type >
-	Array3D &
-	initializer( Sticky< S > const & s )
-	{
-		initializer_ = s;
 		return *this;
 	}
 
