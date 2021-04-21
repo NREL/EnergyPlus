@@ -26,7 +26,6 @@ class byte;
 
 // Types
 typedef  byte  sbyte;
-typedef  Array1< bool >                Array1_bool;
 typedef  Array1< int >                 Array1_int;
 typedef  Array1< std::string >         Array1_string;
 

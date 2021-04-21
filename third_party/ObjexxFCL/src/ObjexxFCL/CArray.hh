@@ -496,17 +496,6 @@ public: // Inspector
 		return std::sqrt( length_sq );
 	}
 
-	// Length Squared
-	T
-	length_squared() const
-	{
-		T length_sq( T( 0 ) );
-		for ( size_type i = 0; i < size_; ++i ) {
-			length_sq += data_[ i ] * data_[ i ];
-		}
-		return length_sq;
-	}
-
 public: // Modifier
 
 	// First Element

@@ -92,11 +92,9 @@ extern Omit const _;
 using ObjexxFCL::_;
 
 using ObjexxFCL::Array1;
-using ObjexxFCL::Array1_bool;
 using ObjexxFCL::Array1_int;
 using ObjexxFCL::Array1_string;
 using ObjexxFCL::Array1A;
-using ObjexxFCL::Array1A_bool;
 using ObjexxFCL::Array1A_int;
 using ObjexxFCL::Array1D;
 using ObjexxFCL::Array1D_bool;

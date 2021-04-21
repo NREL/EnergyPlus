@@ -102,7 +102,6 @@ protected: // Types
 	using Super::assign;
 	using Super::clear_move;
 	using Super::initialize;
-	using Super::move_if;
 	using Super::resize;
 	using Super::shift_set;
 	using Super::shift_only_set;
@@ -144,26 +143,11 @@ public: // Creation
 		a.initializer_.clear();
 	}
 
-	// Copy Constructor Template
-	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	explicit
-	Array5D( Array5D< U > const & a ) :
-	 Super( a ),
-	 initializer_( a.initializer_ )
-	{}
-
 	// Super Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	explicit
 	Array5D( Array5< U > const & a ) :
 	 Super( a )
-	{}
-
-	// Sticky Initializer Value Constructor
-	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	explicit
-	Array5D( Sticky< S > const & s ) :
-	 initializer_( s )
 	{}
 
 	// IndexRange Constructor
@@ -191,75 +175,12 @@ public: // Creation
 		initialize( s );
 	}
 
-	// IndexRange + Sticky Initializer Value + Initializer Value Constructor
-	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< S > const & s, U const & u ) :
-	 Super( I1, I2, I3, I4, I5, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		setup_real();
-		initialize( s );
-		assign( u );
-	}
-
-	// IndexRange + Initializer Function Constructor
-	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, InitializerFunction const & fxn ) :
-	 Super( I1, I2, I3, I4, I5, InitializerSentinel() )
-	{
-		setup_real();
-		initialize( fxn );
-	}
-
-	// IndexRange + Sticky Initializer Value + Initializer Function Constructor
-	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< S > const & s, InitializerFunction const & fxn ) :
-	 Super( I1, I2, I3, I4, I5, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		setup_real();
-		initialize( fxn );
-	}
-
 	// IndexRange + Initializer List Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, std::initializer_list< U > const l ) :
 	 Super( I1, I2, I3, I4, I5, l )
 	{
 		setup_real();
-	}
-
-	// IndexRange + Sticky Initializer Value + Initializer List Constructor Template
-	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< S > const & s, std::initializer_list< U > const l ) :
-	 Super( I1, I2, I3, I4, I5, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		assert( size_ == l.size() );
-		setup_real();
-		initialize( s );
-		std::copy( l.begin(), l.end(), data_ );
-	}
-
-	// IndexRange + Super Constructor Template
-	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Array5< U > const & a ) :
-	 Super( I1, I2, I3, I4, I5, InitializerSentinel() )
-	{
-		assert( conformable( a ) );
-		setup_real();
-		initialize( a );
-	}
-
-	// IndexRange + Sticky Initializer Value + Super Constructor Template
-	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< S > const & s, Array5< U > const & a ) :
-	 Super( I1, I2, I3, I4, I5, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		assert( conformable( a ) );
-		setup_real();
-		initialize( s );
-		assign( a );
 	}
 
 	// Super + IndexRange Constructor Template
@@ -292,42 +213,6 @@ public: // Creation
 		initialize( a );
 	}
 
-	// Array Range Named Constructor Template
-	template< typename U >
-	static
-	Array5D
-	range( Array5< U > const & a )
-	{
-		return Array5D( a.I1_, a.I2_, a.I3_, a.I4_, a.I5_ );
-	}
-
-	// Array Range + Initializer Value Named Constructor Template
-	template< typename U >
-	static
-	Array5D
-	range( Array5< U > const & a, T const & t )
-	{
-		return Array5D( a.I1_, a.I2_, a.I3_, a.I4_, a.I5_, t );
-	}
-
-	// Array Shape Named Constructor Template
-	template< typename U >
-	static
-	Array5D
-	shape( Array5< U > const & a )
-	{
-		return Array5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() );
-	}
-
-	// Array Shape + Initializer Value Named Constructor Template
-	template< typename U >
-	static
-	Array5D
-	shape( Array5< U > const & a, T const & t )
-	{
-		return Array5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), t );
-	}
-
 	// One-Based Copy Named Constructor Template
 	template< typename U >
 	static
@@ -342,24 +227,6 @@ public: // Creation
 	~Array5D()
 	{}
 
-private: // Creation
-
-	// IndexRange Raw Constructor
-	explicit
-	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, InitializerSentinel const & initialized ) :
-	 Super( I1, I2, I3, I4, I5, initialized )
-	{
-		setup_real();
-	}
-
-	// IndexRange Raw Initializer Constructor
-	explicit
-	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Initializer const & initializer ) :
-	 Super( I1, I2, I3, I4, I5, InitializerSentinel() )
-	{
-		setup_real();
-		initialize( initializer );
-	}
 
 public: // Assignment: Array
 
@@ -437,61 +304,6 @@ public: // Assignment: Array
 		return *this;
 	}
 
-	// += Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array5D &
-	operator +=( Array5< U > const & a )
-	{
-		Super::operator +=( a );
-		return *this;
-	}
-
-	// -= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array5D &
-	operator -=( Array5< U > const & a )
-	{
-		Super::operator -=( a );
-		return *this;
-	}
-
-	// *= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array5D &
-	operator *=( Array5< U > const & a )
-	{
-		Super::operator *=( a );
-		return *this;
-	}
-
-	// /= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array5D &
-	operator /=( Array5< U > const & a )
-	{
-		Super::operator /=( a );
-		return *this;
-	}
-
-public: // Assignment: Array: Logical
-
-	// &&= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array5D &
-	and_equals( Array5< U > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array5D &
-	or_equals( Array5< U > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
 
 public: // Assignment: Value
 
@@ -503,37 +315,6 @@ public: // Assignment: Value
 		return *this;
 	}
 
-	// += Value
-	Array5D &
-	operator +=( T const & t )
-	{
-		Base::operator +=( t );
-		return *this;
-	}
-
-	// -= Value
-	Array5D &
-	operator -=( T const & t )
-	{
-		Base::operator -=( t );
-		return *this;
-	}
-
-	// *= Value
-	Array5D &
-	operator *=( T const & t )
-	{
-		Base::operator *=( t );
-		return *this;
-	}
-
-	// /= Value
-	Array5D &
-	operator /=( T const & t )
-	{
-		Base::operator /=( t );
-		return *this;
-	}
 
 public: // Predicate
 
@@ -795,366 +576,6 @@ swap( Array5D< T > & a, Array5D< T > & b )
 
 // Comparison: Elemental
 
-// Array == Array
-template< typename T >
-inline
-Array5D< bool >
-operator ==( Array5< T > const & a, Array5< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array5D< bool > r( Array5D< bool >::shape( a ) );
-	eq_elemental( a, b, r );
-	return r;
-}
-
-// Array != Array
-template< typename T >
-inline
-Array5D< bool >
-operator !=( Array5< T > const & a, Array5< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array5D< bool > r( Array5D< bool >::shape( a ) );
-	ne_elemental( a, b, r );
-	return r;
-}
-
-// Array < Array
-template< typename T >
-inline
-Array5D< bool >
-operator <( Array5< T > const & a, Array5< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array5D< bool > r( Array5D< bool >::shape( a ) );
-	lt_elemental( a, b, r );
-	return r;
-}
-
-// Array <= Array
-template< typename T >
-inline
-Array5D< bool >
-operator <=( Array5< T > const & a, Array5< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array5D< bool > r( Array5D< bool >::shape( a ) );
-	le_elemental( a, b, r );
-	return r;
-}
-
-// Array > Array
-template< typename T >
-inline
-Array5D< bool >
-operator >( Array5< T > const & a, Array5< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array5D< bool > r( Array5D< bool >::shape( a ) );
-	gt_elemental( a, b, r );
-	return r;
-}
-
-// Array >= Array
-template< typename T >
-inline
-Array5D< bool >
-operator >=( Array5< T > const & a, Array5< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array5D< bool > r( Array5D< bool >::shape( a ) );
-	ge_elemental( a, b, r );
-	return r;
-}
-
-// Array == Value
-template< typename T >
-inline
-Array5D< bool >
-operator ==( Array5< T > const & a, T const & t )
-{
-	Array5D< bool > r( Array5D< bool >::shape( a ) );
-	eq_elemental( a, t, r );
-	return r;
-}
-
-// Array != Value
-template< typename T >
-inline
-Array5D< bool >
-operator !=( Array5< T > const & a, T const & t )
-{
-	Array5D< bool > r( Array5D< bool >::shape( a ) );
-	ne_elemental( a, t, r );
-	return r;
-}
-
-// Array < Value
-template< typename T >
-inline
-Array5D< bool >
-operator <( Array5< T > const & a, T const & t )
-{
-	Array5D< bool > r( Array5D< bool >::shape( a ) );
-	lt_elemental( a, t, r );
-	return r;
-}
-
-// Array <= Value
-template< typename T >
-inline
-Array5D< bool >
-operator <=( Array5< T > const & a, T const & t )
-{
-	Array5D< bool > r( Array5D< bool >::shape( a ) );
-	le_elemental( a, t, r );
-	return r;
-}
-
-// Array > Value
-template< typename T >
-inline
-Array5D< bool >
-operator >( Array5< T > const & a, T const & t )
-{
-	Array5D< bool > r( Array5D< bool >::shape( a ) );
-	gt_elemental( a, t, r );
-	return r;
-}
-
-// Array >= Value
-template< typename T >
-inline
-Array5D< bool >
-operator >=( Array5< T > const & a, T const & t )
-{
-	Array5D< bool > r( Array5D< bool >::shape( a ) );
-	ge_elemental( a, t, r );
-	return r;
-}
-
-// Value == Array
-template< typename T >
-inline
-Array5D< bool >
-operator ==( T const & t, Array5< T > const & b )
-{
-	return ( b == t );
-}
-
-// Value != Array
-template< typename T >
-inline
-Array5D< bool >
-operator !=( T const & t, Array5< T > const & b )
-{
-	return ( b != t );
-}
-
-// Value < Array
-template< typename T >
-inline
-Array5D< bool >
-operator <( T const & t, Array5< T > const & b )
-{
-	return ( b > t );
-}
-
-// Value <= Array
-template< typename T >
-inline
-Array5D< bool >
-operator <=( T const & t, Array5< T > const & b )
-{
-	return ( b >= t );
-}
-
-// Value > Array
-template< typename T >
-inline
-Array5D< bool >
-operator >( T const & t, Array5< T > const & b )
-{
-	return ( b < t );
-}
-
-// Value >= Array
-template< typename T >
-inline
-Array5D< bool >
-operator >=( T const & t, Array5< T > const & b )
-{
-	return ( b <= t );
-}
-
-// Generator
-
-// -Array
-template< typename T >
-inline
-Array5D< T >
-operator -( Array5< T > const & a )
-{
-	Array5D< T > r( Array5D< T >::one_based( a ) );
-	r *= T( -1 );
-	return r;
-}
-
-// Array + Array
-template< typename T >
-inline
-Array5D< T >
-operator +( Array5< T > const & a, Array5< T > const & b )
-{
-	Array5D< T > r( Array5D< T >::one_based( a ) );
-	r += b;
-	return r;
-}
-
-// Array - Array
-template< typename T >
-inline
-Array5D< T >
-operator -( Array5< T > const & a, Array5< T > const & b )
-{
-	Array5D< T > r( Array5D< T >::one_based( a ) );
-	r -= b;
-	return r;
-}
-
-// Array * Array
-template< typename T >
-inline
-Array5D< T >
-operator *( Array5< T > const & a, Array5< T > const & b )
-{
-	Array5D< T > r( Array5D< T >::one_based( a ) );
-	r *= b;
-	return r;
-}
-
-// Array / Array
-template< typename T >
-inline
-Array5D< T >
-operator /( Array5< T > const & a, Array5< T > const & b )
-{
-	Array5D< T > r( Array5D< T >::one_based( a ) );
-	r /= b;
-	return r;
-}
-
-// Array + Value
-template< typename T >
-inline
-Array5D< T >
-operator +( Array5< T > const & a, T const & t )
-{
-	Array5D< T > r( Array5D< T >::one_based( a ) );
-	r += t;
-	return r;
-}
-
-// Value + Array
-template< typename T >
-inline
-Array5D< T >
-operator +( T const & t, Array5< T > const & a )
-{
-	Array5D< T > r( Array5D< T >::one_based( a ) );
-	r += t;
-	return r;
-}
-
-// Array - Value
-template< typename T >
-inline
-Array5D< T >
-operator -( Array5< T > const & a, T const & t )
-{
-	Array5D< T > r( Array5D< T >::one_based( a ) );
-	r -= t;
-	return r;
-}
-
-// Value - Array
-template< typename T >
-inline
-Array5D< T >
-operator -( T const & t, Array5< T > const & a )
-{
-	Array5D< T > r( Array5D< T >::one_based( a ) );
-	r *= T( -1 );
-	r += t;
-	return r;
-}
-
-// Array * Value
-template< typename T >
-inline
-Array5D< T >
-operator *( Array5< T > const & a, T const & t )
-{
-	Array5D< T > r( Array5D< T >::one_based( a ) );
-	r *= t;
-	return r;
-}
-
-// Value * Array
-template< typename T >
-inline
-Array5D< T >
-operator *( T const & t, Array5< T > const & a )
-{
-	Array5D< T > r( Array5D< T >::one_based( a ) );
-	r *= t;
-	return r;
-}
-
-// Array / Value
-template< typename T >
-inline
-Array5D< T >
-operator /( Array5< T > const & a, T const & t )
-{
-	Array5D< T > r( Array5D< T >::one_based( a ) );
-	r /= t;
-	return r;
-}
-
-// Value / Array
-template< typename T >
-inline
-Array5D< T >
-operator /( T const & t, Array5< T > const & a )
-{
-	Array5D< T > r( Array5D< T >::one_based( a ) );
-	r.invert();
-	r *= t;
-	return r;
-}
-
-// Array && Array
-template< typename T >
-inline
-Array5D< T >
-operator &&( Array5< T > const & a, Array5< T > const & b )
-{
-	Array5D< T > r( Array5D< T >::one_based( a ) );
-	r.and_equals( b );
-	return r;
-}
-
-// Array || Array
-template< typename T >
-inline
-Array5D< T >
-operator ||( Array5< T > const & a, Array5< T > const & b )
-{
-	Array5D< T > r( Array5D< T >::one_based( a ) );
-	r.or_equals( b );
-	return r;
-}
 
 } // ObjexxFCL
 

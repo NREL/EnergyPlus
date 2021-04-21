@@ -26,7 +26,6 @@ class byte;
 
 // Types
 typedef  byte  sbyte;
-typedef  Array1A< bool >                Array1A_bool;
 typedef  Array1A< int >                 Array1A_int;
 
 } // ObjexxFCL
