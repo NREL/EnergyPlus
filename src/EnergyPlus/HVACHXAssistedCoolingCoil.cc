@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -345,6 +346,20 @@ namespace HVACHXAssistedCoolingCoil {
             state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName = AlphArray(5);
 
             if (UtilityRoutines::SameString(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
+                                            "Coil:Cooling:DX")) {
+                state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num = CoilDX_Cooling;
+                state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType = CurrentModuleObject;
+                state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
+                CoolingCoilErrFlag = false;
+                state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex =
+                    CoilCoolingDX::factory(state, state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName);
+                if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex == -1) {
+                    ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + AlphArray(5));
+                    CoolingCoilErrFlag = true;
+                    ErrorsFound = true;
+                }
+            }
+            else if (UtilityRoutines::SameString(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
                                             "Coil:Cooling:DX:SingleSpeed")) {
                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num = CoilDX_CoolingSingleSpeed;
                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType = CurrentModuleObject;
