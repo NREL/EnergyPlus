@@ -103,8 +103,9 @@ namespace MultiLayerOptics
         double getMinLambda() const override;
         double getMaxLambda() const override;
 
-    private:
         explicit CMultiLayerScattered(const SingleLayerOptics::CScatteringLayer & t_Layer);
+
+    private:
         CMultiLayerScattered(const std::vector<SingleLayerOptics::CScatteringLayer> & layers);
 
         void initialize(const SingleLayerOptics::CScatteringLayer & t_Layer);

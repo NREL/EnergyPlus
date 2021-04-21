@@ -48,6 +48,10 @@ namespace SingleLayerOptics
                          double Tb_dif_dif,
                          double Rb_dif_dif);
 
+        CScatteringLayer( const std::shared_ptr< CMaterial >& t_Material,
+		                  std::shared_ptr< ICellDescription > t_Description = nullptr,
+		                  const DistributionMethod t_Method = DistributionMethod::UniformDiffuse );
+
         static CScatteringLayer createSpecularLayer(const std::shared_ptr<CMaterial> & t_Material);
         static CScatteringLayer
           createPerfectlyDiffusingLayer(const std::shared_ptr<CMaterial> & t_Material);
@@ -143,6 +147,7 @@ namespace SingleLayerOptics
         std::map<FenestrationCommon::Side, CScatteringSurface> m_Surface;
 
         std::shared_ptr<CBSDFLayer> m_BSDFLayer;
+        std::shared_ptr< CBaseCell > m_Cell;
 
         double m_Theta;
         double m_Phi;

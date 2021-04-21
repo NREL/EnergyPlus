@@ -102,7 +102,7 @@ namespace EnergyPlus {
 namespace WindowManager {
 
     // using IGU_BSDFLayers = std::vector< std::shared_ptr< SingleLayerOptics::CBSDFLayer > >;
-    using IGU_Layers = std::vector<std::shared_ptr<SingleLayerOptics::CScatteringLayer>>;
+    using IGU_Layers = std::vector<SingleLayerOptics::CScatteringLayer>;
     // Construction numbers in EnergyPlus are not stored in orders and it can contain wall numbers
     // in between. So we will just use map to store layers so that we get optimized search.
     // using LayersBSDF_Map = std::map< int, std::shared_ptr< IGU_BSDFLayers > >;
@@ -129,8 +129,8 @@ namespace WindowManager {
     public:
         static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(EnergyPlusData &state, int const t_SampleDataPtr);
         static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(Material::MaterialProperties const &t_MaterialProperties);
-        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultSolarRadiationSpectrum(EnergyPlusData &state);
-        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultVisiblePhotopicResponse(EnergyPlusData &state);
+        static FenestrationCommon::CSeries getDefaultSolarRadiationSpectrum(EnergyPlusData &state);
+        static FenestrationCommon::CSeries getDefaultVisiblePhotopicResponse(EnergyPlusData &state);
     };
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -144,7 +144,7 @@ namespace WindowManager {
 
         void pushLayer(FenestrationCommon::WavelengthRange const t_Range,
                        int const t_ConstrNum,
-                       std::shared_ptr<SingleLayerOptics::CScatteringLayer> const &t_Layer);
+                       const SingleLayerOptics::CScatteringLayer& t_Layer);
 
         std::shared_ptr<MultiLayerOptics::CMultiLayerScattered>
         getEquivalentLayer(EnergyPlusData &state, FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum);

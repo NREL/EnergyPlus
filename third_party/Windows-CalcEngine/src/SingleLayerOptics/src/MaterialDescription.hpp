@@ -252,15 +252,15 @@ namespace SingleLayerOptics
         // Creates all of the required ranges in m_Materials from solar radiation
         void createRangesFromSolarRadiation(const FenestrationCommon::CSeries & t_SolarRadiation);
 
-        std::function<void(void)> m_RangeCreator;
-
         // Properties over the rest of range will depend on partial range as well.
         // We do want to keep correct properties of partial range, but will want to update
         // properties for other partial ranges that are not provided by the user.
         // double getModifiedProperty(double t_Range, double t_Solar, double t_Fraction) const;
 
-		std::shared_ptr<CMaterial> m_MaterialPartialRange;
         std::shared_ptr<CMaterial> m_MaterialFullRange;
+        std::shared_ptr<CMaterial> m_MaterialPartialRange;
+
+        std::function<void(void)> m_RangeCreator;
 
         std::vector<std::shared_ptr<CMaterial>> m_Materials;
     };
