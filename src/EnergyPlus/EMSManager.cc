@@ -327,7 +327,7 @@ namespace EMSManager {
             EMSActuatorVariableNum = state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).ActuatorVariableNum;
             if (EMSActuatorVariableNum <= 0) continue; // this can happen for good reason during sizing
 
-            if (state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Type == ValueNull) {
+            if (state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Type == Value::Null) {
                 *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = false;
             } else {
                 // Set the value and the actuated flag remotely on the actuated object via the pointer

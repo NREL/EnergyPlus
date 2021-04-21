@@ -127,7 +127,7 @@ void InitializeRuntimeLanguage(EnergyPlusData &state)
 
         // Create constant built-in variables
         state.dataRuntimeLangProcessor->NullVariableNum = NewEMSVariable(state, "NULL", 0, SetErlValueNumber(0.0));
-        state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->NullVariableNum).Value.Type = ValueNull;
+        state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->NullVariableNum).Value.Type = Value::Null;
         state.dataRuntimeLangProcessor->FalseVariableNum = NewEMSVariable(state, "FALSE", 0, state.dataRuntimeLang->False);
         state.dataRuntimeLangProcessor->TrueVariableNum = NewEMSVariable(state, "TRUE", 0, state.dataRuntimeLang->True);
         state.dataRuntimeLangProcessor->OffVariableNum = NewEMSVariable(state, "OFF", 0, state.dataRuntimeLang->False);
@@ -307,7 +307,7 @@ void BeginEnvrnInitializeRuntimeLanguage(EnergyPlusData &state)
          ++ActuatorUsedLoop) {
         EMSActuatorVariableNum = state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).ActuatorVariableNum;
         ErlVariableNum = state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).ErlVariableNum;
-        state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Type = ValueNull;
+        state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Type = Value::Null;
         *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = false;
         {
             auto const SELECT_CASE_var(state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).PntrVarTypeUsed);
@@ -788,7 +788,7 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
     bool seriousErrorFound(false); // once it gets set true (inside EvaluateExpresssion) it will trigger a fatal (in WriteTrace)
 
     WhileLoopExitCounter = 0;
-    ReturnValue.Type = ValueNumber;
+    ReturnValue.Type = Value::Number;
     ReturnValue.Number = 0.0;
 
     InstructionNum = 1;
@@ -823,7 +823,7 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
                 WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
             } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordRun) {
-                ReturnValue.Type = ValueString;
+                ReturnValue.Type = Value::String;
                 ReturnValue.String = "";
                 WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                 ReturnValue = EvaluateStack(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1);
@@ -841,7 +841,7 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
                     }
                 } else {
                     // KeywordELSE  -- kind of a kludge
-                    ReturnValue.Type = ValueNumber;
+                    ReturnValue.Type = Value::Number;
                     ReturnValue.Number = 1.0;
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                 }
@@ -849,14 +849,14 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
                 InstructionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
 
                 // For debug purposes only...
-                ReturnValue.Type = ValueString;
+                ReturnValue.Type = Value::String;
                 ReturnValue.String = ""; // IntegerToString(InstructionNum)
 
                 continue;
                 // PE if this ever went out of bounds, would the DO loop save it?  or need check here?
 
             } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordEndIf) {
-                ReturnValue.Type = ValueString;
+                ReturnValue.Type = Value::String;
                 ReturnValue.String = "";
                 WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
@@ -887,11 +887,11 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
                 } else { // false, leave while block
                     if (WhileLoopExitCounter > MaxWhileLoopIterations) {
                         WhileLoopExitCounter = 0;
-                        ReturnValue.Type = ValueError;
+                        ReturnValue.Type = Value::Error;
                         ReturnValue.Error = "Maximum WHILE loop iteration limit reached";
                         WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     } else {
-                        ReturnValue.Type = ValueNumber;
+                        ReturnValue.Type = Value::Number;
                         ReturnValue.Number = 0.0;
                         WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                         WhileLoopExitCounter = 0;
@@ -941,7 +941,7 @@ void WriteTrace(EnergyPlusData &state, int const StackNum, int const Instruction
 
     if ((state.dataRuntimeLang->OutputEMSErrors) && (!state.dataRuntimeLang->OutputFullEMSTrace) && (!seriousErrorFound)) {
         // see if error needs to be reported.
-        if (ReturnValue.Type != ValueError) return;
+        if (ReturnValue.Type != Value::Error) return;
     }
 
     if (!state.dataRuntimeLangProcessor->WriteTraceMyOneTimeFlag) {
@@ -973,7 +973,7 @@ void WriteTrace(EnergyPlusData &state, int const StackNum, int const Instruction
     }
     TimeString = DuringWarmup + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
 
-    if (state.dataRuntimeLang->OutputFullEMSTrace || (state.dataRuntimeLang->OutputEMSErrors && (ReturnValue.Type == ValueError))) {
+    if (state.dataRuntimeLang->OutputFullEMSTrace || (state.dataRuntimeLang->OutputEMSErrors && (ReturnValue.Type == Value::Error))) {
         print(state.files.edd, "{},Line {},{},{},{}\n", NameString, LineNumString, LineString, cValueString, TimeString);
     }
 
@@ -1150,7 +1150,7 @@ void ParseExpression(EnergyPlusData &state,
 
             // Save the number token
             if (!ErrorFlag) {
-                state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = TokenNumber;
+                state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = Token::Number;
                 state.dataRuntimeLangProcessor->PEToken(NumTokens).String = StringToken;
                 if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "Number=\"{}\"\n", StringToken);
                 state.dataRuntimeLangProcessor->PEToken(NumTokens).Number = UtilityRoutines::ProcessNumber(StringToken, ErrorFlag);
@@ -1191,7 +1191,7 @@ void ParseExpression(EnergyPlusData &state,
             }
 
             // Save the variable token
-            state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = TokenVariable;
+            state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = Token::Variable;
             state.dataRuntimeLangProcessor->PEToken(NumTokens).String = StringToken;
             if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "Variable=\"{}\"\n", StringToken);
             state.dataRuntimeLangProcessor->PEToken(NumTokens).Variable = NewEMSVariable(state, StringToken, StackNum);
@@ -1225,11 +1225,11 @@ void ParseExpression(EnergyPlusData &state,
                     DivFound = false;
                 } else {
                     StringToken = NextChar;
-                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = TokenOperator;
+                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = Token::Operator;
                 }
             } else { // any other character process as operator
                 StringToken = NextChar;
-                state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = TokenOperator;
+                state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = Token::Operator;
             }
 
             // parse an operator if found,
@@ -1342,7 +1342,7 @@ void ParseExpression(EnergyPlusData &state,
                     OperatorProcessing = true;
                 } else if (StringToken == "0" && (NextChar == '-')) {
                     // process string insert = "0"
-                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = TokenNumber;
+                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = Token::Number;
                     state.dataRuntimeLangProcessor->PEToken(NumTokens).String = StringToken;
                 } else {
                     // Uh OH, this should never happen! throw error
@@ -1358,7 +1358,7 @@ void ParseExpression(EnergyPlusData &state,
             ++Pos;
             StringToken = NextChar;
             if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "PAREN \"{}\"\n", StringToken);
-            state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = TokenParenthesis;
+            state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = Token::Parenthesis;
             state.dataRuntimeLangProcessor->PEToken(NumTokens).String = StringToken;
             if (NextChar == '(') {
                 state.dataRuntimeLangProcessor->PEToken(NumTokens).Parenthesis = ParenthesisLeft;
@@ -1425,7 +1425,7 @@ int ProcessTokens(
     // Process parentheses
     Pos = 0;
     for (TokenNum = 1; TokenNum <= NumTokens; ++TokenNum) {
-        if (Token(TokenNum).Type == TokenParenthesis) {
+        if (Token(TokenNum).Type == Token::Parenthesis) {
             Pos = TokenNum;
             break;
         }
@@ -1437,7 +1437,7 @@ int ProcessTokens(
         ++ParenthWhileCounter;
         Depth = 0;
         for (TokenNum = 1; TokenNum <= NumTokens; ++TokenNum) {
-            if (Token(TokenNum).Type == TokenParenthesis) {
+            if (Token(TokenNum).Type == Token::Parenthesis) {
                 if (Token(TokenNum).Parenthesis == ParenthesisLeft) {
                     if (Depth == 0) Pos = TokenNum; // Record position of first left parenthesis
                     ++Depth;
@@ -1459,7 +1459,7 @@ int ProcessTokens(
                                 Token({Pos + 1, NewNumTokens}) = Token({LastPos + 1, _});
                             }
                             Token.redimension(NewNumTokens);
-                            Token(Pos).Type = TokenExpression;
+                            Token(Pos).Type = Token::Expression;
                             Token(Pos).Expression = ExpressionNum;
                             Token(Pos).String = "Expr";
                             NumTokens = NewNumTokens;
@@ -1475,7 +1475,7 @@ int ProcessTokens(
         // This repeats code again...  Just checks to see if there are any more parentheses to be found
         Pos = 0;
         for (TokenNum = 1; TokenNum <= NumTokens; ++TokenNum) {
-            if (Token(TokenNum).Type == TokenParenthesis) {
+            if (Token(TokenNum).Type == Token::Parenthesis) {
                 Pos = TokenNum;
                 break;
             }
@@ -1497,7 +1497,7 @@ int ProcessTokens(
         // Find the next occurrence of the operator
         Pos = 0; //  position in sequence of tokens
         for (TokenNum = 1; TokenNum <= NumTokens; ++TokenNum) {
-            if ((Token(TokenNum).Type == TokenOperator) && (Token(TokenNum).Operator == OperatorNum)) {
+            if ((Token(TokenNum).Type == Token::Operator) && (Token(TokenNum).Operator == OperatorNum)) {
                 Pos = TokenNum;
                 break;
             }
@@ -1513,7 +1513,7 @@ int ProcessTokens(
                     state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands = NumOperands;
                     state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand.allocate(NumOperands);
 
-                    state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Type = Token(Pos + 1).Type;
+                    state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Type = static_cast<Value>(static_cast<int>(Token(Pos + 1).Type));
                     state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Number = Token(Pos + 1).Number;
                     state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Expression = Token(Pos + 1).Expression;
                     state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Variable = Token(Pos + 1).Variable;
@@ -1524,14 +1524,14 @@ int ProcessTokens(
                             state.dataRuntimeLang->ErlVariable(Token(Pos + 1).Variable).Value.TrendVarPointer;
                     }
                     if ((NumOperands >= 2) && (NumTokens >= 3)) {
-                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Type = Token(Pos + 2).Type;
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Type = static_cast<Value>(static_cast<int>(Token(Pos + 2).Type));
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Number = Token(Pos + 2).Number;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Expression = Token(Pos + 2).Expression;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Variable = Token(Pos + 2).Variable;
                     }
 
                     if ((NumOperands >= 3) && (NumTokens >= 4)) {
-                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(3).Type = Token(Pos + 3).Type;
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(3).Type = static_cast<Value>(static_cast<int>(Token(Pos + 3).Type));
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(3).Number = Token(Pos + 3).Number;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(3).Expression = Token(Pos + 3).Expression;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(3).Variable = Token(Pos + 3).Variable;
@@ -1541,7 +1541,7 @@ int ProcessTokens(
                     }
 
                     if ((NumOperands >= 4) && (NumTokens >= 5)) {
-                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(4).Type = Token(Pos + 4).Type;
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(4).Type = static_cast<Value>(static_cast<int>(Token(Pos + 4).Type));
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(4).Number = Token(Pos + 4).Number;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(4).Expression = Token(Pos + 4).Expression;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(4).Variable = Token(Pos + 4).Variable;
@@ -1551,7 +1551,7 @@ int ProcessTokens(
                     }
 
                     if ((NumOperands == 5) && (NumTokens >= 6)) {
-                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(5).Type = Token(Pos + 5).Type;
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(5).Type = static_cast<Value>(static_cast<int>(Token(Pos + 5).Type));
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(5).Number = Token(Pos + 5).Number;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(5).Expression = Token(Pos + 5).Expression;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(5).Variable = Token(Pos + 5).Variable;
@@ -1584,13 +1584,13 @@ int ProcessTokens(
                 // PE commment: Need a right-hand and left-hand check for these, not just number of operators
                 // Unification of TYPEs would turn these into one-liners
 
-                state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Type = Token(Pos - 1).Type;
+                state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Type = static_cast<Value>(static_cast<int>(Token(Pos - 1).Type));
                 state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Number = Token(Pos - 1).Number;
                 state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Expression = Token(Pos - 1).Expression;
                 state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Variable = Token(Pos - 1).Variable;
 
                 if (NumOperands >= 2) {
-                    state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Type = Token(Pos + 1).Type;
+                    state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Type = static_cast<Value>(static_cast<int>(Token(Pos + 1).Type));
                     state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Number = Token(Pos + 1).Number;
                     state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Expression = Token(Pos + 1).Expression;
                     state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Variable = Token(Pos + 1).Variable;
@@ -1601,7 +1601,7 @@ int ProcessTokens(
                     if (Pos + 2 <= NumTokens) {
                         Token({Pos, NumTokens - 2}) = Token({Pos + 2, _});
                     }
-                    Token(Pos - 1).Type = TokenExpression;
+                    Token(Pos - 1).Type = Token::Expression;
                     Token(Pos - 1).Expression = ExpressionNum;
                     Token(Pos - 1).String = "Expr";
                     NumTokens -= 2;
@@ -1612,7 +1612,7 @@ int ProcessTokens(
             // Find the next occurrence of the operator  (this repeats code, but don't have better idea)
             Pos = 0;
             for (TokenNum = 1; TokenNum <= NumTokens; ++TokenNum) {
-                if ((Token(TokenNum).Type == TokenOperator) && (Token(TokenNum).Operator == OperatorNum)) {
+                if ((Token(TokenNum).Type == Token::Operator) && (Token(TokenNum).Operator == OperatorNum)) {
                     Pos = TokenNum;
                     break;
                 }
@@ -1621,19 +1621,19 @@ int ProcessTokens(
     }
 
     // Should be down to just one token now
-    if (Token(1).Type == TokenNumber) {
+    if (Token(1).Type == Token::Number) {
         ExpressionNum = NewExpression(state);
         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator = OperatorLiteral;
         state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands = 1;
         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand.allocate(1);
-        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Type = Token(1).Type;
+        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Type = static_cast<Value>(static_cast<int>(Token(1).Type));
         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Number = Token(1).Number;
-    } else if (Token(1).Type == TokenVariable) {
+    } else if (Token(1).Type == Token::Variable) {
         ExpressionNum = NewExpression(state);
         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator = OperatorLiteral;
         state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands = 1;
         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand.allocate(1);
-        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Type = Token(1).Type;
+        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Type = static_cast<Value>(static_cast<int>(Token(1).Type));
         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Variable = Token(1).Variable;
     }
 
@@ -1722,7 +1722,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
 
     auto constexpr EMSBuiltInFunction("EMS Built-In Function");
 
-    ReturnValue.Type = ValueNumber;
+    ReturnValue.Type = Value::Number;
     ReturnValue.Number = 0.0;
 
     if (ExpressionNum > 0) {
@@ -1731,19 +1731,19 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
         // Reduce operands down to literals
         for (OperandNum = 1; OperandNum <= state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands; ++OperandNum) {
             Operand(OperandNum) = state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(OperandNum);
-            if (Operand(OperandNum).Type == ValueExpression) {
+            if (Operand(OperandNum).Type == Value::Expression) {
                 Operand(OperandNum) = EvaluateExpression(state, Operand(OperandNum).Expression, seriousErrorFound); // recursive call
                 // check if recursive call found an error in nested expression, want to preserve error message from that
                 if (seriousErrorFound) {
-                    ReturnValue.Type = ValueError;
+                    ReturnValue.Type = Value::Error;
                     ReturnValue.Error = Operand(OperandNum).Error;
                 }
 
-            } else if (Operand(OperandNum).Type == ValueVariable) {
+            } else if (Operand(OperandNum).Type == Value::Variable) {
                 if (state.dataRuntimeLang->ErlVariable(Operand(OperandNum).Variable).Value.initialized) { // check that value has been initialized
                     Operand(OperandNum) = state.dataRuntimeLang->ErlVariable(Operand(OperandNum).Variable).Value;
                 } else { // value has never been set
-                    ReturnValue.Type = ValueError;
+                    ReturnValue.Type = Value::Error;
                     ReturnValue.Error = "EvaluateExpression: Variable = '" + state.dataRuntimeLang->ErlVariable(Operand(OperandNum).Variable).Name +
                                         "' used in expression has not been initialized!";
                     if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !state.dataEMSMgr->FinishProcessingUserInput) {
@@ -1758,7 +1758,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
             }
         }
 
-        if (ReturnValue.Type != ValueError) {
+        if (ReturnValue.Type != Value::Error) {
 
             // Perform the operation
             {
@@ -1770,9 +1770,9 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                 } else if (SELECT_CASE_var == OperatorNegative) { // unary minus sign.  parsing does not work yet
                     ReturnValue = SetErlValueNumber(-1.0 * Operand(1).Number);
                 } else if (SELECT_CASE_var == OperatorDivide) {
-                    if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
+                    if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         if (Operand(2).Number == 0.0) {
-                            ReturnValue.Type = ValueError;
+                            ReturnValue.Type = Value::Error;
                             ReturnValue.Error = "EvaluateExpression: Divide By Zero in EMS Program!";
                             if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation &&
                                 !state.dataEMSMgr->FinishProcessingUserInput) {
@@ -1784,25 +1784,25 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                     }
 
                 } else if (SELECT_CASE_var == OperatorMultiply) {
-                    if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
+                    if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         ReturnValue = SetErlValueNumber(Operand(1).Number * Operand(2).Number);
                     }
 
                 } else if (SELECT_CASE_var == OperatorSubtract) {
-                    if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
+                    if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         ReturnValue = SetErlValueNumber(Operand(1).Number - Operand(2).Number);
                     }
 
                 } else if (SELECT_CASE_var == OperatorAdd) {
-                    if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
+                    if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         ReturnValue = SetErlValueNumber(Operand(1).Number + Operand(2).Number);
                     }
 
                 } else if (SELECT_CASE_var == OperatorEqual) {
                     if (Operand(1).Type == Operand(2).Type) {
-                        if (Operand(1).Type == ValueNull) {
+                        if (Operand(1).Type == Value::Null) {
                             ReturnValue = state.dataRuntimeLang->True;
-                        } else if ((Operand(1).Type == ValueNumber) && (Operand(1).Number == Operand(2).Number)) {
+                        } else if ((Operand(1).Type == Value::Number) && (Operand(1).Number == Operand(2).Number)) {
                             ReturnValue = state.dataRuntimeLang->True;
                         } else {
                             ReturnValue = state.dataRuntimeLang->False;
@@ -1812,7 +1812,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                     }
 
                 } else if (SELECT_CASE_var == OperatorNotEqual) {
-                    if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
+                    if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         if (Operand(1).Number != Operand(2).Number) {
                             ReturnValue = state.dataRuntimeLang->True;
                         } else {
@@ -1821,7 +1821,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                     }
 
                 } else if (SELECT_CASE_var == OperatorLessOrEqual) {
-                    if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
+                    if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         if (Operand(1).Number <= Operand(2).Number) {
                             ReturnValue = state.dataRuntimeLang->True;
                         } else {
@@ -1830,7 +1830,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                     }
 
                 } else if (SELECT_CASE_var == OperatorGreaterOrEqual) {
-                    if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
+                    if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         if (Operand(1).Number >= Operand(2).Number) {
                             ReturnValue = state.dataRuntimeLang->True;
                         } else {
@@ -1838,7 +1838,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         }
                     }
                 } else if (SELECT_CASE_var == OperatorLessThan) {
-                    if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
+                    if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         if (Operand(1).Number < Operand(2).Number) {
                             ReturnValue = state.dataRuntimeLang->True;
                         } else {
@@ -1846,7 +1846,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         }
                     }
                 } else if (SELECT_CASE_var == OperatorGreaterThan) {
-                    if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
+                    if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         if (Operand(1).Number > Operand(2).Number) {
                             ReturnValue = state.dataRuntimeLang->True;
                         } else {
@@ -1855,11 +1855,11 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                     }
 
                 } else if (SELECT_CASE_var == OperatorRaiseToPower) {
-                    if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
+                    if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         TestValue = std::pow(Operand(1).Number, Operand(2).Number);
                         if (std::isnan(TestValue)) {
                             // throw Error
-                            ReturnValue.Type = ValueError;
+                            ReturnValue.Type = Value::Error;
                             ReturnValue.Error =
                                 format("EvaluateExpression: Attempted to raise to power with incompatible numbers: {:.6T} raised to {:.6T}",
                                        Operand(1).Number,
@@ -1873,7 +1873,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         }
                     }
                 } else if (SELECT_CASE_var == OperatorLogicalAND) {
-                    if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
+                    if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         if ((Operand(1).Number == state.dataRuntimeLang->True.Number) && (Operand(2).Number == state.dataRuntimeLang->True.Number)) {
                             ReturnValue = state.dataRuntimeLang->True;
                         } else {
@@ -1881,7 +1881,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         }
                     }
                 } else if (SELECT_CASE_var == OperatorLogicalOR) {
-                    if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
+                    if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         if ((Operand(1).Number == state.dataRuntimeLang->True.Number) || (Operand(2).Number == state.dataRuntimeLang->True.Number)) {
                             ReturnValue = state.dataRuntimeLang->True;
                         } else {
@@ -1913,7 +1913,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         // throw Error
                         ReturnValue.Error =
                             format("EvaluateExpression: Attempted to calculate exponential value of too large a number: {:.4T}", Operand(1).Number);
-                        ReturnValue.Type = ValueError;
+                        ReturnValue.Type = Value::Error;
                         if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !state.dataEMSMgr->FinishProcessingUserInput) {
                             seriousErrorFound = true;
                         }
@@ -1923,7 +1923,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         ReturnValue = SetErlValueNumber(std::log(Operand(1).Number));
                     } else {
                         // throw error,
-                        ReturnValue.Type = ValueError;
+                        ReturnValue.Type = Value::Error;
                         ReturnValue.Error = format("EvaluateExpression: Natural Log of zero or less! ln of value = {:.4T}", Operand(1).Number);
                         if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !state.dataEMSMgr->FinishProcessingUserInput) {
                             seriousErrorFound = true;
@@ -2145,15 +2145,15 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                             if (thisIndex <= state.dataRuntimeLang->TrendVariable(thisTrend).LogDepth) {
                                 ReturnValue = SetErlValueNumber(state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR(thisIndex), Operand(1));
                             } else {
-                                ReturnValue.Type = ValueError;
+                                ReturnValue.Type = Value::Error;
                                 ReturnValue.Error = "Built-in trend function called with index larger than what is being logged";
                             }
                         } else {
-                            ReturnValue.Type = ValueError;
+                            ReturnValue.Type = Value::Error;
                             ReturnValue.Error = "Built-in trend function called with index less than 1";
                         }
                     } else { // not registered as a trend variable
-                        ReturnValue.Type = ValueError;
+                        ReturnValue.Type = Value::Error;
                         ReturnValue.Error = "Variable used with built-in trend function is not associated with a registered trend variable";
                     }
 
@@ -2168,15 +2168,15 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                 thisAverage = sum(state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR({1, thisIndex})) / double(thisIndex);
                                 ReturnValue = SetErlValueNumber(thisAverage, Operand(1));
                             } else {
-                                ReturnValue.Type = ValueError;
+                                ReturnValue.Type = Value::Error;
                                 ReturnValue.Error = "Built-in trend function called with index larger than what is being logged";
                             }
                         } else {
-                            ReturnValue.Type = ValueError;
+                            ReturnValue.Type = Value::Error;
                             ReturnValue.Error = "Built-in trend function called with index less than 1";
                         }
                     } else { // not registered as a trend variable
-                        ReturnValue.Type = ValueError;
+                        ReturnValue.Type = Value::Error;
                         ReturnValue.Error = "Variable used with built-in trend function is not associated with a registered trend variable";
                     }
                 } else if (SELECT_CASE_var == FuncTrendMax) {
@@ -2200,15 +2200,15 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                 }
                                 ReturnValue = SetErlValueNumber(thisMax, Operand(1));
                             } else {
-                                ReturnValue.Type = ValueError;
+                                ReturnValue.Type = Value::Error;
                                 ReturnValue.Error = "Built-in trend function called with index larger than what is being logged";
                             }
                         } else {
-                            ReturnValue.Type = ValueError;
+                            ReturnValue.Type = Value::Error;
                             ReturnValue.Error = "Built-in trend function called with index less than 1";
                         }
                     } else { // not registered as a trend variable
-                        ReturnValue.Type = ValueError;
+                        ReturnValue.Type = Value::Error;
                         ReturnValue.Error = "Variable used with built-in trend function is not associated with a registered trend variable";
                     }
                 } else if (SELECT_CASE_var == FuncTrendMin) {
@@ -2233,16 +2233,16 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                 ReturnValue = SetErlValueNumber(thisMin, Operand(1));
 
                             } else {
-                                ReturnValue.Type = ValueError;
+                                ReturnValue.Type = Value::Error;
                                 ReturnValue.Error = "Built-in trend function called with index larger than what is being logged";
                             }
 
                         } else {
-                            ReturnValue.Type = ValueError;
+                            ReturnValue.Type = Value::Error;
                             ReturnValue.Error = "Built-in trend function called with index less than 1";
                         }
                     } else { // not registered as a trend variable
-                        ReturnValue.Type = ValueError;
+                        ReturnValue.Type = Value::Error;
                         ReturnValue.Error = "Variable used with built-in trend function is not associated with a registered trend variable";
                     }
                 } else if (SELECT_CASE_var == FuncTrendDirection) {
@@ -2262,16 +2262,16 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                              thisIndex * sum(pow(state.dataRuntimeLang->TrendVariable(thisTrend).TimeARR({1, thisIndex}), 2)));
                                 ReturnValue = SetErlValueNumber(thisSlope, Operand(1)); // rate of change per hour
                             } else {
-                                ReturnValue.Type = ValueError;
+                                ReturnValue.Type = Value::Error;
                                 ReturnValue.Error = "Built-in trend function called with index larger than what is being logged";
                             }
 
                         } else {
-                            ReturnValue.Type = ValueError;
+                            ReturnValue.Type = Value::Error;
                             ReturnValue.Error = "Built-in trend function called with index less than 1";
                         }
                     } else { // not registered as a trend variable
-                        ReturnValue.Type = ValueError;
+                        ReturnValue.Type = Value::Error;
                         ReturnValue.Error = "Variable used with built-in trend function is not associated with a registered trend variable";
                     }
                 } else if (SELECT_CASE_var == FuncTrendSum) {
@@ -2284,32 +2284,33 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                 ReturnValue =
                                     SetErlValueNumber(sum(state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR({1, thisIndex})), Operand(1));
                             } else {
-                                ReturnValue.Type = ValueError;
+                                ReturnValue.Type = Value::Error;
                                 ReturnValue.Error = "Built-in trend function called with index larger than what is being logged";
                             }
                         } else {
-                            ReturnValue.Type = ValueError;
+                            ReturnValue.Type = Value::Error;
                             ReturnValue.Error = "Built-in trend function called with index less than 1";
                         }
                     } else { // not registered as a trend variable
-                        ReturnValue.Type = ValueError;
+                        ReturnValue.Type = Value::Error;
                         ReturnValue.Error = "Variable used with built-in trend function is not associated with a registered trend variable";
                     }
                 } else if (SELECT_CASE_var == FuncCurveValue) {
-                    if (Operand(3).Type == 0 && Operand(4).Type == 0 && Operand(5).Type == 0 && Operand(6).Type == 0) {
+                    if (Operand(3).Type == Value::Null && Operand(4).Type == Value::Null && Operand(5).Type == Value::Null &&
+                        Operand(6).Type == Value::Null) {
                         ReturnValue =
                             SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number)); // curve index | X value | Y
                                                                                                                     // value, 2nd independent | Z
                                                                                                                     // Value, 3rd independent | 4th
                                                                                                                     // independent | 5th independent
-                    } else if (Operand(4).Type == 0 && Operand(5).Type == 0 && Operand(6).Type == 0) {
+                    } else if (Operand(4).Type == Value::Null && Operand(5).Type == Value::Null && Operand(6).Type == Value::Null) {
                         ReturnValue = SetErlValueNumber(CurveValue(state,
                                                                    std::floor(Operand(1).Number),
                                                                    Operand(2).Number,
                                                                    Operand(3).Number)); // curve index | X value | Y value, 2nd independent | Z
                                                                                         // Value, 3rd independent | 4th independent | 5th
                                                                                         // independent
-                    } else if (Operand(5).Type == 0 && Operand(6).Type == 0) {
+                    } else if (Operand(5).Type == Value::Null && Operand(6).Type == Value::Null) {
                         ReturnValue = SetErlValueNumber(CurveValue(state,
                                                                    std::floor(Operand(1).Number),
                                                                    Operand(2).Number,
@@ -2317,7 +2318,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                                                    Operand(4).Number)); // curve index | X value | Y value, 2nd independent | Z
                                                                                         // Value, 3rd independent | 4th independent | 5th
                                                                                         // independent
-                    } else if (Operand(6).Type == 0) {
+                    } else if (Operand(6).Type == Value::Null) {
                         ReturnValue = SetErlValueNumber(CurveValue(state,
                                                                    std::floor(Operand(1).Number),
                                                                    Operand(2).Number,
@@ -2481,7 +2482,7 @@ void TodayTomorrowWeather(EnergyPlusData &state,
     if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= state.dataGlobal->NumOfTimeStepInHour)) {
         ReturnVal = SetErlValueNumber(TodayTomorrowWeatherSource(iTimeStep, iHour));
     } else {
-        ReturnVal.Type = DataRuntimeLanguage::ValueError;
+        ReturnVal.Type = DataRuntimeLanguage::Value::Error;
         ReturnVal.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}",
                                  state.dataRuntimeLang->PossibleOperators(FunctionCode).Symbol,
                                  Operand1,
@@ -2506,7 +2507,7 @@ void TodayTomorrowWeather(EnergyPlusData &state,
             ReturnVal = SetErlValueNumber(0.0);
         }
     } else {
-        ReturnVal.Type = DataRuntimeLanguage::ValueError;
+        ReturnVal.Type = DataRuntimeLanguage::Value::Error;
         ReturnVal.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}",
                                  state.dataRuntimeLang->PossibleOperators(FunctionCode).Symbol,
                                  Operand1,
@@ -3627,7 +3628,7 @@ void ReportRuntimeLanguage(EnergyPlusData &state)
          RuntimeReportVarNum <= state.dataRuntimeLang->NumEMSOutputVariables + state.dataRuntimeLang->NumEMSMeteredOutputVariables;
          ++RuntimeReportVarNum) {
         VariableNum = state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).VariableNum;
-        if (state.dataRuntimeLang->ErlVariable(VariableNum).Value.Type == ValueNumber) {
+        if (state.dataRuntimeLang->ErlVariable(VariableNum).Value.Type == Value::Number) {
             state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Value =
                 state.dataRuntimeLang->ErlVariable(VariableNum).Value.Number;
         } else {
@@ -3679,7 +3680,7 @@ ErlValueType SetErlValueNumber(Real64 const Number, Optional<ErlValueType const>
         newValue = OrigValue;
         newValue.Number = Number;
     } else {
-        newValue.Type = ValueNumber;
+        newValue.Type = Value::Number;
         newValue.Number = Number;
     }
 
@@ -3726,7 +3727,7 @@ ErlValueType StringValue(std::string const &String)
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     // na
 
-    Value.Type = ValueString;
+    Value.Type = Value::String;
     Value.String = String;
 
     return Value;
@@ -3761,20 +3762,20 @@ std::string ValueToString(ErlValueType const &Value)
 
     {
         auto const SELECT_CASE_var(Value.Type);
-        if (SELECT_CASE_var == ValueNumber) {
+        if (SELECT_CASE_var == Value::Number) {
             if (Value.Number == 0.0) {
                 String = "0.0";
             } else {
                 String = format("{:.6T}", Value.Number); //(String)
             }
 
-        } else if (SELECT_CASE_var == ValueString) {
+        } else if (SELECT_CASE_var == Value::String) {
             String = Value.String;
 
-        } else if (SELECT_CASE_var == ValueArray) {
+        } else if (SELECT_CASE_var == Value::Array) {
             // TBD
 
-        } else if (SELECT_CASE_var == ValueError) {
+        } else if (SELECT_CASE_var == Value::Error) {
             String = " *** Error: " + Value.Error + " *** ";
         }
     }
@@ -3859,7 +3860,7 @@ int NewEMSVariable(EnergyPlusData &state, std::string const &VariableName, int c
         VariableNum = state.dataRuntimeLang->NumErlVariables;
         state.dataRuntimeLang->ErlVariable(VariableNum).Name = UtilityRoutines::MakeUPPERCase(VariableName);
         state.dataRuntimeLang->ErlVariable(VariableNum).StackNum = StackNum;
-        state.dataRuntimeLang->ErlVariable(VariableNum).Value.Type = ValueNumber; // ErlVariable values are numbers
+        state.dataRuntimeLang->ErlVariable(VariableNum).Value.Type = Value::Number; // ErlVariable values are numbers
     }
 
     if (present(Value)) state.dataRuntimeLang->ErlVariable(VariableNum).Value = Value;
@@ -4349,7 +4350,7 @@ void ExternalInterfaceInitializeErlVariable(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     // Set initial value
     if (setToNull) {
-        state.dataRuntimeLang->ErlVariable(varNum).Value.Type = ValueNull;
+        state.dataRuntimeLang->ErlVariable(varNum).Value.Type = Value::Null;
     } else {
         state.dataRuntimeLang->ErlVariable(varNum).Value = initialValue;
     }

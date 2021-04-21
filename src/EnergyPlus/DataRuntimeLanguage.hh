@@ -75,6 +75,7 @@ namespace DataRuntimeLanguage {
 
     enum class ErlKeywordParam // keyword parameters for types of Erl statements
     {
+        Invaild = -1,
         KeywordNone,     // statement type not set
         KeywordReturn,   // Return statement, as in leave program
         KeywordGoto,     // Goto statement, used in parsing to manage IF-ElseIf-Else-EndIf and nesting
@@ -88,15 +89,22 @@ namespace DataRuntimeLanguage {
         KeywordEndWhile, // EndWhile statement, terminates a While block
     };
 
-    // MODULE PARAMETER DEFINITIONS:
-    int constexpr ValueNull(0);       // Erl entity type, "Null" value
-    int constexpr ValueNumber(1);     // Erl entity type,  hard numeric value
-    int constexpr ValueString(2);     // Erl entity type,  character data
-    int constexpr ValueArray(3);      // Erl entity type,  not used yet, for future array type
-    int constexpr ValueVariable(4);   // Erl entity type,  Erl variable
-    int constexpr ValueExpression(5); // Erl entity type,  Erl expression
-    int constexpr ValueTrend(6);      // Erl entity type,  Erl trend variable
-    int constexpr ValueError(7);      // Erl entity type, processing of an expression failed, returned error
+    enum class Value
+    {
+        Invalid = -1,
+        Null,           // Erl entity type, "Null" value
+        Number,         // Erl entity type,  hard numeric value
+        String,         // Erl entity type,  character data
+        Array,          // Erl entity type,  not used yet, for future array type
+        Variable,       // Erl entity type,  Erl variable
+        Expression,     // Erl entity type,  Erl expression
+        Trend,          // Erl entity type,  Erl trend variable
+        Error           // Erl entity type, processing of an expression failed, returned error
+    };
+    
+
+    
+    int constexpr ValueError(7);      
 
     int constexpr PntrReal(301);    // data type for overloaded pointer management, double real
     int constexpr PntrInteger(302); // data type for overloaded pointer management, integer
@@ -335,7 +343,7 @@ namespace DataRuntimeLanguage {
     {
         // Members
         // instance data structure for the values taken by Erl variables, nested structure in ErlVariable
-        int Type;           // value type, eg. ValueNumber,
+        Value Type;           // value type, eg. ValueNumber,
         Real64 Number;      // numeric value instance for Erl variable
         std::string String; // string data types in Erl (not used yet)
         int Variable;       // Pointer to another Erl variable
@@ -347,12 +355,12 @@ namespace DataRuntimeLanguage {
         bool initialized;    // true if number value has been SET (ie. has been on LHS in SET expression)
 
         // Default Constructor
-        ErlValueType() : Type(0), Number(0.0), Variable(0), Expression(0), TrendVariable(false), TrendVarPointer(0), initialized(false)
+        ErlValueType() : Type(Value::Null), Number(0.0), Variable(0), Expression(0), TrendVariable(false), TrendVarPointer(0), initialized(false)
         {
         }
 
         // Member Constructor
-        ErlValueType(int const Type,            // value type, eg. ValueNumber,
+        ErlValueType(Value const Type,            // value type, eg. ValueNumber,
                      Real64 const Number,       // numeric value instance for Erl variable
                      std::string const &String, // string data types in Erl (not used yet)
                      int const Variable,        // Pointer to another Erl variable
@@ -558,11 +566,11 @@ struct RuntimeLanguageData : BaseGlobalStruct
     Array1D<DataRuntimeLanguage::InternalVarsUsedType> EMSInternalVarsUsed;           // internal data that are used
     Array1D<DataRuntimeLanguage::EMSProgramCallManagementType> EMSProgramCallManager; // program calling managers
     DataRuntimeLanguage::ErlValueType Null =
-        DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true); // special "null" Erl variable value instance
-    DataRuntimeLanguage::ErlValueType False =
-        DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true); // special "false" Erl variable value instance
-    DataRuntimeLanguage::ErlValueType True =
-        DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true); // special "True" Erl variable value instance, gets reset
+        DataRuntimeLanguage::ErlValueType(DataRuntimeLanguage::Value::Null, 0.0, "", 0, 0, false, 0, "", true); // special "null" Erl variable value instance
+    DataRuntimeLanguage::ErlValueType False = DataRuntimeLanguage::ErlValueType(
+        DataRuntimeLanguage::Value::Null, 0.0, "", 0, 0, false, 0, "", true); // special "false" Erl variable value instance
+    DataRuntimeLanguage::ErlValueType True = DataRuntimeLanguage::ErlValueType(
+        DataRuntimeLanguage::Value::Null, 0.0, "", 0, 0, false, 0, "", true); // special "True" Erl variable value instance, gets reset
 
     // EMS Actuator fast duplicate check lookup support
     std::unordered_set<std::tuple<std::string, std::string, std::string>, DataRuntimeLanguage::EMSActuatorKey_hash>
@@ -617,9 +625,9 @@ struct RuntimeLanguageData : BaseGlobalStruct
         this->EMSInternalVarsUsed.deallocate();
         this->EMSProgramCallManager.deallocate();
         this->EMSActuator_lookup.clear();
-        this->Null = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);
-        this->False = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);
-        this->True = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);
+        this->Null = DataRuntimeLanguage::ErlValueType(DataRuntimeLanguage::Value::Null, 0.0, "", 0, 0, false, 0, "", true);
+        this->False = DataRuntimeLanguage::ErlValueType(DataRuntimeLanguage::Value::Null, 0.0, "", 0, 0, false, 0, "", true);
+        this->True = DataRuntimeLanguage::ErlValueType(DataRuntimeLanguage::Value::Null, 0.0, "", 0, 0, false, 0, "", true);
     }
 };
 

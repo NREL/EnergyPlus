@@ -205,7 +205,7 @@ TEST_F(EnergyPlusFixture, CheckActuatorInit)
     EMSManager::GetEMSInput(*state);
 
     // now check that Erl variable is Null
-    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(1).Value.Type, DataRuntimeLanguage::ValueNull);
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(1).Value.Type, DataRuntimeLanguage::Value::Null);
 }
 
 TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlowRate)
