@@ -334,15 +334,15 @@ namespace EMSManager {
                 {
                     auto const SELECT_CASE_var(state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).PntrVarTypeUsed);
 
-                    if (SELECT_CASE_var == PntrReal) {
+                    if (SELECT_CASE_var == PtrDataType::Real) {
                         *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
                         *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).RealValue =
                             state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Number;
-                    } else if (SELECT_CASE_var == PntrInteger) {
+                    } else if (SELECT_CASE_var == PtrDataType::Integer) {
                         *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
                         tmpInteger = std::floor(state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Number);
                         *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).IntValue = tmpInteger;
-                    } else if (SELECT_CASE_var == PntrLogical) {
+                    } else if (SELECT_CASE_var == PtrDataType::Logical) {
                         *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
                         if (state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Number == 0.0) {
                             *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
@@ -430,12 +430,12 @@ namespace EMSManager {
                 {
                     auto const SELECT_CASE_var(state.dataRuntimeLang->EMSInternalVarsAvailable(InternVarAvailNum).PntrVarTypeUsed);
 
-                    if (SELECT_CASE_var == PntrReal) {
+                    if (SELECT_CASE_var == PtrDataType::Real) {
 
                         state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value =
                             SetErlValueNumber(*state.dataRuntimeLang->EMSInternalVarsAvailable(InternVarAvailNum).RealValue);
 
-                    } else if (SELECT_CASE_var == PntrInteger) {
+                    } else if (SELECT_CASE_var == PtrDataType::Integer) {
 
                         tmpReal = double(*state.dataRuntimeLang->EMSInternalVarsAvailable(InternVarAvailNum).IntValue);
                         state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value = SetErlValueNumber(tmpReal);
@@ -2403,7 +2403,7 @@ void SetupEMSActuator(EnergyPlusData &state,
         actuator.Units = cUnits;
         actuator.Actuated = &lEMSActuated; // Pointer assigment
         actuator.RealValue = &rValue;      // Pointer assigment
-        actuator.PntrVarTypeUsed = PntrReal;
+        actuator.PntrVarTypeUsed = PtrDataType::Real;
         state.dataRuntimeLang->EMSActuator_lookup.insert(key);
     }
 }
@@ -2459,7 +2459,7 @@ void SetupEMSActuator(EnergyPlusData &state,
         actuator.Units = cUnits;
         actuator.Actuated = &lEMSActuated; // Pointer assigment
         actuator.IntValue = &iValue;       // Pointer assigment
-        actuator.PntrVarTypeUsed = PntrInteger;
+        actuator.PntrVarTypeUsed = PtrDataType::Integer;
         state.dataRuntimeLang->EMSActuator_lookup.insert(key);
     }
 }
@@ -2515,7 +2515,7 @@ void SetupEMSActuator(EnergyPlusData &state,
         actuator.Units = cUnits;
         actuator.Actuated = &lEMSActuated; // Pointer assigment
         actuator.LogValue = &lValue;       // Pointer assigment
-        actuator.PntrVarTypeUsed = PntrLogical;
+        actuator.PntrVarTypeUsed = PtrDataType::Logical;
         state.dataRuntimeLang->EMSActuator_lookup.insert(key);
     }
 }
@@ -2577,7 +2577,7 @@ void SetupEMSInternalVariable(
         state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).UniqueIDName = cUniqueIDName;
         state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).Units = cUnits;
         state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).RealValue = &rValue;
-        state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).PntrVarTypeUsed = PntrReal;
+        state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).PntrVarTypeUsed = PtrDataType::Real;
     }
 }
 
@@ -2638,7 +2638,7 @@ void SetupEMSInternalVariable(
         state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).UniqueIDName = cUniqueIDName;
         state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).Units = cUnits;
         state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).IntValue = &iValue;
-        state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).PntrVarTypeUsed = PntrInteger;
+        state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).PntrVarTypeUsed = PtrDataType::Integer;
     }
 }
 

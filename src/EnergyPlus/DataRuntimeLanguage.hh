@@ -75,7 +75,7 @@ namespace DataRuntimeLanguage {
 
     enum class ErlKeywordParam // keyword parameters for types of Erl statements
     {
-        Invaild = -1,
+        Unassigned = -1,
         KeywordNone,     // statement type not set
         KeywordReturn,   // Return statement, as in leave program
         KeywordGoto,     // Goto statement, used in parsing to manage IF-ElseIf-Else-EndIf and nesting
@@ -91,7 +91,7 @@ namespace DataRuntimeLanguage {
 
     enum class Value
     {
-        Invalid = -1,
+        Unassigned = -1,
         Null,           // Erl entity type, "Null" value
         Number,         // Erl entity type,  hard numeric value
         String,         // Erl entity type,  character data
@@ -102,24 +102,139 @@ namespace DataRuntimeLanguage {
         Error           // Erl entity type, processing of an expression failed, returned error
     };
     
+    enum class PtrDataType
+    {
+        Unassigned = -1,
+        Real,           // data type for overloaded pointer management, double real
+        Integer,        // data type for overloaded pointer management, integer
+        Logical         // data type for overloaded pointer management, logical
+    };
 
-    
-    int constexpr ValueError(7);      
-
-    int constexpr PntrReal(301);    // data type for overloaded pointer management, double real
-    int constexpr PntrInteger(302); // data type for overloaded pointer management, integer
-    int constexpr PntrLogical(303); // data type for overloaded pointer management, logical
 
     // Parameters for identifying operator types in Erl
     // The number of these parameters indicates the order of precedence
-    int constexpr OperatorLiteral(1);         // Just stores a literal value
-    int constexpr OperatorNegative(2);        // -  (unary) No LHS?
-    int constexpr OperatorDivide(3);          // /
-    int constexpr OperatorMultiply(4);        // *
-    int constexpr OperatorSubtract(5);        // -  (binary)
-    int constexpr OperatorAdd(6);             // +  (binary)
-    int constexpr OperatorEqual(7);           // ==
-    int constexpr OperatorNotEqual(8);        // <>
+    enum class Parameters
+    {
+        Unassigned = -1,
+        Null,
+        OperatorLiteral, // Just stores a literal value
+        OperatorNegative, // -  (unary) No LHS?
+        OperatorDivide,   // /
+        OperatorMultiply, // *
+        OperatorSubtract, // -  (binary)
+        OperatorAdd,      // +  (binary)
+        OperatorEqual,    // ==
+        OperatorNotEqual, // <>
+        OperatorLessOrEqual, // <=
+        OperatorGreaterOrEqual, // >=
+        OperatorLessThan,       // <
+        OperatorGreaterThan,    // >
+        OperatorRaiseToPower,   // ^
+        OperatorLogicalAND,     // &&
+        OperatorLogicalOR,      // ||
+        // note there is an important check "> 15" to distinguish operators from functions
+        //  so be careful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
+        
+        // parameters for built-in Erl functions, these are processed like operators and numbering
+        // must be sequential with the operators.
+        // math functions
+        FuncRound,    // accessor for Fortran's DNINT()
+        FuncMod,      // accessor for Fortran's MOD()
+        FuncSin,      // accessor for Fortran's SIN()
+        FuncCos,      // accessor for Fortran's COS()
+        FuncArcSin,   // accessor for Fortran's ASIN()
+        FuncArcCos,   // accessor for Fortran's ACOS()
+        FuncDegToRad, // Multiplies degrees by DegToRad
+        FuncRadToDeg, // Divides radians by DegToRad
+        FuncExp,      // accessor for Fortran's EXP()
+        FuncLn,       // accessor for Fortran's LOG()
+        FuncMax,      // accessor for Fortran's MAX()
+        FuncMin,      // accessor for Fortran's MIN()
+        FuncABS,      // accessor for Fortran's ABS()
+        FuncRandU,    // accessor for Fortran's Random_Number() intrinsic, uniform distribution
+        FuncRandG,    // accessor for Gaussian/normal distribution random number
+        FuncRandSeed, // accessor for Fortran's Random_Seed() intrinsic
+
+        // begin psychrometric routines
+        FuncRhoAirFnPbTdbW,    // accessor for E+ psych routine
+        FuncCpAirFnW,          // accessor for E+ psych routine
+        FuncHfgAirFnWTdb,      // accessor for E+ psych routine
+        FuncHgAirFnWTdb,       // accessor for E+ psych routine
+        FuncTdpFnTdbTwbPb,     // accessor for E+ psych routine
+        FuncTdpFnWPb,          // accessor for E+ psych routine
+        FuncHFnTdbW,           // accessor for E+ psych routine
+        FuncHFnTdbRhPb,        // accessor for E+ psych routine
+        FuncTdbFnHW,           // accessor for E+ psych routine
+        FuncRhovFnTdbRh,       // accessor for E+ psych routine
+        FuncRhovFnTdbRhLBnd0C, // accessor for E+ psych routine
+        FuncRhovFnTdbWPb,      // accessor for E+ psych routine
+        FuncRhFnTdbRhov,       // accessor for E+ psych routine
+        FuncRhFnTdbRhovLBnd0C, // accessor for E+ psych routine
+        FuncRhFnTdbWPb,        // accessor for E+ psych routine
+        FuncTwbFnTdbWPb,       // accessor for E+ psych routine
+        FuncVFnTdbWPb,         // accessor for E+ psych routine
+        FuncWFnTdpPb,          // accessor for E+ psych routine
+        FuncWFnTdbH,           // accessor for E+ psych routine
+        FuncWFnTdbTwbPb,       // accessor for E+ psych routine
+        FuncWFnTdbRhPb,        // accessor for E+ psych routine
+        FuncPsatFnTemp,        // accessor for E+ psych routine
+        FuncTsatFnHPb,         // accessor for E+ psych routine
+        FuncTsatFnPb,          // not public in PsychRoutines.cc so not really available in EMS.
+        FuncCpCW,              // accessor for E+ psych routine
+        FuncCpHW,              // accessor for E+ psych routine
+        FuncRhoH2O,            // accessor for E+ psych routine
+
+        // Simulation Management Functions
+        FuncFatalHaltEp,       // accessor for E+ error management, "Fatal" level
+        FuncSevereWarnEp,      // accessor for E+ error management, "Severe" level
+        FuncWarnEp,            // accessor for E+ error management, "Warning" level
+
+        // Trend variable handling Functions
+        FuncTrendValue,     // accessor for Erl Trend variables, instance value
+        FuncTrendAverage,   // accessor for Erl Trend variables, average value
+        FuncTrendMax,       // accessor for Erl Trend variables, max value
+        FuncTrendMin,       // accessor for Erl Trend variables, min value
+        FuncTrendDirection, // accessor for Erl Trend variables, slope value
+        FuncTrendSum,       // accessor for Erl Trend variables, sum value
+
+        // Curve and Table access function
+        FuncCurveValue,
+
+        // Weather data query functions
+        FuncTodayIsRain,             // Access TodayIsRain(hour, timestep)
+        FuncTodayIsSnow,             // Access TodayIsSnow(hour, timestep)
+        FuncTodayOutDryBulbTemp,     // Access TodayOutDryBulbTemp(hour, timestep)
+        FuncTodayOutDewPointTemp,    // Access TodayOutDewPointTemp(hour, timestep)
+        FuncTodayOutBaroPress,       // Access TodayOutBaroPress(hour, timestep)
+        FuncTodayOutRelHum,          // Access TodayOutRelHum(hour, timestep)
+        FuncTodayWindSpeed,          // Access TodayWindSpeed(hour, timestep)
+        FuncTodayWindDir,            // Access TodayWindDir(hour, timestep)
+        FuncTodaySkyTemp,            // Access TodaySkyTemp(hour, timestep)
+        FuncTodayHorizIRSky,         // Access TodayHorizIRSky(hour, timestep)
+        FuncTodayBeamSolarRad,       // Access TodayBeamSolarRad(hour, timestep)
+        FuncTodayDifSolarRad,        // Access TodayDifSolarRad(hour, timestep)
+        FuncTodayAlbedo,             // Access TodayAlbedo(hour, timestep)
+        FuncTodayLiquidPrecip,       // Access TodayLiquidPrecip(hour, timestep)
+        FuncTomorrowIsRain,          // Access TomorrowIsRain(hour, timestep)
+        FuncTomorrowIsSnow,          // Access TomorrowIsSnow(hour, timestep)
+        FuncTomorrowOutDryBulbTemp,  // Access TomorrowOutDryBulbTemp(hour, timestep)
+        FuncTomorrowOutDewPointTemp, // Access TomorrowOutDewPointTemp(hour, timestep)
+        FuncTomorrowOutBaroPress,    // Access TomorrowOutBaroPress(hour, timestep)
+        FuncTomorrowOutRelHum,       // Access TomorrowOutRelHum(hour, timestep)
+        FuncTomorrowWindSpeed,       // Access TomorrowWindSpeed(hour, timestep)
+        FuncTomorrowWindDir,         // Access TomorrowWindDir(hour, timestep)
+        FuncTomorrowSkyTemp,         // Access TomorrowSkyTemp(hour, timestep)
+        FuncTomorrowHorizIRSky,      // Access TomorrowHorizIRSky(hour, timestep)
+        FuncTomorrowBeamSolarRad,    // Access TomorrowBeamSolarRad(hour, timestep)
+        FuncTomorrowDifSolarRad,     // Access TomorrowDifSolarRad(hour, timestep)
+        FuncTomorrowAlbedo,          // Access TomorrowAlbedo(hour, timestep)
+        FuncTomorrowLiquidPrecip     // Access TomorrowLiquidPrecip(hour, timestep)
+    };
+    
+
+
+
+
     int constexpr OperatorLessOrEqual(9);     // <=
     int constexpr OperatorGreaterOrEqual(10); // >=
     int constexpr OperatorLessThan(11);       // <
@@ -127,8 +242,7 @@ namespace DataRuntimeLanguage {
     int constexpr OperatorRaiseToPower(13);   // ^
     int constexpr OperatorLogicalAND(14);     // &&
     int constexpr OperatorLogicalOR(15);      // ||
-    // note there is an important check "> 15" to distinguish operators from functions
-    //  so be careful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
+
 
     // parameters for built-in Erl functions, these are processed like operators and numbering
     // must be sequential with the operators.
@@ -257,12 +371,12 @@ namespace DataRuntimeLanguage {
         std::string DataTypeName; // general internal variable name registered, All uppercase
         std::string UniqueIDName; // unique id for internal var, All uppercase
         std::string Units;        // registered units, used for reporting and checks.
-        int PntrVarTypeUsed;      // data type used: integer (PntrInteger) or real (PntrReal)
+        PtrDataType PntrVarTypeUsed; // data type used: integer (PntrInteger) or real (PntrReal)
         Real64 *RealValue;        // POINTER to the REAL value that is being accessed
         int *IntValue;            // POINTER to the Integer value that is being accessed
 
         // Default Constructor
-        InternalVarsAvailableType() : PntrVarTypeUsed(0), RealValue(nullptr), IntValue(nullptr)
+        InternalVarsAvailableType() : PntrVarTypeUsed(PtrDataType::Unassigned), RealValue(nullptr), IntValue(nullptr)
         {
         }
     };
@@ -294,14 +408,15 @@ namespace DataRuntimeLanguage {
         std::string Units;             // control value units, used for reporting and checks.
         int handleCount;               // Number of times you tried to get a handle on this actuator,
                                        // whether from EMS:Actuator or getActuatorHandle (API)
-        int PntrVarTypeUsed;           // data type used: integer (PntrInteger), real (PntrReal) or logical (PntrLogical)
+        PtrDataType PntrVarTypeUsed;   // data type used: integer (PntrInteger), real (PntrReal) or logical (PntrLogical)
         bool *Actuated;                // POINTER to the logical value that signals EMS is actuating
         Real64 *RealValue;             // POINTER to the REAL value that is being actuated
         int *IntValue;                 // POINTER to the Integer value that is being actuated
         bool *LogValue;                // POINTER to the Logical value that is being actuated
 
         // Default Constructor
-        EMSActuatorAvailableType() : handleCount(0), PntrVarTypeUsed(0), Actuated(nullptr), RealValue(nullptr), IntValue(nullptr), LogValue(nullptr)
+        EMSActuatorAvailableType()
+            : handleCount(0), PntrVarTypeUsed(PtrDataType::Unassigned), Actuated(nullptr), RealValue(nullptr), IntValue(nullptr), LogValue(nullptr)
         {
         }
     };
@@ -426,12 +541,12 @@ namespace DataRuntimeLanguage {
     struct ErlExpressionType
     {
         // Members
-        int Operator;                  // indicates the type of operator or function 1..64
+        Parameters Operator;             // indicates the type of operator or function 1..64
         int NumOperands;               // count of operands in expression
         Array1D<ErlValueType> Operand; // holds Erl values for operands in expression
 
         // Default Constructor
-        ErlExpressionType() : Operator(0), NumOperands(0)
+        ErlExpressionType() : Operator(Parameters::Unassigned), NumOperands(0)
         {
         }
     };
@@ -441,11 +556,11 @@ namespace DataRuntimeLanguage {
         // Members
         // structure for operators and functions, used to look up information about each operator or function
         std::string Symbol; // string representation of operator or function (for reporting)
-        int Code;           // integer code 1..64, identifies operator or function
+        Parameters Code;           // integer code 1..64, identifies operator or function
         int NumOperands;    // count of operands or function arguments.
 
         // Default Constructor
-        OperatorType() : Code(0), NumOperands(0)
+        OperatorType() : Code(Parameters::Unassigned), NumOperands(0)
         {
         }
     };
