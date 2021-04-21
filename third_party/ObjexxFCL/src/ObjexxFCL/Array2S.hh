@@ -1542,25 +1542,6 @@ read_binary( std::istream & stream, Array2S< T > & a )
 	return stream;
 }
 
-// Write an Array2S to a Binary File
-template< typename T >
-inline
-std::ostream &
-write_binary( std::ostream & stream, Array2S< T > const & a )
-{
-	std::size_t const n( a.size() );
-	if ( stream && ( n > 0u ) ) {
-		std::size_t const type_size( sizeof( T ) / sizeof( std::ostream::char_type ) );
-		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-				stream.write( ( std::ostream::char_type const * )&a( i1, i2 ), type_size );
-				if ( ! stream ) break;
-			} if ( ! stream ) break;
-		}
-	}
-	return stream;
-}
-
 namespace fmt {
 
 // List-Directed Format: Array2S

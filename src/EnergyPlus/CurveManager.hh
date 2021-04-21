@@ -56,7 +56,6 @@
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array2S.hh>
-#include <ObjexxFCL/Array5D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 #include <nlohmann/json.hpp>
