@@ -139,24 +139,6 @@ public: // Creation
 		data_set();
 	}
 
-	// Array Constructor
-	template< template< typename > class A >
-	Array4S( A< T > const & a ) :
-	 Super( a.data(), a.size() ),
-	 m4_( 1 ),
-	 m3_( a.size4() ),
-	 m2_( a.size3() * m3_ ),
-	 m1_( a.size2() * m2_ ),
-	 k_( -( m1_ + m2_ + m3_ + m4_ ) ),
-	 u1_( a.isize1() ),
-	 u2_( a.isize2() ),
-	 u3_( a.isize3() ),
-	 u4_( a.isize4() )
-	{
-		contiguous_ = true;
-		data_set();
-	}
-
 	// Destructor
 	virtual
 	~Array4S()
@@ -1606,14 +1588,6 @@ public: // Comparison: Predicate: All
 	all_ge( Array4S const & a, Array4S const & b )
 	{
 		return ge( a, b );
-	}
-
-	// All Slice == Value
-	friend
-	bool
-	all_eq( Array4S const & a, T const & t )
-	{
-		return eq( a, t );
 	}
 
 	// All Slice != Value

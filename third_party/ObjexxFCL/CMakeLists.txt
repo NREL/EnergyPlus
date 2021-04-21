@@ -98,9 +98,7 @@ set(src
   src/ObjexxFCL/IndexSlice.hh
   src/ObjexxFCL/InitializerSentinel.hh
         src/ObjexxFCL/MArray.all.fwd.hh
-  src/ObjexxFCL/MArray.all.hh
-  src/ObjexxFCL/MArray.functions.hh
-  src/ObjexxFCL/MArray.fwd.hh
+        src/ObjexxFCL/MArray.fwd.hh
   src/ObjexxFCL/MArray.hh
   src/ObjexxFCL/MArray1.fwd.hh
   src/ObjexxFCL/MArray1.hh
