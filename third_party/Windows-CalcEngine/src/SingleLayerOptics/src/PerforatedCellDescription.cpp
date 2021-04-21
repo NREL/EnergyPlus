@@ -34,10 +34,10 @@ namespace SingleLayerOptics {
 	}
 
 	double CCircularCellDescription::visibleAhole( const CBeamDirection& t_Direction ) const {
-		using ConstantsData::PI;
+		using ConstantsData::WCE_PI;
 		double aHole( 0 );
 
-		double angleLimit = atan( 2 * m_Radius / m_Thickness );
+		double angleLimit = std::atan( 2 * m_Radius / m_Thickness );
 		double aTheta = radians( t_Direction.theta() );
 
 		if ( ( aTheta < 0 ) || ( aTheta > angleLimit ) ) {
@@ -45,9 +45,9 @@ namespace SingleLayerOptics {
 		}
 		else {
 			double A1( 0 ), A2( 0 );
-			A1 = PI / 2 * m_Radius * m_Radius * cos( aTheta );
-			A2 = PI / 2 * ( m_Radius * m_Radius * cos( aTheta ) - m_Radius *
-				( m_Thickness ) * sin( aTheta ) );
+			A1 = WCE_PI / 2 * m_Radius * m_Radius * std::cos( aTheta );
+			A2 = WCE_PI / 2 * ( m_Radius * m_Radius * std::cos( aTheta ) - m_Radius *
+				( m_Thickness ) * std::sin( aTheta ) );
 
 			aHole = A1 + A2;
 		}
@@ -57,7 +57,7 @@ namespace SingleLayerOptics {
 
 	double CCircularCellDescription::visibleAcell( const CBeamDirection& t_Direction ) const {
 		double aTheta = radians( t_Direction.theta() );
-		return ( m_x * m_y ) * cos( aTheta );
+		return ( m_x * m_y ) * std::cos( aTheta );
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +79,7 @@ namespace SingleLayerOptics {
 		double Psi( 0 );
 		double lowerLimit( 0 ), upperLimit( 0 );
 
-		lowerLimit = -( atan( m_YHole / m_Thickness ) );
+		lowerLimit = -( std::atan( m_YHole / m_Thickness ) );
 		upperLimit = -lowerLimit;
 
 		Psi = -t_Direction.profileAngle();
@@ -90,7 +90,7 @@ namespace SingleLayerOptics {
 		}
 		else {
 			double Transmittance( 0 );
-			Transmittance = ( ( m_YHole / m_y ) - std::abs( m_Thickness / m_y * tan( Psi ) ) );
+			Transmittance = ( ( m_YHole / m_y ) - std::abs( m_Thickness / m_y * std::tan( Psi ) ) );
 			if ( Transmittance < 0 ) Transmittance = 0;
 			return Transmittance;
 		}
@@ -100,20 +100,20 @@ namespace SingleLayerOptics {
 		double Eta( 0 );
 		double lowerLimit( 0 ), upperLimit( 0 );
 
-		lowerLimit = -( atan( m_XHole / m_Thickness ) );
+		lowerLimit = -( std::atan( m_XHole / m_Thickness ) );
 		upperLimit = -lowerLimit;
 
 		double Phi = radians( t_Direction.phi() );
 		double Theta = radians( t_Direction.theta() );
 
-		Eta = atan( cos( Phi ) * tan( Theta ) );
+		Eta = std::atan( std::cos( Phi ) * std::tan( Theta ) );
 
 		if ( ( Eta <= lowerLimit ) || ( Eta >= upperLimit ) ) {
 			return 0.0;
 		}
 		else {
 			double Transmittance( 0 );
-			Transmittance = ( ( m_XHole / m_x ) - std::abs( m_Thickness / m_x * tan( Eta ) ) );
+			Transmittance = ( ( m_XHole / m_x ) - std::abs( m_Thickness / m_x * std::tan( Eta ) ) );
 			if ( Transmittance < 0 ) Transmittance = 0;
 			return Transmittance;
 		}

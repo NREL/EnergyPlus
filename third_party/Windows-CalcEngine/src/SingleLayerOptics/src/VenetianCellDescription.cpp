@@ -1,6 +1,5 @@
 #include <cassert>
 #include <memory>
-#include <stdexcept>
 
 #include "VenetianCellDescription.hpp"
 #include "VenetianSlat.hpp"
@@ -67,7 +66,7 @@ namespace SingleLayerOptics {
 		return aBackwardCell;
 	}
 
-	std::shared_ptr< CSquareMatrix > CVenetianCellDescription::viewFactors() {
+	std::shared_ptr< SquareMatrix > CVenetianCellDescription::viewFactors() {
 		return m_Geometry->viewFactors();
 	}
 

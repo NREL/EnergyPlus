@@ -97,7 +97,7 @@ namespace Viewer {
 	void CSegment2D::calculateLength() {
 		auto deltaX = m_EndPoint->x() - m_StartPoint->x();
 		auto deltaY = m_EndPoint->y() - m_StartPoint->y();
-		m_Length = sqrt( deltaX * deltaX + deltaY * deltaY );
+		m_Length = std::sqrt( deltaX * deltaX + deltaY * deltaY );
 	}
 
 	void CSegment2D::calculateCenter() {

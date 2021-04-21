@@ -1,177 +1,237 @@
-#ifndef FENESTRATIONCOMMON_H
-#define FENESTRATIONCOMMON_H
+#pragma once
 
-namespace FenestrationCommon {
+#include "EnumerationTemplate.hpp"
 
-	template < typename T >
-	class Enum {
-	public:
-		class Iterator {
-		public:
-			explicit Iterator( int value ) :
-				m_value( value ) {
-			}
+namespace FenestrationCommon
+{
 
-			T operator*( void ) const {
-				return static_cast< T >( m_value );
-			}
+    template<typename T>
+    int sgn(T val)
+    {
+        return (T(0) < val) - (val < T(0));
+    }
 
-			void operator++( void ) {
-				++m_value;
-			}
+    //////////////////////////////////////////////////////////////////////////
+    // Side
+    //////////////////////////////////////////////////////////////////////////
 
-			bool operator!=( Iterator rhs ) {
-				return m_value != rhs.m_value;
-			}
+    enum class Side
+    {
+        Front,
+        Back
+    };
 
-		private:
-			int m_value;
-		};
+    class EnumSide : public Enum<Side>
+    {};
 
-	};
+    inline EnumSide::Iterator begin(EnumSide)
+    {
+        return EnumSide::Iterator(static_cast<int>(Side::Front));
+    }
 
-	template < typename T >
-	int sgn( T val ) {
-		return ( T( 0 ) < val ) - ( val < T( 0 ) );
-	}
+    inline EnumSide::Iterator end(EnumSide)
+    {
+        return EnumSide::Iterator(static_cast<int>(Side::Back) + 1);
+    }
 
-	//////////////////////////////////////////////////////////////////////////
-	// Side
-	//////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
+    // Property
+    //////////////////////////////////////////////////////////////////////////
 
-	enum class Side { Front, Back };
+    enum class Property
+    {
+        T,
+        R,
+        Abs
+    };
 
-	class EnumSide : public Enum< Side > {
+    class EnumProperty : public Enum<Property>
+    {};
 
-	};
+    inline EnumProperty::Iterator begin(EnumProperty)
+    {
+        return EnumProperty::Iterator(static_cast<int>(Property::T));
+    }
 
-	inline EnumSide::Iterator begin( EnumSide ) {
-		return EnumSide::Iterator( static_cast< int >( Side::Front ) );
-	}
+    inline EnumProperty::Iterator end(EnumProperty)
+    {
+        return EnumProperty::Iterator(static_cast<int>(Property::Abs) + 1);
+    }
 
-	inline EnumSide::Iterator end( EnumSide ) {
-		return EnumSide::Iterator( static_cast< int >( Side::Back ) + 1 );
-	}
+    inline Side oppositeSide(const Side t_Side)
+    {
+        auto aSide = Side::Front;
+        if(t_Side == Side::Front)
+        {
+            aSide = Side::Back;
+        }
+        return aSide;
+    }
 
-	//////////////////////////////////////////////////////////////////////////
-	// Property
-	//////////////////////////////////////////////////////////////////////////
+    inline Side getSide(const Side side, const bool flipped)
+    {
+        return flipped ? oppositeSide(side) : side;
+    }
 
-	enum class Property { T, R, Abs };
+    //////////////////////////////////////////////////////////////////////////
+    // WavelengthRange
+    //////////////////////////////////////////////////////////////////////////
 
-	class EnumProperty : public Enum< Property > {
+    enum class WavelengthRange
+    {
+        Solar,
+        Visible,
+        IR
+    };
 
-	};
+    class EnumWavelengthRange : public Enum<WavelengthRange>
+    {};
 
-	inline EnumProperty::Iterator begin( EnumProperty ) {
-		return EnumProperty::Iterator( static_cast< int >( Property::T ) );
-	}
+    inline EnumWavelengthRange::Iterator begin(EnumWavelengthRange)
+    {
+        return EnumWavelengthRange::Iterator(static_cast<int>(WavelengthRange::Solar));
+    }
 
-	inline EnumProperty::Iterator end( EnumProperty ) {
-		return EnumProperty::Iterator( static_cast< int >( Property::Abs ) + 1 );
-	}
+    inline EnumWavelengthRange::Iterator end(EnumWavelengthRange)
+    {
+        return EnumWavelengthRange::Iterator(static_cast<int>(WavelengthRange::IR) + 1);
+    }
 
-	inline Side oppositeSide( const Side t_Side ) {
-		auto aSide = Side::Front;
-		if ( t_Side == Side::Front ) {
-			aSide = Side::Back;
-		}
-		return aSide;
-	}
+    //////////////////////////////////////////////////////////////////////////
+    // PropertySimple
+    //////////////////////////////////////////////////////////////////////////
 
-	enum class WavelengthRange { Solar, Visible, IR };
+    // Short version of enum class Property is necessary because in optical routines it is quite
+    // often the case when calculations are performed only over transmittance and reflectance. It is
+    // also often the case when Transmittance and Reflectance have different structure from
+    // absorptances.
+    enum class PropertySimple
+    {
+        T,
+        R
+    };
 
-	//////////////////////////////////////////////////////////////////////////
-	// PropertySimple
-	//////////////////////////////////////////////////////////////////////////
+    inline PropertySimple toPropertySimple(const Property prop)
+    {
+        PropertySimple result{PropertySimple::T};
+        if(prop == Property::R)
+        {
+            result = PropertySimple::R;
+        }
+        return result;
+    }
 
-	// Short version of enum class Property is necessary because in optical routines it is quite often the case
-	// when calculations are performed only over transmittance and reflectance. It is also often the case when
-	// Transmittance and Reflectance have different structure from absorptances.
-	enum class PropertySimple { T, R };
+    inline Property toProperty(const PropertySimple prop)
+    {
+        Property result{Property::T};
+        if(prop == PropertySimple::R)
+        {
+            result = Property::R;
+        }
+        return result;
+    }
 
-	class EnumPropertySimple : public Enum< PropertySimple > {
+    class EnumPropertySimple : public Enum<PropertySimple>
+    {};
 
-	};
+    inline EnumPropertySimple::Iterator begin(EnumPropertySimple)
+    {
+        return EnumPropertySimple::Iterator(static_cast<int>(PropertySimple::T));
+    }
 
-	inline EnumPropertySimple::Iterator begin( EnumPropertySimple ) {
-		return EnumPropertySimple::Iterator( static_cast< int >( PropertySimple::T ) );
-	}
+    inline EnumPropertySimple::Iterator end(EnumPropertySimple)
+    {
+        return EnumPropertySimple::Iterator(static_cast<int>(PropertySimple::R) + 1);
+    }
 
-	inline EnumPropertySimple::Iterator end( EnumPropertySimple ) {
-		return EnumPropertySimple::Iterator( static_cast< int >( PropertySimple::R ) + 1 );
-	}
+    enum class Scattering
+    {
+        DirectDirect,
+        DirectDiffuse,
+        DiffuseDiffuse,
+        DirectHemispherical
+    };
 
-	enum class Scattering { DirectDirect, DirectDiffuse, DiffuseDiffuse };
+    class EnumScattering : public Enum<Scattering>
+    {};
 
-	class EnumScattering : public Enum< Scattering > {
+    inline EnumScattering::Iterator begin(EnumScattering)
+    {
+        return EnumScattering::Iterator(static_cast<int>(Scattering::DirectDirect));
+    }
 
-	};
+    inline EnumScattering::Iterator end(EnumScattering)
+    {
+        return EnumScattering::Iterator(static_cast<int>(Scattering::DiffuseDiffuse) + 1);
+    }
 
-	inline EnumScattering::Iterator begin( EnumScattering ) {
-		return EnumScattering::Iterator( static_cast< int >( Scattering::DirectDirect ) );
-	}
+    //////////////////////////////////////////////////////////////////////////
+    // ScatteringSimple
+    //////////////////////////////////////////////////////////////////////////
 
-	inline EnumScattering::Iterator end( EnumScattering ) {
-		return EnumScattering::Iterator( static_cast< int >( Scattering::DiffuseDiffuse ) + 1 );
-	}
+    enum class ScatteringSimple
+    {
+        Direct,
+        Diffuse
+    };
 
-	//////////////////////////////////////////////////////////////////////////
-	// ScatteringSimple
-	//////////////////////////////////////////////////////////////////////////
+    class EnumScatteringSimple : public Enum<ScatteringSimple>
+    {};
 
-	enum class ScatteringSimple { Direct, Diffuse };
+    inline EnumScatteringSimple::Iterator begin(EnumScatteringSimple)
+    {
+        return EnumScatteringSimple::Iterator(static_cast<int>(ScatteringSimple::Direct));
+    }
 
-	class EnumScatteringSimple : public Enum< ScatteringSimple > {
+    inline EnumScatteringSimple::Iterator end(EnumScatteringSimple)
+    {
+        return EnumScatteringSimple::Iterator(static_cast<int>(ScatteringSimple::Diffuse) + 1);
+    }
 
-	};
+    //////////////////////////////////////////////////////////////////////////
+    // EnergyFlow
+    //////////////////////////////////////////////////////////////////////////
 
-	inline EnumScatteringSimple::Iterator begin( EnumScatteringSimple ) {
-		return EnumScatteringSimple::Iterator( static_cast< int >( ScatteringSimple::Direct ) );
-	}
+    enum class EnergyFlow
+    {
+        Forward,
+        Backward
+    };
 
-	inline EnumScatteringSimple::Iterator end( EnumScatteringSimple ) {
-		return EnumScatteringSimple::Iterator( static_cast< int >( ScatteringSimple::Diffuse ) + 1 );
-	}
+    class EnumEnergyFlow : public Enum<EnergyFlow>
+    {};
 
-	//////////////////////////////////////////////////////////////////////////
-	// EnergyFlow
-	//////////////////////////////////////////////////////////////////////////
+    inline EnumEnergyFlow::Iterator begin(EnumEnergyFlow)
+    {
+        return EnumEnergyFlow::Iterator(static_cast<int>(EnergyFlow::Forward));
+    }
 
-	enum class EnergyFlow { Forward, Backward };
+    inline EnumEnergyFlow::Iterator end(EnumEnergyFlow)
+    {
+        return EnumEnergyFlow::Iterator(static_cast<int>(EnergyFlow::Backward) + 1);
+    }
 
-	class EnumEnergyFlow : public Enum< EnergyFlow > {
+    inline EnergyFlow getFlowFromSide(const Side t_Side)
+    {
+        auto aResult = EnergyFlow::Forward;
+        if(t_Side == Side::Back)
+        {
+            aResult = EnergyFlow::Backward;
+        }
 
-	};
+        return aResult;
+    }
 
-	inline EnumEnergyFlow::Iterator begin( EnumEnergyFlow ) {
-		return EnumEnergyFlow::Iterator( static_cast< int >( EnergyFlow::Forward ) );
-	}
+    inline Side getSideFromFlow(const EnergyFlow t_EnergyFlow)
+    {
+        auto aResult = Side::Front;
+        if(t_EnergyFlow == EnergyFlow::Backward)
+        {
+            aResult = Side::Back;
+        }
 
-	inline EnumEnergyFlow::Iterator end( EnumEnergyFlow ) {
-		return EnumEnergyFlow::Iterator( static_cast< int >( EnergyFlow::Backward ) + 1 );
-	}
+        return aResult;
+    }
 
-	inline EnergyFlow getFlowFromSide( const Side t_Side ) {
-		auto aResult = EnergyFlow::Forward;
-		if ( t_Side == Side::Back ) {
-			aResult = EnergyFlow::Backward;
-		}
+}   // namespace FenestrationCommon
 
-		return aResult;
-
-	}
-
-	inline Side getSideFromFlow( const EnergyFlow t_EnergyFlow ) {
-		auto aResult = Side::Front;
-		if ( t_EnergyFlow == EnergyFlow::Backward ) {
-			aResult = Side::Back;
-		}
-
-		return aResult;
-
-	}
-
-}
-
-#endif

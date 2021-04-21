@@ -63,7 +63,7 @@ namespace Viewer {
 	                                         std::shared_ptr< const CPoint2D > const& t_Point2 ) const {
 		auto isHigher = false;
 		if ( m_ProfileAngle != 0 ) {
-			const auto tanPhi = tan( radians( m_ProfileAngle ) );
+			const auto tanPhi = std::tan( radians( m_ProfileAngle ) );
 			if ( tanPhi > 0 ) {
 				isHigher = ( t_Point1->x() - t_Point1->y() / tanPhi ) < ( t_Point2->x() - t_Point2->y() / tanPhi );
 			}

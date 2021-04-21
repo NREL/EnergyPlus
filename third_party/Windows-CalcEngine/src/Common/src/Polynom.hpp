@@ -1,14 +1,16 @@
 #ifndef WINDOWS_CALCENGINE_POLYNOM_HPP
 #define WINDOWS_CALCENGINE_POLYNOM_HPP
 
+#include <vector>
+
 namespace FenestrationCommon {
 
 	// Evaluate polynom value at certain point
 	class Polynom {
 	public:
-		explicit Polynom( std::vector< double > const& t_Coeffs );
+		explicit Polynom( const std::vector< double > & t_Coeffs );
 
-		double valueAt( double const t_x ) const;
+		double valueAt( double t_x ) const;
 
 	private:
 		std::vector< double > m_Coeffs;
@@ -19,9 +21,9 @@ namespace FenestrationCommon {
 	// only valid for incoming angle Phi = 10 deg.
 	class PolynomPoint {
 	public:
-		explicit PolynomPoint( double const Value, Polynom const & t_Poly );
+		explicit PolynomPoint( double Value, Polynom const & t_Poly );
 		double value() const;
-		double valueAt( double const t_X ) const;
+		double valueAt( double t_X ) const;
 
 	private:
 		Polynom m_Polynom;
@@ -34,9 +36,9 @@ namespace FenestrationCommon {
 	public:
 		PolynomialPoints360deg();
 
-		void storePoint( double const t_Value, Polynom const& t_Polynom );
+		void storePoint( double t_Value, const Polynom & t_Polynom );
 		// Function to return point closest to given coordinate
-		double valueAt( double const t_PointValue, double const t_Value );
+		double valueAt( double t_PointValue, double t_Value );
 
 	private:
 		void sortPolynomials();

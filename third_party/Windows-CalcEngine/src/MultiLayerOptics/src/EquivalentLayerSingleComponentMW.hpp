@@ -5,13 +5,7 @@
 #include <vector>
 #include <map>
 
-namespace FenestrationCommon {
-
-	class CSeries;
-	enum class Property;
-	enum class Side;
-
-}
+#include <WCECommon.hpp>
 
 namespace MultiLayerOptics {
 
@@ -24,13 +18,13 @@ namespace MultiLayerOptics {
 	// Keeps series of data related to one surface
 	class CSurfaceSeries {
 	public:
-		CSurfaceSeries( const std::shared_ptr< FenestrationCommon::CSeries >& t_T,
-		                const std::shared_ptr< FenestrationCommon::CSeries >& t_R );
+		CSurfaceSeries(const FenestrationCommon::CSeries &t_T,
+                       const FenestrationCommon::CSeries &t_R );
 
-		std::shared_ptr< FenestrationCommon::CSeries > getProperties( const FenestrationCommon::Property t_Property ) const;
+		FenestrationCommon::CSeries getProperties( const FenestrationCommon::Property t_Property ) const;
 
 	private:
-		std::map< FenestrationCommon::Property, std::shared_ptr< FenestrationCommon::CSeries > > m_Properties;
+		std::map< FenestrationCommon::Property, FenestrationCommon::CSeries > m_Properties;
 	};
 
 	///////////////////////////////////////////////////////////////////////////
@@ -39,13 +33,13 @@ namespace MultiLayerOptics {
 
 	class CLayerSeries {
 	public:
-		CLayerSeries( const std::shared_ptr< FenestrationCommon::CSeries >& t_Tf,
-		              const std::shared_ptr< FenestrationCommon::CSeries >& t_Rf,
-		              const std::shared_ptr< FenestrationCommon::CSeries >& t_Tb,
-		              const std::shared_ptr< FenestrationCommon::CSeries >& t_Rb );
+		CLayerSeries(const FenestrationCommon::CSeries &t_Tf,
+                     const FenestrationCommon::CSeries &t_Rf,
+                     const FenestrationCommon::CSeries &t_Tb,
+                     const FenestrationCommon::CSeries &t_Rb );
 
-		std::shared_ptr< FenestrationCommon::CSeries > getProperties( const FenestrationCommon::Side t_Side,
-		                                                              const FenestrationCommon::Property t_Property ) const;
+		FenestrationCommon::CSeries getProperties(const FenestrationCommon::Side t_Side,
+                              const FenestrationCommon::Property t_Property ) const;
 
 	private:
 		std::map< FenestrationCommon::Side, std::shared_ptr< CSurfaceSeries > > m_Surfaces;
@@ -59,18 +53,18 @@ namespace MultiLayerOptics {
 	// Single component means that ray will propagate through IGU in single state (as perfect beam or prefectly diffuse)
 	class CEquivalentLayerSingleComponentMW {
 	public:
-		CEquivalentLayerSingleComponentMW( const std::shared_ptr< FenestrationCommon::CSeries >& t_Tf,
-		                                   const std::shared_ptr< FenestrationCommon::CSeries >& t_Tb,
-		                                   const std::shared_ptr< FenestrationCommon::CSeries >& t_Rf,
-		                                   const std::shared_ptr< FenestrationCommon::CSeries >& t_Rb );
+		CEquivalentLayerSingleComponentMW(const FenestrationCommon::CSeries &t_Tf,
+                                          const FenestrationCommon::CSeries &t_Tb,
+                                          const FenestrationCommon::CSeries &t_Rf,
+                                          const FenestrationCommon::CSeries &t_Rb );
 
-		void addLayer( const std::shared_ptr< FenestrationCommon::CSeries >& t_Tf,
-		               const std::shared_ptr< FenestrationCommon::CSeries >& t_Tb,
-		               const std::shared_ptr< FenestrationCommon::CSeries >& t_Rf,
-		               const std::shared_ptr< FenestrationCommon::CSeries >& t_Rb );
+		void addLayer(const FenestrationCommon::CSeries &t_Tf,
+                      const FenestrationCommon::CSeries &t_Tb,
+                      const FenestrationCommon::CSeries &t_Rf,
+                      const FenestrationCommon::CSeries &t_Rb );
 
-		std::shared_ptr< FenestrationCommon::CSeries > getProperties( const FenestrationCommon::Property,
-		                                                              const FenestrationCommon::Side ) const;
+        FenestrationCommon::CSeries getProperties(const FenestrationCommon::Property t_Property,
+                              const FenestrationCommon::Side t_Side) const;
 
 	private:
 		std::shared_ptr< CLayerSeries > m_Layer;

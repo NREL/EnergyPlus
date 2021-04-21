@@ -35,7 +35,7 @@ namespace SingleLayerOptics {
 	}
 
 	double CWovenCellDescription::cutOffAngle() const {
-		return acos( gamma() );
+		return std::acos( gamma() );
 	}
 
 	double CWovenCellDescription::T_dir_dir( const Side, const CBeamDirection& t_Direction ) {
@@ -47,20 +47,20 @@ namespace SingleLayerOptics {
 	}
 
 	double CWovenCellDescription::Tx( const CBeamDirection& t_Direction ) {
-		using ConstantsData::PI;
+		using ConstantsData::WCE_PI;
 
 		double aTx = 0;
 		double cutOffAngle = this->cutOffAngle();
 		double aAzimuth = t_Direction.Azimuth();
-		if ( aAzimuth > PI / 2 ) {
-			aAzimuth = PI - aAzimuth;
+		if ( aAzimuth > WCE_PI / 2 ) {
+			aAzimuth = WCE_PI - aAzimuth;
 		}
-		if ( aAzimuth < -PI / 2 ) {
-			aAzimuth = -PI - aAzimuth;
+		if ( aAzimuth < -WCE_PI / 2 ) {
+			aAzimuth = -WCE_PI - aAzimuth;
 		}
 		aAzimuth = std::abs( aAzimuth );
 		if ( aAzimuth < cutOffAngle ) {
-			aTx = 1 - this->gamma() / cos( aAzimuth );
+			aTx = 1 - this->gamma() / std::cos( aAzimuth );
 		}
 		return aTx;
 	}
@@ -69,9 +69,9 @@ namespace SingleLayerOptics {
 		double aTy = 0;
 		double cutOffAngle = this->cutOffAngle();
 		double aAltitude = t_Direction.Altitude();
-		double aPrim = std::abs( atan( tan( aAltitude ) / cos( aAltitude ) ) );
+		double aPrim = std::abs( std::atan( std::tan( aAltitude ) / std::cos( aAltitude ) ) );
 		if ( aPrim < cutOffAngle ) {
-			aTy = 1 - this->gamma() / cos( aPrim );
+			aTy = 1 - this->gamma() / std::cos( aPrim );
 		}
 
 		return aTy;

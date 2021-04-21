@@ -4,13 +4,7 @@
 #include <memory>
 
 #include "WCECommon.hpp"
-
-namespace SingleLayerOptics {
-
-	class CScatteringLayer;
-	class CScatteringSurface;
-
-}
+#include "WCESingleLayerOptics.hpp"
 
 namespace MultiLayerOptics {
 
@@ -55,9 +49,9 @@ namespace MultiLayerOptics {
 			const FenestrationCommon::Side t_Side,
 			const FenestrationCommon::Scattering t_Scattering,
 			const double t_Theta = 0,
-			const double t_Phi = 0 ) const;
+			const double t_Phi = 0 );
 
-		std::shared_ptr< SingleLayerOptics::CScatteringLayer > getLayer() const;
+		SingleLayerOptics::CScatteringLayer getLayer() const;
 
 	private:
 		void calcEquivalentProperties( SingleLayerOptics::CScatteringLayer& t_First,
@@ -81,7 +75,7 @@ namespace MultiLayerOptics {
 			const SingleLayerOptics::CScatteringSurface& b1,
 			const SingleLayerOptics::CScatteringSurface& f2 ) const;
 
-		std::shared_ptr< SingleLayerOptics::CScatteringLayer > m_Layer;
+		SingleLayerOptics::CScatteringLayer m_Layer;
 
 		// Layers for beam and diffuse components
 		std::shared_ptr< CEquivalentLayerSingleComponent > m_DiffuseLayer;

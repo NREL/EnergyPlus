@@ -6,9 +6,9 @@ using namespace FenestrationCommon;
 
 namespace SpectralAveraging {
 
-	CNIRRatio::CNIRRatio( std::shared_ptr< const CSeries > const& t_SolarRadiation,
-	                      double const lowLambda, double const highLambda ) {
-		auto integratedSolar = t_SolarRadiation->integrate( IntegrationType::Trapezoidal );
+	CNIRRatio::CNIRRatio(const CSeries &t_SolarRadiation,
+                         double const lowLambda, double const highLambda ) {
+		auto integratedSolar = t_SolarRadiation.integrate( IntegrationType::Trapezoidal );
 		auto aSolarRange = CWavelengthRange( WavelengthRange::Solar );
 
 		auto totSolar = integratedSolar->sum( aSolarRange.minLambda(), aSolarRange.maxLambda() );

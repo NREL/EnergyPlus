@@ -29,7 +29,7 @@ namespace MultiLayerOptics {
 		double getProperty( const FenestrationCommon::Property t_Property,
 		                    const FenestrationCommon::Side t_Side ) const;
 
-		std::shared_ptr< SingleLayerOptics::CLayerSingleComponent > getLayer() const;
+            SingleLayerOptics::CLayerSingleComponent getLayer() const;
 
 	private:
 		double interreflectance( const SingleLayerOptics::CLayerSingleComponent& t_Layer1,

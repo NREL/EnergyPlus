@@ -17,7 +17,7 @@ namespace FenestrationCommon {
 		for ( auto i = 0; i < 2 * n + 1; i++ ) {
 			x[ i ] = 0;
 			for ( auto j = 0; j < int( t_Table.size() ); j++ )
-				x[ i ] = x[ i ] + pow( t_Table[ j ].first, i );
+				x[ i ] = x[ i ] + std::pow( t_Table[ j ].first, i );
 		}
 
 		std::vector< std::vector< double > > B( n + 1 );
@@ -34,7 +34,7 @@ namespace FenestrationCommon {
 		for ( auto i = 0; i < n + 1; i++ ) {
 			Y[ i ] = 0;
 			for ( auto j = 0; j < int( t_Table.size() ); j++ )
-				Y[ i ] = Y[ i ] + pow( t_Table[ j ].first, i ) * t_Table[ j ].second;
+				Y[ i ] = Y[ i ] + std::pow( t_Table[ j ].first, i ) * t_Table[ j ].second;
 		}
 		for ( auto i = 0; i <= n; i++ )
 			B[ i ][ n + 1 ] = Y[ i ];

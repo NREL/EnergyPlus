@@ -132,9 +132,9 @@ namespace FenestrationCommon {
 
 	double CSPChipInterpolation2D::interpolate( double const h, double const s, double const y_k,
 	                                            double const y_k_plus_one, double const d_k, double const d_k_plus_one ) const {
-		return ( ( 3 * h * pow( s, 2 ) - 2 * pow( s, 3 ) ) / pow( h, 3 ) ) * y_k_plus_one +
-			( ( pow( h, 3 ) - 3 * h * pow( s, 2 ) + 2 * pow( s, 3 ) ) / pow( h, 3 ) ) * y_k +
-			( ( pow( s, 2 ) * ( s - h ) ) / pow( h, 2 ) ) * d_k_plus_one +
-			( ( s * pow( s - h, 2 ) ) / pow( h, 2 ) ) * d_k;
+		return ( ( 3 * h * std::pow( s, 2 ) - 2 * std::pow( s, 3 ) ) / std::pow( h, 3 ) ) * y_k_plus_one +
+			( ( std::pow( h, 3 ) - 3 * h * std::pow( s, 2 ) + 2 * std::pow( s, 3 ) ) / std::pow( h, 3 ) ) * y_k +
+			( ( std::pow( s, 2 ) * ( s - h ) ) / std::pow( h, 2 ) ) * d_k_plus_one +
+			( ( s * std::pow( s - h, 2 ) ) / std::pow( h, 2 ) ) * d_k;
 	}
 }

@@ -86,7 +86,7 @@ namespace SingleLayerOptics {
 
 class CBSDFLayer;
 class CScatteringLayer;
-enum class BSDFHemisphere;
+enum class BSDFDirection;
 
 } // namespace SingleLayerOptics
 
@@ -116,10 +116,10 @@ namespace WindowManager {
     std::pair<Real64, Real64> getWCECoordinates(EnergyPlusData &state,
                                                 const int t_SurfNum,
                                                 const DataVectorTypes::Vector &t_Ray,
-                                                const SingleLayerOptics::BSDFHemisphere t_Direction);
+                                                const SingleLayerOptics::BSDFDirection t_Direction);
 
     // Returns Theta and Phi coordinates of surface BSDF for current Sun position
-    std::pair<Real64, Real64> getSunWCEAngles(EnergyPlusData &state, const int t_SurfNum, const SingleLayerOptics::BSDFHemisphere t_Direction);
+    std::pair<Real64, Real64> getSunWCEAngles(EnergyPlusData &state, const int t_SurfNum, const SingleLayerOptics::BSDFDirection t_Direction);
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCESpecturmProperties

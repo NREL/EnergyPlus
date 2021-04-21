@@ -1,4 +1,3 @@
-#include <stdexcept>
 #include "BSDFThetaLimits.hpp"
 
 namespace SingleLayerOptics {

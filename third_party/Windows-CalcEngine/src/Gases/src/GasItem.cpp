@@ -1,6 +1,5 @@
 #include <memory>
 #include <cmath>
-#include <stdexcept>
 
 #include "WCECommon.hpp"
 #include "GasItem.hpp"
@@ -53,7 +52,7 @@ namespace Gases {
 
 	void CGasItem::flllVacuumPressureProperties() const {
 		using ConstantsData::UNIVERSALGASCONSTANT;
-		using ConstantsData::PI;
+		using ConstantsData::WCE_PI;
 		auto const alpha1 = 0.79;
 		auto const alpha2 = 0.79;
 		auto const alpha = alpha1 * alpha2 / ( alpha2 + alpha1 * ( 1 - alpha2 ) );
@@ -63,7 +62,7 @@ namespace Gases {
 		}
 		auto const mWght = m_GasData->getMolecularWeight();
 		auto B = alpha * ( specificHeatRatio + 1 ) / ( specificHeatRatio - 1 );
-		B *= sqrt( UNIVERSALGASCONSTANT / ( 8 * PI * mWght * m_Temperature ) );
+		B *= sqrt( UNIVERSALGASCONSTANT / ( 8 * WCE_PI * mWght * m_Temperature ) );
 		m_GasProperties->m_ThermalConductivity = B * m_Pressure;
 		m_GasProperties->m_Viscosity = 0;
 		m_GasProperties->m_SpecificHeat = 0;

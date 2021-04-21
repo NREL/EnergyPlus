@@ -13,7 +13,8 @@ namespace MultiLayerOptics {
 	// Class to calculate multilayer optical properties for single component (direct or diffuse)
 	class CMultiLayerSingleComponent {
 	public:
-		CMultiLayerSingleComponent( const double t_Tf, const double t_Rf, const double t_Tb, const double t_Rb );
+		CMultiLayerSingleComponent( const double t_Tf = 0, const double t_Rf = 0,
+				const double t_Tb = 0, const double t_Rb = 0 );
 
 		// Adding layer to front or back side of composition
 		void addLayer( const double t_Tf, const double t_Rf, const double t_Tb, const double t_Rb,

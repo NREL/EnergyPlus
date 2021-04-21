@@ -18,7 +18,6 @@ namespace SpectralAveraging {
 	class CSpectralSample;
 	class CSpectralSampleData;
 	class CSpectralAngleSample;
-	class CAngularSpectralProperties;
 
 	//	enum class WavelengthSet { Custom, Source, Data };
 
@@ -57,7 +56,7 @@ namespace SpectralAveraging {
 		std::shared_ptr< CSingleAngularMeasurement > getMeasurements( double const t_Angle );
 		// Note that previous function (getMeasurements) needs to do interpolation if user asks for t_Angle that does not exist.So this is where you want to do your interpolation
 		// work
-		virtual void setSourceData( std::shared_ptr< FenestrationCommon::CSeries > t_SourceData );
+		virtual void setSourceData(FenestrationCommon::CSeries &t_SourceData );
 
 	private:
 		// Do not forget storage for it

@@ -2,12 +2,7 @@
 #define MultiLayerOpticsMEASUREDDATA_H
 
 #include "WCESpectralAveraging.hpp"
-
-namespace FenestrationCommon {
-
-	class CSeries;
-
-}
+#include <WCECommon.hpp>
 
 namespace MultiLayerOptics {
 
@@ -18,7 +13,7 @@ namespace MultiLayerOptics {
 		CMultiPaneSampleData();
 
 		void addSample( const std::shared_ptr< CSpectralSampleData >& t_Sample );
-		std::shared_ptr< FenestrationCommon::CSeries > getLayerAbsorptances( size_t const Index );
+		FenestrationCommon::CSeries getLayerAbsorptances(size_t const Index );
 		std::vector< double > getWavelengths() const;
 		size_t numberOfLayers() const;
 
@@ -29,7 +24,7 @@ namespace MultiLayerOptics {
 		void calculateEquivalentProperties();
 
 		std::vector< std::shared_ptr< CSpectralSampleData > > m_MeasuredSamples;
-		std::vector< std::shared_ptr< FenestrationCommon::CSeries > > m_LayerAbsorptances;
+		std::vector< FenestrationCommon::CSeries > m_LayerAbsorptances;
 
 	};
 

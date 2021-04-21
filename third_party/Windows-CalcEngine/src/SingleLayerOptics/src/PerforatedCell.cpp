@@ -15,5 +15,4 @@ namespace SingleLayerOptics {
 		CBaseCell( t_MaterialProperties, t_Cell ), CUniformDiffuseCell( t_MaterialProperties, t_Cell ) {
 
 	}
-
 }

@@ -64,7 +64,7 @@ namespace SingleLayerOptics {
 	double CBeamDirection::Altitude() const {
 		double aTheta = radians( m_Theta );
 		double aPhi = radians( m_Phi );
-		return asin( sin( aTheta ) * -sin( aPhi ) );
+		return std::asin( std::sin( aTheta ) * -std::sin( aPhi ) );
 	}
 
 	double CBeamDirection::Azimuth() const {
@@ -73,16 +73,16 @@ namespace SingleLayerOptics {
 		double aPhi = radians( m_Phi );
 		double aAzimuth = 0;
 		if ( std::abs( aTheta ) - std::abs( aAltitude ) > 1e-8 ) {
-			aAzimuth = -acos( cos( aTheta ) / cos( aAltitude ) );
+			aAzimuth = -std::acos( std::cos( aTheta ) / std::cos( aAltitude ) );
 		}
-		if ( cos( aPhi ) < 0 ) {
+		if ( std::cos( aPhi ) < 0 ) {
 			aAzimuth = -aAzimuth;
 		}
 		return aAzimuth;
 	}
 
 	void CBeamDirection::updateProfileAngle( const double t_Theta, const double t_Phi ) {
-		m_ProfileAngle = -atan( sin( radians( t_Phi ) ) * tan( radians( t_Theta ) ) );
+		m_ProfileAngle = -std::atan( std::sin( radians( t_Phi ) ) * std::tan( radians( t_Theta ) ) );
 		m_ProfileAngle = degrees( m_ProfileAngle );
 	}
 

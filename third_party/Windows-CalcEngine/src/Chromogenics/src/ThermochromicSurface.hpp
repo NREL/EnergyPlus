@@ -6,35 +6,37 @@
 
 #include "WCETarcog.hpp"
 
-namespace FenestrationCommon {
-
-	class IInterpolation2D;
-
+namespace FenestrationCommon
+{
+    class IInterpolation2D;
 }
 
-namespace Chromogenics {
+namespace Chromogenics
+{
+	namespace ISO15099 {
+		class CThermochromicSurface : public Tarcog::ISO15099::ISurface {
+		public:
+			CThermochromicSurface( const std::vector< std::pair< double, double>> & t_Emissivity,
+								   const std::vector< std::pair< double, double>> & t_Transmittance );
+			CThermochromicSurface( double t_Emissivity,
+								   const std::vector< std::pair< double, double>> & t_Transmittance );
+			CThermochromicSurface( const std::vector< std::pair< double, double>> & t_Emissivity,
+								   double t_Transmittance );
 
-	class CThermochromicSurface : public Tarcog::ISurface {
-	public:
-		CThermochromicSurface( std::vector< std::pair< double, double > > const& t_Emissivity,
-		                       std::vector< std::pair< double, double > > const& t_Transmittance );
-		CThermochromicSurface( double const& t_Emissivity,
-		                       std::vector< std::pair< double, double > > const& t_Transmittance );
-		CThermochromicSurface( std::vector< std::pair< double, double > > const& t_Emissivity,
-		                       double const& t_Transmittance );
+			CThermochromicSurface( const CThermochromicSurface & t_Surface );
+			CThermochromicSurface & operator=( const CThermochromicSurface & t_Surface );
 
-		CThermochromicSurface( CThermochromicSurface const& t_Surface );
-		CThermochromicSurface& operator=( CThermochromicSurface const& t_Surface );
+			std::shared_ptr< Tarcog::ISO15099::ISurface > clone() const override;
 
-		std::shared_ptr< Tarcog::ISurface > clone() const override;
+			void setTemperature( double t_Temperature ) override;
 
-		void setTemperature( double const t_Temperature ) override;
+		private:
+			std::shared_ptr< FenestrationCommon::IInterpolation2D > m_EmissivityInterpolator;
+			std::shared_ptr< FenestrationCommon::IInterpolation2D > m_TransmittanceInterpolator;
+		};
 
-	private:
-		std::shared_ptr< FenestrationCommon::IInterpolation2D > m_EmissivityInterpolator;
-		std::shared_ptr< FenestrationCommon::IInterpolation2D > m_TransmittanceInterpolator;
-	};
+	}
 
-}
+}   // namespace Chromogenics
 
 #endif
