@@ -1086,17 +1086,17 @@ namespace HVACHXAssistedCoolingCoil {
                 Real64 CoolingSpeedNum = 1; // need to figure out the Cooling Speed number for the HXAssisted
                 Real64 CoolingSpeedRatio = 0.5; // need to figure out the Cooling Speed Ratio for the HXAssisted
                 bool singleMode = false; // need to figure out the singMode for the HXAssisted
-                Real64 CoilSHR = 0.2; // need a procedure to figure out Coil SHR for the new coiling coil 
+                Real64 CoilSHR = 0.75; // need a procedure to figure out Coil SHR for the new coiling coil 
 
                 state.dataCoilCooingDX->coilCoolingDXs[state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex].simulate(
                     state,
-                    OperationMode,
+                    OperationMode, // partially implemented for HXAssistedCoil
                     PartLoadRatio, 
-                    CoolingSpeedNum, // temp not fully implemented, trying to figure out the equivalent for HXAssisted
-                    CoolingSpeedRatio, // temp not fully implemented, trying to figure out the equivalent for HXAssisted
+                    CoolingSpeedNum, // temp not fully implemented, trying to figure out the equivalent for HXAssisted coil
+                    CoolingSpeedRatio, // temp not fully implemented, trying to figure out the equivalent for HXAssisted coil
                     FanOpMode,
-                    singleMode, // temp not fully implemented, trying to figure out the equivalent for HXAssisted
-                    CoilSHR //temp not fully implemented,  trying to figure out the equivalent for HXAssisted
+                    singleMode, // temp not fully implemented, trying to figure out the equivalent for HXAssisted coil
+                    CoilSHR //temp not fully implemented,  trying to figure out the equivalent for HXAssisted coil
                 );
 
             } else if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
