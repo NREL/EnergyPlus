@@ -15,6 +15,8 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array5.fwd.hh>
+#include <ObjexxFCL/Array3S.hh>
+#include <ObjexxFCL/Array4S.hh>
 #include <ObjexxFCL/Array.hh>
 
 namespace ObjexxFCL {
