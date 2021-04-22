@@ -109,10 +109,11 @@ namespace UnitarySystems {
     UnitarySysInputSpec::UnitarySysInputSpec()
         : dx_heating_coil_sizing_ratio(1.0), minimum_supply_air_temperature(2.0), cooling_supply_air_flow_rate(-999.0),
           cooling_supply_air_flow_rate_per_floor_area(-999.0), cooling_fraction_of_autosized_cooling_supply_air_flow_rate(-999.0),
-          cooling_supply_air_flow_rate_per_unit_of_capacity(-999.0), heating_supply_air_flow_rate(-999.0), heating_supply_air_flow_rate_per_floor_area(-999.0),
-          heating_fraction_of_autosized_heating_supply_air_flow_rate(-999.0), heating_supply_air_flow_rate_per_unit_of_capacity(-999.0),
-          no_load_supply_air_flow_rate(-999.0), no_load_supply_air_flow_rate_per_floor_area(-999.0),
-          no_load_fraction_of_autosized_cooling_supply_air_flow_rate(-999.0), no_load_fraction_of_autosized_heating_supply_air_flow_rate(-999.0),
+          cooling_supply_air_flow_rate_per_unit_of_capacity(-999.0), heating_supply_air_flow_rate(-999.0),
+          heating_supply_air_flow_rate_per_floor_area(-999.0), heating_fraction_of_autosized_heating_supply_air_flow_rate(-999.0),
+          heating_supply_air_flow_rate_per_unit_of_capacity(-999.0), no_load_supply_air_flow_rate(-999.0),
+          no_load_supply_air_flow_rate_per_floor_area(-999.0), no_load_fraction_of_autosized_cooling_supply_air_flow_rate(-999.0),
+          no_load_fraction_of_autosized_heating_supply_air_flow_rate(-999.0),
           no_load_supply_air_flow_rate_per_unit_of_capacity_during_cooling_operation(-999.0),
           no_load_supply_air_flow_rate_per_unit_of_capacity_during_heating_operation(-999.0), maximum_supply_air_temperature(80.0),
           maximum_outdoor_dry_bulb_temperature_for_supplemental_heater_operation(21.0), maximum_cycling_rate(2.5), heat_pump_time_constant(60.0),
@@ -170,15 +171,15 @@ namespace UnitarySystems {
           m_SensibleLoadMet(0.0), m_LatentLoadMet(0.0), m_MyStagedFlag(false), m_SensibleLoadPredicted(0.0), m_MoistureLoadPredicted(0.0),
           m_FaultyCoilSATFlag(false), m_FaultyCoilSATIndex(0), m_FaultyCoilSATOffset(0.0), m_TESOpMode(0), m_initLoadBasedControlAirLoopPass(false),
           m_airLoopPassCounter(0), m_airLoopReturnCounter(0), m_FanCompNotSetYet(true), m_CoolCompNotSetYet(true), m_HeatCompNotSetYet(true),
-          m_SuppCompNotSetYet(true), m_OKToPrintSizing(false), m_SmallLoadTolerance(5.0), UnitarySystemType_Num(0), MaxIterIndex(0),
-          RegulaFalsiFailedIndex(0), NodeNumOfControlledZone(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0), HeatCoilWaterFlowRatio(0.0),
-          ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0),
-          DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0), MaxCoolCoilFluidFlow(0.0),
-          MaxHeatCoilFluidFlow(0.0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0),
-          CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0),
-          HeatCoilBranchNum(0), HeatCoilCompNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0),
-          HeatCoilOutletNodeNum(0), ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0), m_CompPointerMSHP(nullptr),
-          LoadSHR(0.0), CoilSHR(0.0)
+          m_SuppCompNotSetYet(true), m_OKToPrintSizing(false), m_SmallLoadTolerance(5.0), m_setupOutputVars(false), UnitarySystemType_Num(0),
+          MaxIterIndex(0), RegulaFalsiFailedIndex(0), NodeNumOfControlledZone(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0),
+          HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0),
+          MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0),
+          MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0),
+          CoolCoilLoopNum(0), CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0),
+          HeatCoilLoopSide(0), HeatCoilBranchNum(0), HeatCoilCompNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0),
+          HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0), ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0),
+          m_CompPointerMSHP(nullptr), LoadSHR(0.0), CoilSHR(0.0)
     {
     }
 
@@ -2898,8 +2899,12 @@ namespace UnitarySystems {
         //    UnitarySystemNumericFields.deallocate(); // remove temporary array for field names at end of sizing
     }
 
-    void UnitarySys::processInputSpec(
-        EnergyPlusData &state, const UnitarySysInputSpec &input_data, int sysNum, bool &errorsFound, bool const ZoneEquipment, int const ZoneOAUnitNum)
+    void UnitarySys::processInputSpec(EnergyPlusData &state,
+                                      const UnitarySysInputSpec &input_data,
+                                      int sysNum,
+                                      bool &errorsFound,
+                                      bool const ZoneEquipment,
+                                      int const ZoneOAUnitNum)
     {
 
         static std::string const unitarySysHeatPumpPerformanceObjectType("UnitarySystemPerformance:Multispeed");
@@ -2910,26 +2915,26 @@ namespace UnitarySystems {
         std::string loc_AirInNodeName = input_data.air_inlet_node_name;
         if (state.dataUnitarySystems->getInputOnceFlag)
             this->AirInNode = NodeInputManager::GetOnlySingleNode(state,
-                                                                    loc_AirInNodeName,
-                                                                    errorsFound,
-                                                                    cCurrentModuleObject,
-                                                                    thisObjectName,
-                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                    1,
-                                                                    DataLoopNode::ObjectIsParent);
+                                                                  loc_AirInNodeName,
+                                                                  errorsFound,
+                                                                  cCurrentModuleObject,
+                                                                  thisObjectName,
+                                                                  DataLoopNode::NodeFluidType::Air,
+                                                                  DataLoopNode::NodeConnectionType::Inlet,
+                                                                  1,
+                                                                  DataLoopNode::ObjectIsParent);
 
         std::string loc_AirOutNodeName = input_data.air_outlet_node_name;
         if (state.dataUnitarySystems->getInputOnceFlag)
             this->AirOutNode = NodeInputManager::GetOnlySingleNode(state,
-                                                                     loc_AirOutNodeName,
-                                                                     errorsFound,
-                                                                     cCurrentModuleObject,
-                                                                     thisObjectName,
-                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                     1,
-                                                                     DataLoopNode::ObjectIsParent);
+                                                                   loc_AirOutNodeName,
+                                                                   errorsFound,
+                                                                   cCurrentModuleObject,
+                                                                   thisObjectName,
+                                                                   DataLoopNode::NodeFluidType::Air,
+                                                                   DataLoopNode::NodeConnectionType::Outlet,
+                                                                   1,
+                                                                   DataLoopNode::ObjectIsParent);
 
         // these are needed for call from GetOASysNumHeat(Cool)ingCoils
         std::string loc_heatingCoilType = input_data.heating_coil_object_type;
@@ -2953,11 +2958,9 @@ namespace UnitarySystems {
         if (input_data.supplemental_heating_coil_object_type.size() > 0) {
             this->m_SuppCoilExists = true;
         }
-  
-        // Early calls to ATMixer don't have enough info to pass GetInput. Need push_back here, and protect against the next time through.
+
+        // Early calls to ATMixer don't have enough info to pass GetInput. Need to get the data next time through.
         if (sysNum == -1 || !state.dataZoneEquip->ZoneEquipInputsFilled) {
-            //if (sysNum == -1) state.dataUnitarySystems->unitarySys.push_back(thisSys);
-            //continue;
             return;
         }
 
@@ -3141,30 +3144,7 @@ namespace UnitarySystems {
                     // The Node was found among the exhaust nodes, now check that a matching inlet node exists
                     this->m_ZoneInletNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum);
                     this->ControlZoneNum = ControlledZoneNum;
-                    //this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
-                    this->NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode;
-                    TotalFloorAreaOnAirLoop =
-                        state.dataHeatBal->Zone(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ActualZoneNum).FloorArea;
-                    this->m_AirLoopEquipment = false;
-                    if (state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex > 0) {
-                        for (int EquipNum = 1;
-                             EquipNum <= state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                                             .NumOfEquipTypes;
-                             ++EquipNum) {
-                            if ((state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                                     .EquipType_Num(EquipNum) != DataZoneEquipment::ZoneUnitarySys_Num) ||
-                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                                        .EquipName(EquipNum) != thisObjectName)
-                                continue;
-                            this->m_ZoneSequenceCoolingNum =
-                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                                    .CoolingPriority(EquipNum);
-                            this->m_ZoneSequenceHeatingNum =
-                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                                    .HeatingPriority(EquipNum);
-                            break;
-                        }
-                    }
+                    this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
                     ZoneInletNodeFound = searchZoneInletNodesByEquipmentIndex(state, this->AirOutNode, this->ControlZoneNum);
                 }
             } else if (this->ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
@@ -3173,30 +3153,7 @@ namespace UnitarySystems {
                     ZoneEquipmentFound = true;
                     this->m_ZoneInletNode = this->AirOutNode;
                     this->ControlZoneNum = ControlledZoneNum;
-                    //this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
-                    this->NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode;
-                    TotalFloorAreaOnAirLoop =
-                        state.dataHeatBal->Zone(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ActualZoneNum).FloorArea;
-                    this->m_AirLoopEquipment = false;
-                    if (state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex > 0) {
-                        for (int EquipNum = 1;
-                             EquipNum <= state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                                             .NumOfEquipTypes;
-                             ++EquipNum) {
-                            if ((state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                                     .EquipType_Num(EquipNum) != DataZoneEquipment::ZoneUnitarySys_Num) ||
-                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                                        .EquipName(EquipNum) != thisObjectName)
-                                continue;
-                            this->m_ZoneSequenceCoolingNum =
-                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                                    .CoolingPriority(EquipNum);
-                            this->m_ZoneSequenceHeatingNum =
-                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                                    .HeatingPriority(EquipNum);
-                            break;
-                        }
-                    }
+                    this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
                     // The Node was found among the exhaust nodes, now check that a matching inlet node exists
                     ZoneInletNodeFound = searchZoneInletNodesByEquipmentIndex(state, this->AirOutNode, this->ControlZoneNum);
                 }
@@ -3206,30 +3163,7 @@ namespace UnitarySystems {
                     ZoneEquipmentFound = true;
                     this->m_ZoneInletNode = this->ATMixerOutNode;
                     this->ControlZoneNum = ControlledZoneNum;
-                    //this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
-                    this->NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode;
-                    TotalFloorAreaOnAirLoop =
-                        state.dataHeatBal->Zone(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ActualZoneNum).FloorArea;
-                    this->m_AirLoopEquipment = false;
-                    if (state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex > 0) {
-                        for (int EquipNum = 1;
-                             EquipNum <= state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                                             .NumOfEquipTypes;
-                             ++EquipNum) {
-                            if ((state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                                     .EquipType_Num(EquipNum) != DataZoneEquipment::ZoneUnitarySys_Num) ||
-                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                                        .EquipName(EquipNum) != thisObjectName)
-                                continue;
-                            this->m_ZoneSequenceCoolingNum =
-                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                                    .CoolingPriority(EquipNum);
-                            this->m_ZoneSequenceHeatingNum =
-                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                                    .HeatingPriority(EquipNum);
-                            break;
-                        }
-                    }
+                    this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
                     // The Node was found among the exhaust nodes, now check that a matching inlet node exists
                     ZoneInletNodeFound = searchZoneInletNodesByEquipmentIndex(state, this->ATMixerOutNode, this->ControlZoneNum);
                 }
@@ -3363,12 +3297,8 @@ namespace UnitarySystems {
             }
         }
 
-        // if (!AirLoopFound && !ZoneEquipmentFound && !OASysFound && !DataHVACGlobals::GetAirPathDataDone) {
         if (!AirLoopFound && !ZoneEquipmentFound && !OASysFound) {
-            // Unsucessful attempt. Need to push_back here, and protect against the next time through.
-            // If no push back, then memory will be reallocated next time factory is called with next push_back
-            //if (sysNum == -1) state.dataUnitarySystems->unitarySys.push_back(thisSys);
-            //continue; // will this do the trick and avoid protecting everything below here?
+            // Unsucessful attempt to get all input data.
             return;
         } else {
             if (AirLoopFound && (this->m_ZoneInletNode > 0 || this->m_ControlType == ControlType::Setpoint)) {
@@ -3689,8 +3619,7 @@ namespace UnitarySystems {
                 errorsFound = true;
             } else {
 
-                this->m_HeatingCoilIndex =
-                    VariableSpeedCoils::GetCoilIndexVariableSpeed(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
+                this->m_HeatingCoilIndex = VariableSpeedCoils::GetCoilIndexVariableSpeed(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                     errorsFound = true;
@@ -4036,8 +3965,7 @@ namespace UnitarySystems {
                     errFlag = false;
                 }
 
-                this->m_DesignHeatingCapacity =
-                    WaterToAirHeatPumpSimple::GetCoilCapacity(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
+                this->m_DesignHeatingCapacity = WaterToAirHeatPumpSimple::GetCoilCapacity(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                     errorsFound = true;
@@ -4046,8 +3974,7 @@ namespace UnitarySystems {
 
                 // Get DX coil air flow rate. Later fields will overwrite this IF input field is present
                 errFlag = false;
-                this->m_MaxHeatAirVolFlow =
-                    WaterToAirHeatPumpSimple::GetCoilAirFlowRate(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
+                this->m_MaxHeatAirVolFlow = WaterToAirHeatPumpSimple::GetCoilAirFlowRate(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
                 if (this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
                 if (errFlag) {
                     ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
@@ -4136,8 +4063,7 @@ namespace UnitarySystems {
                     errFlag = false;
                 }
 
-                UserDefinedComponents::GetUserDefinedCoilIndex(
-                    state, loc_m_HeatingCoilName, this->m_HeatingCoilIndex, errFlag, cCurrentModuleObject);
+                UserDefinedComponents::GetUserDefinedCoilIndex(state, loc_m_HeatingCoilName, this->m_HeatingCoilIndex, errFlag, cCurrentModuleObject);
                 if (this->m_HeatingCoilIndex == 0) {
                     ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
                     ShowContinueError(state, "Illegal Heating Coil Name = " + loc_m_HeatingCoilName);
@@ -4839,8 +4765,7 @@ namespace UnitarySystems {
 
                     // Set fan info
                     if (this->m_FanExists) {
-                        VariableSpeedCoils::setVarSpeedFanInfo(
-                            state, this->m_CoolingCoilIndex, loc_m_FanName, this->m_FanIndex, this->m_FanType_Num);
+                        VariableSpeedCoils::setVarSpeedFanInfo(state, this->m_CoolingCoilIndex, loc_m_FanName, this->m_FanIndex, this->m_FanType_Num);
                     }
                 }
 
@@ -5480,8 +5405,7 @@ namespace UnitarySystems {
 
                     // Get the Heating Coil water Inlet or control Node number
                     errFlag = false;
-                    this->m_SuppCoilFluidInletNode =
-                        WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", loc_m_SuppHeatCoilName, errFlag);
+                    this->m_SuppCoilFluidInletNode = WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", loc_m_SuppHeatCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                         errorsFound = true;
@@ -5489,8 +5413,7 @@ namespace UnitarySystems {
 
                     // Get the ReHeat Coil hot water max volume flow rate
                     errFlag = false;
-                    this->m_MaxSuppCoilFluidFlow =
-                        WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", loc_m_SuppHeatCoilName, errFlag);
+                    this->m_MaxSuppCoilFluidFlow = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", loc_m_SuppHeatCoilName, errFlag);
                     if (this->m_MaxSuppCoilFluidFlow == DataSizing::AutoSize) {
                         this->m_RequestAutoSize = true;
                         this->m_DesignSuppHeatingCapacity = DataSizing::AutoSize;
@@ -5538,8 +5461,7 @@ namespace UnitarySystems {
 
                     // Get the Heating Coil steam inlet node number
                     errFlag = false;
-                    this->m_SuppCoilFluidInletNode =
-                        SteamCoils::GetCoilSteamInletNode(state, "Coil:Heating:Steam", loc_m_SuppHeatCoilName, errFlag);
+                    this->m_SuppCoilFluidInletNode = SteamCoils::GetCoilSteamInletNode(state, "Coil:Heating:Steam", loc_m_SuppHeatCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                         errorsFound = true;
@@ -5556,8 +5478,7 @@ namespace UnitarySystems {
                         Real64 TempSteamIn = 100.0;
                         Real64 SteamDensity =
                             FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, "getUnitarySystemInputData");
-                        this->m_MaxSuppCoilFluidFlow =
-                            SteamCoils::GetCoilMaxSteamFlowRate(state, this->m_SuppHeatCoilIndex, errFlag) * SteamDensity;
+                        this->m_MaxSuppCoilFluidFlow = SteamCoils::GetCoilMaxSteamFlowRate(state, this->m_SuppHeatCoilIndex, errFlag) * SteamDensity;
                     }
 
                     // Get the Heating Coil Inlet Node
@@ -6570,14 +6491,14 @@ namespace UnitarySystems {
         } else {
             if (loc_condenserInletNodeName != "") {
                 this->m_CondenserNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                                 loc_condenserInletNodeName,
-                                                                                 errFlag,
-                                                                                 cCurrentModuleObject,
-                                                                                 thisObjectName,
-                                                                                 DataLoopNode::NodeFluidType::Air,
-                                                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                                                 1,
-                                                                                 DataLoopNode::ObjectIsParent);
+                                                                               loc_condenserInletNodeName,
+                                                                               errFlag,
+                                                                               cCurrentModuleObject,
+                                                                               thisObjectName,
+                                                                               DataLoopNode::NodeFluidType::Air,
+                                                                               DataLoopNode::NodeConnectionType::Inlet,
+                                                                               1,
+                                                                               DataLoopNode::ObjectIsParent);
             } else {
                 // do nothing?
             }
@@ -6610,23 +6531,23 @@ namespace UnitarySystems {
             errFlag = false;
             if (loc_heatRecoveryInletNodeName != "" && loc_heatRecoveryOutletNodeName != "") {
                 this->m_HeatRecoveryInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                                         loc_heatRecoveryInletNodeName,
-                                                                                         errFlag,
-                                                                                         cCurrentModuleObject,
-                                                                                         thisObjectName,
-                                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                                         3,
-                                                                                         DataLoopNode::ObjectIsNotParent);
+                                                                                       loc_heatRecoveryInletNodeName,
+                                                                                       errFlag,
+                                                                                       cCurrentModuleObject,
+                                                                                       thisObjectName,
+                                                                                       DataLoopNode::NodeFluidType::Water,
+                                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                                       3,
+                                                                                       DataLoopNode::ObjectIsNotParent);
                 this->m_HeatRecoveryOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                                          loc_heatRecoveryOutletNodeName,
-                                                                                          errFlag,
-                                                                                          cCurrentModuleObject,
-                                                                                          thisObjectName,
-                                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                                          3,
-                                                                                          DataLoopNode::ObjectIsNotParent);
+                                                                                        loc_heatRecoveryOutletNodeName,
+                                                                                        errFlag,
+                                                                                        cCurrentModuleObject,
+                                                                                        thisObjectName,
+                                                                                        DataLoopNode::NodeFluidType::Water,
+                                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                                        3,
+                                                                                        DataLoopNode::ObjectIsNotParent);
 
                 BranchNodeConnections::TestCompSet(state,
                                                    cCurrentModuleObject,
@@ -6881,8 +6802,6 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
         }
-
-
     }
 
     void UnitarySys::getUnitarySystemInputData(
@@ -6990,7 +6909,7 @@ namespace UnitarySystems {
                 }
                 if (fields.find("supplemental_heating_coil_object_type") != fields.end()) { // not required field
                     input_spec.supplemental_heating_coil_object_type =
-                       UtilityRoutines::MakeUPPERCase(fields.at("supplemental_heating_coil_object_type"));
+                        UtilityRoutines::MakeUPPERCase(fields.at("supplemental_heating_coil_object_type"));
                 }
                 if (fields.find("supplemental_heating_coil_name") != fields.end()) { // not required field
                     input_spec.supplemental_heating_coil_name = UtilityRoutines::MakeUPPERCase(fields.at("supplemental_heating_coil_name"));
@@ -7010,7 +6929,8 @@ namespace UnitarySystems {
                     input_spec.cooling_supply_air_flow_rate_per_floor_area = fields.at("cooling_supply_air_flow_rate_per_floor_area");
                 }
                 if (fields.find("cooling_fraction_of_autosized_cooling_supply_air_flow_rate") != fields.end()) { // not required field
-                    input_spec.cooling_fraction_of_autosized_cooling_supply_air_flow_rate = fields.at("cooling_fraction_of_autosized_cooling_supply_air_flow_rate");
+                    input_spec.cooling_fraction_of_autosized_cooling_supply_air_flow_rate =
+                        fields.at("cooling_fraction_of_autosized_cooling_supply_air_flow_rate");
                 }
                 if (fields.find("cooling_supply_air_flow_rate_per_unit_of_capacity") != fields.end()) { // not required field
                     input_spec.cooling_supply_air_flow_rate_per_unit_of_capacity = fields.at("cooling_supply_air_flow_rate_per_unit_of_capacity");
@@ -7123,391 +7043,398 @@ namespace UnitarySystems {
                         UtilityRoutines::MakeUPPERCase(fields.at("design_specification_multispeed_object_name"));
                 }
 
-                thisSys.processInputSpec(state, input_spec, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);        
+                thisSys.processInputSpec(state, input_spec, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
 
                 if (sysNum == -1) {
                     state.dataUnitarySystems->unitarySys.push_back(thisSys);
+                    thisSys.m_setupOutputVars = true;
                 } else {
                     state.dataUnitarySystems->unitarySys[sysNum] = thisSys;
+                    thisSys.m_setupOutputVars = false;
                 }
 
                 if (sysNum == -1) sysNum = getUnitarySystemIndex(state, thisObjectName);
 
-                // Setup Report variables for the Unitary System that are not reported in the components themselves
-                //                if (GetUnitarySystemDoOnlyOnceFlag) {
-                //                    for (UnitarySysNum = 1; UnitarySysNum <= NumUnitarySystem; ++UnitarySysNum) {
-                SetupOutputVariable(state,
-                                    "Unitary System Part Load Ratio",
-                                    OutputProcessor::Unit::None,
-                                    state.dataUnitarySystems->unitarySys[sysNum].m_PartLoadFrac,
-                                    "System",
-                                    "Average",
-                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
-                SetupOutputVariable(state,
-                                    "Unitary System Total Cooling Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataUnitarySystems->unitarySys[sysNum].m_TotCoolEnergyRate,
-                                    "System",
-                                    "Average",
-                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
-                SetupOutputVariable(state,
-                                    "Unitary System Sensible Cooling Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataUnitarySystems->unitarySys[sysNum].m_SensCoolEnergyRate,
-                                    "System",
-                                    "Average",
-                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
-                SetupOutputVariable(state,
-                                    "Unitary System Latent Cooling Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataUnitarySystems->unitarySys[sysNum].m_LatCoolEnergyRate,
-                                    "System",
-                                    "Average",
-                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
-                SetupOutputVariable(state,
-                                    "Unitary System Total Heating Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataUnitarySystems->unitarySys[sysNum].m_TotHeatEnergyRate,
-                                    "System",
-                                    "Average",
-                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
-                SetupOutputVariable(state,
-                                    "Unitary System Sensible Heating Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataUnitarySystems->unitarySys[sysNum].m_SensHeatEnergyRate,
-                                    "System",
-                                    "Average",
-                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
-                SetupOutputVariable(state,
-                                    "Unitary System Latent Heating Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataUnitarySystems->unitarySys[sysNum].m_LatHeatEnergyRate,
-                                    "System",
-                                    "Average",
-                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
-                SetupOutputVariable(state,
-                                    "Unitary System Ancillary Electricity Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataUnitarySystems->unitarySys[sysNum].m_TotalAuxElecPower,
-                                    "System",
-                                    "Average",
-                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
-                if (state.dataUnitarySystems->unitarySys[sysNum].m_CoolCoilExists) {
-                    SetupOutputVariable(state,
-                                        "Unitary System Cooling Ancillary Electricity Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataUnitarySystems->unitarySys[sysNum].m_CoolingAuxElecConsumption,
-                                        "System",
-                                        "Sum",
-                                        state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                        _,
-                                        "Electricity",
-                                        "Cooling",
-                                        _,
-                                        "System");
-                }
-                if (state.dataUnitarySystems->unitarySys[sysNum].m_HeatCoilExists || state.dataUnitarySystems->unitarySys[sysNum].m_SuppCoilExists) {
-                    SetupOutputVariable(state,
-                                        "Unitary System Heating Ancillary Electricity Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataUnitarySystems->unitarySys[sysNum].m_HeatingAuxElecConsumption,
-                                        "System",
-                                        "Sum",
-                                        state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                        _,
-                                        "Electricity",
-                                        "Heating",
-                                        _,
-                                        "System");
-                }
+                if (thisSys.m_setupOutputVars) {
 
-                SetupOutputVariable(state,
-                                    "Unitary System Electricity Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataUnitarySystems->unitarySys[sysNum].m_ElecPower,
-                                    "System",
-                                    "Average",
-                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
-                SetupOutputVariable(state,
-                                    "Unitary System Electricity Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataUnitarySystems->unitarySys[sysNum].m_ElecPowerConsumption,
-                                    "System",
-                                    "Sum",
-                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
-
-                // report predicted load as determined by Unitary System for load control only
-                if (state.dataUnitarySystems->unitarySys[sysNum].m_ControlType != ControlType::Setpoint) {
+                    // Setup Report variables for the Unitary System that are not reported in the components themselves
+                    //                if (GetUnitarySystemDoOnlyOnceFlag) {
+                    //                    for (UnitarySysNum = 1; UnitarySysNum <= NumUnitarySystem; ++UnitarySysNum) {
                     SetupOutputVariable(state,
-                                        "Unitary System Predicted Sensible Load to Setpoint Heat Transfer Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataUnitarySystems->unitarySys[sysNum].m_SensibleLoadPredicted,
-                                        "System",
-                                        "Average",
-                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
-                    SetupOutputVariable(state,
-                                        "Unitary System Predicted Moisture Load to Setpoint Heat Transfer Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataUnitarySystems->unitarySys[sysNum].m_MoistureLoadPredicted,
-                                        "System",
-                                        "Average",
-                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
-                }
-
-                //        IF(UnitarySystem(UnitarySysNum)%m_DehumidControlType_Num .EQ. dehumidm_ControlType::CoolReheat)THEN
-                SetupOutputVariable(state,
-                                    "Unitary System Dehumidification Induced Heating Demand Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataUnitarySystems->unitarySys[sysNum].m_DehumidInducedHeatingDemandRate,
-                                    "System",
-                                    "Average",
-                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
-                //        END IF
-
-                if (state.dataUnitarySystems->unitarySys[sysNum].m_FanExists) {
-                    SetupOutputVariable(state,
-                                        "Unitary System Fan Part Load Ratio",
+                                        "Unitary System Part Load Ratio",
                                         OutputProcessor::Unit::None,
-                                        state.dataUnitarySystems->unitarySys[sysNum].FanPartLoadRatio,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_PartLoadFrac,
                                         "System",
                                         "Average",
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
-                }
+                    SetupOutputVariable(state,
+                                        "Unitary System Total Cooling Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_TotCoolEnergyRate,
+                                        "System",
+                                        "Average",
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Unitary System Sensible Cooling Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_SensCoolEnergyRate,
+                                        "System",
+                                        "Average",
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Unitary System Latent Cooling Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_LatCoolEnergyRate,
+                                        "System",
+                                        "Average",
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Unitary System Total Heating Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_TotHeatEnergyRate,
+                                        "System",
+                                        "Average",
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Unitary System Sensible Heating Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_SensHeatEnergyRate,
+                                        "System",
+                                        "Average",
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Unitary System Latent Heating Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_LatHeatEnergyRate,
+                                        "System",
+                                        "Average",
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Unitary System Ancillary Electricity Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_TotalAuxElecPower,
+                                        "System",
+                                        "Average",
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    if (state.dataUnitarySystems->unitarySys[sysNum].m_CoolCoilExists) {
+                        SetupOutputVariable(state,
+                                            "Unitary System Cooling Ancillary Electricity Energy",
+                                            OutputProcessor::Unit::J,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_CoolingAuxElecConsumption,
+                                            "System",
+                                            "Sum",
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name,
+                                            _,
+                                            "Electricity",
+                                            "Cooling",
+                                            _,
+                                            "System");
+                    }
+                    if (state.dataUnitarySystems->unitarySys[sysNum].m_HeatCoilExists ||
+                        state.dataUnitarySystems->unitarySys[sysNum].m_SuppCoilExists) {
+                        SetupOutputVariable(state,
+                                            "Unitary System Heating Ancillary Electricity Energy",
+                                            OutputProcessor::Unit::J,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_HeatingAuxElecConsumption,
+                                            "System",
+                                            "Sum",
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name,
+                                            _,
+                                            "Electricity",
+                                            "Heating",
+                                            _,
+                                            "System");
+                    }
 
-                SetupOutputVariable(state,
-                                    "Unitary System Compressor Part Load Ratio",
-                                    OutputProcessor::Unit::None,
-                                    state.dataUnitarySystems->unitarySys[sysNum].m_CompPartLoadRatio,
-                                    "System",
-                                    "Average",
-                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Unitary System Electricity Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_ElecPower,
+                                        "System",
+                                        "Average",
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Unitary System Electricity Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_ElecPowerConsumption,
+                                        "System",
+                                        "Sum",
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
 
-                SetupOutputVariable(state,
-                                    "Unitary System Frost Control Status",
-                                    OutputProcessor::Unit::None,
-                                    state.dataUnitarySystems->unitarySys[sysNum].m_FrostControlStatus,
-                                    "System",
-                                    "Average",
-                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    // report predicted load as determined by Unitary System for load control only
+                    if (state.dataUnitarySystems->unitarySys[sysNum].m_ControlType != ControlType::Setpoint) {
+                        SetupOutputVariable(state,
+                                            "Unitary System Predicted Sensible Load to Setpoint Heat Transfer Rate",
+                                            OutputProcessor::Unit::W,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_SensibleLoadPredicted,
+                                            "System",
+                                            "Average",
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
+                        SetupOutputVariable(state,
+                                            "Unitary System Predicted Moisture Load to Setpoint Heat Transfer Rate",
+                                            OutputProcessor::Unit::W,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_MoistureLoadPredicted,
+                                            "System",
+                                            "Average",
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    }
 
-                {
-                    auto const SELECT_CASE_var(state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num);
-                    if (SELECT_CASE_var == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
-                    } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_MultiSpeedCooling || (SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling)) {
-                        if (state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecActive) {
+                    //        IF(UnitarySystem(UnitarySysNum)%m_DehumidControlType_Num .EQ. dehumidm_ControlType::CoolReheat)THEN
+                    SetupOutputVariable(state,
+                                        "Unitary System Dehumidification Induced Heating Demand Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_DehumidInducedHeatingDemandRate,
+                                        "System",
+                                        "Average",
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    //        END IF
+
+                    if (state.dataUnitarySystems->unitarySys[sysNum].m_FanExists) {
+                        SetupOutputVariable(state,
+                                            "Unitary System Fan Part Load Ratio",
+                                            OutputProcessor::Unit::None,
+                                            state.dataUnitarySystems->unitarySys[sysNum].FanPartLoadRatio,
+                                            "System",
+                                            "Average",
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    }
+
+                    SetupOutputVariable(state,
+                                        "Unitary System Compressor Part Load Ratio",
+                                        OutputProcessor::Unit::None,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_CompPartLoadRatio,
+                                        "System",
+                                        "Average",
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+
+                    SetupOutputVariable(state,
+                                        "Unitary System Frost Control Status",
+                                        OutputProcessor::Unit::None,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_FrostControlStatus,
+                                        "System",
+                                        "Average",
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+
+                    {
+                        auto const SELECT_CASE_var(state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num);
+                        if (SELECT_CASE_var == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
+                        } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                                   (SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling)) {
+                            if (state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecActive) {
+                                SetupOutputVariable(state,
+                                                    "Unitary System Heat Recovery Rate",
+                                                    OutputProcessor::Unit::W,
+                                                    state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryRate,
+                                                    "System",
+                                                    "Average",
+                                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
+                                SetupOutputVariable(state,
+                                                    "Unitary System Heat Recovery Inlet Temperature",
+                                                    OutputProcessor::Unit::C,
+                                                    state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryInletTemp,
+                                                    "System",
+                                                    "Average",
+                                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
+                                SetupOutputVariable(state,
+                                                    "Unitary System Heat Recovery Outlet Temperature",
+                                                    OutputProcessor::Unit::C,
+                                                    state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryOutletTemp,
+                                                    "System",
+                                                    "Average",
+                                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
+                                SetupOutputVariable(state,
+                                                    "Unitary System Heat Recovery Fluid Mass Flow Rate",
+                                                    OutputProcessor::Unit::kg_s,
+                                                    state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryMassFlowRate,
+                                                    "System",
+                                                    "Average",
+                                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
+                                SetupOutputVariable(state,
+                                                    "Unitary System Heat Recovery Energy",
+                                                    OutputProcessor::Unit::J,
+                                                    state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryEnergy,
+                                                    "System",
+                                                    "Sum",
+                                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
+                            }
+                        } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) ||
+                                   (SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling) ||
+                                   (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) ||
+                                   (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) ||
+                                   (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWaterToAirHP)) {
                             SetupOutputVariable(state,
-                                                "Unitary System Heat Recovery Rate",
+                                                "Unitary System Requested Sensible Cooling Rate",
                                                 OutputProcessor::Unit::W,
-                                                state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryRate,
+                                                state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilSensDemand,
                                                 "System",
                                                 "Average",
                                                 state.dataUnitarySystems->unitarySys[sysNum].Name);
                             SetupOutputVariable(state,
-                                                "Unitary System Heat Recovery Inlet Temperature",
-                                                OutputProcessor::Unit::C,
-                                                state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryInletTemp,
+                                                "Unitary System Requested Latent Cooling Rate",
+                                                OutputProcessor::Unit::W,
+                                                state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilLatentDemand,
                                                 "System",
                                                 "Average",
                                                 state.dataUnitarySystems->unitarySys[sysNum].Name);
+                        } else {
+                        }
+                    }
+                    if (state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling &&
+                        state.dataCoilCooingDX->coilCoolingDXs[state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilIndex].SubcoolReheatFlag) {
+                        SetupOutputVariable(state,
+                                            "Unitary System Zone Load Sensible Heat Ratio",
+                                            OutputProcessor::Unit::None,
+                                            state.dataUnitarySystems->unitarySys[sysNum].LoadSHR,
+                                            "System",
+                                            "Average",
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
+                        SetupOutputVariable(state,
+                                            "Unitary System Cooling Coil Load Sensible Heat Ratio",
+                                            OutputProcessor::Unit::None,
+                                            state.dataUnitarySystems->unitarySys[sysNum].CoilSHR,
+                                            "System",
+                                            "Average",
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    }
+
+                    {
+                        auto const SELECT_CASE_var(state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilType_Num);
+                        if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) ||
+                            (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) ||
+                            (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple) ||
+                            (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHP)) {
                             SetupOutputVariable(state,
-                                                "Unitary System Heat Recovery Outlet Temperature",
-                                                OutputProcessor::Unit::C,
-                                                state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryOutletTemp,
+                                                "Unitary System Requested Heating Rate",
+                                                OutputProcessor::Unit::W,
+                                                state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilSensDemand,
                                                 "System",
                                                 "Average",
-                                                state.dataUnitarySystems->unitarySys[sysNum].Name);
-                            SetupOutputVariable(state,
-                                                "Unitary System Heat Recovery Fluid Mass Flow Rate",
-                                                OutputProcessor::Unit::kg_s,
-                                                state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryMassFlowRate,
-                                                "System",
-                                                "Average",
-                                                state.dataUnitarySystems->unitarySys[sysNum].Name);
-                            SetupOutputVariable(state,
-                                                "Unitary System Heat Recovery Energy",
-                                                OutputProcessor::Unit::J,
-                                                state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryEnergy,
-                                                "System",
-                                                "Sum",
                                                 state.dataUnitarySystems->unitarySys[sysNum].Name);
                         }
-                    } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) ||
-                               (SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling) ||
-                               (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) ||
-                               (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) ||
-                               (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWaterToAirHP)) {
-                        SetupOutputVariable(state,
-                                            "Unitary System Requested Sensible Cooling Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilSensDemand,
-                                            "System",
-                                            "Average",
-                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
-                        SetupOutputVariable(state,
-                                            "Unitary System Requested Latent Cooling Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilLatentDemand,
-                                            "System",
-                                            "Average",
-                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
-                    } else {
                     }
-                }
-                if (state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling &&
-                    state.dataCoilCooingDX->coilCoolingDXs[state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilIndex].SubcoolReheatFlag) {
-                    SetupOutputVariable(state,
-                                        "Unitary System Zone Load Sensible Heat Ratio",
-                                        OutputProcessor::Unit::None,
-                                        state.dataUnitarySystems->unitarySys[sysNum].LoadSHR,
-                                        "System",
-                                        "Average",
-                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
-                    SetupOutputVariable(state,
-                                        "Unitary System Cooling Coil Load Sensible Heat Ratio",
-                                        OutputProcessor::Unit::None,
-                                        state.dataUnitarySystems->unitarySys[sysNum].CoilSHR,
-                                        "System",
-                                        "Average",
-                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
-                }
 
-                {
-                    auto const SELECT_CASE_var(state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilType_Num);
-                    if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) ||
-                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) ||
-                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple) ||
-                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHP)) {
+                    if (state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                        state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
+                        state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling ||
+                        state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating ||
+                        state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage ||
+                        state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage) {
                         SetupOutputVariable(state,
-                                            "Unitary System Requested Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilSensDemand,
+                                            "Unitary System DX Coil Cycling Ratio",
+                                            OutputProcessor::Unit::None,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_CycRatio,
+                                            "System",
+                                            "Average",
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
+                        SetupOutputVariable(state,
+                                            "Unitary System DX Coil Speed Ratio",
+                                            OutputProcessor::Unit::None,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_SpeedRatio,
+                                            "System",
+                                            "Average",
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
+                        SetupOutputVariable(state,
+                                            "Unitary System DX Coil Speed Level",
+                                            OutputProcessor::Unit::None,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_SpeedNum,
                                             "System",
                                             "Average",
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
                     }
-                }
 
-                if (state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
-                    state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
-                    state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling ||
-                    state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating ||
-                    state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage ||
-                    state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage) {
-                    SetupOutputVariable(state,
-                                        "Unitary System DX Coil Cycling Ratio",
-                                        OutputProcessor::Unit::None,
-                                        state.dataUnitarySystems->unitarySys[sysNum].m_CycRatio,
-                                        "System",
-                                        "Average",
-                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
-                    SetupOutputVariable(state,
-                                        "Unitary System DX Coil Speed Ratio",
-                                        OutputProcessor::Unit::None,
-                                        state.dataUnitarySystems->unitarySys[sysNum].m_SpeedRatio,
-                                        "System",
-                                        "Average",
-                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
-                    SetupOutputVariable(state,
-                                        "Unitary System DX Coil Speed Level",
-                                        OutputProcessor::Unit::None,
-                                        state.dataUnitarySystems->unitarySys[sysNum].m_SpeedNum,
-                                        "System",
-                                        "Average",
-                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
-                }
+                    if (((state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
+                          state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) &&
+                         state.dataUnitarySystems->unitarySys[sysNum].m_DiscreteSpeedCoolingCoil) ||
+                        (state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater &&
+                         state.dataUnitarySystems->unitarySys[sysNum].m_MultiSpeedHeatingCoil)) {
+                        SetupOutputVariable(state,
+                                            "Unitary System Water Coil Cycling Ratio",
+                                            OutputProcessor::Unit::None,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_CycRatio,
+                                            "System",
+                                            "Average",
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
+                        SetupOutputVariable(state,
+                                            "Unitary System Water Coil Speed Ratio",
+                                            OutputProcessor::Unit::None,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_SpeedRatio,
+                                            "System",
+                                            "Average",
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
+                        SetupOutputVariable(state,
+                                            "Unitary System Water Coil Speed Level",
+                                            OutputProcessor::Unit::None,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_SpeedNum,
+                                            "System",
+                                            "Average",
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    }
 
-                if (((state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
-                      state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) &&
-                     state.dataUnitarySystems->unitarySys[sysNum].m_DiscreteSpeedCoolingCoil) ||
-                    (state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater &&
-                     state.dataUnitarySystems->unitarySys[sysNum].m_MultiSpeedHeatingCoil)) {
-                    SetupOutputVariable(state,
-                                        "Unitary System Water Coil Cycling Ratio",
-                                        OutputProcessor::Unit::None,
-                                        state.dataUnitarySystems->unitarySys[sysNum].m_CycRatio,
-                                        "System",
-                                        "Average",
-                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
-                    SetupOutputVariable(state,
-                                        "Unitary System Water Coil Speed Ratio",
-                                        OutputProcessor::Unit::None,
-                                        state.dataUnitarySystems->unitarySys[sysNum].m_SpeedRatio,
-                                        "System",
-                                        "Average",
-                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
-                    SetupOutputVariable(state,
-                                        "Unitary System Water Coil Speed Level",
-                                        OutputProcessor::Unit::None,
-                                        state.dataUnitarySystems->unitarySys[sysNum].m_SpeedNum,
-                                        "System",
-                                        "Average",
-                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                        SetupEMSActuator(state,
+                                         "UnitarySystem",
+                                         state.dataUnitarySystems->unitarySys[sysNum].Name,
+                                         "Autosized Supply Air Flow Rate",
+                                         "[m3/s]",
+                                         state.dataUnitarySystems->unitarySys[sysNum].m_DesignFanVolFlowRateEMSOverrideOn,
+                                         state.dataUnitarySystems->unitarySys[sysNum].m_DesignFanVolFlowRateEMSOverrideValue);
+                        SetupEMSActuator(state,
+                                         "UnitarySystem",
+                                         state.dataUnitarySystems->unitarySys[sysNum].Name,
+                                         "Autosized Supply Air Flow Rate During Cooling Operation",
+                                         "[m3/s]",
+                                         state.dataUnitarySystems->unitarySys[sysNum].m_MaxCoolAirVolFlowEMSOverrideOn,
+                                         state.dataUnitarySystems->unitarySys[sysNum].m_MaxCoolAirVolFlowEMSOverrideValue);
+                        SetupEMSActuator(state,
+                                         "UnitarySystem",
+                                         state.dataUnitarySystems->unitarySys[sysNum].Name,
+                                         "Autosized Supply Air Flow Rate During Heating Operation",
+                                         "[m3/s]",
+                                         state.dataUnitarySystems->unitarySys[sysNum].m_MaxHeatAirVolFlowEMSOverrideOn,
+                                         state.dataUnitarySystems->unitarySys[sysNum].m_MaxHeatAirVolFlowEMSOverrideValue);
+                        SetupEMSActuator(state,
+                                         "UnitarySystem",
+                                         state.dataUnitarySystems->unitarySys[sysNum].Name,
+                                         "Autosized Supply Air Flow Rate During No Heating or Cooling Operation",
+                                         "[m3/s]",
+                                         state.dataUnitarySystems->unitarySys[sysNum].m_MaxNoCoolHeatAirVolFlowEMSOverrideOn,
+                                         state.dataUnitarySystems->unitarySys[sysNum].m_MaxNoCoolHeatAirVolFlowEMSOverrideValue);
+                    }
+                    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                        SetupEMSInternalVariable(state,
+                                                 "Unitary System Control Zone Mass Flow Fraction",
+                                                 state.dataUnitarySystems->unitarySys[sysNum].Name,
+                                                 "[]",
+                                                 state.dataUnitarySystems->unitarySys[sysNum].ControlZoneMassFlowFrac);
+                        SetupEMSInternalVariable(state,
+                                                 "Unitary HVAC Design Heating Capacity",
+                                                 state.dataUnitarySystems->unitarySys[sysNum].Name,
+                                                 "[W]",
+                                                 state.dataUnitarySystems->unitarySys[sysNum].m_DesignHeatingCapacity);
+                        SetupEMSInternalVariable(state,
+                                                 "Unitary HVAC Design Cooling Capacity",
+                                                 state.dataUnitarySystems->unitarySys[sysNum].Name,
+                                                 "[W]",
+                                                 state.dataUnitarySystems->unitarySys[sysNum].m_DesignCoolingCapacity);
+                        SetupEMSActuator(state,
+                                         "Unitary HVAC",
+                                         state.dataUnitarySystems->unitarySys[sysNum].Name,
+                                         "Sensible Load Request",
+                                         "[W]",
+                                         state.dataUnitarySystems->unitarySys[sysNum].m_EMSOverrideSensZoneLoadRequest,
+                                         state.dataUnitarySystems->unitarySys[sysNum].m_EMSSensibleZoneLoadValue);
+                        SetupEMSActuator(state,
+                                         "Unitary HVAC",
+                                         state.dataUnitarySystems->unitarySys[sysNum].Name,
+                                         "Moisture Load Request",
+                                         "[W]",
+                                         state.dataUnitarySystems->unitarySys[sysNum].m_EMSOverrideMoistZoneLoadRequest,
+                                         state.dataUnitarySystems->unitarySys[sysNum].m_EMSMoistureZoneLoadValue);
+                    }
+                    // can this be called each time a system is gotten?
+                    bool anyEMSRan;
+                    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::ComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
                 }
-
-                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                    SetupEMSActuator(state,
-                                     "UnitarySystem",
-                                     state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                     "Autosized Supply Air Flow Rate",
-                                     "[m3/s]",
-                                     state.dataUnitarySystems->unitarySys[sysNum].m_DesignFanVolFlowRateEMSOverrideOn,
-                                     state.dataUnitarySystems->unitarySys[sysNum].m_DesignFanVolFlowRateEMSOverrideValue);
-                    SetupEMSActuator(state,
-                                     "UnitarySystem",
-                                     state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                     "Autosized Supply Air Flow Rate During Cooling Operation",
-                                     "[m3/s]",
-                                     state.dataUnitarySystems->unitarySys[sysNum].m_MaxCoolAirVolFlowEMSOverrideOn,
-                                     state.dataUnitarySystems->unitarySys[sysNum].m_MaxCoolAirVolFlowEMSOverrideValue);
-                    SetupEMSActuator(state,
-                                     "UnitarySystem",
-                                     state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                     "Autosized Supply Air Flow Rate During Heating Operation",
-                                     "[m3/s]",
-                                     state.dataUnitarySystems->unitarySys[sysNum].m_MaxHeatAirVolFlowEMSOverrideOn,
-                                     state.dataUnitarySystems->unitarySys[sysNum].m_MaxHeatAirVolFlowEMSOverrideValue);
-                    SetupEMSActuator(state,
-                                     "UnitarySystem",
-                                     state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                     "Autosized Supply Air Flow Rate During No Heating or Cooling Operation",
-                                     "[m3/s]",
-                                     state.dataUnitarySystems->unitarySys[sysNum].m_MaxNoCoolHeatAirVolFlowEMSOverrideOn,
-                                     state.dataUnitarySystems->unitarySys[sysNum].m_MaxNoCoolHeatAirVolFlowEMSOverrideValue);
-                }
-                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                    SetupEMSInternalVariable(state,
-                                             "Unitary System Control Zone Mass Flow Fraction",
-                                             state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                             "[]",
-                                             state.dataUnitarySystems->unitarySys[sysNum].ControlZoneMassFlowFrac);
-                    SetupEMSInternalVariable(state,
-                                             "Unitary HVAC Design Heating Capacity",
-                                             state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                             "[W]",
-                                             state.dataUnitarySystems->unitarySys[sysNum].m_DesignHeatingCapacity);
-                    SetupEMSInternalVariable(state,
-                                             "Unitary HVAC Design Cooling Capacity",
-                                             state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                             "[W]",
-                                             state.dataUnitarySystems->unitarySys[sysNum].m_DesignCoolingCapacity);
-                    SetupEMSActuator(state,
-                                     "Unitary HVAC",
-                                     state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                     "Sensible Load Request",
-                                     "[W]",
-                                     state.dataUnitarySystems->unitarySys[sysNum].m_EMSOverrideSensZoneLoadRequest,
-                                     state.dataUnitarySystems->unitarySys[sysNum].m_EMSSensibleZoneLoadValue);
-                    SetupEMSActuator(state,
-                                     "Unitary HVAC",
-                                     state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                     "Moisture Load Request",
-                                     "[W]",
-                                     state.dataUnitarySystems->unitarySys[sysNum].m_EMSOverrideMoistZoneLoadRequest,
-                                     state.dataUnitarySystems->unitarySys[sysNum].m_EMSMoistureZoneLoadValue);
-                }
-                // can this be called each time a system is gotten?
-                bool anyEMSRan;
-                EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::ComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
             }
         }
     }
@@ -16949,31 +16876,31 @@ namespace UnitarySystems {
         return false;
     }
 
-    //void setSystemParams(EnergyPlusData &state, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName)
-    //{
-    //    this->NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode;
-    //    TotalFloorAreaOnAirLoop = state.dataHeatBal->Zone(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ActualZoneNum).FloorArea;
-    //    this->m_AirLoopEquipment = false;
-    //    if (state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex > 0) {
-    //        for (int EquipNum = 1;
-    //             EquipNum <=
-    //             state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex).NumOfEquipTypes;
-    //             ++EquipNum) {
-    //            if ((state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-    //                     .EquipType_Num(EquipNum) != DataZoneEquipment::ZoneUnitarySys_Num) ||
-    //                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-    //                        .EquipName(EquipNum) != thisObjectName)
-    //                continue;
-    //            this->m_ZoneSequenceCoolingNum =
-    //                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-    //                    .CoolingPriority(EquipNum);
-    //            this->m_ZoneSequenceHeatingNum =
-    //                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-    //                    .HeatingPriority(EquipNum);
-    //            break;
-    //        }
-    //    }
-    //}
+     void UnitarySys::setSystemParams(EnergyPlusData &state, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName)
+    {
+        this->NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode;
+        TotalFloorAreaOnAirLoop = state.dataHeatBal->Zone(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ActualZoneNum).FloorArea;
+        this->m_AirLoopEquipment = false;
+        if (state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex > 0) {
+            for (int EquipNum = 1;
+                 EquipNum <=
+                 state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex).NumOfEquipTypes;
+                 ++EquipNum) {
+                if ((state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
+                         .EquipType_Num(EquipNum) != DataZoneEquipment::ZoneUnitarySys_Num) ||
+                    state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
+                            .EquipName(EquipNum) != thisObjectName)
+                    continue;
+                this->m_ZoneSequenceCoolingNum =
+                    state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
+                        .CoolingPriority(EquipNum);
+                this->m_ZoneSequenceHeatingNum =
+                    state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
+                        .HeatingPriority(EquipNum);
+                break;
+            }
+        }
+    }
 
     bool searchTotalComponents(EnergyPlusData &state, std::string objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex)
     {

@@ -63,7 +63,7 @@ struct EnergyPlusData;
 
 namespace UnitarySystems {
 
-struct UnitarySysInputSpec
+    struct UnitarySysInputSpec
     {
         std::string name;
         std::string control_type;
@@ -400,6 +400,7 @@ struct UnitarySysInputSpec
         bool m_SuppCompNotSetYet;
         bool m_OKToPrintSizing;
         Real64 m_SmallLoadTolerance;
+        bool m_setupOutputVars;
 
     public:
         // SZVAV variables
@@ -520,7 +521,7 @@ struct UnitarySysInputSpec
                               bool const ZoneEquipment,
                               int const ZoneOAUnitNum);
 
-        //void setSystemParams(EnergyPlusData &state, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
+        void setSystemParams(EnergyPlusData &state, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
 
         static Real64 DOE2DXCoilResidual(EnergyPlusData &state,
                                          Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
@@ -877,7 +878,7 @@ struct UnitarySysInputSpec
     bool searchZoneInletNodesByEquipmentIndex(EnergyPlusData &state, int nodeToFind, int zoneEquipmentIndex);
     bool searchZoneInletNodeAirLoopNum(EnergyPlusData &state, int airLoopNumToFind, int ZoneEquipConfigIndex, int &InletNodeIndex);
     bool searchExhaustNodes(EnergyPlusData &state, const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex);
-    //void setSystemParams(EnergyPlusData &state, UnitarySys &thisSys, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
+    // void setSystemParams(EnergyPlusData &state, UnitarySys &thisSys, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
     bool searchTotalComponents(EnergyPlusData &state, std::string objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex);
 
 } // namespace UnitarySystems
