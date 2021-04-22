@@ -63,6 +63,69 @@ struct EnergyPlusData;
 
 namespace UnitarySystems {
 
+struct UnitarySysInputSpec
+    {
+        std::string name;
+        std::string control_type;
+        std::string controlling_zone_or_thermostat_location;
+        std::string dehumidification_control_type;
+        std::string availability_schedule_name;
+        std::string air_inlet_node_name;
+        std::string air_outlet_node_name;
+        std::string supply_fan_object_type;
+        std::string supply_fan_name;
+        std::string fan_placement;
+        std::string supply_air_fan_operating_mode_schedule_name;
+        std::string heating_coil_object_type;
+        std::string heating_coil_name;
+        Real64 dx_heating_coil_sizing_ratio;
+        std::string cooling_coil_object_type;
+        std::string cooling_coil_name;
+        std::string use_doas_dx_cooling_coil;
+        Real64 minimum_supply_air_temperature;
+        std::string latent_load_control;
+        std::string supplemental_heating_coil_object_type;
+        std::string supplemental_heating_coil_name;
+        std::string cooling_supply_air_flow_rate_method;
+        Real64 cooling_supply_air_flow_rate;
+        Real64 cooling_supply_air_flow_rate_per_floor_area;
+        Real64 cooling_fraction_of_autosized_cooling_supply_air_flow_rate;
+        Real64 cooling_supply_air_flow_rate_per_unit_of_capacity;
+        std::string heating_supply_air_flow_rate_method;
+        Real64 heating_supply_air_flow_rate;
+        Real64 heating_supply_air_flow_rate_per_floor_area;
+        Real64 heating_fraction_of_autosized_heating_supply_air_flow_rate;
+        Real64 heating_supply_air_flow_rate_per_unit_of_capacity;
+        std::string no_load_supply_air_flow_rate_method;
+        Real64 no_load_supply_air_flow_rate;
+        Real64 no_load_supply_air_flow_rate_per_floor_area;
+        Real64 no_load_fraction_of_autosized_cooling_supply_air_flow_rate;
+        Real64 no_load_fraction_of_autosized_heating_supply_air_flow_rate;
+        Real64 no_load_supply_air_flow_rate_per_unit_of_capacity_during_cooling_operation;
+        Real64 no_load_supply_air_flow_rate_per_unit_of_capacity_during_heating_operation;
+        Real64 maximum_supply_air_temperature;
+        Real64 maximum_outdoor_dry_bulb_temperature_for_supplemental_heater_operation;
+        std::string outdoor_dry_bulb_temperature_sensor_node_name;
+        Real64 maximum_cycling_rate;
+        Real64 heat_pump_time_constant;
+        Real64 fraction_of_on_cycle_power_use;
+        Real64 heat_pump_fan_delay_time;
+        Real64 ancillary_on_cycle_electric_power;
+        Real64 ancillary_off_cycle_electric_power;
+        Real64 design_heat_recovery_water_flow_rate;
+        Real64 maximum_temperature_for_heat_recovery;
+        std::string heat_recovery_water_inlet_node_name;
+        std::string heat_recovery_water_outlet_node_name;
+        std::string design_specification_multispeed_object_type;
+        std::string design_specification_multispeed_object_name;
+
+        UnitarySysInputSpec();
+
+        ~UnitarySysInputSpec()
+        {
+        }
+    };
+
     struct DesignSpecMSHP
     {
         // friend class UnitarySys;
@@ -122,8 +185,7 @@ namespace UnitarySystems {
             UseCompressorOffFlow // set compressor OFF air flow rate equal to user defined value
         };
 
-        // friend class DesignSpecMSHP;
-
+        UnitarySysInputSpec original_input_specs;
         int m_UnitarySysNum;
         int m_unitarySystemType_Num;
         bool m_ThisSysInputShouldBeGotten;
@@ -450,6 +512,15 @@ namespace UnitarySystems {
         WarnMessages warnIndex;
 
         static void getUnitarySystemInput(EnergyPlusData &state, std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum);
+
+        void processInputSpec(EnergyPlusData &state,
+                              const UnitarySysInputSpec &input_data,
+                              int sysNum,
+                              bool errorsFound,
+                              bool const ZoneEquipment,
+                              int const ZoneOAUnitNum);
+
+        //void setSystemParams(EnergyPlusData &state, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
 
         static Real64 DOE2DXCoilResidual(EnergyPlusData &state,
                                          Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
@@ -806,7 +877,7 @@ namespace UnitarySystems {
     bool searchZoneInletNodesByEquipmentIndex(EnergyPlusData &state, int nodeToFind, int zoneEquipmentIndex);
     bool searchZoneInletNodeAirLoopNum(EnergyPlusData &state, int airLoopNumToFind, int ZoneEquipConfigIndex, int &InletNodeIndex);
     bool searchExhaustNodes(EnergyPlusData &state, const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex);
-    void setSystemParams(EnergyPlusData &state, UnitarySys &thisSys, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
+    //void setSystemParams(EnergyPlusData &state, UnitarySys &thisSys, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
     bool searchTotalComponents(EnergyPlusData &state, std::string objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex);
 
 } // namespace UnitarySystems
