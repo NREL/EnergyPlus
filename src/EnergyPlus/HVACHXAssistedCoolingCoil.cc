@@ -1120,7 +1120,7 @@ namespace HVACHXAssistedCoolingCoil {
                 }
 
                 Real64 CoolingSpeedNum = 1; // need to figure out the Cooling Speed number for the HXAssisted
-                Real64 CoolingSpeedRatio = 0.5; // need to figure out the Cooling Speed Ratio for the HXAssisted
+                Real64 CoolingSpeedRatio = 1; // need to figure out the Cooling Speed Ratio for the HXAssisted
                 bool singleMode = true;
                 if (state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].getNumModes() > 1) {
                     singleMode = false;
