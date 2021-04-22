@@ -654,7 +654,7 @@ namespace SolarReflectionManager {
 
                     if (state.dataSolarReflectionManager->HitPtSurfNum > 0) {
                         // Skip rays that hit a daylighting shelf, from which solar reflection is calculated separately.
-                        if (state.dataSurface->Surface(state.dataSolarReflectionManager->HitPtSurfNum).Shelf > 0) continue;
+                        if (state.dataSurface->SurfDaylightingShelfInd(state.dataSolarReflectionManager->HitPtSurfNum) > 0) continue;
 
                         // Skip rays that hit a window
                         // If hit point's surface is a window or glass door go to next ray since it is assumed for now
@@ -1167,7 +1167,7 @@ namespace SolarReflectionManager {
                     if (state.dataSolarReflectionManager->HitPntSurfNum > 0) {
                         // Ray hits an obstruction
                         // Skip hit points on daylighting shelves, from which solar reflection is separately calculated
-                        if (state.dataSurface->Surface(state.dataSolarReflectionManager->HitPntSurfNum).Shelf > 0) continue;
+                        if (state.dataSurface->SurfDaylightingShelfInd(state.dataSolarReflectionManager->HitPntSurfNum) > 0) continue;
                         // Reflected radiance at hit point divided by unobstructed sky diffuse horizontal irradiance
                         state.dataSolarReflectionManager->HitPtSurfNumX = state.dataSolarReflectionManager->HitPntSurfNum;
                         // Each shading surface has a "mirror" duplicate surface facing in the opposite direction.
@@ -1179,7 +1179,7 @@ namespace SolarReflectionManager {
                                     state.dataSurface->Surface(state.dataSolarReflectionManager->HitPntSurfNum).OutNormVec) > 0.0) {
                                 if (state.dataSolarReflectionManager->HitPntSurfNum + 1 < state.dataSurface->TotSurfaces)
                                     state.dataSolarReflectionManager->HitPtSurfNumX = state.dataSolarReflectionManager->HitPntSurfNum + 1;
-                                if (state.dataSurface->Surface(state.dataSolarReflectionManager->HitPtSurfNumX).Shelf > 0) continue;
+                                if (state.dataSurface->SurfDaylightingShelfInd(state.dataSolarReflectionManager->HitPtSurfNumX) > 0) continue;
                             }
                         }
 

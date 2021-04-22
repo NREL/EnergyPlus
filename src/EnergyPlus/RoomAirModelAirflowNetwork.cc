@@ -1083,14 +1083,14 @@ namespace RoomAirModelAirflowNetwork {
             HA = HA + state.dataHeatBal->HConvIn(SurfNum) * Area;
             SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
 
-            if (state.dataSurface->Surface(SurfNum).TAirRef == ZoneMeanAirTemp) {
+            if (state.dataSurface->SurfTAirRef(SurfNum) == ZoneMeanAirTemp) {
                 // The zone air is the reference temperature(which is to be solved for in CorrectZoneAirTemp).
                 RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 SumHA += HA;
-            } else if (state.dataSurface->Surface(SurfNum).TAirRef == AdjacentAirTemp) {
+            } else if (state.dataSurface->SurfTAirRef(SurfNum) == AdjacentAirTemp) {
                 RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
                 SumHATref += HA * RefAirTemp;
-            } else if (state.dataSurface->Surface(SurfNum).TAirRef == ZoneSupplyAirTemp) {
+            } else if (state.dataSurface->SurfTAirRef(SurfNum) == ZoneSupplyAirTemp) {
                 // check whether this zone is a controlled zone or not
                 if (!ControlledZoneAirFlag) {
                     ShowFatalError(state,

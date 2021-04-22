@@ -842,7 +842,7 @@ namespace DaylightingDevices {
                         state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                     }
 
-                    if (state.dataSurface->Surface(SurfNum).Shelf > 0) {
+                    if (state.dataSurface->SurfDaylightingShelfInd(SurfNum) > 0) {
                         ShowSevereError(state,
                                         cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " +
                                             state.dataIPShortCut->cAlphaArgs(2) + " is referenced by more than one shelf.");
@@ -877,7 +877,7 @@ namespace DaylightingDevices {
                     }
 
                     state.dataDaylightingDevicesData->Shelf(ShelfNum).Window = SurfNum;
-                    state.dataSurface->Surface(SurfNum).Shelf = ShelfNum;
+                    state.dataSurface->SurfDaylightingShelfInd(SurfNum) = ShelfNum;
                 }
 
                 // Get inside shelf heat transfer surface (optional)

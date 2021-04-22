@@ -2938,12 +2938,12 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             FirstSurfFlag = true;
             for (SurfNum = Zone(Loop).HTSurfaceFirst; SurfNum <= Zone(Loop).HTSurfaceLast; ++SurfNum) {
                 if (FirstSurfFlag) {
-                    TRefFlag = state.dataSurface->Surface(SurfNum).TAirRef;
+                    TRefFlag = state.dataSurface->SurfTAirRef(SurfNum);
                     FirstSurfFlag = false;
                 }
                 // for each particular zone, the reference air temperature(s) should be the same
                 // (either mean air, bulk air, or supply air temp).
-                if (state.dataSurface->Surface(SurfNum).TAirRef != TRefFlag) {
+                if (state.dataSurface->SurfTAirRef(SurfNum) != TRefFlag) {
                     ShowWarningError(state, "Different reference air temperatures for difference surfaces encountered in zone " + Zone(Loop).Name);
                 }
             }
@@ -6783,7 +6783,7 @@ void CalcZoneSums(EnergyPlusData &state,
 
         // determine reference air temperature for this surface
         {
-            auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNum).TAirRef);
+            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
             if (SELECT_CASE_var == ZoneMeanAirTemp) {
                 // The zone air is the reference temperature (which is to be solved for in CorrectZoneAirTemp).
                 RefAirTemp = MAT(ZoneNum);
@@ -7034,7 +7034,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
         Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
         // determine reference air temperature for this surface's convective heat transfer model
         {
-            auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNum).TAirRef);
+            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
             if (SELECT_CASE_var == ZoneMeanAirTemp) {
                 // The zone air is the reference temperature
                 RefAirTemp = MAT(ZoneNum);

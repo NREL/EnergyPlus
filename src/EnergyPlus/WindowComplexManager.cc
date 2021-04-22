@@ -2768,7 +2768,7 @@ namespace WindowComplexManager {
 
             // determine reference air temperature for this surface
             {
-                auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNum).TAirRef);
+                auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
                     RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 } else if (SELECT_CASE_var == AdjacentAirTemp) {
@@ -2821,7 +2821,7 @@ namespace WindowComplexManager {
 
                 // determine reference air temperature for this surface
                 {
-                    auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNumAdj).TAirRef);
+                    auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNumAdj));
                     if (SELECT_CASE_var == ZoneMeanAirTemp) {
                         RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
                     } else if (SELECT_CASE_var == AdjacentAirTemp) {
@@ -2876,8 +2876,8 @@ namespace WindowComplexManager {
                 // Calculate LWR from surrounding surfaces if defined for an exterior window
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-                    if (state.dataSurface->Surface(SurfNum).HasSurroundingSurfProperties) {
-                        SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurroundingSurfacesNum;
+                    if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
+                        SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
                         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
                             state.dataSurface->Surface(SurfNum).ViewFactorSkyIR =
                                 state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;

@@ -9147,7 +9147,7 @@ namespace AirflowNetworkBalanceManager {
                 ZN2 = state.dataAirflowNetwork->AirflowNetworkNodeData(M).EPlusZoneNum;
                 // Find a linkage from a zone to outdoors
                 if (ZN1 > 0 && ZN2 == 0) {
-                    if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).HasLinkedOutAirNode) {
+                    if (state.dataSurface->SurfHasLinkedOutAirNode(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum)) {
                         Tamb = state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).OutDryBulbTemp;
                         CpAir = PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(
                             state,
@@ -9232,7 +9232,7 @@ namespace AirflowNetworkBalanceManager {
                     }
                 }
                 if (ZN1 == 0 && ZN2 > 0) {
-                    if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).HasLinkedOutAirNode) {
+                    if (state.dataSurface->SurfHasLinkedOutAirNode(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum)) {
                         Tamb = state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).OutDryBulbTemp;
                         CpAir = PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(
                             state,

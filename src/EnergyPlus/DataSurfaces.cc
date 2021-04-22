@@ -298,7 +298,7 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
 
     // determine reference air temperature for this surface
     {
-        const auto SELECT_CASE_var(TAirRef);
+        const auto SELECT_CASE_var(state.dataSurface->SurfTAirRef(t_SurfNum));
         if (SELECT_CASE_var == ZoneMeanAirTemp) {
             RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
         } else if (SELECT_CASE_var == AdjacentAirTemp) {

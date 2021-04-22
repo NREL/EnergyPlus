@@ -1076,15 +1076,17 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataHeatBal->TempEffBulkAir.allocate(3);
     state->dataHeatBalSurf->TempSurfInTmp.allocate(3);
 
+    state->dataSurface->SurfTAirRef.allocate(3);
+    state->dataSurface->SurfTAirRef(1) = ZoneMeanAirTemp;
+    state->dataSurface->SurfTAirRef(2) = AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(3) = ZoneSupplyAirTemp;
+
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(2).HeatTransSurf = true;
     state->dataSurface->Surface(3).HeatTransSurf = true;
     state->dataSurface->Surface(1).Area = 10.0;
     state->dataSurface->Surface(2).Area = 10.0;
     state->dataSurface->Surface(3).Area = 10.0;
-    state->dataSurface->Surface(1).TAirRef = ZoneMeanAirTemp;
-    state->dataSurface->Surface(2).TAirRef = AdjacentAirTemp;
-    state->dataSurface->Surface(3).TAirRef = ZoneSupplyAirTemp;
     state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
     state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
     state->dataHeatBalSurf->TempSurfInTmp(3) = 25.0;

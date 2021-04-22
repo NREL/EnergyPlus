@@ -574,8 +574,8 @@ void GetShadowingInput(EnergyPlusData &state)
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataSurface->Surface(SurfNum).Name + "_shading");
             if (ExtShadingSchedNum) {
-                state.dataSurface->Surface(SurfNum).SchedExternalShadingFrac = true;
-                state.dataSurface->Surface(SurfNum).ExternalShadingSchInd = ExtShadingSchedNum;
+                state.dataSurface->SurfSchedExternalShadingFrac(SurfNum) = true;
+                state.dataSurface->SurfExternalShadingSchInd(SurfNum) = ExtShadingSchedNum;
             } else {
                 ShowWarningError(state,
                                  cCurrentModuleObject + ": sunlit fraction schedule not found for " + state.dataSurface->Surface(SurfNum).Name +
@@ -745,7 +745,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
     int SurfLoop;
     int I;
     int NumOfLayers;
-
+    // TODO - check allocation here
     state.dataSolarShading->CTHETA.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSolarShading->SAREA.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSurface->SurfSunlitArea.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -928,6 +928,11 @@ void AllocateModuleArrays(EnergyPlusData &state)
         state.dataSurface->SurfWinInsRevealDiffIntoZoneReport(SurfNum) = 0.0;
         state.dataSurface->SurfWinInsRevealDiffOntoFrameReport(SurfNum) = 0.0;
         state.dataSurface->SurfWinBmSolAbsdInsRevealReport(SurfNum) = 0.0;
+    }
+
+    state.dataSurface->SurfPenumbraID.allocate(state.dataSurface->TotSurfaces);
+    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        state.dataSurface->SurfPenumbraID(SurfNum) = 0;
     }
 
     DisplayString(state, "Initializing Zone and Enclosure Report Variables");
@@ -4906,9 +4911,9 @@ void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const
     if ((state.dataSysVars->shadingMethod == ShadingMethod::Scheduled || state.dataSysVars->shadingMethod == ShadingMethod::Imported) &&
         !state.dataGlobal->DoingSizing && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (state.dataSurface->Surface(SurfNum).SchedExternalShadingFrac) {
+            if (state.dataSurface->SurfSchedExternalShadingFrac(SurfNum)) {
                 state.dataHeatBal->SunlitFrac(iTimeStep, iHour, SurfNum) =
-                    LookUpScheduleValue(state, state.dataSurface->Surface(SurfNum).ExternalShadingSchInd, iHour, iTimeStep);
+                    LookUpScheduleValue(state, state.dataSurface->SurfExternalShadingSchInd(SurfNum), iHour, iTimeStep);
             } else {
                 state.dataHeatBal->SunlitFrac(iTimeStep, iHour, SurfNum) = 1.0;
             }
@@ -5128,9 +5133,9 @@ void DetermineShadowingCombinations(EnergyPlusData &state)
 
             // Skip interior surfaces if the other side has already been added to penumbra
             if (state.dataSurface->Surface(GRSNR).ExtBoundCond > 0) {
-                if (state.dataSurface->Surface(state.dataSurface->Surface(GRSNR).ExtBoundCond).PenumbraID >= 0) {
-                    state.dataSurface->Surface(GRSNR).PenumbraID =
-                        state.dataSurface->Surface(state.dataSurface->Surface(GRSNR).ExtBoundCond).PenumbraID;
+                if (state.dataSurface->SurfPenumbraID(state.dataSurface->Surface(GRSNR).ExtBoundCond) >= 0) {
+                    state.dataSurface->SurfPenumbraID(GRSNR) =
+                        state.dataSurface->SurfPenumbraID(state.dataSurface->Surface(GRSNR).ExtBoundCond);
                     skipSurface = true;
                 }
             }
@@ -5211,8 +5216,8 @@ void DetermineShadowingCombinations(EnergyPlusData &state)
                         pSurf.addHole(subPoly);
                     }
                 }
-                state.dataSurface->Surface(GRSNR).PenumbraID = state.dataSolarShading->penumbra->addSurface(pSurf);
-                state.dataSolarShading->penumbraIDs.push_back(state.dataSurface->Surface(GRSNR).PenumbraID);
+                state.dataSurface->SurfPenumbraID(GRSNR) = state.dataSolarShading->penumbra->addSurface(pSurf);
+                state.dataSolarShading->penumbraIDs.push_back(state.dataSurface->SurfPenumbraID(GRSNR));
             }
         }
 #endif
@@ -5580,14 +5585,14 @@ void SHADOW(EnergyPlusData &state,
         } else { // Surface in sun and either shading surfaces or subsurfaces present (or both)
 
 #ifndef EP_NO_OPENGL
-            auto id = state.dataSurface->Surface(HTS).PenumbraID;
+            auto id = state.dataSurface->SurfPenumbraID(HTS);
             if (state.dataSolarShading->penumbra && id >= 0) {
                 // SAREA(HTS) = buildingPSSF.at(id) / CTHETA(HTS);
                 state.dataSolarShading->SAREA(HTS) = state.dataSolarShading->penumbra->fetchPSSA(id) / state.dataSolarShading->CTHETA(HTS);
                 // SAREA(HTS) = penumbra->fetchPSSA(Surface(HTS).PenumbraID)/CTHETA(HTS);
                 for (int SS = 1; SS <= NSBS; ++SS) {
                     auto HTSS = state.dataShadowComb->ShadowComb(HTS).SubSurf(SS);
-                    id = state.dataSurface->Surface(HTSS).PenumbraID;
+                    id = state.dataSurface->SurfPenumbraID(HTSS);
                     if (id >= 0) {
                         // SAREA(HTSS) = buildingPSSF.at(id) / CTHETA(HTSS);
                         state.dataSolarShading->SAREA(HTSS) = state.dataSolarShading->penumbra->fetchPSSA(id) / state.dataSolarShading->CTHETA(HTSS);
@@ -6148,20 +6153,20 @@ void CalcInteriorSolarOverlaps(EnergyPlusData &state,
                 for (auto bkSurfNum : state.dataShadowComb->ShadowComb(GRSNR).BackSurf) {
                     if (bkSurfNum == 0) continue;
                     if (state.dataSolarShading->CTHETA(bkSurfNum) < DataEnvironment::SunIsUpValue) {
-                        pbBackSurfaces.push_back(state.dataSurface->Surface(bkSurfNum).PenumbraID);
+                        pbBackSurfaces.push_back(state.dataSurface->SurfPenumbraID(bkSurfNum));
                     }
                 }
                 pssas =
-                    state.dataSolarShading->penumbra->calculateInteriorPSSAs({(unsigned)state.dataSurface->Surface(HTSS).PenumbraID}, pbBackSurfaces);
+                    state.dataSolarShading->penumbra->calculateInteriorPSSAs({(unsigned)state.dataSurface->SurfPenumbraID(HTSS)}, pbBackSurfaces);
                 // penumbra->renderInteriorScene({(unsigned)Surface(HTSS).PenumbraID}, pbBackSurfaces);
 
                 JBKS = 0;
                 for (auto bkSurfNum : state.dataShadowComb->ShadowComb(GRSNR).BackSurf) {
                     if (bkSurfNum == 0) continue;
-                    if (pssas[state.dataSurface->Surface(bkSurfNum).PenumbraID] > 0) {
+                    if (pssas[state.dataSurface->SurfPenumbraID(bkSurfNum)] > 0) {
                         ++JBKS;
                         state.dataHeatBal->BackSurfaces(TS, iHour, JBKS, HTSS) = bkSurfNum;
-                        Real64 OverlapArea = pssas[state.dataSurface->Surface(bkSurfNum).PenumbraID] / state.dataSolarShading->CTHETA(HTSS);
+                        Real64 OverlapArea = pssas[state.dataSurface->SurfPenumbraID(bkSurfNum)] / state.dataSolarShading->CTHETA(HTSS);
                         state.dataHeatBal->OverlapAreas(TS, iHour, JBKS, HTSS) = OverlapArea * state.dataSurface->SurfWinGlazedFrac(HTSS);
                     }
                 }
@@ -7328,7 +7333,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                 Real64 InOutProjSLFracMult = state.dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(state.dataGlobal->HourOfDay);
                 int InShelfSurf = 0; // Inside daylighting shelf surface number
-                int ShelfNum = state.dataSurface->Surface(SurfNum).Shelf;
+                int ShelfNum = state.dataSurface->SurfDaylightingShelfInd(SurfNum);
                 if (ShelfNum > 0) { // Daylighting shelf
                     InShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf;
                 }
@@ -8379,7 +8384,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                     (state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) {
 
                     WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
-                    int ShelfNum = state.dataSurface->Surface(SurfNum).Shelf;
+                    int ShelfNum = state.dataSurface->SurfDaylightingShelfInd(SurfNum);
                     int OutShelfSurf = 0;
                     if (ShelfNum > 0) { // Outside daylighting shelf
                         OutShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf;
@@ -10441,8 +10446,8 @@ void SkyDifSolarShading(EnergyPlusData &state)
         }
         state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = 1.0 - state.dataSurface->Surface(SurfNum).ViewFactorSkyIR;
 
-        if (state.dataSurface->Surface(SurfNum).HasSurroundingSurfProperties) {
-            SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurroundingSurfacesNum;
+        if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
+            SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
             if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
                 state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
             }

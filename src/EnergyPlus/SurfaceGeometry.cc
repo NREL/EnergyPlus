@@ -359,8 +359,6 @@ namespace SurfaceGeometry {
         state.dataSurfaceGeometry->CosZoneRelNorth.deallocate();
         state.dataSurfaceGeometry->SinZoneRelNorth.deallocate();
 
-        AllocateModuleArrays(state); // This needs to be moved to the main manager routine of SSG at a later date
-
         state.dataSurface->AirSkyRadSplit.dimension(state.dataSurface->TotSurfaces, 0.0);
 
         state.dataHeatBal->CalcWindowRevealReflection = false; // Set to True in ProcessSurfaceVertices if beam solar reflection from window reveals
@@ -840,7 +838,7 @@ namespace SurfaceGeometry {
         CheckZoneOutBulbTempAt(state);
     }
 
-    void AllocateModuleArrays(EnergyPlusData &state)
+    void AllocateSurfaceArrays(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -882,6 +880,7 @@ namespace SurfaceGeometry {
         state.dataSurface->Y0.dimension(state.dataSurface->TotSurfaces, 0.0);
         state.dataSurface->Z0.dimension(state.dataSurface->TotSurfaces, 0.0);
 
+        // TODO: move the following to (surface) heat balance
         state.dataSurface->EnclSolDB.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataSurface->EnclSolDBSSG.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBal->QSDifSol.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -894,6 +893,26 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinA.dimension(state.dataSurface->TotSurfaces, CFSMAXNL + 1, 0.0);
         state.dataSurface->SurfWinADiffFront.dimension(state.dataSurface->TotSurfaces, CFSMAXNL + 1, 0.0);
         state.dataSurface->SurfWinACFOverlap.dimension(state.dataSurface->TotSurfaces, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+
+        // Following are surface property arrays used in SurfaceGeometry
+        state.dataSurface->SurfShadowSurfPossibleObstruction.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfShadowSurfRecSurfNum.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfSchedExternalShadingFrac.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfExternalShadingSchInd.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfHasSurroundingSurfProperties.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfSurroundingSurfacesNum.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfHasLinkedOutAirNode.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfLinkedOutAirNode.allocate(state.dataSurface->TotSurfaces);
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            state.dataSurface->SurfShadowSurfPossibleObstruction(SurfNum) = false;
+            state.dataSurface->SurfShadowSurfRecSurfNum(SurfNum) = 0;
+            state.dataSurface->SurfSchedExternalShadingFrac(SurfNum) = false;
+            state.dataSurface->SurfExternalShadingSchInd(SurfNum) = 0;
+            state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum) = false;
+            state.dataSurface->SurfSurroundingSurfacesNum(SurfNum) = 0;
+            state.dataSurface->SurfHasLinkedOutAirNode(SurfNum) = false;
+            state.dataSurface->SurfLinkedOutAirNode(SurfNum) = 0;
+        }
     }
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
@@ -1235,15 +1254,16 @@ namespace SurfaceGeometry {
             ShowFatalError(state, RoutineName + "Errors discovered, program terminates.");
         }
 
+        state.dataSurface->Surface.allocate(state.dataSurface->TotSurfaces); // Allocate the Surface derived type appropriately
+        state.dataSurface->SurfaceWindow.allocate(state.dataSurface->TotSurfaces);
+        AllocateSurfaceArrays(state);
+        AllocateSurfaceWindows(state, state.dataSurface->TotSurfaces);
+
         // Have to make room for added surfaces, if needed
         FirstTotalSurfaces = NumSurfs + AddedSubSurfaces;
         if (NeedToAddSurfaces + NeedToAddSubSurfaces > 0) {
             state.dataSurfaceGeometry->SurfaceTmp.redimension(state.dataSurface->TotSurfaces);
         }
-
-        state.dataSurface->SurfaceWindow.allocate(state.dataSurface->TotSurfaces);
-
-        AllocateSurfaceWindows(state, state.dataSurface->TotSurfaces);
 
         // add the "need to add" surfaces
         // Debug    write(outputfiledebug,*) ' need to add ',NeedtoAddSurfaces+NeedToAddSubSurfaces
@@ -1452,14 +1472,6 @@ namespace SurfaceGeometry {
         //    After reordering, MovedSurfs should equal TotSurfaces
 
         MovedSurfs = 0;
-        // todo - move allocation to property functions
-        state.dataSurface->Surface.allocate(state.dataSurface->TotSurfaces); // Allocate the Surface derived type appropriately
-        state.dataSurface->SurfShadowSurfPossibleObstruction.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfShadowSurfRecSurfNum.allocate(state.dataSurface->TotSurfaces);
-        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            state.dataSurface->SurfShadowSurfPossibleObstruction(SurfNum) = false;
-            state.dataSurface->SurfShadowSurfRecSurfNum(SurfNum) = 0;
-        }
         Array1D<bool> SurfaceTmpClassMoved;                                  // Tmp class is moved
         SurfaceTmpClassMoved.dimension(state.dataSurface->TotSurfaces, false);
 
@@ -7638,16 +7650,16 @@ namespace SurfaceGeometry {
             for (Loop = 1; Loop <= state.dataSurface->TotSurfLocalEnv; ++Loop) {
                 if (state.dataSurface->SurfLocalEnvironment(Loop).SurfPtr == SurfLoop) {
                     if (state.dataSurface->SurfLocalEnvironment(Loop).OutdoorAirNodePtr != 0) {
-                        state.dataSurface->Surface(SurfLoop).HasLinkedOutAirNode = true;
-                        state.dataSurface->Surface(SurfLoop).LinkedOutAirNode = state.dataSurface->SurfLocalEnvironment(Loop).OutdoorAirNodePtr;
+                        state.dataSurface->SurfHasLinkedOutAirNode(SurfLoop) = true;
+                        state.dataSurface->SurfLinkedOutAirNode(SurfLoop) = state.dataSurface->SurfLocalEnvironment(Loop).OutdoorAirNodePtr;
                     }
                     if (state.dataSurface->SurfLocalEnvironment(Loop).ExtShadingSchedPtr != 0) {
-                        state.dataSurface->Surface(SurfLoop).SchedExternalShadingFrac = true;
-                        state.dataSurface->Surface(SurfLoop).ExternalShadingSchInd = state.dataSurface->SurfLocalEnvironment(Loop).ExtShadingSchedPtr;
+                        state.dataSurface->SurfSchedExternalShadingFrac(SurfLoop) = true;
+                        state.dataSurface->SurfExternalShadingSchInd(SurfLoop) = state.dataSurface->SurfLocalEnvironment(Loop).ExtShadingSchedPtr;
                     }
                     if (state.dataSurface->SurfLocalEnvironment(Loop).SurroundingSurfsPtr != 0) {
-                        state.dataSurface->Surface(SurfLoop).HasSurroundingSurfProperties = true;
-                        state.dataSurface->Surface(SurfLoop).SurroundingSurfacesNum =
+                        state.dataSurface->SurfHasSurroundingSurfProperties(SurfLoop) = true;
+                        state.dataSurface->SurfSurroundingSurfacesNum(SurfLoop) =
                             state.dataSurface->SurfLocalEnvironment(Loop).SurroundingSurfsPtr;
                     }
                 }

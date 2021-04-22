@@ -515,9 +515,6 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataSurface->Surface(surfNum1).Area = 10.0;
     state->dataSurface->Surface(surfNum2).Area = 10.0;
     state->dataSurface->Surface(surfNum3).Area = 10.0;
-    state->dataSurface->Surface(surfNum1).TAirRef = DataSurfaces::ZoneMeanAirTemp;
-    state->dataSurface->Surface(surfNum2).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
-    state->dataSurface->Surface(surfNum3).TAirRef = DataSurfaces::AdjacentAirTemp;
     state->dataSurface->Surface(surfNum1).SolarEnclIndex = 1;
     state->dataSurface->Surface(surfNum2).SolarEnclIndex = 1;
     state->dataSurface->Surface(surfNum3).SolarEnclIndex = 1;
@@ -575,8 +572,13 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataSurface->SurfWinGainFrameDividerToZoneRep.allocate(3);
     state->dataSurface->InsideFrameCondensationFlag.allocate(3);
     state->dataSurface->InsideDividerCondensationFlag.allocate(3);
+
     state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(3);
     state->dataSurface->SurfIntConvCoeff.allocate(3);
+    state->dataSurface->SurfTAirRef.allocate(3);
+    state->dataSurface->SurfTAirRef(surfNum1) = DataSurfaces::ZoneMeanAirTemp;
+    state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::ZoneSupplyAirTemp;
+    state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::AdjacentAirTemp;
 
     state->dataHeatBalSurf->QdotConvOutRep.allocate(3);
     state->dataHeatBalSurf->QdotConvOutRepPerArea.allocate(3);
@@ -624,7 +626,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataLoopNodes->Node(2).MassFlowRate = 0.0;
     state->dataSurface->Surface(1).ExtBoundCond = 2;
     state->dataSurface->Surface(2).ExtBoundCond = 1;
-    state->dataSurface->Surface(1).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
+    state->dataSurface->SurfTAirRef(1) = DataSurfaces::ZoneSupplyAirTemp;
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBal->HConvIn(surfNum2), inSurfTemp, outSurfTemp);
     EXPECT_NEAR(25.0, state->dataHeatBal->TempEffBulkAir(surfNum2), 0.0001);
 }
@@ -2747,9 +2749,6 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataSurface->Surface(surfNum1).Area = 10.0;
     state->dataSurface->Surface(surfNum2).Area = 10.0;
     state->dataSurface->Surface(surfNum3).Area = 10.0;
-    state->dataSurface->Surface(surfNum1).TAirRef = DataSurfaces::ZoneMeanAirTemp;
-    state->dataSurface->Surface(surfNum2).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
-    state->dataSurface->Surface(surfNum3).TAirRef = DataSurfaces::AdjacentAirTemp;
     state->dataSurface->Surface(surfNum1).SolarEnclIndex = 1;
     state->dataSurface->Surface(surfNum2).SolarEnclIndex = 1;
     state->dataSurface->Surface(surfNum3).SolarEnclIndex = 1;
@@ -2809,6 +2808,10 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataSurface->InsideDividerCondensationFlag.allocate(3);
     state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(3);
     state->dataSurface->SurfIntConvCoeff.allocate(3);
+    state->dataSurface->SurfTAirRef.allocate(3);
+    state->dataSurface->SurfTAirRef(surfNum1) = DataSurfaces::ZoneMeanAirTemp;
+    state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::ZoneSupplyAirTemp;
+    state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::AdjacentAirTemp;
 
     state->dataHeatBalSurf->QdotConvOutRep.allocate(3);
     state->dataHeatBalSurf->QdotConvOutRepPerArea.allocate(3);

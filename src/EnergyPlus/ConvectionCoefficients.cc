@@ -394,8 +394,8 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
     TSky = state.dataEnvrn->SkyTempKelvin;
     TGround = TAir;
 
-    if (Surface(SurfNum).HasSurroundingSurfProperties) {
-        SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
+    if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
+        SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
             TSky = GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum) +
                    DataGlobalConstants::KelvinConv;
@@ -2664,7 +2664,7 @@ void CalcDetailedHcInForDVModel(EnergyPlusData &state,
 
         // UCSD
         {
-            auto const SELECT_CASE_var(Surface(SurfNum).TAirRef);
+            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
             if (SELECT_CASE_var == AdjacentAirTemp) {
                 TAirConv = state.dataHeatBal->TempEffBulkAir(SurfNum);
             } else {
@@ -2988,7 +2988,7 @@ void CalcCeilingDiffuserInletCorr(EnergyPlusData &state,
                 state.dataHeatBal->HConvIn(SurfNum) = 0.19 * std::pow(ACH, 0.8); // Wall correlation
             }
             // set flag for reference air temperature
-            Surface(SurfNum).TAirRef = ZoneSupplyAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneSupplyAirTemp;
         }
 
         // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
@@ -4437,7 +4437,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
             } else {
                 tmpHc = CalcASHRAEVerticalWall((Tsurface - Tzone));
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_WaltonUnstableHorizontalOrTilt) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
@@ -4446,7 +4446,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
             } else {
                 tmpHc = CalcWaltonUnstableHorizontalOrTilt((Tsurface - Tzone), Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_WaltonStableHorizontalOrTilt) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
@@ -4455,7 +4455,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
             } else {
                 tmpHc = CalcWaltonStableHorizontalOrTilt((Tsurface - Tzone), Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserFloor) {
             Real64 AirChangeRate = CalcCeilingDiffuserACH(state, ZoneNum);
             Real64 AirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum);
@@ -4474,7 +4474,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
                                                             Surface(SurfNum).Height,
                                                             state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow);
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserCeiling) {
             Real64 AirChangeRate = CalcCeilingDiffuserACH(state, ZoneNum);
             Real64 AirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum);
@@ -4493,7 +4493,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
                                                               Surface(SurfNum).Height,
                                                               state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow);
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserWalls) {
             Real64 AirChangeRate = CalcCeilingDiffuserACH(state, ZoneNum);
             Real64 AirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum);
@@ -4515,7 +4515,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=](double, double, double, double, double) -> double { return tmpHc; };
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_AlamdariHammondStableHorizontal) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
@@ -4524,7 +4524,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
             } else {
                 tmpHc = CalcAlamdariHammondStableHorizontal(state, (Tsurface - Tzone), Surface(SurfNum).IntConvZoneHorizHydrDiam, SurfNum);
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_AlamdariHammondVerticalWall) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
@@ -4533,7 +4533,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
             } else {
                 tmpHc = CalcAlamdariHammondVerticalWall(state, (Tsurface - Tzone), Surface(SurfNum).IntConvZoneWallHeight, SurfNum);
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_AlamdariHammondUnstableHorizontal) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
@@ -4542,42 +4542,42 @@ void EvaluateIntHcModels(EnergyPlusData &state,
             } else {
                 tmpHc = CalcAlamdariHammondUnstableHorizontal(state, (Tsurface - Tzone), Surface(SurfNum).IntConvZoneHorizHydrDiam, SurfNum);
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_KhalifaEq3WallAwayFromHeat) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKhalifaEq3WallAwayFromHeat(Tsurf - Tamb); };
             } else {
                 tmpHc = CalcKhalifaEq3WallAwayFromHeat((Tsurface - Tzone));
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_KhalifaEq4CeilingAwayFromHeat) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKhalifaEq4CeilingAwayFromHeat(Tsurf - Tamb); };
             } else {
                 tmpHc = CalcKhalifaEq4CeilingAwayFromHeat((Tsurface - Tzone));
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_KhalifaEq5WallNearHeat) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKhalifaEq5WallsNearHeat(Tsurf - Tamb); };
             } else {
                 tmpHc = CalcKhalifaEq5WallsNearHeat((Tsurface - Tzone));
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_KhalifaEq6NonHeatedWalls) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKhalifaEq6NonHeatedWalls(Tsurf - Tamb); };
             } else {
                 tmpHc = CalcKhalifaEq6NonHeatedWalls((Tsurface - Tzone));
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_KhalifaEq7Ceiling) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKhalifaEq7Ceiling(Tsurf - Tamb); };
             } else {
                 tmpHc = CalcKhalifaEq7Ceiling((Tsurface - Tzone));
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_AwbiHattonHeatedFloor) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
@@ -4586,7 +4586,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
             } else {
                 tmpHc = CalcAwbiHattonHeatedFloor((Tsurface - Tzone), Surface(SurfNum).IntConvZoneHorizHydrDiam);
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_AwbiHattonHeatedWall) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
@@ -4595,7 +4595,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
             } else {
                 tmpHc = CalcAwbiHattonHeatedWall((Tsurface - Tzone), Surface(SurfNum).IntConvZoneHorizHydrDiam);
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedAssistingWall) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
@@ -4608,7 +4608,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
             } else {
                 tmpHc = CalcBeausoleilMorrisonMixedAssistedWall(state, (Tsurface - Tzone), Surface(SurfNum).IntConvZoneWallHeight, Tsurface, ZoneNum);
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedOppossingWall) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
@@ -4621,7 +4621,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
             } else {
                 tmpHc = CalcBeausoleilMorrisonMixedOpposingWall(state, (Tsurface - Tzone), Surface(SurfNum).IntConvZoneWallHeight, Tsurface, ZoneNum);
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedStableCeiling) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
@@ -4635,7 +4635,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
                 tmpHc =
                     CalcBeausoleilMorrisonMixedStableCeiling(state, (Tsurface - Tzone), Surface(SurfNum).IntConvZoneHorizHydrDiam, Tsurface, ZoneNum);
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedUnstableCeiling) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
@@ -4649,7 +4649,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
                 tmpHc = CalcBeausoleilMorrisonMixedUnstableCeiling(
                     state, (Tsurface - Tzone), Surface(SurfNum).IntConvZoneHorizHydrDiam, Tsurface, ZoneNum);
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedStableFloor) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
@@ -4663,7 +4663,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
                 tmpHc =
                     CalcBeausoleilMorrisonMixedStableFloor(state, (Tsurface - Tzone), Surface(SurfNum).IntConvZoneHorizHydrDiam, Tsurface, ZoneNum);
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedUnstableFloor) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
@@ -4677,7 +4677,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
                 tmpHc =
                     CalcBeausoleilMorrisonMixedUnstableFloor(state, (Tsurface - Tzone), Surface(SurfNum).IntConvZoneHorizHydrDiam, Tsurface, ZoneNum);
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_FohannoPolidoriVerticalWall) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 Real64 QdotConvection = -state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum);
@@ -4696,18 +4696,18 @@ void EvaluateIntHcModels(EnergyPlusData &state,
                                                             -state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum),
                                                             SurfNum);
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_KaradagChilledCeiling) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKaradagChilledCeiling(Tsurf - Tamb); };
             } else {
                 tmpHc = CalcKaradagChilledCeiling((Tsurface - Tzone));
             }
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_ISO15099Windows) {
             CalcISO15099WindowIntConvCoeff(state, SurfNum, Tsurface, Tzone);
             tmpHc = state.dataHeatBal->HConvIn(SurfNum);
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_GoldsteinNovoselacCeilingDiffuserWindow) {
             tmpHc = CalcGoldsteinNovoselacCeilingDiffuserWindow(
                 Surface(SurfNum).IntConvZonePerimLength, Surface(SurfNum).IntConvWindowWallRatio, Surface(SurfNum).IntConvWindowLocation, ZoneNum);
@@ -4716,9 +4716,9 @@ void EvaluateIntHcModels(EnergyPlusData &state,
             }
             int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
             if (ZoneNode > 0) {
-                Surface(SurfNum).TAirRef = ZoneSupplyAirTemp;
+                state.dataSurface->SurfTAirRef(SurfNum) = ZoneSupplyAirTemp;
             } else {
-                Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+                state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
             }
         } else if (SELECT_CASE_var == HcInt_GoldsteinNovoselacCeilingDiffuserWalls) {
             tmpHc =
@@ -4728,9 +4728,9 @@ void EvaluateIntHcModels(EnergyPlusData &state,
             }
             int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
             if (ZoneNode > 0) {
-                Surface(SurfNum).TAirRef = ZoneSupplyAirTemp;
+                state.dataSurface->SurfTAirRef(SurfNum) = ZoneSupplyAirTemp;
             } else {
-                Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+                state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
             }
         } else if (SELECT_CASE_var == HcInt_GoldsteinNovoselacCeilingDiffuserFloor) {
             tmpHc = CalcGoldsteinNovoselacCeilingDiffuserFloor(Surface(SurfNum).IntConvZonePerimLength, ZoneNum);
@@ -4739,9 +4739,9 @@ void EvaluateIntHcModels(EnergyPlusData &state,
             }
             int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
             if (ZoneNode > 0) {
-                Surface(SurfNum).TAirRef = ZoneSupplyAirTemp;
+                state.dataSurface->SurfTAirRef(SurfNum) = ZoneSupplyAirTemp;
             } else {
-                Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+                state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
             }
         }
     }
@@ -6339,13 +6339,13 @@ void CalcUserDefinedInsideHcModel(EnergyPlusData &state, int const SurfNum, int 
 
         if (SELECT_CASE_var == RefTempMeanAirTemp) {
             tmpAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-            Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == RefTempAdjacentAirTemp) {
             tmpAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
-            Surface(SurfNum).TAirRef = AdjacentAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = AdjacentAirTemp;
         } else if (SELECT_CASE_var == RefTempSupplyAirTemp) {
             tmpAirTemp = SupplyAirTemp;
-            Surface(SurfNum).TAirRef = ZoneSupplyAirTemp;
+            state.dataSurface->SurfTAirRef(SurfNum) = ZoneSupplyAirTemp;
         }
     }
 

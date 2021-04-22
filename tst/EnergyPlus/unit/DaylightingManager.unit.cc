@@ -837,6 +837,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
     EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
+    state->dataSurface->SurfDaylightingShelfInd.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfDaylightingShelfInd = 0;
 
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -2110,6 +2112,9 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
+    state->dataSurface->SurfDaylightingShelfInd.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfDaylightingShelfInd = 0;
+
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
@@ -2859,6 +2864,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
     EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
+    state->dataSurface->SurfDaylightingShelfInd.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfDaylightingShelfInd = 0;
 
     state->dataConstruction->Construct(state->dataSurface->Surface(7).Construction).TransDiff = 0.001; // required for GetTDDInput function to work.
     DaylightingDevices::GetTDDInput(*state);

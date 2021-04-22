@@ -781,7 +781,7 @@ namespace MundtSimMgr {
                     state.dataHeatBal->TempEffBulkAir(SurfFirst + SurfNum - 1) =
                         state.dataMundtSimMgr->MundtAirSurf(SurfNum, state.dataMundtSimMgr->MundtZoneNum).TMeanAir;
                     // set flag for reference air temperature
-                    state.dataSurface->Surface(SurfFirst + SurfNum - 1).TAirRef = AdjacentAirTemp;
+                    state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1) = AdjacentAirTemp;
                 }
                 // b) Average zone air temperature -> ZT(ZoneNum)
                 // For Mundt model, average room air is the weighted value of floor and ceiling air temps
@@ -803,7 +803,7 @@ namespace MundtSimMgr {
                     state.dataHeatBal->TempEffBulkAir(SurfFirst + SurfNum - 1) =
                         state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp;
                     // set flag for reference air temperature
-                    state.dataSurface->Surface(SurfFirst + SurfNum - 1).TAirRef = AdjacentAirTemp;
+                    state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1) = AdjacentAirTemp;
                 }
                 // b) Average zone air temperature -> ZT(ZoneNum)
                 // For Mundt model, average room air is the weighted value of floor and ceiling air temps
@@ -826,7 +826,7 @@ namespace MundtSimMgr {
             for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
                 state.dataHeatBal->TempEffBulkAir(SurfFirst + SurfNum - 1) = state.dataHeatBalFanSys->MAT(ZoneNum);
                 // set flag for reference air temperature
-                state.dataSurface->Surface(SurfFirst + SurfNum - 1).TAirRef = ZoneMeanAirTemp;
+                state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1) = ZoneMeanAirTemp;
             }
             // set flag to indicate that Mundt model is NOT used for this zone at the present time
             state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;

@@ -667,8 +667,8 @@ namespace DataSurfaces {
         Real64 Multiplier;                               // Multiplies glazed area, frame area and divider area (windows only)
 
         // Daylighting pointers
-        int Shelf;   // Pointer to daylighting shelf
-        int TAirRef; // Flag for reference air temperature
+//        int Shelf;   // Pointer to daylighting shelf
+//        int TAirRef; // Flag for reference air temperature
         // ZoneMeanAirTemp   = 1 = mean air temperature or MAT => for mixing air model with all convection algos
         // except inlet-dependent algo
         // AdjacentAirTemp   = 2 = adjacent air temperature or TempEffBulkAir => for nodal or zonal air model
@@ -680,14 +680,14 @@ namespace DataSurfaces {
         Real64 OutWetBulbTemp;                 // Surface outside wet bulb air temperature, for surface heat balance (C)
         Real64 WindSpeed;                      // Surface outside wind speed, for surface heat balance (m/s)
         Real64 WindDir;                    // Surface outside wind direction, for surface heat balance and ventilation(degree)
-        bool SchedExternalShadingFrac;     // true if the external shading is scheduled or calculated externally to be imported
-        int ExternalShadingSchInd;         // Schedule for a the external shading
-        bool HasSurroundingSurfProperties; // true if surrounding surfaces properties are listed for an external surface
-        int SurroundingSurfacesNum;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
-        bool HasLinkedOutAirNode;          // true if an OutdoorAir::Node is linked to the surface
-        int LinkedOutAirNode;              // Index of the an OutdoorAir:Node
-
-        int PenumbraID; // Surface ID in penumbra
+//        bool SchedExternalShadingFrac;     // true if the external shading is scheduled or calculated externally to be imported
+//        int ExternalShadingSchInd;         // Schedule for a the external shading
+//        bool HasSurroundingSurfProperties; // true if surrounding surfaces properties are listed for an external surface
+//        int SurroundingSurfacesNum;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
+//        bool HasLinkedOutAirNode;          // true if an OutdoorAir::Node is linked to the surface
+//        int LinkedOutAirNode;              // Index of the an OutdoorAir:Node
+//
+//        int PenumbraID; // Surface ID in penumbra
 
         std::string UNomWOFilm; // Nominal U Value without films stored as string
         std::string UNomFilm;   // Nominal U Value with films stored as string
@@ -746,14 +746,10 @@ namespace DataSurfaces {
               Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0), lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0),
               NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0), CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true),
               IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0), shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0),
-              activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), FrameDivider(0), Multiplier(1.0), Shelf(0),
-              TAirRef(ZoneMeanAirTemp), OutDryBulbTemp(0.0),
+              activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), FrameDivider(0), Multiplier(1.0),
+              OutDryBulbTemp(0.0),
               OutWetBulbTemp(0.0),WindSpeed(0.0),
               WindDir(0.0),
-
-              SchedExternalShadingFrac(false), ExternalShadingSchInd(0), HasSurroundingSurfProperties(false), SurroundingSurfacesNum(0),
-              HasLinkedOutAirNode(false), LinkedOutAirNode(0), PenumbraID(-1),
-
               UNomWOFilm("-              "), UNomFilm("-              "), ExtEcoRoof(false), ExtCavityPresent(false), ExtCavNum(0), IsPV(false),
               IsICS(false), IsPool(false), ICSPtr(0), MirroredSurf(false), IntConvClassification(0), IntConvHcModelEq(0), IntConvHcUserCurveIndex(0),
               OutConvClassification(0), OutConvHfModelEq(0), OutConvHfUserCurveIndex(0), OutConvHnModelEq(0), OutConvHnUserCurveIndex(0),
@@ -1368,6 +1364,15 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<int> SurfHighTempErrCount;
     Array1D<Real64> SurfIntConvCoeff; // Interior Convection Coefficient pointer (different data structure) when being overridden
     Array1D<Real64> SurfExtConvCoeff; // Exterior Convection Coefficient pointer (different data structure) when being overridden
+    Array1D<int> SurfDaylightingShelfInd;   // Pointer to daylighting shelf
+    Array1D<int> SurfTAirRef; // Flag for reference air temperature
+    Array1D<bool> SurfSchedExternalShadingFrac;     // true if the external shading is scheduled or calculated externally to be imported
+    Array1D<int> SurfExternalShadingSchInd;         // Schedule for a the external shading
+    Array1D<bool> SurfHasSurroundingSurfProperties; // true if surrounding surfaces properties are listed for an external surface
+    Array1D<int> SurfSurroundingSurfacesNum;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
+    Array1D<bool> SurfHasLinkedOutAirNode;          // true if an OutdoorAir::Node is linked to the surface
+    Array1D<int> SurfLinkedOutAirNode;              // Index of the an OutdoorAir:Node
+    Array1D<int> SurfPenumbraID;
 
     // Surface Shadow Properties
     Array1D<bool> SurfShadowSurfPossibleObstruction; // True if a surface can be an exterior obstruction
@@ -1695,6 +1700,15 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfExtConvCoeff.deallocate();
         this->SurfShadowSurfPossibleObstruction.deallocate();
         this->SurfShadowSurfRecSurfNum.deallocate();
+        this->SurfDaylightingShelfInd.deallocate();
+        this->SurfTAirRef.deallocate();
+        this->SurfSchedExternalShadingFrac.deallocate();
+        this->SurfExternalShadingSchInd.deallocate();
+        this->SurfHasSurroundingSurfProperties.deallocate();
+        this->SurfSurroundingSurfacesNum.deallocate();
+        this->SurfHasLinkedOutAirNode.deallocate();
+        this->SurfLinkedOutAirNode.deallocate();
+        this->SurfPenumbraID.deallocate();
 
         this->SurfWinTransSolar.deallocate();
         this->SurfWinBmSolar.deallocate();

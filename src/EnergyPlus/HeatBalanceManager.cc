@@ -5775,6 +5775,13 @@ namespace HeatBalanceManager {
         // Use the total number of zones or surfaces to allocate variables to avoid a limit
         // Allocate real Variables
         // Following used for Calculations
+        // Allocate solar shading variables
+        state.dataSurface->SurfPenumbraID.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfDaylightingShelfInd.allocate(state.dataSurface->TotSurfaces);
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            state.dataSurface->SurfPenumbraID(SurfNum) = 0;
+            state.dataSurface->SurfDaylightingShelfInd(SurfNum) = 0;
+        }
         //  Allocate variables in DataHeatBalSys
         state.dataHeatBalFanSys->SumConvHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->SumLatentHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);

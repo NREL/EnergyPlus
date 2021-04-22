@@ -2407,7 +2407,7 @@ namespace WindowManager {
 
             // determine reference air temperature for this surface
             {
-                auto const SELECT_CASE_var(surface.TAirRef);
+                auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
                     RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                     state.dataHeatBal->TempEffBulkAir(SurfNum) = RefAirTemp;
@@ -2676,7 +2676,7 @@ namespace WindowManager {
 
                 // determine reference air temperature for this surface
                 {
-                    auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNumAdj).TAirRef);
+                    auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNumAdj));
                     if (SELECT_CASE_var == ZoneMeanAirTemp) {
                         RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
                         state.dataHeatBal->TempEffBulkAir(SurfNumAdj) = RefAirTemp;
@@ -2734,8 +2734,8 @@ namespace WindowManager {
                 // Calculate LWR from surrounding surfaces if defined for an exterior window
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-                    if (state.dataSurface->Surface(SurfNum).HasSurroundingSurfProperties) {
-                        SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurroundingSurfacesNum;
+                    if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
+                        SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
 
                         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
                             surface.ViewFactorSkyIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
@@ -2912,8 +2912,8 @@ namespace WindowManager {
         Real64 rad_out_lw_srd_per_area = 0;
 
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-            if (state.dataSurface->Surface(SurfNum).HasSurroundingSurfProperties) {
-                SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurroundingSurfacesNum;
+            if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
+                SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
                 for (SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
                     SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                     SrdSurfTempAbs = GetCurrentScheduleValue(

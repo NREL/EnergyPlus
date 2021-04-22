@@ -318,15 +318,15 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     //  END DO
     if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (Surface(SurfNum).HasLinkedOutAirNode) {
-                Surface(SurfNum).OutDryBulbTemp = state.dataLoopNodes->Node(Surface(SurfNum).LinkedOutAirNode).OutAirDryBulb;
-                Surface(SurfNum).OutWetBulbTemp = state.dataLoopNodes->Node(Surface(SurfNum).LinkedOutAirNode).OutAirWetBulb;
-                Surface(SurfNum).WindSpeed = state.dataLoopNodes->Node(Surface(SurfNum).LinkedOutAirNode).OutAirWindSpeed;
-                Surface(SurfNum).WindDir = state.dataLoopNodes->Node(Surface(SurfNum).LinkedOutAirNode).OutAirWindDir;
+            if (state.dataSurface->SurfHasLinkedOutAirNode(SurfNum)) {
+                Surface(SurfNum).OutDryBulbTemp = state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum)).OutAirDryBulb;
+                Surface(SurfNum).OutWetBulbTemp = state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum)).OutAirWetBulb;
+                Surface(SurfNum).WindSpeed = state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum)).OutAirWindSpeed;
+                Surface(SurfNum).WindDir = state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum)).OutAirWindDir;
             }
 
-            if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime && Surface(SurfNum).HasSurroundingSurfProperties) {
-                Real64 SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
+            if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime && state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
+                Real64 SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
                 Real64 SrdSurfsViewFactor = 0;
                 if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0) {
                     SrdSurfsViewFactor += state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
@@ -1307,11 +1307,13 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     state.dataSurface->SurfHighTempErrCount.allocate(state.dataSurface->TotSurfaces);
     state.dataSurface->SurfIntConvCoeff.allocate(state.dataSurface->TotSurfaces);
     state.dataSurface->SurfExtConvCoeff.allocate(state.dataSurface->TotSurfaces);
+    state.dataSurface->SurfTAirRef.allocate(state.dataSurface->TotSurfaces);
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
         state.dataSurface->SurfLowTempErrCount(SurfNum) = 0;
         state.dataSurface->SurfHighTempErrCount(SurfNum) = 0;
         state.dataSurface->SurfIntConvCoeff(SurfNum) = 0.0;
         state.dataSurface->SurfExtConvCoeff(SurfNum) = 0.0;
+        state.dataSurface->SurfTAirRef(SurfNum) = 0;
     }
 
     // Use the total number of surfaces to allocate variables to avoid a surface number limit
@@ -2017,7 +2019,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Surface Inside Face Convection Reference Air Index",
                             OutputProcessor::Unit::None,
-                            Surface(loop).TAirRef,
+                            state.dataSurface->SurfTAirRef(loop),
                             "Zone",
                             "Average",
                             Surface(loop).Name);
@@ -2887,7 +2889,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                     int SurfSolIncPtr = SurfaceScheduledSolarInc(state, SurfNum, ConstrNum);
                     if (SurfSolIncPtr == 0) {
                         if (state.dataConstruction->Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
-                            int ShelfNum = Surface(SurfNum).Shelf;                           // Daylighting shelf object number
+                            int ShelfNum = state.dataSurface->SurfDaylightingShelfInd(SurfNum);                           // Daylighting shelf object number
                             int InShelfSurf = 0;                                             // Inside daylighting shelf surface number
                             if (ShelfNum > 0) {
                                 InShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf; // Inside daylighting shelf present if > 0
@@ -6303,8 +6305,8 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                         }
                     }
                     // Calculate LWR from surrounding surfaces if defined for an exterior surface
-                    if (Surface(SurfNum).HasSurroundingSurfProperties) {
-                        int SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
+                    if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
+                        int SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
                         // Absolute temperature of the outside surface of an exterior surface
                         Real64 TSurf = state.dataHeatBalSurf->TH(1, 1, SurfNum) + DataGlobalConstants::KelvinConv;
                         for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface;
@@ -6601,7 +6603,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
         if (Surface(SurfNum).Class == SurfaceClass::TDD_Dome) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
 
         {
-            auto const SELECT_CASE_var(Surface(SurfNum).TAirRef);
+            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
             if (SELECT_CASE_var == ZoneMeanAirTemp) {
                 state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) = state.dataHeatBalFanSys->MAT(ZoneNum);
                 state.dataHeatBal->TempEffBulkAir(SurfNum) = state.dataHeatBalFanSys->MAT(ZoneNum); // for reporting surf adjacent air temp
@@ -7536,7 +7538,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                     state.dataHeatBalSurf->IsNotPoolSurf(surfNum) = 1;
                 }
             }
-            auto const SELECT_CASE_var(Surface(surfNum).TAirRef);
+            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(surfNum));
             if (SELECT_CASE_var == ZoneMeanAirTemp) {
                 state.dataHeatBalSurfMgr->RefAirTemp(surfNum) = state.dataHeatBalFanSys->MAT(zoneNum);
                 state.dataHeatBal->TempEffBulkAir(surfNum) = state.dataHeatBalFanSys->MAT(zoneNum); // for reporting surf adjacent air temp
@@ -8374,8 +8376,8 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
     Real64 TSky = state.dataEnvrn->SkyTemp;
     Real64 TGround = state.dataEnvrn->OutDryBulbTemp;
 
-    if (Surface(SurfNum).HasSurroundingSurfProperties) {
-        int SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
+    if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
+        int SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
             TSky = GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum);
         }
@@ -8566,8 +8568,8 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
     QRadLWOutSrdSurfsRep = 0;
     // Report LWR from surrounding surfaces for current exterior surf temp
     // Current exterior surf temp would be used for the next step LWR calculation.
-    if (Surface(SurfNum).HasSurroundingSurfProperties) {
-        int SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
+    if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
+        int SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
         for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
             Real64 SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
             Real64 SrdSurfTempAbs =

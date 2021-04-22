@@ -319,8 +319,8 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int &ZoneNum) // Zone n
             state.dataSurface->SurfWinFractionUpgoing(IWin) = state.dataSurface->Surface(IWin).Tilt / 180.0;
 
             // Daylighting shelf simplification:  All light goes up to the ceiling regardless of orientation of shelf
-            if (state.dataSurface->Surface(IWin).Shelf > 0) {
-                if (state.dataDaylightingDevicesData->Shelf(state.dataSurface->Surface(IWin).Shelf).InSurf > 0)
+            if (state.dataSurface->SurfDaylightingShelfInd(IWin) > 0) {
+                if (state.dataDaylightingDevicesData->Shelf(state.dataSurface->SurfDaylightingShelfInd(IWin)).InSurf > 0)
                     state.dataSurface->SurfWinFractionUpgoing(IWin) = 1.0;
             }
         }
@@ -1756,10 +1756,10 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
     BlNum = state.dataSurface->SurfWinBlindNumber(IWin);
     // ScNum = SurfaceWindow( IWin ).ScreenNumber; //Unused Set but never used
 
-    ShelfNum = state.dataSurface->Surface(IWin).Shelf;
+    ShelfNum = state.dataSurface->SurfDaylightingShelfInd(IWin);
     if (ShelfNum > 0) {
         InShelfSurf =
-            state.dataDaylightingDevicesData->Shelf(state.dataSurface->Surface(IWin).Shelf).InSurf; // Inside daylighting shelf present if > 0
+            state.dataDaylightingDevicesData->Shelf(state.dataSurface->SurfDaylightingShelfInd(IWin)).InSurf; // Inside daylighting shelf present if > 0
     } else {
         InShelfSurf = 0;
     }
@@ -3392,7 +3392,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                 }
             } else {
                 // Shadowing surface is nearest hit
-                if (state.dataSurface->Surface(NearestHitSurfNum).Shelf > 0) {
+                if (state.dataSurface->SurfDaylightingShelfInd(NearestHitSurfNum) > 0) {
                     // This is a daylighting shelf, for which reflection is separately calculated
                     ObsVisRefl = 0.0;
                 } else {
@@ -7732,7 +7732,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
         PipeNum = state.dataSurface->SurfWinTDDPipeNum(IWin);
     }
 
-    ShelfNum = state.dataSurface->Surface(IWin).Shelf;
+    ShelfNum = state.dataSurface->SurfDaylightingShelfInd(IWin);
     if (ShelfNum > 0) {
         InShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf;   // Inside daylighting shelf present if > 0
         OutShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf; // Outside daylighting shelf present if > 0
@@ -7892,7 +7892,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         }
                     } else {
                         // Shadowing surface is nearest hit
-                        if (state.dataSurface->Surface(NearestHitSurfNum).Shelf > 0) {
+                        if (state.dataSurface->SurfDaylightingShelfInd(NearestHitSurfNum) > 0) {
                             // Skip daylighting shelves, whose reflection is separately calculated
                             ObsVisRefl = 0.0;
                         } else {
@@ -9328,7 +9328,7 @@ void DayltgSurfaceLumFromSun(EnergyPlusData &state,
 
     LumAtReflHitPtFrSun = 0.0;
     // Skip daylighting shelves since reflection from these is separately calculated
-    if (state.dataSurface->Surface(ReflSurfNum).Shelf > 0) return;
+    if (state.dataSurface->SurfDaylightingShelfInd(ReflSurfNum) > 0) return;
     // Normal to reflecting surface in hemisphere containing window element
     DayltgSurfaceLumFromSunReflNorm = state.dataSurface->Surface(ReflSurfNum).OutNormVec;
     if (state.dataSurface->Surface(ReflSurfNum).ShadowingSurf) {
