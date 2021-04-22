@@ -97,8 +97,7 @@ namespace WindowManager {
         return aFactory->getBSDFLayer(state);
     }
 
-    CScatteringLayer
-    getScatteringLayer(EnergyPlusData &state, const Material::MaterialProperties &t_Material, const WavelengthRange t_Range)
+    CScatteringLayer getScatteringLayer(EnergyPlusData &state, const Material::MaterialProperties &t_Material, const WavelengthRange t_Range)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
