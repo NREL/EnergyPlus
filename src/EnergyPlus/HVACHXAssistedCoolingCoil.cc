@@ -1122,7 +1122,7 @@ namespace HVACHXAssistedCoolingCoil {
                 Real64 CoolingSpeedNum = 1; // need to figure out the Cooling Speed number for the HXAssisted
                 Real64 CoolingSpeedRatio = 0.5; // need to figure out the Cooling Speed Ratio for the HXAssisted
                 bool singleMode = false; // need to figure out the singMode for the HXAssisted
-                Real64 CoilSHR = 0.75; // need a procedure to figure out Coil SHR for the new coiling coil 
+                Real64 CoilSHR = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].performance.NormalSHR;
 
                 state.dataCoilCooingDX->coilCoolingDXs[state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex].simulate(
                     state,
@@ -1132,7 +1132,7 @@ namespace HVACHXAssistedCoolingCoil {
                     CoolingSpeedRatio, // temp not fully implemented, trying to figure out the equivalent for HXAssisted coil
                     FanOpMode,
                     singleMode, // temp not fully implemented, trying to figure out the equivalent for HXAssisted coil
-                    CoilSHR //temp not fully implemented,  trying to figure out the equivalent for HXAssisted coil
+                    CoilSHR 
                 );
 
             } else if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
