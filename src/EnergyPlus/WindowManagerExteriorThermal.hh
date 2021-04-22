@@ -61,12 +61,12 @@ namespace DataHeatBalance {
 } // namespace EnergyPlus
 
 namespace Tarcog {
-    namespace ISO15099 {
-        class CBaseIGULayer;
-        class CEnvironment;
-        class CIGU;
-        class CSingleSystem;
-    } // namespace ISO15099
+namespace ISO15099 {
+    class CBaseIGULayer;
+    class CEnvironment;
+    class CIGU;
+    class CSingleSystem;
+} // namespace ISO15099
 } // namespace Tarcog
 
 namespace Gases {

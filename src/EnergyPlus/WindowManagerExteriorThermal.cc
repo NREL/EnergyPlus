@@ -227,8 +227,10 @@ namespace WindowManager {
             auto NetIRHeatGainGlass =
                 surface.Area * backSurface->getEmissivity() * (state.dataWindowManager->sigma * pow(backSurface->getTemperature(), 4) - rmir);
 
-            state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) = aLayers[totLayers - 1]->getTemperature(FenestrationCommon::Side::Back) - state.dataWindowManager->TKelvin;
-            state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss = aLayers[totLayers - 1]->getSurface(FenestrationCommon::Side::Back)->getEmissivity();
+            state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
+                aLayers[totLayers - 1]->getTemperature(FenestrationCommon::Side::Back) - state.dataWindowManager->TKelvin;
+            state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss =
+                aLayers[totLayers - 1]->getSurface(FenestrationCommon::Side::Back)->getEmissivity();
 
             state.dataSurface->SurfWinHeatGain(SurfNum) =
                 state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
@@ -619,7 +621,8 @@ namespace WindowManager {
 
         auto IR = m_Surface.getInsideIR(state, m_SurfNum);
 
-        std::shared_ptr<Tarcog::ISO15099::CEnvironment> Indoor = std::make_shared<Tarcog::ISO15099::CIndoorEnvironment>(tin, state.dataEnvrn->OutBaroPress);
+        std::shared_ptr<Tarcog::ISO15099::CEnvironment> Indoor =
+            std::make_shared<Tarcog::ISO15099::CIndoorEnvironment>(tin, state.dataEnvrn->OutBaroPress);
         Indoor->setHCoeffModel(Tarcog::ISO15099::BoundaryConditionsCoeffModel::CalculateH, hcin);
         Indoor->setEnvironmentIR(IR);
         return Indoor;
@@ -666,7 +669,7 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates IGU object from surface properties in EnergyPlus
-        
+
         return {m_Surface.Width, m_Surface.Height, m_Surface.Tilt};
     }
 
