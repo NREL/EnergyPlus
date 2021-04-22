@@ -221,7 +221,7 @@ namespace WindowManager {
         m_Layers[WavelengthRange::Visible] = Layers_Map();
     }
 
-    void CWindowConstructionsSimplified::pushLayer(WavelengthRange const t_Range, int const t_ConstrNum, const CScatteringLayer& t_Layer)
+    void CWindowConstructionsSimplified::pushLayer(WavelengthRange const t_Range, int const t_ConstrNum, const CScatteringLayer &t_Layer)
     {
         Layers_Map &aMap = m_Layers.at(t_Range);
         const auto it = aMap.find(t_ConstrNum);

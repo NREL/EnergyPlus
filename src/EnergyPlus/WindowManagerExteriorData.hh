@@ -142,9 +142,7 @@ namespace WindowManager {
     public:
         static CWindowConstructionsSimplified &instance();
 
-        void pushLayer(FenestrationCommon::WavelengthRange const t_Range,
-                       int const t_ConstrNum,
-                       const SingleLayerOptics::CScatteringLayer& t_Layer);
+        void pushLayer(FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum, const SingleLayerOptics::CScatteringLayer &t_Layer);
 
         std::shared_ptr<MultiLayerOptics::CMultiLayerScattered>
         getEquivalentLayer(EnergyPlusData &state, FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum);

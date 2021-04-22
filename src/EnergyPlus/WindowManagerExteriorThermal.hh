@@ -133,16 +133,17 @@ namespace WindowManager {
         int getNumOfLayers(EnergyPlusData &state) const;
 
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getSolidLayer(EnergyPlusData &state,
-                                                             DataSurfaces::SurfaceData const &surface,
-                                                             Material::MaterialProperties const &material,
-                                                             int const t_Index,
-                                                             int const t_SurfNum);
+                                                                       DataSurfaces::SurfaceData const &surface,
+                                                                       Material::MaterialProperties const &material,
+                                                                       int const t_Index,
+                                                                       int const t_SurfNum);
 
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getGapLayer(Material::MaterialProperties const &material) const;
 
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getShadeToGlassLayer(EnergyPlusData &state, int const t_Index) const;
 
-        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getComplexGapLayer(EnergyPlusData &state, Material::MaterialProperties const &material) const;
+        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getComplexGapLayer(EnergyPlusData &state,
+                                                                            Material::MaterialProperties const &material) const;
 
         Gases::CGas getGas(Material::MaterialProperties const &material) const;
         static Gases::CGas getAir();

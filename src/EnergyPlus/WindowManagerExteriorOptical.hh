@@ -63,7 +63,6 @@ namespace DataHeatBalance {
 }
 } // namespace EnergyPlus
 
-
 namespace EnergyPlus {
 
 // Forward declarations

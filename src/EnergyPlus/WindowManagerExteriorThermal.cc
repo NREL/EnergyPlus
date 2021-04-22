@@ -483,7 +483,7 @@ namespace WindowManager {
 
             aSolidLayer->setSolarAbsorptance(absCoeff, swRadiation);
         }
-        return std::move(aSolidLayer);
+        return aSolidLayer;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
