@@ -4847,33 +4847,40 @@ namespace UnitarySystems {
                             }
 
                             if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX")) {
-                                //
+                                
+                                int childCCIndex_temp = CoilCoolingDX::factory(state, ChildCoolingCoilName);
                                 errFlag = false;
-                                if (thisSys.m_CoolingCoilIndex < 0) {
+                                if (childCCIndex_temp < 0) {
                                     ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                     errFlag = true;
                                     errorsFound = true;
                                 }
-                                thisSys.m_CoolingCoilAvailSchPtr = state.dataCoilCooingDX->coilCoolingDXs[thisSys.m_CoolingCoilIndex].availScheduleIndex;
 
-                                // Get Coil:Cooling:DX coil air flow rate. Later fields will overwrite this IF input field is present
-                                errFlag = false;
-                                Real64 airMassFlowRate = 0.0;
-                                thisSys.m_MaxCoolAirVolFlow = state.dataCoilCooingDX->coilCoolingDXs[thisSys.m_CoolingCoilIndex].airMassFlowRate; // not sure if this is good; it mass flow rate rather than vol
-                                // maybe use getDataAfterSizing() to get max cool air vol flow for new coil? 
+                                auto &newCoil_temp = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex_temp];
+                                thisSys.m_DesignCoolingCapacity = newCoil_temp.performance.normalMode.ratedGrossTotalCap;
+                                thisSys.m_MaxCoolAirVolFlow = newCoil_temp.performance.normalMode.ratedEvapAirFlowRate;
+                                if (thisSys.m_DesignCoolingCapacity == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
                                 if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
-                                if (errFlag) { // this errFlag is not changed for new coil:cooling:dx
-                                    ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
-                                    errorsFound = true;
-                                }
+                                thisSys.m_CoolingCoilAvailSchPtr = newCoil_temp.availScheduleIndex;
+
+                                // // Get Coil:Cooling:DX coil air flow rate. Later fields will overwrite this IF input field is present
+                                // errFlag = false;
+                                // maybe use getDataAfterSizing() to get max cool air vol flow for new coil? 
+                                // if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                                // if (errFlag) { // this errFlag is not changed for new coil:cooling:dx
+                                //    ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                //    errorsFound = true;
+                                // }
 
                                 // Get Outdoor condenser node from heat exchanger assisted DX coil object
                                 errFlag = false;
-                                thisSys.m_CondenserNodeNum = state.dataCoilCooingDX->coilCoolingDXs[thisSys.m_CoolingCoilIndex].condInletNodeIndex;
-                                if (errFlag) { // this errFlag is not changed for new coil:cooling:dx
-                                    ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
-                                    errorsFound = true;
-                                }
+                                // thisSys.m_CondenserNodeNum = state.dataCoilCooingDX->coilCoolingDXs[thisSys.m_CoolingCoilIndex].condInletNodeIndex;
+                                thisSys.m_CondenserNodeNum = newCoil_temp.condInletNodeIndex;
+
+                                // if (errFlag) { // this errFlag is not changed for new coil:cooling:dx
+                                //    ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                //    errorsFound = true;
+                                //}
 
                             } else if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX:SINGLESPEED")) {
 

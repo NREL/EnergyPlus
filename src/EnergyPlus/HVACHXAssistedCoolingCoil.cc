@@ -358,6 +358,18 @@ namespace HVACHXAssistedCoolingCoil {
                     CoolingCoilErrFlag = true;
                     ErrorsFound = true;
                 }
+                int coolingCoilIndex_temp = state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex;
+                state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).DXCoilNumOfSpeeds =
+                    state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex_temp].performance.normalMode.speeds.size();
+                if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).DXCoilNumOfSpeeds < 1) {
+                    CoolingCoilErrFlag = true;
+                }
+                if (CoolingCoilErrFlag) {
+                    ShowContinueError(state,
+                                      "...occurs in " + CurrentModuleObject + "=\"" +
+                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
+                    ErrorsFound = true;
+                }
             } else if (UtilityRoutines::SameString(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
                                             "Coil:Cooling:DX:SingleSpeed")) {
                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num = CoilDX_CoolingSingleSpeed;
