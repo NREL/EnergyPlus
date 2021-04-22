@@ -6802,6 +6802,7 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
         }
+        this->m_setupOutputVars = true;
     }
 
     void UnitarySys::getUnitarySystemInputData(
@@ -7047,10 +7048,8 @@ namespace UnitarySystems {
 
                 if (sysNum == -1) {
                     state.dataUnitarySystems->unitarySys.push_back(thisSys);
-                    thisSys.m_setupOutputVars = true;
                 } else {
                     state.dataUnitarySystems->unitarySys[sysNum] = thisSys;
-                    thisSys.m_setupOutputVars = false;
                 }
 
                 if (sysNum == -1) sysNum = getUnitarySystemIndex(state, thisObjectName);
