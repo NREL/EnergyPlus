@@ -1369,8 +1369,7 @@ namespace HVACHXAssistedCoolingCoil {
 
                 if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                     int coolingCoilDXIndex = state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilIndex;
-                    CoilCapacity = 1.0;  // state.dataCoilCooingDX->coilCoolingDXs[coolingCoilDXIndex]. // Need to find the capacity of the new
-                                        // Coil:Cooling:DX coil
+                    CoilCapacity = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilDXIndex].performance.standardRatingCoolingCapacity; 
                 } else if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
                     CoilCapacity = GetDXCoilCapacity(state,
                                                      state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
