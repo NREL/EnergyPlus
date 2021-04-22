@@ -353,7 +353,7 @@ namespace HVACHXAssistedCoolingCoil {
                 CoolingCoilErrFlag = false;
                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex =
                     CoilCoolingDX::factory(state, state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName);
-                if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex == -1) {
+                if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex < 0) {
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + AlphArray(5));
                     CoolingCoilErrFlag = true;
                     ErrorsFound = true;
