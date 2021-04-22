@@ -63,22 +63,26 @@ struct EnergyPlusData;
 
 namespace DataSurfaceColors {
 
-    int constexpr NumColors = 15;
-    int constexpr ColorNo_Text = 1;
-    int constexpr ColorNo_Wall = 2;
-    int constexpr ColorNo_Window = 3;
-    int constexpr ColorNo_GlassDoor = 4;
-    int constexpr ColorNo_Door = 5;
-    int constexpr ColorNo_Floor = 6;
-    int constexpr ColorNo_Roof = 7;
-    int constexpr ColorNo_ShdDetBldg = 8;
-    int constexpr ColorNo_ShdDetFix = 9;
-    int constexpr ColorNo_ShdAtt = 10;
-    int constexpr ColorNo_PV = 11;
-    int constexpr ColorNo_TDDDome = 12;
-    int constexpr ColorNo_TDDDiffuser = 13;
-    int constexpr ColorNo_DaylSensor1 = 14;
-    int constexpr ColorNo_DaylSensor2 = 15;
+    enum class ColorNo
+    {
+        Unassigned = -1,
+        Text,
+        Wall,
+        Window,
+        GlassDoor,
+        Door,
+        Floor,
+        Roof,
+        ShdDetBldg,
+        ShdDetFix,
+        ShdAtt,
+        PV,
+        TDDDome,
+        TDDDiffuser,
+        DaylSensor1,
+        DaylSensor2,
+        NUM
+    };
 
     bool MatchAndSetColorTextString(EnergyPlusData &state,
                                     std::string const &String,   // string to be matched
@@ -92,10 +96,10 @@ namespace DataSurfaceColors {
 
 struct SurfaceColorData : BaseGlobalStruct
 {
-    Array1D_int const defaultcolorno = Array1D_int(DataSurfaceColors::NumColors, {3, 43, 143, 143, 45, 8, 15, 195, 9, 13, 174, 143, 143, 10, 5});
-    Array1D_int DXFcolorno = Array1D_int(DataSurfaceColors::NumColors, SurfaceColorData::defaultcolorno);
+    Array1D_int const defaultcolorno = Array1D_int(static_cast<int>(DataSurfaceColors::ColorNo::NUM), {3, 43, 143, 143, 45, 8, 15, 195, 9, 13, 174, 143, 143, 10, 5});
+    Array1D_int DXFcolorno = Array1D_int(static_cast<int>(DataSurfaceColors::ColorNo::NUM), SurfaceColorData::defaultcolorno);
 
-    Array1D_string const colorkeys = Array1D_string(DataSurfaceColors::NumColors,
+    Array1D_string const colorkeys = Array1D_string(static_cast<int>(DataSurfaceColors::ColorNo::NUM),
                                                     {"Text",
                                                      "Walls",
                                                      "Windows",
@@ -112,26 +116,26 @@ struct SurfaceColorData : BaseGlobalStruct
                                                      "DaylightReferencePoint1",
                                                      "DaylightReferencePoint2"});
 
-    Array1D_int const colorkeyptr = Array1D_int(DataSurfaceColors::NumColors,
-                                                {DataSurfaceColors::ColorNo_Text,
-                                                 DataSurfaceColors::ColorNo_Wall,
-                                                 DataSurfaceColors::ColorNo_Window,
-                                                 DataSurfaceColors::ColorNo_GlassDoor,
-                                                 DataSurfaceColors::ColorNo_Door,
-                                                 DataSurfaceColors::ColorNo_Floor,
-                                                 DataSurfaceColors::ColorNo_Roof,
-                                                 DataSurfaceColors::ColorNo_ShdDetBldg,
-                                                 DataSurfaceColors::ColorNo_ShdDetFix,
-                                                 DataSurfaceColors::ColorNo_ShdAtt,
-                                                 DataSurfaceColors::ColorNo_PV,
-                                                 DataSurfaceColors::ColorNo_TDDDome,
-                                                 DataSurfaceColors::ColorNo_TDDDiffuser,
-                                                 DataSurfaceColors::ColorNo_DaylSensor1,
-                                                 DataSurfaceColors::ColorNo_DaylSensor2});
+    Array1D_int const colorkeyptr = Array1D_int(static_cast<int>(DataSurfaceColors::ColorNo::NUM),
+                                                {static_cast<int>(DataSurfaceColors::ColorNo::Text),
+                                                 static_cast<int>(DataSurfaceColors::ColorNo::Wall),
+                                                 static_cast<int>(DataSurfaceColors::ColorNo::Window),
+                                                 static_cast<int>(DataSurfaceColors::ColorNo::GlassDoor),
+                                                 static_cast<int>(DataSurfaceColors::ColorNo::Door),
+                                                 static_cast<int>(DataSurfaceColors::ColorNo::Floor),
+                                                 static_cast<int>(DataSurfaceColors::ColorNo::Roof),
+                                                 static_cast<int>(DataSurfaceColors::ColorNo::ShdDetBldg),
+                                                 static_cast<int>(DataSurfaceColors::ColorNo::ShdDetFix),
+                                                 static_cast<int>(DataSurfaceColors::ColorNo::ShdAtt),
+                                                 static_cast<int>(DataSurfaceColors::ColorNo::PV),
+                                                 static_cast<int>(DataSurfaceColors::ColorNo::TDDDome),
+                                                 static_cast<int>(DataSurfaceColors::ColorNo::TDDDiffuser),
+                                                 static_cast<int>(DataSurfaceColors::ColorNo::DaylSensor1),
+                                                 static_cast<int>(DataSurfaceColors::ColorNo::DaylSensor2)});
 
     void clear_state() override
     {
-        this->DXFcolorno = Array1D_int(DataSurfaceColors::NumColors, SurfaceColorData::defaultcolorno);
+        this->DXFcolorno = Array1D_int(static_cast<int>(DataSurfaceColors::ColorNo::NUM), SurfaceColorData::defaultcolorno);
     }
 };
 
