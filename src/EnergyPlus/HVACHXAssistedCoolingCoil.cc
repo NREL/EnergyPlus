@@ -1138,7 +1138,8 @@ namespace HVACHXAssistedCoolingCoil {
                 if (state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].getNumModes() > 1) {
                     singleMode = false;
                 }
-                state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].performance.normalMode.speeds[0].grossRatedSHR;
+                Real64 CoilSHR = 0.75; // state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].performance.NormalSHR;
+                    // state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].performance.normalMode.speeds[0].grossRatedSHR;
 
                 state.dataCoilCooingDX->coilCoolingDXs[state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex].simulate(
                     state,
