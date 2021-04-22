@@ -516,7 +516,7 @@ struct UnitarySysInputSpec
         void processInputSpec(EnergyPlusData &state,
                               const UnitarySysInputSpec &input_data,
                               int sysNum,
-                              bool errorsFound,
+                              bool &errorsFound,
                               bool const ZoneEquipment,
                               int const ZoneOAUnitNum);
 

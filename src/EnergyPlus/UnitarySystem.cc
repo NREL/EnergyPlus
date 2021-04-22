@@ -2899,12 +2899,12 @@ namespace UnitarySystems {
     }
 
     void UnitarySys::processInputSpec(
-        EnergyPlusData &state, const UnitarySysInputSpec &input_data, int sysNum, bool errorsFound, bool const ZoneEquipment, int const ZoneOAUnitNum)
+        EnergyPlusData &state, const UnitarySysInputSpec &input_data, int sysNum, bool &errorsFound, bool const ZoneEquipment, int const ZoneOAUnitNum)
     {
 
         static std::string const unitarySysHeatPumpPerformanceObjectType("UnitarySystemPerformance:Multispeed");
 
-        std::string cCurrentModuleObject("AirloopHVAC:UnitarySystem");
+        std::string cCurrentModuleObject("AirLoopHVAC:UnitarySystem");
         std::string thisObjectName = input_data.name;
 
         std::string loc_AirInNodeName = input_data.air_inlet_node_name;
@@ -3030,7 +3030,7 @@ namespace UnitarySystems {
             this->m_SysAvailSchedPtr = ScheduleManager::GetScheduleIndex(state, loc_sysAvailSched);
             if (this->m_SysAvailSchedPtr == 0) {
                 ShowWarningError(state,
-                                 "getUnitarySystemInputdata" + cCurrentModuleObject + "=\"" + this->Name + "\", invalid Availability Schedule Name" +
+                                 "getUnitarySystemInputData" + cCurrentModuleObject + "=\"" + this->Name + "\", invalid Availability Schedule Name" +
                                      " = " + loc_sysAvailSched);
                 ShowContinueError(state, "Set the default as Always On. Simulation continues.");
                 this->m_SysAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -3985,7 +3985,7 @@ namespace UnitarySystems {
                     int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                     Real64 TempSteamIn = 100.0;
                     Real64 SteamDensity =
-                        FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, "getUnitarySystemInputdata");
+                        FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, "getUnitarySystemInputData");
                     this->MaxHeatCoilFluidFlow *= SteamDensity;
                     errFlag = false;
                 }
@@ -5555,7 +5555,7 @@ namespace UnitarySystems {
                         int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                         Real64 TempSteamIn = 100.0;
                         Real64 SteamDensity =
-                            FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, "getUnitarySystemInputdata");
+                            FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, "getUnitarySystemInputData");
                         this->m_MaxSuppCoilFluidFlow =
                             SteamCoils::GetCoilMaxSteamFlowRate(state, this->m_SuppHeatCoilIndex, errFlag) * SteamDensity;
                     }
