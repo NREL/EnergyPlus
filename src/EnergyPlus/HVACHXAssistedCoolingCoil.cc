@@ -454,13 +454,9 @@ namespace HVACHXAssistedCoolingCoil {
             if (UtilityRoutines::SameString(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
                                             "Coil:Cooling:DX")) {
                 CoolingCoilErrFlag = false;
-                // CoolingCoilInletNodeNum = GetDXCoilInletNode(state,
-                //                                              state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
-                //                                              state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
-                //                                              CoolingCoilErrFlag);
                 CoolingCoilInletNodeNum =
                     state.dataCoilCooingDX->coilCoolingDXs[state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex].evapInletNodeIndex;
-                if (CoolingCoilErrFlag) {
+                if (CoolingCoilErrFlag) { // this flag is not changed
                     ShowContinueError(state,
                                       "...Occurs in " + CurrentModuleObject + "=\"" +
                                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
@@ -482,17 +478,12 @@ namespace HVACHXAssistedCoolingCoil {
                     ShowContinueError(state, "Cooling coil air inlet node name=\"" + state.dataLoopNodes->NodeID(CoolingCoilInletNodeNum) + "\"");
                     ErrorsFound = true;
                 }
+
                 CoolingCoilErrFlag = false;
-                // CoolingCoilOutletNodeNum =
-                //    VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(state,
-                //                                                       state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
-                //                                                       state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
-                //                                                       CoolingCoilErrFlag);
                 CoolingCoilOutletNodeNum =
                         state.dataCoilCooingDX->coilCoolingDXs[state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex]
                         .evapOutletNodeIndex;
-
-                if (CoolingCoilErrFlag) {
+                if (CoolingCoilErrFlag) { // this error flag is not changed
                     ShowContinueError(state,
                                       "...Occurs in " + CurrentModuleObject + "=\"" +
                                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
