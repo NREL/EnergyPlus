@@ -4857,9 +4857,9 @@ namespace UnitarySystems {
                                 }
 
                                 auto &newCoil_temp = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex_temp];
-                                thisSys.m_DesignCoolingCapacity = newCoil_temp.performance.normalMode.ratedGrossTotalCap;
+                                // thisSys.m_DesignCoolingCapacity = newCoil_temp.performance.normalMode.ratedGrossTotalCap;
                                 thisSys.m_MaxCoolAirVolFlow = newCoil_temp.performance.normalMode.ratedEvapAirFlowRate;
-                                if (thisSys.m_DesignCoolingCapacity == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                                // if (thisSys.m_DesignCoolingCapacity == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
                                 if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
                                 thisSys.m_CoolingCoilAvailSchPtr = newCoil_temp.availScheduleIndex;
 
