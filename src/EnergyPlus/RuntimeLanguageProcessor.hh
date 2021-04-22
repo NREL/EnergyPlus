@@ -67,7 +67,7 @@ namespace RuntimeLanguageProcessor {
 
     // Using/Aliasing
     using DataRuntimeLanguage::ErlValueType;
-    using DataRuntimeLanguage::Parameters;
+    using DataRuntimeLanguage::ErlFunc;
 
     int constexpr MaxErrors(20);
 
@@ -92,14 +92,14 @@ namespace RuntimeLanguageProcessor {
         Token Type;         // token type, eg. TokenNumber
         Real64 Number;      // May want to store all literals as a variable?
         std::string String; // Serves double duty, also saves string version of token for easy debugging
-        Parameters Operator; // indentifies operator or function 1..64
+        ErlFunc Operator; // indentifies operator or function 1..64
         int Variable;       // points to a variable in ErlVariable structure
         int Parenthesis;    // identifes if token is left or right parenthesis
         int Expression;     // points to an expression in ErlExpression structure
         std::string Error;  // holds token processing error message content
 
         // Default Constructor
-        TokenType() : Type(Token::Unassigned), Number(0.0), Operator(Parameters::Unassigned), Variable(0), Parenthesis(0), Expression(0)
+        TokenType() : Type(Token::Unassigned), Number(0.0), Operator(ErlFunc::Unassigned), Variable(0), Parenthesis(0), Expression(0)
         {
         }
     };
@@ -154,14 +154,14 @@ namespace RuntimeLanguageProcessor {
     ErlValueType EvaluateExpression(EnergyPlusData &state, int ExpressionNum, bool &seriousErrorFound);
 
     void TodayTomorrowWeather(EnergyPlusData &state,
-                              Parameters FunctionCode,
+                              ErlFunc FunctionCode,
                               Real64 Operand1,
                               Real64 Operand2,
                               Array2D<Real64> &TodayTomorrowWeatherSource,
                               ErlValueType &ReturnVal);
 
     void TodayTomorrowWeather(EnergyPlusData &state,
-                              Parameters FunctionCode,
+                              ErlFunc FunctionCode,
                               Real64 Operand1,
                               Real64 Operand2,
                               Array2D_bool &TodayTomorrowWeatherSource,

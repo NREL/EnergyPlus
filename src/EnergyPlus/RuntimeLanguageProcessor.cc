@@ -421,10 +421,10 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
             if (SELECT_CASE_var == "RETURN") {
                 if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "RETURN \"{}\"\n", Line);
                 if (Remainder.empty()) {
-                    InstructionNum = AddInstruction(state, StackNum, LineNum, RuntimeLanguageProcessor::ErlKeywordParam::KeywordReturn);
+                    InstructionNum = AddInstruction(state, StackNum, LineNum, RuntimeLanguageProcessor::ErlKeywordParam::Return);
                 } else {
                     ParseExpression(state, Remainder, StackNum, ExpressionNum, Line);
-                    InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordReturn, ExpressionNum);
+                    InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::Return, ExpressionNum);
                 }
 
             } else if (SELECT_CASE_var == "SET") {
@@ -449,7 +449,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
                     } else {
                         ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
                         InstructionNum =
-                            AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordSet, VariableNum, ExpressionNum);
+                            AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::Set, VariableNum, ExpressionNum);
                     }
                 }
 
@@ -466,7 +466,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
                     if (StackNum2 == 0) {
                         AddError(state, StackNum, LineNum, "Program or Subroutine name [" + Variable + "] not found for the RUN instruction.");
                     } else {
-                        InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordRun, StackNum2);
+                        InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::Run, StackNum2);
                     }
                 }
 
@@ -493,7 +493,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
                     InstructionNum = AddInstruction(state,
                                                     StackNum,
                                                     LineNum,
-                                                    DataRuntimeLanguage::ErlKeywordParam::KeywordIf,
+                                                    DataRuntimeLanguage::ErlKeywordParam::If,
                                                     ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
                     SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
                 }
@@ -509,7 +509,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
                 }
 
                 // Complete the preceding block with a GOTO instruction
-                InstructionNum = AddInstruction(state, StackNum, 0, DataRuntimeLanguage::ErlKeywordParam::KeywordGoto); // Arg2 is added at the ENDIF
+                InstructionNum = AddInstruction(state, StackNum, 0, DataRuntimeLanguage::ErlKeywordParam::Goto); // Arg2 is added at the ENDIF
                 ++NumGotos(NestedIfDepth);
                 if (NumGotos(NestedIfDepth) > ELSEIFLengthAllowed) {
                     AddError(state, StackNum, LineNum, "Detected ELSEIF series that is longer than allowed; terminate earlier IF instruction.");
@@ -529,7 +529,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
                 InstructionNum = AddInstruction(state,
                                                 StackNum,
                                                 LineNum,
-                                                DataRuntimeLanguage::ErlKeywordParam::KeywordIf,
+                                                DataRuntimeLanguage::ErlKeywordParam::If,
                                                 ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
                 state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
                 SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
@@ -549,7 +549,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
                 ReadyForElse(NestedIfDepth) = false;
 
                 // Complete the preceding block with a GOTO instruction
-                InstructionNum = AddInstruction(state, StackNum, 0, DataRuntimeLanguage::ErlKeywordParam::KeywordGoto); // Arg2 is added at the ENDIF
+                InstructionNum = AddInstruction(state, StackNum, 0, DataRuntimeLanguage::ErlKeywordParam::Goto); // Arg2 is added at the ENDIF
                 ++NumGotos(NestedIfDepth);
                 if (NumGotos(NestedIfDepth) > ELSEIFLengthAllowed) {
                     AddError(state, StackNum, LineNum, "Detected ELSEIF-ELSE series that is longer than allowed.");
@@ -563,7 +563,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
                 }
 
                 InstructionNum =
-                    AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordElse); // can make this into a KeywordIf?
+                    AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::Else); // can make this into a KeywordIf?
                 state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
                 SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
 
@@ -587,7 +587,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
                     AddError(state, StackNum, LineNum, "Nothing is allowed to follow the ENDIF instruction.");
                 }
 
-                InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordEndIf);
+                InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::EndIf);
                 state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
 
                 // Go back and complete all of the GOTOs that terminate each IF and ELSEIF block
@@ -617,7 +617,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
                         state, StackNum, LineNum, "Detected WHILE nested deeper than is allowed; need to terminate an earlier WHILE instruction.");
                     break;
                 } else {
-                    InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordWhile, ExpressionNum);
+                    InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::While, ExpressionNum);
                     SavedWhileInstructionNum = InstructionNum;
                     SavedWhileExpressionNum = ExpressionNum;
                 }
@@ -632,7 +632,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
                     AddError(state, StackNum, LineNum, "Nothing is allowed to follow the ENDWHILE instruction.");
                 }
 
-                InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordEndWhile);
+                InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::EndWhile);
                 state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedWhileInstructionNum).Argument2 = InstructionNum;
                 state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1 = SavedWhileExpressionNum;
                 state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2 = SavedWhileInstructionNum;
@@ -797,17 +797,17 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
         {
             auto const SELECT_CASE_var(state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Keyword);
 
-            if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordNone) {
+            if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::None) {
                 // There probably shouldn't be any of these
 
-            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordReturn) {
+            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Return) {
                 if (state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1 > 0)
                     ReturnValue =
                         EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
                 WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                 break; // RETURN always terminates an instruction stack
 
-            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordSet) {
+            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Set) {
 
                 ReturnValue =
                     EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
@@ -822,13 +822,13 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
 
                 WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
-            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordRun) {
+            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Run) {
                 ReturnValue.Type = Value::String;
                 ReturnValue.String = "";
                 WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                 ReturnValue = EvaluateStack(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1);
-            } else if ((SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordIf) ||
-                       (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordElse)) { // same???
+            } else if ((SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::If) ||
+                       (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Else)) { // same???
                 ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                 InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
                 if (ExpressionNum > 0) { // could be 0 if this was an ELSE
@@ -845,7 +845,7 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
                     ReturnValue.Number = 1.0;
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                 }
-            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordGoto) {
+            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Goto) {
                 InstructionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
 
                 // For debug purposes only...
@@ -855,12 +855,12 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
                 continue;
                 // PE if this ever went out of bounds, would the DO loop save it?  or need check here?
 
-            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordEndIf) {
+            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::EndIf) {
                 ReturnValue.Type = Value::String;
                 ReturnValue.String = "";
                 WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
-            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordWhile) {
+            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::While) {
                 // evaluate expression at while, skip to past endwhile if not true
                 ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                 InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
@@ -871,7 +871,7 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
                     InstructionNum = InstructionNum2;
                     // CYCLE
                 }
-            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordEndWhile) {
+            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::EndWhile) {
 
                 // reevaluate expression at While and goto there if true, otherwise continue
                 ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
@@ -1234,7 +1234,7 @@ void ParseExpression(EnergyPlusData &state,
 
             // parse an operator if found,
             // returns true and increments position, other wise returns false and leaves state untouched
-            const auto parse = [&](const char *string, Parameters op, bool case_insensitive) {
+            const auto parse = [&](const char *string, ErlFunc op, bool case_insensitive) {
                 const auto len = strlen(string);
                 const auto potential_match = String.substr(Pos, len);
 
@@ -1250,72 +1250,64 @@ void ParseExpression(EnergyPlusData &state,
             };
 
             // case insensitive wrapper call to parse
-            const auto i_parse = [&](const char *string, const Parameters op) { return parse(string, op, true); };
+            const auto i_parse = [&](const char *string, const ErlFunc op) { return parse(string, op, true); };
 
             // First check for two character operators:  == <> <= >= || &&
             std::string const cc(String.substr(Pos, 2));
-            if (parse("==", Parameters::OperatorEqual, false) || parse("<>", Parameters::OperatorNotEqual, false) ||
-                parse("<=", Parameters::OperatorLessOrEqual, false) || parse(">=", Parameters::OperatorGreaterOrEqual, false) ||
-                parse("||", Parameters::OperatorLogicalOR, false) || parse("&&", Parameters::OperatorLogicalAND, false)) {
+            if (parse("==", ErlFunc::Equal, false) || parse("<>", ErlFunc::NotEqual, false) ||
+                parse("<=", ErlFunc::LessOrEqual, false) || parse(">=", ErlFunc::GreaterOrEqual, false) ||
+                parse("||", ErlFunc::LogicalOR, false) || parse("&&", ErlFunc::LogicalAND, false)) {
                 // One of the comparision / logical operators
                 OperatorProcessing = true;
 
             } else if (String[Pos] == '@') { // next check for builtin functions signaled by "@"
 
-                if (i_parse("@Round", Parameters::FuncRound) || i_parse("@Mod", Parameters::FuncMod) || i_parse("@Sin", Parameters::FuncSin) ||
-                    i_parse("@Cos", Parameters::FuncCos) || i_parse("@ArcCos", Parameters::FuncArcCos) ||
-                    i_parse("@ArcSin", Parameters::FuncArcSin) ||
-                    i_parse("@DegToRad", Parameters::FuncDegToRad) || i_parse("@RadToDeg", Parameters::FuncRadToDeg) ||
-                    i_parse("@Exp", Parameters::FuncExp) ||
-                    i_parse("@Ln", Parameters::FuncLn) ||
-                    i_parse("@Max", Parameters::FuncMax) || i_parse("@Min", Parameters::FuncMin) || i_parse("@Abs", Parameters::FuncABS) ||
-                    i_parse("@RANDOMUNIFORM", Parameters::FuncRandU) ||
-                    i_parse("@RANDOMNORMAL", Parameters::FuncRandG) || i_parse("@SEEDRANDOM", Parameters::FuncRandSeed) ||
-                    i_parse("@RhoAirFnPbTdbW", Parameters::FuncRhoAirFnPbTdbW) ||
-                    i_parse("@CpAirFnW", Parameters::FuncCpAirFnW) || i_parse("@HfgAirFnWTdb", Parameters::FuncHfgAirFnWTdb) ||
-                    i_parse("@HgAirFnWTdb", Parameters::FuncHgAirFnWTdb) ||
-                    i_parse("@TdpFnTdbTwbPb", Parameters::FuncTdpFnTdbTwbPb) || i_parse("@TdpFnWPb", Parameters::FuncTdpFnWPb) ||
-                    i_parse("@HFnTdbW", Parameters::FuncHFnTdbW) ||
-                    i_parse("@HFnTdbRhPb", Parameters::FuncHFnTdbRhPb) || i_parse("@TdbFnHW", Parameters::FuncTdbFnHW) ||
-                    i_parse("@RhovFnTdbRhLBnd0C", Parameters::FuncRhovFnTdbRhLBnd0C) || i_parse("@RhovFnTdbRh", Parameters::FuncRhovFnTdbRh) ||
-                    i_parse("@RhovFnTdbWPb", Parameters::FuncRhovFnTdbWPb) || i_parse("@RhFnTdbRhovLBnd0C", Parameters::FuncRhFnTdbRhovLBnd0C) ||
-                    i_parse("@RhFnTdbRhov", Parameters::FuncRhFnTdbRhov) || i_parse("@RhFnTdbWPb", Parameters::FuncRhFnTdbWPb) ||
-                    i_parse("@TwbFnTdbWPb", Parameters::FuncTwbFnTdbWPb) ||
-                    i_parse("@VFnTdbWPb", Parameters::FuncVFnTdbWPb) || i_parse("@WFnTdpPb", Parameters::FuncWFnTdpPb) ||
-                    i_parse("@WFnTdbH", Parameters::FuncWFnTdbH) ||
-                    i_parse("@WFnTdbTwbPb", Parameters::FuncWFnTdbTwbPb) || i_parse("@WFnTdbRhPb", Parameters::FuncWFnTdbRhPb) ||
-                    i_parse("@PsatFnTemp", Parameters::FuncPsatFnTemp) ||
-                    i_parse("@TsatFnHPb", Parameters::FuncTsatFnHPb) || i_parse("@TsatFnPb", Parameters::FuncTsatFnPb) ||
-                    i_parse("@CpCW", Parameters::FuncCpCW) ||
-                    i_parse("@CpHW", Parameters::FuncCpHW) || i_parse("@RhoH2O", Parameters::FuncRhoH2O) ||
-                    i_parse("@FATALHALTEP", Parameters::FuncFatalHaltEp) ||
-                    i_parse("@SEVEREWARNEP", Parameters::FuncSevereWarnEp) || i_parse("@WARNEP", Parameters::FuncWarnEp) ||
-                    i_parse("@TRENDVALUE", Parameters::FuncTrendValue) ||
-                    i_parse("@TRENDAVERAGE", Parameters::FuncTrendAverage) || i_parse("@TRENDMAX", Parameters::FuncTrendMax) ||
-                    i_parse("@TRENDMIN", Parameters::FuncTrendMin) ||
-                    i_parse("@TRENDDIRECTION", Parameters::FuncTrendDirection) || i_parse("@TRENDSUM", Parameters::FuncTrendSum) ||
-                    i_parse("@CURVEVALUE", Parameters::FuncCurveValue) ||
-                    i_parse("@TODAYISRAIN", Parameters::FuncTodayIsRain) || i_parse("@TODAYISSNOW", Parameters::FuncTodayIsSnow) ||
-                    i_parse("@TODAYOUTDRYBULBTEMP", Parameters::FuncTodayOutDryBulbTemp) ||
-                    i_parse("@TODAYOUTDEWPOINTTEMP", Parameters::FuncTodayOutDewPointTemp) ||
-                    i_parse("@TODAYOUTBAROPRESS", Parameters::FuncTodayOutBaroPress) || i_parse("@TODAYOUTRELHUM", Parameters::FuncTodayOutRelHum) ||
-                    i_parse("@TODAYWINDSPEED", Parameters::FuncTodayWindSpeed) || i_parse("@TODAYWINDDIR", Parameters::FuncTodayWindDir) ||
-                    i_parse("@TODAYSKYTEMP", Parameters::FuncTodaySkyTemp) || i_parse("@TODAYHORIZIRSKY", Parameters::FuncTodayHorizIRSky) ||
-                    i_parse("@TODAYBEAMSOLARRAD", Parameters::FuncTodayBeamSolarRad) ||
-                    i_parse("@TODAYDIFSOLARRAD", Parameters::FuncTodayDifSolarRad) ||
-                    i_parse("@TODAYALBEDO", Parameters::FuncTodayAlbedo) || i_parse("@TODAYLIQUIDPRECIP", Parameters::FuncTodayLiquidPrecip) ||
-                    i_parse("@TOMORROWISRAIN", Parameters::FuncTomorrowIsRain) || i_parse("@TOMORROWISSNOW", Parameters::FuncTomorrowIsSnow) ||
-                    i_parse("@TOMORROWOUTDRYBULBTEMP", Parameters::FuncTomorrowOutDryBulbTemp) ||
-                    i_parse("@TOMORROWOUTDEWPOINTTEMP", Parameters::FuncTomorrowOutDewPointTemp) ||
-                    i_parse("@TOMORROWOUTBAROPRESS", Parameters::FuncTomorrowOutBaroPress) ||
-                    i_parse("@TOMORROWOUTRELHUM", Parameters::FuncTomorrowOutRelHum) ||
-                    i_parse("@TOMORROWWINDSPEED", Parameters::FuncTomorrowWindSpeed) ||
-                    i_parse("@TOMORROWWINDDIR", Parameters::FuncTomorrowWindDir) || i_parse("@TOMORROWSKYTEMP", Parameters::FuncTomorrowSkyTemp) ||
-                    i_parse("@TOMORROWHORIZIRSKY", Parameters::FuncTomorrowHorizIRSky) ||
-                    i_parse("@TOMORROWBEAMSOLARRAD", Parameters::FuncTomorrowBeamSolarRad) ||
-                    i_parse("@TOMORROWDIFSOLARRAD", Parameters::FuncTomorrowDifSolarRad) ||
-                    i_parse("@TOMORROWALBEDO", Parameters::FuncTomorrowAlbedo) ||
-                    i_parse("@TOMORROWLIQUIDPRECIP", Parameters::FuncTomorrowLiquidPrecip)) {
+                if (i_parse("@Round", ErlFunc::Round) || i_parse("@Mod", ErlFunc::Mod) || i_parse("@Sin", ErlFunc::Sin) ||
+                    i_parse("@Cos", ErlFunc::Cos) || i_parse("@ArcCos", ErlFunc::ArcCos) ||
+                    i_parse("@ArcSin", ErlFunc::ArcSin) || i_parse("@DegToRad", ErlFunc::DegToRad) ||
+                    i_parse("@RadToDeg", ErlFunc::RadToDeg) || i_parse("@Exp", ErlFunc::Exp) || i_parse("@Ln", ErlFunc::Ln) ||
+                    i_parse("@Max", ErlFunc::Max) || i_parse("@Min", ErlFunc::Min) || i_parse("@Abs", ErlFunc::ABS) ||
+                    i_parse("@RANDOMUNIFORM", ErlFunc::RandU) || i_parse("@RANDOMNORMAL", ErlFunc::RandG) ||
+                    i_parse("@SEEDRANDOM", ErlFunc::RandSeed) || i_parse("@RhoAirFnPbTdbW", ErlFunc::RhoAirFnPbTdbW) ||
+                    i_parse("@CpAirFnW", ErlFunc::CpAirFnW) || i_parse("@HfgAirFnWTdb", ErlFunc::HfgAirFnWTdb) ||
+                    i_parse("@HgAirFnWTdb", ErlFunc::HgAirFnWTdb) || i_parse("@TdpFnTdbTwbPb", ErlFunc::TdpFnTdbTwbPb) ||
+                    i_parse("@TdpFnWPb", ErlFunc::TdpFnWPb) || i_parse("@HFnTdbW", ErlFunc::HFnTdbW) ||
+                    i_parse("@HFnTdbRhPb", ErlFunc::HFnTdbRhPb) || i_parse("@TdbFnHW", ErlFunc::TdbFnHW) ||
+                    i_parse("@RhovFnTdbRhLBnd0C", ErlFunc::RhovFnTdbRhLBnd0C) || i_parse("@RhovFnTdbRh", ErlFunc::RhovFnTdbRh) ||
+                    i_parse("@RhovFnTdbWPb", ErlFunc::RhovFnTdbWPb) || i_parse("@RhFnTdbRhovLBnd0C", ErlFunc::RhFnTdbRhovLBnd0C) ||
+                    i_parse("@RhFnTdbRhov", ErlFunc::RhFnTdbRhov) || i_parse("@RhFnTdbWPb", ErlFunc::RhFnTdbWPb) ||
+                    i_parse("@TwbFnTdbWPb", ErlFunc::TwbFnTdbWPb) || i_parse("@VFnTdbWPb", ErlFunc::VFnTdbWPb) ||
+                    i_parse("@WFnTdpPb", ErlFunc::WFnTdpPb) || i_parse("@WFnTdbH", ErlFunc::WFnTdbH) ||
+                    i_parse("@WFnTdbTwbPb", ErlFunc::WFnTdbTwbPb) || i_parse("@WFnTdbRhPb", ErlFunc::WFnTdbRhPb) ||
+                    i_parse("@PsatFnTemp", ErlFunc::PsatFnTemp) || i_parse("@TsatFnHPb", ErlFunc::TsatFnHPb) ||
+                    i_parse("@TsatFnPb", ErlFunc::TsatFnPb) || i_parse("@CpCW", ErlFunc::CpCW) ||
+                    i_parse("@CpHW", ErlFunc::CpHW) || i_parse("@RhoH2O", ErlFunc::RhoH2O) ||
+                    i_parse("@FATALHALTEP", ErlFunc::FatalHaltEp) || i_parse("@SEVEREWARNEP", ErlFunc::SevereWarnEp) ||
+                    i_parse("@WARNEP", ErlFunc::WarnEp) || i_parse("@TRENDVALUE", ErlFunc::TrendValue) ||
+                    i_parse("@TRENDAVERAGE", ErlFunc::TrendAverage) || i_parse("@TRENDMAX", ErlFunc::TrendMax) ||
+                    i_parse("@TRENDMIN", ErlFunc::TrendMin) || i_parse("@TRENDDIRECTION", ErlFunc::TrendDirection) ||
+                    i_parse("@TRENDSUM", ErlFunc::TrendSum) || i_parse("@CURVEVALUE", ErlFunc::CurveValue) ||
+                    i_parse("@TODAYISRAIN", ErlFunc::TodayIsRain) || i_parse("@TODAYISSNOW", ErlFunc::TodayIsSnow) ||
+                    i_parse("@TODAYOUTDRYBULBTEMP", ErlFunc::TodayOutDryBulbTemp) ||
+                    i_parse("@TODAYOUTDEWPOINTTEMP", ErlFunc::TodayOutDewPointTemp) ||
+                    i_parse("@TODAYOUTBAROPRESS", ErlFunc::TodayOutBaroPress) || i_parse("@TODAYOUTRELHUM", ErlFunc::TodayOutRelHum) ||
+                    i_parse("@TODAYWINDSPEED", ErlFunc::TodayWindSpeed) || i_parse("@TODAYWINDDIR", ErlFunc::TodayWindDir) ||
+                    i_parse("@TODAYSKYTEMP", ErlFunc::TodaySkyTemp) || i_parse("@TODAYHORIZIRSKY", ErlFunc::TodayHorizIRSky) ||
+                    i_parse("@TODAYBEAMSOLARRAD", ErlFunc::TodayBeamSolarRad) ||
+                    i_parse("@TODAYDIFSOLARRAD", ErlFunc::TodayDifSolarRad) || i_parse("@TODAYALBEDO", ErlFunc::TodayAlbedo) ||
+                    i_parse("@TODAYLIQUIDPRECIP", ErlFunc::TodayLiquidPrecip) || i_parse("@TOMORROWISRAIN", ErlFunc::TomorrowIsRain) ||
+                    i_parse("@TOMORROWISSNOW", ErlFunc::TomorrowIsSnow) ||
+                    i_parse("@TOMORROWOUTDRYBULBTEMP", ErlFunc::TomorrowOutDryBulbTemp) ||
+                    i_parse("@TOMORROWOUTDEWPOINTTEMP", ErlFunc::TomorrowOutDewPointTemp) ||
+                    i_parse("@TOMORROWOUTBAROPRESS", ErlFunc::TomorrowOutBaroPress) ||
+                    i_parse("@TOMORROWOUTRELHUM", ErlFunc::TomorrowOutRelHum) ||
+                    i_parse("@TOMORROWWINDSPEED", ErlFunc::TomorrowWindSpeed) ||
+                    i_parse("@TOMORROWWINDDIR", ErlFunc::TomorrowWindDir) || i_parse("@TOMORROWSKYTEMP", ErlFunc::TomorrowSkyTemp) ||
+                    i_parse("@TOMORROWHORIZIRSKY", ErlFunc::TomorrowHorizIRSky) ||
+                    i_parse("@TOMORROWBEAMSOLARRAD", ErlFunc::TomorrowBeamSolarRad) ||
+                    i_parse("@TOMORROWDIFSOLARRAD", ErlFunc::TomorrowDifSolarRad) ||
+                    i_parse("@TOMORROWALBEDO", ErlFunc::TomorrowAlbedo) ||
+                    i_parse("@TOMORROWLIQUIDPRECIP", ErlFunc::TomorrowLiquidPrecip)) {
                     // was a built in function operator
                 } else { // throw error
                     if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "ERROR \"{}\"\n", String);
@@ -1331,7 +1323,7 @@ void ParseExpression(EnergyPlusData &state,
 
                 if (StringToken == "+") {
                     if (!OperatorProcessing) {
-                        state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = Parameters::OperatorAdd;
+                        state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = ErlFunc::Add;
                         OperatorProcessing = true;
                     } else {
                         PlusFound = true;
@@ -1339,28 +1331,28 @@ void ParseExpression(EnergyPlusData &state,
                     }
                 } else if (StringToken == "-") {
                     if (!OperatorProcessing) {
-                        state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = Parameters::OperatorSubtract;
+                        state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = ErlFunc::Subtract;
                         OperatorProcessing = true;
                     } else {
                         MinusFound = true;
                         OperatorProcessing = false;
                     }
                 } else if (StringToken == "*") {
-                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = Parameters::OperatorMultiply;
+                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = ErlFunc::Multiply;
                     MultFound = true;
                     OperatorProcessing = true;
                 } else if (StringToken == "/") {
-                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = Parameters::OperatorDivide;
+                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = ErlFunc::Divide;
                     DivFound = true;
                     OperatorProcessing = true;
                 } else if (StringToken == "<") {
-                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = Parameters::OperatorLessThan;
+                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = ErlFunc::LessThan;
                     OperatorProcessing = true;
                 } else if (StringToken == ">") {
-                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = Parameters::OperatorGreaterThan;
+                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = ErlFunc::GreaterThan;
                     OperatorProcessing = true;
                 } else if (StringToken == "^") {
-                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = Parameters::OperatorRaiseToPower;
+                    state.dataRuntimeLangProcessor->PEToken(NumTokens).Operator = ErlFunc::RaiseToPower;
                     OperatorProcessing = true;
                 } else if (StringToken == "0" && (NextChar == '-')) {
                     // process string insert = "0"
@@ -1519,7 +1511,7 @@ int ProcessTokens(
         // Find the next occurrence of the operator
         Pos = 0; //  position in sequence of tokens
         for (TokenNum = 1; TokenNum <= NumTokens; ++TokenNum) {
-            if ((Token(TokenNum).Type == Token::Operator) && (Token(TokenNum).Operator == static_cast<Parameters>(OperatorNum))) {
+            if ((Token(TokenNum).Type == Token::Operator) && (Token(TokenNum).Operator == static_cast<ErlFunc>(OperatorNum))) {
                 Pos = TokenNum;
                 break;
             }
@@ -1528,9 +1520,10 @@ int ProcessTokens(
         while (Pos > 0) {
             if (Pos == 1) {
                 // if first token is for a built-in function starting with "@" then okay, otherwise the operator needs a LHS
-                if (static_cast<int>(Token(TokenNum).Operator) > static_cast<int>(Parameters::OperatorLogicalOR)) { // we have a function expression to set up
+                if (static_cast<int>(Token(TokenNum).Operator) >
+                    static_cast<int>(ErlFunc::LogicalOR)) { // we have a function expression to set up
                     ExpressionNum = NewExpression(state);
-                    state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator = static_cast<Parameters>(OperatorNum);
+                    state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator = static_cast<ErlFunc>(OperatorNum);
                     NumOperands = state.dataRuntimeLang->PossibleOperators(OperatorNum).NumOperands;
                     state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands = NumOperands;
                     state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand.allocate(NumOperands);
@@ -1546,14 +1539,16 @@ int ProcessTokens(
                             state.dataRuntimeLang->ErlVariable(Token(Pos + 1).Variable).Value.TrendVarPointer;
                     }
                     if ((NumOperands >= 2) && (NumTokens >= 3)) {
-                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Type = static_cast<Value>(static_cast<int>(Token(Pos + 2).Type));
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Type =
+                            static_cast<Value>(static_cast<int>(Token(Pos + 2).Type));
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Number = Token(Pos + 2).Number;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Expression = Token(Pos + 2).Expression;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Variable = Token(Pos + 2).Variable;
                     }
 
                     if ((NumOperands >= 3) && (NumTokens >= 4)) {
-                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(3).Type = static_cast<Value>(static_cast<int>(Token(Pos + 3).Type));
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(3).Type =
+                            static_cast<Value>(static_cast<int>(Token(Pos + 3).Type));
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(3).Number = Token(Pos + 3).Number;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(3).Expression = Token(Pos + 3).Expression;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(3).Variable = Token(Pos + 3).Variable;
@@ -1563,7 +1558,8 @@ int ProcessTokens(
                     }
 
                     if ((NumOperands >= 4) && (NumTokens >= 5)) {
-                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(4).Type = static_cast<Value>(static_cast<int>(Token(Pos + 4).Type));
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(4).Type =
+                            static_cast<Value>(static_cast<int>(Token(Pos + 4).Type));
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(4).Number = Token(Pos + 4).Number;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(4).Expression = Token(Pos + 4).Expression;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(4).Variable = Token(Pos + 4).Variable;
@@ -1573,7 +1569,8 @@ int ProcessTokens(
                     }
 
                     if ((NumOperands == 5) && (NumTokens >= 6)) {
-                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(5).Type = static_cast<Value>(static_cast<int>(Token(Pos + 5).Type));
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(5).Type =
+                            static_cast<Value>(static_cast<int>(Token(Pos + 5).Type));
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(5).Number = Token(Pos + 5).Number;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(5).Expression = Token(Pos + 5).Expression;
                         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(5).Variable = Token(Pos + 5).Variable;
@@ -1598,7 +1595,7 @@ int ProcessTokens(
             } else {
 
                 ExpressionNum = NewExpression(state);
-                state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator = static_cast<Parameters>(OperatorNum);
+                state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator = static_cast<ErlFunc>(OperatorNum);
                 NumOperands = state.dataRuntimeLang->PossibleOperators(OperatorNum).NumOperands;
                 state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands = NumOperands;
                 state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand.allocate(NumOperands);
@@ -1634,7 +1631,7 @@ int ProcessTokens(
             // Find the next occurrence of the operator  (this repeats code, but don't have better idea)
             Pos = 0;
             for (TokenNum = 1; TokenNum <= NumTokens; ++TokenNum) {
-                if ((Token(TokenNum).Type == Token::Operator) && (Token(TokenNum).Operator == static_cast<Parameters>(OperatorNum))) {
+                if ((Token(TokenNum).Type == Token::Operator) && (Token(TokenNum).Operator == static_cast<ErlFunc>(OperatorNum))) {
                     Pos = TokenNum;
                     break;
                 }
@@ -1645,14 +1642,14 @@ int ProcessTokens(
     // Should be down to just one token now
     if (Token(1).Type == Token::Number) {
         ExpressionNum = NewExpression(state);
-        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator = Parameters::OperatorLiteral;
+        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator = ErlFunc::Literal;
         state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands = 1;
         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand.allocate(1);
         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Type = static_cast<Value>(static_cast<int>(Token(1).Type));
         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Number = Token(1).Number;
     } else if (Token(1).Type == Token::Variable) {
         ExpressionNum = NewExpression(state);
-        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator = Parameters::OperatorLiteral;
+        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator = ErlFunc::Literal;
         state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands = 1;
         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand.allocate(1);
         state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Type = static_cast<Value>(static_cast<int>(Token(1).Type));
@@ -1772,7 +1769,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
 
                         // check if this is an arg in CurveValue,
                         if (state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator !=
-                            Parameters::FuncCurveValue) { // padding the argument list for CurveValue is too common to fatal on.  only reported to EDD
+                            ErlFunc::CurveValue) { // padding the argument list for CurveValue is too common to fatal on.  only reported to EDD
                             seriousErrorFound = true;
                         }
                     }
@@ -1786,12 +1783,12 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
             {
                 auto const SELECT_CASE_var(state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator);
 
-                if (SELECT_CASE_var == Parameters::OperatorLiteral) {
+                if (SELECT_CASE_var == ErlFunc::Literal) {
                     ReturnValue = Operand(1);
                     ReturnValue.initialized = true;
-                } else if (SELECT_CASE_var == Parameters::OperatorNegative) { // unary minus sign.  parsing does not work yet
+                } else if (SELECT_CASE_var == ErlFunc::Negative) { // unary minus sign.  parsing does not work yet
                     ReturnValue = SetErlValueNumber(-1.0 * Operand(1).Number);
-                } else if (SELECT_CASE_var == Parameters::OperatorDivide) {
+                } else if (SELECT_CASE_var == ErlFunc::Divide) {
                     if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         if (Operand(2).Number == 0.0) {
                             ReturnValue.Type = Value::Error;
@@ -1805,22 +1802,22 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         }
                     }
 
-                } else if (SELECT_CASE_var == Parameters::OperatorMultiply) {
+                } else if (SELECT_CASE_var == ErlFunc::Multiply) {
                     if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         ReturnValue = SetErlValueNumber(Operand(1).Number * Operand(2).Number);
                     }
 
-                } else if (SELECT_CASE_var == Parameters::OperatorSubtract) {
+                } else if (SELECT_CASE_var == ErlFunc::Subtract) {
                     if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         ReturnValue = SetErlValueNumber(Operand(1).Number - Operand(2).Number);
                     }
 
-                } else if (SELECT_CASE_var == Parameters::OperatorAdd) {
+                } else if (SELECT_CASE_var == ErlFunc::Add) {
                     if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         ReturnValue = SetErlValueNumber(Operand(1).Number + Operand(2).Number);
                     }
 
-                } else if (SELECT_CASE_var == Parameters::OperatorEqual) {
+                } else if (SELECT_CASE_var == ErlFunc::Equal) {
                     if (Operand(1).Type == Operand(2).Type) {
                         if (Operand(1).Type == Value::Null) {
                             ReturnValue = state.dataRuntimeLang->True;
@@ -1833,7 +1830,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         ReturnValue = state.dataRuntimeLang->False;
                     }
 
-                } else if (SELECT_CASE_var == Parameters::OperatorNotEqual) {
+                } else if (SELECT_CASE_var == ErlFunc::NotEqual) {
                     if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         if (Operand(1).Number != Operand(2).Number) {
                             ReturnValue = state.dataRuntimeLang->True;
@@ -1842,7 +1839,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         }
                     }
 
-                } else if (SELECT_CASE_var == Parameters::OperatorLessOrEqual) {
+                } else if (SELECT_CASE_var == ErlFunc::LessOrEqual) {
                     if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         if (Operand(1).Number <= Operand(2).Number) {
                             ReturnValue = state.dataRuntimeLang->True;
@@ -1851,7 +1848,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         }
                     }
 
-                } else if (SELECT_CASE_var == Parameters::OperatorGreaterOrEqual) {
+                } else if (SELECT_CASE_var == ErlFunc::GreaterOrEqual) {
                     if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         if (Operand(1).Number >= Operand(2).Number) {
                             ReturnValue = state.dataRuntimeLang->True;
@@ -1859,7 +1856,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                             ReturnValue = state.dataRuntimeLang->False;
                         }
                     }
-                } else if (SELECT_CASE_var == Parameters::OperatorLessThan) {
+                } else if (SELECT_CASE_var == ErlFunc::LessThan) {
                     if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         if (Operand(1).Number < Operand(2).Number) {
                             ReturnValue = state.dataRuntimeLang->True;
@@ -1867,7 +1864,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                             ReturnValue = state.dataRuntimeLang->False;
                         }
                     }
-                } else if (SELECT_CASE_var == Parameters::OperatorGreaterThan) {
+                } else if (SELECT_CASE_var == ErlFunc::GreaterThan) {
                     if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         if (Operand(1).Number > Operand(2).Number) {
                             ReturnValue = state.dataRuntimeLang->True;
@@ -1876,7 +1873,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         }
                     }
 
-                } else if (SELECT_CASE_var == Parameters::OperatorRaiseToPower) {
+                } else if (SELECT_CASE_var == ErlFunc::RaiseToPower) {
                     if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         TestValue = std::pow(Operand(1).Number, Operand(2).Number);
                         if (std::isnan(TestValue)) {
@@ -1894,7 +1891,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                             ReturnValue = SetErlValueNumber(TestValue);
                         }
                     }
-                } else if (SELECT_CASE_var == Parameters::OperatorLogicalAND) {
+                } else if (SELECT_CASE_var == ErlFunc::LogicalAND) {
                     if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         if ((Operand(1).Number == state.dataRuntimeLang->True.Number) && (Operand(2).Number == state.dataRuntimeLang->True.Number)) {
                             ReturnValue = state.dataRuntimeLang->True;
@@ -1902,7 +1899,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                             ReturnValue = state.dataRuntimeLang->False;
                         }
                     }
-                } else if (SELECT_CASE_var == Parameters::OperatorLogicalOR) {
+                } else if (SELECT_CASE_var == ErlFunc::LogicalOR) {
                     if ((Operand(1).Type == Value::Number) && (Operand(2).Type == Value::Number)) {
                         if ((Operand(1).Number == state.dataRuntimeLang->True.Number) || (Operand(2).Number == state.dataRuntimeLang->True.Number)) {
                             ReturnValue = state.dataRuntimeLang->True;
@@ -1910,23 +1907,23 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                             ReturnValue = state.dataRuntimeLang->False;
                         }
                     }
-                } else if (SELECT_CASE_var == Parameters::FuncRound) {
+                } else if (SELECT_CASE_var == ErlFunc::Round) {
                     ReturnValue = SetErlValueNumber(nint(Operand(1).Number));
-                } else if (SELECT_CASE_var == Parameters::FuncMod) {
+                } else if (SELECT_CASE_var == ErlFunc::Mod) {
                     ReturnValue = SetErlValueNumber(mod(Operand(1).Number, Operand(2).Number));
-                } else if (SELECT_CASE_var == Parameters::FuncSin) {
+                } else if (SELECT_CASE_var == ErlFunc::Sin) {
                     ReturnValue = SetErlValueNumber(std::sin(Operand(1).Number));
-                } else if (SELECT_CASE_var == Parameters::FuncCos) {
+                } else if (SELECT_CASE_var == ErlFunc::Cos) {
                     ReturnValue = SetErlValueNumber(std::cos(Operand(1).Number));
-                } else if (SELECT_CASE_var == Parameters::FuncArcSin) {
+                } else if (SELECT_CASE_var == ErlFunc::ArcSin) {
                     ReturnValue = SetErlValueNumber(std::asin(Operand(1).Number));
-                } else if (SELECT_CASE_var == Parameters::FuncArcCos) {
+                } else if (SELECT_CASE_var == ErlFunc::ArcCos) {
                     ReturnValue = SetErlValueNumber(std::acos(Operand(1).Number));
-                } else if (SELECT_CASE_var == Parameters::FuncDegToRad) {
+                } else if (SELECT_CASE_var == ErlFunc::DegToRad) {
                     ReturnValue = SetErlValueNumber(Operand(1).Number * DataGlobalConstants::DegToRadians);
-                } else if (SELECT_CASE_var == Parameters::FuncRadToDeg) {
+                } else if (SELECT_CASE_var == ErlFunc::RadToDeg) {
                     ReturnValue = SetErlValueNumber(Operand(1).Number / DataGlobalConstants::DegToRadians);
-                } else if (SELECT_CASE_var == Parameters::FuncExp) {
+                } else if (SELECT_CASE_var == ErlFunc::Exp) {
                     if ((Operand(1).Number < 700.0) && (Operand(1).Number > -20.0)) {
                         ReturnValue = SetErlValueNumber(std::exp(Operand(1).Number));
                     } else if (Operand(1).Number <= -20.0) {
@@ -1940,7 +1937,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                             seriousErrorFound = true;
                         }
                     }
-                } else if (SELECT_CASE_var == Parameters::FuncLn) {
+                } else if (SELECT_CASE_var == ErlFunc::Ln) {
                     if (Operand(1).Number > 0.0) {
                         ReturnValue = SetErlValueNumber(std::log(Operand(1).Number));
                     } else {
@@ -1951,18 +1948,18 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                             seriousErrorFound = true;
                         }
                     }
-                } else if (SELECT_CASE_var == Parameters::FuncMax) {
+                } else if (SELECT_CASE_var == ErlFunc::Max) {
                     ReturnValue = SetErlValueNumber(max(Operand(1).Number, Operand(2).Number));
-                } else if (SELECT_CASE_var == Parameters::FuncMin) {
+                } else if (SELECT_CASE_var == ErlFunc::Min) {
                     ReturnValue = SetErlValueNumber(min(Operand(1).Number, Operand(2).Number));
 
-                } else if (SELECT_CASE_var == Parameters::FuncABS) {
+                } else if (SELECT_CASE_var == ErlFunc::ABS) {
                     ReturnValue = SetErlValueNumber(std::abs(Operand(1).Number));
-                } else if (SELECT_CASE_var == Parameters::FuncRandU) {
+                } else if (SELECT_CASE_var == ErlFunc::RandU) {
                     RANDOM_NUMBER(tmpRANDU1);
                     tmpRANDU1 = Operand(1).Number + (Operand(2).Number - Operand(1).Number) * tmpRANDU1;
                     ReturnValue = SetErlValueNumber(tmpRANDU1);
-                } else if (SELECT_CASE_var == Parameters::FuncRandG) {
+                } else if (SELECT_CASE_var == ErlFunc::RandG) {
                     while (true) { // Box-Muller algorithm
                         RANDOM_NUMBER(tmpRANDU1);
                         RANDOM_NUMBER(tmpRANDU2);
@@ -1978,7 +1975,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                     tmpRANDG = max(tmpRANDG, Operand(3).Number); // min limit
                     tmpRANDG = min(tmpRANDG, Operand(4).Number); // max limit
                     ReturnValue = SetErlValueNumber(tmpRANDG);
-                } else if (SELECT_CASE_var == Parameters::FuncRandSeed) {
+                } else if (SELECT_CASE_var == ErlFunc::RandSeed) {
                     // convert arg to an integer array for the seed.
                     RANDOM_SEED(SeedN); // obtains processor's use size as output
                     SeedIntARR.allocate(SeedN);
@@ -1992,7 +1989,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                     RANDOM_SEED(_, SeedIntARR);
                     ReturnValue = SetErlValueNumber(double(SeedIntARR(1))); // just return first number pass as seed
                     SeedIntARR.deallocate();
-                } else if (SELECT_CASE_var == Parameters::FuncRhoAirFnPbTdbW) {
+                } else if (SELECT_CASE_var == ErlFunc::RhoAirFnPbTdbW) {
                     ReturnValue = SetErlValueNumber(PsyRhoAirFnPbTdbW(state,
                                                                       Operand(1).Number,
                                                                       Operand(2).Number,
@@ -2000,76 +1997,76 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                                                       EMSBuiltInFunction)); // result =>   density of moist air (kg/m3) | pressure
                                                                                             // (Pa) | drybulb (C) | Humidity ratio (kg water
                                                                                             // vapor/kg dry air) | called from
-                } else if (SELECT_CASE_var == Parameters::FuncCpAirFnW) {
+                } else if (SELECT_CASE_var == ErlFunc::CpAirFnW) {
                     ReturnValue = SetErlValueNumber(PsyCpAirFnW(Operand(1).Number)); // result =>   heat capacity of air
                                                                                      // {J/kg-C} | Humidity ratio (kg water vapor/kg dry air)
-                } else if (SELECT_CASE_var == Parameters::FuncHfgAirFnWTdb) {
+                } else if (SELECT_CASE_var == ErlFunc::HfgAirFnWTdb) {
                     // BG comment these two psych funct seems confusing (?) is this the enthalpy of water in the air?
                     ReturnValue = SetErlValueNumber(PsyHfgAirFnWTdb(Operand(1).Number, Operand(2).Number)); // result =>   heat of vaporization
                                                                                                             // for moist air {J/kg} | Humidity
                                                                                                             // ratio (kg water vapor/kg dry air) |
                                                                                                             // drybulb (C)
-                } else if (SELECT_CASE_var == Parameters::FuncHgAirFnWTdb) {
+                } else if (SELECT_CASE_var == ErlFunc::HgAirFnWTdb) {
                     // confusing ?  seems like this is really classical Hfg, heat of vaporization
                     ReturnValue = SetErlValueNumber(PsyHgAirFnWTdb(Operand(1).Number, Operand(2).Number)); // result =>   enthalpy of the gas
                                                                                                            // {units?} | Humidity ratio (kg water
                                                                                                            // vapor/kg dry air) | drybulb (C)
-                } else if (SELECT_CASE_var == Parameters::FuncTdpFnTdbTwbPb) {
+                } else if (SELECT_CASE_var == ErlFunc::TdpFnTdbTwbPb) {
                     ReturnValue = SetErlValueNumber(
                         PsyTdpFnTdbTwbPb(state,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          Operand(3).Number,
                                          EMSBuiltInFunction)); // result =>   dew-point temperature {C} | drybulb (C) | wetbulb (C) | pressure (Pa)
-                } else if (SELECT_CASE_var == Parameters::FuncTdpFnWPb) {
+                } else if (SELECT_CASE_var == ErlFunc::TdpFnWPb) {
                     ReturnValue = SetErlValueNumber(PsyTdpFnWPb(
                         state,
                         Operand(1).Number,
                         Operand(2).Number,
                         EMSBuiltInFunction)); // result =>  dew-point temperature {C} | Humidity ratio (kg water vapor/kg dry air) | pressure (Pa)
-                } else if (SELECT_CASE_var == Parameters::FuncHFnTdbW) {
+                } else if (SELECT_CASE_var == ErlFunc::HFnTdbW) {
                     ReturnValue = SetErlValueNumber(
                         PsyHFnTdbW(Operand(1).Number,
                                    Operand(2).Number)); // result =>  enthalpy (J/kg) | drybulb (C) | Humidity ratio (kg water vapor/kg dry air)
-                } else if (SELECT_CASE_var == Parameters::FuncHFnTdbRhPb) {
+                } else if (SELECT_CASE_var == ErlFunc::HFnTdbRhPb) {
                     ReturnValue = SetErlValueNumber(PsyHFnTdbRhPb(
                         state,
                         Operand(1).Number,
                         Operand(2).Number,
                         Operand(3).Number,
                         EMSBuiltInFunction)); // result =>  enthalpy (J/kg) | drybulb (C) | relative humidity value (0.0 - 1.0) | pressure (Pa)
-                } else if (SELECT_CASE_var == Parameters::FuncTdbFnHW) {
+                } else if (SELECT_CASE_var == ErlFunc::TdbFnHW) {
                     ReturnValue = SetErlValueNumber(PsyTdbFnHW(
                         Operand(1).Number,
                         Operand(2).Number)); // result =>  dry-bulb temperature {C} | enthalpy (J/kg) | Humidity ratio (kg water vapor/kg dry air)
-                } else if (SELECT_CASE_var == Parameters::FuncRhovFnTdbRh) {
+                } else if (SELECT_CASE_var == ErlFunc::RhovFnTdbRh) {
                     ReturnValue = SetErlValueNumber(PsyRhovFnTdbRh(
                         state,
                         Operand(1).Number,
                         Operand(2).Number,
                         EMSBuiltInFunction)); // result =>  Vapor density in air (kg/m3) | drybulb (C) | relative humidity value (0.0 - 1.0)
-                } else if (SELECT_CASE_var == Parameters::FuncRhovFnTdbRhLBnd0C) {
+                } else if (SELECT_CASE_var == ErlFunc::RhovFnTdbRhLBnd0C) {
                     ReturnValue = SetErlValueNumber(PsyRhovFnTdbRhLBnd0C(
                         Operand(1).Number,
                         Operand(2).Number)); // result =>  Vapor density in air (kg/m3) | drybulb (C) | relative humidity value (0.0 - 1.0)
-                } else if (SELECT_CASE_var == Parameters::FuncRhovFnTdbWPb) {
+                } else if (SELECT_CASE_var == ErlFunc::RhovFnTdbWPb) {
                     ReturnValue = SetErlValueNumber(
                         PsyRhovFnTdbWPb(Operand(1).Number, Operand(2).Number, Operand(3).Number)); // result =>  Vapor density in air (kg/m3) |
                                                                                                    // drybulb (C) | Humidity ratio (kg water
                                                                                                    // vapor/kg dry air) | pressure (Pa)
-                } else if (SELECT_CASE_var == Parameters::FuncRhFnTdbRhov) {
+                } else if (SELECT_CASE_var == ErlFunc::RhFnTdbRhov) {
                     ReturnValue = SetErlValueNumber(PsyRhFnTdbRhov(
                         state,
                         Operand(1).Number,
                         Operand(2).Number,
                         EMSBuiltInFunction)); // result => relative humidity value (0.0-1.0) | drybulb (C) | vapor density in air (kg/m3)
-                } else if (SELECT_CASE_var == Parameters::FuncRhFnTdbRhovLBnd0C) {
+                } else if (SELECT_CASE_var == ErlFunc::RhFnTdbRhovLBnd0C) {
                     ReturnValue = SetErlValueNumber(
                         PsyRhFnTdbRhovLBnd0C(state,
                                              Operand(1).Number,
                                              Operand(2).Number,
                                              EMSBuiltInFunction)); // relative humidity value (0.0-1.0) | drybulb (C) | vapor density in air (kg/m3)
-                } else if (SELECT_CASE_var == Parameters::FuncRhFnTdbWPb) {
+                } else if (SELECT_CASE_var == ErlFunc::RhFnTdbWPb) {
                     ReturnValue = SetErlValueNumber(PsyRhFnTdbWPb(state,
                                                                   Operand(1).Number,
                                                                   Operand(2).Number,
@@ -2077,7 +2074,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                                                   EMSBuiltInFunction)); // result =>  relative humidity value (0.0-1.0) | drybulb
                                                                                         // (C) | Humidity ratio (kg water vapor/kg dry air) |
                                                                                         // pressure (Pa)
-                } else if (SELECT_CASE_var == Parameters::FuncTwbFnTdbWPb) {
+                } else if (SELECT_CASE_var == ErlFunc::TwbFnTdbWPb) {
                     ReturnValue = SetErlValueNumber(PsyTwbFnTdbWPb(state,
                                                                    Operand(1).Number,
                                                                    Operand(2).Number,
@@ -2085,7 +2082,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                                                    EMSBuiltInFunction)); // result=> Temperature Wet-Bulb {C} | drybulb (C) |
                                                                                          // Humidity ratio (kg water vapor/kg dry air) | pressure
                                                                                          // (Pa)
-                } else if (SELECT_CASE_var == Parameters::FuncVFnTdbWPb) {
+                } else if (SELECT_CASE_var == ErlFunc::VFnTdbWPb) {
                     ReturnValue = SetErlValueNumber(PsyVFnTdbWPb(state,
                                                                  Operand(1).Number,
                                                                  Operand(2).Number,
@@ -2093,26 +2090,26 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                                                  EMSBuiltInFunction)); // result=> specific volume {m3/kg} | drybulb (C) |
                                                                                        // Humidity ratio (kg water vapor/kg dry air) | pressure
                                                                                        // (Pa)
-                } else if (SELECT_CASE_var == Parameters::FuncWFnTdpPb) {
+                } else if (SELECT_CASE_var == ErlFunc::WFnTdpPb) {
                     ReturnValue = SetErlValueNumber(PsyWFnTdpPb(
                         state,
                         Operand(1).Number,
                         Operand(2).Number,
                         EMSBuiltInFunction)); // result=> humidity ratio  (kg water vapor/kg dry air) | dew point temperature (C) | pressure (Pa)
-                } else if (SELECT_CASE_var == Parameters::FuncWFnTdbH) {
+                } else if (SELECT_CASE_var == ErlFunc::WFnTdbH) {
                     ReturnValue = SetErlValueNumber(
                         PsyWFnTdbH(state,
                                    Operand(1).Number,
                                    Operand(2).Number,
                                    EMSBuiltInFunction)); // result=> humidity ratio  (kg water vapor/kg dry air) | drybulb (C) | enthalpy (J/kg)
-                } else if (SELECT_CASE_var == Parameters::FuncWFnTdbTwbPb) {
+                } else if (SELECT_CASE_var == ErlFunc::WFnTdbTwbPb) {
                     ReturnValue = SetErlValueNumber(PsyWFnTdbTwbPb(state,
                                                                    Operand(1).Number,
                                                                    Operand(2).Number,
                                                                    Operand(3).Number,
                                                                    EMSBuiltInFunction)); // result=> humidity ratio  (kg water vapor/kg dry air) |
                                                                                          // drybulb (C) | wet-bulb temperature {C} | pressure (Pa)
-                } else if (SELECT_CASE_var == Parameters::FuncWFnTdbRhPb) {
+                } else if (SELECT_CASE_var == ErlFunc::WFnTdbRhPb) {
                     ReturnValue = SetErlValueNumber(PsyWFnTdbRhPb(state,
                                                                   Operand(1).Number,
                                                                   Operand(2).Number,
@@ -2120,10 +2117,10 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                                                   EMSBuiltInFunction)); // result=> humidity ratio  (kg water vapor/kg dry air) |
                                                                                         // drybulb (C) | relative humidity value (0.0-1.0) |
                                                                                         // pressure (Pa)
-                } else if (SELECT_CASE_var == Parameters::FuncPsatFnTemp) {
+                } else if (SELECT_CASE_var == ErlFunc::PsatFnTemp) {
                     ReturnValue = SetErlValueNumber(
                         PsyPsatFnTemp(state, Operand(1).Number, EMSBuiltInFunction)); // result=> saturation pressure {Pascals} | drybulb (C)
-                } else if (SELECT_CASE_var == Parameters::FuncTsatFnHPb) {
+                } else if (SELECT_CASE_var == ErlFunc::TsatFnHPb) {
                     ReturnValue = SetErlValueNumber(
                         PsyTsatFnHPb(state,
                                      Operand(1).Number,
@@ -2133,31 +2130,31 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                                            //        ReturnValue = NumberValue( &   ! result=> saturation temperature {C}
                                                            //                        PsyTsatFnPb(Operand(1)%Number, & ! pressure (Pa)
                                                            //                                    'EMS Built-In Function') )
-                } else if (SELECT_CASE_var == Parameters::FuncCpCW) {
+                } else if (SELECT_CASE_var == ErlFunc::CpCW) {
                     ReturnValue =
                         SetErlValueNumber(CPCW(Operand(1).Number)); // result => specific heat of water (J/kg-K) = 4180.d0 | temperature (C) unused
-                } else if (SELECT_CASE_var == Parameters::FuncCpHW) {
+                } else if (SELECT_CASE_var == ErlFunc::CpHW) {
                     ReturnValue =
                         SetErlValueNumber(CPHW(Operand(1).Number)); // result => specific heat of water (J/kg-K) = 4180.d0 | temperature (C) unused
-                } else if (SELECT_CASE_var == Parameters::FuncRhoH2O) {
+                } else if (SELECT_CASE_var == ErlFunc::RhoH2O) {
                     ReturnValue = SetErlValueNumber(RhoH2O(Operand(1).Number)); // result => density of water (kg/m3) | temperature (C)
-                } else if (SELECT_CASE_var == Parameters::FuncFatalHaltEp) {
+                } else if (SELECT_CASE_var == ErlFunc::FatalHaltEp) {
 
                     ShowSevereError(state, "EMS user program found serious problem and is halting simulation");
                     ShowContinueErrorTimeStamp(state, "");
                     ShowFatalError(state, format("EMS user program halted simulation with error code = {:.2T}", Operand(1).Number));
                     ReturnValue = SetErlValueNumber(Operand(1).Number); // returns back the error code
-                } else if (SELECT_CASE_var == Parameters::FuncSevereWarnEp) {
+                } else if (SELECT_CASE_var == ErlFunc::SevereWarnEp) {
 
                     ShowSevereError(state, format("EMS user program issued severe warning with error code = {:.2T}", Operand(1).Number));
                     ShowContinueErrorTimeStamp(state, "");
                     ReturnValue = SetErlValueNumber(Operand(1).Number); // returns back the error code
-                } else if (SELECT_CASE_var == Parameters::FuncWarnEp) {
+                } else if (SELECT_CASE_var == ErlFunc::WarnEp) {
 
                     ShowWarningError(state, format("EMS user program issued warning with error code = {:.2T}", Operand(1).Number));
                     ShowContinueErrorTimeStamp(state, "");
                     ReturnValue = SetErlValueNumber(Operand(1).Number); // returns back the error code
-                } else if (SELECT_CASE_var == Parameters::FuncTrendValue) {
+                } else if (SELECT_CASE_var == ErlFunc::TrendValue) {
                     // find TrendVariable , first operand is ErlVariable
                     if (Operand(1).TrendVariable) {
                         thisTrend = Operand(1).TrendVarPointer;
@@ -2179,7 +2176,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         ReturnValue.Error = "Variable used with built-in trend function is not associated with a registered trend variable";
                     }
 
-                } else if (SELECT_CASE_var == Parameters::FuncTrendAverage) {
+                } else if (SELECT_CASE_var == ErlFunc::TrendAverage) {
                     // find TrendVariable , first operand is ErlVariable
                     if (Operand(1).TrendVariable) {
                         thisTrend = Operand(1).TrendVarPointer;
@@ -2201,7 +2198,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         ReturnValue.Type = Value::Error;
                         ReturnValue.Error = "Variable used with built-in trend function is not associated with a registered trend variable";
                     }
-                } else if (SELECT_CASE_var == Parameters::FuncTrendMax) {
+                } else if (SELECT_CASE_var == ErlFunc::TrendMax) {
                     if (Operand(1).TrendVariable) {
                         thisTrend = Operand(1).TrendVarPointer;
                         thisIndex = std::floor(Operand(2).Number);
@@ -2233,7 +2230,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         ReturnValue.Type = Value::Error;
                         ReturnValue.Error = "Variable used with built-in trend function is not associated with a registered trend variable";
                     }
-                } else if (SELECT_CASE_var == Parameters::FuncTrendMin) {
+                } else if (SELECT_CASE_var == ErlFunc::TrendMin) {
                     if (Operand(1).TrendVariable) {
                         thisTrend = Operand(1).TrendVarPointer;
                         thisIndex = std::floor(Operand(2).Number);
@@ -2267,7 +2264,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         ReturnValue.Type = Value::Error;
                         ReturnValue.Error = "Variable used with built-in trend function is not associated with a registered trend variable";
                     }
-                } else if (SELECT_CASE_var == Parameters::FuncTrendDirection) {
+                } else if (SELECT_CASE_var == ErlFunc::TrendDirection) {
                     if (Operand(1).TrendVariable) {
                         // do a linear least squares fit and get slope of line
                         thisTrend = Operand(1).TrendVarPointer;
@@ -2296,7 +2293,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         ReturnValue.Type = Value::Error;
                         ReturnValue.Error = "Variable used with built-in trend function is not associated with a registered trend variable";
                     }
-                } else if (SELECT_CASE_var == Parameters::FuncTrendSum) {
+                } else if (SELECT_CASE_var == ErlFunc::TrendSum) {
                     if (Operand(1).TrendVariable) {
 
                         thisTrend = Operand(1).TrendVarPointer;
@@ -2317,7 +2314,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         ReturnValue.Type = Value::Error;
                         ReturnValue.Error = "Variable used with built-in trend function is not associated with a registered trend variable";
                     }
-                } else if (SELECT_CASE_var == Parameters::FuncCurveValue) {
+                } else if (SELECT_CASE_var == ErlFunc::CurveValue) {
                     if (Operand(3).Type == Value::Null && Operand(4).Type == Value::Null && Operand(5).Type == Value::Null &&
                         Operand(6).Type == Value::Null) {
                         ReturnValue =
@@ -2360,186 +2357,186 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                                                                         // independent | 5th independent
                     }
 
-                } else if (SELECT_CASE_var == Parameters::FuncTodayIsRain) {
+                } else if (SELECT_CASE_var == ErlFunc::TodayIsRain) {
                     TodayTomorrowWeather(
-                        state, Parameters::FuncTodayIsRain, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsRain, ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTodayIsSnow) {
+                        state, ErlFunc::TodayIsRain, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsRain, ReturnValue);
+                } else if (SELECT_CASE_var == ErlFunc::TodayIsSnow) {
                     TodayTomorrowWeather(
-                        state, Parameters::FuncTodayIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsSnow, ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTodayOutDryBulbTemp) {
+                        state, ErlFunc::TodayIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsSnow, ReturnValue);
+                } else if (SELECT_CASE_var == ErlFunc::TodayOutDryBulbTemp) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTodayOutDryBulbTemp,
+                                         ErlFunc::TodayOutDryBulbTemp,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TodayOutDryBulbTemp,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTodayOutDewPointTemp) {
+                } else if (SELECT_CASE_var == ErlFunc::TodayOutDewPointTemp) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTodayOutDewPointTemp,
+                                         ErlFunc::TodayOutDewPointTemp,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TodayOutDewPointTemp,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTodayOutBaroPress) {
+                } else if (SELECT_CASE_var == ErlFunc::TodayOutBaroPress) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTodayOutBaroPress,
+                                         ErlFunc::TodayOutBaroPress,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TodayOutBaroPress,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTodayOutRelHum) {
+                } else if (SELECT_CASE_var == ErlFunc::TodayOutRelHum) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTodayOutRelHum,
+                                         ErlFunc::TodayOutRelHum,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TodayOutRelHum,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTodayWindSpeed) {
+                } else if (SELECT_CASE_var == ErlFunc::TodayWindSpeed) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTodayWindSpeed,
+                                         ErlFunc::TodayWindSpeed,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TodayWindSpeed,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTodayWindDir) {
+                } else if (SELECT_CASE_var == ErlFunc::TodayWindDir) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTodayWindDir,
+                                         ErlFunc::TodayWindDir,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TodayWindDir,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTodaySkyTemp) {
+                } else if (SELECT_CASE_var == ErlFunc::TodaySkyTemp) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTodaySkyTemp,
+                                         ErlFunc::TodaySkyTemp,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TodaySkyTemp,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTodayHorizIRSky) {
+                } else if (SELECT_CASE_var == ErlFunc::TodayHorizIRSky) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTodayHorizIRSky,
+                                         ErlFunc::TodayHorizIRSky,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TodayHorizIRSky,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTodayBeamSolarRad) {
+                } else if (SELECT_CASE_var == ErlFunc::TodayBeamSolarRad) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTodayBeamSolarRad,
+                                         ErlFunc::TodayBeamSolarRad,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TodayBeamSolarRad,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTodayDifSolarRad) {
+                } else if (SELECT_CASE_var == ErlFunc::TodayDifSolarRad) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTodayDifSolarRad,
+                                         ErlFunc::TodayDifSolarRad,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TodayDifSolarRad,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTodayAlbedo) {
+                } else if (SELECT_CASE_var == ErlFunc::TodayAlbedo) {
                     TodayTomorrowWeather(
-                        state, Parameters::FuncTodayAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayAlbedo, ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTodayLiquidPrecip) {
+                        state, ErlFunc::TodayAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayAlbedo, ReturnValue);
+                } else if (SELECT_CASE_var == ErlFunc::TodayLiquidPrecip) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTodayLiquidPrecip,
+                                         ErlFunc::TodayLiquidPrecip,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TodayLiquidPrecip,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTomorrowIsRain) {
+                } else if (SELECT_CASE_var == ErlFunc::TomorrowIsRain) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTomorrowIsRain,
+                                         ErlFunc::TomorrowIsRain,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowIsRain,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTomorrowIsSnow) {
+                } else if (SELECT_CASE_var == ErlFunc::TomorrowIsSnow) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTomorrowIsSnow,
+                                         ErlFunc::TomorrowIsSnow,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowIsSnow,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTomorrowOutDryBulbTemp) {
+                } else if (SELECT_CASE_var == ErlFunc::TomorrowOutDryBulbTemp) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTomorrowOutDryBulbTemp,
+                                         ErlFunc::TomorrowOutDryBulbTemp,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowOutDryBulbTemp,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTomorrowOutDewPointTemp) {
+                } else if (SELECT_CASE_var == ErlFunc::TomorrowOutDewPointTemp) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTomorrowOutDewPointTemp,
+                                         ErlFunc::TomorrowOutDewPointTemp,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowOutDewPointTemp,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTomorrowOutBaroPress) {
+                } else if (SELECT_CASE_var == ErlFunc::TomorrowOutBaroPress) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTomorrowOutBaroPress,
+                                         ErlFunc::TomorrowOutBaroPress,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowOutBaroPress,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTomorrowOutRelHum) {
+                } else if (SELECT_CASE_var == ErlFunc::TomorrowOutRelHum) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTomorrowOutRelHum,
+                                         ErlFunc::TomorrowOutRelHum,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowOutRelHum,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTomorrowWindSpeed) {
+                } else if (SELECT_CASE_var == ErlFunc::TomorrowWindSpeed) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTomorrowWindSpeed,
+                                         ErlFunc::TomorrowWindSpeed,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowWindSpeed,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTomorrowWindDir) {
+                } else if (SELECT_CASE_var == ErlFunc::TomorrowWindDir) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTomorrowWindDir,
+                                         ErlFunc::TomorrowWindDir,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowWindDir,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTomorrowSkyTemp) {
+                } else if (SELECT_CASE_var == ErlFunc::TomorrowSkyTemp) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTomorrowSkyTemp,
+                                         ErlFunc::TomorrowSkyTemp,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowSkyTemp,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTomorrowHorizIRSky) {
+                } else if (SELECT_CASE_var == ErlFunc::TomorrowHorizIRSky) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTomorrowHorizIRSky,
+                                         ErlFunc::TomorrowHorizIRSky,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowHorizIRSky,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTomorrowBeamSolarRad) {
+                } else if (SELECT_CASE_var == ErlFunc::TomorrowBeamSolarRad) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTomorrowBeamSolarRad,
+                                         ErlFunc::TomorrowBeamSolarRad,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowBeamSolarRad,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTomorrowDifSolarRad) {
+                } else if (SELECT_CASE_var == ErlFunc::TomorrowDifSolarRad) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTomorrowDifSolarRad,
+                                         ErlFunc::TomorrowDifSolarRad,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowDifSolarRad,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTomorrowAlbedo) {
+                } else if (SELECT_CASE_var == ErlFunc::TomorrowAlbedo) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTomorrowAlbedo,
+                                         ErlFunc::TomorrowAlbedo,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowAlbedo,
                                          ReturnValue);
-                } else if (SELECT_CASE_var == Parameters::FuncTomorrowLiquidPrecip) {
+                } else if (SELECT_CASE_var == ErlFunc::TomorrowLiquidPrecip) {
                     TodayTomorrowWeather(state,
-                                         Parameters::FuncTomorrowLiquidPrecip,
+                                         ErlFunc::TomorrowLiquidPrecip,
                                          Operand(1).Number,
                                          Operand(2).Number,
                                          state.dataWeatherManager->TomorrowLiquidPrecip,
@@ -2557,7 +2554,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
 }
 
 void TodayTomorrowWeather(EnergyPlusData &state,
-                          Parameters const FunctionCode,
+                          ErlFunc const FunctionCode,
                           Real64 const Operand1,
                           Real64 const Operand2,
                           Array2D<Real64> &TodayTomorrowWeatherSource,
@@ -2577,7 +2574,7 @@ void TodayTomorrowWeather(EnergyPlusData &state,
 }
 
 void TodayTomorrowWeather(EnergyPlusData &state,
-                          Parameters const FunctionCode,
+                          ErlFunc const FunctionCode,
                           Real64 const Operand1,
                           Real64 const Operand2,
                           Array2D_bool &TodayTomorrowWeatherSource,
@@ -3998,389 +3995,390 @@ void SetupPossibleOperators(EnergyPlusData &state)
     // Build operator table
     // Order in this table is the order of precedence
 
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorLiteral)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorLiteral)).Code = Parameters::OperatorLiteral;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Literal)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Literal)).Code = ErlFunc::Literal;
 
     // not sure how to distinguish from subtract in parsing of tokens, not yet available
     //  PossibleOperators(OperatorNegative)%NumOperands = 1
     //  PossibleOperators(OperatorNegative)%Code        = OperatorNegative
     //  PossibleOperators(OperatorNegative)%Symbol      = '-'
 
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorDivide)).Symbol = "/";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorDivide)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorDivide)).Code = Parameters::OperatorDivide;
-                                                                                        
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorMultiply)).Symbol = "*";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorMultiply)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorMultiply)).Code = Parameters::OperatorMultiply;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Divide)).Symbol = "/";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Divide)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Divide)).Code = ErlFunc::Divide;
 
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorSubtract)).Symbol = "-";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorSubtract)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorSubtract)).Code = Parameters::OperatorSubtract;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Multiply)).Symbol = "*";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Multiply)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Multiply)).Code = ErlFunc::Multiply;
 
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorAdd)).Symbol = "+";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorAdd)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorAdd)).Code = Parameters::OperatorAdd;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorEqual)).Symbol = "==";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorEqual)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorEqual)).Code = Parameters::OperatorEqual;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorNotEqual)).Symbol = "<>";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorNotEqual)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorNotEqual)).Code = Parameters::OperatorNotEqual;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorLessOrEqual)).Symbol = "<=";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorLessOrEqual)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorLessOrEqual)).Code = Parameters::OperatorLessOrEqual;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorGreaterOrEqual)).Symbol = ">=";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorGreaterOrEqual)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorGreaterOrEqual)).Code = Parameters::OperatorGreaterOrEqual;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorLessThan)).Symbol = "<";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorLessThan)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorLessThan)).Code = Parameters::OperatorLessThan;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorGreaterThan)).Symbol = ">";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorGreaterThan)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorGreaterThan)).Code = Parameters::OperatorGreaterThan;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorRaiseToPower)).Symbol = "^";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorRaiseToPower)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorRaiseToPower)).Code = Parameters::OperatorRaiseToPower;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorLogicalAND)).Symbol = "&&";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorLogicalAND)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorLogicalAND)).Code = Parameters::OperatorLogicalAND;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorLogicalOR)).Symbol = "||";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorLogicalOR)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::OperatorLogicalOR)).Code = Parameters::OperatorLogicalOR;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRound)).Symbol = "@ROUND";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRound)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRound)).Code = Parameters::FuncRound;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncMod)).Symbol = "@MOD";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncMod)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncMod)).Code = Parameters::FuncMod;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncSin)).Symbol = "@SIN";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncSin)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncSin)).Code = Parameters::FuncSin;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncCos)).Symbol = "@COS";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncCos)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncCos)).Code = Parameters::FuncCos;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncArcSin)).Symbol = "@ARCSIN";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncArcSin)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncArcSin)).Code = Parameters::FuncArcSin;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncArcCos)).Symbol = "@ARCCOS";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncArcCos)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncArcCos)).Code = Parameters::FuncArcCos;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncDegToRad)).Symbol = "@DEGTORAD";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncDegToRad)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncDegToRad)).Code = Parameters::FuncDegToRad;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRadToDeg)).Symbol = "@RADTODEG";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRadToDeg)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRadToDeg)).Code = Parameters::FuncRadToDeg;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncExp)).Symbol = "@EXP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncExp)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncExp)).Code = Parameters::FuncExp;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncLn)).Symbol = "@LN";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncLn)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncLn)).Code = Parameters::FuncLn;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncMax)).Symbol = "@MAX";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncMax)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncMax)).Code = Parameters::FuncMax;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncMin)).Symbol = "@MIN";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncMin)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncMin)).Code = Parameters::FuncMin;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncABS)).Symbol = "@ABS";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncABS)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncABS)).Code = Parameters::FuncABS;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRandU)).Symbol = "@RANDOMUNIFORM";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRandU)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRandU)).Code = Parameters::FuncRandU;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRandG)).Symbol = "@RANDOMNORMAL";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRandG)).NumOperands = 4;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRandG)).Code = Parameters::FuncRandG;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRandSeed)).Symbol = "@SEEDRANDOM";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRandSeed)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRandSeed)).Code = Parameters::FuncRandSeed;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhoAirFnPbTdbW)).Symbol = "@RHOAIRFNPBTDBW";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhoAirFnPbTdbW)).NumOperands = 3;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhoAirFnPbTdbW)).Code = Parameters::FuncRhoAirFnPbTdbW;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncCpAirFnW)).Symbol = "@CPAIRFNW";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncCpAirFnW)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncCpAirFnW)).Code = Parameters::FuncCpAirFnW;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncHfgAirFnWTdb)).Symbol = "@HFGAIRFNWTDB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncHfgAirFnWTdb)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncHfgAirFnWTdb)).Code = Parameters::FuncHfgAirFnWTdb;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncHgAirFnWTdb)).Symbol = "@HGAIRFNWTDB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncHgAirFnWTdb)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncHgAirFnWTdb)).Code = Parameters::FuncHgAirFnWTdb;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTdpFnTdbTwbPb)).Symbol = "@TDPFNTDBTWBPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTdpFnTdbTwbPb)).NumOperands = 3;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTdpFnTdbTwbPb)).Code = Parameters::FuncTdpFnTdbTwbPb;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTdpFnWPb)).Symbol = "@TDPFNWPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTdpFnWPb)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTdpFnWPb)).Code = Parameters::FuncTdpFnWPb;
-   
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncHFnTdbW)).Symbol = "@HFNTDBW";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncHFnTdbW)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncHFnTdbW)).Code = Parameters::FuncHFnTdbW;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncHFnTdbRhPb)).Symbol = "@HFNTDBRHPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncHFnTdbRhPb)).NumOperands = 3;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncHFnTdbRhPb)).Code = Parameters::FuncHFnTdbRhPb;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTdbFnHW)).Symbol = "@TDBFNHW";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTdbFnHW)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTdbFnHW)).Code = Parameters::FuncTdbFnHW;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhovFnTdbRh)).Symbol = "@RHOVFNTDBR";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhovFnTdbRh)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhovFnTdbRh)).Code = Parameters::FuncRhovFnTdbRh;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhovFnTdbRhLBnd0C)).Symbol = "@RhovFnTdbRhLBnd0C";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhovFnTdbRhLBnd0C)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhovFnTdbRhLBnd0C)).Code = Parameters::FuncRhovFnTdbRhLBnd0C;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhovFnTdbWPb)).Symbol = "@RHOVFNTDBWPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhovFnTdbWPb)).NumOperands = 3;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhovFnTdbWPb)).Code = Parameters::FuncRhovFnTdbWPb;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhFnTdbRhov)).Symbol = "@RHFNTDBRHOV";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhFnTdbRhov)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhFnTdbRhov)).Code = Parameters::FuncRhFnTdbRhov;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhFnTdbRhovLBnd0C)).Symbol = "@RHFNTDBRHOVLBND0C";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhFnTdbRhovLBnd0C)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhFnTdbRhovLBnd0C)).Code = Parameters::FuncRhFnTdbRhovLBnd0C;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhFnTdbWPb)).Symbol = "@RHFNTDBWPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhFnTdbWPb)).NumOperands = 3;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhFnTdbWPb)).Code = Parameters::FuncRhFnTdbWPb;
-   
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTwbFnTdbWPb)).Symbol = "@TWBFNTDBWPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTwbFnTdbWPb)).NumOperands = 3;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTwbFnTdbWPb)).Code = Parameters::FuncTwbFnTdbWPb;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncVFnTdbWPb)).Symbol = "@VFNTDBWPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncVFnTdbWPb)).NumOperands = 3;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncVFnTdbWPb)).Code = Parameters::FuncVFnTdbWPb;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncWFnTdpPb)).Symbol = "@WFNTDPPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncWFnTdpPb)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncWFnTdpPb)).Code = Parameters::FuncWFnTdpPb;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncWFnTdbH)).Symbol = "@WFNTDBH";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncWFnTdbH)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncWFnTdbH)).Code = Parameters::FuncWFnTdbH;
-   
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncWFnTdbTwbPb)).Symbol = "@WFNTDBTWBPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncWFnTdbTwbPb)).NumOperands = 3;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncWFnTdbTwbPb)).Code = Parameters::FuncWFnTdbTwbPb;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncWFnTdbRhPb)).Symbol = "@WFNTDBRHPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncWFnTdbRhPb)).NumOperands = 4;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncWFnTdbRhPb)).Code = Parameters::FuncWFnTdbRhPb;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncPsatFnTemp)).Symbol = "@PSATFNTEMP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncPsatFnTemp)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncPsatFnTemp)).Code = Parameters::FuncPsatFnTemp;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTsatFnHPb)).Symbol = "@TSATFNHPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTsatFnHPb)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTsatFnHPb)).Code = Parameters::FuncTsatFnHPb;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTsatFnPb)).Symbol = "@TSATFNPB";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTsatFnPb)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTsatFnPb)).Code = Parameters::FuncTsatFnPb;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncCpCW)).Symbol = "@CPCW";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncCpCW)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncCpCW)).Code = Parameters::FuncCpCW;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncCpHW)).Symbol = "@CPHW";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncCpHW)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncCpHW)).Code = Parameters::FuncCpHW;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhoH2O)).Symbol = "@RHOH2O";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhoH2O)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncRhoH2O)).Code = Parameters::FuncRhoH2O;
-   
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncFatalHaltEp)).Symbol = "@FATALHALTEP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncFatalHaltEp)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncFatalHaltEp)).Code = Parameters::FuncFatalHaltEp;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncSevereWarnEp)).Symbol = "@SEVEREWARNEP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncSevereWarnEp)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncSevereWarnEp)).Code = Parameters::FuncSevereWarnEp;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncWarnEp)).Symbol = "@WARNEP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncWarnEp)).NumOperands = 1;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncWarnEp)).Code = Parameters::FuncWarnEp;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendValue)).Symbol = "@TRENDVALUE";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendValue)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendValue)).Code = Parameters::FuncTrendValue;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendAverage)).Symbol = "@TRENDAVERAGE";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendAverage)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendAverage)).Code = Parameters::FuncTrendAverage;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendMax)).Symbol = "@TRENDMAX";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendMax)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendMax)).Code = Parameters::FuncTrendMax;
-     
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendMin)).Symbol = "@TRENDMIN";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendMin)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendMin)).Code = Parameters::FuncTrendMin;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendDirection)).Symbol = "@TRENDDIRECTION";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendDirection)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendDirection)).Code = Parameters::FuncTrendDirection;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendSum)).Symbol = "@TRENDSUM";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendSum)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTrendSum)).Code = Parameters::FuncTrendSum;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncCurveValue)).Symbol = "@CURVEVALUE";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncCurveValue)).NumOperands = 6;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncCurveValue)).Code = Parameters::FuncCurveValue;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayIsRain)).Symbol = "@TODAYISRAIN";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayIsRain)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayIsRain)).Code = Parameters::FuncTodayIsRain;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayIsSnow)).Symbol = "@TODAYISSNOW";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayIsSnow)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayIsSnow)).Code = Parameters::FuncTodayIsSnow;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayOutDryBulbTemp)).Symbol = "@TODAYOUTDRYBULBTEMP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayOutDryBulbTemp)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayOutDryBulbTemp)).Code = Parameters::FuncTodayOutDryBulbTemp;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayOutDewPointTemp)).Symbol = "@TODAYOUTDEWPOINTTEMP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayOutDewPointTemp)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayOutDewPointTemp)).Code = Parameters::FuncTodayOutDewPointTemp;
-     
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayOutBaroPress)).Symbol = "@TODAYOUTBAROPRESS";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayOutBaroPress)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayOutBaroPress)).Code = Parameters::FuncTodayOutBaroPress;
-     
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayOutRelHum)).Symbol = "@TODAYOUTRELHUM";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayOutRelHum)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayOutRelHum)).Code = Parameters::FuncTodayOutRelHum;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayWindSpeed)).Symbol = "@TODAYWINDSPEED";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayWindSpeed)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayWindSpeed)).Code = Parameters::FuncTodayWindSpeed;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayWindDir)).Symbol = "@TODAYWINDDIR";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayWindDir)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayWindDir)).Code = Parameters::FuncTodayWindDir;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodaySkyTemp)).Symbol = "@TODAYSKYTEMP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodaySkyTemp)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodaySkyTemp)).Code = Parameters::FuncTodaySkyTemp;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayHorizIRSky)).Symbol = "@TODAYHORIZIRSKY";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayHorizIRSky)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayHorizIRSky)).Code = Parameters::FuncTodayHorizIRSky;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayBeamSolarRad)).Symbol = "@TODAYBEAMSOLARRAD";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayBeamSolarRad)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayBeamSolarRad)).Code = Parameters::FuncTodayBeamSolarRad;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Subtract)).Symbol = "-";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Subtract)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Subtract)).Code = ErlFunc::Subtract;
 
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayDifSolarRad)).Symbol = "@TODAYDIFSOLARRAD";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayDifSolarRad)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayDifSolarRad)).Code = Parameters::FuncTodayDifSolarRad;
-   
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayAlbedo)).Symbol = "@TODAYALBEDO";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayAlbedo)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayAlbedo)).Code = Parameters::FuncTodayAlbedo;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayLiquidPrecip)).Symbol = "@TODAYLIQUIDPRECIP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayLiquidPrecip)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTodayLiquidPrecip)).Code = Parameters::FuncTodayLiquidPrecip;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowIsRain)).Symbol = "@TOMORROWISRAIN";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowIsRain)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowIsRain)).Code = Parameters::FuncTomorrowIsRain;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowIsSnow)).Symbol = "@TOMORROWISSNOW";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowIsSnow)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowIsSnow)).Code = Parameters::FuncTomorrowIsSnow;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowOutDryBulbTemp)).Symbol = "@TOMORROWOUTDRYBULBTEMP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowOutDryBulbTemp)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowOutDryBulbTemp)).Code = Parameters::FuncTomorrowOutDryBulbTemp;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowOutDewPointTemp)).Symbol = "@TOMORROWOUTDEWPOINTTEMP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowOutDewPointTemp)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowOutDewPointTemp)).Code = Parameters::FuncTomorrowOutDewPointTemp;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowOutBaroPress)).Symbol = "@TOMORROWOUTBAROPRESS";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowOutBaroPress)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowOutBaroPress)).Code = Parameters::FuncTomorrowOutBaroPress;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowOutRelHum)).Symbol = "@TOMORROWOUTRELHUM";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowOutRelHum)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowOutRelHum)).Code = Parameters::FuncTomorrowOutRelHum;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Add)).Symbol = "+";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Add)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Add)).Code = ErlFunc::Add;
 
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowWindSpeed)).Symbol = "@TOMORROWWINDSPEED";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowWindSpeed)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowWindSpeed)).Code = Parameters::FuncTomorrowWindSpeed;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowWindDir)).Symbol = "@TOMORROWWINDDIR";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowWindDir)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowWindDir)).Code = Parameters::FuncTomorrowWindDir;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Equal)).Symbol = "==";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Equal)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Equal)).Code = ErlFunc::Equal;
 
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowSkyTemp)).Symbol = "@TOMORROWSKYTEMP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowSkyTemp)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowSkyTemp)).Code = Parameters::FuncTomorrowSkyTemp;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowHorizIRSky)).Symbol = "@TOMORROWHORIZIRSKY";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowHorizIRSky)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowHorizIRSky)).Code = Parameters::FuncTomorrowHorizIRSky;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowBeamSolarRad)).Symbol = "@TOMORROWBEAMSOLARRAD";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowBeamSolarRad)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowBeamSolarRad)).Code = Parameters::FuncTomorrowBeamSolarRad;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowDifSolarRad)).Symbol = "@TOMORROWDIFSOLARRAD";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowDifSolarRad)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowDifSolarRad)).Code = Parameters::FuncTomorrowDifSolarRad;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowAlbedo)).Symbol = "@TOMORROWALBEDO";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowAlbedo)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowAlbedo)).Code = Parameters::FuncTomorrowAlbedo;
-    
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowLiquidPrecip)).Symbol = "@TOMORROWLIQUIDPRECIP";
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowLiquidPrecip)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(Parameters::FuncTomorrowLiquidPrecip)).Code = Parameters::FuncTomorrowLiquidPrecip;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::NotEqual)).Symbol = "<>";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::NotEqual)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::NotEqual)).Code = ErlFunc::NotEqual;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LessOrEqual)).Symbol = "<=";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LessOrEqual)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LessOrEqual)).Code = ErlFunc::LessOrEqual;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::GreaterOrEqual)).Symbol = ">=";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::GreaterOrEqual)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::GreaterOrEqual)).Code = ErlFunc::GreaterOrEqual;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LessThan)).Symbol = "<";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LessThan)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LessThan)).Code = ErlFunc::LessThan;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::GreaterThan)).Symbol = ">";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::GreaterThan)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::GreaterThan)).Code = ErlFunc::GreaterThan;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RaiseToPower)).Symbol = "^";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RaiseToPower)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RaiseToPower)).Code = ErlFunc::RaiseToPower;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LogicalAND)).Symbol = "&&";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LogicalAND)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LogicalAND)).Code = ErlFunc::LogicalAND;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LogicalOR)).Symbol = "||";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LogicalOR)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::LogicalOR)).Code = ErlFunc::LogicalOR;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Round)).Symbol = "@ROUND";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Round)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Round)).Code = ErlFunc::Round;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Mod)).Symbol = "@MOD";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Mod)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Mod)).Code = ErlFunc::Mod;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Sin)).Symbol = "@SIN";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Sin)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Sin)).Code = ErlFunc::Sin;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Cos)).Symbol = "@COS";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Cos)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Cos)).Code = ErlFunc::Cos;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ArcSin)).Symbol = "@ARCSIN";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ArcSin)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ArcSin)).Code = ErlFunc::ArcSin;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ArcCos)).Symbol = "@ARCCOS";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ArcCos)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ArcCos)).Code = ErlFunc::ArcCos;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::DegToRad)).Symbol = "@DEGTORAD";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::DegToRad)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::DegToRad)).Code = ErlFunc::DegToRad;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RadToDeg)).Symbol = "@RADTODEG";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RadToDeg)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RadToDeg)).Code = ErlFunc::RadToDeg;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Exp)).Symbol = "@EXP";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Exp)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Exp)).Code = ErlFunc::Exp;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Ln)).Symbol = "@LN";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Ln)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Ln)).Code = ErlFunc::Ln;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Max)).Symbol = "@MAX";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Max)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Max)).Code = ErlFunc::Max;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Min)).Symbol = "@MIN";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Min)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::Min)).Code = ErlFunc::Min;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ABS)).Symbol = "@ABS";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ABS)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::ABS)).Code = ErlFunc::ABS;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandU)).Symbol = "@RANDOMUNIFORM";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandU)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandU)).Code = ErlFunc::RandU;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandG)).Symbol = "@RANDOMNORMAL";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandG)).NumOperands = 4;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandG)).Code = ErlFunc::RandG;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandSeed)).Symbol = "@SEEDRANDOM";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandSeed)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RandSeed)).Code = ErlFunc::RandSeed;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhoAirFnPbTdbW)).Symbol = "@RHOAIRFNPBTDBW";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhoAirFnPbTdbW)).NumOperands = 3;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhoAirFnPbTdbW)).Code = ErlFunc::RhoAirFnPbTdbW;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpAirFnW)).Symbol = "@CPAIRFNW";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpAirFnW)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpAirFnW)).Code = ErlFunc::CpAirFnW;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HfgAirFnWTdb)).Symbol = "@HFGAIRFNWTDB";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HfgAirFnWTdb)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HfgAirFnWTdb)).Code = ErlFunc::HfgAirFnWTdb;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HgAirFnWTdb)).Symbol = "@HGAIRFNWTDB";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HgAirFnWTdb)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HgAirFnWTdb)).Code = ErlFunc::HgAirFnWTdb;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdpFnTdbTwbPb)).Symbol = "@TDPFNTDBTWBPB";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdpFnTdbTwbPb)).NumOperands = 3;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdpFnTdbTwbPb)).Code = ErlFunc::TdpFnTdbTwbPb;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdpFnWPb)).Symbol = "@TDPFNWPB";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdpFnWPb)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdpFnWPb)).Code = ErlFunc::TdpFnWPb;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HFnTdbW)).Symbol = "@HFNTDBW";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HFnTdbW)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HFnTdbW)).Code = ErlFunc::HFnTdbW;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HFnTdbRhPb)).Symbol = "@HFNTDBRHPB";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HFnTdbRhPb)).NumOperands = 3;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::HFnTdbRhPb)).Code = ErlFunc::HFnTdbRhPb;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdbFnHW)).Symbol = "@TDBFNHW";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdbFnHW)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TdbFnHW)).Code = ErlFunc::TdbFnHW;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbRh)).Symbol = "@RHOVFNTDBR";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbRh)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbRh)).Code = ErlFunc::RhovFnTdbRh;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbRhLBnd0C)).Symbol = "@RhovFnTdbRhLBnd0C";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbRhLBnd0C)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbRhLBnd0C)).Code = ErlFunc::RhovFnTdbRhLBnd0C;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbWPb)).Symbol = "@RHOVFNTDBWPB";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbWPb)).NumOperands = 3;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhovFnTdbWPb)).Code = ErlFunc::RhovFnTdbWPb;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbRhov)).Symbol = "@RHFNTDBRHOV";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbRhov)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbRhov)).Code = ErlFunc::RhFnTdbRhov;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbRhovLBnd0C)).Symbol = "@RHFNTDBRHOVLBND0C";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbRhovLBnd0C)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbRhovLBnd0C)).Code = ErlFunc::RhFnTdbRhovLBnd0C;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbWPb)).Symbol = "@RHFNTDBWPB";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbWPb)).NumOperands = 3;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhFnTdbWPb)).Code = ErlFunc::RhFnTdbWPb;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TwbFnTdbWPb)).Symbol = "@TWBFNTDBWPB";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TwbFnTdbWPb)).NumOperands = 3;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TwbFnTdbWPb)).Code = ErlFunc::TwbFnTdbWPb;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::VFnTdbWPb)).Symbol = "@VFNTDBWPB";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::VFnTdbWPb)).NumOperands = 3;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::VFnTdbWPb)).Code = ErlFunc::VFnTdbWPb;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdpPb)).Symbol = "@WFNTDPPB";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdpPb)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdpPb)).Code = ErlFunc::WFnTdpPb;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbH)).Symbol = "@WFNTDBH";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbH)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbH)).Code = ErlFunc::WFnTdbH;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbTwbPb)).Symbol = "@WFNTDBTWBPB";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbTwbPb)).NumOperands = 3;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbTwbPb)).Code = ErlFunc::WFnTdbTwbPb;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbRhPb)).Symbol = "@WFNTDBRHPB";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbRhPb)).NumOperands = 4;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WFnTdbRhPb)).Code = ErlFunc::WFnTdbRhPb;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::PsatFnTemp)).Symbol = "@PSATFNTEMP";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::PsatFnTemp)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::PsatFnTemp)).Code = ErlFunc::PsatFnTemp;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TsatFnHPb)).Symbol = "@TSATFNHPB";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TsatFnHPb)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TsatFnHPb)).Code = ErlFunc::TsatFnHPb;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TsatFnPb)).Symbol = "@TSATFNPB";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TsatFnPb)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TsatFnPb)).Code = ErlFunc::TsatFnPb;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpCW)).Symbol = "@CPCW";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpCW)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpCW)).Code = ErlFunc::CpCW;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpHW)).Symbol = "@CPHW";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpHW)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CpHW)).Code = ErlFunc::CpHW;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhoH2O)).Symbol = "@RHOH2O";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhoH2O)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::RhoH2O)).Code = ErlFunc::RhoH2O;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::FatalHaltEp)).Symbol = "@FATALHALTEP";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::FatalHaltEp)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::FatalHaltEp)).Code = ErlFunc::FatalHaltEp;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::SevereWarnEp)).Symbol = "@SEVEREWARNEP";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::SevereWarnEp)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::SevereWarnEp)).Code = ErlFunc::SevereWarnEp;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WarnEp)).Symbol = "@WARNEP";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WarnEp)).NumOperands = 1;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::WarnEp)).Code = ErlFunc::WarnEp;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendValue)).Symbol = "@TRENDVALUE";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendValue)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendValue)).Code = ErlFunc::TrendValue;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendAverage)).Symbol = "@TRENDAVERAGE";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendAverage)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendAverage)).Code = ErlFunc::TrendAverage;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendMax)).Symbol = "@TRENDMAX";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendMax)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendMax)).Code = ErlFunc::TrendMax;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendMin)).Symbol = "@TRENDMIN";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendMin)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendMin)).Code = ErlFunc::TrendMin;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendDirection)).Symbol = "@TRENDDIRECTION";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendDirection)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendDirection)).Code = ErlFunc::TrendDirection;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendSum)).Symbol = "@TRENDSUM";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendSum)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TrendSum)).Code = ErlFunc::TrendSum;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CurveValue)).Symbol = "@CURVEVALUE";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CurveValue)).NumOperands = 6;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::CurveValue)).Code = ErlFunc::CurveValue;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayIsRain)).Symbol = "@TODAYISRAIN";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayIsRain)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayIsRain)).Code = ErlFunc::TodayIsRain;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayIsSnow)).Symbol = "@TODAYISSNOW";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayIsSnow)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayIsSnow)).Code = ErlFunc::TodayIsSnow;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutDryBulbTemp)).Symbol = "@TODAYOUTDRYBULBTEMP";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutDryBulbTemp)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutDryBulbTemp)).Code = ErlFunc::TodayOutDryBulbTemp;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutDewPointTemp)).Symbol = "@TODAYOUTDEWPOINTTEMP";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutDewPointTemp)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutDewPointTemp)).Code = ErlFunc::TodayOutDewPointTemp;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutBaroPress)).Symbol = "@TODAYOUTBAROPRESS";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutBaroPress)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutBaroPress)).Code = ErlFunc::TodayOutBaroPress;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutRelHum)).Symbol = "@TODAYOUTRELHUM";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutRelHum)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayOutRelHum)).Code = ErlFunc::TodayOutRelHum;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayWindSpeed)).Symbol = "@TODAYWINDSPEED";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayWindSpeed)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayWindSpeed)).Code = ErlFunc::TodayWindSpeed;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayWindDir)).Symbol = "@TODAYWINDDIR";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayWindDir)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayWindDir)).Code = ErlFunc::TodayWindDir;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodaySkyTemp)).Symbol = "@TODAYSKYTEMP";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodaySkyTemp)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodaySkyTemp)).Code = ErlFunc::TodaySkyTemp;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayHorizIRSky)).Symbol = "@TODAYHORIZIRSKY";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayHorizIRSky)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayHorizIRSky)).Code = ErlFunc::TodayHorizIRSky;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayBeamSolarRad)).Symbol = "@TODAYBEAMSOLARRAD";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayBeamSolarRad)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayBeamSolarRad)).Code = ErlFunc::TodayBeamSolarRad;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayDifSolarRad)).Symbol = "@TODAYDIFSOLARRAD";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayDifSolarRad)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayDifSolarRad)).Code = ErlFunc::TodayDifSolarRad;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayAlbedo)).Symbol = "@TODAYALBEDO";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayAlbedo)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayAlbedo)).Code = ErlFunc::TodayAlbedo;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayLiquidPrecip)).Symbol = "@TODAYLIQUIDPRECIP";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayLiquidPrecip)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TodayLiquidPrecip)).Code = ErlFunc::TodayLiquidPrecip;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowIsRain)).Symbol = "@TOMORROWISRAIN";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowIsRain)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowIsRain)).Code = ErlFunc::TomorrowIsRain;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowIsSnow)).Symbol = "@TOMORROWISSNOW";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowIsSnow)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowIsSnow)).Code = ErlFunc::TomorrowIsSnow;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutDryBulbTemp)).Symbol = "@TOMORROWOUTDRYBULBTEMP";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutDryBulbTemp)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutDryBulbTemp)).Code = ErlFunc::TomorrowOutDryBulbTemp;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutDewPointTemp)).Symbol = "@TOMORROWOUTDEWPOINTTEMP";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutDewPointTemp)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutDewPointTemp)).Code =
+        ErlFunc::TomorrowOutDewPointTemp;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutBaroPress)).Symbol = "@TOMORROWOUTBAROPRESS";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutBaroPress)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutBaroPress)).Code = ErlFunc::TomorrowOutBaroPress;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutRelHum)).Symbol = "@TOMORROWOUTRELHUM";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutRelHum)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutRelHum)).Code = ErlFunc::TomorrowOutRelHum;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowWindSpeed)).Symbol = "@TOMORROWWINDSPEED";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowWindSpeed)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowWindSpeed)).Code = ErlFunc::TomorrowWindSpeed;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowWindDir)).Symbol = "@TOMORROWWINDDIR";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowWindDir)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowWindDir)).Code = ErlFunc::TomorrowWindDir;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowSkyTemp)).Symbol = "@TOMORROWSKYTEMP";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowSkyTemp)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowSkyTemp)).Code = ErlFunc::TomorrowSkyTemp;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowHorizIRSky)).Symbol = "@TOMORROWHORIZIRSKY";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowHorizIRSky)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowHorizIRSky)).Code = ErlFunc::TomorrowHorizIRSky;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowBeamSolarRad)).Symbol = "@TOMORROWBEAMSOLARRAD";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowBeamSolarRad)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowBeamSolarRad)).Code = ErlFunc::TomorrowBeamSolarRad;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowDifSolarRad)).Symbol = "@TOMORROWDIFSOLARRAD";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowDifSolarRad)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowDifSolarRad)).Code = ErlFunc::TomorrowDifSolarRad;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowAlbedo)).Symbol = "@TOMORROWALBEDO";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowAlbedo)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowAlbedo)).Code = ErlFunc::TomorrowAlbedo;
+
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowLiquidPrecip)).Symbol = "@TOMORROWLIQUIDPRECIP";
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowLiquidPrecip)).NumOperands = 2;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowLiquidPrecip)).Code = ErlFunc::TomorrowLiquidPrecip;
 
     state.dataRuntimeLangProcessor->AlreadyDidOnce = true;
 }
