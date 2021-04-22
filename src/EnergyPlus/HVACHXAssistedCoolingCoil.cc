@@ -350,15 +350,16 @@ namespace HVACHXAssistedCoolingCoil {
                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num = CoilDX_Cooling;
                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType = CurrentModuleObject;
                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
+
                 CoolingCoilErrFlag = false;
-                state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex =
-                    CoilCoolingDX::factory(state, state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName);
-                if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex < 0) {
+                int coolingCoilIndex_temp = CoilCoolingDX::factory(state, state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName);
+                state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex = coolingCoilIndex_temp;
+                if (coolingCoilIndex_temp < 0) {
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + AlphArray(5));
                     CoolingCoilErrFlag = true;
                     ErrorsFound = true;
                 }
-                int coolingCoilIndex_temp = state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex;
+
                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).DXCoilNumOfSpeeds =
                     state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex_temp].performance.normalMode.speeds.size();
                 if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).DXCoilNumOfSpeeds < 1) {
