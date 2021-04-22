@@ -1119,8 +1119,9 @@ namespace HVACHXAssistedCoolingCoil {
                     OperationMode = DataHVACGlobals::coilEnhancedMode;
                 }
 
-                Real64 CoolingSpeedNum = 1; // need to figure out the Cooling Speed number for the HXAssisted
-                Real64 CoolingSpeedRatio = 1; // need to figure out the Cooling Speed Ratio for the HXAssisted
+                Real64 CoolingSpeedNum =
+                    state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].performance.normalMode.speeds.size(); // used the same for the original variable speed coil
+                Real64 CoolingSpeedRatio = 1.0; // used same setting as the original variable speed coil
                 bool singleMode = true;
                 if (state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].getNumModes() > 1) {
                     singleMode = false;
@@ -1131,8 +1132,8 @@ namespace HVACHXAssistedCoolingCoil {
                     state,
                     OperationMode, // partially implemented for HXAssistedCoil
                     PartLoadRatio, 
-                    CoolingSpeedNum, // temp not fully implemented, trying to figure out the equivalent for HXAssisted coil
-                    CoolingSpeedRatio, // temp not fully implemented, trying to figure out the equivalent for HXAssisted coil
+                    CoolingSpeedNum, 
+                    CoolingSpeedRatio, 
                     FanOpMode,
                     singleMode,
                     CoilSHR 
