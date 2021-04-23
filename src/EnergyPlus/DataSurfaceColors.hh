@@ -96,10 +96,10 @@ namespace DataSurfaceColors {
 
 struct SurfaceColorData : BaseGlobalStruct
 {
-    Array1D_int const defaultcolorno = Array1D_int(static_cast<int>(DataSurfaceColors::ColorNo::NUM), {3, 43, 143, 143, 45, 8, 15, 195, 9, 13, 174, 143, 143, 10, 5});
-    Array1D_int DXFcolorno = Array1D_int(static_cast<int>(DataSurfaceColors::ColorNo::NUM), SurfaceColorData::defaultcolorno);
+    Array1D_int const defaultcolorno = Array1D_int({0, 14}, {3, 43, 143, 143, 45, 8, 15, 195, 9, 13, 174, 143, 143, 10, 5});
+    Array1D_int DXFcolorno = Array1D_int({0, 14}, SurfaceColorData::defaultcolorno);
 
-    Array1D_string const colorkeys = Array1D_string(static_cast<int>(DataSurfaceColors::ColorNo::NUM),
+    Array1D_string const colorkeys = Array1D_string({0, 14},
                                                     {"Text",
                                                      "Walls",
                                                      "Windows",
@@ -116,7 +116,7 @@ struct SurfaceColorData : BaseGlobalStruct
                                                      "DaylightReferencePoint1",
                                                      "DaylightReferencePoint2"});
 
-    Array1D_int const colorkeyptr = Array1D_int(static_cast<int>(DataSurfaceColors::ColorNo::NUM),
+    Array1D_int const colorkeyptr = Array1D_int({0, 14},
                                                 {static_cast<int>(DataSurfaceColors::ColorNo::Text),
                                                  static_cast<int>(DataSurfaceColors::ColorNo::Wall),
                                                  static_cast<int>(DataSurfaceColors::ColorNo::Window),
@@ -135,7 +135,7 @@ struct SurfaceColorData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->DXFcolorno = Array1D_int(static_cast<int>(DataSurfaceColors::ColorNo::NUM), SurfaceColorData::defaultcolorno);
+        this->DXFcolorno = Array1D_int({0, 14}, SurfaceColorData::defaultcolorno);
     }
 };
 
