@@ -116,23 +116,6 @@ struct SurfaceColorData : BaseGlobalStruct
                                                      "DaylightReferencePoint1",
                                                      "DaylightReferencePoint2"});
 
-    Array1D_int const colorkeyptr = Array1D_int({0, 14},
-                                                {static_cast<int>(DataSurfaceColors::ColorNo::Text),
-                                                 static_cast<int>(DataSurfaceColors::ColorNo::Wall),
-                                                 static_cast<int>(DataSurfaceColors::ColorNo::Window),
-                                                 static_cast<int>(DataSurfaceColors::ColorNo::GlassDoor),
-                                                 static_cast<int>(DataSurfaceColors::ColorNo::Door),
-                                                 static_cast<int>(DataSurfaceColors::ColorNo::Floor),
-                                                 static_cast<int>(DataSurfaceColors::ColorNo::Roof),
-                                                 static_cast<int>(DataSurfaceColors::ColorNo::ShdDetBldg),
-                                                 static_cast<int>(DataSurfaceColors::ColorNo::ShdDetFix),
-                                                 static_cast<int>(DataSurfaceColors::ColorNo::ShdAtt),
-                                                 static_cast<int>(DataSurfaceColors::ColorNo::PV),
-                                                 static_cast<int>(DataSurfaceColors::ColorNo::TDDDome),
-                                                 static_cast<int>(DataSurfaceColors::ColorNo::TDDDiffuser),
-                                                 static_cast<int>(DataSurfaceColors::ColorNo::DaylSensor1),
-                                                 static_cast<int>(DataSurfaceColors::ColorNo::DaylSensor2)});
-
     void clear_state() override
     {
         this->DXFcolorno = Array1D_int({0, 14}, SurfaceColorData::defaultcolorno);
