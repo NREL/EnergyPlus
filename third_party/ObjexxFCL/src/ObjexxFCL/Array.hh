@@ -3405,23 +3405,6 @@ operator <<( std::ostream & stream, Array< T > const & a )
 	return stream;
 }
 
-// Read an Array from a Binary File
-template< typename T >
-inline
-std::istream &
-read_binary( std::istream & stream, Array< T > & a )
-{
-	std::size_t const n( a.size() );
-	if ( stream && ( n > 0u ) ) {
-		std::size_t const type_size( sizeof( T ) / sizeof( std::istream::char_type ) );
-		for ( std::size_t i = 0; i < n; ++i ) {
-			stream.read( ( std::istream::char_type * )&a[ i ], type_size );
-			if ( ! stream ) break;
-		}
-	}
-	return stream;
-}
-
 
 namespace fmt {
 

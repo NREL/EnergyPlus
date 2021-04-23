@@ -1154,23 +1154,6 @@ operator <<( std::ostream & stream, Array1S< T > const & a )
 	return stream;
 }
 
-// Read an Array1S from a Binary File
-template< typename T >
-inline
-std::istream &
-read_binary( std::istream & stream, Array1S< T > & a )
-{
-	std::size_t const n( a.size() );
-	if ( stream && ( n > 0u ) ) {
-		std::size_t const type_size( sizeof( T ) / sizeof( std::istream::char_type ) );
-		for ( int i = 1, e = a.u(); i <= e; ++i ) {
-			stream.read( ( std::istream::char_type * )&a( i ), type_size );
-			if ( ! stream ) break;
-		}
-	}
-	return stream;
-}
-
 namespace fmt {
 
 // List-Directed Format: Array1S

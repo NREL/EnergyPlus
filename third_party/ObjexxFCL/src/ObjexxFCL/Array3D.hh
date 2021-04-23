@@ -428,44 +428,6 @@ public: // Assignment: Array
 		return *this;
 	}
 
-public: // Assignment: Array: Logical
-
-	// &&= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array3D &
-	and_equals( Array3< U > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array3D &
-	or_equals( Array3< U > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
-
-	// &&= Slice Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array3D &
-	and_equals( Array3S< U > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= Slice Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array3D &
-	or_equals( Array3S< U > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
-
 
 public: // Assignment: Value
 

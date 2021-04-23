@@ -2206,40 +2206,6 @@ operator <<( std::ostream & stream, MArray1< A, T > const & a )
 	return stream;
 }
 
-// Read an MArray1 from a Binary File
-template< class A, typename T >
-inline
-std::istream &
-read_binary( std::istream & stream, MArray1< A, T > & a )
-{
-	std::size_t const n( a.size() );
-	if ( stream && ( n > 0u ) ) {
-		std::size_t const type_size( sizeof( T ) / sizeof( std::istream::char_type ) );
-		for ( int i = 1, e = a.u(); i <= e; ++i ) {
-			stream.read( ( std::istream::char_type * )&a( i ), type_size );
-			if ( ! stream ) break;
-		}
-	}
-	return stream;
-}
-
-// Write an MArray1 to a Binary File
-template< class A, typename T >
-inline
-std::ostream &
-write_binary( std::ostream & stream, MArray1< A, T > const & a )
-{
-	std::size_t const n( a.size() );
-	if ( stream && ( n > 0u ) ) {
-		std::size_t const type_size( sizeof( T ) / sizeof( std::ostream::char_type ) );
-		for ( int i = 1, e = a.u(); i <= e; ++i ) {
-			stream.write( ( std::ostream::char_type const * )&a( i ), type_size );
-			if ( ! stream ) break;
-		}
-	}
-	return stream;
-}
-
 namespace fmt {
 
 // List-Directed Format: MArray1
