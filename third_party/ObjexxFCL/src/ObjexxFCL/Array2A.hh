@@ -366,15 +366,6 @@ public: // Assignment: Value
 		return *this;
 	}
 
-public: // Predicate
-
-	// Initializer Active?
-	bool
-	initializer_active() const
-	{
-		return false;
-	}
-
 public: // Modifier
 
 	// Clear

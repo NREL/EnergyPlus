@@ -1231,11 +1231,6 @@ public: // Predicate
 		return ! owner_;
 	}
 
-	// Initializer Active?
-	virtual
-	bool
-	initializer_active() const = 0;
-
 	// Active?
 	bool
 	active() const

@@ -121,24 +121,20 @@ public: // Creation
 
 	// Copy Constructor
 	Array3D( Array3D const & a ) :
-	 Super( a ),
-	 initializer_( a.initializer_ )
+	 Super( a )
 	{}
 
 	// Move Constructor
 	Array3D( Array3D && a ) NOEXCEPT :
-	 Super( std::move( a ) ),
-	 initializer_( a.initializer_ )
+	 Super( std::move( a ) )
 	{
-		a.initializer_.clear();
 	}
 
 	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	explicit
 	Array3D( Array3D< U > const & a ) :
-	 Super( a ),
-	 initializer_( a.initializer_ )
+	 Super( a )
 	{}
 
 	// Super Constructor Template
@@ -587,16 +583,6 @@ public: // Assignment: Value
 		return *this;
 	}
 
-
-public: // Predicate
-
-	// Initializer Active?
-	bool
-	initializer_active() const
-	{
-		return initializer_.active();
-	}
-
 public: // Modifier
 
 	// Clear
@@ -604,7 +590,6 @@ public: // Modifier
 	clear()
 	{
 		Super::clear();
-		initializer_.clear();
 		return *this;
 	}
 
@@ -684,30 +669,12 @@ public: // Modifier
 		return *this;
 	}
 
-
-	// Set Initializer Value
-	Array3D &
-	initializer( T const & t )
-	{
-		initializer_ = t;
-		return *this;
-	}
-
-	// Clear Initializer
-	Array3D &
-	initializer_clear()
-	{
-		initializer_.clear();
-		return *this;
-	}
-
 	// Swap
 	Array3D &
 	swap( Array3D & v )
 	{
 		using std::swap;
 		swap3( v );
-		swap( initializer_, v.initializer_ );
 		return *this;
 	}
 
@@ -724,20 +691,13 @@ protected: // Functions
 	void
 	initialize()
 	{
-		if ( initializer_.active() ) { // Sticky initialize
-			T const fill( initializer_() );
-			for ( size_type i = 0; i < size_; ++i ) {
-				new ( data_ + i ) T( fill );
-			}
-		} else { // Default initialize
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-			std::uninitialized_fill_n( data_, size_, Traits::initial_array_value() );
+		std::uninitialized_fill_n( data_, size_, Traits::initial_array_value() );
 #else
-			for ( size_type i = 0; i < size_; ++i ) {
+		for ( size_type i = 0; i < size_; ++i ) {
 				new ( data_ + i ) T;
 			}
 #endif
-		}
 	}
 
 	// Initialize by Function
@@ -752,16 +712,9 @@ protected: // Functions
 	void
 	assign()
 	{
-		if ( initializer_.active() ) { // Sticky initialize
-			T const fill( initializer_() );
-			for ( size_type i = 0; i < size_; ++i ) {
-				data_[ i ] = fill;
-			}
-		} else { // Default initialize
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-			std::fill_n( data_, size_, Traits::initial_array_value() );
+		std::fill_n( data_, size_, Traits::initial_array_value() );
 #endif
-		}
 	}
 
 private: // Functions
@@ -818,10 +771,6 @@ private: // Functions
 		if ( size_real( I1, I2, I3 ) ) initialize();
 		fxn( *this );
 	}
-
-private: // Data
-
-	Initializer initializer_; // Array initializer
 
 }; // Array3D
 
