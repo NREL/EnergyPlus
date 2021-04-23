@@ -85,8 +85,7 @@ set(src
   src/ObjexxFCL/DimensionSlice.hh
   src/ObjexxFCL/environment.cc
   src/ObjexxFCL/environment.hh
-  src/ObjexxFCL/floops.hh
-  src/ObjexxFCL/Fmath.hh
+        src/ObjexxFCL/Fmath.hh
         src/ObjexxFCL/Index.cc
   src/ObjexxFCL/Index.fwd.hh
   src/ObjexxFCL/Index.hh
@@ -121,18 +120,12 @@ set(src
   src/ObjexxFCL/random.hh
         src/ObjexxFCL/Reference.fwd.hh
   src/ObjexxFCL/Reference.hh
-  src/ObjexxFCL/Required.fwd.hh
-  src/ObjexxFCL/Required.hh
         src/ObjexxFCL/string.constants.cc
   src/ObjexxFCL/string.constants.hh
   src/ObjexxFCL/string.functions.cc
   src/ObjexxFCL/string.functions.hh
   src/ObjexxFCL/time.cc
   src/ObjexxFCL/time.hh
-  src/ObjexxFCL/TraitsA.hh
-        src/ObjexxFCL/TraitsE.hh
-  src/ObjexxFCL/TraitsF.hh
-        src/ObjexxFCL/TraitsI.hh
         src/ObjexxFCL/TypeTraits.hh
         src/ObjexxFCL/Vector2.fwd.hh
   src/ObjexxFCL/Vector2.hh
