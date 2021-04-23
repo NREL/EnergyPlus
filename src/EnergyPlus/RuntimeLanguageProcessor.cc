@@ -1254,59 +1254,50 @@ void ParseExpression(EnergyPlusData &state,
 
             // First check for two character operators:  == <> <= >= || &&
             std::string const cc(String.substr(Pos, 2));
-            if (parse("==", ErlFunc::Equal, false) || parse("<>", ErlFunc::NotEqual, false) ||
-                parse("<=", ErlFunc::LessOrEqual, false) || parse(">=", ErlFunc::GreaterOrEqual, false) ||
-                parse("||", ErlFunc::LogicalOR, false) || parse("&&", ErlFunc::LogicalAND, false)) {
+            if (parse("==", ErlFunc::Equal, false) || parse("<>", ErlFunc::NotEqual, false) || parse("<=", ErlFunc::LessOrEqual, false) ||
+                parse(">=", ErlFunc::GreaterOrEqual, false) || parse("||", ErlFunc::LogicalOR, false) || parse("&&", ErlFunc::LogicalAND, false)) {
                 // One of the comparision / logical operators
                 OperatorProcessing = true;
 
             } else if (String[Pos] == '@') { // next check for builtin functions signaled by "@"
 
                 if (i_parse("@Round", ErlFunc::Round) || i_parse("@Mod", ErlFunc::Mod) || i_parse("@Sin", ErlFunc::Sin) ||
-                    i_parse("@Cos", ErlFunc::Cos) || i_parse("@ArcCos", ErlFunc::ArcCos) ||
-                    i_parse("@ArcSin", ErlFunc::ArcSin) || i_parse("@DegToRad", ErlFunc::DegToRad) ||
-                    i_parse("@RadToDeg", ErlFunc::RadToDeg) || i_parse("@Exp", ErlFunc::Exp) || i_parse("@Ln", ErlFunc::Ln) ||
-                    i_parse("@Max", ErlFunc::Max) || i_parse("@Min", ErlFunc::Min) || i_parse("@Abs", ErlFunc::ABS) ||
+                    i_parse("@Cos", ErlFunc::Cos) || i_parse("@ArcCos", ErlFunc::ArcCos) || i_parse("@ArcSin", ErlFunc::ArcSin) ||
+                    i_parse("@DegToRad", ErlFunc::DegToRad) || i_parse("@RadToDeg", ErlFunc::RadToDeg) || i_parse("@Exp", ErlFunc::Exp) ||
+                    i_parse("@Ln", ErlFunc::Ln) || i_parse("@Max", ErlFunc::Max) || i_parse("@Min", ErlFunc::Min) || i_parse("@Abs", ErlFunc::ABS) ||
                     i_parse("@RANDOMUNIFORM", ErlFunc::RandU) || i_parse("@RANDOMNORMAL", ErlFunc::RandG) ||
                     i_parse("@SEEDRANDOM", ErlFunc::RandSeed) || i_parse("@RhoAirFnPbTdbW", ErlFunc::RhoAirFnPbTdbW) ||
                     i_parse("@CpAirFnW", ErlFunc::CpAirFnW) || i_parse("@HfgAirFnWTdb", ErlFunc::HfgAirFnWTdb) ||
                     i_parse("@HgAirFnWTdb", ErlFunc::HgAirFnWTdb) || i_parse("@TdpFnTdbTwbPb", ErlFunc::TdpFnTdbTwbPb) ||
-                    i_parse("@TdpFnWPb", ErlFunc::TdpFnWPb) || i_parse("@HFnTdbW", ErlFunc::HFnTdbW) ||
-                    i_parse("@HFnTdbRhPb", ErlFunc::HFnTdbRhPb) || i_parse("@TdbFnHW", ErlFunc::TdbFnHW) ||
-                    i_parse("@RhovFnTdbRhLBnd0C", ErlFunc::RhovFnTdbRhLBnd0C) || i_parse("@RhovFnTdbRh", ErlFunc::RhovFnTdbRh) ||
-                    i_parse("@RhovFnTdbWPb", ErlFunc::RhovFnTdbWPb) || i_parse("@RhFnTdbRhovLBnd0C", ErlFunc::RhFnTdbRhovLBnd0C) ||
-                    i_parse("@RhFnTdbRhov", ErlFunc::RhFnTdbRhov) || i_parse("@RhFnTdbWPb", ErlFunc::RhFnTdbWPb) ||
-                    i_parse("@TwbFnTdbWPb", ErlFunc::TwbFnTdbWPb) || i_parse("@VFnTdbWPb", ErlFunc::VFnTdbWPb) ||
-                    i_parse("@WFnTdpPb", ErlFunc::WFnTdpPb) || i_parse("@WFnTdbH", ErlFunc::WFnTdbH) ||
+                    i_parse("@TdpFnWPb", ErlFunc::TdpFnWPb) || i_parse("@HFnTdbW", ErlFunc::HFnTdbW) || i_parse("@HFnTdbRhPb", ErlFunc::HFnTdbRhPb) ||
+                    i_parse("@TdbFnHW", ErlFunc::TdbFnHW) || i_parse("@RhovFnTdbRhLBnd0C", ErlFunc::RhovFnTdbRhLBnd0C) ||
+                    i_parse("@RhovFnTdbRh", ErlFunc::RhovFnTdbRh) || i_parse("@RhovFnTdbWPb", ErlFunc::RhovFnTdbWPb) ||
+                    i_parse("@RhFnTdbRhovLBnd0C", ErlFunc::RhFnTdbRhovLBnd0C) || i_parse("@RhFnTdbRhov", ErlFunc::RhFnTdbRhov) ||
+                    i_parse("@RhFnTdbWPb", ErlFunc::RhFnTdbWPb) || i_parse("@TwbFnTdbWPb", ErlFunc::TwbFnTdbWPb) ||
+                    i_parse("@VFnTdbWPb", ErlFunc::VFnTdbWPb) || i_parse("@WFnTdpPb", ErlFunc::WFnTdpPb) || i_parse("@WFnTdbH", ErlFunc::WFnTdbH) ||
                     i_parse("@WFnTdbTwbPb", ErlFunc::WFnTdbTwbPb) || i_parse("@WFnTdbRhPb", ErlFunc::WFnTdbRhPb) ||
                     i_parse("@PsatFnTemp", ErlFunc::PsatFnTemp) || i_parse("@TsatFnHPb", ErlFunc::TsatFnHPb) ||
-                    i_parse("@TsatFnPb", ErlFunc::TsatFnPb) || i_parse("@CpCW", ErlFunc::CpCW) ||
-                    i_parse("@CpHW", ErlFunc::CpHW) || i_parse("@RhoH2O", ErlFunc::RhoH2O) ||
-                    i_parse("@FATALHALTEP", ErlFunc::FatalHaltEp) || i_parse("@SEVEREWARNEP", ErlFunc::SevereWarnEp) ||
-                    i_parse("@WARNEP", ErlFunc::WarnEp) || i_parse("@TRENDVALUE", ErlFunc::TrendValue) ||
-                    i_parse("@TRENDAVERAGE", ErlFunc::TrendAverage) || i_parse("@TRENDMAX", ErlFunc::TrendMax) ||
-                    i_parse("@TRENDMIN", ErlFunc::TrendMin) || i_parse("@TRENDDIRECTION", ErlFunc::TrendDirection) ||
-                    i_parse("@TRENDSUM", ErlFunc::TrendSum) || i_parse("@CURVEVALUE", ErlFunc::CurveValue) ||
-                    i_parse("@TODAYISRAIN", ErlFunc::TodayIsRain) || i_parse("@TODAYISSNOW", ErlFunc::TodayIsSnow) ||
-                    i_parse("@TODAYOUTDRYBULBTEMP", ErlFunc::TodayOutDryBulbTemp) ||
-                    i_parse("@TODAYOUTDEWPOINTTEMP", ErlFunc::TodayOutDewPointTemp) ||
-                    i_parse("@TODAYOUTBAROPRESS", ErlFunc::TodayOutBaroPress) || i_parse("@TODAYOUTRELHUM", ErlFunc::TodayOutRelHum) ||
-                    i_parse("@TODAYWINDSPEED", ErlFunc::TodayWindSpeed) || i_parse("@TODAYWINDDIR", ErlFunc::TodayWindDir) ||
-                    i_parse("@TODAYSKYTEMP", ErlFunc::TodaySkyTemp) || i_parse("@TODAYHORIZIRSKY", ErlFunc::TodayHorizIRSky) ||
-                    i_parse("@TODAYBEAMSOLARRAD", ErlFunc::TodayBeamSolarRad) ||
+                    i_parse("@TsatFnPb", ErlFunc::TsatFnPb) || i_parse("@CpCW", ErlFunc::CpCW) || i_parse("@CpHW", ErlFunc::CpHW) ||
+                    i_parse("@RhoH2O", ErlFunc::RhoH2O) || i_parse("@FATALHALTEP", ErlFunc::FatalHaltEp) ||
+                    i_parse("@SEVEREWARNEP", ErlFunc::SevereWarnEp) || i_parse("@WARNEP", ErlFunc::WarnEp) ||
+                    i_parse("@TRENDVALUE", ErlFunc::TrendValue) || i_parse("@TRENDAVERAGE", ErlFunc::TrendAverage) ||
+                    i_parse("@TRENDMAX", ErlFunc::TrendMax) || i_parse("@TRENDMIN", ErlFunc::TrendMin) ||
+                    i_parse("@TRENDDIRECTION", ErlFunc::TrendDirection) || i_parse("@TRENDSUM", ErlFunc::TrendSum) ||
+                    i_parse("@CURVEVALUE", ErlFunc::CurveValue) || i_parse("@TODAYISRAIN", ErlFunc::TodayIsRain) ||
+                    i_parse("@TODAYISSNOW", ErlFunc::TodayIsSnow) || i_parse("@TODAYOUTDRYBULBTEMP", ErlFunc::TodayOutDryBulbTemp) ||
+                    i_parse("@TODAYOUTDEWPOINTTEMP", ErlFunc::TodayOutDewPointTemp) || i_parse("@TODAYOUTBAROPRESS", ErlFunc::TodayOutBaroPress) ||
+                    i_parse("@TODAYOUTRELHUM", ErlFunc::TodayOutRelHum) || i_parse("@TODAYWINDSPEED", ErlFunc::TodayWindSpeed) ||
+                    i_parse("@TODAYWINDDIR", ErlFunc::TodayWindDir) || i_parse("@TODAYSKYTEMP", ErlFunc::TodaySkyTemp) ||
+                    i_parse("@TODAYHORIZIRSKY", ErlFunc::TodayHorizIRSky) || i_parse("@TODAYBEAMSOLARRAD", ErlFunc::TodayBeamSolarRad) ||
                     i_parse("@TODAYDIFSOLARRAD", ErlFunc::TodayDifSolarRad) || i_parse("@TODAYALBEDO", ErlFunc::TodayAlbedo) ||
                     i_parse("@TODAYLIQUIDPRECIP", ErlFunc::TodayLiquidPrecip) || i_parse("@TOMORROWISRAIN", ErlFunc::TomorrowIsRain) ||
-                    i_parse("@TOMORROWISSNOW", ErlFunc::TomorrowIsSnow) ||
-                    i_parse("@TOMORROWOUTDRYBULBTEMP", ErlFunc::TomorrowOutDryBulbTemp) ||
+                    i_parse("@TOMORROWISSNOW", ErlFunc::TomorrowIsSnow) || i_parse("@TOMORROWOUTDRYBULBTEMP", ErlFunc::TomorrowOutDryBulbTemp) ||
                     i_parse("@TOMORROWOUTDEWPOINTTEMP", ErlFunc::TomorrowOutDewPointTemp) ||
-                    i_parse("@TOMORROWOUTBAROPRESS", ErlFunc::TomorrowOutBaroPress) ||
-                    i_parse("@TOMORROWOUTRELHUM", ErlFunc::TomorrowOutRelHum) ||
-                    i_parse("@TOMORROWWINDSPEED", ErlFunc::TomorrowWindSpeed) ||
-                    i_parse("@TOMORROWWINDDIR", ErlFunc::TomorrowWindDir) || i_parse("@TOMORROWSKYTEMP", ErlFunc::TomorrowSkyTemp) ||
-                    i_parse("@TOMORROWHORIZIRSKY", ErlFunc::TomorrowHorizIRSky) ||
+                    i_parse("@TOMORROWOUTBAROPRESS", ErlFunc::TomorrowOutBaroPress) || i_parse("@TOMORROWOUTRELHUM", ErlFunc::TomorrowOutRelHum) ||
+                    i_parse("@TOMORROWWINDSPEED", ErlFunc::TomorrowWindSpeed) || i_parse("@TOMORROWWINDDIR", ErlFunc::TomorrowWindDir) ||
+                    i_parse("@TOMORROWSKYTEMP", ErlFunc::TomorrowSkyTemp) || i_parse("@TOMORROWHORIZIRSKY", ErlFunc::TomorrowHorizIRSky) ||
                     i_parse("@TOMORROWBEAMSOLARRAD", ErlFunc::TomorrowBeamSolarRad) ||
-                    i_parse("@TOMORROWDIFSOLARRAD", ErlFunc::TomorrowDifSolarRad) ||
-                    i_parse("@TOMORROWALBEDO", ErlFunc::TomorrowAlbedo) ||
+                    i_parse("@TOMORROWDIFSOLARRAD", ErlFunc::TomorrowDifSolarRad) || i_parse("@TOMORROWALBEDO", ErlFunc::TomorrowAlbedo) ||
                     i_parse("@TOMORROWLIQUIDPRECIP", ErlFunc::TomorrowLiquidPrecip)) {
                     // was a built in function operator
                 } else { // throw error
@@ -1520,8 +1511,7 @@ int ProcessTokens(
         while (Pos > 0) {
             if (Pos == 1) {
                 // if first token is for a built-in function starting with "@" then okay, otherwise the operator needs a LHS
-                if (static_cast<int>(Token(TokenNum).Operator) >
-                    static_cast<int>(ErlFunc::LogicalOR)) { // we have a function expression to set up
+                if (static_cast<int>(Token(TokenNum).Operator) > static_cast<int>(ErlFunc::LogicalOR)) { // we have a function expression to set up
                     ExpressionNum = NewExpression(state);
                     state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator = static_cast<ErlFunc>(OperatorNum);
                     NumOperands = state.dataRuntimeLang->PossibleOperators(OperatorNum).NumOperands;
@@ -2385,33 +2375,17 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                          state.dataWeatherManager->TodayOutBaroPress,
                                          ReturnValue);
                 } else if (SELECT_CASE_var == ErlFunc::TodayOutRelHum) {
-                    TodayTomorrowWeather(state,
-                                         ErlFunc::TodayOutRelHum,
-                                         Operand(1).Number,
-                                         Operand(2).Number,
-                                         state.dataWeatherManager->TodayOutRelHum,
-                                         ReturnValue);
+                    TodayTomorrowWeather(
+                        state, ErlFunc::TodayOutRelHum, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayOutRelHum, ReturnValue);
                 } else if (SELECT_CASE_var == ErlFunc::TodayWindSpeed) {
-                    TodayTomorrowWeather(state,
-                                         ErlFunc::TodayWindSpeed,
-                                         Operand(1).Number,
-                                         Operand(2).Number,
-                                         state.dataWeatherManager->TodayWindSpeed,
-                                         ReturnValue);
+                    TodayTomorrowWeather(
+                        state, ErlFunc::TodayWindSpeed, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayWindSpeed, ReturnValue);
                 } else if (SELECT_CASE_var == ErlFunc::TodayWindDir) {
-                    TodayTomorrowWeather(state,
-                                         ErlFunc::TodayWindDir,
-                                         Operand(1).Number,
-                                         Operand(2).Number,
-                                         state.dataWeatherManager->TodayWindDir,
-                                         ReturnValue);
+                    TodayTomorrowWeather(
+                        state, ErlFunc::TodayWindDir, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayWindDir, ReturnValue);
                 } else if (SELECT_CASE_var == ErlFunc::TodaySkyTemp) {
-                    TodayTomorrowWeather(state,
-                                         ErlFunc::TodaySkyTemp,
-                                         Operand(1).Number,
-                                         Operand(2).Number,
-                                         state.dataWeatherManager->TodaySkyTemp,
-                                         ReturnValue);
+                    TodayTomorrowWeather(
+                        state, ErlFunc::TodaySkyTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodaySkyTemp, ReturnValue);
                 } else if (SELECT_CASE_var == ErlFunc::TodayHorizIRSky) {
                     TodayTomorrowWeather(state,
                                          ErlFunc::TodayHorizIRSky,
@@ -2444,19 +2418,11 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                          state.dataWeatherManager->TodayLiquidPrecip,
                                          ReturnValue);
                 } else if (SELECT_CASE_var == ErlFunc::TomorrowIsRain) {
-                    TodayTomorrowWeather(state,
-                                         ErlFunc::TomorrowIsRain,
-                                         Operand(1).Number,
-                                         Operand(2).Number,
-                                         state.dataWeatherManager->TomorrowIsRain,
-                                         ReturnValue);
+                    TodayTomorrowWeather(
+                        state, ErlFunc::TomorrowIsRain, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowIsRain, ReturnValue);
                 } else if (SELECT_CASE_var == ErlFunc::TomorrowIsSnow) {
-                    TodayTomorrowWeather(state,
-                                         ErlFunc::TomorrowIsSnow,
-                                         Operand(1).Number,
-                                         Operand(2).Number,
-                                         state.dataWeatherManager->TomorrowIsSnow,
-                                         ReturnValue);
+                    TodayTomorrowWeather(
+                        state, ErlFunc::TomorrowIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowIsSnow, ReturnValue);
                 } else if (SELECT_CASE_var == ErlFunc::TomorrowOutDryBulbTemp) {
                     TodayTomorrowWeather(state,
                                          ErlFunc::TomorrowOutDryBulbTemp,
@@ -2528,12 +2494,8 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                          state.dataWeatherManager->TomorrowDifSolarRad,
                                          ReturnValue);
                 } else if (SELECT_CASE_var == ErlFunc::TomorrowAlbedo) {
-                    TodayTomorrowWeather(state,
-                                         ErlFunc::TomorrowAlbedo,
-                                         Operand(1).Number,
-                                         Operand(2).Number,
-                                         state.dataWeatherManager->TomorrowAlbedo,
-                                         ReturnValue);
+                    TodayTomorrowWeather(
+                        state, ErlFunc::TomorrowAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowAlbedo, ReturnValue);
                 } else if (SELECT_CASE_var == ErlFunc::TomorrowLiquidPrecip) {
                     TodayTomorrowWeather(state,
                                          ErlFunc::TomorrowLiquidPrecip,
@@ -4337,8 +4299,7 @@ void SetupPossibleOperators(EnergyPlusData &state)
 
     state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutDewPointTemp)).Symbol = "@TOMORROWOUTDEWPOINTTEMP";
     state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutDewPointTemp)).NumOperands = 2;
-    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutDewPointTemp)).Code =
-        ErlFunc::TomorrowOutDewPointTemp;
+    state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutDewPointTemp)).Code = ErlFunc::TomorrowOutDewPointTemp;
 
     state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutBaroPress)).Symbol = "@TOMORROWOUTBAROPRESS";
     state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowOutBaroPress)).NumOperands = 2;

@@ -2748,7 +2748,8 @@ void CorrectZoneContaminants(EnergyPlusData &state,
         }
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone)) {
+            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
+                static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone)) {
                 B += state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).TotalCO2;
             }
 
@@ -2822,7 +2823,8 @@ void CorrectZoneContaminants(EnergyPlusData &state,
         }
 
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone)) {
+            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
+                static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone)) {
                 B += state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).TotalGC;
             }
 

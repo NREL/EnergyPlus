@@ -92,24 +92,23 @@ namespace DataRuntimeLanguage {
     enum class Value
     {
         Unassigned = -1,
-        Null,           // Erl entity type, "Null" value
-        Number,         // Erl entity type,  hard numeric value
-        String,         // Erl entity type,  character data
-        Array,          // Erl entity type,  not used yet, for future array type
-        Variable,       // Erl entity type,  Erl variable
-        Expression,     // Erl entity type,  Erl expression
-        Trend,          // Erl entity type,  Erl trend variable
-        Error           // Erl entity type, processing of an expression failed, returned error
+        Null,       // Erl entity type, "Null" value
+        Number,     // Erl entity type,  hard numeric value
+        String,     // Erl entity type,  character data
+        Array,      // Erl entity type,  not used yet, for future array type
+        Variable,   // Erl entity type,  Erl variable
+        Expression, // Erl entity type,  Erl expression
+        Trend,      // Erl entity type,  Erl trend variable
+        Error       // Erl entity type, processing of an expression failed, returned error
     };
-    
+
     enum class PtrDataType
     {
         Unassigned = -1,
-        Real,           // data type for overloaded pointer management, double real
-        Integer,        // data type for overloaded pointer management, integer
-        Logical         // data type for overloaded pointer management, logical
+        Real,    // data type for overloaded pointer management, double real
+        Integer, // data type for overloaded pointer management, integer
+        Logical  // data type for overloaded pointer management, logical
     };
-
 
     // Parameters for identifying operator types in Erl
     // The number of these parameters indicates the order of precedence
@@ -117,24 +116,24 @@ namespace DataRuntimeLanguage {
     {
         Unassigned = -1,
         Null,
-        Literal,            // Just stores a literal value
-        Negative,           // -  (unary) No LHS?
-        Divide,             // /
-        Multiply,           // *
-        Subtract,           // -  (binary)
-        Add,                // +  (binary)
-        Equal,              // ==
-        NotEqual,           // <>
-        LessOrEqual,        // <=
-        GreaterOrEqual,     // >=
-        LessThan,           // <
-        GreaterThan,        // >
-        RaiseToPower,       // ^
-        LogicalAND,         // &&
-        LogicalOR,          // ||
+        Literal,        // Just stores a literal value
+        Negative,       // -  (unary) No LHS?
+        Divide,         // /
+        Multiply,       // *
+        Subtract,       // -  (binary)
+        Add,            // +  (binary)
+        Equal,          // ==
+        NotEqual,       // <>
+        LessOrEqual,    // <=
+        GreaterOrEqual, // >=
+        LessThan,       // <
+        GreaterThan,    // >
+        RaiseToPower,   // ^
+        LogicalAND,     // &&
+        LogicalOR,      // ||
         // note there is an important check "> 15" to distinguish operators from functions
         //  so be careful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
-        
+
         // parameters for built-in Erl functions, these are processed like operators and numbering
         // must be sequential with the operators.
         // math functions
@@ -185,9 +184,9 @@ namespace DataRuntimeLanguage {
         RhoH2O,            // accessor for E+ psych routine
 
         // Simulation Management Functions
-        FatalHaltEp,       // accessor for E+ error management, "Fatal" level
-        SevereWarnEp,      // accessor for E+ error management, "Severe" level
-        WarnEp,            // accessor for E+ error management, "Warning" level
+        FatalHaltEp,  // accessor for E+ error management, "Fatal" level
+        SevereWarnEp, // accessor for E+ error management, "Severe" level
+        WarnEp,       // accessor for E+ error management, "Warning" level
 
         // Trend variable handling Functions
         TrendValue,     // accessor for Erl Trend variables, instance value
@@ -230,7 +229,7 @@ namespace DataRuntimeLanguage {
         TomorrowAlbedo,          // Access TomorrowAlbedo(hour, timestep)
         TomorrowLiquidPrecip     // Access TomorrowLiquidPrecip(hour, timestep)
     };
-    
+
     int constexpr NumPossibleOperators(96); // total number of operators and built-in functions
 
     int constexpr MaxWhileLoopIterations(1000000); // protect from infinite loop in WHILE loops
@@ -260,12 +259,12 @@ namespace DataRuntimeLanguage {
     {
         // Members
         // structure for internal data available for use in Erl that are not sourced by output variables
-        std::string DataTypeName; // general internal variable name registered, All uppercase
-        std::string UniqueIDName; // unique id for internal var, All uppercase
-        std::string Units;        // registered units, used for reporting and checks.
+        std::string DataTypeName;    // general internal variable name registered, All uppercase
+        std::string UniqueIDName;    // unique id for internal var, All uppercase
+        std::string Units;           // registered units, used for reporting and checks.
         PtrDataType PntrVarTypeUsed; // data type used: integer (PntrInteger) or real (PntrReal)
-        Real64 *RealValue;        // POINTER to the REAL value that is being accessed
-        int *IntValue;            // POINTER to the Integer value that is being accessed
+        Real64 *RealValue;           // POINTER to the REAL value that is being accessed
+        int *IntValue;               // POINTER to the Integer value that is being accessed
 
         // Default Constructor
         InternalVarsAvailableType() : PntrVarTypeUsed(PtrDataType::Unassigned), RealValue(nullptr), IntValue(nullptr)
@@ -350,7 +349,7 @@ namespace DataRuntimeLanguage {
     {
         // Members
         // instance data structure for the values taken by Erl variables, nested structure in ErlVariable
-        Value Type;           // value type, eg. ValueNumber,
+        Value Type;         // value type, eg. ValueNumber,
         Real64 Number;      // numeric value instance for Erl variable
         std::string String; // string data types in Erl (not used yet)
         int Variable;       // Pointer to another Erl variable
@@ -367,7 +366,7 @@ namespace DataRuntimeLanguage {
         }
 
         // Member Constructor
-        ErlValueType(Value const Type,            // value type, eg. ValueNumber,
+        ErlValueType(Value const Type,          // value type, eg. ValueNumber,
                      Real64 const Number,       // numeric value instance for Erl variable
                      std::string const &String, // string data types in Erl (not used yet)
                      int const Variable,        // Pointer to another Erl variable
@@ -433,7 +432,7 @@ namespace DataRuntimeLanguage {
     struct ErlExpressionType
     {
         // Members
-        ErlFunc Operator;             // indicates the type of operator or function 1..64
+        ErlFunc Operator;              // indicates the type of operator or function 1..64
         int NumOperands;               // count of operands in expression
         Array1D<ErlValueType> Operand; // holds Erl values for operands in expression
 
@@ -448,7 +447,7 @@ namespace DataRuntimeLanguage {
         // Members
         // structure for operators and functions, used to look up information about each operator or function
         std::string Symbol; // string representation of operator or function (for reporting)
-        ErlFunc Code;           // integer code 1..64, identifies operator or function
+        ErlFunc Code;       // integer code 1..64, identifies operator or function
         int NumOperands;    // count of operands or function arguments.
 
         // Default Constructor
@@ -572,8 +571,8 @@ struct RuntimeLanguageData : BaseGlobalStruct
     Array1D<DataRuntimeLanguage::InternalVarsAvailableType> EMSInternalVarsAvailable; // internal data that could be used
     Array1D<DataRuntimeLanguage::InternalVarsUsedType> EMSInternalVarsUsed;           // internal data that are used
     Array1D<DataRuntimeLanguage::EMSProgramCallManagementType> EMSProgramCallManager; // program calling managers
-    DataRuntimeLanguage::ErlValueType Null =
-        DataRuntimeLanguage::ErlValueType(DataRuntimeLanguage::Value::Null, 0.0, "", 0, 0, false, 0, "", true); // special "null" Erl variable value instance
+    DataRuntimeLanguage::ErlValueType Null = DataRuntimeLanguage::ErlValueType(
+        DataRuntimeLanguage::Value::Null, 0.0, "", 0, 0, false, 0, "", true); // special "null" Erl variable value instance
     DataRuntimeLanguage::ErlValueType False = DataRuntimeLanguage::ErlValueType(
         DataRuntimeLanguage::Value::Null, 0.0, "", 0, 0, false, 0, "", true); // special "false" Erl variable value instance
     DataRuntimeLanguage::ErlValueType True = DataRuntimeLanguage::ErlValueType(

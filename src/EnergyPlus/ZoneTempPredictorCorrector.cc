@@ -5278,7 +5278,8 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
                 (state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum));
             //    TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
-            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone)) {
+            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
+                static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone)) {
                 TempIndCoef += state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).TotalSen;
             }
             //    TempDepZnLd(ZoneNum) = (11.0/6.0) * AirCap + TempDepCoef
@@ -5374,7 +5375,8 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
 
             //      TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
-            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone)) {
+            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
+                static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone)) {
                 TempIndCoef += state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).TotalSen;
             }
             //      TempDepZnLd(ZoneNum) = (11.0/6.0) * AirCap + TempDepCoef
@@ -6210,7 +6212,8 @@ void InverseModelTemperature(EnergyPlusData &state,
                 (state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum));
             //    TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
-            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone)) {
+            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
+                static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone)) {
                 TempIndCoef += state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).TotalSen;
             }
             // Calculate air capacity using UseAnalyticalSolution

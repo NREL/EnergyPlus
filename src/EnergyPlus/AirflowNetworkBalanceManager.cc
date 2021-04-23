@@ -200,7 +200,8 @@ namespace AirflowNetworkBalanceManager {
 
         state.dataAirflowNetwork->AirflowNetworkFanActivated = false;
 
-        if (present(FirstHVACIteration) && static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >= static_cast<int>(AirflowNetworkControl::SimpleADS)) {
+        if (present(FirstHVACIteration) &&
+            static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >= static_cast<int>(AirflowNetworkControl::SimpleADS)) {
             if (FirstHVACIteration) {
                 if (allocated(state.dataAirLoop->AirLoopAFNInfo)) {
                     for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
@@ -252,7 +253,8 @@ namespace AirflowNetworkBalanceManager {
         if (state.dataAirflowNetworkBalanceManager->VentilationCtrl == 1 && state.dataHVACGlobal->NumHybridVentSysAvailMgrs > 0)
             state.dataAirflowNetwork->AirflowNetworkFanActivated = false;
 
-        if (present(Iter) && present(ResimulateAirZone) && static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >= static_cast<int>(AirflowNetworkControl::SimpleADS)) {
+        if (present(Iter) && present(ResimulateAirZone) &&
+            static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >= static_cast<int>(AirflowNetworkControl::SimpleADS)) {
             if (state.dataAirflowNetwork->AirflowNetworkFanActivated && Iter < 3 && AFNSupplyFanType == FanType_SimpleOnOff) {
                 ResimulateAirZone = true;
             }
@@ -4658,7 +4660,8 @@ namespace AirflowNetworkBalanceManager {
         state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks > 0 &&
-            static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetworkControl::Multizone)) { // Multizone + Distribution
+            static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
+                static_cast<int>(AirflowNetworkControl::Multizone)) { // Multizone + Distribution
             state.dataAirflowNetwork->AirflowNetworkNumOfLinks =
                 state.dataAirflowNetwork->NumOfLinksMultiZone + state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks;
             state.dataAirflowNetwork->AirflowNetworkLinkageData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks +
@@ -5587,7 +5590,8 @@ void AirflowNetworkBalanceManagerData::initialize(EnergyPlusData &state)
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
         initializeMyEnvrnFlag = true;
-        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetworkBalanceManager::AirflowNetworkControl::Simple)) {
+        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
+            static_cast<int>(AirflowNetworkBalanceManager::AirflowNetworkControl::Simple)) {
             if (state.dataAirflowNetwork->RollBackFlag) {
                 for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
                     state.dataAirflowNetwork->ANZT(i) = state.dataHeatBalFanSys->XMAT(i);

@@ -92,20 +92,20 @@ namespace DataRoomAirModel {
     };
 
     // Parameters to indicate type of air node, which is dependent on air models
-    enum class AirNodeType              
+    enum class AirNodeType
     {
         Unassigned = -1,
-        InletAirNode,               // air node at inlet (for Mundt and Rees&Haves Models)
-        FloorAirNode,               // air node at floor (for Mundt and Rees&Haves Models)
-        ControlAirNode,             // air node at control point (for Mundt Model)
-        CeilingAirNode,             // air node at ceiling (for Mundt Model)
-        MundtRoomAirNode,           // air node for vertical walls (for Mundt Model)
-        ReturnAirNode,              // air node for return (for Mundt and Rees&Haves Models)
-        AirflowNetworkRoomAirNode,  // air node for airflow network based room air model
-        PlumeAirNode,               // air node for plume load (for Rees&Haves Model)
-        RoomAirNode                 // air node for vertical walls (for Rees&Haves Model)
+        InletAirNode,              // air node at inlet (for Mundt and Rees&Haves Models)
+        FloorAirNode,              // air node at floor (for Mundt and Rees&Haves Models)
+        ControlAirNode,            // air node at control point (for Mundt Model)
+        CeilingAirNode,            // air node at ceiling (for Mundt Model)
+        MundtRoomAirNode,          // air node for vertical walls (for Mundt Model)
+        ReturnAirNode,             // air node for return (for Mundt and Rees&Haves Models)
+        AirflowNetworkRoomAirNode, // air node for airflow network based room air model
+        PlumeAirNode,              // air node for plume load (for Rees&Haves Model)
+        RoomAirNode                // air node for vertical walls (for Rees&Haves Model)
     };
-                
+
     // user-defined pattern two gradient interpolation modes
     enum class UserDefinedPatternMode
     {
@@ -171,7 +171,7 @@ namespace DataRoomAirModel {
         std::string Name; // name
         std::string ZoneName;
         int ZonePtr;               // Pointer to the zone number for this statement
-        AirNodeType ClassType;    // depending on type of model
+        AirNodeType ClassType;     // depending on type of model
         Real64 Height;             // height
         Real64 ZoneVolumeFraction; // portion of zone air volume associated with this node
         Array1D_bool SurfMask;     // limit of 60 surfaces at current sizing

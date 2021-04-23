@@ -61,19 +61,19 @@ namespace AirflowNetwork {
 
     enum VentControlType // TODO: make enum class, since this enum is used in SetupOutputVariable()
     {
-        None = -1,       // Wrong input
-        Temp,            // Temperature venting control
-        Enth,            // Enthalpy venting control
-        Const,           // Constant venting control
+        None = -1, // Wrong input
+        Temp,      // Temperature venting control
+        Enth,      // Enthalpy venting control
+        Const,     // Constant venting control
         ASH55,
         CEN15251,
-        NoVent,          // No venting
-        ZoneLevel,       // ZoneLevel control for a heat transfer subsurface
-        AdjTemp,         // Temperature venting control based on adjacent zone conditions
-        AdjEnth          // Enthalpy venting control based on adjacent zone conditions
+        NoVent,    // No venting
+        ZoneLevel, // ZoneLevel control for a heat transfer subsurface
+        AdjTemp,   // Temperature venting control based on adjacent zone conditions
+        AdjEnth    // Enthalpy venting control based on adjacent zone conditions
     };
 
-    enum OpenStatus      // TODO: make enum class, since this enum is used in SetupOutputVariable()
+    enum OpenStatus // TODO: make enum class, since this enum is used in SetupOutputVariable()
     {
         Uninitialized = -1,
         FreeOperation,     // Free operation
@@ -107,15 +107,15 @@ namespace AirflowNetwork {
     enum class iComponentTypeNum : int
     {
         Unassigned = -1,
-        DOP,  // Detailed large opening component
-        SOP,  // Simple opening component
-        SCR,  // Surface crack component
-        SEL,  // Surface effective leakage ratio component
-        PLR,  // Distribution system crack component
-        DWC,  // Distribution system duct component
-        CVF,  // Distribution system constant volume fan component
-        FAN,  // Distribution system detailed fan component
-        MRR,  // Distribution system multiple curve fit power law resistant flow component
+        DOP, // Detailed large opening component
+        SOP, // Simple opening component
+        SCR, // Surface crack component
+        SEL, // Surface effective leakage ratio component
+        PLR, // Distribution system crack component
+        DWC, // Distribution system duct component
+        CVF, // Distribution system constant volume fan component
+        FAN, // Distribution system detailed fan component
+        MRR, // Distribution system multiple curve fit power law resistant flow component
         DMP, // Distribution system damper component
         ELR, // Distribution system effective leakage ratio component
         CPD, // Distribution system constant pressure drop component
@@ -133,25 +133,25 @@ namespace AirflowNetwork {
     {
         Unassigned = -1,
         DOP, // Detailed large opening component
-        SOP,     // Simple opening component
-        SCR,     // Surface crack component
-        SEL,     // Surface effective leakage ratio component
-        PLR,     // Distribution system crack component
-        DWC,     // Distribution system duct component
-        CVF,     // Distribution system constant volume fan component
-        FAN,     // Distribution system detailed fan component
-        MRR,     // Distribution system multiple curve fit power law resistant flow component
-        DMP,     // Distribution system damper component
-        ELR,     // Distribution system effective leakage ratio component
-        CPD,     // Distribution system constant pressure drop component
-        COI,     // Distribution system coil component
-        TMU,     // Distribution system terminal unit component
-        EXF,     // Zone exhaust fan
-        HEX,     // Distribution system heat exchanger
-        HOP,     // Horizontal opening component
-        RVD,     // Reheat VAV terminal damper
-        OAF,     // Distribution system OA
-        REL      // Distribution system relief air
+        SOP, // Simple opening component
+        SCR, // Surface crack component
+        SEL, // Surface effective leakage ratio component
+        PLR, // Distribution system crack component
+        DWC, // Distribution system duct component
+        CVF, // Distribution system constant volume fan component
+        FAN, // Distribution system detailed fan component
+        MRR, // Distribution system multiple curve fit power law resistant flow component
+        DMP, // Distribution system damper component
+        ELR, // Distribution system effective leakage ratio component
+        CPD, // Distribution system constant pressure drop component
+        COI, // Distribution system coil component
+        TMU, // Distribution system terminal unit component
+        EXF, // Zone exhaust fan
+        HEX, // Distribution system heat exchanger
+        HOP, // Horizontal opening component
+        RVD, // Reheat VAV terminal damper
+        OAF, // Distribution system OA
+        REL  // Distribution system relief air
     };
 
     // EPlus component Type
@@ -171,15 +171,15 @@ namespace AirflowNetwork {
     enum class iEPlusNodeType : int
     {
         Unassigned = -1,
-        ZIN,  // Zone inlet node
-        ZOU,  // Zone outlet node
-        SPL,  // Splitter node
-        MIX,  // Mixer node
-        OAN,  // Outside air system node
-        EXT,  // OA system inlet node
-        FIN,  // Fan Inlet node
-        FOU,  // Fan Outlet Node
-        COU,  // Coil Outlet Node
+        ZIN, // Zone inlet node
+        ZOU, // Zone outlet node
+        SPL, // Splitter node
+        MIX, // Mixer node
+        OAN, // Outside air system node
+        EXT, // OA system inlet node
+        FIN, // Fan Inlet node
+        FOU, // Fan Outlet Node
+        COU, // Coil Outlet Node
         HXO, // Heat exchanger Outlet Node
         DIN, // Damper Inlet node
         DOU, // Damper Outlet Node
@@ -204,12 +204,12 @@ namespace AirflowNetwork {
     enum class AirflowNetworkControl
     {
         Unassigned = -1,
-        Simple,             // Simple calculations only
-        Multizone,          // Perform multizone calculations only
-        NoneADS,            // Perform distribution system during system on time only
-        SimpleADS,          // Perform distribution system during system on time and simple calculations during off time
-        MultiADS            // Perform distribution system during system on time and multizone calculations during off time
-    
+        Simple,    // Simple calculations only
+        Multizone, // Perform multizone calculations only
+        NoneADS,   // Perform distribution system during system on time only
+        SimpleADS, // Perform distribution system during system on time and simple calculations during off time
+        MultiADS   // Perform distribution system during system on time and multizone calculations during off time
+
     };
 
     // Node simulation variable in air distribution system
@@ -1333,7 +1333,7 @@ namespace AirflowNetwork {
         int AFNNodeNum;                // AFN node number
         std::string ControlObjectType; // The control type to be used for pressure control
         std::string ControlObjectName; // Corresponding control type name
-        PressureCtrl ControlTypeSet;            // Control type set to be used for pressure control
+        PressureCtrl ControlTypeSet;   // Control type set to be used for pressure control
         int AvailSchedPtr;             // Availability schedule pointer
         int PresSetpointSchedPtr;      // Pressure setpoint schedule pointer
         int AirLoopNum;                // Air loop number
@@ -1343,8 +1343,8 @@ namespace AirflowNetwork {
 
         // Default Constructor
         PressureControllerProp()
-            : ZoneNum(0), AFNNodeNum(0), ControlTypeSet(PressureCtrl::Unassigned), AvailSchedPtr(0), PresSetpointSchedPtr(0), AirLoopNum(0), OANodeNum(0), bypass(false),
-              PresCtrlMassRate(0.0)
+            : ZoneNum(0), AFNNodeNum(0), ControlTypeSet(PressureCtrl::Unassigned), AvailSchedPtr(0), PresSetpointSchedPtr(0), AirLoopNum(0),
+              OANodeNum(0), bypass(false), PresCtrlMassRate(0.0)
         {
         }
     };
@@ -1669,8 +1669,8 @@ struct AirflowNetworkData : BaseGlobalStruct
     Real64 VAVTerminalRatio = 0.0;       // The terminal flow ratio when a supply VAV fan reach its max flow rate
     bool VAVSystem = false;              // This flag is used to represent a VAV system
     Real64 ExhaustFanMassFlowRate = 0.0; // Exhaust fan flow rate used in PressureStat
-    AirflowNetwork::PressureCtrl PressureSetFlag = AirflowNetwork::PressureCtrl::Unassigned;             // PressureSet flag
-    Real64 ReliefMassFlowRate = 0.0;     // OA Mixer relief node flow rate used in PressureStat
+    AirflowNetwork::PressureCtrl PressureSetFlag = AirflowNetwork::PressureCtrl::Unassigned; // PressureSet flag
+    Real64 ReliefMassFlowRate = 0.0;                                                         // OA Mixer relief node flow rate used in PressureStat
 
     Array1D<AirflowNetwork::AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
     Array1D<AirflowNetwork::AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;

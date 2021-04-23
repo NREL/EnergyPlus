@@ -2982,7 +2982,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 if (SELECT_CASE_var == ZoneSplitter_Type) { // 'AirLoopHVAC:ZoneSplitter'
 
                     if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
-                          static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone))) {
+                          static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
+                              static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone))) {
                         SimAirLoopSplitter(state,
                                            state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
                                            FirstHVACIteration,
@@ -3510,7 +3511,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 if (SELECT_CASE_var == ZoneSplitter_Type) { // 'AirLoopHVAC:ZoneSplitter'
 
                     if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
-                          static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone))) {
+                          static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
+                              static_cast<int>(AirflowNetwork::AirflowNetworkControl::Multizone))) {
                         SimAirLoopSplitter(state,
                                            state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
                                            FirstHVACIteration,

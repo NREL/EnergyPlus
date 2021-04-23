@@ -4461,7 +4461,8 @@ namespace SystemAvailabilityManager {
             }
 
             if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr == 0) {
-                if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) <= static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
+                if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) <=
+                    static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
                     ShowWarningError(state,
                                      RoutineName + cCurrentModuleObject + "=\"" +
                                          state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
@@ -5031,7 +5032,8 @@ namespace SystemAvailabilityManager {
                     ACH = 0.0;
                     HybridVentModeOA = true;
                     if (!state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
-                        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) <= static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
+                        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) <=
+                            static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
                             HybridVentModeOA = false;
                         }
                     }

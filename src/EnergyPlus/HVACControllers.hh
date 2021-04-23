@@ -70,11 +70,11 @@ namespace HVACControllers {
 
     // Using/Aliasing
     using DataAirSystems::DefinePrimaryAirSystem;
+    using DataHVACControllers::ControllerAction;
+    using DataHVACControllers::ControllerMode;
     using DataHVACControllers::ControllerSimple_Type;
     using DataHVACControllers::iFirstMode;
     using DataHVACControllers::iLastMode;
-    using DataHVACControllers::ControllerMode;
-    using DataHVACControllers::ControllerAction;
     using DataRootFinder::RootFinderDataType;
 
     // Parameters for controls used here
@@ -106,15 +106,15 @@ namespace HVACControllers {
         std::string ControllerName; // Name of the Controller
         std::string ControllerType; // Type of Controller
         int ControllerType_Num;
-        iCtrl ControlVar;  // The type of control variable being sensed
-        iCtrl ActuatorVar; // The variable that the controller will act on ie. flow
+        iCtrl ControlVar;        // The type of control variable being sensed
+        iCtrl ActuatorVar;       // The variable that the controller will act on ie. flow
         ControllerAction Action; // Controller Action - Reverse or Normal
         // Controller must be initialized to set MinActuated and MaxActuated
         bool InitFirstPass;
         // --------------------
         // Internal data used for optimal restart across successive calls to SimAirLoop()
         // --------------------
-        int NumCalcCalls; // Number of Calc() calls since last call to Reset()
+        int NumCalcCalls;    // Number of Calc() calls since last call to Reset()
         ControllerMode Mode; // Operational model of controller at current iteration
         // Flag indicating whether the current controller simulation was performed from a cold start
         // or following a speculative warm restart. Set in the ResetController() routine.
@@ -295,8 +295,12 @@ namespace HVACControllers {
     void ExitCalcController(
         EnergyPlusData &state, int ControlNum, Real64 NextActuatedValue, ControllerMode Mode, bool &IsConvergedFlag, bool &IsUpToDateFlag);
 
-    void TrackAirLoopControllers(
-        EnergyPlusData &state, int AirLoopNum, DataHVACControllers::ControllerWarmRestart WarmRestartStatus, int AirLoopIterMax, int AirLoopIterTot, int AirLoopNumCalls);
+    void TrackAirLoopControllers(EnergyPlusData &state,
+                                 int AirLoopNum,
+                                 DataHVACControllers::ControllerWarmRestart WarmRestartStatus,
+                                 int AirLoopIterMax,
+                                 int AirLoopIterTot,
+                                 int AirLoopNumCalls);
 
     void TrackAirLoopController(EnergyPlusData &state,
                                 int AirLoopNum,       // Air loop index

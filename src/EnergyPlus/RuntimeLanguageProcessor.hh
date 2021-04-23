@@ -66,8 +66,8 @@ struct EnergyPlusData;
 namespace RuntimeLanguageProcessor {
 
     // Using/Aliasing
-    using DataRuntimeLanguage::ErlValueType;
     using DataRuntimeLanguage::ErlFunc;
+    using DataRuntimeLanguage::ErlValueType;
 
     int constexpr MaxErrors(20);
 
@@ -75,11 +75,11 @@ namespace RuntimeLanguageProcessor {
     {
         Invalid = -1,
         Unassigned = 0,
-        Number = 1,             // matches the ValueNumber
-        Variable = 4,           // matches the ValueVariable
-        Expression = 5,         // matches the ValueExpression
-        Operator = 7,           // includes basic operators and built-in functions.
-        Parenthesis = 9         // parenthesis token
+        Number = 1,     // matches the ValueNumber
+        Variable = 4,   // matches the ValueVariable
+        Expression = 5, // matches the ValueExpression
+        Operator = 7,   // includes basic operators and built-in functions.
+        Parenthesis = 9 // parenthesis token
     };
 
     int constexpr ParenthesisLeft(10);  // indicates left side parenthesis found in parsing
@@ -92,7 +92,7 @@ namespace RuntimeLanguageProcessor {
         Token Type;         // token type, eg. TokenNumber
         Real64 Number;      // May want to store all literals as a variable?
         std::string String; // Serves double duty, also saves string version of token for easy debugging
-        ErlFunc Operator; // indentifies operator or function 1..64
+        ErlFunc Operator;   // indentifies operator or function 1..64
         int Variable;       // points to a variable in ErlVariable structure
         int Parenthesis;    // identifes if token is left or right parenthesis
         int Expression;     // points to an expression in ErlExpression structure
