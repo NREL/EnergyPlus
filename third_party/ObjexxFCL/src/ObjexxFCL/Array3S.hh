@@ -1280,14 +1280,6 @@ public: // Comparison: Predicate: All
 		return ge( a, b );
 	}
 
-	// All Slice == Value
-	friend
-	bool
-	all_eq( Array3S const & a, T const & t )
-	{
-		return eq( a, t );
-	}
-
 	// All Slice != Value
 	friend
 	bool
@@ -1756,26 +1748,6 @@ read_binary( std::istream & stream, Array3S< T > & a )
 	return stream;
 }
 
-// Write an Array3S to a Binary File
-template< typename T >
-inline
-std::ostream &
-write_binary( std::ostream & stream, Array3S< T > const & a )
-{
-	std::size_t const n( a.size() );
-	if ( stream && ( n > 0u ) ) {
-		std::size_t const type_size( sizeof( T ) / sizeof( std::ostream::char_type ) );
-		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-					stream.write( ( std::ostream::char_type const * )&a( i1, i2, i3 ), type_size );
-					if ( ! stream ) break;
-				} if ( ! stream ) break;
-			} if ( ! stream ) break;
-		}
-	}
-	return stream;
-}
 
 namespace fmt {
 

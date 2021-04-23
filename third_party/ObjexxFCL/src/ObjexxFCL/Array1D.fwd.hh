@@ -25,7 +25,6 @@ template< typename > class Array1D;
 class byte;
 
 // Types
-typedef  byte  sbyte;
 typedef  Array1D< bool >                Array1D_bool;
 typedef  Array1D< short int >           Array1D_short;
 typedef  Array1D< int >                 Array1D_int;

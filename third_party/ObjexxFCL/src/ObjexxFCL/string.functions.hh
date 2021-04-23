@@ -888,14 +888,6 @@ len_trim( std::string const & s )
 	return s.find_last_not_of( ' ' ) + 1; // Works if npos returned: npos + 1 == 0
 }
 
-// Length Whitespace-Trimmed
-inline
-std::string::size_type
-len_trim_whitespace( std::string const & s )
-{
-	return s.find_last_not_of( " \t\000" ) + 1; // Works if npos returned: npos + 1 == 0
-}
-
 // Index of a Substring
 template< typename T >
 inline

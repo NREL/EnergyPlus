@@ -129,21 +129,6 @@ protected: // Creation
 		a.clear_move();
 	}
 
-	// Copy Constructor Template
-	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	explicit
-	Array4( Array4< U > const & a ) :
-	 Super( a ),
-	 I1_( a.I1_ ),
-	 I2_( a.I2_ ),
-	 I3_( a.I3_ ),
-	 I4_( a.I4_ ),
-	 z1_( a.z1_ ),
-	 z2_( a.z2_ ),
-	 z3_( a.z3_ ),
-	 z4_( a.z4_ )
-	{}
-
 	// Slice Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	explicit
@@ -153,19 +138,6 @@ protected: // Creation
 	 I2_( a.u2() ),
 	 I3_( a.u3() ),
 	 I4_( a.u4() ),
-	 z1_( I1_.size() ),
-	 z2_( I2_.size() ),
-	 z3_( I3_.size() ),
-	 z4_( I4_.size() )
-	{}
-
-	// IndexRange Constructor
-	Array4( IR const & I1, IR const & I2, IR const & I3, IR const & I4 ) :
-	 Super( size_of( I1, I2, I3, I4 ) ),
-	 I1_( I1 ),
-	 I2_( I2 ),
-	 I3_( I3 ),
-	 I4_( I4 ),
 	 z1_( I1_.size() ),
 	 z2_( I2_.size() ),
 	 z3_( I3_.size() ),
@@ -1662,14 +1634,6 @@ public: // Comparison: Predicate: Any
 
 public: // Comparison: Predicate: All
 
-	// Array4 == Array4
-	friend
-	bool
-	all_eq( Array4 const & a, Array4 const & b )
-	{
-		return eq( a, b );
-	}
-
 	// Array4 != Array4
 	friend
 	bool
@@ -2146,14 +2110,6 @@ public: // Comparison: Predicate: All: Slice
 	all_ge( Array4 const & a, Array4S< T > const & b )
 	{
 		return ge( a, b );
-	}
-
-	// All Array4S == Array4
-	friend
-	bool
-	all_eq( Array4S< T > const & a, Array4 const & b )
-	{
-		return all_eq( b, a );
 	}
 
 	// All Array4S != Array4

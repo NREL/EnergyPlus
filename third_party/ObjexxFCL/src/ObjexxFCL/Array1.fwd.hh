@@ -25,7 +25,6 @@ template< typename > class Array1;
 class byte;
 
 // Types
-typedef  byte  sbyte;
 typedef  Array1< int >                 Array1_int;
 typedef  Array1< std::string >         Array1_string;
 

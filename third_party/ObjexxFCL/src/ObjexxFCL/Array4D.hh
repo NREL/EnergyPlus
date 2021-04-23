@@ -676,21 +676,6 @@ public: // Modifier
 		return *this;
 	}
 
-
-	// Set Initializer Value
-	Array4D &
-	initializer( T const & t )
-	{
-		return *this;
-	}
-
-	// Clear Initializer
-	Array4D &
-	initializer_clear()
-	{
-		return *this;
-	}
-
 	// Swap
 	Array4D &
 	swap( Array4D & v )

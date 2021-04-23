@@ -19,7 +19,6 @@ namespace ObjexxFCL {
 class byte;
 
 // Types
-typedef  byte  sbyte; // Alternative name making it clearer that it is a signed byte type
 
 } // ObjexxFCL
 

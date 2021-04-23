@@ -25,7 +25,6 @@ template< typename > class Vector4;
 class byte;
 
 // Types
-typedef  byte  sbyte;
 
 } // ObjexxFCL
 

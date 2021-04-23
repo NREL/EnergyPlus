@@ -25,7 +25,6 @@ template< typename > class Reference;
 class byte;
 
 // Types
-typedef  byte  sbyte;
 typedef  Reference< bool >                Reference_bool;
 typedef  Reference< byte >                Reference_byte;
 typedef  Reference< short int >           Reference_short;

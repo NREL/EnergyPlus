@@ -370,7 +370,6 @@ private: // Data
 }; // byte
 
 // Types
-typedef  byte  sbyte;
 
 // byte + byte
 byte

@@ -25,7 +25,6 @@ template< typename > class CArrayA;
 class byte;
 
 // Types
-typedef  byte  sbyte;
 
 } // ObjexxFCL
 

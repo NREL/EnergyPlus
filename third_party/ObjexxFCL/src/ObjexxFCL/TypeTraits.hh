@@ -107,9 +107,6 @@ struct TypeTraits
 	static std::streamsize const precision = 0; // Precision
 	static Size const width = 0; // Field width
 	static int const iwidth = 0; // Field width
-	static Size const loc_2_crossover = 300u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits char Specialization
@@ -150,9 +147,6 @@ struct TypeTraits< char >
 	static std::streamsize const precision = 0; // Precision
 	static Size const width = 1; // Field width
 	static int const iwidth = 1; // Field width
-	static Size const loc_2_crossover = 300u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits signed char Specialization
@@ -193,9 +187,6 @@ struct TypeTraits< signed char >
 	static std::streamsize const precision = 0; // Precision
 	static Size const width = 1; // Field width
 	static int const iwidth = 1; // Field width
-	static Size const loc_2_crossover = 300u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits unsigned char Specialization
@@ -236,9 +227,6 @@ struct TypeTraits< unsigned char >
 	static std::streamsize const precision = 0; // Precision
 	static Size const width = 1; // Field width
 	static int const iwidth = 1; // Field width
-	static Size const loc_2_crossover = 300u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits bool Specialization
@@ -279,9 +267,6 @@ struct TypeTraits< bool >
 	static std::streamsize const precision = 0; // Precision
 	static Size const width = 2; // Field width
 	static int const iwidth = 2; // Field width
-	static Size const loc_2_crossover = 300u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits byte Specialization
@@ -322,9 +307,6 @@ struct TypeTraits< byte >
 	static std::streamsize const precision = 0; // Precision
 	static Size const width = 7; // Field width
 	static int const iwidth = 7; // Field width
-	static Size const loc_2_crossover = 300u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits short int Specialization
@@ -365,9 +347,6 @@ struct TypeTraits< short int >
 	static std::streamsize const precision = 0; // Precision
 	static Size const width = 7; // Field width
 	static int const iwidth = 7; // Field width
-	static Size const loc_2_crossover = 275u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits unsigned short int Specialization
@@ -408,9 +387,6 @@ struct TypeTraits< unsigned short int >
 	static std::streamsize const precision = 0; // Precision
 	static Size const width = 7; // Field width
 	static int const iwidth = 7; // Field width
-	static Size const loc_2_crossover = 275u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits int Specialization
@@ -451,9 +427,6 @@ struct TypeTraits< int >
 	static std::streamsize const precision = 0; // Precision
 	static Size const width = 12; // Field width
 	static int const iwidth = 12; // Field width
-	static Size const loc_2_crossover = 150u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 11u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits unsigned int Specialization
@@ -494,9 +467,6 @@ struct TypeTraits< unsigned int >
 	static std::streamsize const precision = 0; // Precision
 	static Size const width = 12; // Field width
 	static int const iwidth = 12; // Field width
-	static Size const loc_2_crossover = 150u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 11u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits long int Specialization
@@ -537,9 +507,6 @@ struct TypeTraits< long int >
 	static std::streamsize const precision = 0; // Precision
 	static Size const width = 23; // Field width
 	static int const iwidth = 23; // Field width
-	static Size const loc_2_crossover = 170u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits unsigned long int Specialization
@@ -580,9 +547,6 @@ struct TypeTraits< unsigned long int >
 	static std::streamsize const precision = 0; // Precision
 	static Size const width = 23; // Field width
 	static int const iwidth = 23; // Field width
-	static Size const loc_2_crossover = 170u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits long long int Specialization
@@ -623,9 +587,6 @@ struct TypeTraits< long long int >
 	static std::streamsize const precision = 0; // Precision
 	static Size const width = 23; // Field width
 	static int const iwidth = 23; // Field width
-	static Size const loc_2_crossover = 145u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits unsigned long long int Specialization
@@ -666,9 +627,6 @@ struct TypeTraits< unsigned long long int >
 	static std::streamsize const precision = 0; // Precision
 	static Size const width = 23; // Field width
 	static int const iwidth = 23; // Field width
-	static Size const loc_2_crossover = 145u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits float Specialization
@@ -713,9 +671,6 @@ struct TypeTraits< float >
 #endif
 	static Size const width = 15; // Field width
 	static int const iwidth = 15; // Field width
-	static Size const loc_2_crossover = 200u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits double Specialization
@@ -760,9 +715,6 @@ struct TypeTraits< double >
 #endif
 	static Size const width = 23; // Field width
 	static int const iwidth = 23; // Field width
-	static Size const loc_2_crossover = 150u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits long double Specialization
@@ -807,9 +759,6 @@ struct TypeTraits< long double >
 #endif
 	static Size const width = 42; // Field width
 	static int const iwidth = 42; // Field width
-	static Size const loc_2_crossover = ( sizeof( traits_type ) >= 16 ? 125u : 150u ); // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = ( sizeof( traits_type ) >= 16 ? 600u : 10u ); // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = ( sizeof( traits_type ) >= 16 ? 400u : 10u ); // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits std::complex< float > Specialization
@@ -855,9 +804,6 @@ struct TypeTraits< std::complex< float > >
 #endif
 	static Size const width = 33; // Field width
 	static int const iwidth = 33; // Field width
-	static Size const loc_2_crossover = 150u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits std::complex< double > Specialization
@@ -903,9 +849,6 @@ struct TypeTraits< std::complex< double > >
 #endif
 	static Size const width = 49; // Field width
 	static int const iwidth = 49; // Field width
-	static Size const loc_2_crossover = 150u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
 // TypeTraits: Type Traits std::complex< long double > Specialization
@@ -951,9 +894,6 @@ struct TypeTraits< std::complex< long double > >
 #endif
 	static Size const width = 83; // Field width
 	static int const iwidth = 83; // Field width
-	static Size const loc_2_crossover = 100u; // Array 2D min/max location crossover
-	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
-	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
 } // ObjexxFCL

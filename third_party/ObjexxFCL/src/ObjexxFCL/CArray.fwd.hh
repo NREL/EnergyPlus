@@ -25,7 +25,6 @@ template< typename > class CArray;
 class byte;
 
 // Types
-typedef  byte  sbyte;
 typedef  CArray< bool >                CArray_bool;
 typedef  CArray< short int >           CArray_short;
 typedef  CArray< int >                 CArray_int;

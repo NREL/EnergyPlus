@@ -25,7 +25,6 @@ template< typename, typename = void > class Required;
 class byte;
 
 // Types
-typedef  byte  sbyte;
 typedef  Required< bool >                Required_bool;
 typedef  Required< byte >                Required_byte;
 typedef  Required< short int >           Required_short;

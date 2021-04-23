@@ -22,7 +22,6 @@ namespace ObjexxFCL {
 
 // Forward
 template< typename > class Array3D;
-template< typename > class Array3A;
 
 // Array3: Row-Major 3D Array Abstract Base Class
 template< typename T >
@@ -37,7 +36,6 @@ private: // Friend
 
 	template< typename > friend class Array3;
 	template< typename > friend class Array3D;
-	template< typename > friend class Array3A;
 
 protected: // Types
 

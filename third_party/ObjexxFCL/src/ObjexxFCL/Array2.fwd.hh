@@ -24,7 +24,6 @@ namespace ObjexxFCL {
 template< typename > class Array2;
 
 // Types
-typedef  byte  sbyte;
 typedef  Array2< int >                 Array2_int;
 
 } // ObjexxFCL

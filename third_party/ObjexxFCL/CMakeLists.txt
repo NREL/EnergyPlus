@@ -123,8 +123,6 @@ set(src
   src/ObjexxFCL/Reference.hh
   src/ObjexxFCL/Required.fwd.hh
   src/ObjexxFCL/Required.hh
-        src/ObjexxFCL/sbyte.fwd.hh
-  src/ObjexxFCL/sbyte.hh
         src/ObjexxFCL/string.constants.cc
   src/ObjexxFCL/string.constants.hh
   src/ObjexxFCL/string.functions.cc

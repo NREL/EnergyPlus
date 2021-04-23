@@ -1763,22 +1763,6 @@ public: // Comparison: Predicate: Any
 
 public: // Comparison: Predicate: All
 
-	// All Array == Value
-	friend
-	bool
-	all_eq( Array const & a, T const & t )
-	{
-		return eq( a, t );
-	}
-
-	// All Value == Array
-	friend
-	bool
-	all_eq( T const & t, Array const & a )
-	{
-		return eq( a, t );
-	}
-
 	// All Array != Value
 	friend
 	bool
@@ -2133,14 +2117,6 @@ protected: // Comparison: Predicate: Any
 	}
 
 protected: // Comparison: Predicate: All
-
-	// All Array == Array
-	friend
-	bool
-	all_eq( Array const & a, Array const & b )
-	{
-		return eq( a, b );
-	}
 
 	// All Array != Array
 	friend

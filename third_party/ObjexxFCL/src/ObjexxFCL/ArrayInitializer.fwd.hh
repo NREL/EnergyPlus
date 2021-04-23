@@ -25,7 +25,6 @@ template< typename > class ArrayInitializer;
 class byte;
 
 // Types
-typedef  byte  sbyte;
 typedef  ArrayInitializer< short int >           ArrayInitializer_short;
 typedef  ArrayInitializer< int >                 ArrayInitializer_int;
 typedef  ArrayInitializer< signed char >         ArrayInitializer_schar;

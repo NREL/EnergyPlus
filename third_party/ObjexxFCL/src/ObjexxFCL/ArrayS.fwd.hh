@@ -25,7 +25,6 @@ template< typename > class ArrayS;
 class byte;
 
 // Types
-typedef  byte  sbyte;
 typedef  ArrayS< double >              ArrayS_double;
 
 } // ObjexxFCL

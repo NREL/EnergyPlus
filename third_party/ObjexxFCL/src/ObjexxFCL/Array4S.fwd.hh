@@ -25,7 +25,6 @@ template< typename > class Array4S;
 class byte;
 
 // Types
-typedef  byte  sbyte;
 
 } // ObjexxFCL
 

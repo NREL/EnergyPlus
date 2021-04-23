@@ -25,7 +25,6 @@ template< typename > class Array3D;
 class byte;
 
 // Types
-typedef  byte  sbyte;
 typedef  Array3D< bool >                Array3D_bool;
 typedef  Array3D< int >                 Array3D_int;
 

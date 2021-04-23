@@ -25,7 +25,6 @@ template< typename, typename = void > class Optional;
 class byte;
 
 // Types
-typedef  byte  sbyte;
 typedef  Optional< bool >                Optional_bool;
 typedef  Optional< short int >           Optional_short;
 typedef  Optional< int >                 Optional_int;

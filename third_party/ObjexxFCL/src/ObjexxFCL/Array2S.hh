@@ -1100,14 +1100,6 @@ public: // Comparison: Predicate: All
 		return ge( a, b );
 	}
 
-	// All Slice == Value
-	friend
-	bool
-	all_eq( Array2S const & a, T const & t )
-	{
-		return eq( a, t );
-	}
-
 	// All Slice != Value
 	friend
 	bool

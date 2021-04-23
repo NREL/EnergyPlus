@@ -31,7 +31,6 @@
 #include <ObjexxFCL/Read.fwd.hh>
 #include <ObjexxFCL/Reference.fwd.hh>
 #include <ObjexxFCL/Required.fwd.hh>
-#include <ObjexxFCL/sbyte.fwd.hh>
 #include <ObjexxFCL/SetWrapper.fwd.hh>
 #include <ObjexxFCL/Stream.fwd.hh>
 #include <ObjexxFCL/Write.fwd.hh>
