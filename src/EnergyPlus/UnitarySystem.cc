@@ -12571,6 +12571,8 @@ namespace UnitarySystems {
                                     Par[4] = 0.0;
                                 }
                                 Par[5] = double(FanOpMode);
+                                Par[6] = double(this->m_DehumidificationMode);
+                                Par[7] = this->LoadSHR;
                                 TempSolveRoot::SolveRoot(
                                     state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilHRResidual, 0.0, 1.0, Par);
                                 if (SolFla == -1) {
@@ -15273,6 +15275,9 @@ namespace UnitarySystems {
         bool FirstHVACIteration = (Par[3] > 0.0);
         bool HXUnitOn = (Par[4] == 1.0);
         int FanOpMode = int(Par[5]);
+        int DehumidificationMode_par = int(Par[6]);
+        Real64 LoadSHR_par = Par[7];
+        
         HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil(state,
                                                              CoilIndex,
                                                              FirstHVACIteration,
@@ -15281,7 +15286,9 @@ namespace UnitarySystems {
                                                              HXUnitOn,
                                                              FanOpMode,
                                                              _,
-                                                             state.dataUnitarySystems->economizerFlag);
+                                                             state.dataUnitarySystems->economizerFlag,
+                                                             DehumidificationMode_par,
+                                                             LoadSHR_par);
         Real64 OutletAirHumRat = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(CoilIndex);
         Residuum = Par[2] - OutletAirHumRat;
         return Residuum;
