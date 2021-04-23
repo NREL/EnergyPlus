@@ -11830,7 +11830,10 @@ namespace UnitarySystems {
                                                                             FanOpMode,
                                                                             HXUnitOn,
                                                                             _,
-                                                                            state.dataUnitarySystems->economizerFlag);
+                                                                            state.dataUnitarySystems->economizerFlag,
+                                                                            _,
+                                                                            this->m_DehumidificationMode,
+                                                                            this->LoadSHR);
 
                         if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) this->m_CompPartLoadRatio = PartLoadFrac;
 
