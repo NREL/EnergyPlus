@@ -116,7 +116,7 @@ namespace HVACHXAssistedCoolingCoil {
                                   Optional_bool_const EconomizerFlag = _, // OA sys or air loop economizer status
                                   Optional<Real64> QTotOut = _,            // the total cooling output of unit
                                   Optional_int_const DehumidificationMode = _, // Optional dehumbidication mode
-                                  Optional<Real64 const> CoilSHR = _      // Optional coil SHR pass over    
+                                  Optional<Real64 const> LoadSHR = _      // Optional coil SHR pass over    
     );
 
     void GetHXAssistedCoolingCoilInput(EnergyPlusData &state);
@@ -133,7 +133,7 @@ namespace HVACHXAssistedCoolingCoil {
                                    Optional<Real64 const> OnOffAirFlow = _, // Ratio of compressor ON air mass flow to AVERAGE over time step
                                    Optional_bool_const EconomizerFlag = _,   // OA (or airloop) econommizer status
                                   Optional_int_const DehumidificationMode = _, // Optional dehumbidication mode
-                                  Optional<Real64 const> CoilSHR = _       // Optional coil SHR pass over
+                                  Optional<Real64 const> LoadSHR = _       // Optional coil SHR pass over
     );
 
     void GetHXDXCoilIndex(
