@@ -109,7 +109,9 @@ namespace HVACHXAssistedCoolingCoil {
                                   Optional_bool_const HXUnitEnable,   // flag to enable heat exchanger heat recovery
                                   Optional<Real64 const> OnOffAFR,    // Ratio of compressor ON air mass flow rate to AVERAGE over time step
                                   Optional_bool_const EconomizerFlag, // OA sys or air loop economizer status
-                                  Optional<Real64> QTotOut            // the total cooling output of unit
+                                  Optional<Real64> QTotOut,            // the total cooling output of unit
+                                  Optional_int_const DehumidificationMode,   // Optional dehumbidication mode
+                                  Optional<Real64 const> CoilSHR             // Optional CoilSHR pass over
     )
     {
 
@@ -190,8 +192,23 @@ namespace HVACHXAssistedCoolingCoil {
         } else {
             AirFlowRatio = 1.0;
         }
-        CalcHXAssistedCoolingCoil(
-            state, HXAssistedCoilNum, FirstHVACIteration, CompOp, PartLoadRatio, HXUnitOn, FanOpMode, AirFlowRatio, EconomizerFlag);
+        if (present(DehumidificationMode) && present(CoilSHR) &&
+            state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) {
+            CalcHXAssistedCoolingCoil(state,
+                                      HXAssistedCoilNum,
+                                      FirstHVACIteration,
+                                      CompOp,
+                                      PartLoadRatio,
+                                      HXUnitOn,
+                                      FanOpMode,
+                                      AirFlowRatio,
+                                      EconomizerFlag,
+                                      DehumidificationMode,
+                                      CoilSHR);
+        } else {
+            CalcHXAssistedCoolingCoil(
+                state, HXAssistedCoilNum, FirstHVACIteration, CompOp, PartLoadRatio, HXUnitOn, FanOpMode, AirFlowRatio, EconomizerFlag);
+        }
 
         // Update the current HXAssistedCoil output
         //  Call UpdateHXAssistedCoolingCoil(HXAssistedCoilNum), not required. Updates done by the HX and cooling coil components.
@@ -1001,7 +1018,9 @@ namespace HVACHXAssistedCoolingCoil {
                                    bool const HXUnitOn,                 // Flag to enable heat exchanger
                                    int const FanOpMode,                 // Allows parent object to control fan operation
                                    Optional<Real64 const> OnOffAirFlow, // Ratio of compressor ON air mass flow to AVERAGE over time step
-                                   Optional_bool_const EconomizerFlag   // OA (or airloop) econommizer status
+                                   Optional_bool_const EconomizerFlag,  // OA (or airloop) econommizer status
+                                   Optional_int_const DehumidificationMode, // Optional dehumbidication mode
+                                   Optional<Real64 const> CoilSHR       // Optional coil SHR pass over
     )
     {
 
@@ -1084,7 +1103,7 @@ namespace HVACHXAssistedCoolingCoil {
                 int OperationMode = DataHVACGlobals::coilNormalMode;
                 if (state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].SubcoolReheatFlag) {
                     OperationMode = DataHVACGlobals::coilSubcoolReheatMode;
-                } else if (false /*this.m_DehumidificationMode == 1*/) { //temporily override not to use enhanced mode
+                } else if (DehumidificationMode == 1) {
                     OperationMode = DataHVACGlobals::coilEnhancedMode;
                 }
 
@@ -1095,8 +1114,6 @@ namespace HVACHXAssistedCoolingCoil {
                 if (state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].getNumModes() > 1) {
                     singleMode = false;
                 }
-                Real64 CoilSHR = 0.75; // state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].performance.NormalSHR;
-                    // state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].performance.normalMode.speeds[0].grossRatedSHR;
 
                 state.dataCoilCooingDX->coilCoolingDXs[state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex].simulate(
                     state,

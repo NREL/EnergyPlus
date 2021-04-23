@@ -11030,7 +11030,10 @@ namespace UnitarySystems {
                                                                     this->m_FanOpMode,
                                                                     HXUnitOn,
                                                                     OnOffAirFlowRatio,
-                                                                    state.dataUnitarySystems->economizerFlag);
+                                                                    state.dataUnitarySystems->economizerFlag,
+                                                                    _,
+                                                                    this->m_DehumidificationMode,
+                                                                    this->LoadSHR);
                 if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted)
                     this->m_CoolCompPartLoadRatio = PartLoadRatio * double(CompOn);
 
