@@ -12109,9 +12109,9 @@ namespace UnitarySystems {
                                                                                         HXUnitOn,
                                                                                         _,
                                                                                         state.dataUnitarySystems->economizerFlag,
-                                        _,
-                                        this->m_DehumidificationMode,
-                                        this->LoadSHR);
+                                                                                        _,
+                                                                                        this->m_DehumidificationMode,
+                                                                                        this->LoadSHR);
                                     TempOutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
                                 }
                                 // Relax boundary slightly to assure a solution can be found using RegulaFalsi (i.e. one boundary may
@@ -12370,9 +12370,9 @@ namespace UnitarySystems {
                                                                             HXUnitOn,
                                                                             _,
                                                                             state.dataUnitarySystems->economizerFlag,
-                            _,
-                            this->m_DehumidificationMode,
-                            this->LoadSHR);
+                                                                            _,
+                                                                            this->m_DehumidificationMode,
+                                                                            this->LoadSHR);
 
                         OutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
 
@@ -12613,7 +12613,10 @@ namespace UnitarySystems {
                                                                                             FanOpMode,
                                                                                             HXUnitOn,
                                                                                             _,
-                                                                                            state.dataUnitarySystems->economizerFlag);
+                                                                                            state.dataUnitarySystems->economizerFlag,
+                                                                                            _,
+                                                                                            this->m_DehumidificationMode,
+                                                                                            this->LoadSHR);
                                         OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(this->m_CoolingCoilIndex);
                                     }
                                     //                   tighter boundary of solution has been found, CALL RegulaFalsi a second time
