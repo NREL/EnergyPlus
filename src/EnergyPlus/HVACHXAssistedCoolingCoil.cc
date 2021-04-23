@@ -193,7 +193,7 @@ namespace HVACHXAssistedCoolingCoil {
             AirFlowRatio = 1.0;
         }
         if (present(DehumidificationMode) && present(CoilSHR) &&
-            state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) {
+            state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
             CalcHXAssistedCoolingCoil(state,
                                       HXAssistedCoilNum,
                                       FirstHVACIteration,
