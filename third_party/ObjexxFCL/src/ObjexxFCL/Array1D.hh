@@ -42,7 +42,6 @@ public: // Types
 	typedef  typename Super::Base  Base;
 	typedef  typename Super::Traits  Traits;
 	typedef  typename Super::IR  IR;
-	typedef  typename Super::Initializer  Initializer;
 
 	// STL Style
 	typedef  typename Super::value_type  value_type;
@@ -507,14 +506,6 @@ private: // Creation
 		setup_real();
 	}
 
-	// IndexRange Raw Initializer Constructor
-	explicit
-	Array1D( IR const & I, Initializer const & initializer ) :
-	 Super( I, InitializerSentinel() )
-	{
-		setup_real();
-		initialize( initializer );
-	}
 
 public: // Assignment: Array
 

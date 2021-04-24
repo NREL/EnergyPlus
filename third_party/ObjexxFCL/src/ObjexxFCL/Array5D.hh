@@ -41,7 +41,6 @@ public: // Types
 	typedef  typename Super::Base  Base;
 	typedef  typename Super::Traits  Traits;
 	typedef  typename Super::IR  IR;
-	typedef  typename Super::Initializer  Initializer;
 
 	// STL Style
 	typedef  typename Super::value_type  value_type;

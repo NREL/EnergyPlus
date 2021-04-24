@@ -15,7 +15,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.fwd.hh>
-#include <ObjexxFCL/ArrayInitializer.hh>
 #include <ObjexxFCL/BArray.hh>
 #include <ObjexxFCL/AlignedAllocator.hh>
 #include <ObjexxFCL/ArrayS.hh>
@@ -78,7 +77,6 @@ public: // Types
 	typedef  Array< T >  Base;
 	typedef  AlignedAllocator< T >  Aligned;
 	typedef  TypeTraits< T >  Traits;
-	typedef  ArrayInitializer< T >  Initializer;
 
 	// STL style
 	typedef  T  value_type;
@@ -3000,26 +2998,6 @@ protected: // Methods
 		std::swap( data_, v.data_ );
 		std::swap( shift_, v.shift_ );
 		std::swap( sdata_, v.sdata_ );
-	}
-
-	// Initialize to Intializer
-	void
-	initialize( Initializer const & initializer )
-	{
-		if ( initializer.active() ) { // Sticky initialize
-			T const fill( initializer.value() );
-			for ( size_type i = 0; i < size_; ++i ) {
-				new ( data_ + i ) T( fill );
-			}
-		} else { // Default initialize
-#if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-			std::uninitialized_fill_n( data_, size_, Traits::initial_array_value() );
-#else
-			for ( size_type i = 0; i < size_; ++i ) {
-				new ( data_ + i ) T;
-			}
-#endif
-		}
 	}
 
 	// Initialize by Uniform Value

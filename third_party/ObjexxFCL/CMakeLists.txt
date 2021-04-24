@@ -55,9 +55,7 @@ set(src
   src/ObjexxFCL/Array5.hh
         src/ObjexxFCL/Array5D.fwd.hh
   src/ObjexxFCL/Array5D.hh
-        src/ObjexxFCL/ArrayInitializer.fwd.hh
-  src/ObjexxFCL/ArrayInitializer.hh
-  src/ObjexxFCL/ArrayRS.fwd.hh
+        src/ObjexxFCL/ArrayRS.fwd.hh
   src/ObjexxFCL/ArrayRS.hh
   src/ObjexxFCL/ArrayS.all.fwd.hh
   src/ObjexxFCL/ArrayS.all.hh
