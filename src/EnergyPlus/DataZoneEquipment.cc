@@ -1458,13 +1458,7 @@ Real64 CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
                     DSOAFlowPeople = state.dataHeatBal->ZoneIntGain(ActualZoneNum).NOFOCC * OARequirements(DSOAPtr).OAFlowPerPerson;
                 }
             } else {
-                if (MaxOAFlag) {
-                    // OAPerPersonMode == PerPersonByDesignLevel (UseOccSchFlag = FALSE)
-                    // use total people when requesting MaxOAFlow
-                    DSOAFlowPeople = Zone(ActualZoneNum).TotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
-                } else {
-                    DSOAFlowPeople = Zone(ActualZoneNum).TotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
-                }
+                DSOAFlowPeople = Zone(ActualZoneNum).TotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
             }
             if (PerPersonModeNotSet) DSOAFlowPeople = 0.0; // for Dual Duct if Per Person Ventilation Rate Mode is not entered
         } else {
