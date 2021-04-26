@@ -66,7 +66,6 @@ namespace DataHeatBalSurface {
     Real64 constexpr MinSurfaceTempLimit(-100.0);            // Lowest inside surface temperature allowed in Celsius
     Real64 constexpr MinSurfaceTempLimitBeforeFatal(-250.0); // 2.5 times MinSurfaceTempLimit
     Real64 constexpr DefaultSurfaceTempLimit(200.0);         // Highest inside surface temperature allowed in Celsius
-    Real64 constexpr IterDampConst(5.0);                     // Damping constant for inside surface temperature iterations
     int constexpr ItersReevalConvCoeff(30);                  // Number of iterations between inside convection coefficient reevaluations
     int constexpr MaxIterations(500);                        // Maximum number of iterations allowed for inside surface temps
     Real64 constexpr PoolIsOperatingLimit(0.0001);           // Limit to determine if swimming pool is operating or not
@@ -87,6 +86,7 @@ struct HeatBalSurfData : BaseGlobalStruct
     Real64 MaxSurfaceTempLimit = 200.0;            // Highest inside surface temperature allowed in Celsius
     Real64 MaxSurfaceTempLimitBeforeFatal = 500.0; // 2.5 times MaxSurfaceTempLimit
     int MinIterations = 1;                         // Minimum number of iterations for surface heat balance
+    Real64 IterDampConst = 5.0;                    // Damping constant for inside surface temperature iterations
 
     // Variables Dimensioned to Max Number of Heat Transfer Surfaces (maxhts)
     Array1D<Real64> CTFConstInPart;  // Constant Inside Portion of the CTF calculation
