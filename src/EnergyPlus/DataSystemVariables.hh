@@ -112,7 +112,7 @@ struct SystemVarsData : BaseGlobalStruct
     bool ReverseDD = false;          // TRUE if reverse design days (reordering sizingperiod:*) are to be run.
     bool DisableGLHECaching = false; // TRUE if caching is to be disabled, for example, during unit tests.
     bool FullAnnualRun = false;      // TRUE if full annual simulation is to be run.
-    bool DeveloperFlag = false;      // TRUE if developer flag is turned on. (turns on more displays to console)
+    bool DeveloperFlag = true;      // TRUE if developer flag is turned on. (turns on more displays to console)
     bool TimingFlag = false;         // TRUE if timing flag is turned on. (turns on more timing displays to console)
 
     bool SutherlandHodgman = true;                 // TRUE if SutherlandHodgman algorithm for polygon clipping is to be used.
