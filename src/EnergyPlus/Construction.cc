@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
+#include <EnergyPlus/Cache.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataConversions.hh>
@@ -1059,6 +1060,9 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
     if (allocated(this->Gamma1)) this->Gamma1.deallocate();
     if (allocated(this->Gamma2)) this->Gamma2.deallocate();
     if (allocated(this->s)) this->s.deallocate();
+
+    // write cache data
+    this->writeCacheData(state);
 }
 
 void ConstructionProps::calculateExponentialMatrix()
@@ -2044,6 +2048,76 @@ void ConstructionProps::setArraysBasedOnMaxSolidWinLayers(EnergyPlusData &state)
             this->abBareSolCoef(Layer)(Index) = 0.0;
         }
     }
+}
+
+void ConstructionProps::writeCacheData(EnergyPlusData &state)
+{
+    // empty cache for this construction
+    nlohmann::json cacheData;
+
+    // construction name
+    cacheData["name"] = this->Name;
+
+    // CTF data
+    Cache::arrayToJSON(this->CTFCross, cacheData, "ctf_cross");
+    Cache::arrayToJSON(this->CTFFlux, cacheData, "ctf_flux");
+    Cache::arrayToJSON(this->CTFInside, cacheData, "ctf_inside");
+    Cache::arrayToJSON(this->CTFOutside, cacheData, "ctf_outside");
+
+    // other necessary data
+    cacheData["num_histories"] = this->NumHistories;
+    cacheData["num_ctf_terms"] = this->NumCTFTerms;
+    cacheData["ctf_timestep"] = this->CTFTimeStep;
+    cacheData["u_value"] = this->UValue;
+
+    // write to cache
+    std::string key = this->getCacheKey(state);
+    state.dataCache->cache[Cache::CTFKey][key] = cacheData;
+}
+
+void ConstructionProps::loadFromCache(EnergyPlusData &state)
+{
+    try {
+        // load cached data
+        std::string key = this->getCacheKey(state);
+        nlohmann::json jCTFData = state.dataCache->cache[Cache::CTFKey][key];
+
+        // CTF arrays
+        Cache::jsonToArray(state, this->CTFCross, jCTFData, "ctf_cross");
+        Cache::jsonToArray1(state, this->CTFFlux, jCTFData, "ctf_flux");
+        Cache::jsonToArray(state, this->CTFInside, jCTFData, "ctf_inside");
+        Cache::jsonToArray(state, this->CTFOutside, jCTFData, "ctf_outside");
+
+        // other necessary data
+        Cache::jsonToData(state, this->NumHistories, jCTFData, "num_histories");
+        Cache::jsonToData(state, this->NumCTFTerms, jCTFData, "num_ctf_terms");
+        Cache::jsonToData(state, this->CTFTimeStep, jCTFData, "ctf_timestep");
+        Cache::jsonToData(state, this->UValue, jCTFData, "u_value");
+
+        this->CTFLoadedFromCache = true;
+    } catch (nlohmann::json::out_of_range &e) {
+        // should already be defaulted to false, but this makes sure
+        // we might need other error handling if we get to this point
+        this->CTFLoadedFromCache = false;
+    }
+}
+
+std::string ConstructionProps::getCacheKey(EnergyPlusData &state)
+{
+    std::string key;
+
+    // Data from material layers
+    for (int Layer = 1; Layer <= this->TotLayers; ++Layer) {
+        int CurrentLayer = this->LayerPoint(Layer);
+        auto &mat = state.dataMaterial->Material(CurrentLayer);
+        key.append(format("{:.{}f},", mat.Thickness, 8));
+        key.append(format("{:.{}f},", mat.Conductivity, 8));
+        key.append(format("{:.{}f},", mat.Density, 8));
+        key.append(format("{:.{}f},", mat.SpecHeat, 8));
+        key.append(format("{:.{}f},", mat.Resistance, 8));
+    }
+
+    return key;
 }
 
 } // namespace EnergyPlus::Construction

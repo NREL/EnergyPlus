@@ -54,13 +54,13 @@ namespace EnergyPlus {
 
 EnergyPlusData::EnergyPlusData()
 {
+    this->dataAFNProps = std::make_unique<DataAFNProps>();
+    this->dataAFNSolver = std::make_unique<AirflowNetworkSolverData>();
     this->dataAirLoop = std::make_unique<DataAirLoopData>();
     this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
     this->dataAirSystemsData = std::make_unique<AirSystemsData>();
     this->dataAirflowNetwork = std::make_unique<AirflowNetworkData>();
     this->dataAirflowNetworkBalanceManager = std::make_unique<AirflowNetworkBalanceManagerData>();
-    this->dataAFNProps = std::make_unique<DataAFNProps>();
-    this->dataAFNSolver = std::make_unique<AirflowNetworkSolverData>();
     this->dataBSDFWindow = std::make_unique<BSDFWindowData>();
     this->dataBaseSizerFanHeatInputs = std::make_unique<BaseSizerWithFanHeatInputsData>();
     this->dataBaseSizerScalableInputs = std::make_unique<BaseSizerWithScalableInputsData>();
@@ -73,6 +73,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataBranchNodeConnections = std::make_unique<BranchNodeConnectionsData>();
     this->dataCHPElectGen = std::make_unique<MicroCHPElectricGeneratorData>();
     this->dataCTElectricGenerator = std::make_unique<CTElectricGeneratorData>();
+    this->dataCache = std::make_unique<CacheData>();
     this->dataChilledCeilingPanelSimple = std::make_unique<ChilledCeilingPanelSimpleData>();
     this->dataChillerAbsorber = std::make_unique<ChillerAbsorberData>();
     this->dataChillerElectricEIR = std::make_unique<ChillerElectricEIRData>();
@@ -172,9 +173,9 @@ EnergyPlusData::EnergyPlusData()
     this->dataHybridUnitaryAC = std::make_unique<HybridUnitaryAirConditionersData>();
     this->dataHysteresisPhaseChange = std::make_unique<HysteresisPhaseChangeData>();
     this->dataICEngElectGen = std::make_unique<ICEngineElectricGeneratorData>();
-    this->dataInputProcessing = std::make_unique<DataInputProcessing>();
     this->dataIPShortCut = std::make_unique<IPShortCutsData>();
     this->dataIceThermalStorage = std::make_unique<IceThermalStorageData>();
+    this->dataInputProcessing = std::make_unique<DataInputProcessing>();
     this->dataIntegratedHP = std::make_unique<IntegratedHeatPumpGlobalData>();
     this->dataInternalHeatGains = std::make_unique<InternalHeatGainsData>();
     this->dataLoopNodes = std::make_unique<LoopNodeData>();
@@ -222,8 +223,8 @@ EnergyPlusData::EnergyPlusData()
     this->dataPollutionModule = std::make_unique<PollutionModuleData>();
     this->dataPondGHE = std::make_unique<PondGroundHeatExchangerData>();
     this->dataPowerInductionUnits = std::make_unique<PoweredInductionUnitsData>();
-    this->dataPsychrometrics = std::make_unique<PsychrometricsData>();
     this->dataPsychCache = std::make_unique<PsychrometricCacheData>();
+    this->dataPsychrometrics = std::make_unique<PsychrometricsData>();
     this->dataPumps = std::make_unique<PumpsData>();
     this->dataPurchasedAirMgr = std::make_unique<PurchasedAirManagerData>();
     this->dataRefrigCase = std::make_unique<RefrigeratedCaseData>();
@@ -264,13 +265,13 @@ EnergyPlusData::EnergyPlusData()
     this->dataSysVars = std::make_unique<SystemVarsData>();
     this->dataSystemAvailabilityManager = std::make_unique<SystemAvailabilityManagerData>();
     this->dataTARCOGCommon = std::make_unique<TARCOGCommonData>();
+    this->dataTARCOGGasses90 = std::make_unique<TARCOGGasses90Data>();
+    this->dataTARCOGMain = std::make_unique<TARCOGMainData>();
     this->dataTARCOGOutputs = std::make_unique<TARCOGOutputData>();
+    this->dataTarcogShading = std::make_unique<TarcogShadingData>();
     this->dataThermalChimneys = std::make_unique<ThermalChimneysData>();
     this->dataThermalComforts = std::make_unique<ThermalComfortsData>();
     this->dataThermalISO15099Calc = std::make_unique<ThermalISO15099CalcData>();
-    this->dataTARCOGGasses90 = std::make_unique<TARCOGGasses90Data>();
-    this->dataTARCOGMain = std::make_unique<TARCOGMainData>();
-    this->dataTarcogShading = std::make_unique<TarcogShadingData>();
     this->dataTimingsData = std::make_unique<DataTimingsData>();
     this->dataTranspiredCollector = std::make_unique<TranspiredCollectorData>();
     this->dataUCSDShared = std::make_unique<UCSDSharedData>();
@@ -311,13 +312,13 @@ EnergyPlusData::EnergyPlusData()
 
 void EnergyPlusData::clear_state()
 {
+    this->dataAFNProps->clear_state();
+    this->dataAFNSolver->clear_state();
     this->dataAirLoop->clear_state();
     this->dataAirLoopHVACDOAS->clear_state();
     this->dataAirSystemsData->clear_state();
     this->dataAirflowNetwork->clear_state();
     this->dataAirflowNetworkBalanceManager->clear_state();
-    this->dataAFNSolver->clear_state();
-    this->dataAFNProps->clear_state();
     this->dataBSDFWindow->clear_state();
     this->dataBaseSizerFanHeatInputs->clear_state();
     this->dataBaseSizerScalableInputs->clear_state();
@@ -330,6 +331,7 @@ void EnergyPlusData::clear_state()
     this->dataBranchNodeConnections->clear_state();
     this->dataCHPElectGen->clear_state();
     this->dataCTElectricGenerator->clear_state();
+    this->dataCache->clear_state();
     this->dataChilledCeilingPanelSimple->clear_state();
     this->dataChillerAbsorber->clear_state();
     this->dataChillerElectricEIR->clear_state();
@@ -479,8 +481,8 @@ void EnergyPlusData::clear_state()
     this->dataPollutionModule->clear_state();
     this->dataPondGHE->clear_state();
     this->dataPowerInductionUnits->clear_state();
-    this->dataPsychrometrics->clear_state();
     this->dataPsychCache->clear_state();
+    this->dataPsychrometrics->clear_state();
     this->dataPumps->clear_state();
     this->dataPurchasedAirMgr->clear_state();
     this->dataRefrigCase->clear_state();
@@ -521,13 +523,13 @@ void EnergyPlusData::clear_state()
     this->dataSysVars->clear_state();
     this->dataSystemAvailabilityManager->clear_state();
     this->dataTARCOGCommon->clear_state();
+    this->dataTARCOGGasses90->clear_state();
+    this->dataTARCOGMain->clear_state();
     this->dataTARCOGOutputs->clear_state();
+    this->dataTarcogShading->clear_state();
     this->dataThermalChimneys->clear_state();
     this->dataThermalComforts->clear_state();
     this->dataThermalISO15099Calc->clear_state();
-    this->dataTARCOGGasses90->clear_state();
-    this->dataTARCOGMain->clear_state();
-    this->dataTarcogShading->clear_state();
     this->dataTimingsData->clear_state();
     this->dataTranspiredCollector->clear_state();
     this->dataUCSDShared->clear_state();

@@ -56,6 +56,9 @@
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
+// other
+#include <nlohmann/json.hpp>
+
 namespace EnergyPlus {
 
 // Forward declarations
@@ -268,6 +271,7 @@ namespace Construction {
         // with a heat source/sink.
         int NodeSource;   // Node at which a source or sink is present
         int NodeUserTemp; // Node where user wishes to calculate a temperature (for constructions with sources/sinks only)
+        bool CTFLoadedFromCache;
 
         // Default Constructor
         ConstructionProps()
@@ -296,7 +300,7 @@ namespace Construction {
               ReverseConstructionNumLayersWarning(false), ReverseConstructionLayersOrderWarning(false), WindowTypeEQL(false), EQLConsPtr(0),
               AbsDiffFrontEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0), AbsDiffBackEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0),
               TransDiffFrontEQL(0.0), TransDiffBackEQL(0.0), TypeIsAirBoundary(false), TypeIsAirBoundaryMixing(false), AirBoundaryACH(0.0),
-              AirBoundaryMixingSched(0), rcmax(0), NodeSource(0), NodeUserTemp(0)
+              AirBoundaryMixingSched(0), rcmax(0), NodeSource(0), NodeUserTemp(0), CTFLoadedFromCache(false)
         {
             BMat.allocate(3);
             CMat.allocate(2);
@@ -323,6 +327,12 @@ namespace Construction {
         void setNodeSourceAndUserTemp(Array1D_int &Nodes);
 
         void setArraysBasedOnMaxSolidWinLayers(EnergyPlusData &state);
+
+        void writeCacheData(EnergyPlusData &state);
+
+        void loadFromCache(EnergyPlusData &state);
+
+        std::string getCacheKey(EnergyPlusData &state);
     };
 } // namespace Construction
 

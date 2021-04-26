@@ -58,6 +58,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Cache.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -9891,7 +9892,7 @@ namespace HeatBalanceManager {
             state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF = true;
         }
 
-        // Do not forget to deallocate localy allocated variables
+        // Do not forget to deallocate locally allocated variables
         if (allocated(locAlphaFieldNames)) locAlphaFieldNames.deallocate();
         if (allocated(locNumericFieldNames)) locNumericFieldNames.deallocate();
         if (allocated(locNumericFieldBlanks)) locNumericFieldBlanks.deallocate();
@@ -9901,191 +9902,22 @@ namespace HeatBalanceManager {
 
         if (ErrorsFound) ShowFatalError(state, "Error in complex fenestration input.");
     }
-    void readJSONfile(EnergyPlusData &state, std::string &filePath, nlohmann::json &j)
-    {
-        if (!FileSystem::fileExists(filePath)) {
-            // if the file doesn't exist, there are no data to read
-            return;
-        } else {
-            std::ifstream ifs(filePath);
-
-            // read json_in data
-            try {
-                ifs >> j;
-                ifs.close();
-            } catch (...) {
-                if (!j.empty()) {
-                    // file exists, is not empty, but failed for some other reason
-                    ShowWarningError(state, filePath + " contains invalid file format");
-                }
-                ifs.close();
-                return;
-            }
-        }
-    }
-
-    void writeJSONfile(nlohmann::json &j, std::string &fPath)
-    {
-        std::ofstream ofs(fPath);
-        ofs << std::setw(2) << j;
-        ofs.close();
-    }
-
-    void jsonToArray(EnergyPlusData &state, Array1D<Real64> &arr, nlohmann::json &j, std::string const &key)
-    {
-        // 0-based array to JSON list
-
-        try {
-            int size = static_cast<int>(j[key].size());
-            arr.dimension({0, size - 1}, 0.0);
-            int idx = 0;
-            for (auto &v : j[key]) {
-                arr[idx] = v;
-                ++idx;
-            }
-        } catch (nlohmann::json::out_of_range &e) {
-            ShowFatalError(state, format(R"(From eplusout.cache, key: "{}" not found)", key));
-        }
-    }
-
-    void jsonToArray1(EnergyPlusData &state, Array1D<Real64> &arr, nlohmann::json &j, std::string const &key)
-    {
-        // 1-based array to JSON list
-
-        try {
-            int size = static_cast<int>(j[key].size());
-            arr.dimension(size, 0.0);
-            int idx = 0;
-            for (auto &v : j[key]) {
-                arr[idx] = v;
-                ++idx;
-            }
-        } catch (nlohmann::json::out_of_range &e) {
-            ShowFatalError(state, format(R"(From eplusout.cache, key: "{}" not found)", key));
-        }
-    }
-
-    template <typename T> void jsonToData(EnergyPlusData &state, T &data, nlohmann::json &j, std::string const &key)
-    {
-        try {
-            data = j[key];
-        } catch (nlohmann::json::out_of_range &e) {
-            ShowFatalError(state, format(R"(From eplusout.cache, key: "{}" not found)", key));
-        }
-    }
-
-    void arrayToJSON(Array1D<Real64> &arr, nlohmann::json &j, std::string const &key)
-    {
-        std::vector<Real64> vect;
-        for (auto v : arr)
-            vect.push_back(v);
-        j[key] = vect;
-    }
-
-    void loadCachedCTFs(EnergyPlusData &state, nlohmann::json &j, Construction::ConstructionProps &construction, bool &found)
-    {
-        try {
-            // load cached data
-            nlohmann::json jCTFData = j["CTFs"][construction.Name];
-
-            // CTF arrays
-            jsonToArray(state, construction.CTFCross, jCTFData, "ctf_cross");
-            jsonToArray1(state, construction.CTFFlux, jCTFData, "ctf_flux");
-            jsonToArray(state, construction.CTFInside, jCTFData, "ctf_inside");
-            jsonToArray(state, construction.CTFOutside, jCTFData, "ctf_outside");
-
-            // other necessary data
-            jsonToData(state, construction.NumHistories, jCTFData, "num_histories");
-            jsonToData(state, construction.NumCTFTerms, jCTFData, "num_ctf_terms");
-            jsonToData(state, construction.CTFTimeStep, jCTFData, "ctf_timestep");
-            jsonToData(state, construction.UValue, jCTFData, "u_value");
-
-            found = true;
-        } catch (nlohmann::json::out_of_range &e) {
-            // should already be defaulted to false, but this makes sure
-            // we might need other error handling if we get to this point
-            found = false;
-        }
-    }
-
-    nlohmann::json writeCTFsToCache(EnergyPlusData &state, Construction::ConstructionProps &construction)
-    {
-        // construction data to be saved
-        nlohmann::json jCTFData;
-
-        // construction name
-        jCTFData["name"] = construction.Name;
-
-        // material properties data
-        std::vector<std::string> matNames;
-        std::vector<Real64> thickness;
-        std::vector<Real64> conductivity;
-        std::vector<Real64> density;
-        std::vector<Real64> specificHeat;
-        std::vector<Real64> resistance;
-
-        for (int Layer = 1; Layer <= construction.TotLayers; ++Layer) {
-            int CurrentLayer = construction.LayerPoint(Layer);
-            auto &mat = state.dataMaterial->Material(CurrentLayer);
-            matNames.push_back(mat.Name);
-            thickness.push_back(mat.Thickness);
-            conductivity.push_back(mat.Conductivity);
-            density.push_back(mat.Density);
-            specificHeat.push_back(mat.SpecHeat);
-            resistance.push_back(mat.Resistance);
-        }
-
-        jCTFData["material_name"] = matNames;
-        jCTFData["material_thickness"] = thickness;
-        jCTFData["material_conductivity"] = conductivity;
-        jCTFData["material_density"] = density;
-        jCTFData["material_specific_heat"] = specificHeat;
-
-        // CTF data
-        arrayToJSON(construction.CTFCross, jCTFData, "ctf_cross");
-        arrayToJSON(construction.CTFFlux, jCTFData, "ctf_flux");
-        arrayToJSON(construction.CTFInside, jCTFData, "ctf_inside");
-        arrayToJSON(construction.CTFOutside, jCTFData, "ctf_outside");
-
-        // other necessary data
-        jCTFData["num_histories"] = construction.NumHistories;
-        jCTFData["num_ctf_terms"] = construction.NumCTFTerms;
-        jCTFData["ctf_timestep"] = construction.CTFTimeStep;
-        jCTFData["u_value"] = construction.UValue;
-
-        return jCTFData;
-    }
 
     void InitConductionTransferFunctions(EnergyPlusData &state)
     {
         bool ErrorsFound(false); // Flag for input error condition
         bool DoCTFErrorReport(false);
-        bool cacheExists(true);
 
-        std::string const cacheName = "eplusout.cache";
-        std::string cacheFilePath = FileSystem::getAbsolutePath(FileSystem::getParentDirectoryPath(FileSystem::getProgramPath())) + "/" + cacheName;
-
-        // does the cache file even exist?
-        if (!FileSystem::fileExists(cacheFilePath)) {
-            cacheExists = false;
-        }
-
-        // empty json for use below
-        nlohmann::json j;
-
-        if (cacheExists) {
-
-            // load cache file one time
-            readJSONfile(state, cacheFilePath, j);
+        if (state.dataCache->cacheExists) {
 
             // cache exists, check each construction for cached CTF values
             for (auto &construction : state.dataConstruction->Construct) {
 
-                bool foundCachedMatch = false;
-                loadCachedCTFs(state, j, construction, foundCachedMatch);
+                // try loading from cache
+                construction.loadFromCache(state);
 
                 // if they were not found, compute the CTF values and write to a file
-                if (!foundCachedMatch) {
+                if (!construction.CTFLoadedFromCache) {
                     construction.calculateTransferFunction(state, ErrorsFound, DoCTFErrorReport);
                 }
             }
@@ -10096,16 +9928,6 @@ namespace HeatBalanceManager {
                 construction.calculateTransferFunction(state, ErrorsFound, DoCTFErrorReport);
             }
         }
-
-        // write CTF cache data
-        nlohmann::json jCTFData;
-        for (auto &construction : state.dataConstruction->Construct) {
-            jCTFData[construction.Name] = writeCTFsToCache(state, construction);
-        }
-        j["CTFs"] = jCTFData;
-
-        // we're done with the cache for now, write the data out
-        writeJSONfile(j, cacheFilePath);
 
         bool InitCTFDoReport;
         General::ScanForReports(state, "Constructions", InitCTFDoReport, "Constructions");

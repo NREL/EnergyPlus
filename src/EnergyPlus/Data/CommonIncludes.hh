@@ -68,6 +68,7 @@
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/CTElectricGenerator.hh>
+#include <EnergyPlus/Cache.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
