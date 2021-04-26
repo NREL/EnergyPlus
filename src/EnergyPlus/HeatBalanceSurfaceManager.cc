@@ -8029,7 +8029,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
             for (int surfNum = firstNonWinSurf; surfNum <= lastNonWinSurf; ++surfNum) {
                 Real64 delta = state.dataHeatBalSurf->TempSurfIn(surfNum) - state.dataHeatBalSurf->TempInsOld(surfNum);
                 Real64 absDif = std::abs(delta);
-                //MaxDelTemp = std::max(absDif, MaxDelTemp);
+                // MaxDelTemp = std::max(absDif, MaxDelTemp);
                 zoneMaxDelTemp = std::max(absDif, zoneMaxDelTemp);
             }
             MaxDelTemp = std::max(zoneMaxDelTemp, MaxDelTemp);
@@ -8038,7 +8038,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 
         } // ...end of loop to check for convergence
 
-        //if (MaxDelTemp <= state.dataHeatBal->MaxAllowedDelTemp) Converged = true;
+        // if (MaxDelTemp <= state.dataHeatBal->MaxAllowedDelTemp) Converged = true;
 
 #ifdef EP_Count_Calls
         state.dataTimingsData->NumMaxInsideSurfIterations =
