@@ -514,6 +514,8 @@ namespace UnitarySystems {
 
         static void getUnitarySystemInput(EnergyPlusData &state, std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
+        static void getDXCoilSystemInput(EnergyPlusData &state, std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum);
+
         void processInputSpec(EnergyPlusData &state,
                               const UnitarySysInputSpec &input_data,
                               int sysNum,
@@ -806,6 +808,9 @@ namespace UnitarySystems {
 
         static void getUnitarySystemInputData(
             EnergyPlusData &state, std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
+
+        static void
+        getDXCoilSystemData(EnergyPlusData &state, std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
         static HVACSystemData *
         factory(EnergyPlusData &state, int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);

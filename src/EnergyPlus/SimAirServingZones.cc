@@ -1218,21 +1218,19 @@ void GetAirPathData(EnergyPlusData &state)
                     } else if (componentType == "COIL:HEATING:DESUPERHEATER") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Coil_DeSuperHeat;
 
-                    } else if (componentType == "COILSYSTEM:COOLING:DX") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = DXSystem;
+                    //} else if (componentType == "COILSYSTEM:COOLING:DX") {
+                    //    PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = DXSystem;
                     } else if (componentType == "COILSYSTEM:HEATING:DX") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = DXHeatPumpSystem;
                     } else if (componentType == "COIL:USERDEFINED") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CoilUserDefined;
-                    } else if (componentType == "AIRLOOPHVAC:UNITARYSYSTEM") {
+                    } else if (componentType == "AIRLOOPHVAC:UNITARYSYSTEM" || componentType == "COILSYSTEM:COOLING:DX") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = UnitarySystemModel;
                         UnitarySystems::UnitarySys thisSys;
+                        int compType = UnitarySystemModel;
+                        if (componentType == "COILSYSTEM:COOLING:DX") compType = DXSystem;
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).compPointer =
-                            thisSys.factory(state,
-                                            DataHVACGlobals::UnitarySys_AnyCoilType,
-                                            PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
-                                            false,
-                                            0);
+                            thisSys.factory(state, compType, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, false, 0);
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys_HeatOnly;
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL") {

@@ -446,6 +446,13 @@ namespace UnitarySystems {
     HVACSystemData *UnitarySys::factory(
         EnergyPlusData &state, int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum)
     {
+        int temp_object_type_of_num = object_type_of_num;
+
+        if (object_type_of_num == SimAirServingZones::DXSystem) {
+            if (state.dataUnitarySystems->getInputOnceFlag) UnitarySys::getDXCoilSystem(state, objectName, ZoneEquipment, ZoneOAUnitNum);
+            state.dataUnitarySystems->getInputOnceFlag = false;
+            temp_object_type_of_num = DataHVACGlobals::UnitarySys_AnyCoilType;
+        }
         if (state.dataUnitarySystems->getInputOnceFlag) {
             UnitarySys::getUnitarySystemInput(state, objectName, ZoneEquipment, ZoneOAUnitNum);
             state.dataUnitarySystems->getInputOnceFlag = false;
@@ -453,7 +460,7 @@ namespace UnitarySystems {
         int sysNum = -1;
         for (auto &sys : state.dataUnitarySystems->unitarySys) {
             ++sysNum;
-            if (UtilityRoutines::SameString(sys.Name, objectName) && object_type_of_num == DataHVACGlobals::UnitarySys_AnyCoilType) {
+            if (UtilityRoutines::SameString(sys.Name, objectName) && temp_object_type_of_num == DataHVACGlobals::UnitarySys_AnyCoilType) {
                 state.dataUnitarySystems->unitarySys[sysNum].m_UnitarySysNum = sysNum;
                 return &sys;
             }
@@ -1432,6 +1439,18 @@ namespace UnitarySystems {
 
         if (errorsFound) {
             ShowFatalError(state, "getUnitarySystemInputData: previous errors cause termination. Check inputs");
+        }
+    }
+
+    void UnitarySys::getDXCoilSystemInput(EnergyPlusData &state, std::string const &objectName, bool const ZoneEquipment, int const ZoneOAUnitNum)
+    {
+
+        bool errorsFound(false);
+
+        UnitarySys::getDXCoilSystemData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
+
+        if (errorsFound) {
+            ShowFatalError(state, "getDXCoilSystemData: previous errors cause termination. Check inputs");
         }
     }
 
@@ -6803,6 +6822,1178 @@ namespace UnitarySystems {
             }
         }
         this->m_setupOutputVars = true;
+    }
+
+    void UnitarySys::getDXCoilSystemData(
+        EnergyPlusData &state, std::string const &objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
+    {
+        static std::string const getDXCoilSystem("getDXCoilSystemData");
+        std::string cCurrentModuleObject = "CoilSystem:Cooling:DX";
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+        if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
+            ShowSevereError(state, "getDXCoilSystemData: did not find CoilSystem:Cooling:DX object in input file. Check inputs");
+            errorsFound = true;
+        } else {
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                // only get the current data once all data has been read in and vector unitarySys has been initialized
+                // when UnitarySystems::getInputOnceFlag is true read all unitary systems, otherwise read just the curren object
+                if (!UtilityRoutines::SameString(objectName, thisObjectName)) continue;
+
+                ++state.dataUnitarySystems->numUnitarySystems;
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
+
+                // get CoilSystem:Cooling:DX objects inputs
+
+                //              CoilSystem:Cooling:DX,
+                //               \min-fields 7
+                //          A1 , \field Name
+                //               \required-field
+                //               \reference CoolingCoilSystemName
+                //               \type alpha
+                //               \reference-class-name validBranchEquipmentTypes
+                //               \reference validBranchEquipmentNames
+                //               \reference-class-name validOASysEquipmentTypes
+                //               \reference validOASysEquipmentNames
+                //          A2 , \field Availability Schedule Name
+                //               \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+                //               \note If this field is blank, the system is always available.
+                //          A3 , \field DX Cooling Coil System Inlet Node Name
+                //               \required-field
+                //          A4 , \field DX Cooling Coil System Outlet Node Name
+                //               \required-field
+                //          A5 , \field DX Cooling Coil System Sensor Node Name
+                //               \required-field
+                //          A6,  \field Cooling Coil Object Type
+                //               \type choice
+                //               \required-field
+                //               \key Coil:Cooling:DX:SingleSpeed
+                //               \key CoilSystem:Cooling:DX:HeatExchangerAssisted
+                //               \key Coil:Cooling:DX:TwoSpeed
+                //               \key Coil:Cooling:DX:TwoStageWithHumidityControlMode
+                //               \key Coil:Cooling:DX:VariableSpeed
+                //               \key Coil:Cooling:DX:SingleSpeed:ThermalStorage
+                //          A7,  \field Cooling Coil Name
+                //               \required-field
+                //          A8,  \field Dehumidification Control Type
+                //               \type choice
+                //               \key None
+                //               \key Multimode
+                //               \key CoolReheat
+                //               \default None
+                //               \note None = meet sensible load only
+                //               \note Multimode = activate enhanced dehumidification mode
+                //               \note as needed and meet sensible load. If no sensible load
+                //               \note exists, and Run on Latent Load = Yes, and a latent
+                //               \note load exists, the unit will operate to meet the latent load.
+                //               \note Valid only with Coil:Cooling:DX:TwoStageWithHumidityControlMode
+                //               \note or CoilSystem:Cooling:DX:HeatExchangerAssisted.
+                //               \note CoolReheat = cool beyond the dry-bulb setpoint.
+                //               \note as required to meet the humidity setpoint.
+                //               \note Valid for all coil types.
+                //               \note For all dehumidification controls, the max
+                //               \note humidity setpoint on the Sensor Node is used.
+                //               \note SetpointManager:SingleZone:Humidity:Maximum,
+                //               \note SetpointManager:MultiZone:Humidity:Maximum, or
+                //               \note SetpointManager:MultiZone:MaximumHumidity:Average, and
+                //               \note SetpointManager:OutdoorAirPretreat (optional) objects.
+                //          A9,  \field Run on Sensible Load
+                //               \type choice
+                //               \key Yes
+                //               \key No
+                //               \default Yes
+                //               \note If Yes, unit will run if there is a sensible load.
+                //               \note If No, unit will not run if there is only a sensible load.
+                //               \note Dehumidification controls will be active if specified.
+                //         A10,  \field Run on Latent Load
+                //               \type choice
+                //               \key Yes
+                //               \key No
+                //               \default No
+                //               \note If Yes, unit will run if there is a latent load.
+                //               \note even if there is no sensible load.
+                //               \note If No, unit will not run only if there is a latent load.
+                //               \note Dehumidification controls will be active if specified.
+                //         A11,  \field Use Outdoor Air DX Cooling Coil
+                //               \type choice
+                //               \key Yes
+                //               \key No
+                //               \default No
+                //               \note This input field is designed for use with DX cooling coils with low air flow
+                //               \note to capacity ratio range (100 - 300 cfm/ton). Typical application is 100% dedicated
+                //               \note outdoor air system (DOAS). Other air loop or zone HVAC systems with low flow
+                //               \note to capacity ratio range may also use this input field. If Yes, the DX cooling
+                //               \note coil runs as 100% DOAS DX coil or low flow to capacity ratio range.
+                //               \note If No, the DX cooling coil runs as a regular DX coil. If left blank the
+                //               \note default is regular DX coil.
+                //         N1 ;  \field Outdoor Air DX Cooling Coil Leaving Minimum Air Temperature
+                //               \type real
+                //               \units C
+                //               \minimum 0.0
+                //               \maximum 7.2
+                //               \default 2.0
+                //               \note DX cooling coil leaving minimum air temperature defines the minimum DX cooling coil
+                //               \note leaving air temperature that should be maintained to avoid frost formation. This input
+                //               \note field is optional and only used along with the input field above.
+
+                
+                auto const &fields = instance.value();
+                std::string loc_sysAvailSched = UtilityRoutines::MakeUPPERCase(fields.at("availability_schedule_name"));
+                std::string loc_AirInNodeName = UtilityRoutines::MakeUPPERCase(fields.at("dx_cooling_coil_system_inlet_node_name")); // required field
+                std::string loc_AirOutNodeName =
+                    UtilityRoutines::MakeUPPERCase(fields.at("dx_cooling_coil_system_outlet_node_name")); // required field
+                std::string loc_SensorNodeName =
+                    UtilityRoutines::MakeUPPERCase(fields.at("dx_cooling_coil_system_sensor_node_name"));                // required field
+                std::string loc_coolingCoilType = UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_object_type")); // required field
+                std::string loc_m_CoolingCoilName = UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_name"));      // required field
+                // min-fields = 7, begin optional inputs
+                std::string loc_dehumm_ControlType("");
+                if (fields.find("dehumidification_control_type") != fields.end()) { // not required field
+                    loc_dehumm_ControlType = UtilityRoutines::MakeUPPERCase(fields.at("dehumidification_control_type"));
+                } else {
+                    // find default value
+                    loc_dehumm_ControlType = "None";
+                }
+                std::string loc_RunOnSensLoad("");
+                if (fields.find("run_on_sensible_load") != fields.end()) { // not required field
+                    loc_RunOnSensLoad = UtilityRoutines::MakeUPPERCase(fields.at("run_on_sensible_load"));
+                } else {
+                    // find default value
+                    loc_RunOnSensLoad = "YES";
+                }
+                std::string loc_RunOnLatLoad("");
+                if (fields.find("run_on_latent_load") != fields.end()) { // not required field
+                    loc_RunOnLatLoad = UtilityRoutines::MakeUPPERCase(fields.at("run_on_latent_load"));
+                } else {
+                    // find default value
+                    loc_RunOnLatLoad = "NO";
+                }
+                std::string loc_UseOADXCoil("");
+                if (fields.find("use_outdoor_air_dx_cooling_coil") != fields.end()) { // not required field
+                    loc_UseOADXCoil = UtilityRoutines::MakeUPPERCase(fields.at("use_outdoor_air_dx_cooling_coil"));
+                } else {
+                    // find default value
+                    loc_UseOADXCoil = "NO";
+                }
+                Real64 loc_OADXCoilLeavingT(0.0);
+                if (fields.find("outdoor_air_dx_cooling_coil_leaving_minimum_air_temperature") != fields.end()) { // not required field
+                    loc_OADXCoilLeavingT = fields.at("outdoor_air_dx_cooling_coil_leaving_minimum_air_temperature");
+                } else {
+                    // find default value
+                    loc_OADXCoilLeavingT = 2.0;
+                }
+
+                // now translate to UnitarySystem
+                int sysNum = state.dataUnitarySystems->numUnitarySystems;
+                UnitarySys thisSys;
+                thisSys.Name = thisObjectName;
+
+                // CoilSystem:Cooling:DX is set point control with constant fan mode
+                thisSys.m_ControlType = ControlType::Setpoint;
+                thisSys.m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
+
+                thisSys.m_SysAvailSchedPtr = ScheduleManager::GetScheduleIndex(state, loc_sysAvailSched);
+                thisSys.AirInNode = NodeInputManager::GetOnlySingleNode(state,
+                                                                        loc_AirInNodeName,
+                                                                        errorsFound,
+                                                                        cCurrentModuleObject,
+                                                                        thisObjectName,
+                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                                        1,
+                                                                        DataLoopNode::ObjectIsParent);
+
+                thisSys.AirOutNode = NodeInputManager::GetOnlySingleNode(state,
+                                                                         loc_AirOutNodeName,
+                                                                         errorsFound,
+                                                                         cCurrentModuleObject,
+                                                                         thisObjectName,
+                                                                         DataLoopNode::NodeFluidType::Air,
+                                                                         DataLoopNode::NodeConnectionType::Outlet,
+                                                                         1,
+                                                                         DataLoopNode::ObjectIsParent);
+
+                thisSys.m_SystemCoolControlNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                                         loc_SensorNodeName,
+                                                                                         errorsFound,
+                                                                                         cCurrentModuleObject,
+                                                                                         thisObjectName,
+                                                                                         DataLoopNode::NodeFluidType::Air,
+                                                                                         DataLoopNode::NodeConnectionType::Sensor,
+                                                                                         1,
+                                                                                         DataLoopNode::ObjectIsParent);
+                if (!SetPointManager::NodeHasSPMCtrlVarType(state, thisSys.m_SystemCoolControlNodeNum, SetPointManager::iCtrlVarType::Temp)) {
+                    ShowWarningError(state, "Missing set point at control node");
+                }
+
+                //\key Coil : Cooling : DX : SingleSpeed
+                //\key CoilSystem : Cooling : DX : HeatExchangerAssisted
+                //\key Coil : Cooling : DX : TwoSpeed
+                //\key Coil : Cooling : DX : TwoStageWithHumidityControlMode
+                //\key Coil : Cooling : DX : VariableSpeed
+                //\key Coil : Cooling : DX : SingleSpeed : ThermalStorage
+
+                bool errFlag = false;
+                bool PrintMessage = false;
+                // same coils allowed in UnitarySystem, could make this a worker function
+                if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
+                    thisSys.m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
+                    thisSys.m_ContSpeedCoolingCoil = true; // is this needed for CoilSystem ?
+                } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:MultiSpeed")) {
+                    thisSys.m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
+                } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:Water")) {
+                    thisSys.m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWater;
+                } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
+                    thisSys.m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterDetailed;
+                } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
+                    thisSys.m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl;
+                } else if (UtilityRoutines::SameString(loc_coolingCoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
+                    thisSys.m_CoolingCoilType_Num =
+                        HVACHXAssistedCoolingCoil::GetCoilGroupTypeNum(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag, PrintMessage);
+                } else if (UtilityRoutines::SameString(loc_coolingCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
+                    thisSys.m_CoolingCoilType_Num =
+                        HVACHXAssistedCoolingCoil::GetCoilGroupTypeNum(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag, PrintMessage);
+                } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:WaterToAirHeatPump:EquationFit")) {
+                    thisSys.m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterToAirHPSimple;
+                } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation")) {
+                    thisSys.m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterToAirHP;
+                } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit")) {
+                    thisSys.m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit;
+                } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:SingleSpeed")) {
+                    thisSys.m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
+                } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:TwoSpeed")) {
+                    thisSys.m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingTwoSpeed;
+                } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:UserDefined")) {
+                    thisSys.m_CoolingCoilType_Num = DataHVACGlobals::Coil_UserDefined;
+                } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:SingleSpeed:ThermalStorage")) {
+                    thisSys.m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_PackagedThermalStorageCooling;
+                } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX")) { // CoilCoolingDX
+                    thisSys.m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_Cooling;
+                } else {
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
+                    // ShowContinueError(state, "Illegal " + cAlphaFields(iCoolingCoilTypeAlphaNum) + " = " + Alphas(iCoolingCoilTypeAlphaNum));
+                }
+
+                if (UtilityRoutines::SameString(loc_dehumm_ControlType, "None")) {
+                    thisSys.m_DehumidControlType_Num = DehumCtrlType::None;
+                    thisSys.m_Humidistat = false;
+                } else if (UtilityRoutines::SameString(loc_dehumm_ControlType, "CoolReheat")) {
+                    thisSys.m_DehumidControlType_Num = DehumCtrlType::CoolReheat;
+                    thisSys.m_Humidistat = true;
+                } else if (UtilityRoutines::SameString(loc_dehumm_ControlType, "Multimode")) {
+                    thisSys.m_DehumidControlType_Num = DehumCtrlType::Multimode;
+                    thisSys.m_Humidistat = true;
+                }
+
+                if (UtilityRoutines::SameString(loc_RunOnSensLoad, "YES")) thisSys.m_RunOnSensibleLoad = true;
+                if (UtilityRoutines::SameString(loc_RunOnLatLoad, "YES")) thisSys.m_RunOnLatentLoad = true;
+
+                if (UtilityRoutines::SameString(loc_UseOADXCoil, "YES")) {
+                    thisSys.m_ISHundredPercentDOASDXCoil = true;
+                    if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                        ShowWarningError(state, cCurrentModuleObject + " = " + thisObjectName);
+                        // ShowContinueError(state, "Invalid entry for " + cAlphaFields(iDOASDXCoilAlphaNum) + " :" +
+                        // Alphas(iDOASDXCoilAlphaNum));
+                        ShowContinueError(state, "Variable DX Cooling Coil is not supported as 100% DOAS DX coil.");
+                        ShowContinueError(state, "Variable DX Cooling Coil resets Use DOAS DX Cooling Coil = No and the simulation continues.");
+                        thisSys.m_ISHundredPercentDOASDXCoil = false;
+                    }
+                }
+                int CoolingCoilInletNode = 0;
+                int CoolingCoilOutletNode = 0;
+                bool isNotOK = false;
+                if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
+                    thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
+                    ValidateComponent(state, loc_coolingCoilType, loc_m_CoolingCoilName, isNotOK, cCurrentModuleObject);
+                    if (isNotOK) {
+                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                        errorsFound = true;
+
+                    } else { // mine data from DX cooling coil
+
+                        if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
+                            thisSys.m_NumOfSpeedCooling = 2;
+                            thisSys.m_MultiOrVarSpeedCoolCoil = true;
+                        } else {
+                            thisSys.m_NumOfSpeedCooling = 1;
+                            thisSys.m_MultiOrVarSpeedCoolCoil = false;
+                        }
+
+                        // Get DX cooling coil index
+                        DXCoils::GetDXCoilIndex(state,
+                                                loc_m_CoolingCoilName,
+                                                thisSys.m_CoolingCoilIndex,
+                                                isNotOK,
+                                                ObjexxFCL::Optional_string_const(),
+                                                ObjexxFCL::Optional_bool_const());
+                        if (isNotOK) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+                        if (state.dataGlobal->DoCoilDirectSolutions && thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
+                            DXCoils::DisableLatentDegradation(state, thisSys.m_CoolingCoilIndex);
+                        }
+
+                        thisSys.m_CoolingCoilAvailSchPtr = DXCoils::GetDXCoilAvailSchPtr(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+
+                        // Get DX cooling coil capacity
+                        errFlag = false;
+                        thisSys.m_DesignCoolingCapacity = DXCoils::GetCoilCapacity(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (thisSys.m_DesignCoolingCapacity == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                        // Get DX coil air flow rate. Latter fields will overwrite this IF input field is present
+                        errFlag = false;
+                        thisSys.m_MaxCoolAirVolFlow = DXCoils::GetDXCoilAirFlow(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                        // Get the Cooling Coil Nodes
+                        errFlag = false;
+                        CoolingCoilInletNode = DXCoils::GetCoilInletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        CoolingCoilOutletNode = DXCoils::GetCoilOutletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                        // Get Outdoor condenser node from DX coil object
+                        errFlag = false;
+                        thisSys.m_CondenserNodeNum = DXCoils::GetCoilCondenserInletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+                    }
+
+                } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
+                    ValidateComponent(state, loc_coolingCoilType, loc_m_CoolingCoilName, isNotOK, cCurrentModuleObject);
+                    if (isNotOK) {
+                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                        errorsFound = true;
+
+                    } else {
+                        //                    // call CoilCoolingDX constructor
+                        thisSys.m_CoolingCoilIndex = CoilCoolingDX::factory(state, loc_m_CoolingCoilName);
+                        if (thisSys.m_CoolingCoilIndex == -1) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        } else {
+
+                            // mine data from coil object
+                            // TODO: Need to check for autosize on these I guess
+                            auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[thisSys.m_CoolingCoilIndex];
+                            thisSys.m_DesignCoolingCapacity = newCoil.performance.normalMode.ratedGrossTotalCap;
+                            thisSys.m_MaxCoolAirVolFlow = newCoil.performance.normalMode.ratedEvapAirFlowRate;
+                            if (thisSys.m_DesignCoolingCapacity == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                            if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                            thisSys.m_CoolingCoilAvailSchPtr = newCoil.availScheduleIndex;
+                            CoolingCoilInletNode = newCoil.evapInletNodeIndex;
+                            CoolingCoilOutletNode = newCoil.evapOutletNodeIndex;
+                            thisSys.m_CondenserNodeNum = newCoil.condInletNodeIndex;
+                            thisSys.m_NumOfSpeedCooling = (int)newCoil.performance.normalMode.speeds.size();
+                            thisSys.m_MinOATCompressorCooling = newCoil.performance.minOutdoorDrybulb;
+                            newCoil.supplyFanName = thisSys.m_FanName;
+                            newCoil.supplyFanIndex = thisSys.m_FanIndex;
+                            newCoil.supplyFanType = thisSys.m_FanType_Num;
+                            if (newCoil.SubcoolReheatFlag) {
+                                thisSys.m_Humidistat = true;
+                                if (thisSys.m_NumOfSpeedCooling > 1) {
+                                    thisSys.FullOutput.resize(thisSys.m_NumOfSpeedCooling + 1);
+                                    thisSys.FullLatOutput.resize(thisSys.m_NumOfSpeedCooling + 1);
+                                    thisSys.SpeedSHR.resize(thisSys.m_NumOfSpeedCooling + 1);
+                                }
+                                if (thisSys.m_ControlType == ControlType::Setpoint) {
+                                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
+                                    ShowContinueError(state,
+                                                      "Setpoint control is not available for SubcoolReheat cooling coil. Load control is forced. "
+                                                      "Simulation continues.");
+                                    thisSys.m_ControlType = ControlType::Load;
+                                }
+                            }
+                            newCoil.setData(thisSys.m_FanIndex, thisSys.m_FanType_Num, thisSys.m_FanName, thisSys.m_SuppCoilLoopNum);
+
+                            // Push heating coil PLF curve index to DX coil
+                            //                    if ( HeatingCoilPLFCurveIndex > 0 ) {
+                            //                        SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrorsFound,
+                            //                        HeatingCoilPLFCurveIndex );
+                            //                    }
+
+                            // set variable speed coil flag as necessary
+                            if (thisSys.m_NumOfSpeedCooling > 1) {
+                                if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::DISCRETE) {
+                                    thisSys.m_DiscreteSpeedCoolingCoil = true;
+                                } else if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::CONTINUOUS) {
+                                    thisSys.m_ContSpeedCoolingCoil = true;
+                                }
+                                thisSys.m_MultiOrVarSpeedCoolCoil = true;
+                            }
+                        }
+
+                        if (state.dataGlobal->DoCoilDirectSolutions && thisSys.m_NumOfSpeedCooling > 1) {
+                            thisSys.FullOutput.resize(thisSys.m_NumOfSpeedCooling + 1);
+                        }
+
+                        if (thisSys.m_HeatCoilExists) {
+                            if (thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
+                                thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ||
+                                thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHP ||
+                                thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple ||
+                                thisSys.m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating ||
+                                thisSys.m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical) {
+                                thisSys.m_HeatPump = true;
+                            }
+
+                            // set fan info for heating coils
+                            if (thisSys.m_FanExists) {
+                                if (thisSys.m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
+                                        state,
+                                        thisSys.m_HeatingCoilName,
+                                        thisSys.m_HeatingCoilTypeName,
+                                        thisSys.m_FanName,
+                                        DataAirSystems::objectVectorOOFanSystemModel,
+                                        thisSys.m_FanIndex);
+
+                                } else {
+                                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
+                                        state,
+                                        thisSys.m_HeatingCoilName,
+                                        thisSys.m_HeatingCoilTypeName,
+                                        thisSys.m_FanName,
+                                        DataAirSystems::structArrayLegacyFanModels,
+                                        thisSys.m_FanIndex);
+                                }
+                            }
+                        }
+                    }
+
+                } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
+                    ValidateComponent(state, loc_coolingCoilType, loc_m_CoolingCoilName, isNotOK, cCurrentModuleObject);
+                    if (isNotOK) {
+                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                        errorsFound = true;
+
+                    } else { // mine data from DX cooling coil
+
+                        // Get DX cooling coil index
+                        DXCoils::GetDXCoilIndex(state,
+                                                loc_m_CoolingCoilName,
+                                                thisSys.m_CoolingCoilIndex,
+                                                isNotOK,
+                                                ObjexxFCL::Optional_string_const(),
+                                                ObjexxFCL::Optional_bool_const());
+                        if (isNotOK) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                        thisSys.m_CoolingCoilAvailSchPtr = DXCoils::GetDXCoilAvailSchPtr(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+
+                        // Get DX cooling coil capacity
+                        errFlag = false;
+                        thisSys.m_DesignCoolingCapacity = DXCoils::GetCoilCapacity(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (thisSys.m_DesignCoolingCapacity == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                        // Get DX coil air flow rate. Later fields will overwrite this IF input field is present
+                        errFlag = false;
+                        thisSys.m_MaxCoolAirVolFlow = DXCoils::GetDXCoilAirFlow(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                        // Get the Cooling Coil Nodes
+                        errFlag = false;
+                        CoolingCoilInletNode = DXCoils::GetCoilInletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        CoolingCoilOutletNode = DXCoils::GetCoilOutletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                        // Get Outdoor condenser node from DX coil object
+                        errFlag = false;
+                        thisSys.m_CondenserNodeNum = DXCoils::GetCoilCondenserInletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                    } // IF (IsNotOK) THEN
+
+                } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) {
+                    ValidateComponent(state, loc_coolingCoilType, loc_m_CoolingCoilName, isNotOK, cCurrentModuleObject);
+                    if (isNotOK) {
+                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                        errorsFound = true;
+
+                    } else { // mine data from heat exchanger assisted cooling coil
+
+                        // Get DX heat exchanger assisted cooling coil index
+                        errFlag = false;
+                        HVACHXAssistedCoolingCoil::GetHXDXCoilIndex(state, loc_m_CoolingCoilName, thisSys.m_CoolingCoilIndex, isNotOK);
+                        if (isNotOK) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                        errFlag = false;
+                        std::string ChildCoolingCoilName =
+                            HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, loc_coolingCoilType, loc_m_CoolingCoilName, isNotOK);
+                        std::string ChildCoolingCoilType =
+                            HVACHXAssistedCoolingCoil::GetHXDXCoilType(state, loc_coolingCoilType, loc_m_CoolingCoilName, isNotOK);
+                        if (isNotOK) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                        if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX:SINGLESPEED")) {
+
+                            errFlag = false;
+                            thisSys.m_CoolingCoilAvailSchPtr =
+                                DXCoils::GetDXCoilAvailSchPtr(state, ChildCoolingCoilType, ChildCoolingCoilName, errFlag);
+                            if (isNotOK) {
+                                ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                errorsFound = true;
+                            }
+
+                            // Get DX coil air flow rate. Later fields will overwrite this IF input field is present
+                            errFlag = false;
+                            thisSys.m_MaxCoolAirVolFlow = DXCoils::GetDXCoilAirFlow(state, ChildCoolingCoilType, ChildCoolingCoilName, errFlag);
+                            if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                            if (errFlag) {
+                                ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                errorsFound = true;
+                            }
+
+                            // Get Outdoor condenser node from heat exchanger assisted DX coil object
+                            errFlag = false;
+                            thisSys.m_CondenserNodeNum = DXCoils::GetCoilCondenserInletNode(
+                                state,
+                                "COIL:COOLING:DX:SINGLESPEED",
+                                HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag),
+                                errFlag);
+
+                            if (errFlag) {
+                                ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                errorsFound = true;
+                            }
+
+                        } else if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED")) {
+                            thisSys.m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                            errFlag = false;
+                            thisSys.m_MaxCoolAirVolFlow =
+                                VariableSpeedCoils::GetCoilAirFlowRateVariableSpeed(state, ChildCoolingCoilType, ChildCoolingCoilName, errFlag);
+                            if (errFlag) {
+                                ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                errorsFound = true;
+                            }
+                            thisSys.m_CondenserNodeNum = VariableSpeedCoils::GetVSCoilCondenserInletNode(state, ChildCoolingCoilName, errFlag);
+                            if (errFlag) {
+                                ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                errorsFound = true;
+                            }
+                        }
+
+                        // Get DX cooling coil capacity
+                        errFlag = false;
+                        thisSys.m_DesignCoolingCapacity =
+                            HVACHXAssistedCoolingCoil::GetCoilCapacity(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (thisSys.m_DesignCoolingCapacity == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                        // Get the Cooling Coil Nodes
+                        errFlag = false;
+                        CoolingCoilInletNode =
+                            HVACHXAssistedCoolingCoil::GetCoilInletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        CoolingCoilOutletNode =
+                            HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                    } // IF (IsNotOK) THEN
+                } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilWater_CoolingHXAssisted) {
+                    ValidateComponent(state, loc_coolingCoilType, loc_m_CoolingCoilName, isNotOK, cCurrentModuleObject);
+                    if (isNotOK) {
+                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                        errorsFound = true;
+
+                    } else { // mine data from heat exchanger assisted cooling coil
+
+                        errFlag = false;
+                        int ActualCoolCoilType =
+                            HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag, true);
+                        std::string HXCoilName =
+                            HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                        // Get DX heat exchanger assisted cooling coil index
+                        errFlag = false;
+                        HVACHXAssistedCoolingCoil::GetHXDXCoilIndex(state, loc_m_CoolingCoilName, thisSys.m_CoolingCoilIndex, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                        errFlag = false;
+                        thisSys.m_CoolingCoilAvailSchPtr = WaterCoils::GetWaterCoilAvailScheduleIndex(
+                            state, DataHVACGlobals::cAllCoilTypes(ActualCoolCoilType), HXCoilName, errFlag);
+                        thisSys.MaxCoolCoilFluidFlow =
+                            WaterCoils::GetCoilMaxWaterFlowRate(state, DataHVACGlobals::cAllCoilTypes(ActualCoolCoilType), HXCoilName, errFlag);
+                        // Get the Cooling Coil water Inlet Node number
+                        thisSys.CoolCoilFluidInletNode =
+                            WaterCoils::GetCoilWaterInletNode(state, DataHVACGlobals::cAllCoilTypes(ActualCoolCoilType), HXCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                        // Get the Cooling Coil Nodes
+                        errFlag = false;
+                        CoolingCoilInletNode =
+                            HVACHXAssistedCoolingCoil::GetCoilInletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        CoolingCoilOutletNode =
+                            HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                        errFlag = false;
+                        thisSys.m_MaxCoolAirVolFlow =
+                            HVACHXAssistedCoolingCoil::GetHXCoilAirFlowRate(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize) {
+                            thisSys.m_RequestAutoSize = true;
+                            thisSys.m_DesignCoolingCapacity = DataSizing::AutoSize;
+                        }
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                        thisSys.m_CondenserNodeNum = 0;
+
+                    } // IF (IsNotOK) THEN
+                } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ||
+                           thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
+                    ValidateComponent(state, loc_coolingCoilType, loc_m_CoolingCoilName, isNotOK, cCurrentModuleObject);
+                    if (isNotOK) {
+                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                        errorsFound = true;
+                    } else {
+                        errFlag = false;
+                        thisSys.m_CoolingCoilIndex =
+                            VariableSpeedCoils::GetCoilIndexVariableSpeed(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        CoolingCoilInletNode =
+                            VariableSpeedCoils::GetCoilInletNodeVariableSpeed(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        CoolingCoilOutletNode =
+                            VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        thisSys.m_CondenserNodeNum = VariableSpeedCoils::GetVSCoilCondenserInletNode(state, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        thisSys.m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
+
+                        thisSys.m_NumOfSpeedCooling = VariableSpeedCoils::GetVSCoilNumOfSpeeds(state, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        errFlag = false;
+                        thisSys.m_DesignCoolingCapacity =
+                            VariableSpeedCoils::GetCoilCapacityVariableSpeed(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (thisSys.m_DesignCoolingCapacity == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                        errFlag = false;
+                        thisSys.m_MaxCoolAirVolFlow =
+                            VariableSpeedCoils::GetCoilAirFlowRateVariableSpeed(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+                    }
+
+                    if (errFlag) {
+                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                        errorsFound = true;
+                    }
+
+                    if (thisSys.m_HeatCoilExists) {
+                        if (thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHP ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical) {
+                            thisSys.m_HeatPump = true;
+                        }
+                    }
+
+                } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
+                    errFlag = false;
+                    DXCoils::GetDXCoilIndex(
+                        state, loc_m_CoolingCoilName, thisSys.m_CoolingCoilIndex, errFlag, loc_coolingCoilType, ObjexxFCL::Optional_bool_const());
+                    if (errFlag) {
+                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                        errorsFound = true;
+                        errFlag = false;
+                    }
+
+                    thisSys.m_CoolingCoilAvailSchPtr = DXCoils::GetDXCoilAvailSchPtr(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+
+                    errFlag = false;
+                    CoolingCoilInletNode = DXCoils::GetCoilInletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                    if (errFlag) {
+                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                        errorsFound = true;
+                        errFlag = false;
+                    }
+
+                    errFlag = false;
+                    CoolingCoilOutletNode = DXCoils::GetCoilOutletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                    if (errFlag) {
+                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                        errorsFound = true;
+                        errFlag = false;
+                    }
+
+                    errFlag = false;
+                    thisSys.m_DesignCoolingCapacity = DXCoils::GetCoilCapacity(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                    if (thisSys.m_DesignCoolingCapacity == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                    if (errFlag) {
+                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                        errorsFound = true;
+                    }
+
+                    // Get DX coil air flow rate. Later fields will overwrite this IF input field is present
+                    errFlag = false;
+                    thisSys.m_MaxCoolAirVolFlow = DXCoils::GetDXCoilAirFlow(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                    if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                    if (errFlag) {
+                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                        errorsFound = true;
+                    }
+
+                    if (thisSys.m_HeatCoilExists) {
+                        if (thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHP ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical) {
+                            thisSys.m_HeatPump = true;
+                        }
+                    }
+
+                } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
+                           thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) {
+
+                    ValidateComponent(state, loc_coolingCoilType, loc_m_CoolingCoilName, isNotOK, cCurrentModuleObject);
+                    if (isNotOK) {
+                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                        errorsFound = true;
+                    } else { // mine data from Cooling coil object
+
+                        errFlag = false;
+                        thisSys.m_CoolingCoilAvailSchPtr =
+                            WaterCoils::GetWaterCoilAvailScheduleIndex(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        thisSys.m_CoolingCoilIndex = WaterCoils::GetWaterCoilIndex(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (thisSys.m_CoolingCoilIndex == 0) {
+                            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
+                            ShowContinueError(state, "Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        // call for air flow rate not valid for other water coil types
+                        if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater) {
+                            thisSys.m_MaxCoolAirVolFlow =
+                                WaterCoils::GetWaterCoilDesAirFlow(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                            if (errFlag) {
+                                ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                errorsFound = true;
+                                errFlag = false;
+                            }
+                        }
+
+                        // Get the Cooling Coil water Inlet Node number
+                        thisSys.CoolCoilFluidInletNode =
+                            WaterCoils::GetCoilWaterInletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        bool InletNodeNotControlled = true;
+                        //  CALL CheckCoilWaterInletNode(thisSys%CoolCoilFluidInletNode,InletNodeNotControlled)
+                        if (!InletNodeNotControlled) {
+                            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
+                            ShowContinueError(state,
+                                              state.dataHVACCtrl->ControllerTypes(DataHVACControllers::ControllerSimple_Type) + " found for " +
+                                                  loc_coolingCoilType + " = \"" + loc_m_CoolingCoilName + ".\"");
+                            ShowContinueError(state, "...water coil controllers are not used with " + thisSys.UnitType);
+                            errorsFound = true;
+                        }
+
+                        // Get the Cooling Coil chilled water max volume flow rate
+                        errFlag = false;
+                        thisSys.MaxCoolCoilFluidFlow =
+                            WaterCoils::GetCoilMaxWaterFlowRate(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (thisSys.MaxCoolCoilFluidFlow == DataSizing::AutoSize) {
+                            thisSys.m_RequestAutoSize = true;
+                            thisSys.m_DesignCoolingCapacity = DataSizing::AutoSize; // water coils don't have a capacity field, need other logic?
+                        }
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        // Get the Cooling Coil Inlet Node
+                        CoolingCoilInletNode = WaterCoils::GetCoilInletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        // Get the Cooling Coil Outlet Node
+                        CoolingCoilOutletNode = WaterCoils::GetCoilOutletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+                    }
+                } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) {
+                    ValidateComponent(state, loc_coolingCoilType, loc_m_CoolingCoilName, isNotOK, cCurrentModuleObject);
+                    if (isNotOK) {
+                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                        errorsFound = true;
+                    } else { // mine data from Cooling coil object
+
+                        errFlag = false;
+                        thisSys.m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        thisSys.m_CoolingCoilIndex =
+                            WaterToAirHeatPumpSimple::GetCoilIndex(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (thisSys.m_CoolingCoilIndex == 0) {
+                            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
+                            ShowContinueError(state, "Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        thisSys.m_DesignCoolingCapacity =
+                            WaterToAirHeatPumpSimple::GetCoilCapacity(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        // Get DX coil air flow rate. Later fields will overwrite this IF input field is present
+                        errFlag = false;
+                        thisSys.m_MaxCoolAirVolFlow =
+                            WaterToAirHeatPumpSimple::GetCoilAirFlowRate(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        }
+
+                        // Get the Cooling Coil Inlet Node
+                        errFlag = false;
+                        CoolingCoilInletNode = WaterToAirHeatPumpSimple::GetCoilInletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        // Get the Cooling Coil Outlet Node
+                        CoolingCoilOutletNode =
+                            WaterToAirHeatPumpSimple::GetCoilOutletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+                    }
+
+                    if (thisSys.m_HeatCoilExists) {
+                        if (thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHP ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical) {
+                            thisSys.m_HeatPump = true;
+                        }
+                    }
+
+                } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHP) {
+                    ValidateComponent(state, loc_coolingCoilType, loc_m_CoolingCoilName, isNotOK, cCurrentModuleObject);
+                    if (isNotOK) {
+                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                        errorsFound = true;
+                    } else { // mine data from Cooling coil object
+
+                        errFlag = false;
+                        thisSys.m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        thisSys.m_CoolingCoilIndex = WaterToAirHeatPump::GetCoilIndex(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (thisSys.m_CoolingCoilIndex == 0) {
+                            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
+                            ShowContinueError(state, "Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        thisSys.m_DesignCoolingCapacity =
+                            WaterToAirHeatPump::GetCoilCapacity(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        // Get the Cooling Coil Inlet Node
+                        errFlag = false;
+                        CoolingCoilInletNode = WaterToAirHeatPump::GetCoilInletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        // Get the Cooling Coil Outlet Node
+                        CoolingCoilOutletNode = WaterToAirHeatPump::GetCoilOutletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+                    }
+
+                    if (thisSys.m_HeatCoilExists) {
+                        if (thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHP ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating ||
+                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical) {
+                            thisSys.m_HeatPump = true;
+                        }
+                    }
+
+                } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_UserDefined) {
+                    ValidateComponent(state, loc_coolingCoilType, loc_m_CoolingCoilName, isNotOK, cCurrentModuleObject);
+                    if (isNotOK) {
+                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                        errorsFound = true;
+                    } else { // mine data from Cooling coil object
+
+                        errFlag = false;
+                        thisSys.m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        UserDefinedComponents::GetUserDefinedCoilIndex(
+                            state, loc_m_CoolingCoilName, thisSys.m_CoolingCoilIndex, errFlag, cCurrentModuleObject);
+                        if (thisSys.m_CoolingCoilIndex == 0) {
+                            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
+                            ShowContinueError(state, "Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        // **** How to get this info ****
+                        //                        UnitarySystem( UnitarySysNum ).DesignCoolingCapacity =
+                        // GetWtoAHPCoilCapacity(
+                        // CoolingCoilType, loc_m_CoolingCoilName, errFlag );                         if ( errFlag ) {
+                        //                            ShowContinueError(state,  "Occurs in " + CurrentModuleObject + " = "
+                        //+
+                        // UnitarySystem( UnitarySysNum ).Name );                             ErrorsFound = true;
+                        //                            errFlag = false;
+                        //                        }
+
+                        // Get the Cooling Coil Inlet Node
+                        errFlag = false;
+                        UserDefinedComponents::GetUserDefinedCoilAirInletNode(
+                            state, loc_m_CoolingCoilName, CoolingCoilInletNode, errFlag, cCurrentModuleObject);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        // Get the Cooling Coil Outlet Node
+                        UserDefinedComponents::GetUserDefinedCoilAirOutletNode(
+                            state, loc_m_CoolingCoilName, CoolingCoilOutletNode, errFlag, cCurrentModuleObject);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+                    }
+
+                } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_PackagedThermalStorageCooling) {
+                    ValidateComponent(state, loc_coolingCoilType, loc_m_CoolingCoilName, isNotOK, cCurrentModuleObject);
+                    if (isNotOK) {
+                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                        errorsFound = true;
+                    } else { // mine data from Cooling coil object
+
+                        errFlag = false;
+                        thisSys.m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        PackagedThermalStorageCoil::GetTESCoilIndex(
+                            state, loc_m_CoolingCoilName, thisSys.m_CoolingCoilIndex, errFlag, cCurrentModuleObject);
+                        if (thisSys.m_CoolingCoilIndex == 0) {
+                            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
+                            ShowContinueError(state, "Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        PackagedThermalStorageCoil::GetTESCoilCoolingAirFlowRate(
+                            state, loc_m_CoolingCoilName, thisSys.m_MaxCoolAirVolFlow, errFlag, cCurrentModuleObject);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        PackagedThermalStorageCoil::GetTESCoilCoolingCapacity(
+                            state, loc_m_CoolingCoilName, thisSys.m_DesignCoolingCapacity, errFlag, cCurrentModuleObject);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        // Get the Cooling Coil Inlet Node
+                        errFlag = false;
+                        PackagedThermalStorageCoil::GetTESCoilAirInletNode(
+                            state, loc_m_CoolingCoilName, CoolingCoilInletNode, errFlag, cCurrentModuleObject);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+
+                        // Get the Cooling Coil Outlet Node
+                        PackagedThermalStorageCoil::GetTESCoilAirOutletNode(
+                            state, loc_m_CoolingCoilName, CoolingCoilOutletNode, errFlag, cCurrentModuleObject);
+                        if (errFlag) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                            errFlag = false;
+                        }
+                    }
+
+                } else { // IF(.NOT. lAlphaBlanks(16))THEN
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
+                    // ShowContinueError(state, "Illegal " + cAlphaFields(iCoolingCoilTypeAlphaNum) + " = " + Alphas(iCoolingCoilTypeAlphaNum));
+                    errorsFound = true;
+                }
+
+                if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
+                    thisSys.m_DiscreteSpeedCoolingCoil = true;
+                } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit ||
+                           thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                    thisSys.m_ContSpeedCoolingCoil = true;
+                } // CoilDX_Cooling is set above
+
+                thisSys.CoolCoilInletNodeNum = CoolingCoilInletNode;
+                thisSys.CoolCoilOutletNodeNum = CoolingCoilOutletNode;
+                thisSys.m_CoolingCoilName = loc_m_CoolingCoilName;
+                thisSys.m_CoolCoilExists = true;
+                thisSys.m_ThisSysInputShouldBeGotten = false;
+                thisSys.m_CoolingSAFMethod = state.dataUnitarySystems->SupplyAirFlowRate;
+
+                state.dataUnitarySystems->unitarySys.push_back(thisSys);
+                break;
+            }
+        }
     }
 
     void UnitarySys::getUnitarySystemInputData(
