@@ -51,12 +51,16 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-// json
+// JSON Header
 #include <nlohmann/json.hpp>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace Cache {
 
@@ -76,7 +80,7 @@ namespace Cache {
         try {
             data = j[key];
         } catch (nlohmann::json::out_of_range &e) {
-            ShowFatalError(state, format(R"(From eplusout.cache, key: "{}" not found)", key));
+            ShowFatalError(state, format("From eplusout.cache, key: \"{}\" not found", key));
         }
     }
 

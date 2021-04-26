@@ -47,6 +47,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Cache.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -95,7 +96,7 @@ void jsonToArray(EnergyPlusData &state, Array1D<Real64> &arr, nlohmann::json &j,
             ++idx;
         }
     } catch (nlohmann::json::out_of_range &e) {
-        ShowFatalError(state, format(R"(From eplusout.cache, key: "{}" not found)", key));
+        ShowFatalError(state, format("From eplusout.cache, key: \"{}\" not found", key));
     }
 }
 
@@ -112,7 +113,7 @@ void jsonToArray1(EnergyPlusData &state, Array1D<Real64> &arr, nlohmann::json &j
             ++idx;
         }
     } catch (nlohmann::json::out_of_range &e) {
-        ShowFatalError(state, format(R"(From eplusout.cache, key: "{}" not found)", key));
+        ShowFatalError(state, format("From eplusout.cache, key: \"{}\" not found", key));
     }
 }
 
