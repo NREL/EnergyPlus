@@ -1187,22 +1187,6 @@ public: // Comparison: Predicate: All
 		return ! any_eq( a, t );
 	}
 
-	// All Array < Value
-	friend
-	bool
-	all_lt( Array const & a, T const & t )
-	{
-		return lt( a, t );
-	}
-
-	// All Value < Array
-	friend
-	bool
-	all_lt( T const & t, Array const & a )
-	{
-		return lt( t, a );
-	}
-
 	// All Array <= Value
 	friend
 	bool
@@ -1219,28 +1203,12 @@ public: // Comparison: Predicate: All
 		return le( t, a );
 	}
 
-	// All Array > Value
-	friend
-	bool
-	all_gt( Array const & a, T const & t )
-	{
-		return gt( a, t );
-	}
-
 	// All Value > Array
 	friend
 	bool
 	all_gt( T const & t, Array const & a )
 	{
 		return gt( t, a );
-	}
-
-	// All Array >= Value
-	friend
-	bool
-	all_ge( Array const & a, T const & t )
-	{
-		return ge( a, t );
 	}
 
 	// All Value >= Array
