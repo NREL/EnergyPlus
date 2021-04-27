@@ -66,9 +66,7 @@ set(src
   src/ObjexxFCL/BArray.fwd.hh
   src/ObjexxFCL/BArray.hh
   src/ObjexxFCL/bit.hh
-  src/ObjexxFCL/byte.fwd.hh
-  src/ObjexxFCL/byte.hh
-  src/ObjexxFCL/CArray.fwd.hh
+        src/ObjexxFCL/CArray.fwd.hh
   src/ObjexxFCL/CArray.hh
   src/ObjexxFCL/CArrayA.fwd.hh
   src/ObjexxFCL/CArrayA.hh

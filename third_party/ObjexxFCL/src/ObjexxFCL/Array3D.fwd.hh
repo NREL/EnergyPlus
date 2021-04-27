@@ -22,7 +22,6 @@ namespace ObjexxFCL {
 
 // Forward
 template< typename > class Array3D;
-class byte;
 
 // Types
 typedef  Array3D< bool >                Array3D_bool;

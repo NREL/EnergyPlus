@@ -22,7 +22,6 @@ namespace ObjexxFCL {
 
 // Forward
 template< typename > class CArrayA;
-class byte;
 
 // Types
 

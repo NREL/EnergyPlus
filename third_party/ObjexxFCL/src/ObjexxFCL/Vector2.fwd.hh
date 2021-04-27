@@ -22,7 +22,6 @@ namespace ObjexxFCL {
 
 // Forward
 template< typename > class Vector2;
-class byte;
 
 // Types
 
