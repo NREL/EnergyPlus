@@ -73,7 +73,8 @@ public:
     Real64 surfTempAmplitude_2;
     Real64 phaseShift_2;
 
-    static std::shared_ptr<XingGroundTempsModel> XingGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
+    static std::shared_ptr<XingGroundTempsModel>
+    XingGTMFactory(EnergyPlusData &state, GroundTemperatureManager::objectType objectType, std::string objectName);
 
     Real64 getGroundTemp(EnergyPlusData &state) override;
 

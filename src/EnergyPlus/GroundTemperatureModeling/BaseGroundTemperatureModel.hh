@@ -62,7 +62,7 @@ class BaseGroundTempsModel
 {
 public:
     // Public Members
-    int objectType;
+    GroundTemperatureManager::objectType objectType;
     std::string objectName;
     bool errorsFound;
 
@@ -73,7 +73,7 @@ public:
     BaseGroundTempsModel &operator=(BaseGroundTempsModel &&) = delete;
 
     // Default Constructor
-    BaseGroundTempsModel() : objectType(0), errorsFound(false)
+    BaseGroundTempsModel() : objectType(GroundTemperatureManager::objectType::Unassigned), errorsFound(false)
     {
     }
 

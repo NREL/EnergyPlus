@@ -79,7 +79,7 @@ TEST_F(EnergyPlusFixture, SiteDeepGroundTempTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    std::string const CurrentModuleObject = state->dataGrndTempModelMgr->CurrentModuleObjects(objectType_SiteDeepGroundTemp);
+    std::string const CurrentModuleObject = state->dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(objectType::SiteDeepGroundTemp));
 
     auto thisModel = GetGroundTempModelAndInit(*state, CurrentModuleObject, "TEST");
 

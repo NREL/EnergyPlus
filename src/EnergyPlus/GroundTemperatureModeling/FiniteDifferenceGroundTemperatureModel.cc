@@ -73,7 +73,7 @@ namespace EnergyPlus {
 
 // Finite difference model factory
 std::shared_ptr<FiniteDiffGroundTempsModel>
-FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
+FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, GroundTemperatureManager::objectType objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -99,7 +99,7 @@ FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, int obje
     std::shared_ptr<FiniteDiffGroundTempsModel> thisModel(new FiniteDiffGroundTempsModel());
 
     // Search through finite diff models here
-    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(objectType_FiniteDiffGroundTemp);
+    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(objectType::FiniteDiffGroundTemp));
     int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
@@ -833,7 +833,7 @@ void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
     std::unique_ptr<KusudaGroundTempsModel> tempModel(new KusudaGroundTempsModel());
 
     tempModel->objectName = "KAModelForFDModel";
-    tempModel->objectType = objectType_KusudaGroundTemp;
+    tempModel->objectType = objectType::KusudaGroundTemp;
     tempModel->aveGroundTemp = annualAveAirTemp;
     tempModel->aveGroundTempAmplitude =
         (maxDailyAirTemp - minDailyAirTemp) / 4.0; // Rough estimate here. Ground temps will not swing as far as the air temp.
