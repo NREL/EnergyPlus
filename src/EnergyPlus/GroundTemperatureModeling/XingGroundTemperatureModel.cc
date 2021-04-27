@@ -64,7 +64,7 @@ namespace EnergyPlus {
 
 // Xing model factory
 std::shared_ptr<XingGroundTempsModel>
-XingGroundTempsModel::XingGTMFactory(EnergyPlusData &state, GroundTemperatureManager::objectType objectType, std::string objectName)
+XingGroundTempsModel::XingGTMFactory(EnergyPlusData &state, GroundTemperatureManager::Type objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -89,7 +89,7 @@ XingGroundTempsModel::XingGTMFactory(EnergyPlusData &state, GroundTemperatureMan
     // New shared pointer for this model object
     std::shared_ptr<XingGroundTempsModel> thisModel(new XingGroundTempsModel());
 
-    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(objectType_XingGroundTemp));
+    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(Type::XingGroundTemp));
     int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {

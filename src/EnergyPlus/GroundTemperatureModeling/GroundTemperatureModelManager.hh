@@ -67,7 +67,7 @@ struct EnergyPlusData;
 
 namespace GroundTemperatureManager {
 
-    enum class objectType
+    enum class Type
     {
         Unassigned = -1,
         KusudaGroundTemp,

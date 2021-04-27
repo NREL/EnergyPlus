@@ -77,7 +77,7 @@ public:
     }
 
     static std::shared_ptr<SiteFCFactorMethodGroundTemps>
-    FCFactorGTMFactory(EnergyPlusData &state, GroundTemperatureManager::objectType objectType, std::string objectName);
+    FCFactorGTMFactory(EnergyPlusData &state, GroundTemperatureManager::Type objectType, std::string objectName);
 
     Real64 getGroundTemp([[maybe_unused]] EnergyPlusData &state) override;
 

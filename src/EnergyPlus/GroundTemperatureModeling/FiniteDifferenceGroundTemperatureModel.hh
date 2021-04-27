@@ -59,16 +59,18 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 
 namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
 
+using GroundTemperatureManager::objectType;
+
 // Derived class for Finite-Difference Model
 class FiniteDiffGroundTempsModel : public BaseGroundTempsModel
 {
-
     static int constexpr maxYearsToIterate = 10;
 
     Real64 rhoCp_soil_liq_1;
@@ -138,7 +140,7 @@ public:
     Array1D<instanceOfWeatherData> weatherDataArray;
 
     static std::shared_ptr<FiniteDiffGroundTempsModel>
-    FiniteDiffGTMFactory(EnergyPlusData &state, GroundTemperatureManager::objectType objectType, std::string objectName);
+    FiniteDiffGTMFactory(EnergyPlusData &state, GroundTemperatureManager::Type objectType, std::string objectName);
 
     void getWeatherData(EnergyPlusData &state);
 
