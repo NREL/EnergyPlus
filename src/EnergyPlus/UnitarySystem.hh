@@ -128,7 +128,6 @@ namespace UnitarySystems {
 
     struct DesignSpecMSHP
     {
-        // friend class UnitarySys;
 
     public:
         DesignSpecMSHP(); // constructor
@@ -514,14 +513,13 @@ namespace UnitarySystems {
 
         static void getUnitarySystemInput(EnergyPlusData &state, std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
-        static void getDXCoilSystemInput(EnergyPlusData &state, std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum);
-
         void processInputSpec(EnergyPlusData &state,
                               const UnitarySysInputSpec &input_data,
                               int sysNum,
                               bool &errorsFound,
                               bool const ZoneEquipment,
-                              int const ZoneOAUnitNum);
+                              int const ZoneOAUnitNum,
+                              int const compType_Num);
 
         void setSystemParams(EnergyPlusData &state, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
 
