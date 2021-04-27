@@ -267,41 +267,6 @@ public: // Creation
 		return Array3D( a.I1_, a.I2_, a.I3_, t );
 	}
 
-	// Array Shape Named Constructor Template
-	template< typename U >
-	static
-	Array3D
-	shape( Array3< U > const & a )
-	{
-		return Array3D( a.isize1(), a.isize2(), a.isize3() );
-	}
-
-	// Array Shape + Initializer Value Named Constructor Template
-	template< typename U >
-	static
-	Array3D
-	shape( Array3< U > const & a, T const & t )
-	{
-		return Array3D( a.isize1(), a.isize2(), a.isize3(), t );
-	}
-
-	// Slice Shape Named Constructor Template
-	template< typename U >
-	static
-	Array3D
-	shape( Array3S< U > const & a )
-	{
-		return Array3D( a.isize1(), a.isize2(), a.isize3() );
-	}
-
-	// Slice Shape + Initializer Value Named Constructor Template
-	template< typename U >
-	static
-	Array3D
-	shape( Array3S< U > const & a, T const & t )
-	{
-		return Array3D( a.isize1(), a.isize2(), a.isize3(), t );
-	}
 
 
 	// One-Based Copy Named Constructor Template

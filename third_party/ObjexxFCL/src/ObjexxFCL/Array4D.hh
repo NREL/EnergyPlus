@@ -277,42 +277,6 @@ public: // Creation
 		return Array4D( a.I1_, a.I2_, a.I3_, a.I4_, t );
 	}
 
-	// Array Shape Named Constructor Template
-	template< typename U >
-	static
-	Array4D
-	shape( Array4< U > const & a )
-	{
-		return Array4D( a.isize1(), a.isize2(), a.isize3(), a.isize4() );
-	}
-
-	// Array Shape + Initializer Value Named Constructor Template
-	template< typename U >
-	static
-	Array4D
-	shape( Array4< U > const & a, T const & t )
-	{
-		return Array4D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), t );
-	}
-
-	// Slice Shape Named Constructor Template
-	template< typename U >
-	static
-	Array4D
-	shape( Array4S< U > const & a )
-	{
-		return Array4D( a.isize1(), a.isize2(), a.isize3(), a.isize4() );
-	}
-
-	// Slice Shape + Initializer Value Named Constructor Template
-	template< typename U >
-	static
-	Array4D
-	shape( Array4S< U > const & a, T const & t )
-	{
-		return Array4D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), t );
-	}
-
 	// One-Based Copy Named Constructor Template
 	template< typename U >
 	static
