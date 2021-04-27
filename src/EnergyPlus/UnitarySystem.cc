@@ -458,8 +458,7 @@ namespace UnitarySystems {
                 return &sys;
             }
         }
-        ShowFatalError(state,
-                       "UnitarySystem factory: Error getting inputs for system named: " + objectName);
+        ShowFatalError(state, "UnitarySystem factory: Error getting inputs for system named: " + objectName);
         return nullptr;
     }
 
@@ -6844,10 +6843,10 @@ namespace UnitarySystems {
                     UtilityRoutines::MakeUPPERCase(fields.at("dx_cooling_coil_system_outlet_node_name")); // required field
 
                 std::string loc_SensorNodeName =
-                    UtilityRoutines::MakeUPPERCase(fields.at("dx_cooling_coil_system_sensor_node_name"));                // required field
+                    UtilityRoutines::MakeUPPERCase(fields.at("dx_cooling_coil_system_sensor_node_name")); // required field
 
                 original_input_specs.cooling_coil_object_type =
-                    UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_object_type"));                          // required field
+                    UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_object_type"));                               // required field
                 original_input_specs.cooling_coil_name = UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_name")); // required field
                 // min-fields = 7, begin optional inputs
                 std::string loc_dehumm_ControlType("");

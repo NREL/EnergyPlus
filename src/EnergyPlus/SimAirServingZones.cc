@@ -1218,8 +1218,8 @@ void GetAirPathData(EnergyPlusData &state)
                     } else if (componentType == "COIL:HEATING:DESUPERHEATER") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Coil_DeSuperHeat;
 
-                    //} else if (componentType == "COILSYSTEM:COOLING:DX") {
-                    //    PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = DXSystem;
+                        //} else if (componentType == "COILSYSTEM:COOLING:DX") {
+                        //    PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = DXSystem;
                     } else if (componentType == "COILSYSTEM:HEATING:DX") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = DXHeatPumpSystem;
                     } else if (componentType == "COIL:USERDEFINED") {
@@ -1228,7 +1228,7 @@ void GetAirPathData(EnergyPlusData &state)
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = UnitarySystemModel;
                         UnitarySystems::UnitarySys thisSys;
                         int compType = UnitarySys_AnyCoilType;
-                        //if (componentType == "COILSYSTEM:COOLING:DX") compType = DXSystem;
+                        // if (componentType == "COILSYSTEM:COOLING:DX") compType = DXSystem;
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).compPointer =
                             thisSys.factory(state, compType, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, false, 0);
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") {
