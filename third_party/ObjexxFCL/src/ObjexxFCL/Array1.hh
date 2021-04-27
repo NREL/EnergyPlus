@@ -350,23 +350,6 @@ public: // Assignment: Array
 		return *this;
 	}
 
-	// MArray Assignment Template
-	template< class A, typename M >
-	Array1 &
-	operator =( MArray1< A, M > const & a )
-	{
-		size_type l( 0u );
-		if ( ( conformable( a ) ) || ( ! dimension_assign( a.I() ) ) ) {
-			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-				data_[ l ] = a( i );
-			}
-		} else {
-			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-				new ( data_ + l ) T( a( i ) );
-			}
-		}
-		return *this;
-	}
 
 	// Initializer List Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
@@ -595,59 +578,6 @@ public: // Assignment: Array
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	Array1 &
 	operator /=( Array1S< U > const & a )
-	{
-		assert( conformable( a ) );
-		size_type l( 0u );
-		for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-			assert( a( i ) != T( 0 ) );
-			data_[ l ] /= a( i );
-		}
-		return *this;
-	}
-
-	// += MArray Template
-	template< class A, typename M >
-	Array1 &
-	operator +=( MArray1< A, M > const & a )
-	{
-		assert( conformable( a ) );
-		size_type l( 0u );
-		for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-			data_[ l ] += a( i );
-		}
-		return *this;
-	}
-
-	// -= MArray Template
-	template< class A, typename M >
-	Array1 &
-	operator -=( MArray1< A, M > const & a )
-	{
-		assert( conformable( a ) );
-		size_type l( 0u );
-		for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-			data_[ l ] -= a( i );
-		}
-		return *this;
-	}
-
-	// *= MArray Template
-	template< class A, typename M >
-	Array1 &
-	operator *=( MArray1< A, M > const & a )
-	{
-		assert( conformable( a ) );
-		size_type l( 0u );
-		for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-			data_[ l ] *= a( i );
-		}
-		return *this;
-	}
-
-	// /= MArray Template
-	template< class A, typename M >
-	Array1 &
-	operator /=( MArray1< A, M > const & a )
 	{
 		assert( conformable( a ) );
 		size_type l( 0u );
@@ -1029,14 +959,6 @@ public: // Predicate
 		return ( size_ == a.size() );
 	}
 
-	// Conformable?
-	template< class A, typename M >
-	bool
-	conformable( MArray1< A, M > const & a ) const
-	{
-		return ( size_ == a.size() );
-	}
-
 	// Equal Dimensions?
 	template< typename U >
 	bool
@@ -1049,14 +971,6 @@ public: // Predicate
 	template< typename U >
 	bool
 	equal_dimensions( Array1S< U > const & a ) const
-	{
-		return ( ( l() == 1 ) && ( u() == a.u() ) );
-	}
-
-	// Equal Dimensions?
-	template< class A, typename M >
-	bool
-	equal_dimensions( MArray1< A, M > const & a ) const
 	{
 		return ( ( l() == 1 ) && ( u() == a.u() ) );
 	}
@@ -1298,34 +1212,6 @@ public: // Comparison: Predicate: Slice
 		return eq( b, a );
 	}
 
-public: // Comparison: Predicate: MArray
-
-	// Array1 == MArray1
-	template< class A >
-	friend
-	bool
-	eq( Array1 const & a, MArray1< A, T > const & b )
-	{
-		assert( a.size_bounded() );
-		assert( a.conformable( b ) );
-		if ( a.empty() ) return true;
-		size_type l( 0u );
-		for ( int i = 1, e = b.u(); i <= e; ++i, ++l ) {
-			if ( ! ( a[ l ] == b( i ) ) ) return false;
-		}
-		return true;
-	}
-
-	// MArray1 == Array1
-	template< class A >
-	friend
-	bool
-	eq( MArray1< A, T > const & a, Array1 const & b )
-	{
-		return eq( b, a );
-	}
-
-
 protected: // Functions
 
 	// Dimension by IndexRange
@@ -1378,24 +1264,6 @@ template< typename U, typename V >
 inline
 bool
 conformable( Array1S< U > const & a, Array1< V > const & b )
-{
-	return b.conformable( a );
-}
-
-// Conformable?
-template< typename U, class A, typename M >
-inline
-bool
-conformable( Array1< U > const & a, MArray1< A, M > const & b )
-{
-	return a.conformable( b );
-}
-
-// Conformable?
-template< class A, typename M, typename V >
-inline
-bool
-conformable( MArray1< A, M > const & a, Array1< V > const & b )
 {
 	return b.conformable( a );
 }
@@ -1472,30 +1340,6 @@ template< typename T >
 inline
 T
 distance( Array1S< T > const & a, Array1< T > const & b )
-{
-	return distance( b, a );
-}
-
-// Distance
-template< class A, typename T >
-inline
-T
-distance( Array1< T > const & a, MArray1< A, T > const & b )
-{
-	assert( a.size() == b.size() );
-	T distance_sq( T( 0 ) );
-	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
-		T const distance_i( a( i ) - b( j ) );
-		distance_sq += distance_i * distance_i;
-	}
-	return std::sqrt( distance_sq );
-}
-
-// Distance
-template< class A, typename T >
-inline
-T
-distance( MArray1< A, T > const & a, Array1< T > const & b )
 {
 	return distance( b, a );
 }
@@ -1612,30 +1456,6 @@ distance_squared( Array1S< T > const & a, Array1< T > const & b )
 }
 
 // Distance Squared
-template< class A, typename T >
-inline
-T
-distance_squared( Array1< T > const & a, MArray1< A, T > const & b )
-{
-	assert( a.size() == b.size() );
-	T distance_sq( T( 0 ) );
-	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
-		T const distance_i( a( i ) - b( j ) );
-		distance_sq += distance_i * distance_i;
-	}
-	return distance_sq;
-}
-
-// Distance Squared
-template< class A, typename T >
-inline
-T
-distance_squared( MArray1< A, T > const & a, Array1< T > const & b )
-{
-	return distance_squared( b, a );
-}
-
-// Distance Squared
 template< typename T >
 inline
 T
@@ -1744,29 +1564,6 @@ dot( Array1S< T > const & a, Array1< T > const & b )
 	return dot( b, a );
 }
 
-// Dot Product
-template< class A, typename T >
-inline
-T
-dot( Array1< T > const & a, MArray1< A, T > const & b )
-{
-	assert( a.size() == b.size() );
-	T result( T( 0 ) );
-	for ( int i = a.l(), j = 1, e = a.u(); i <= e; ++i, ++j ) {
-		result += a( i ) * b( j );
-	}
-	return result;
-}
-
-// Dot Product
-template< class A, typename T >
-inline
-T
-dot( MArray1< A, T > const & a, Array1< T > const & b )
-{
-	return dot( b, a );
-}
-
 // Dot Product of Boolean Arrays
 inline
 bool
@@ -1803,32 +1600,6 @@ dot( Array1< bool > const & a, Array1S< bool > const & b )
 inline
 bool
 dot( Array1S< bool > const & a, Array1< bool > const & b )
-{
-	return dot( b, a );
-}
-
-// Dot Product of Boolean Arrays
-template< class A >
-inline
-bool
-dot( Array1< bool > const & a, MArray1< A, bool > const & b )
-{
-	assert( a.size() == b.size() );
-	bool result( false );
-	for ( int i = a.l(), j = 1, e = a.u(); i <= e; ++i, ++j ) {
-		if ( a( i ) && b( j ) ) {
-			result = true;
-			break;
-		}
-	}
-	return result;
-}
-
-// Dot Product of Boolean Arrays
-template< class A >
-inline
-bool
-dot( MArray1< A, bool > const & a, Array1< bool > const & b )
 {
 	return dot( b, a );
 }
@@ -1929,24 +1700,6 @@ dot_product( Array1S< T > const & a, Array1< T > const & b )
 	return dot( a, b );
 }
 
-// Dot Product (Fortran Intrinsic Name)
-template< class A, typename T >
-inline
-T
-dot_product( Array1< T > const & a, MArray1< A, T > const & b )
-{
-	return dot( a, b );
-}
-
-// Dot Product (Fortran Intrinsic Name)
-template< class A, typename T >
-inline
-T
-dot_product( MArray1< A, T > const & a, Array1< T > const & b )
-{
-	return dot( b, a );
-}
-
 // Dot Product of Boolean Arrays (Fortran Intrinsic Name)
 inline
 bool
@@ -1969,24 +1722,6 @@ bool
 dot_product( Array1S< bool > const & a, Array1< bool > const & b )
 {
 	return dot( a, b );
-}
-
-// Dot Product of Boolean Arrays (Fortran Intrinsic Name)
-template< class A >
-inline
-bool
-dot_product( Array1< bool > const & a, MArray1< A, bool > const & b )
-{
-	return dot( a, b );
-}
-
-// Dot Product of Boolean Arrays (Fortran Intrinsic Name)
-template< class A >
-inline
-bool
-dot_product( MArray1< A, bool > const & a, Array1< bool > const & b )
-{
-	return dot( b, a );
 }
 
 // Cross Product of 2-Tuples

@@ -267,4 +267,4 @@ endif()
 # Executable name will be EnergyPlus_tests
 # Execute energyplus_tests --help for options using gtest runner
 # Execute energyplus_tests with no arguments to run all tests
-create_test_targets(energyplus "${test_src}" "${test_dependencies}")
+create_test_targets(energyplus "${test_src}" "${test_dependencies}" True)

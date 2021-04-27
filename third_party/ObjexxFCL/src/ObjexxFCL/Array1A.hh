@@ -200,15 +200,6 @@ public: // Assignment: Array
 		return *this;
 	}
 
-	// MArray Assignment Template
-	template< class A, typename M >
-	Array1A &
-	operator =( MArray1< A, M > const & a )
-	{
-		Super::operator =( a );
-		return *this;
-	}
-
 	// Initializer List Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	Array1A &
@@ -330,42 +321,6 @@ public: // Assignment: Array
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	Array1A &
 	operator /=( Array1S< U > const & a )
-	{
-		Super::operator /=( a );
-		return *this;
-	}
-
-	// += MArray Template
-	template< class A, typename M >
-	Array1A &
-	operator +=( MArray1< A, M > const & a )
-	{
-		Super::operator +=( a );
-		return *this;
-	}
-
-	// -= MArray Template
-	template< class A, typename M >
-	Array1A &
-	operator -=( MArray1< A, M > const & a )
-	{
-		Super::operator -=( a );
-		return *this;
-	}
-
-	// *= MArray Template
-	template< class A, typename M >
-	Array1A &
-	operator *=( MArray1< A, M > const & a )
-	{
-		Super::operator *=( a );
-		return *this;
-	}
-
-	// /= MArray Template
-	template< class A, typename M >
-	Array1A &
-	operator /=( MArray1< A, M > const & a )
 	{
 		Super::operator /=( a );
 		return *this;

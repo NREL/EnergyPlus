@@ -875,12 +875,6 @@ public: // Inspector
 		return ( ( ( static_cast< std::ptrdiff_t >( u2_ + 1 ) * u3_ ) + 1 ) * u4_ ) + 1;
 	}
 
-public: // MArray Generators
-
-	// Template Helpers
-	template< typename U > class Wrapper {};
-	typedef  typename std::conditional< std::is_class< T >::value, T, Wrapper< T > >::type  ClassT;
-
 private: // Methods
 
 	// Contiguous?
