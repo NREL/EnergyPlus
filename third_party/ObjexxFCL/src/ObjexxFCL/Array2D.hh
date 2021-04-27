@@ -462,44 +462,6 @@ public: // Assignment: Array
 		return *this;
 	}
 
-public: // Assignment: Array: Logical
-
-	// &&= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array2D &
-	and_equals( Array2< U > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array2D &
-	or_equals( Array2< U > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
-
-	// &&= Slice Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array2D &
-	and_equals( Array2S< U > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= Slice Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array2D &
-	or_equals( Array2S< U > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
-
 public: // Assignment: Value
 
 	// = Value
@@ -1054,28 +1016,6 @@ operator /( T const & t, Array2< T > const & a )
 	return r;
 }
 
-// Array && Array
-template< typename T >
-inline
-Array2D< T >
-operator &&( Array2< T > const & a, Array2< T > const & b )
-{
-	Array2D< T > r( Array2D< T >::one_based( a ) );
-	r.and_equals( b );
-	return r;
-}
-
-// Array || Array
-template< typename T >
-inline
-Array2D< T >
-operator ||( Array2< T > const & a, Array2< T > const & b )
-{
-	Array2D< T > r( Array2D< T >::one_based( a ) );
-	r.or_equals( b );
-	return r;
-}
-
 // Array Transpose: Fortran-Compatible 1-Based Indexing
 template< typename T >
 inline
@@ -1344,28 +1284,6 @@ operator /( T const & t, Array2S< T > const & a )
 	Array2D< T > r( Array2D< T >::one_based( a ) );
 	r.invert();
 	r *= t;
-	return r;
-}
-
-// Slice && Slice
-template< typename T >
-inline
-Array2D< T >
-operator &&( Array2S< T > const & a, Array2S< T > const & b )
-{
-	Array2D< T > r( Array2D< T >::one_based( a ) );
-	r.and_equals( b );
-	return r;
-}
-
-// Slice || Slice
-template< typename T >
-inline
-Array2D< T >
-operator ||( Array2S< T > const & a, Array2S< T > const & b )
-{
-	Array2D< T > r( Array2D< T >::one_based( a ) );
-	r.or_equals( b );
 	return r;
 }
 

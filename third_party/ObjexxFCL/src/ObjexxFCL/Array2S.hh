@@ -276,36 +276,6 @@ public: // Assignment: Array
 		return *this;
 	}
 
-public: // Assignment: Logical
-
-	// &&= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array2S &
-	and_equals( Array2S const & a )
-	{
-		assert( conformable( a ) );
-		for ( int i1 = 1; i1 <= u1_; ++i1 ) {
-			for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-				operator ()( i1, i2 ) = operator ()( i1, i2 ) && a( i1, i2 );
-			}
-		}
-		return *this;
-	}
-
-	// ||= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array2S &
-	or_equals( Array2S const & a )
-	{
-		assert( conformable( a ) );
-		for ( int i1 = 1; i1 <= u1_; ++i1 ) {
-			for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-				operator ()( i1, i2 ) = operator ()( i1, i2 ) || a( i1, i2 );
-			}
-		}
-		return *this;
-	}
-
 public: // Assignment: Value
 
 	// = Value

@@ -960,170 +960,6 @@ public: // Assignment: Array
 		return *this;
 	}
 
-public: // Assignment: Array: Logical
-
-	// &&= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	and_equals( Array1< U > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	or_equals( Array1< U > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
-
-	// &&= Slice Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	and_equals( Array1S< U > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= Slice Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	or_equals( Array1S< U > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
-
-	// &&= MArray Template
-	template< class A, typename M >
-	Array1D &
-	and_equals( MArray1< A, M > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= MArray Template
-	template< class A, typename M >
-	Array1D &
-	or_equals( MArray1< A, M > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
-
-	// &&= Initializer List Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	and_equals( std::initializer_list< U > const l )
-	{
-		Super::and_equals( l );
-		return *this;
-	}
-
-	// ||= Initializer List Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	or_equals( std::initializer_list< U > const l )
-	{
-		Super::or_equals( l );
-		return *this;
-	}
-
-	// &&= std::array Template
-	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	and_equals( std::array< U, s > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= std::array Template
-	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	or_equals( std::array< U, s > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
-
-	// &&= std::vector Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	and_equals( std::vector< U > const & v )
-	{
-		Super::and_equals( v );
-		return *this;
-	}
-
-	// ||= std::vector Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	or_equals( std::vector< U > const & v )
-	{
-		Super::or_equals( v );
-		return *this;
-	}
-
-	// &&= Vector2 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	and_equals( Vector2< U > const & v )
-	{
-		Super::and_equals( v );
-		return *this;
-	}
-
-	// ||= Vector2 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	or_equals( Vector2< U > const & v )
-	{
-		Super::or_equals( v );
-		return *this;
-	}
-
-	// &&= Vector3 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	and_equals( Vector3< U > const & v )
-	{
-		Super::and_equals( v );
-		return *this;
-	}
-
-	// ||= Vector3 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	or_equals( Vector3< U > const & v )
-	{
-		Super::or_equals( v );
-		return *this;
-	}
-
-	// &&= Vector4 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	and_equals( Vector4< U > const & v )
-	{
-		Super::and_equals( v );
-		return *this;
-	}
-
-	// ||= Vector4 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	or_equals( Vector4< U > const & v )
-	{
-		Super::or_equals( v );
-		return *this;
-	}
-
 public: // Assignment: Value
 
 	// = Value
@@ -2921,27 +2757,6 @@ operator /( T const & t, Array1< T > const & a )
 	return r;
 }
 
-// Array && Array
-template< typename T >
-inline
-Array1D< T >
-operator &&( Array1< T > const & a, Array1< T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r.and_equals( b );
-	return r;
-}
-
-// Array || Array
-template< typename T >
-inline
-Array1D< T >
-operator ||( Array1< T > const & a, Array1< T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r.or_equals( b );
-	return r;
-}
 
 // Generator: Slice
 
@@ -3178,28 +2993,6 @@ operator /( T const & t, Array1S< T > const & a )
 	return r;
 }
 
-// Slice && Slice
-template< typename T >
-inline
-Array1D< T >
-operator &&( Array1S< T > const & a, Array1S< T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r.and_equals( b );
-	return r;
-}
-
-// Slice || Slice
-template< typename T >
-inline
-Array1D< T >
-operator ||( Array1S< T > const & a, Array1S< T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r.or_equals( b );
-	return r;
-}
-
 // Generator: MArray
 
 // -MArray
@@ -3432,28 +3225,6 @@ operator /( T const & t, MArray1< A, T > const & a )
 	Array1D< T > r( Array1D< T >::one_based( a ) );
 	r.invert();
 	r *= t;
-	return r;
-}
-
-// MArray && MArray
-template< class A, typename T >
-inline
-Array1D< T >
-operator &&( MArray1< A, T > const & a, MArray1< A, T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r.and_equals( b );
-	return r;
-}
-
-// MArray || MArray
-template< class A, typename T >
-inline
-Array1D< T >
-operator ||( MArray1< A, T > const & a, MArray1< A, T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r.or_equals( b );
 	return r;
 }
 
