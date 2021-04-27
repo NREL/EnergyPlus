@@ -1399,62 +1399,6 @@ public: // Modifier
 		}
 	}
 
-	// Data-Preserving Redimension by Array Template
-	template< typename U >
-	Array1D &
-	redimension( Array1< U > const & a )
-	{
-		return redimension( a.I_ );
-	}
-
-	// Data-Preserving Redimension by Array + Fill Value Template
-	template< typename U >
-	Array1D &
-	redimension( Array1< U > const & a, T const & t )
-	{
-		return redimension( a.I_, t );
-	}
-
-	// Append Value: Grow by 1
-	Array1D &
-	append( T const & t )
-	{
-		if ( capacity_ == size_ ) { // Grow by 1
-			Array1D o( IndexRange( l(), u() + 1 ), InitializerSentinel() );
-			for ( int i = l(), e = u(); i <= e; ++i ) {
-				new ( &o( i ) ) T( move_if( operator ()( i ) ) );
-			}
-			swap1( o );
-			new ( data_ + size_ - 1 ) T( t );
-		} else {
-			I_.grow();
-			++size_;
-			operator ()( u() ) = t;
-		}
-		return *this;
-	}
-
-	// Append Value: Grow by 1
-	template< typename U = T, class = typename std::enable_if< std::is_move_assignable< U >::value >::type >
-	Array1D &
-	append( T && t )
-	{
-		if ( capacity_ == size_ ) { // Grow by 1
-			Array1D o( IndexRange( l(), u() + 1 ), InitializerSentinel() );
-			for ( int i = l(), e = u(); i <= e; ++i ) {
-				new ( &o( i ) ) T( std::move( operator ()( i ) ) );
-			}
-			swap1( o );
-			new ( data_ + size_ - 1 ) T( std::move( t ) );
-		} else {
-			I_.grow();
-			++size_;
-			operator ()( u() ) = std::move( t );
-		}
-		return *this;
-	}
-
-
 	// Swap
 	Array1D &
 	swap( Array1D & v )
