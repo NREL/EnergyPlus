@@ -3,7 +3,7 @@ Assembly Window Output Reporting
 
 **Jason Glazer, GARD Analytics**
 
- - April 20, 2021
+ - April 27, 2021
  
 
 ## Justification for New Feature ##
@@ -158,6 +158,13 @@ U-Factor, assembly SHGC, assembly visible transmittance,</ins> conductance
 azimuth, tilt, cardinal direction. <ins>The assembly result include the effect
 of the frame and divider.</ins>
 
+<ins>Differences should still be expected between the results from EnergyPlus 
+and the WINDOW program for the u-factor, SHGC, and visible transmittance, 
+both glass and assembly. This differences are based on algorithmic differences
+between the two programs even though they do share some code in the Windows 
+Calculation Engine, other portions of the algorithms differ.</ins>
+
+
 ## Input Description ##
 
 The  only input change is to provide the user a way to specify the NFRC product type so
@@ -178,7 +185,8 @@ WindowProperty:FrameAndDivider,
        \key HorizontalSlider
        \key Jal
        \key Pivoted
-       \key Projecting
+       \key ProjectingSingle
+       \key ProjectingDual
        \key DoorSidelite
        \key Skylight
        \key SlidingPatioDoor
