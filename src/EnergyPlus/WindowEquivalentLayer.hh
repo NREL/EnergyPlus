@@ -90,7 +90,7 @@ namespace WindowEquivalentLayer {
 
     void CalcEQLWindowOpticalProperty(EnergyPlusData &state,
                                       CFSTY &FS,              // fenestration system
-                                      int const DiffBeamFlag, // isDIFF: calc diffuse properties
+                                      SolarArrays const DiffBeamFlag, // isDIFF: calc diffuse properties
                                       Array2A<Real64> Abs1,
                                       Real64 const IncA,   // angle of incidence, radians
                                       Real64 const VProfA, // inc solar vertical profile angle, radians
@@ -752,7 +752,7 @@ namespace WindowEquivalentLayer {
 
     void CalcEQLOpticalProperty(EnergyPlusData &state,
                                 int const SurfNum,
-                                int const BeamDIffFlag, // identifier index of diffuse and beam SW radiation
+                                SolarArrays const BeamDIffFlag, // identifier index of diffuse and beam SW radiation
                                 Array2A<Real64> CFSAbs  // absorbed beam solar radiation by layers fraction
     );
 
