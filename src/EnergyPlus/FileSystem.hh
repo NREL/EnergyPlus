@@ -49,6 +49,7 @@
 #define FileSystem_hh_INCLUDED
 
 #include <algorithm>
+#include <string>
 
 namespace EnergyPlus {
 
