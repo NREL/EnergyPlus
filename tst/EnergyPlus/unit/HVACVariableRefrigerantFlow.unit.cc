@@ -557,6 +557,8 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     state->dataAirLoop->AirLoopInputsFilled = true;
 
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp = 35.0;
+    // primary air loop has OA system, TU OA flow rate will size to 0
+    state->dataAirSystemsData->PrimaryAirSystems(1).OASysExists = true;
 
     int VRFTUOAMixerOANodeNum = thisTU.VRFTUOAMixerOANodeNum;
     int VRFTUOAMixerRetNodeNum = thisTU.VRFTUOAMixerRetNodeNum;
@@ -587,8 +589,7 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).TempSetPoint = 20.0; // select 20 C as TU outlet set point temperature
 
     InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
-    thisTU.NoCoolHeatOutAirMassFlow = 0.0;
-    // the above needs correcting for air loop equipment. OA flow should be set to 0 if autosized as it is here.
+
     ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFCond);
     EXPECT_TRUE(thisTU.isInAirLoop);          // initialization found TU in main air loop
     EXPECT_TRUE(thisTU.isSetPointControlled); // initialization found TU is set point controlled
@@ -603,7 +604,7 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
     EXPECT_LT(QZnReq, 0.0);                                                              // cooling load exists
     EXPECT_TRUE(thisTU.coolSPActive);                                                    // cooling set point control active
-    EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.coolCoilAirInNode).Temp, 24.0, 0.001); // verify mixer outlet node is not at set point = 20
+    EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.coolCoilAirInNode).Temp, 24.0, 0.001); // verify coil inlet node is not at set point = 20
 
     SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     EXPECT_LT(SysOutputProvided, 0.0);
@@ -630,7 +631,7 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     EXPECT_FALSE(thisTU.coolSPActive);                                                   // verify cooling set point control is not active
     EXPECT_TRUE(thisTU.heatSPActive);                                                    // verify heating set point control is active
     EXPECT_NEAR(18.0, tuInletNode.Temp, 0.001);                                          // verify TU inlet node = 18
-    EXPECT_NEAR(18.0, state->dataLoopNodes->Node(thisTU.coolCoilAirInNode).Temp, 0.001); // verify mixer outlet node = 18
+    EXPECT_NEAR(18.0, state->dataLoopNodes->Node(thisTU.coolCoilAirInNode).Temp, 0.001); // verify cooling coil inlet node = 18
     SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     EXPECT_GT(SysOutputProvided, 0.0);                                                                      // TU provides heating
     EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).Temp, thisTU.coilTempSetPoint, 0.01); // TU outlet is at SP target
