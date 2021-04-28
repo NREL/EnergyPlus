@@ -47,8 +47,7 @@ protected:
         /////////////////////////////////////////////////////////
         // System
         /////////////////////////////////////////////////////////
-        return std::make_shared<Tarcog::ISO15099::CSystem>(
-          aIGU, Indoor, Outdoor);
+        return std::make_shared<Tarcog::ISO15099::CSystem>(aIGU, Indoor, Outdoor);
     }
 };
 
@@ -120,14 +119,7 @@ TEST_F(TestHorizontalSliderWindow, CalculatedCOG)
     const auto tSol{0.3716};
 
     auto window = Tarcog::ISO15099::DualVisionHorizontal(
-      width,
-      height,
-      tVis,
-      tSol,
-      getCOG(),
-      tVis,
-      tSol,
-      getCOG());
+      width, height, tVis, tSol, getCOG(), tVis, tSol, getCOG());
 
     window.setFrameTopLeft(frameData);
     window.setFrameTopRight(frameData);

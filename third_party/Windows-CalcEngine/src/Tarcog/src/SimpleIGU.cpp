@@ -5,7 +5,9 @@ namespace Tarcog
     namespace ISO15099
     {
         SimpleIGU::SimpleIGU(double uValue, double shgc, double hc) :
-          m_UValue(uValue), m_SHGC(shgc), m_Hc(hc)
+            m_UValue(uValue),
+            m_SHGC(shgc),
+            m_Hc(hc)
         {}
 
         double SimpleIGU::getUValue()

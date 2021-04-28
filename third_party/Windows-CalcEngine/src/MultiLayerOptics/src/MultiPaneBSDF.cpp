@@ -425,18 +425,18 @@ namespace MultiLayerOptics
     }
     std::vector<double> CMultiPaneBSDF::getWavelengths() const
     {
-        //return std::vector<double>();
-		return m_Layer.getCommonWavelengths();
+        // return std::vector<double>();
+        return m_Layer.getCommonWavelengths();
     }
     double CMultiPaneBSDF::getMinLambda() const
     {
-        //return 0;
-		return m_Layer.getMinLambda();
+        // return 0;
+        return m_Layer.getMinLambda();
     }
     double CMultiPaneBSDF::getMaxLambda() const
     {
-        //return 0;
-		return m_Layer.getMaxLambda();
+        // return 0;
+        return m_Layer.getMaxLambda();
     }
     std::vector<double>
       CMultiPaneBSDF::getAbsorptanceLayers(const double minLambda,

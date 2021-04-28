@@ -34,7 +34,7 @@ namespace SingleLayerOptics
     public:
         CBSDFLayer(const std::shared_ptr<CBaseCell> & t_Cell, const CBSDFHemisphere & t_Directions);
 
-        void setSourceData(FenestrationCommon::CSeries &t_SourceData);
+        void setSourceData(FenestrationCommon::CSeries & t_SourceData);
 
         // BSDF results for the enire spectrum range of the material in the cell
         std::shared_ptr<CBSDFIntegrator> getResults();

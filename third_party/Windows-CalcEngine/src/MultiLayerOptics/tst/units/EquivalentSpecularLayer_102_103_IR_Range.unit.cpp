@@ -113,5 +113,6 @@ TEST_F(EquivalentSpecularLayer_102_103_IR_Range, TestNoAvailableData)
                            "requested range. Calculation is not possible.");
               throw;
           }
-      }, std::runtime_error);
+      },
+      std::runtime_error);
 }

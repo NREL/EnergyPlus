@@ -18,7 +18,8 @@ namespace FenestrationCommon
 
 namespace SingleLayerOptics
 {
-    typedef std::pair<FenestrationCommon::Side, FenestrationCommon::PropertySimple> pair_Side_PropertySimple;
+    typedef std::pair<FenestrationCommon::Side, FenestrationCommon::PropertySimple>
+      pair_Side_PropertySimple;
 
     // Layer results from BSDF directions.
     class CBSDFIntegrator
@@ -29,10 +30,10 @@ namespace SingleLayerOptics
 
         // Result matrices
         FenestrationCommon::SquareMatrix & getMatrix(FenestrationCommon::Side t_Side,
-            FenestrationCommon::PropertySimple t_Property);
+                                                     FenestrationCommon::PropertySimple t_Property);
 
-        [[nodiscard]] const FenestrationCommon::SquareMatrix & at(FenestrationCommon::Side t_Side,
-            FenestrationCommon::PropertySimple t_Property) const;
+        [[nodiscard]] const FenestrationCommon::SquareMatrix &
+          at(FenestrationCommon::Side t_Side, FenestrationCommon::PropertySimple t_Property) const;
 
         void setResultMatrices(const FenestrationCommon::SquareMatrix & t_Tau,
                                const FenestrationCommon::SquareMatrix & t_Rho,
@@ -44,11 +45,12 @@ namespace SingleLayerOptics
                       double t_Theta = 0,
                       double t_Phi = 0) const;
         double DirDir(FenestrationCommon::Side t_Side,
-        	FenestrationCommon::PropertySimple t_Property, size_t Index) const;
+                      FenestrationCommon::PropertySimple t_Property,
+                      size_t Index) const;
 
         // Directional hemispherical results for every direction in BSDF definition
         std::vector<double> DirHem(FenestrationCommon::Side t_Side,
-        	FenestrationCommon::PropertySimple t_Property);
+                                   FenestrationCommon::PropertySimple t_Property);
         std::vector<double> Abs(FenestrationCommon::Side t_Side);
 
         // Directional hemispherical results for given Theta and Phi direction
@@ -61,7 +63,8 @@ namespace SingleLayerOptics
 
         // std::shared_ptr< const CBSDFDirections > getDirections() const;
 
-        double DiffDiff(FenestrationCommon::Side t_Side, FenestrationCommon::PropertySimple t_Property);
+        double DiffDiff(FenestrationCommon::Side t_Side,
+                        FenestrationCommon::PropertySimple t_Property);
 
         double AbsDiffDiff(FenestrationCommon::Side t_Side);
 
@@ -88,7 +91,9 @@ namespace SingleLayerOptics
 
         bool m_HemisphericalCalculated;
         bool m_DiffuseDiffuseCalculated;
-        FenestrationCommon::mmap<double, FenestrationCommon::Side, FenestrationCommon::PropertySimple> m_MapDiffDiff;
+        FenestrationCommon::
+          mmap<double, FenestrationCommon::Side, FenestrationCommon::PropertySimple>
+            m_MapDiffDiff;
     };
 
 }   // namespace SingleLayerOptics

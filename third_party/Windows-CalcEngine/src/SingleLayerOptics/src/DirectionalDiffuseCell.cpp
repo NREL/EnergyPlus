@@ -33,9 +33,9 @@ namespace SingleLayerOptics
     }
 
     std::vector<double>
-        CDirectionalDiffuseCell::T_dir_dif_band(const FenestrationCommon::Side t_Side,
-                                                const CBeamDirection & t_IncomingDirection,
-                                                const CBeamDirection & t_OutgoingDirection)
+      CDirectionalDiffuseCell::T_dir_dif_band(const FenestrationCommon::Side t_Side,
+                                              const CBeamDirection & t_IncomingDirection,
+                                              const CBeamDirection & t_OutgoingDirection)
     {
         double cellT = CBaseCell::T_dir_dir(t_Side, t_IncomingDirection);
 
@@ -53,9 +53,9 @@ namespace SingleLayerOptics
     }
 
     std::vector<double>
-        CDirectionalDiffuseCell::R_dir_dif_band(const FenestrationCommon::Side t_Side,
-                                                const CBeamDirection & t_IncomingDirection,
-                                                const CBeamDirection & t_OutgoingDirection)
+      CDirectionalDiffuseCell::R_dir_dif_band(const FenestrationCommon::Side t_Side,
+                                              const CBeamDirection & t_IncomingDirection,
+                                              const CBeamDirection & t_OutgoingDirection)
     {
         double cellT = CBaseCell::T_dir_dir(t_Side, t_IncomingDirection);
         double cellR = CBaseCell::R_dir_dir(t_Side, t_IncomingDirection);

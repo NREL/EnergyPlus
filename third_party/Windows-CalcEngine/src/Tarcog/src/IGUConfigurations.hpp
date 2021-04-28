@@ -23,5 +23,5 @@ namespace Tarcog
             virtual void setWidthAndHeight(double width, double height) = 0;
             virtual void setInteriorAndExteriorSurfacesHeight(double height) = 0;
         };
-    }
-}
+    }   // namespace ISO15099
+}   // namespace Tarcog

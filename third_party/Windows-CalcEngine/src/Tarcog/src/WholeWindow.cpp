@@ -136,7 +136,8 @@ namespace Tarcog::ISO15099
 
     double WindowDualVision::shgc(const double tSol1, const double tSol2) const
     {
-        return (m_Vision1.shgc(tSol1) * m_Vision1.area() + m_Vision2.shgc(tSol2) * m_Vision2.area()) / area();
+        return (m_Vision1.shgc(tSol1) * m_Vision1.area() + m_Vision2.shgc(tSol2) * m_Vision2.area())
+               / area();
     }
 
     double WindowDualVision::shgc(const double tSol) const
@@ -151,7 +152,8 @@ namespace Tarcog::ISO15099
 
     double WindowDualVision::vt(double tVis1, double tVis2) const
     {
-        return (m_Vision1.vt(tVis1) * m_Vision1.area() + m_Vision2.vt(tVis2) * m_Vision2.area()) / area();
+        return (m_Vision1.vt(tVis1) * m_Vision1.area() + m_Vision2.vt(tVis2) * m_Vision2.area())
+               / area();
     }
 
     double WindowDualVision::vt(const double tVis) const
@@ -161,12 +163,14 @@ namespace Tarcog::ISO15099
 
     double WindowDualVision::uValueCOGAverage() const
     {
-        return (m_Vision1.uValueCOG() * m_Vision1.area() + m_Vision2.uValueCOG() * m_Vision2.area()) / area();
+        return (m_Vision1.uValueCOG() * m_Vision1.area() + m_Vision2.uValueCOG() * m_Vision2.area())
+               / area();
     }
 
     double WindowDualVision::shgcCOGAverage() const
     {
-        return (m_Vision1.shgcCOG() * m_Vision1.area() + m_Vision2.shgcCOG() * m_Vision2.area()) / area();
+        return (m_Vision1.shgcCOG() * m_Vision1.area() + m_Vision2.shgcCOG() * m_Vision2.area())
+               / area();
     }
 
     IGUDimensions WindowDualVision::getIGUDimensions() const
@@ -176,7 +180,9 @@ namespace Tarcog::ISO15099
 
     double WindowDualVision::visionPercentage() const
     {
-        return (m_Vision1.visionPercentage() * m_Vision1.area() + m_Vision2.visionPercentage() * m_Vision2.area()) / area();
+        return (m_Vision1.visionPercentage() * m_Vision1.area()
+                + m_Vision2.visionPercentage() * m_Vision2.area())
+               / area();
     }
 
     double WindowDualVision::uValueCOG1() const

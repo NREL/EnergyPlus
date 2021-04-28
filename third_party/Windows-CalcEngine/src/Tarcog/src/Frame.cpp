@@ -5,7 +5,11 @@
 namespace Tarcog::ISO15099
 {
     FrameData::FrameData() :
-        UValue(0), EdgeUValue(0), ProjectedFrameDimension(0), WettedLength(0), Absorptance(0)
+        UValue(0),
+        EdgeUValue(0),
+        ProjectedFrameDimension(0),
+        WettedLength(0),
+        Absorptance(0)
     {}
 
     FrameData::FrameData(double uValue,
@@ -36,7 +40,9 @@ namespace Tarcog::ISO15099
     }
 
     Frame::Frame(double length, FrameType frameType, FrameData frameData) :
-        m_Length(length), m_FrameType(frameType), m_FrameData(frameData)
+        m_Length(length),
+        m_FrameType(frameType),
+        m_FrameData(frameData)
     {}
 
     FrameType Frame::frameType() const

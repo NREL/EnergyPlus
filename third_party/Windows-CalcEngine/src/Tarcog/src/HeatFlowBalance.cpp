@@ -135,7 +135,8 @@ namespace Tarcog
                 m_VectorB[sP] += backSurface->getTransmittance() * environmentRadiosity;
                 m_VectorB[sP + 1] += -backSurface->getTransmittance() * environmentRadiosity;
                 m_VectorB[sP + 2] += -backSurface->getReflectance() * environmentRadiosity;
-                m_VectorB[sP + 3] += -environmentRadiosity - hgap_next * airTemperature + backSurface->getTransmittance() * environmentRadiosity;
+                m_VectorB[sP + 3] += -environmentRadiosity - hgap_next * airTemperature
+                                     + backSurface->getTransmittance() * environmentRadiosity;
             }
         }
 

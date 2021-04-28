@@ -25,7 +25,8 @@ TEST_F(TestFrameISO15099, ExteriorFrameLeftSideFrameExterior)
     const double frameLength{1.0};
     Tarcog::ISO15099::Frame frame{frameLength, Tarcog::ISO15099::FrameType::Exterior, frameData};
 
-    Tarcog::ISO15099::Frame leftFrame{frameLength, Tarcog::ISO15099::FrameType::Exterior, frameData};
+    Tarcog::ISO15099::Frame leftFrame{
+      frameLength, Tarcog::ISO15099::FrameType::Exterior, frameData};
 
     frame.assignFrame(leftFrame, Tarcog::ISO15099::FrameSide::Left);
 
@@ -55,7 +56,8 @@ TEST_F(TestFrameISO15099, ExteriorFrameLeftSideFrameInterior)
     const double frameLength{1.0};
     Tarcog::ISO15099::Frame frame{frameLength, Tarcog::ISO15099::FrameType::Exterior, frameData};
 
-    const Tarcog::ISO15099::Frame leftFrame{frameLength, Tarcog::ISO15099::FrameType::Interior, frameData};
+    const Tarcog::ISO15099::Frame leftFrame{
+      frameLength, Tarcog::ISO15099::FrameType::Interior, frameData};
 
     frame.assignFrame(leftFrame, Tarcog::ISO15099::FrameSide::Left);
 
@@ -85,8 +87,10 @@ TEST_F(TestFrameISO15099, InteriorFrameLeftandRightSideFramesExterior)
     const double frameLength{1.0};
     Tarcog::ISO15099::Frame frame{frameLength, Tarcog::ISO15099::FrameType::Interior, frameData};
 
-    const Tarcog::ISO15099::Frame leftFrame{frameLength, Tarcog::ISO15099::FrameType::Exterior, frameData};
-    const Tarcog::ISO15099::Frame rightFrame{frameLength, Tarcog::ISO15099::FrameType::Exterior, frameData};
+    const Tarcog::ISO15099::Frame leftFrame{
+      frameLength, Tarcog::ISO15099::FrameType::Exterior, frameData};
+    const Tarcog::ISO15099::Frame rightFrame{
+      frameLength, Tarcog::ISO15099::FrameType::Exterior, frameData};
 
     frame.assignFrame(leftFrame, Tarcog::ISO15099::FrameSide::Left);
     frame.assignFrame(rightFrame, Tarcog::ISO15099::FrameSide::Right);

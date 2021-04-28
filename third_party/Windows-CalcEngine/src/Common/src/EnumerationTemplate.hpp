@@ -31,4 +31,4 @@ namespace FenestrationCommon
             int m_value;
         };
     };
-}
+}   // namespace FenestrationCommon

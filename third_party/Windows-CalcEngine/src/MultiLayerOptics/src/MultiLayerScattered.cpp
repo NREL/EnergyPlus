@@ -23,7 +23,9 @@ namespace MultiLayerOptics
                                                const double t_Rf_dif_dif,
                                                const double t_Tb_dif_dif,
                                                const double t_Rb_dif_dif) :
-        m_Calculated(false), m_Theta(0), m_Phi(0)
+        m_Calculated(false),
+        m_Theta(0),
+        m_Phi(0)
     {
         CScatteringLayer aLayer(t_Tf_dir_dir,
                                 t_Rf_dir_dir,
@@ -42,7 +44,9 @@ namespace MultiLayerOptics
     }
 
     CMultiLayerScattered::CMultiLayerScattered(const CScatteringLayer & t_Layer) :
-        m_Calculated(false), m_Theta(0), m_Phi(0)
+        m_Calculated(false),
+        m_Theta(0),
+        m_Phi(0)
     {
         initialize(t_Layer);
     }
@@ -153,7 +157,8 @@ namespace MultiLayerOptics
         std::vector<double> abs;
         for(size_t i = 0u; i < m_Layers.size(); ++i)
         {
-            abs.push_back(getAbsorptanceLayer(minLambda, maxLambda, i, side, scattering, theta, phi));
+            abs.push_back(
+              getAbsorptanceLayer(minLambda, maxLambda, i, side, scattering, theta, phi));
         }
         return abs;
     }

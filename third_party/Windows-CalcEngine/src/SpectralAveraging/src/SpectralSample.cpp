@@ -227,7 +227,8 @@ namespace SpectralAveraging
                                      const CSeries & t_SourceData,
                                      FenestrationCommon::IntegrationType integrationType,
                                      double NormalizationCoefficient) :
-        CSample(t_SourceData, integrationType, NormalizationCoefficient), m_SampleData(t_SampleData)
+        CSample(t_SourceData, integrationType, NormalizationCoefficient),
+        m_SampleData(t_SampleData)
     {
         if(t_SampleData == nullptr)
         {
@@ -244,7 +245,8 @@ namespace SpectralAveraging
     }
 
     CSpectralSample::CSpectralSample(std::shared_ptr<CSpectralSampleData> const & t_SampleData) :
-        CSample(), m_SampleData(t_SampleData)
+        CSample(),
+        m_SampleData(t_SampleData)
     {
         if(t_SampleData == nullptr)
         {

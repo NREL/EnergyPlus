@@ -18,14 +18,13 @@ protected:
         ASSERT_TRUE(surface2 != nullptr);
         surface2->setTemperature(300);
 
-        m_SolidLayer =
-          std::unique_ptr<Tarcog::ISO15099::CIGUSolidLayer>(
-          	new Tarcog::ISO15099::CIGUSolidLayer(0.01, 2.5, surface1, surface2));
+        m_SolidLayer = std::unique_ptr<Tarcog::ISO15099::CIGUSolidLayer>(
+          new Tarcog::ISO15099::CIGUSolidLayer(0.01, 2.5, surface1, surface2));
         ASSERT_TRUE(m_SolidLayer != nullptr);
     }
 
 public:
-    Tarcog::ISO15099::CIGUSolidLayer* GetLayer() const
+    Tarcog::ISO15099::CIGUSolidLayer * GetLayer() const
     {
         return m_SolidLayer.get();
     };

@@ -43,15 +43,15 @@ namespace MultiLayerOptics
         return m_CombinedLayerWavelengths;
     }
 
-	double CEquivalentBSDFLayer::getMinLambda() const
-	{
-		return m_CombinedLayerWavelengths.front();
-	}
+    double CEquivalentBSDFLayer::getMinLambda() const
+    {
+        return m_CombinedLayerWavelengths.front();
+    }
 
-	double CEquivalentBSDFLayer::getMaxLambda() const
-	{
-		return m_CombinedLayerWavelengths.back();
-	}
+    double CEquivalentBSDFLayer::getMaxLambda() const
+    {
+        return m_CombinedLayerWavelengths.back();
+    }
 
     std::shared_ptr<CMatrixSeries> CEquivalentBSDFLayer::getTotalA(const Side t_Side)
     {
@@ -72,7 +72,7 @@ namespace MultiLayerOptics
         return m_Tot.at(std::make_pair(t_Side, t_Property));
     }
 
-    void CEquivalentBSDFLayer::setSolarRadiation(CSeries &t_SolarRadiation)
+    void CEquivalentBSDFLayer::setSolarRadiation(CSeries & t_SolarRadiation)
     {
         // Need to recreate wavelenght by wavelength layers
         m_LayersWL.clear();

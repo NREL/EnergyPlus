@@ -68,7 +68,7 @@ protected:
         const auto spacing = 0.003;    // m
 
         // Perforated layer is created here
-        const auto LayerWoven {CBSDFLayerMaker::getWovenLayer(aMaterial, aBSDF, diameter, spacing)};
+        const auto LayerWoven{CBSDFLayerMaker::getWovenLayer(aMaterial, aBSDF, diameter, spacing)};
 
         m_Layer = CMultiPaneBSDF::create({LayerWoven}, loadSolarRadiationFile());
     }

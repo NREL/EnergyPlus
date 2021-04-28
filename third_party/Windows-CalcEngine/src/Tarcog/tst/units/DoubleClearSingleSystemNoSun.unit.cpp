@@ -41,11 +41,9 @@ protected:
         auto solidLayerThickness = 0.005715;   // [m]
         auto solidLayerConductance = 1.0;
 
-        auto layer1 =
-          Tarcog::ISO15099::Layers::solid(solidLayerThickness, solidLayerConductance);
+        auto layer1 = Tarcog::ISO15099::Layers::solid(solidLayerThickness, solidLayerConductance);
 
-        auto layer2 =
-          Tarcog::ISO15099::Layers::solid(solidLayerThickness, solidLayerConductance);
+        auto layer2 = Tarcog::ISO15099::Layers::solid(solidLayerThickness, solidLayerConductance);
 
         auto gapThickness = 0.012;
         auto m_GapLayer = Tarcog::ISO15099::Layers::gap(gapThickness);

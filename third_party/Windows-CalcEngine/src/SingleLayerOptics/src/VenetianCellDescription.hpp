@@ -46,8 +46,10 @@ namespace SingleLayerOptics
           beamViewFactors(double t_ProfileAngle, const FenestrationCommon::Side t_Side);
 
         // Direct to direct component of the ray
-        double T_dir_dir(FenestrationCommon::Side t_Side, const CBeamDirection & t_Direction) override;
-        double R_dir_dir(FenestrationCommon::Side t_Side, const CBeamDirection & t_Direction) override;
+        double T_dir_dir(FenestrationCommon::Side t_Side,
+                         const CBeamDirection & t_Direction) override;
+        double R_dir_dir(FenestrationCommon::Side t_Side,
+                         const CBeamDirection & t_Direction) override;
 
         [[nodiscard]] double slatWidth() const;
         [[nodiscard]] double slatSpacing() const;

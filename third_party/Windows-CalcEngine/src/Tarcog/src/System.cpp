@@ -90,8 +90,7 @@ namespace Tarcog
             return m_System.at(t_System)->getNumberOfIterations();
         }
 
-        std::vector<double>
-          CSystem::getSolidEffectiveLayerConductivities(const System t_System)
+        std::vector<double> CSystem::getSolidEffectiveLayerConductivities(const System t_System)
         {
             checkSolved();
             return m_System.at(t_System)->getSolidEffectiveLayerConductivities();
@@ -157,7 +156,7 @@ namespace Tarcog
         {
             for(auto & [key, aSystem] : m_System)
             {
-                aSystem->setInteriorAndExteriorSurfacesHeight(height);                
+                aSystem->setInteriorAndExteriorSurfacesHeight(height);
             }
             m_Solved = false;
         }

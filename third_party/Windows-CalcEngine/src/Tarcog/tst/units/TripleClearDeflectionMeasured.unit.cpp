@@ -42,14 +42,11 @@ protected:
         auto solidLayerThickness2 = 0.005715;
         auto solidLayerConductance = 1.0;
 
-        auto layer1 =
-          Tarcog::ISO15099::Layers::solid(solidLayerThickness1, solidLayerConductance);
+        auto layer1 = Tarcog::ISO15099::Layers::solid(solidLayerThickness1, solidLayerConductance);
 
-        auto layer2 =
-          Tarcog::ISO15099::Layers::solid(solidLayerThickness2, solidLayerConductance);
+        auto layer2 = Tarcog::ISO15099::Layers::solid(solidLayerThickness2, solidLayerConductance);
 
-        auto layer3 =
-          Tarcog::ISO15099::Layers::solid(solidLayerThickness1, solidLayerConductance);
+        auto layer3 = Tarcog::ISO15099::Layers::solid(solidLayerThickness1, solidLayerConductance);
 
         auto gapThickness = 0.0127;
         auto gapPressure = 101325.0;

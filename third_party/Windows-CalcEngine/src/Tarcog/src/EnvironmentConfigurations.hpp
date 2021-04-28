@@ -16,5 +16,5 @@ namespace Tarcog
             Indoor,
             Outdoor
         };
-    }
+    }   // namespace ISO15099
 }   // namespace Tarcog

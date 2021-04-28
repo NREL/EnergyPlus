@@ -28,13 +28,15 @@ namespace Tarcog
                               double youngsModulus,
                               double poissonRatio);
 
-            static std::shared_ptr<CIGUSolidLayer> shading(double thickness,
-                                                           double conductivity,
-                                                           EffectiveLayers::EffectiveOpenness effectiveOpenness = EffectiveLayers::EffectiveOpenness(0,0,0,0,0,0),
-                                                           double frontEmissivity = 0.84,
-                                                           double frontTransmittance = 0.0,
-                                                           double backEmissivity = 0.84,
-                                                           double backTransmittance = 0.0);
+            static std::shared_ptr<CIGUSolidLayer>
+              shading(double thickness,
+                      double conductivity,
+                      EffectiveLayers::EffectiveOpenness effectiveOpenness =
+                        EffectiveLayers::EffectiveOpenness(0, 0, 0, 0, 0, 0),
+                      double frontEmissivity = 0.84,
+                      double frontTransmittance = 0.0,
+                      double backEmissivity = 0.84,
+                      double backTransmittance = 0.0);
 
             static std::shared_ptr<CIGUGapLayer> gap(double thickness, double pressure = 101325);
             static std::shared_ptr<CIGUGapLayer>

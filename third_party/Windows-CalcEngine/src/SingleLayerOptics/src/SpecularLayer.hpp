@@ -15,7 +15,8 @@ namespace SingleLayerOptics
     class SpecularLayer : public BaseLayer
     {
     public:
-        static std::shared_ptr<SpecularLayer> createLayer(const std::shared_ptr<CMaterial> & t_Material);
+        static std::shared_ptr<SpecularLayer>
+          createLayer(const std::shared_ptr<CMaterial> & t_Material);
 
         // Transmittance averaged over entire wavelength spectrum
         double T_dir_dir(FenestrationCommon::Side t_Side, const CBeamDirection & t_Direction);
@@ -32,7 +33,7 @@ namespace SingleLayerOptics
                                            const CBeamDirection & t_Direction);
 
         std::vector<double> getBandWavelengths() const;
-        void setSourceData(FenestrationCommon::CSeries &t_SourceData);
+        void setSourceData(FenestrationCommon::CSeries & t_SourceData);
 
         double getMinLambda() const;
         double getMaxLambda() const;

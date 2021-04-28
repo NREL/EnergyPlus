@@ -16,8 +16,7 @@ namespace Gases
         m_DefaultGas = true;
     }
 
-    CGas::CGas(const std::vector<std::pair<double, CGasData>> & gases) :
-        m_Pressure(DefaultPressure)
+    CGas::CGas(const std::vector<std::pair<double, CGasData>> & gases) : m_Pressure(DefaultPressure)
     {
         addGasItems(gases);
     }

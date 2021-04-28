@@ -23,7 +23,7 @@ namespace Tarcog
         [[nodiscard]] virtual double visionPercentage() const = 0;
         [[nodiscard]] virtual double area() const = 0;
         [[nodiscard]] virtual double hc() const = 0;
-        
+
 
         virtual void setHc(double hc) = 0;
     };
@@ -36,9 +36,7 @@ namespace Tarcog
         double height;
     };
 
-    inline IGUDimensions::IGUDimensions(double width, double height):
-        width(width),
-        height(height)
+    inline IGUDimensions::IGUDimensions(double width, double height) : width(width), height(height)
     {}
 
     class IWindow

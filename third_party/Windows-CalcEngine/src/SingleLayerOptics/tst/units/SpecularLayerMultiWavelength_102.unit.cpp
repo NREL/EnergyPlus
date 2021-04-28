@@ -19,7 +19,7 @@ private:
 protected:
     virtual void SetUp()
     {
-        //CSeries aSolarRadiation{
+        // CSeries aSolarRadiation{
         //  {0.3000, 0.0}, {0.3050, 3.4}, {0.3100, 15.6}, {0.3150, 41.1}, {0.3200, 71.2}};
 
         const auto aMeasurements = CSpectralSampleData::create({{0.300, 0.0020, 0.0470, 0.0480},

@@ -56,7 +56,7 @@ TEST_F(TestCMADoubleVisionHorizontalWindow, CMASingleVision)
                                      frameDataWorstWorstSill};
 
     const auto width{1.5};
-    const auto height{1.2};    
+    const auto height{1.2};
 
     auto window{CMA::CMAWindowDualVisionHorizontal(width, height)};
 

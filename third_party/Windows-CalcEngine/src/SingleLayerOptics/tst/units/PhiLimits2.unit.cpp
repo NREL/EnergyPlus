@@ -11,7 +11,7 @@ using namespace SingleLayerOptics;
 class TestPhiLimits2 : public testing::Test
 {
 private:
-    CPhiLimits m_PhiLimits{ 1 };
+    CPhiLimits m_PhiLimits{1};
 
 public:
     const CPhiLimits & GetLimits() const

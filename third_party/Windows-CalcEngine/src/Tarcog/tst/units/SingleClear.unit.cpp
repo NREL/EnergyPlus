@@ -54,7 +54,7 @@ protected:
         // System
         /////////////////////////////////////////////////////////
         m_TarcogSystem = std::unique_ptr<Tarcog::ISO15099::CSystem>(
-        	new Tarcog::ISO15099::CSystem(aIGU, Indoor, Outdoor));
+          new Tarcog::ISO15099::CSystem(aIGU, Indoor, Outdoor));
         ASSERT_TRUE(m_TarcogSystem != nullptr);
     }
 

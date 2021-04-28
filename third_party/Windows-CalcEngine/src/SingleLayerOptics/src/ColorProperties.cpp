@@ -24,7 +24,9 @@ namespace SingleLayerOptics
                                      const FenestrationCommon::CSeries & t_DetectorY,
                                      const FenestrationCommon::CSeries & t_DetectorZ,
                                      const std::vector<double> & t_wavelengths) :
-        m_LayerX(std::move(layerX)), m_LayerY(std::move(layerY)), m_LayerZ(std::move(layerZ))
+        m_LayerX(std::move(layerX)),
+        m_LayerY(std::move(layerY)),
+        m_LayerZ(std::move(layerZ))
     {
         auto wavelengths = m_LayerX->getWavelengths();
         if(!t_wavelengths.empty())

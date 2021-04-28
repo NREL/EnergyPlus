@@ -11,8 +11,8 @@ namespace FenestrationCommon
     /////////////////////////////////////////////////////////////////////////////////////////////
 
     WavelengthRangeData::WavelengthRangeData(const double startLambda, const double endLambda) :
-            startLambda(startLambda),
-            endLambda(endLambda)
+        startLambda(startLambda),
+        endLambda(endLambda)
     {}
 
     /////////////////////////////////////////////////////////////////////////////////////////////

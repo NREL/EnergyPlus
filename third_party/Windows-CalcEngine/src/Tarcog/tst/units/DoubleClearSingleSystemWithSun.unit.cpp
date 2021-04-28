@@ -42,13 +42,11 @@ protected:
         auto solidLayerConductance = 1.0;
         auto solarAbsorptance = 0.187443971634;
 
-        auto layer1 =
-          Tarcog::ISO15099::Layers::solid(solidLayerThickness, solidLayerConductance);
+        auto layer1 = Tarcog::ISO15099::Layers::solid(solidLayerThickness, solidLayerConductance);
         layer1->setSolarAbsorptance(solarAbsorptance, solarRadiation);
 
         solarAbsorptance = 0.054178960621;
-        auto layer2 =
-          Tarcog::ISO15099::Layers::solid(solidLayerThickness, solidLayerConductance);
+        auto layer2 = Tarcog::ISO15099::Layers::solid(solidLayerThickness, solidLayerConductance);
         layer2->setSolarAbsorptance(solarAbsorptance, solarRadiation);
 
         auto gapThickness = 0.012;

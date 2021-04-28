@@ -9,7 +9,6 @@
 namespace FenestrationCommon
 {
     enum class Side;
-
 }
 
 namespace SingleLayerOptics

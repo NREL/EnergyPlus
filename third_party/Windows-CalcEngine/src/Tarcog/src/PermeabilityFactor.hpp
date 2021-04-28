@@ -13,7 +13,7 @@ namespace ThermalPermeability
                         double t_MatThickness,
                         double t_SlatCurvature,
                         double t_SlatWidth);
-    }
+    }   // namespace Venetian
 
     namespace Perforated
     {
@@ -38,7 +38,7 @@ namespace ThermalPermeability
                         double t_SpacingY,
                         double t_DimensionX,
                         double t_DimensionY);
-    }
+    }   // namespace Perforated
 
     namespace Woven
     {

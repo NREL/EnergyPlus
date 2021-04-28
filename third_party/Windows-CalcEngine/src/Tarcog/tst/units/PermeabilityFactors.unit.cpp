@@ -80,11 +80,10 @@ TEST_F(TestPermeabilityFactors, TestWovenPermeability)
 {
     SCOPED_TRACE("Begin Test: Woven layer thermal permeability.");
 
-    const auto diameter{0.001};      // m
-    const auto spacing{0.002};   // m
+    const auto diameter{0.001};   // m
+    const auto spacing{0.002};    // m
 
-    const auto permeabilityOpenness{
-      ThermalPermeability::Woven::openness(diameter, spacing)};
+    const auto permeabilityOpenness{ThermalPermeability::Woven::openness(diameter, spacing)};
 
     EXPECT_NEAR(0.25, permeabilityOpenness, 1e-6);
 }

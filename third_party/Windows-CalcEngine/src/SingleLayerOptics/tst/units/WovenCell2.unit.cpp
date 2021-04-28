@@ -17,17 +17,17 @@ protected:
     virtual void SetUp()
     {
         // create material
-		const auto Tmat = 0.15;
-		const auto Rfmat = 0.8;
-		const auto Rbmat = 0.6;
-		const auto minLambda = 0.3;
-		const auto maxLambda = 2.5;
+        const auto Tmat = 0.15;
+        const auto Rfmat = 0.8;
+        const auto Rbmat = 0.6;
+        const auto minLambda = 0.3;
+        const auto maxLambda = 2.5;
         const auto aMaterial =
           Material::singleBandMaterial(Tmat, Tmat, Rfmat, Rbmat, minLambda, maxLambda);
 
         // make cell geometry
-		const auto diameter = 6.35;   // mm
-		const auto spacing = 19.05;   // mm
+        const auto diameter = 6.35;   // mm
+        const auto spacing = 19.05;   // mm
         std::shared_ptr<ICellDescription> aCell =
           std::make_shared<CWovenCellDescription>(diameter, spacing);
 
@@ -47,8 +47,8 @@ TEST_F(TestWovenCell2, TestWoven1)
 
     std::shared_ptr<CWovenCell> aCell = GetCell();
 
-    const double Theta = 0; // deg
-    const double Phi = 0;   // deg
+    const double Theta = 0;   // deg
+    const double Phi = 0;     // deg
     const Side aFrontSide = Side::Front;
     const Side aBackSide = Side::Back;
 
@@ -79,8 +79,8 @@ TEST_F(TestWovenCell2, TestWoven2)
 
     std::shared_ptr<CWovenCell> aCell = GetCell();
 
-    const double Theta = 45; // deg
-    const double Phi = 0;    // deg
+    const double Theta = 45;   // deg
+    const double Phi = 0;      // deg
     const Side aFrontSide = Side::Front;
     const Side aBackSide = Side::Back;
 
@@ -111,8 +111,8 @@ TEST_F(TestWovenCell2, TestWoven3)
 
     std::shared_ptr<CWovenCell> aCell = GetCell();
 
-    const double Theta = 78; // deg
-    const double Phi = 45;   // deg
+    const double Theta = 78;   // deg
+    const double Phi = 45;     // deg
     const Side aFrontSide = Side::Front;
     const Side aBackSide = Side::Back;
 

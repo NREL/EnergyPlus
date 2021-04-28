@@ -11,8 +11,10 @@ namespace Chromogenics
           std::vector<std::pair<double, double>> const & t_Emissivity,
           std::vector<std::pair<double, double>> const & t_Transmittance) :
             ISurface(0, 0),
-            m_EmissivityInterpolator(std::make_shared<FenestrationCommon::CSPChipInterpolation2D>(t_Emissivity)),
-            m_TransmittanceInterpolator(std::make_shared<FenestrationCommon::CSPChipInterpolation2D>(t_Transmittance))
+            m_EmissivityInterpolator(
+              std::make_shared<FenestrationCommon::CSPChipInterpolation2D>(t_Emissivity)),
+            m_TransmittanceInterpolator(
+              std::make_shared<FenestrationCommon::CSPChipInterpolation2D>(t_Transmittance))
         {}
 
         CThermochromicSurface::CThermochromicSurface(
@@ -20,14 +22,16 @@ namespace Chromogenics
           std::vector<std::pair<double, double>> const & t_Transmittance) :
             ISurface(t_Emissivity, 0),
             m_EmissivityInterpolator(nullptr),
-            m_TransmittanceInterpolator(std::make_shared<FenestrationCommon::CSPChipInterpolation2D>(t_Transmittance))
+            m_TransmittanceInterpolator(
+              std::make_shared<FenestrationCommon::CSPChipInterpolation2D>(t_Transmittance))
         {}
 
         CThermochromicSurface::CThermochromicSurface(
           std::vector<std::pair<double, double>> const & t_Emissivity,
           const double t_Transmittance) :
             ISurface(0, t_Transmittance),
-            m_EmissivityInterpolator(std::make_shared<FenestrationCommon::CSPChipInterpolation2D>(t_Emissivity)),
+            m_EmissivityInterpolator(
+              std::make_shared<FenestrationCommon::CSPChipInterpolation2D>(t_Emissivity)),
             m_TransmittanceInterpolator(nullptr)
         {}
 

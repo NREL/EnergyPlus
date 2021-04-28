@@ -5,8 +5,7 @@
 #include "WCETarcog.hpp"
 
 class TestCMABestWorstUvalues : public testing::Test
-{
-};
+{};
 
 TEST_F(TestCMABestWorstUvalues, TestBestIGUUValue)
 {
@@ -14,7 +13,7 @@ TEST_F(TestCMABestWorstUvalues, TestBestIGUUValue)
     auto best{CMA::CreateBestWorstUFactorOption(CMA::Option::Best)};
     const auto uValue{best.uValue()};
     const auto correctUValue{0.454198};
-    
+
     EXPECT_NEAR(correctUValue, uValue, 1e-5);
 }
 
@@ -24,6 +23,6 @@ TEST_F(TestCMABestWorstUvalues, TestWorstIGUUValue)
     auto worst{CMA::CreateBestWorstUFactorOption(CMA::Option::Worst)};
     const auto uValue{worst.uValue()};
     const auto correctUValue{2.839511};
-    
+
     EXPECT_NEAR(correctUValue, uValue, 1e-5);
 }

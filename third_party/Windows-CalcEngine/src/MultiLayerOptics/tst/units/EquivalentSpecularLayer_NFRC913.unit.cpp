@@ -143,7 +143,7 @@ protected:
 
         double thickness = 4.7752e-3;   // [m]
         const auto aMaterial_913 = Material::nBandMaterial(
-                loadSampleData_NFRC_913(), thickness, MaterialType::Monolithic, WavelengthRange::Solar);
+          loadSampleData_NFRC_913(), thickness, MaterialType::Monolithic, WavelengthRange::Solar);
 
         const auto layer913 = SpecularLayer::createLayer(aMaterial_913);
 
@@ -180,7 +180,6 @@ TEST_F(EquivalentSpecularLayer_NFRC913, TestAngle0)
     const double Abs1 =
       aLayer.getAbsorptanceLayer(1, Side::Front, ScatteringSimple::Direct, angle, 0);
     EXPECT_NEAR(0.431559, Abs1, 1e-6);
-
 }
 
 TEST_F(EquivalentSpecularLayer_NFRC913, TestAngle10)

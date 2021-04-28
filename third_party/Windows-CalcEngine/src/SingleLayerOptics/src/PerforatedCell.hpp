@@ -20,6 +20,6 @@ namespace SingleLayerOptics
         CPerforatedCell(const std::shared_ptr<CMaterial> & t_MaterialProperties,
                         const std::shared_ptr<ICellDescription> & t_Cell);
     };
-}
+}   // namespace SingleLayerOptics
 
 #endif

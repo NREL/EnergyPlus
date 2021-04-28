@@ -101,10 +101,7 @@ protected:
     }
 
 public:
-    [[nodiscard]] Tarcog::ISO15099::DualVisionVertical & getWindow()
-    {
-        return m_Window;
-    }
+    [[nodiscard]] Tarcog::ISO15099::DualVisionVertical & getWindow() { return m_Window; }
 };
 
 TEST_F(TestDoubleLowEVerticalSliderUFactorRun, Test1)
@@ -116,7 +113,7 @@ TEST_F(TestDoubleLowEVerticalSliderUFactorRun, Test1)
     const auto UValue{window.uValue()};
     EXPECT_NEAR(UValue, 1.886103, 1e-5);
 
-    const auto UValueCOG {window.uValueCOGAverage()};
+    const auto UValueCOG{window.uValueCOGAverage()};
     EXPECT_NEAR(UValueCOG, 1.667878, 1e-5);
 
     const auto SHGC{window.shgc()};

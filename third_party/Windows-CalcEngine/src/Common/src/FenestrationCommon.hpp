@@ -4,7 +4,6 @@
 
 namespace FenestrationCommon
 {
-
     template<typename T>
     int sgn(T val)
     {
@@ -234,4 +233,3 @@ namespace FenestrationCommon
     }
 
 }   // namespace FenestrationCommon
-

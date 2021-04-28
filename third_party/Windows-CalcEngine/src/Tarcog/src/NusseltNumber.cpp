@@ -65,7 +65,8 @@ namespace Tarcog
             const double Nu90 = nusselt90->calculate(t_Tilt, t_Ra, t_Asp);
 
             // linear interpolation between 60 and 90 degrees
-            const double gnu = ((Nu90 - Nu60) / (90.0 - 60.0)) * (t_Tilt * 180 / WCE_PI - 60.0) + Nu60;
+            const double gnu =
+              ((Nu90 - Nu60) / (90.0 - 60.0)) * (t_Tilt * 180 / WCE_PI - 60.0) + Nu60;
 
             return gnu;
         }

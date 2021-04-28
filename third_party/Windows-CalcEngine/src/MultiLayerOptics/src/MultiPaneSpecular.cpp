@@ -17,7 +17,9 @@ namespace MultiLayerOptics
     ////////////////////////////////////////////////////////////////////////////////////////////
     CEquivalentLayerSingleComponentMWAngle::CEquivalentLayerSingleComponentMWAngle(
       CEquivalentLayerSingleComponentMW t_Layer, CAbsorptancesMultiPane t_Abs, double t_Angle) :
-        m_Layer(std::move(t_Layer)), m_Abs(std::move(t_Abs)), m_Angle(t_Angle)
+        m_Layer(std::move(t_Layer)),
+        m_Abs(std::move(t_Abs)),
+        m_Angle(t_Angle)
     {}
 
     double CEquivalentLayerSingleComponentMWAngle::angle() const
@@ -54,7 +56,9 @@ namespace MultiLayerOptics
       const std::vector<std::shared_ptr<SingleLayerOptics::SpecularLayer>> & layers,
       const CSeries & t_SolarRadiation,
       const CSeries & t_DetectorData) :
-        m_Layers(layers), m_SolarRadiation(t_SolarRadiation), m_DetectorData(t_DetectorData)
+        m_Layers(layers),
+        m_SolarRadiation(t_SolarRadiation),
+        m_DetectorData(t_DetectorData)
     {
         CCommonWavelengths aCommonWL;
         for(auto & layer : m_Layers)
@@ -82,7 +86,8 @@ namespace MultiLayerOptics
     CMultiPaneSpecular::CMultiPaneSpecular(const std::vector<double> & t_CommonWavelength,
                                            const CSeries & t_SolarRadiation,
                                            const std::shared_ptr<SpecularLayer> & t_Layer) :
-        m_CommonWavelengths(t_CommonWavelength), m_SolarRadiation(t_SolarRadiation)
+        m_CommonWavelengths(t_CommonWavelength),
+        m_SolarRadiation(t_SolarRadiation)
     {
         m_SolarRadiation = m_SolarRadiation.interpolate(m_CommonWavelengths);
         addLayer(t_Layer);

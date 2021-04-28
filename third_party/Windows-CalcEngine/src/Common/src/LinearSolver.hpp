@@ -10,11 +10,10 @@ namespace FenestrationCommon
     class CLinearSolver
     {
     public:
-
-        static std::vector<double> solveSystem(SquareMatrix & t_MatrixA, std::vector<double> & t_VectorB);
+        static std::vector<double> solveSystem(SquareMatrix & t_MatrixA,
+                                               std::vector<double> & t_VectorB);
 
     private:
-        
     };
 }   // namespace FenestrationCommon
 

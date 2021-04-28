@@ -153,20 +153,20 @@ TEST_F(TestNFRC102ScatteringLayer1, Test1)
       minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DirectDirect);
     EXPECT_NEAR(0.074816, R_dir_dir, 1e-6);
 
-    double T_dir_dif =
-      aLayer.getPropertySimple(minLambda, maxLambda, PropertySimple::T, aSide, Scattering::DirectDiffuse);
+    double T_dir_dif = aLayer.getPropertySimple(
+      minLambda, maxLambda, PropertySimple::T, aSide, Scattering::DirectDiffuse);
     EXPECT_NEAR(0, T_dir_dif, 1e-6);
 
-    double R_dir_dif =
-      aLayer.getPropertySimple(minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DirectDiffuse);
+    double R_dir_dif = aLayer.getPropertySimple(
+      minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DirectDiffuse);
     EXPECT_NEAR(0, R_dir_dif, 1e-6);
 
-    double T_dif_dif =
-      aLayer.getPropertySimple(minLambda, maxLambda, PropertySimple::T, aSide, Scattering::DiffuseDiffuse);
+    double T_dif_dif = aLayer.getPropertySimple(
+      minLambda, maxLambda, PropertySimple::T, aSide, Scattering::DiffuseDiffuse);
     EXPECT_NEAR(0.752655, T_dif_dif, 1e-6);
 
-    double R_dif_dif =
-      aLayer.getPropertySimple(minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DiffuseDiffuse);
+    double R_dif_dif = aLayer.getPropertySimple(
+      minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DiffuseDiffuse);
     EXPECT_NEAR(0.146041, R_dif_dif, 1e-6);
 
     double A_dir = aLayer.getAbsorptance(aSide, ScatteringSimple::Direct);
@@ -213,11 +213,9 @@ TEST_F(TestNFRC102ScatteringLayer1, Test2)
       minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DiffuseDiffuse, Theta, Phi);
     EXPECT_NEAR(0.146042, R_dif_dif, 1e-6);
 
-    double A_dir =
-      aLayer.getAbsorptance(aSide, ScatteringSimple::Direct, Theta, Phi);
+    double A_dir = aLayer.getAbsorptance(aSide, ScatteringSimple::Direct, Theta, Phi);
     EXPECT_NEAR(0.093637, A_dir, 1e-6);
 
-    double A_dif =
-      aLayer.getAbsorptance(aSide, ScatteringSimple::Diffuse, Theta, Phi);
+    double A_dif = aLayer.getAbsorptance(aSide, ScatteringSimple::Diffuse, Theta, Phi);
     EXPECT_NEAR(0.101303, A_dif, 1e-6);
 }

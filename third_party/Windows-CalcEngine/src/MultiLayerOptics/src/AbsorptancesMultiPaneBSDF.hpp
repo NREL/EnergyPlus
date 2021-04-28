@@ -8,7 +8,6 @@
 namespace SingleLayerOptics
 {
     class CBSDFLayer;
-
 }
 
 namespace MultiLayerOptics
@@ -19,12 +18,13 @@ namespace MultiLayerOptics
     class CAbsorptancesMultiPaneBSDF
     {
     public:
-        CAbsorptancesMultiPaneBSDF(FenestrationCommon::Side t_Side,
-                                   const std::shared_ptr<std::vector<double>> & t_CommonWavelengths,
-                                   const std::shared_ptr<FenestrationCommon::CSeries> & t_SolarRadiation,
-                                   const std::shared_ptr<SingleLayerOptics::CBSDFLayer> & t_Layer,
-                                   FenestrationCommon::IntegrationType t_integrator,
-                                   double normalizationCoefficient);
+        CAbsorptancesMultiPaneBSDF(
+          FenestrationCommon::Side t_Side,
+          const std::shared_ptr<std::vector<double>> & t_CommonWavelengths,
+          const std::shared_ptr<FenestrationCommon::CSeries> & t_SolarRadiation,
+          const std::shared_ptr<SingleLayerOptics::CBSDFLayer> & t_Layer,
+          FenestrationCommon::IntegrationType t_integrator,
+          double normalizationCoefficient);
 
         void addLayer(SingleLayerOptics::CBSDFLayer & t_Layer);
 
@@ -34,15 +34,20 @@ namespace MultiLayerOptics
         void calculateState(const double minLambda, const double maxLambda);
 
         // Denominator term for t and r coefficients (absorptance calculations)
-        FenestrationCommon::SquareMatrix getDenomForRTCoeff(const FenestrationCommon::SquareMatrix & t_Reflectance,
-                                                            const FenestrationCommon::SquareMatrix & t_PreviousR) const;
+        FenestrationCommon::SquareMatrix
+          getDenomForRTCoeff(const FenestrationCommon::SquareMatrix & t_Reflectance,
+                             const FenestrationCommon::SquareMatrix & t_PreviousR) const;
 
-        // Returns correct layer index. Depends if object is used to calculate forward or backward properties
+        // Returns correct layer index. Depends if object is used to calculate forward or backward
+        // properties
         size_t layerIndex(const size_t Index) const;
 
-        static std::vector<double> multVectors(const std::vector<double> & t_vec1, const std::vector<double> & t_vec2);
-        static std::vector<double> divVectors(const std::vector<double> & t_vec1, const std::vector<double> & t_vec2);
-        static std::vector<double> addVectors(const std::vector<double> & t_vec1, const std::vector<double> & t_vec2);
+        static std::vector<double> multVectors(const std::vector<double> & t_vec1,
+                                               const std::vector<double> & t_vec2);
+        static std::vector<double> divVectors(const std::vector<double> & t_vec1,
+                                              const std::vector<double> & t_vec2);
+        static std::vector<double> addVectors(const std::vector<double> & t_vec1,
+                                              const std::vector<double> & t_vec2);
 
         FenestrationCommon::SquareMatrix m_Lambda;
         std::vector<double> m_LambdaVector;

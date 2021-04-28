@@ -142,62 +142,62 @@ namespace SingleLayerOptics
         std::map<FenestrationCommon::Side, std::shared_ptr<CSurface>> m_Property;
     };
 
-	//////////////////////////////////////////////////////////////////////////////////////////
-	///   CMaterialSingleBandBSDF
-	//////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ///   CMaterialSingleBandBSDF
+    //////////////////////////////////////////////////////////////////////////////////////////
 
-	//! \brief Simple material with angular dependence on reflection or transmittance.
-	//!
-	//! This is mainly used for shading device materials
-	class CMaterialSingleBandBSDF : public CMaterial
-	{
-	public:
-		CMaterialSingleBandBSDF(std::vector<std::vector<double>> const & t_Tf,
-			std::vector<std::vector<double>> const & t_Tb,
-			std::vector<std::vector<double>> const & t_Rf,
-			std::vector<std::vector<double>> const & t_Rb,
-			CBSDFHemisphere const & t_Hemisphere,
-			double minLambda,
-			double maxLambda);
-		CMaterialSingleBandBSDF(std::vector<std::vector<double>> const & t_Tf,
-			std::vector<std::vector<double>> const & t_Tb,
-			std::vector<std::vector<double>> const & t_Rf,
-			std::vector<std::vector<double>> const & t_Rb,
-			CBSDFHemisphere const & t_Hemisphere,
-			FenestrationCommon::WavelengthRange t_Range);
+    //! \brief Simple material with angular dependence on reflection or transmittance.
+    //!
+    //! This is mainly used for shading device materials
+    class CMaterialSingleBandBSDF : public CMaterial
+    {
+    public:
+        CMaterialSingleBandBSDF(std::vector<std::vector<double>> const & t_Tf,
+                                std::vector<std::vector<double>> const & t_Tb,
+                                std::vector<std::vector<double>> const & t_Rf,
+                                std::vector<std::vector<double>> const & t_Rb,
+                                CBSDFHemisphere const & t_Hemisphere,
+                                double minLambda,
+                                double maxLambda);
+        CMaterialSingleBandBSDF(std::vector<std::vector<double>> const & t_Tf,
+                                std::vector<std::vector<double>> const & t_Tb,
+                                std::vector<std::vector<double>> const & t_Rf,
+                                std::vector<std::vector<double>> const & t_Rb,
+                                CBSDFHemisphere const & t_Hemisphere,
+                                FenestrationCommon::WavelengthRange t_Range);
 
-		double
-			getProperty(FenestrationCommon::Property t_Property,
-				FenestrationCommon::Side t_Side,
-				const CBeamDirection & t_IncomingDirection = CBeamDirection(),
-				const CBeamDirection & t_OutgoingDirection = CBeamDirection()) const override;
+        double
+          getProperty(FenestrationCommon::Property t_Property,
+                      FenestrationCommon::Side t_Side,
+                      const CBeamDirection & t_IncomingDirection = CBeamDirection(),
+                      const CBeamDirection & t_OutgoingDirection = CBeamDirection()) const override;
 
-		std::vector<double> getBandProperties(
-			FenestrationCommon::Property t_Property,
-			FenestrationCommon::Side t_Side,
-			const CBeamDirection & t_IncomingDirection = CBeamDirection(),
-			const CBeamDirection & t_OutgoingDirection = CBeamDirection()) const override;
+        std::vector<double> getBandProperties(
+          FenestrationCommon::Property t_Property,
+          FenestrationCommon::Side t_Side,
+          const CBeamDirection & t_IncomingDirection = CBeamDirection(),
+          const CBeamDirection & t_OutgoingDirection = CBeamDirection()) const override;
 
-		std::vector<std::vector<double>> const &
-			getBSDFMatrix(FenestrationCommon::Property const & t_Property,
-				FenestrationCommon::Side const & t_Side) const;
+        std::vector<std::vector<double>> const &
+          getBSDFMatrix(FenestrationCommon::Property const & t_Property,
+                        FenestrationCommon::Side const & t_Side) const;
 
-		CBSDFHemisphere getHemisphere() const;
+        CBSDFHemisphere getHemisphere() const;
 
-	private:
-		std::vector<double> calculateBandWavelengths() override;
-		// Checks to make sure a matrix has the same number of values as the BSDF hemisphere
-		// has directions.  Assumption:  All the inner vectors have the same number of values
-		// This should probably be somewhere more general, just putting it here for now
-		void validateMatrix(std::vector<std::vector<double>> const & matrix,
-			CBSDFHemisphere const & m_Hemisphere) const;
+    private:
+        std::vector<double> calculateBandWavelengths() override;
+        // Checks to make sure a matrix has the same number of values as the BSDF hemisphere
+        // has directions.  Assumption:  All the inner vectors have the same number of values
+        // This should probably be somewhere more general, just putting it here for now
+        void validateMatrix(std::vector<std::vector<double>> const & matrix,
+                            CBSDFHemisphere const & m_Hemisphere) const;
 
-	protected:
-		std::map<std::pair<FenestrationCommon::Property, FenestrationCommon::Side>,
-			std::vector<std::vector<double>>>
-			m_Property;
-		CBSDFHemisphere m_Hemisphere;
-	};
+    protected:
+        std::map<std::pair<FenestrationCommon::Property, FenestrationCommon::Side>,
+                 std::vector<std::vector<double>>>
+          m_Property;
+        CBSDFHemisphere m_Hemisphere;
+    };
 
     //////////////////////////////////////////////////////////////////////////////////////////
     ///   CMaterialDualBand
@@ -287,36 +287,35 @@ namespace SingleLayerOptics
                                     double t_Fraction) override;
     };
 
-	
 
-	//////////////////////////////////////////////////////////////////////////////////////////
-	///   CMaterialDualBandBSDF
-	//////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ///   CMaterialDualBandBSDF
+    //////////////////////////////////////////////////////////////////////////////////////////
 
-	//! \brief Material that for given solar and partial range (visible, uv) will calculate
-	//! equivalent optical properties for the entire range.  Uses BSDF matrices and results are
-	//! therefore angular dependent.
-	class CMaterialDualBandBSDF : public IMaterialDualBand
-	{
-	public:
-		// ratio is calculated outside of the class and can be provided here.
-		// TODO: Need to confirm with the team if we actually need this approach
-		// (ratio should be calculated and not quessed)
-		CMaterialDualBandBSDF(const std::shared_ptr<CMaterialSingleBandBSDF> & t_PartialRange,
-			const std::shared_ptr<CMaterialSingleBandBSDF> & t_FullRange,
-			double t_Ratio = 0.49);
+    //! \brief Material that for given solar and partial range (visible, uv) will calculate
+    //! equivalent optical properties for the entire range.  Uses BSDF matrices and results are
+    //! therefore angular dependent.
+    class CMaterialDualBandBSDF : public IMaterialDualBand
+    {
+    public:
+        // ratio is calculated outside of the class and can be provided here.
+        // TODO: Need to confirm with the team if we actually need this approach
+        // (ratio should be calculated and not quessed)
+        CMaterialDualBandBSDF(const std::shared_ptr<CMaterialSingleBandBSDF> & t_PartialRange,
+                              const std::shared_ptr<CMaterialSingleBandBSDF> & t_FullRange,
+                              double t_Ratio = 0.49);
 
-		// ratio is calculated based on provided solar radiation values
-		CMaterialDualBandBSDF(const std::shared_ptr<CMaterialSingleBandBSDF> & t_PartialRange,
-			const std::shared_ptr<CMaterialSingleBandBSDF> & t_FullRange,
-			const FenestrationCommon::CSeries & t_SolarRadiation);
+        // ratio is calculated based on provided solar radiation values
+        CMaterialDualBandBSDF(const std::shared_ptr<CMaterialSingleBandBSDF> & t_PartialRange,
+                              const std::shared_ptr<CMaterialSingleBandBSDF> & t_FullRange,
+                              const FenestrationCommon::CSeries & t_SolarRadiation);
 
-	protected:
-		// Creates after UV range and stores data into m_Materials
-		void createNIRRange(const std::shared_ptr<CMaterial> & t_PartialRange,
-			const std::shared_ptr<CMaterial> & t_SolarRange,
-			double t_Fraction) override;
-	};
+    protected:
+        // Creates after UV range and stores data into m_Materials
+        void createNIRRange(const std::shared_ptr<CMaterial> & t_PartialRange,
+                            const std::shared_ptr<CMaterial> & t_SolarRange,
+                            double t_Fraction) override;
+    };
 
     //////////////////////////////////////////////////////////////////////////////////////////
     ///   CMaterialSample
@@ -436,7 +435,7 @@ namespace SingleLayerOptics
         std::shared_ptr<SpectralAveraging::CAngularMeasurements> m_AngularMeasurements;
     };
 
-    
+
 }   // namespace SingleLayerOptics
 
 #endif

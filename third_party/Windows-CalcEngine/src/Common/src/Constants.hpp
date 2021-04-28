@@ -15,5 +15,5 @@ namespace ConstantsData
     static const double BOLTZMANNCONSTANT = 1.380622e-23;
     static const double floatErrorTolerance = 1e-12;
     static const double ELECTRON_CHARGE = 1.502e-19;
-    static const double EOGHeight = 0.0635; // meters
+    static const double EOGHeight = 0.0635;   // meters
 }   // namespace ConstantsData

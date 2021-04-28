@@ -56,9 +56,9 @@ protected:
         aIGU.addLayers({layer1, gap, layer2});
 
         // Alternative way of adding layers.
-        //aIGU.addLayer(layer1);
-        //aIGU.addLayer(gap);
-        //aIGU.addLayer(layer2);
+        // aIGU.addLayer(layer1);
+        // aIGU.addLayer(gap);
+        // aIGU.addLayer(layer2);
 
         // Deflection properties
         auto Tini = 303.15;

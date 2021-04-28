@@ -13,7 +13,9 @@ namespace SingleLayerOptics
     CPerforatedCellDescription::CPerforatedCellDescription(const double t_x,
                                                            const double t_y,
                                                            const double t_Thickness) :
-        m_x(t_x), m_y(t_y), m_Thickness(t_Thickness)
+        m_x(t_x),
+        m_y(t_y),
+        m_Thickness(t_Thickness)
     {}
 
     double CPerforatedCellDescription::R_dir_dir(const Side, const CBeamDirection &)

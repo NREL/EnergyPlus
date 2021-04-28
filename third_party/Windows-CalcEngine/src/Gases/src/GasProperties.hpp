@@ -45,7 +45,7 @@ namespace Gases
         GasProperties & operator+(const GasProperties & t_A);
         GasProperties & operator+=(const GasProperties & t_A);
         GasProperties & operator=(const GasProperties & t_A);
-        bool operator==( const GasProperties & t_A ) const;
+        bool operator==(const GasProperties & t_A) const;
 
         void calculateAlphaAndPrandl();
         double m_ThermalConductivity;

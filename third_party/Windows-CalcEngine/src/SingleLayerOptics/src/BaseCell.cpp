@@ -69,13 +69,13 @@ namespace SingleLayerOptics
         return m_Material->getBandWavelengths();
     }
 
-    void CBaseCell::setBandWavelengths(const std::vector<double> & wavelengths)
+    void CBaseCell::setBandWavelengths(const std::vector<double> & wavelengths) const
     {
         assert(m_Material != nullptr);
         m_Material->setBandWavelengths(wavelengths);
     }
 
-    int CBaseCell::getBandIndex(const double t_Wavelength)
+    int CBaseCell::getBandIndex(const double t_Wavelength) const
     {
         return m_Material->getBandIndex(t_Wavelength);
     }
@@ -95,7 +95,7 @@ namespace SingleLayerOptics
         return m_Material->getMaxLambda();
     }
 
-    void CBaseCell::Flipped(bool flipped)
+    void CBaseCell::Flipped(bool flipped) const
     {
         m_Material->Flipped(flipped);
     }

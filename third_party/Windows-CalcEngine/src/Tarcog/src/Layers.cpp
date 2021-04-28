@@ -64,16 +64,16 @@ namespace Tarcog
             }
 
             return std::make_shared<CIGUShadeLayer>(
-                thickness,
-                conductivity,
-                std::make_shared<CShadeOpenings>(effectiveOpenness.Atop,
-                                                 effectiveOpenness.Abot,
-                                                 effectiveOpenness.Al,
-                                                 effectiveOpenness.Ar,
-                                                 effectiveOpenness.Ah,
-                                                 effectiveOpenness.FrontPorosity),
-                std::make_shared<CSurface>(frontEmissivity, frontTransmittance),
-                std::make_shared<CSurface>(backEmissivity, backTransmittance));
+              thickness,
+              conductivity,
+              std::make_shared<CShadeOpenings>(effectiveOpenness.Atop,
+                                               effectiveOpenness.Abot,
+                                               effectiveOpenness.Al,
+                                               effectiveOpenness.Ar,
+                                               effectiveOpenness.Ah,
+                                               effectiveOpenness.FrontPorosity),
+              std::make_shared<CSurface>(frontEmissivity, frontTransmittance),
+              std::make_shared<CSurface>(backEmissivity, backTransmittance));
         }
 
         std::shared_ptr<CIGUGapLayer>

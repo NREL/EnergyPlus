@@ -9,7 +9,6 @@
 namespace FenestrationCommon
 {
     enum class Side;
-
 }
 
 namespace SingleLayerOptics
@@ -35,15 +34,13 @@ namespace SingleLayerOptics
                                  const CBeamDirection & t_IncomingDirection,
                                  const CBeamDirection & t_OutgoingDirection);
 
-        virtual std::vector<double>
-            T_dir_dif_band(const FenestrationCommon::Side t_Side,
-                           const CBeamDirection & t_IncomingDirection,
-                           const CBeamDirection & t_OutgoingDirection);
+        virtual std::vector<double> T_dir_dif_band(const FenestrationCommon::Side t_Side,
+                                                   const CBeamDirection & t_IncomingDirection,
+                                                   const CBeamDirection & t_OutgoingDirection);
 
-        virtual std::vector<double>
-            R_dir_dif_band(const FenestrationCommon::Side t_Side,
-                           const CBeamDirection & t_IncomingDirection,
-                           const CBeamDirection & t_OutgoingDirection);
+        virtual std::vector<double> R_dir_dif_band(const FenestrationCommon::Side t_Side,
+                                                   const CBeamDirection & t_IncomingDirection,
+                                                   const CBeamDirection & t_OutgoingDirection);
     };
 
 }   // namespace SingleLayerOptics

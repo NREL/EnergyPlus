@@ -18,9 +18,9 @@ using namespace FenestrationCommon;
 namespace SingleLayerOptics
 {
     std::map<EmissivityPolynomials, std::vector<double>> emissPolynomial{
-        {EmissivityPolynomials::NFRC_301_Coated, {1.3217, -1.8766, 4.6586, -5.8349, 2.7406}},
-        {EmissivityPolynomials::NFRC_301_Uncoated, {0.1569, 3.7669, -5.4398, 2.4733}},
-        {EmissivityPolynomials::EN12898, {1.1887, -0.4967, 0.2452}}};
+      {EmissivityPolynomials::NFRC_301_Coated, {1.3217, -1.8766, 4.6586, -5.8349, 2.7406}},
+      {EmissivityPolynomials::NFRC_301_Uncoated, {0.1569, 3.7669, -5.4398, 2.4733}},
+      {EmissivityPolynomials::EN12898, {1.1887, -0.4967, 0.2452}}};
 
     CScatteringLayer::CScatteringLayer(const CScatteringSurface & t_Front,
                                        const CScatteringSurface & t_Back) :
@@ -30,8 +30,8 @@ namespace SingleLayerOptics
         m_Phi(0)
     {}
 
-    CScatteringLayer::CScatteringLayer(const CScatteringSurface && t_Front,
-                                       const CScatteringSurface && t_Back) :
+    CScatteringLayer::CScatteringLayer(CScatteringSurface && t_Front,
+                                       CScatteringSurface && t_Back) :
         m_Surface({{Side::Front, std::move(t_Front)}, {Side::Back, std::move(t_Back)}}),
         m_BSDFLayer(nullptr),
         m_Theta(0),
@@ -52,20 +52,10 @@ namespace SingleLayerOptics
                                        const double Rb_dif_dif) :
         m_Surface({{Side::Front,
                     CScatteringSurface(
-                        Tf_dir_dir,
-                        Rf_dir_dir,
-                        Tf_dir_dif,
-                        Rf_dir_dif,
-                        Tf_dif_dif,
-                        Rf_dif_dif)},
+                      Tf_dir_dir, Rf_dir_dir, Tf_dir_dif, Rf_dir_dif, Tf_dif_dif, Rf_dif_dif)},
                    {Side::Back,
                     CScatteringSurface(
-                        Tb_dir_dir,
-                        Rb_dir_dir,
-                        Tb_dir_dif,
-                        Rb_dir_dif,
-                        Tb_dif_dif,
-                        Rb_dif_dif)}}),
+                      Tb_dir_dir, Rb_dir_dir, Tb_dir_dif, Rb_dir_dif, Tb_dif_dif, Rb_dif_dif)}}),
         m_BSDFLayer(nullptr),
         m_Theta(0),
         m_Phi(0)
@@ -79,8 +69,9 @@ namespace SingleLayerOptics
         m_Theta(0),
         m_Phi(0)
     {
-        // Scattering layer can also be created from material and cell desctiption in which case integration will
-        // be performed using BSDF distribution while direct-direct component will be taken directly from cell.
+        // Scattering layer can also be created from material and cell desctiption in which case
+        // integration will be performed using BSDF distribution while direct-direct component will
+        // be taken directly from cell.
         const auto aBSDF = CBSDFHemisphere::create(BSDFBasis::Full);
         auto aMaker = CBSDFLayerMaker(t_Material, aBSDF, t_Description, t_Method);
         m_Cell = aMaker.getCell();
@@ -149,9 +140,7 @@ namespace SingleLayerOptics
     }
 
     double
-        CScatteringLayer::getAbsorptance(const Side t_Side,
-                                         const double t_Theta,
-                                         const double t_Phi)
+      CScatteringLayer::getAbsorptance(const Side t_Side, const double t_Theta, const double t_Phi)
     {
         checkCurrentAngles(t_Theta, t_Phi);
         auto aSurface = getSurface(t_Side);
@@ -226,21 +215,19 @@ namespace SingleLayerOptics
     }
 
     CScatteringSurface
-        CScatteringLayer::createSurface(const Side t_Side, const double t_Theta, const double t_Phi)
+      CScatteringLayer::createSurface(const Side t_Side, const double t_Theta, const double t_Phi)
     {
         CBeamDirection aDirection = CBeamDirection(t_Theta, t_Phi);
         double T_dir_dir = m_BSDFLayer->getCell()->T_dir_dir(t_Side, aDirection);
         double R_dir_dir = m_BSDFLayer->getCell()->R_dir_dir(t_Side, aDirection);
         double T_dir_dif =
-            m_BSDFLayer->getResults()->DirHem(t_Side, PropertySimple::T, t_Theta, t_Phi) -
-            T_dir_dir;
+          m_BSDFLayer->getResults()->DirHem(t_Side, PropertySimple::T, t_Theta, t_Phi) - T_dir_dir;
         if(T_dir_dif < 0)
         {
             T_dir_dif = 0;
         }
         double R_dir_dif =
-            m_BSDFLayer->getResults()->DirHem(t_Side, PropertySimple::R, t_Theta, t_Phi) -
-            R_dir_dir;
+          m_BSDFLayer->getResults()->DirHem(t_Side, PropertySimple::R, t_Theta, t_Phi) - R_dir_dir;
         if(R_dir_dif < 0)
         {
             R_dir_dif = 0;
@@ -283,7 +270,7 @@ namespace SingleLayerOptics
     }
 
     CScatteringLayer
-        CScatteringLayer::createSpecularLayer(const std::shared_ptr<CMaterial> & t_Material)
+      CScatteringLayer::createSpecularLayer(const std::shared_ptr<CMaterial> & t_Material)
     {
         const auto aBSDF = CBSDFHemisphere::create(BSDFBasis::Full);
         return CScatteringLayer(CBSDFLayerMaker::getSpecularLayer(t_Material, aBSDF));
@@ -294,78 +281,63 @@ namespace SingleLayerOptics
     {}
 
     CScatteringLayer CScatteringLayer::createWovenLayer(
-        const std::shared_ptr<CMaterial> & t_Material,
-        const double diameter,
-        const double spacing)
+      const std::shared_ptr<CMaterial> & t_Material, const double diameter, const double spacing)
     {
         const auto aBSDF = CBSDFHemisphere::create(BSDFBasis::Full);
         return CScatteringLayer(
-            CBSDFLayerMaker::getWovenLayer(t_Material, aBSDF, diameter, spacing));
+          CBSDFLayerMaker::getWovenLayer(t_Material, aBSDF, diameter, spacing));
     }
 
     CScatteringLayer
-        CScatteringLayer::createPerfectlyDiffusingLayer(
-            const std::shared_ptr<CMaterial> & t_Material)
+      CScatteringLayer::createPerfectlyDiffusingLayer(const std::shared_ptr<CMaterial> & t_Material)
     {
         const auto aBSDF = CBSDFHemisphere::create(BSDFBasis::Full);
         return CScatteringLayer(CBSDFLayerMaker::getPerfectlyDiffuseLayer(t_Material, aBSDF));
     }
 
     CScatteringLayer
-        CScatteringLayer::createVenetianLayer(const std::shared_ptr<CMaterial> & t_Material,
-                                              const double slatWidth,
-                                              const double slatSpacing,
-                                              const double slatTiltAngle,
-                                              const double curvatureRadius,
-                                              const size_t numOfSlatSegments,
-                                              const DistributionMethod method)
+      CScatteringLayer::createVenetianLayer(const std::shared_ptr<CMaterial> & t_Material,
+                                            const double slatWidth,
+                                            const double slatSpacing,
+                                            const double slatTiltAngle,
+                                            const double curvatureRadius,
+                                            const size_t numOfSlatSegments,
+                                            const DistributionMethod method)
     {
         const auto aBSDF = CBSDFHemisphere::create(BSDFBasis::Full);
         return CScatteringLayer(CBSDFLayerMaker::getVenetianLayer(t_Material,
-            aBSDF,
-            slatWidth,
-            slatSpacing,
-            slatTiltAngle,
-            curvatureRadius,
-            numOfSlatSegments,
-            method));
+                                                                  aBSDF,
+                                                                  slatWidth,
+                                                                  slatSpacing,
+                                                                  slatTiltAngle,
+                                                                  curvatureRadius,
+                                                                  numOfSlatSegments,
+                                                                  method));
     }
 
     CScatteringLayer
-        CScatteringLayer::createPerforatedCircularLayer(
-            const std::shared_ptr<CMaterial> & t_Material,
-            double x,
-            double y,
-            double thickness,
-            double radius)
+      CScatteringLayer::createPerforatedCircularLayer(const std::shared_ptr<CMaterial> & t_Material,
+                                                      double x,
+                                                      double y,
+                                                      double thickness,
+                                                      double radius)
     {
         const auto aBSDF = CBSDFHemisphere::create(BSDFBasis::Full);
         return CScatteringLayer(
-            CBSDFLayerMaker::getCircularPerforatedLayer(t_Material,
-                                                        aBSDF,
-                                                        x,
-                                                        y,
-                                                        thickness,
-                                                        radius));
+          CBSDFLayerMaker::getCircularPerforatedLayer(t_Material, aBSDF, x, y, thickness, radius));
     }
 
     CScatteringLayer CScatteringLayer::createPerforatedRectangularLayer(
-        const std::shared_ptr<CMaterial> & t_Material,
-        const double x,
-        const double y,
-        const double thickness,
-        const double xHole,
-        const double yHole)
+      const std::shared_ptr<CMaterial> & t_Material,
+      const double x,
+      const double y,
+      const double thickness,
+      const double xHole,
+      const double yHole)
     {
         const auto aBSDF = CBSDFHemisphere::create(BSDFBasis::Full);
         return CScatteringLayer(CBSDFLayerMaker::getRectangularPerforatedLayer(
-            t_Material,
-            aBSDF,
-            x,
-            y,
-            thickness,
-            xHole,
-            yHole));
+          t_Material, aBSDF, x, y, thickness, xHole, yHole));
     }
 
     double CScatteringLayer::normalToHemisphericalEmissivity(FenestrationCommon::Side t_Side,
@@ -385,4 +357,4 @@ namespace SingleLayerOptics
         }
         return value;
     }
-} // namespace SingleLayerOptics
+}   // namespace SingleLayerOptics

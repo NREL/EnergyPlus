@@ -125,42 +125,48 @@ namespace SingleLayerOptics
         return std::make_shared<CUniformDiffuseBSDFLayer>(aCell, t_BSDF);
     }
 
-    CBSDFLayerMaker::CBSDFLayerMaker( const std::shared_ptr< CMaterial >& t_Material,
-                                     const CBSDFHemisphere & t_BSDF, std::shared_ptr< ICellDescription > t_Description,
-                                      const DistributionMethod t_Method ) : m_Cell( nullptr ) {
-
-        if ( t_Material == nullptr )
+    CBSDFLayerMaker::CBSDFLayerMaker(const std::shared_ptr<CMaterial> & t_Material,
+                                     const CBSDFHemisphere & t_BSDF,
+                                     std::shared_ptr<ICellDescription> t_Description,
+                                     const DistributionMethod t_Method) :
+        m_Cell(nullptr)
+    {
+        if(t_Material == nullptr)
         {
-            throw std::runtime_error( "Material for BSDF layer must be defined." );
+            throw std::runtime_error("Material for BSDF layer must be defined.");
         }
 
-        // Specular BSDF layer is considered to be default. Default is used if t_Description is null pointer
-        if ( t_Description == nullptr )
+        // Specular BSDF layer is considered to be default. Default is used if t_Description is null
+        // pointer
+        if(t_Description == nullptr)
         {
-            t_Description = std::make_shared< CSpecularCellDescription >();
+            t_Description = std::make_shared<CSpecularCellDescription>();
         }
 
         // Specular cell
-        if ( std::dynamic_pointer_cast< CSpecularCellDescription >( t_Description ) != nullptr )
+        if(std::dynamic_pointer_cast<CSpecularCellDescription>(t_Description) != nullptr)
         {
             m_Layer = getSpecularLayer(t_Material, t_BSDF);
         }
 
-        if (std::dynamic_pointer_cast< CFlatCellDescription >(t_Description) != nullptr)
+        if(std::dynamic_pointer_cast<CFlatCellDescription>(t_Description) != nullptr)
         {
             m_Layer = getPerfectlyDiffuseLayer(t_Material, t_BSDF);
         }
 
         // Venetian cell
-        if ( std::dynamic_pointer_cast< CVenetianCellDescription >( t_Description ) != nullptr )
+        if(std::dynamic_pointer_cast<CVenetianCellDescription>(t_Description) != nullptr)
         {
-            const auto description{std::dynamic_pointer_cast< CVenetianCellDescription >( t_Description )};
-            m_Layer = getVenetianLayer(t_Material, t_BSDF,
+            const auto description{
+              std::dynamic_pointer_cast<CVenetianCellDescription>(t_Description)};
+            m_Layer = getVenetianLayer(t_Material,
+                                       t_BSDF,
                                        description->slatWidth(),
                                        description->slatSpacing(),
                                        description->slatSpacing(),
                                        description->curvatureRadius(),
-                                       description->numberOfSegments(), t_Method);
+                                       description->numberOfSegments(),
+                                       t_Method);
         }
 
         // Perforated cell

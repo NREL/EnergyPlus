@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include "Material.hpp"
 #include "WCECommon.hpp"
 #include "MaterialDescription.hpp"

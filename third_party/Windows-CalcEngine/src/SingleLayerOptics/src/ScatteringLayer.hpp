@@ -33,7 +33,7 @@ namespace SingleLayerOptics
     public:
         CScatteringLayer() = default;
         CScatteringLayer(const CScatteringSurface & t_Front, const CScatteringSurface & t_Back);
-        CScatteringLayer(const CScatteringSurface && t_Front, const CScatteringSurface && t_Back);
+        CScatteringLayer(CScatteringSurface && t_Front, CScatteringSurface && t_Back);
 
         CScatteringLayer(double Tf_dir_dir,
                          double Rf_dir_dir,
@@ -48,9 +48,9 @@ namespace SingleLayerOptics
                          double Tb_dif_dif,
                          double Rb_dif_dif);
 
-        CScatteringLayer( const std::shared_ptr< CMaterial >& t_Material,
-		                  std::shared_ptr< ICellDescription > t_Description = nullptr,
-		                  const DistributionMethod t_Method = DistributionMethod::UniformDiffuse );
+        explicit CScatteringLayer(const std::shared_ptr<CMaterial> & t_Material,
+                                  std::shared_ptr<ICellDescription> t_Description = nullptr,
+                                  DistributionMethod t_Method = DistributionMethod::UniformDiffuse);
 
         static CScatteringLayer createSpecularLayer(const std::shared_ptr<CMaterial> & t_Material);
         static CScatteringLayer
@@ -83,23 +83,19 @@ namespace SingleLayerOptics
                                            double yHole);
 
 
-        void setSourceData(FenestrationCommon::CSeries &t_SourceData) const;
+        void setSourceData(FenestrationCommon::CSeries & t_SourceData) const;
 
         void setBlackBodySource(double temperature);
 
         CScatteringSurface & getSurface(FenestrationCommon::Side t_Side);
 
-        double getPropertySimple(const double minLambda,
-                                 const double maxLambda,
+        double getPropertySimple(double minLambda,
+                                 double maxLambda,
                                  FenestrationCommon::PropertySimple t_Property,
                                  FenestrationCommon::Side t_Side,
                                  FenestrationCommon::Scattering t_Scattering,
                                  double t_Theta = 0,
                                  double t_Phi = 0) override;
-
-        // void setPropertySimple( const FenestrationCommon::PropertySimple t_Property,
-        //  const FenestrationCommon::Side t_Side, const FenestrationCommon::Scattering
-        //  t_Scattering, const double value ) const;
 
         double getAbsorptance(FenestrationCommon::Side t_Side,
                               FenestrationCommon::ScatteringSimple t_Scattering,
@@ -109,12 +105,12 @@ namespace SingleLayerOptics
         double
           getAbsorptance(FenestrationCommon::Side t_Side, double t_Theta = 0, double t_Phi = 0);
 
-        std::vector<double> getAbsorptanceLayers(const double minLambda,
-                                                 const double maxLambda,
+        std::vector<double> getAbsorptanceLayers(double minLambda,
+                                                 double maxLambda,
                                                  FenestrationCommon::Side side,
                                                  FenestrationCommon::ScatteringSimple scattering,
-                                                 const double theta,
-                                                 const double phi) override;
+                                                 double theta,
+                                                 double phi) override;
 
         // This function is valid only for specular layers
         double normalToHemisphericalEmissivity(FenestrationCommon::Side t_Side,
@@ -126,31 +122,29 @@ namespace SingleLayerOptics
                                        double t_Theta = 0,
                                        double t_Phi = 0);
 
-        std::vector<double> getWavelengths() const override;
+        [[nodiscard]] std::vector<double> getWavelengths() const override;
         void setWavelengths(const std::vector<double> & wavelengths);
 
-        double getMinLambda() const override;
-        double getMaxLambda() const override;
+        [[nodiscard]] double getMinLambda() const override;
+        [[nodiscard]] double getMaxLambda() const override;
 
     private:
+        explicit CScatteringLayer(const std::shared_ptr<CBSDFLayer> & aBSDF);
 
-        CScatteringLayer(const std::shared_ptr<CBSDFLayer> & aBSDF);
+        void createResultsAtAngle(double t_Theta, double t_Phi);
 
-        void createResultsAtAngle(const double t_Theta, const double t_Phi);
+        CScatteringSurface
+          createSurface(FenestrationCommon::Side t_Side, double t_Theta, double t_Phi);
 
-        CScatteringSurface createSurface(const FenestrationCommon::Side t_Side,
-                                         const double t_Theta,
-                                         const double t_Phi);
-
-        bool checkCurrentAngles(const double t_Theta, const double t_Phi);
+        bool checkCurrentAngles(double t_Theta, double t_Phi);
 
         std::map<FenestrationCommon::Side, CScatteringSurface> m_Surface;
 
         std::shared_ptr<CBSDFLayer> m_BSDFLayer;
-        std::shared_ptr< CBaseCell > m_Cell;
+        std::shared_ptr<CBaseCell> m_Cell;
 
-        double m_Theta;
-        double m_Phi;
+        double m_Theta{0.0};
+        double m_Phi{0.0};
     };
 
 }   // namespace SingleLayerOptics

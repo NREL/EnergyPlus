@@ -37,7 +37,11 @@ namespace Tarcog
         }
 
         CShadeOpenings::CShadeOpenings() :
-            m_Atop(0), m_Abot(0), m_Aleft(0), m_Aright(0), m_Afront(0)
+            m_Atop(0),
+            m_Abot(0),
+            m_Aleft(0),
+            m_Aright(0),
+            m_Afront(0)
         {
             initialize();
         }

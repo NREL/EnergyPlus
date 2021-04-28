@@ -16,7 +16,7 @@ class EquivalentSpecularLayer_21467 : public testing::Test
 private:
     std::shared_ptr<CMultiPaneSpecular> m_Layer;
 
-	CSeries loadSolarRadiationFile() const
+    CSeries loadSolarRadiationFile() const
     {
         // Full ASTM E891-87 Table 1 (Solar radiation)
         auto aSolarRadiation = CSeries(

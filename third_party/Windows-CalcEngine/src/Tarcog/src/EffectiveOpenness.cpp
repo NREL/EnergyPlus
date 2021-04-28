@@ -5,7 +5,11 @@
 namespace EffectiveLayers
 {
     ShadeOpenness::ShadeOpenness(double ah, double dl, double dr, double dtop, double dbot) :
-        Ah(ah), Dl(dl), Dr(dr), Dtop(dtop), Dbot(dbot)
+        Ah(ah),
+        Dl(dl),
+        Dr(dr),
+        Dtop(dtop),
+        Dbot(dbot)
     {}
 
     EffectiveOpenness::EffectiveOpenness(const double ah,
@@ -14,12 +18,18 @@ namespace EffectiveLayers
                                          const double atop,
                                          const double abot,
                                          const double frontPorosity) :
-        Ah(ah), Al(al), Ar(ar), Atop(atop), Abot(abot), FrontPorosity(frontPorosity)
+        Ah(ah),
+        Al(al),
+        Ar(ar),
+        Atop(atop),
+        Abot(abot),
+        FrontPorosity(frontPorosity)
     {}
 
     bool EffectiveOpenness::isClosed() const
     {
-        return Ah == 0.0 && Al == 0.0 && Ar == 0.0 && Atop == 0.0 && Abot == 0.0 && FrontPorosity == 0.0;
+        return Ah == 0.0 && Al == 0.0 && Ar == 0.0 && Atop == 0.0 && Abot == 0.0
+               && FrontPorosity == 0.0;
     }
 
     EffectiveLayer::EffectiveLayer(double width,
@@ -36,7 +46,10 @@ namespace EffectiveLayers
     {}
 
     Coefficients::Coefficients(double c1, double c2, double c3, double c4) :
-        C1(c1), C2(c2), C3(c3), C4(c4)
+        C1(c1),
+        C2(c2),
+        C3(c3),
+        C4(c4)
     {}
 
     EffectiveVenetian::EffectiveVenetian(double width,

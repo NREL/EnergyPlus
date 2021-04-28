@@ -23,11 +23,11 @@ protected:
         auto solarRadiation = 0.0;
 
         Outdoor =
-			Tarcog::ISO15099::Environments::outdoor( airTemperature,
-													 airSpeed,
-													 solarRadiation,
-													 tSky,
-													 Tarcog::ISO15099::SkyModel::TSkySpecified);
+          Tarcog::ISO15099::Environments::outdoor(airTemperature,
+                                                  airSpeed,
+                                                  solarRadiation,
+                                                  tSky,
+                                                  Tarcog::ISO15099::SkyModel::TSkySpecified);
         ASSERT_TRUE(Outdoor != nullptr);
         Outdoor->setHCoeffModel(Tarcog::ISO15099::BoundaryConditionsCoeffModel::CalculateH);
 

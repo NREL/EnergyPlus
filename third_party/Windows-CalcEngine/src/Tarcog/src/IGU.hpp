@@ -39,7 +39,8 @@ namespace Tarcog
 
             void setSolarRadiation(double t_SolarRadiation) const;
 
-            [[nodiscard]] std::shared_ptr<CBaseLayer> getEnvironment(Environment t_Environment) const;
+            [[nodiscard]] std::shared_ptr<CBaseLayer>
+              getEnvironment(Environment t_Environment) const;
 
             [[nodiscard]] std::vector<double> getState() const;
             void setState(const std::vector<double> & t_State) const;

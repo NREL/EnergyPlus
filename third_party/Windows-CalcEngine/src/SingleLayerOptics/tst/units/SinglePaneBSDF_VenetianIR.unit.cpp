@@ -107,8 +107,7 @@ TEST_F(SinglePaneBSDF_VenetianIR, TestBSDF1)
       aLayer.DiffDiff(FenestrationCommon::Side::Front, FenestrationCommon::PropertySimple::R);
     EXPECT_NEAR(0.020572975598423356, rhoDiff, 1e-6);
 
-    const double absDiff =
-      aLayer.AbsDiffDiff(FenestrationCommon::Side::Front);
+    const double absDiff = aLayer.AbsDiffDiff(FenestrationCommon::Side::Front);
     EXPECT_NEAR(0.5564947806702053, absDiff, 1e-6);
 
     const auto theta{0.0};

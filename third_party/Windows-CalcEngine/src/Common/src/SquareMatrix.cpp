@@ -74,7 +74,8 @@ namespace FenestrationCommon
     //    m_Matrix(std::move(tMatrix.m_Matrix))
     //{}
 
-    SquareMatrix SquareMatrix::inverse() const {
+    SquareMatrix SquareMatrix::inverse() const
+    {
         // return LU decomposed matrix of current matrix
         auto aLu(LU());
 
@@ -124,7 +125,8 @@ namespace FenestrationCommon
         return m_Matrix[i][j];
     }
 
-    SquareMatrix SquareMatrix::LU() const {
+    SquareMatrix SquareMatrix::LU() const
+    {
         SquareMatrix D(this->m_Matrix);
 
         for(auto k = 0u; k <= m_size - 2; ++k)
@@ -147,18 +149,18 @@ namespace FenestrationCommon
     {
         std::vector<double> vv;
 
-        for (auto i = 0u; i < m_size; ++i)
+        for(auto i = 0u; i < m_size; ++i)
         {
             auto aamax = 0.0;
-            for (size_t j = 0; j < m_size; ++j)
+            for(size_t j = 0; j < m_size; ++j)
             {
                 const auto absCellValue = std::abs(m_Matrix[i][j]);
-                if (absCellValue > aamax)
+                if(absCellValue > aamax)
                 {
                     aamax = absCellValue;
                 }
             }
-            if (aamax == 0)
+            if(aamax == 0)
             {
                 assert(aamax != 0);
             }
@@ -170,7 +172,7 @@ namespace FenestrationCommon
 
     std::vector<size_t> SquareMatrix::makeUpperTriangular()
     {
-        const auto TINY( 1e-20 );
+        const auto TINY(1e-20);
 
         std::vector<size_t> index(m_size);
 
@@ -178,12 +180,12 @@ namespace FenestrationCommon
 
         auto d = 1;
 
-        for (auto j = 0u; j < m_size; ++j)
+        for(auto j = 0u; j < m_size; ++j)
         {
-            for (auto i = 0; i <= int(j - 1); ++i)
+            for(auto i = 0; i <= int(j - 1); ++i)
             {
                 auto sum = m_Matrix[i][j];
-                for (auto k = 0; k <= i - 1; ++k)
+                for(auto k = 0; k <= i - 1; ++k)
                 {
                     sum = sum - m_Matrix[i][k] * m_Matrix[k][j];
                 }
@@ -193,25 +195,25 @@ namespace FenestrationCommon
             auto aamax = 0.0;
             auto imax = 0;
 
-            for (auto i = j; i < m_size; ++i)
+            for(auto i = j; i < m_size; ++i)
             {
                 auto sum = m_Matrix[i][j];
-                for (auto k = 0; k <= int(j - 1); ++k)
+                for(auto k = 0; k <= int(j - 1); ++k)
                 {
                     sum = sum - m_Matrix[i][k] * m_Matrix[k][j];
                 }
                 m_Matrix[i][j] = sum;
                 const auto dum = vv[i] * std::abs(sum);
-                if (dum >= aamax)
+                if(dum >= aamax)
                 {
                     imax = i;
                     aamax = dum;
                 }
             }
 
-            if (int(j) != imax)
+            if(int(j) != imax)
             {
-                for (auto k = 0u; k < m_size; ++k)
+                for(auto k = 0u; k < m_size; ++k)
                 {
                     const auto dum = m_Matrix[imax][k];
                     m_Matrix[imax][k] = m_Matrix[j][k];
@@ -221,14 +223,14 @@ namespace FenestrationCommon
                 vv[imax] = vv[j];
             }
             index[j] = imax;
-            if (m_Matrix[j][j] == 0.0)
+            if(m_Matrix[j][j] == 0.0)
             {
                 m_Matrix[j][j] = TINY;
             }
-            if (j != (m_size - 1))
+            if(j != (m_size - 1))
             {
                 const auto dum = 1.0 / m_Matrix[j][j];
-                for (auto i = j + 1; i < m_size; ++i)
+                for(auto i = j + 1; i < m_size; ++i)
                 {
                     m_Matrix[i][j] = m_Matrix[i][j] * dum;
                 }   // i
@@ -336,10 +338,10 @@ namespace FenestrationCommon
         return res;
     }
 
-	std::vector<std::vector<double>> SquareMatrix::getMatrix() const
-	{
-		return m_Matrix;
-	}
+    std::vector<std::vector<double>> SquareMatrix::getMatrix() const
+    {
+        return m_Matrix;
+    }
 
     std::vector<double> operator*(const std::vector<double> & first, const SquareMatrix & second)
     {

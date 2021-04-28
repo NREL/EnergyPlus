@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include "BSDFPhiLimits.hpp"
 #include "BSDFPhiAngles.hpp"
 

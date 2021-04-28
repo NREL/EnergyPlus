@@ -172,7 +172,7 @@ namespace SpectralAveraging
         return aAngular;
     }
 
-    void CAngularMeasurements::setSourceData(CSeries &t_SourceData)
+    void CAngularMeasurements::setSourceData(CSeries & t_SourceData)
     {
         for(size_t i = 0; i < m_Measurements.size(); i++)
         {

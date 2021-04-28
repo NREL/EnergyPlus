@@ -14,19 +14,21 @@ using namespace FenestrationCommon;
 namespace SingleLayerOptics
 {
     CUniformDiffuseBSDFLayer::CUniformDiffuseBSDFLayer(
-		const std::shared_ptr< CUniformDiffuseCell > & t_Cell,
-		const CBSDFHemisphere & t_Hemisphere ) :
+      const std::shared_ptr<CUniformDiffuseCell> & t_Cell, const CBSDFHemisphere & t_Hemisphere) :
         CBSDFLayer(t_Cell, t_Hemisphere)
     {}
 
     std::shared_ptr<CUniformDiffuseCell> CUniformDiffuseBSDFLayer::cellAsUniformDiffuse() const
     {
-        std::shared_ptr<CUniformDiffuseCell> aCell = std::dynamic_pointer_cast<CUniformDiffuseCell>(m_Cell);
+        std::shared_ptr<CUniformDiffuseCell> aCell =
+          std::dynamic_pointer_cast<CUniformDiffuseCell>(m_Cell);
         assert(aCell != nullptr);
         return aCell;
     }
 
-    void CUniformDiffuseBSDFLayer::calcDiffuseDistribution(const Side aSide, const CBeamDirection & t_Direction, const size_t t_DirectionIndex)
+    void CUniformDiffuseBSDFLayer::calcDiffuseDistribution(const Side aSide,
+                                                           const CBeamDirection & t_Direction,
+                                                           const size_t t_DirectionIndex)
     {
         std::shared_ptr<CUniformDiffuseCell> aCell = cellAsUniformDiffuse();
 
@@ -48,7 +50,9 @@ namespace SingleLayerOptics
         }
     }
 
-    void CUniformDiffuseBSDFLayer::calcDiffuseDistribution_wv(const Side aSide, const CBeamDirection & t_Direction, const size_t t_DirectionIndex)
+    void CUniformDiffuseBSDFLayer::calcDiffuseDistribution_wv(const Side aSide,
+                                                              const CBeamDirection & t_Direction,
+                                                              const size_t t_DirectionIndex)
     {
         std::shared_ptr<CUniformDiffuseCell> aCell = cellAsUniformDiffuse();
 
@@ -70,8 +74,8 @@ namespace SingleLayerOptics
                 assert(aResults != nullptr);
                 auto & tau = aResults->getMatrix(aSide, PropertySimple::T);
                 auto & rho = aResults->getMatrix(aSide, PropertySimple::R);
-                tau(i,t_DirectionIndex) += aTau[j] / WCE_PI;
-                rho(i,t_DirectionIndex) += Ref[j] / WCE_PI;
+                tau(i, t_DirectionIndex) += aTau[j] / WCE_PI;
+                rho(i, t_DirectionIndex) += Ref[j] / WCE_PI;
             }
         }
     }

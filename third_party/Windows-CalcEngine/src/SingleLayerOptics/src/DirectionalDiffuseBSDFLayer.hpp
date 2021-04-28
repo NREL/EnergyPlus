@@ -31,25 +31,20 @@ namespace SingleLayerOptics
     class CDirectionalDiffuseBSDFLayer : public CDirectionalBSDFLayer
     {
     public:
-
         CDirectionalDiffuseBSDFLayer(const std::shared_ptr<CDirectionalDiffuseCell> & t_Cell,
                                      const CBSDFHemisphere & t_Hemisphere);
 
     protected:
-
         double diffuseDistributionScalar(size_t outgoingDirection) override;
     };
 
     class CMatrixBSDFLayer : public CDirectionalBSDFLayer
     {
     public:
-
-
         CMatrixBSDFLayer(const std::shared_ptr<CDirectionalDiffuseCell> & t_Cell,
                          const CBSDFHemisphere & t_Hemisphere);
 
     protected:
-
         double diffuseDistributionScalar(size_t outgoingDirection) override;
     };
 

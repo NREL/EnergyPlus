@@ -53,7 +53,7 @@ namespace CMA
 
         std::map<Option, CMABestWorstUFactors> m_BestWorstIGUUvalues;
 
-        BestWorst<double> m_Spacer;        
+        BestWorst<double> m_Spacer;
     };
 
     //////////////////////////////////////////
@@ -74,17 +74,18 @@ namespace CMA
         void setFrameBottom(CMAFrame cmaFrameData);
         void setFrameLeft(CMAFrame cmaFrameData);
         void setFrameRight(CMAFrame cmaFrameData);
-        void setDividers(CMAFrame frameData, size_t nHorizontal, size_t nVertical);        
+        void setDividers(CMAFrame frameData, size_t nHorizontal, size_t nVertical);
 
     private:
         //! Single vision windows needs to create this structure, otherwise it will not work
-        [[nodiscard]] static std::map<Option, std::map<Option, Tarcog::ISO15099::WindowSingleVision>>
+        [[nodiscard]] static std::map<Option,
+                                      std::map<Option, Tarcog::ISO15099::WindowSingleVision>>
           createBestWorstWindows(double width,
                                  double height,
                                  double tvis,
                                  double tsol,
                                  CMABestWorstUFactors bestUFactor,
-                                 CMABestWorstUFactors worstUFactor) ;
+                                 CMABestWorstUFactors worstUFactor);
 
         Tarcog::IWindow & windowAt(Option spacer, Option glazing) override;
 

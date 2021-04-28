@@ -8,41 +8,43 @@
 #include "HeatFlowBalance.hpp"
 #include "IGU.hpp"
 
-namespace Tarcog {
+namespace Tarcog
+{
+    namespace ISO15099
+    {
+        class CNonLinearSolver
+        {
+        public:
+            explicit CNonLinearSolver(CIGU & t_IGU);
 
-	namespace ISO15099 {
-		class CNonLinearSolver {
-		public:
-			explicit CNonLinearSolver( CIGU & t_IGU );
+            // sets tolerance for solution
+            void setTolerance(double t_Tolerance);
 
-			// sets tolerance for solution
-			void setTolerance( double t_Tolerance );
+            // returns number of iterations for current solution.
+            size_t getNumOfIterations() const;
 
-			// returns number of iterations for current solution.
-			size_t getNumOfIterations() const;
+            void solve();
 
-			void solve();
+            double solutionTolerance() const;
+            bool isToleranceAchieved() const;
 
-			double solutionTolerance() const;
-			bool isToleranceAchieved() const;
+        private:
+            double calculateTolerance(const std::vector<double> & t_Solution) const;
+            void estimateNewState(const std::vector<double> & t_Solution);
 
-		private:
-			double calculateTolerance( const std::vector< double > & t_Solution ) const;
-			void estimateNewState( const std::vector< double > & t_Solution );
+            CIGU & m_IGU;
+            FenestrationCommon::CLinearSolver m_LinearSolver;
+            CHeatFlowBalance m_QBalance;
+            std::vector<double> m_IGUState;
+            double m_Tolerance;
+            size_t m_Iterations;
+            double m_RelaxParam;
+            double m_SolutionTolerance;
+        };
 
-			CIGU & m_IGU;
-			FenestrationCommon::CLinearSolver m_LinearSolver;
-			CHeatFlowBalance m_QBalance;
-			std::vector< double > m_IGUState;
-			double m_Tolerance;
-			size_t m_Iterations;
-			double m_RelaxParam;
-			double m_SolutionTolerance;
-		};
+    }   // namespace ISO15099
 
-	}
-
-}
+}   // namespace Tarcog
 
 
 #endif

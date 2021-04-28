@@ -14,15 +14,15 @@ namespace SingleLayerOptics
 {
     double modifyProperty(const double t_Range, const double t_Solar, const double t_Fraction)
     {
-		// If t_fraction == 1 that means a dual-band material is evaluated only for partial range
-		if(t_Fraction == 1)
-		{
-			return t_Range;
-		}
-		else
-		{
-			return (t_Solar - t_Fraction * t_Range) / (1 - t_Fraction);
-		}
+        // If t_fraction == 1 that means a dual-band material is evaluated only for partial range
+        if(t_Fraction == 1)
+        {
+            return t_Range;
+        }
+        else
+        {
+            return (t_Solar - t_Fraction * t_Range) / (1 - t_Fraction);
+        }
     }
 
     std::vector<std::vector<double>>
@@ -159,7 +159,9 @@ namespace SingleLayerOptics
     ////////////////////////////////////////////////////////////////////////////////////
 
     CMaterial::CMaterial(const double minLambda, const double maxLambda) :
-        m_MinLambda(minLambda), m_MaxLambda(maxLambda), m_WavelengthsCalculated(false)
+        m_MinLambda(minLambda),
+        m_MaxLambda(maxLambda),
+        m_WavelengthsCalculated(false)
     {}
 
     CMaterial::CMaterial(const WavelengthRange t_Range) : m_WavelengthsCalculated(false)
@@ -414,10 +416,11 @@ namespace SingleLayerOptics
             aWavelengths.push_back(m_Materials[i]->getMinLambda());
         }
 
-        // TODO: Do not create extra wavelength since this might be important for the integration. Range is already kept with
-        // min and max lambda. Integration of double specular layer is working correctly. Make sure that integration of single
-        // shading layer is working correctly too.
-        //aWavelengths.push_back(m_Materials.back()->getMaxLambda());
+        // TODO: Do not create extra wavelength since this might be important for the integration.
+        // Range is already kept with min and max lambda. Integration of double specular layer is
+        // working correctly. Make sure that integration of single shading layer is working
+        // correctly too.
+        // aWavelengths.push_back(m_Materials.back()->getMaxLambda());
 
         return aWavelengths;
     }
@@ -619,7 +622,8 @@ namespace SingleLayerOptics
       const std::shared_ptr<SpectralAveraging::CAngularMeasurements> & t_AngularMeasurements,
       const double minLambda,
       const double maxLambda) :
-        CMaterial(minLambda, maxLambda), m_AngularMeasurements(t_AngularMeasurements)
+        CMaterial(minLambda, maxLambda),
+        m_AngularMeasurements(t_AngularMeasurements)
     {
         if(t_AngularMeasurements == nullptr)
         {
@@ -631,7 +635,8 @@ namespace SingleLayerOptics
     CMaterialMeasured::CMaterialMeasured(
       const std::shared_ptr<SpectralAveraging::CAngularMeasurements> & t_AngularMeasurements,
       const WavelengthRange t_Range) :
-        CMaterial(t_Range), m_AngularMeasurements(t_AngularMeasurements)
+        CMaterial(t_Range),
+        m_AngularMeasurements(t_AngularMeasurements)
     {
         if(t_AngularMeasurements == nullptr)
         {
@@ -698,7 +703,8 @@ namespace SingleLayerOptics
                                                      CBSDFHemisphere const & t_Hemisphere,
                                                      double minLambda,
                                                      double maxLambda) :
-        CMaterial(minLambda, maxLambda), m_Hemisphere(t_Hemisphere)
+        CMaterial(minLambda, maxLambda),
+        m_Hemisphere(t_Hemisphere)
     {
         validateMatrix(t_Tf, m_Hemisphere);
         validateMatrix(t_Tb, m_Hemisphere);
@@ -720,7 +726,8 @@ namespace SingleLayerOptics
                                                      std::vector<std::vector<double>> const & t_Rb,
                                                      CBSDFHemisphere const & t_Hemisphere,
                                                      FenestrationCommon::WavelengthRange t_Range) :
-        CMaterial(t_Range), m_Hemisphere(t_Hemisphere)
+        CMaterial(t_Range),
+        m_Hemisphere(t_Hemisphere)
     {
         validateMatrix(t_Tf, m_Hemisphere);
         validateMatrix(t_Tb, m_Hemisphere);
@@ -740,14 +747,15 @@ namespace SingleLayerOptics
                                  CBSDFHemisphere const & hemisphere,
                                  size_t incomingIdx)
     {
-		const auto outgoingLambdas = hemisphere.getDirections(BSDFDirection::Outgoing).lambdaVector();
+        const auto outgoingLambdas =
+          hemisphere.getDirections(BSDFDirection::Outgoing).lambdaVector();
 
-		double result = 0;
-		for(size_t outgoingIdx = 0; outgoingIdx < outgoingLambdas.size(); ++outgoingIdx)
-		{
-			result += m[outgoingIdx][incomingIdx] * outgoingLambdas[outgoingIdx];
-		}
-		return result;
+        double result = 0;
+        for(size_t outgoingIdx = 0; outgoingIdx < outgoingLambdas.size(); ++outgoingIdx)
+        {
+            result += m[outgoingIdx][incomingIdx] * outgoingLambdas[outgoingIdx];
+        }
+        return result;
     }
 
 
@@ -756,28 +764,30 @@ namespace SingleLayerOptics
                                                 const CBeamDirection & t_IncomingDirection,
                                                 const CBeamDirection & t_OutgoingDirection) const
     {
-		const auto incomingIdx =
-			m_Hemisphere.getDirections(BSDFDirection::Incoming)
-			.getNearestBeamIndex(t_IncomingDirection.theta(), t_IncomingDirection.phi());
+        const auto incomingIdx =
+          m_Hemisphere.getDirections(BSDFDirection::Incoming)
+            .getNearestBeamIndex(t_IncomingDirection.theta(), t_IncomingDirection.phi());
 
         if(t_Property == FenestrationCommon::Property::Abs)
         {
-			double tHem = calcDirectHemispheric(m_Property.at({FenestrationCommon::Property::T, t_Side}), m_Hemisphere, incomingIdx);
-			double rHem = calcDirectHemispheric(m_Property.at({FenestrationCommon::Property::R, t_Side}), m_Hemisphere, incomingIdx);
-			return 1 - tHem - rHem;
+            double tHem = calcDirectHemispheric(
+              m_Property.at({FenestrationCommon::Property::T, t_Side}), m_Hemisphere, incomingIdx);
+            double rHem = calcDirectHemispheric(
+              m_Property.at({FenestrationCommon::Property::R, t_Side}), m_Hemisphere, incomingIdx);
+            return 1 - tHem - rHem;
         }
-		else
-		{
-			const auto outgoingIdx =
-				m_Hemisphere.getDirections(BSDFDirection::Outgoing)
-				.getNearestBeamIndex(t_OutgoingDirection.theta(), t_OutgoingDirection.phi());
+        else
+        {
+            const auto outgoingIdx =
+              m_Hemisphere.getDirections(BSDFDirection::Outgoing)
+                .getNearestBeamIndex(t_OutgoingDirection.theta(), t_OutgoingDirection.phi());
 
-			auto lambda{m_Hemisphere.getDirections(BSDFDirection::Outgoing).lambdaVector()};
+            auto lambda{m_Hemisphere.getDirections(BSDFDirection::Outgoing).lambdaVector()};
 
-			const auto val = m_Property.at({t_Property, t_Side})[outgoingIdx][incomingIdx];
+            const auto val = m_Property.at({t_Property, t_Side})[outgoingIdx][incomingIdx];
 
-			return val * lambda[outgoingIdx];
-		}
+            return val * lambda[outgoingIdx];
+        }
     }
 
     std::vector<double>

@@ -26,8 +26,7 @@ protected:
           Material::singleBandMaterial(Tmat, Tmat, Rfmat, Rbmat, minLambda, maxLambda);
 
         // make cell geometry
-        std::shared_ptr<ICellDescription> aCell =
-          std::make_shared<CFlatCellDescription>();
+        std::shared_ptr<ICellDescription> aCell = std::make_shared<CFlatCellDescription>();
 
         m_Cell = std::make_shared<CUniformDiffuseCell>(aMaterial, aCell);
     }

@@ -18,17 +18,21 @@ namespace MultiLayerOptics
         {
             for(EnergyFlow t_EnergyFlow : EnumEnergyFlow())
             {
-                m_IEnergy[std::make_pair(t_Side, t_EnergyFlow)] = std::make_shared<std::vector<double>>();
+                m_IEnergy[std::make_pair(t_Side, t_EnergyFlow)] =
+                  std::make_shared<std::vector<double>>();
             }
         }
     }
 
-    void CSurfaceEnergy::addEnergy(const Side t_Side, const EnergyFlow t_EnergySide, const double t_Value)
+    void CSurfaceEnergy::addEnergy(const Side t_Side,
+                                   const EnergyFlow t_EnergySide,
+                                   const double t_Value)
     {
         m_IEnergy.at(std::make_pair(t_Side, t_EnergySide))->push_back(t_Value);
     }
 
-    double CSurfaceEnergy::IEnergy(const size_t Index, const Side t_Side, const EnergyFlow t_EnergyFlow)
+    double
+      CSurfaceEnergy::IEnergy(const size_t Index, const Side t_Side, const EnergyFlow t_EnergyFlow)
     {
         return (*m_IEnergy[std::make_pair(t_Side, t_EnergyFlow)])[Index - 1];
     }
@@ -37,13 +41,17 @@ namespace MultiLayerOptics
     //   CInterRefSingleComponent
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    CInterRefSingleComponent::CInterRefSingleComponent(const double t_Tf, const double t_Rf, const double t_Tb, const double t_Rb) :
+    CInterRefSingleComponent::CInterRefSingleComponent(const double t_Tf,
+                                                       const double t_Rf,
+                                                       const double t_Tb,
+                                                       const double t_Rb) :
         m_StateCalculated(false)
     {
         initialize(t_Tf, t_Rf, t_Tb, t_Rb);
     }
 
-    CInterRefSingleComponent::CInterRefSingleComponent(const CLayerSingleComponent & t_Layer) : m_StateCalculated(false)
+    CInterRefSingleComponent::CInterRefSingleComponent(const CLayerSingleComponent & t_Layer) :
+        m_StateCalculated(false)
     {
         const double Tf = t_Layer.getProperty(Property::T, Side::Front);
         const double Rf = t_Layer.getProperty(Property::R, Side::Front);
@@ -52,7 +60,8 @@ namespace MultiLayerOptics
         initialize(Tf, Rf, Tb, Rb);
     }
 
-    void CInterRefSingleComponent::addLayer(const double t_Tf, const double t_Rf, const double t_Tb, const double t_Rb, const Side t_Side)
+    void CInterRefSingleComponent::addLayer(
+      const double t_Tf, const double t_Rf, const double t_Tb, const double t_Rb, const Side t_Side)
     {
         const CLayerSingleComponent aLayer(t_Tf, t_Rf, t_Tb, t_Rb);
         switch(t_Side)
@@ -70,7 +79,8 @@ namespace MultiLayerOptics
         m_StateCalculated = false;
     }
 
-    void CInterRefSingleComponent::addLayer(const SingleLayerOptics::CLayerSingleComponent & tLayer, const Side t_Side)
+    void CInterRefSingleComponent::addLayer(const SingleLayerOptics::CLayerSingleComponent & tLayer,
+                                            const Side t_Side)
     {
         const double Tf = tLayer.getProperty(Property::T, Side::Front);
         const double Rf = tLayer.getProperty(Property::R, Side::Front);
@@ -79,7 +89,9 @@ namespace MultiLayerOptics
         addLayer(Tf, Rf, Tb, Rb, t_Side);
     }
 
-    double CInterRefSingleComponent::getEnergyToSurface(const size_t Index, const Side t_Side, const EnergyFlow t_EnergyFlow)
+    double CInterRefSingleComponent::getEnergyToSurface(const size_t Index,
+                                                        const Side t_Side,
+                                                        const EnergyFlow t_EnergyFlow)
     {
         calculateEnergies();
         return m_IEnergy.IEnergy(Index, t_Side, t_EnergyFlow);
@@ -102,12 +114,16 @@ namespace MultiLayerOptics
         double absTot = 0;
         for(Side aSide : EnumSide())
         {
-            absTot += m_Layers[Index - 1].getProperty(Property::Abs, aSide) * getEnergyToSurface(Index, aSide, aFlow);
+            absTot += m_Layers[Index - 1].getProperty(Property::Abs, aSide)
+                      * getEnergyToSurface(Index, aSide, aFlow);
         }
         return absTot;
     }
 
-    void CInterRefSingleComponent::initialize(const double t_Tf, const double t_Rf, const double t_Tb, const double t_Rb)
+    void CInterRefSingleComponent::initialize(const double t_Tf,
+                                              const double t_Rf,
+                                              const double t_Tb,
+                                              const double t_Rb)
     {
         m_StateCalculated = false;
         addLayer(t_Tf, t_Rf, t_Tb, t_Rb);
@@ -148,7 +164,8 @@ namespace MultiLayerOptics
         }
     }
 
-    std::vector<SingleLayerOptics::CLayerSingleComponent> CInterRefSingleComponent::calculateForwardLayers()
+    std::vector<SingleLayerOptics::CLayerSingleComponent>
+      CInterRefSingleComponent::calculateForwardLayers()
     {
         std::vector<CLayerSingleComponent> forwardLayers;
         // Insert exterior environment properties
@@ -168,7 +185,8 @@ namespace MultiLayerOptics
         return forwardLayers;
     }
 
-    std::vector<SingleLayerOptics::CLayerSingleComponent> CInterRefSingleComponent::calculateBackwardLayers()
+    std::vector<SingleLayerOptics::CLayerSingleComponent>
+      CInterRefSingleComponent::calculateBackwardLayers()
     {
         std::vector<CLayerSingleComponent> backwardLayers;
         // Insert interior environment properties

@@ -230,10 +230,20 @@ namespace MultiLayerOptics
                 {
                     If = diffSum.IEnergy(i + 1, Side::Front, aEnergyFlow);
                 }
-                const double Rf_bkw = bkwLayer.getPropertySimple(bkwLayer.getMinLambda(), bkwLayer.getMaxLambda(),
-                  PropertySimple::R, Side::Front, Scattering::DiffuseDiffuse, t_Theta, t_Phi);
-                const double Rb_fwd = fwdLayer.getPropertySimple(fwdLayer.getMinLambda(), fwdLayer.getMaxLambda(),
-                  PropertySimple::R, Side::Back, Scattering::DiffuseDiffuse, t_Theta, t_Phi);
+                const double Rf_bkw = bkwLayer.getPropertySimple(bkwLayer.getMinLambda(),
+                                                                 bkwLayer.getMaxLambda(),
+                                                                 PropertySimple::R,
+                                                                 Side::Front,
+                                                                 Scattering::DiffuseDiffuse,
+                                                                 t_Theta,
+                                                                 t_Phi);
+                const double Rb_fwd = fwdLayer.getPropertySimple(fwdLayer.getMinLambda(),
+                                                                 fwdLayer.getMaxLambda(),
+                                                                 PropertySimple::R,
+                                                                 Side::Back,
+                                                                 Scattering::DiffuseDiffuse,
+                                                                 t_Theta,
+                                                                 t_Phi);
                 const double interRef = 1 / (1 - Rf_bkw * Rb_fwd);
                 const double Ib_tot = (Ib * Rf_bkw + If) * interRef;
                 const double If_tot = (Ib + Rb_fwd * If) * interRef;

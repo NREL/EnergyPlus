@@ -20,13 +20,14 @@ protected:
     virtual void SetUp()
     {
         // make cell geometry
-		const auto slatWidth = 0.076200;     // m
-		const auto slatSpacing = 0.057150;   // m
-		const auto slatTiltAngle = -55.000000;
-		const auto curvatureRadius = 0.123967;
+        const auto slatWidth = 0.076200;     // m
+        const auto slatSpacing = 0.057150;   // m
+        const auto slatTiltAngle = -55.000000;
+        const auto curvatureRadius = 0.123967;
         size_t aNumOfSlats = 2;
 
-        m_Cell = std::make_shared<CVenetianCellDescription>(slatWidth, slatSpacing, slatTiltAngle, curvatureRadius, aNumOfSlats);
+        m_Cell = std::make_shared<CVenetianCellDescription>(
+          slatWidth, slatSpacing, slatTiltAngle, curvatureRadius, aNumOfSlats);
     }
 
 public:
@@ -66,7 +67,8 @@ TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian1)
 
 TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian2)
 {
-    SCOPED_TRACE("Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (0, 0).");
+    SCOPED_TRACE(
+      "Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (0, 0).");
 
     std::shared_ptr<CVenetianCellDescription> aCell = GetCell();
 
@@ -79,7 +81,8 @@ TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian2)
 
 TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian3)
 {
-    SCOPED_TRACE("Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (18, -45).");
+    SCOPED_TRACE(
+      "Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (18, -45).");
 
     std::shared_ptr<CVenetianCellDescription> aCell = GetCell();
 
@@ -92,7 +95,8 @@ TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian3)
 
 TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian4)
 {
-    SCOPED_TRACE("Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (18, -90).");
+    SCOPED_TRACE(
+      "Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (18, -90).");
 
     std::shared_ptr<CVenetianCellDescription> aCell = GetCell();
 
@@ -105,7 +109,8 @@ TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian4)
 
 TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian5)
 {
-    SCOPED_TRACE("Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (36, -30).");
+    SCOPED_TRACE(
+      "Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (36, -30).");
 
     std::shared_ptr<CVenetianCellDescription> aCell = GetCell();
 
@@ -118,7 +123,8 @@ TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian5)
 
 TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian6)
 {
-    SCOPED_TRACE("Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (36, -60).");
+    SCOPED_TRACE(
+      "Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (36, -60).");
 
     std::shared_ptr<CVenetianCellDescription> aCell = GetCell();
 
@@ -131,7 +137,8 @@ TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian6)
 
 TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian7)
 {
-    SCOPED_TRACE("Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (54, -30).");
+    SCOPED_TRACE(
+      "Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (54, -30).");
 
     std::shared_ptr<CVenetianCellDescription> aCell = GetCell();
 
@@ -144,7 +151,8 @@ TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian7)
 
 TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian8)
 {
-    SCOPED_TRACE("Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (36, -90).");
+    SCOPED_TRACE(
+      "Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (36, -90).");
 
     std::shared_ptr<CVenetianCellDescription> aCell = GetCell();
 
@@ -157,7 +165,8 @@ TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian8)
 
 TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian9)
 {
-    SCOPED_TRACE("Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (54, -60).");
+    SCOPED_TRACE(
+      "Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (54, -60).");
 
     std::shared_ptr<CVenetianCellDescription> aCell = GetCell();
 
@@ -170,7 +179,8 @@ TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian9)
 
 TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian10)
 {
-    SCOPED_TRACE("Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (54, -90).");
+    SCOPED_TRACE(
+      "Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (54, -90).");
 
     std::shared_ptr<CVenetianCellDescription> aCell = GetCell();
 
@@ -183,7 +193,8 @@ TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian10)
 
 TEST_F(TestVenetianCellDescriptionCurvedMinus55, TestVenetian11)
 {
-    SCOPED_TRACE("Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component (76.5, -45).");
+    SCOPED_TRACE("Begin Test: Venetian cell (Curved, -55 degrees slats) - Direct-direct component "
+                 "(76.5, -45).");
 
     std::shared_ptr<CVenetianCellDescription> aCell = GetCell();
 

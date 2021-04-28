@@ -11,7 +11,9 @@ namespace MultiLayerOptics
     //  CInterReflectance
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    CInterReflectance::CInterReflectance(const SquareMatrix & t_Lambda, const SquareMatrix & t_Rb, const SquareMatrix & t_Rf)
+    CInterReflectance::CInterReflectance(const SquareMatrix & t_Lambda,
+                                         const SquareMatrix & t_Rb,
+                                         const SquareMatrix & t_Rf)
     {
         const auto size = t_Lambda.size();
         const auto lRb = t_Lambda * t_Rb;
@@ -32,19 +34,28 @@ namespace MultiLayerOptics
     //  CBSDFDoubleLayer
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    CBSDFDoubleLayer::CBSDFDoubleLayer(const CBSDFIntegrator & t_FrontLayer, const CBSDFIntegrator & t_BackLayer)
+    CBSDFDoubleLayer::CBSDFDoubleLayer(const CBSDFIntegrator & t_FrontLayer,
+                                       const CBSDFIntegrator & t_BackLayer)
     {
         const SquareMatrix aLambda = t_FrontLayer.lambdaMatrix();
         CInterReflectance InterRefl1 =
-          CInterReflectance(aLambda, t_FrontLayer.at(Side::Back, PropertySimple::R), t_BackLayer.at(Side::Front, PropertySimple::R));
+          CInterReflectance(aLambda,
+                            t_FrontLayer.at(Side::Back, PropertySimple::R),
+                            t_BackLayer.at(Side::Front, PropertySimple::R));
 
         CInterReflectance InterRefl2 =
-          CInterReflectance(aLambda, t_BackLayer.at(Side::Front, PropertySimple::R), t_FrontLayer.at(Side::Back, PropertySimple::R));
+          CInterReflectance(aLambda,
+                            t_BackLayer.at(Side::Front, PropertySimple::R),
+                            t_FrontLayer.at(Side::Back, PropertySimple::R));
 
-        m_Tf =
-          equivalentT(t_BackLayer.at(Side::Front, PropertySimple::T), InterRefl1.value(), aLambda, t_FrontLayer.at(Side::Front, PropertySimple::T));
-        m_Tb =
-          equivalentT(t_FrontLayer.at(Side::Back, PropertySimple::T), InterRefl2.value(), aLambda, t_BackLayer.at(Side::Back, PropertySimple::T));
+        m_Tf = equivalentT(t_BackLayer.at(Side::Front, PropertySimple::T),
+                           InterRefl1.value(),
+                           aLambda,
+                           t_FrontLayer.at(Side::Front, PropertySimple::T));
+        m_Tb = equivalentT(t_FrontLayer.at(Side::Back, PropertySimple::T),
+                           InterRefl2.value(),
+                           aLambda,
+                           t_BackLayer.at(Side::Back, PropertySimple::T));
         m_Rf = equivalentR(t_FrontLayer.at(Side::Front, PropertySimple::R),
                            t_FrontLayer.at(Side::Front, PropertySimple::T),
                            t_FrontLayer.at(Side::Back, PropertySimple::T),
@@ -97,7 +108,9 @@ namespace MultiLayerOptics
     //  CEquivalentBSDFLayerSingleBand
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    CEquivalentBSDFLayerSingleBand::CEquivalentBSDFLayerSingleBand(const std::shared_ptr<CBSDFIntegrator> & t_Layer) : m_PropertiesCalculated(false)
+    CEquivalentBSDFLayerSingleBand::CEquivalentBSDFLayerSingleBand(
+      const std::shared_ptr<CBSDFIntegrator> & t_Layer) :
+        m_PropertiesCalculated(false)
     {
         m_EquivalentLayer = std::make_shared<CBSDFIntegrator>(t_Layer);
         for(Side aSide : EnumSide())
@@ -108,18 +121,21 @@ namespace MultiLayerOptics
         m_Lambda = t_Layer->lambdaMatrix();
     }
 
-    SquareMatrix CEquivalentBSDFLayerSingleBand::getMatrix(const Side t_Side, const PropertySimple t_Property)
+    SquareMatrix CEquivalentBSDFLayerSingleBand::getMatrix(const Side t_Side,
+                                                           const PropertySimple t_Property)
     {
         calcEquivalentProperties();
         return m_EquivalentLayer->getMatrix(t_Side, t_Property);
     }
 
-    SquareMatrix CEquivalentBSDFLayerSingleBand::getProperty(const Side t_Side, const PropertySimple t_Property)
+    SquareMatrix CEquivalentBSDFLayerSingleBand::getProperty(const Side t_Side,
+                                                             const PropertySimple t_Property)
     {
         return getMatrix(t_Side, t_Property);
     }
 
-    std::vector<double> CEquivalentBSDFLayerSingleBand::getLayerAbsorptances(const size_t Index, Side t_Side)
+    std::vector<double> CEquivalentBSDFLayerSingleBand::getLayerAbsorptances(const size_t Index,
+                                                                             Side t_Side)
     {
         calcEquivalentProperties();
         return m_A.at(t_Side)[Index - 1];
@@ -186,11 +202,16 @@ namespace MultiLayerOptics
                 CBSDFIntegrator & Layer1 = *m_Backward[i + 1];
                 CBSDFIntegrator & Layer2 = *m_Forward[i];
                 CInterReflectance InterRefl2 =
-                  CInterReflectance(m_Lambda, Layer1.at(Side::Front, PropertySimple::R), Layer2.at(Side::Back, PropertySimple::R));
+                  CInterReflectance(m_Lambda,
+                                    Layer1.at(Side::Front, PropertySimple::R),
+                                    Layer2.at(Side::Back, PropertySimple::R));
                 const std::vector<double> Ab = m_Layers[i]->Abs(Side::Back);
-                Ap1b = absTerm1(Ab, InterRefl2.value(), Layer1.getMatrix(Side::Back, PropertySimple::T));
-                Ap2f = absTerm2(
-                  Ab, InterRefl2.value(), Layer1.getMatrix(Side::Front, PropertySimple::R), Layer2.getMatrix(Side::Front, PropertySimple::T));
+                Ap1b =
+                  absTerm1(Ab, InterRefl2.value(), Layer1.getMatrix(Side::Back, PropertySimple::T));
+                Ap2f = absTerm2(Ab,
+                                InterRefl2.value(),
+                                Layer1.getMatrix(Side::Front, PropertySimple::R),
+                                Layer2.getMatrix(Side::Front, PropertySimple::T));
             }
 
             if(i == 0)
@@ -203,11 +224,15 @@ namespace MultiLayerOptics
                 CBSDFIntegrator & Layer1 = *m_Forward[i - 1];
                 CBSDFIntegrator & Layer2 = *m_Backward[i];
                 CInterReflectance InterRefl1 =
-                  CInterReflectance(m_Lambda, Layer1.at(Side::Back, PropertySimple::R), Layer2.at(Side::Front, PropertySimple::R));
+                  CInterReflectance(m_Lambda,
+                                    Layer1.at(Side::Back, PropertySimple::R),
+                                    Layer2.at(Side::Front, PropertySimple::R));
                 std::vector<double> Af = m_Layers[i]->Abs(Side::Front);
                 Ap1f = absTerm1(Af, InterRefl1.value(), Layer1.at(Side::Front, PropertySimple::T));
-                Ap2b = absTerm2(
-                  Af, InterRefl1.value(), Layer1.at(Side::Back, PropertySimple::R), Layer2.at(Side::Back, PropertySimple::T));
+                Ap2b = absTerm2(Af,
+                                InterRefl1.value(),
+                                Layer1.at(Side::Back, PropertySimple::R),
+                                Layer2.at(Side::Back, PropertySimple::T));
             }
 
             std::map<Side, std::vector<double>> aTotal;
@@ -230,7 +255,9 @@ namespace MultiLayerOptics
     }
 
     std::vector<double>
-      CEquivalentBSDFLayerSingleBand::absTerm1(const std::vector<double> & t_Alpha, const SquareMatrix & t_InterRefl, const SquareMatrix & t_T) const
+      CEquivalentBSDFLayerSingleBand::absTerm1(const std::vector<double> & t_Alpha,
+                                               const SquareMatrix & t_InterRefl,
+                                               const SquareMatrix & t_T) const
     {
         auto part1 = t_Alpha * t_InterRefl;
         const auto part2 = m_Lambda * t_T;
@@ -238,10 +265,11 @@ namespace MultiLayerOptics
         return part1;
     }
 
-    std::vector<double> CEquivalentBSDFLayerSingleBand::absTerm2(const std::vector<double> & t_Alpha,
-                                                                 const SquareMatrix & t_InterRefl,
-                                                                 const SquareMatrix & t_R,
-                                                                 const SquareMatrix & t_T) const
+    std::vector<double>
+      CEquivalentBSDFLayerSingleBand::absTerm2(const std::vector<double> & t_Alpha,
+                                               const SquareMatrix & t_InterRefl,
+                                               const SquareMatrix & t_R,
+                                               const SquareMatrix & t_T) const
     {
         auto part1 = t_Alpha * t_InterRefl;
         const auto part2 = m_Lambda * t_R;

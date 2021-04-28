@@ -46,8 +46,7 @@ namespace Tarcog
         protected:
             [[nodiscard]] double visionPercentage() const override;
 
-        private:            
-
+        private:
             WindowVision vision;
         };
 

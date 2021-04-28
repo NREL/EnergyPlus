@@ -64,11 +64,15 @@ protected:
 
         EffectiveLayers::EffectiveOpenness effOpenness{effectiveLayer.getEffectiveOpenness()};
 
-        auto layer2 = Tarcog::ISO15099::Layers::shading(
-            shadeLayerThickness, shadeLayerConductance, effOpenness,
-            emissivity, tir, emissivity, tir);
+        auto layer2 = Tarcog::ISO15099::Layers::shading(shadeLayerThickness,
+                                                        shadeLayerConductance,
+                                                        effOpenness,
+                                                        emissivity,
+                                                        tir,
+                                                        emissivity,
+                                                        tir);
 
-        ASSERT_TRUE(layer2 != nullptr);        
+        ASSERT_TRUE(layer2 != nullptr);
 
         auto gapThickness = 0.0127;
         auto gap1 = Tarcog::ISO15099::Layers::gap(gapThickness);
@@ -103,7 +107,7 @@ TEST_F(DoubleIGU_With_TIR_and_Openness_SHGC, Test1)
     auto radiosity = aSystem->getRadiosities(Tarcog::ISO15099::System::SHGC);
 
     std::vector<double> correctTemp = {
-        311.16511198886826, 311.35084358843835, 312.56143334708418, 312.18578373706208};
+      311.16511198886826, 311.35084358843835, 312.56143334708418, 312.18578373706208};
     std::vector<double> correctJ = {
       525.13728201703634, 532.26392522289359, 529.47497000248063, 528.72274402817823};
 

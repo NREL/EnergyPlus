@@ -70,10 +70,10 @@ namespace SingleLayerOptics
                         double diameter,
                         double spacing);
 
-        CBSDFLayerMaker( const std::shared_ptr< CMaterial >& t_Material,
+        CBSDFLayerMaker(const std::shared_ptr<CMaterial> & t_Material,
                         const CBSDFHemisphere & t_BSDF,
-                         std::shared_ptr< ICellDescription > t_Description = nullptr,
-                        const DistributionMethod t_Method = DistributionMethod::UniformDiffuse );
+                        std::shared_ptr<ICellDescription> t_Description = nullptr,
+                        const DistributionMethod t_Method = DistributionMethod::UniformDiffuse);
 
         [[nodiscard]] std::shared_ptr<CBSDFLayer> getLayer() const;
         [[nodiscard]] std::shared_ptr<CBaseCell> getCell() const;

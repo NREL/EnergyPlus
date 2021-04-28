@@ -179,19 +179,19 @@ TEST_F(EquivalentSpecularLayer_6046, TestAngle10)
     CMultiPaneSpecular aLayer = *getLayer();
 
     const double T =
-            aLayer.getPropertySimple(PropertySimple::T, Side::Front, Scattering::DirectDirect, angle, 0);
+      aLayer.getPropertySimple(PropertySimple::T, Side::Front, Scattering::DirectDirect, angle, 0);
     EXPECT_NEAR(0.382717, T, 1e-6);
 
     const double Rf =
-            aLayer.getPropertySimple(PropertySimple::R, Side::Front, Scattering::DirectDirect, angle, 0);
+      aLayer.getPropertySimple(PropertySimple::R, Side::Front, Scattering::DirectDirect, angle, 0);
     EXPECT_NEAR(0.285927, Rf, 1e-6);
 
     const double Rb =
-            aLayer.getPropertySimple(PropertySimple::R, Side::Back, Scattering::DirectDirect, angle, 0);
+      aLayer.getPropertySimple(PropertySimple::R, Side::Back, Scattering::DirectDirect, angle, 0);
     EXPECT_NEAR(0.449203, Rb, 1e-6);
 
     const double Abs1 =
-            aLayer.getAbsorptanceLayer(1, Side::Front, ScatteringSimple::Direct, angle, 0);
+      aLayer.getAbsorptanceLayer(1, Side::Front, ScatteringSimple::Direct, angle, 0);
     EXPECT_NEAR(0.331354, Abs1, 1e-6);
 }
 

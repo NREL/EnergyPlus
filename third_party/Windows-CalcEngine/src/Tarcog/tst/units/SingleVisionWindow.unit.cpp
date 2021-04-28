@@ -49,8 +49,7 @@ protected:
         /////////////////////////////////////////////////////////
         // System
         /////////////////////////////////////////////////////////
-        return std::make_shared<Tarcog::ISO15099::CSystem>(
-          aIGU, Indoor, Outdoor);
+        return std::make_shared<Tarcog::ISO15099::CSystem>(aIGU, Indoor, Outdoor);
     }
 };
 
@@ -115,12 +114,7 @@ TEST_F(TestSingleVisionWindow, CalculatedCOG)
     const auto tVis{0.638525};
     const auto tSol{0.3716};
 
-    auto window = Tarcog::ISO15099::WindowSingleVision(
-      width,
-      height,
-      tVis,
-      tSol,
-      getCOG());
+    auto window = Tarcog::ISO15099::WindowSingleVision(width, height, tVis, tSol, getCOG());
 
     window.setFrameTop(frameData);
     window.setFrameBottom(frameData);

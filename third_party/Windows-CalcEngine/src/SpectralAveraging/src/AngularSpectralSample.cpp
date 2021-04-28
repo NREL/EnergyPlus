@@ -23,7 +23,8 @@ namespace SpectralAveraging
       double const t_Angle,
       MaterialType const t_Type,
       double const t_Thickness) :
-        m_Angle(t_Angle), m_Thickness(t_Thickness)
+        m_Angle(t_Angle),
+        m_Thickness(t_Thickness)
     {
         m_AngularData = std::make_shared<CSpectralSampleData>();
         calculateAngularProperties(t_SpectralSample, t_Type);
@@ -113,7 +114,8 @@ namespace SpectralAveraging
 
     CSpectralSampleAngle::CSpectralSampleAngle(std::shared_ptr<CSpectralSample> const & t_Sample,
                                                double const t_Angle) :
-        m_Sample(t_Sample), m_Angle(t_Angle)
+        m_Sample(t_Sample),
+        m_Angle(t_Angle)
     {}
 
     double CSpectralSampleAngle::angle() const
@@ -134,7 +136,9 @@ namespace SpectralAveraging
       std::shared_ptr<CSpectralSample> const & t_SpectralSample,
       double const t_Thickness,
       FenestrationCommon::MaterialType const t_Type) :
-        m_SpectralSampleZero(t_SpectralSample), m_Thickness(t_Thickness), m_Type(t_Type)
+        m_SpectralSampleZero(t_SpectralSample),
+        m_Thickness(t_Thickness),
+        m_Type(t_Type)
     {}
 
     void CAngularSpectralSample::setSourceData(CSeries & t_SourceData)

@@ -1,4 +1,5 @@
 #include <iterator>
+#include <stdexcept>
 
 #include "MultiPaneSpectralSample.hpp"
 #include "MultiPaneSampleData.hpp"
@@ -11,8 +12,7 @@ using namespace FenestrationCommon;
 namespace MultiLayerOptics
 {
     CMultiPaneSpectralSample::CMultiPaneSpectralSample(
-            const std::shared_ptr<CSpectralSampleData> &t_SampleData,
-            const CSeries &t_SourceData) :
+      const std::shared_ptr<CSpectralSampleData> & t_SampleData, const CSeries & t_SourceData) :
         CSpectralSample(t_SampleData, t_SourceData)
     {}
 
@@ -60,8 +60,7 @@ namespace MultiLayerOptics
             {
                 // Perspective is always from front side when using in MultiLayerOptics. Flipping
                 // flag should be used when putting layer in IGU
-                auto layerAbsorbed =
-                  m_SampleData->properties(Property ::Abs, Side::Front);
+                auto layerAbsorbed = m_SampleData->properties(Property ::Abs, Side::Front);
                 integrateAndAppendAbsorptances(layerAbsorbed);
             }
 
@@ -69,8 +68,7 @@ namespace MultiLayerOptics
         }
     }
 
-    void CMultiPaneSpectralSample::integrateAndAppendAbsorptances(
-            const CSeries &t_Absorptances)
+    void CMultiPaneSpectralSample::integrateAndAppendAbsorptances(const CSeries & t_Absorptances)
     {
         CSeries aAbs = t_Absorptances;
         if(m_WavelengthSet != WavelengthSet::Data)

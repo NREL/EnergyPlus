@@ -54,9 +54,14 @@ TEST_F(TestLinearSolver1, TestSolverException)
 
     std::vector<double> aVector = {1, 2};
 
-    try {
+    try
+    {
         auto aSolution = CLinearSolver::solveSystem(aMatrix, aVector);
-    } catch(const std::runtime_error & err) {
-        EXPECT_EQ(err.what(), std::string("Matrix and vector for system of linear equations are not same size."));
+    }
+    catch(const std::runtime_error & err)
+    {
+        EXPECT_EQ(
+          err.what(),
+          std::string("Matrix and vector for system of linear equations are not same size."));
     }
 }

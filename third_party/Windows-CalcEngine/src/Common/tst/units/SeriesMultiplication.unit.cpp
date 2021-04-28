@@ -14,7 +14,6 @@ private:
 protected:
     void SetUp() override
     {
-
         CSeries astmSolarRadiation = CSeries();
 
         // part of ASTM E891-87 Table 1

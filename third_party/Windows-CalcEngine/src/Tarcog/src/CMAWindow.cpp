@@ -50,7 +50,8 @@ namespace CMA
     {
         // For CMA it does not matter what the value of tsol is
         const auto tSol{1.0};
-        return SHGCb(keffSpacer, tSol) + (SHGCw(keffSpacer, tSol) - SHGCb(keffSpacer, tSol)) * SHGCcog;
+        return SHGCb(keffSpacer, tSol)
+               + (SHGCw(keffSpacer, tSol) - SHGCb(keffSpacer, tSol)) * SHGCcog;
     }
 
     Tarcog::IGUDimensions CMAWindow::getIGUDimensions()

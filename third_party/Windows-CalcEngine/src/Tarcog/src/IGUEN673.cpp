@@ -1,4 +1,6 @@
 #include <numeric>
+#include <stdexcept>
+
 #include "IGUEN673.hpp"
 #include "WCECommon.hpp"
 

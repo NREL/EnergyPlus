@@ -18,8 +18,7 @@ namespace SingleLayerOptics
         {
             std::stringstream err_msg;
             err_msg << "Sum of Transmittance and Reflectance is greater than one.\n"
-					<< "Transmittance: " << t_T 
-					<< "\nReflectance: " << t_R;
+                    << "Transmittance: " << t_T << "\nReflectance: " << t_R;
             throw std::runtime_error(err_msg.str());
         }
         m_Property[Property::T] = t_T;
@@ -52,10 +51,8 @@ namespace SingleLayerOptics
             T_dir_dif = 0;
         m_PropertySimple[std::make_pair(PropertySimple::T, Scattering::DirectDirect)] = T_dir_dir;
         m_PropertySimple[std::make_pair(PropertySimple::R, Scattering::DirectDirect)] = R_dir_dir;
-        m_PropertySimple[std::make_pair(PropertySimple::T, Scattering::DirectDiffuse)] =
-          T_dir_dif;
-        m_PropertySimple[std::make_pair(PropertySimple::R, Scattering::DirectDiffuse)] =
-          R_dir_dif;
+        m_PropertySimple[std::make_pair(PropertySimple::T, Scattering::DirectDiffuse)] = T_dir_dif;
+        m_PropertySimple[std::make_pair(PropertySimple::R, Scattering::DirectDiffuse)] = R_dir_dif;
         m_PropertySimple[std::make_pair(PropertySimple::T, Scattering::DirectHemispherical)] =
           T_dir_dif + T_dir_dir;
         m_PropertySimple[std::make_pair(PropertySimple::R, Scattering::DirectHemispherical)] =

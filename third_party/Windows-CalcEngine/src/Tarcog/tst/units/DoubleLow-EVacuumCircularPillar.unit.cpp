@@ -45,21 +45,21 @@ protected:
         auto emissivityBackIR = 0.036749500781;
 
         auto layer1 = Tarcog::ISO15099::Layers::solid(solidLayerThickness,
-                                                            solidLayerConductance,
-                                                            emissivityFrontIR,
-                                                            TransmittanceIR,
-                                                            emissivityBackIR,
-                                                            TransmittanceIR);
+                                                      solidLayerConductance,
+                                                      emissivityFrontIR,
+                                                      TransmittanceIR,
+                                                      emissivityBackIR,
+                                                      TransmittanceIR);
 
         solidLayerThickness = 0.003962399904;
         emissivityBackIR = 0.84;
 
         auto layer2 = Tarcog::ISO15099::Layers::solid(solidLayerThickness,
-                                                            solidLayerConductance,
-                                                            emissivityFrontIR,
-                                                            TransmittanceIR,
-                                                            emissivityBackIR,
-                                                            TransmittanceIR);
+                                                      solidLayerConductance,
+                                                      emissivityFrontIR,
+                                                      TransmittanceIR,
+                                                      emissivityBackIR,
+                                                      TransmittanceIR);
 
         auto gapThickness = 0.0001;
         auto gapPressure = 0.1333;

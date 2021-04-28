@@ -83,7 +83,11 @@ namespace MultiLayerOptics
     {
         return Abs(
                  Index, t_Angle, minLambda, maxLambda, t_IntegrationType, normalizationCoefficient)
-               - AbsHeat(
-                 Index, t_Angle, minLambda, maxLambda, t_IntegrationType, normalizationCoefficient);
+               - AbsHeat(Index,
+                         t_Angle,
+                         minLambda,
+                         maxLambda,
+                         t_IntegrationType,
+                         normalizationCoefficient);
     }
 }   // namespace MultiLayerOptics

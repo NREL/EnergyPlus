@@ -32,10 +32,13 @@ namespace Tarcog
             [[nodiscard]] std::vector<double> getMaxDeflections(System t_System);
             [[nodiscard]] std::vector<double> getMeanDeflections(System t_System);
 
-            [[nodiscard]] std::vector<std::shared_ptr<CIGUSolidLayer>> getSolidLayers(System t_System) const;
+            [[nodiscard]] std::vector<std::shared_ptr<CIGUSolidLayer>>
+              getSolidLayers(System t_System) const;
 
-            [[nodiscard]] std::vector<double> getSolidEffectiveLayerConductivities(const System t_System);
-            [[nodiscard]] std::vector<double> getGapEffectiveLayerConductivities(const System t_System);
+            [[nodiscard]] std::vector<double>
+              getSolidEffectiveLayerConductivities(const System t_System);
+            [[nodiscard]] std::vector<double>
+              getGapEffectiveLayerConductivities(const System t_System);
             [[nodiscard]] double getEffectiveSystemConductivity(const System t_System);
             [[nodiscard]] double thickness(const System t_System) const;
 

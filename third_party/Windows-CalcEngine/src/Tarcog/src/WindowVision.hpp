@@ -16,7 +16,11 @@ namespace Tarcog
         public:
             WindowVision() = default;
             WindowVision(const WindowVision & vision) = default;
-            WindowVision(double width, double height, double tvis, double tsol, std::shared_ptr<IIGUSystem> iguSystem);
+            WindowVision(double width,
+                         double height,
+                         double tvis,
+                         double tsol,
+                         std::shared_ptr<IIGUSystem> iguSystem);
             [[nodiscard]] double area() const override;
             [[nodiscard]] double uValue() const override;
             //! Returns solar transmittance for the default IGU solar transmittance.
@@ -30,7 +34,7 @@ namespace Tarcog
             [[nodiscard]] double uValueCOG() const;
             [[nodiscard]] double shgcCOG() const;
             void setHc(double hc) override;
-            
+
             void setFrameData(FramePosition position, FrameData frameData);
 
             void setFrameTypes(std::map<FramePosition, FrameType> frameTypes);
@@ -72,9 +76,8 @@ namespace Tarcog
             std::map<FramePosition, Frame> m_Frame;
 
             size_t m_NumOfVerticalDividers{0u};
-            size_t m_NumOfHorizontalDividers{0u}; 
+            size_t m_NumOfHorizontalDividers{0u};
             std::optional<FrameData> m_Divider;
-
         };
     }   // namespace ISO15099
 }   // namespace Tarcog

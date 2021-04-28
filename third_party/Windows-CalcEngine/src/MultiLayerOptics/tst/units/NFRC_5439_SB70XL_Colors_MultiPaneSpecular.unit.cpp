@@ -324,8 +324,7 @@ private:
 
         aMaterial->setBandWavelengths(loadWavelengths());
 
-        auto single_layer =
-          SingleLayerOptics::SpecularLayer::createLayer(aMaterial);
+        auto single_layer = SingleLayerOptics::SpecularLayer::createLayer(aMaterial);
 
         CSeries solarRadiation{loadSolarRadiationFile()};
         single_layer->setSourceData(solarRadiation);

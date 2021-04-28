@@ -3,21 +3,28 @@
 #include <map>
 #include "GasData.hpp"
 
-namespace Gases {
-  
-  enum class GasDef {Air, Argon, Krypton, Xenon};
+namespace Gases
+{
+    enum class GasDef
+    {
+        Air,
+        Argon,
+        Krypton,
+        Xenon
+    };
 
-	class Gas {
-	public:
-		static Gas & intance();
+    class Gas
+    {
+    public:
+        static Gas & intance();
 
-		CGasData get( GasDef gasDef ) const;
+        CGasData get(GasDef gasDef) const;
 
-	private:
-		Gas();
+    private:
+        Gas();
 
-		// Storage for predefined gases
-		const std::map<GasDef, const CGasData> m_Gas;
-	};
+        // Storage for predefined gases
+        const std::map<GasDef, const CGasData> m_Gas;
+    };
 
-}
+}   // namespace Gases

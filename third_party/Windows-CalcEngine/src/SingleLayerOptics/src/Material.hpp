@@ -13,7 +13,7 @@ namespace SingleLayerOptics
 {
     class CMaterial;
     class CMaterialPhotovoltaic;
-	class CBSDFHemisphere;
+    class CBSDFHemisphere;
 
     class Material
     {

@@ -86,7 +86,7 @@ protected:
         const auto windowWidth{1.2};
         const auto windowHeight{1.5};
         const auto tVis{0.6385};
-        const auto tSol{0.371589958668};        
+        const auto tSol{0.371589958668};
 
         m_Window = Tarcog::ISO15099::WindowSingleVision(windowWidth, windowHeight, tVis, tSol, igu);
 
@@ -102,10 +102,7 @@ protected:
     }
 
 public:
-    [[nodiscard]] Tarcog::ISO15099::WindowSingleVision & getWindow()
-    {
-        return m_Window;
-    }
+    [[nodiscard]] Tarcog::ISO15099::WindowSingleVision & getWindow() { return m_Window; }
 };
 
 TEST_F(TestDoubleLowESingleVisionUFactorRunWithDividers, Test1)
@@ -114,7 +111,7 @@ TEST_F(TestDoubleLowESingleVisionUFactorRunWithDividers, Test1)
 
     const auto window{getWindow()};
 
-    const auto UValue {window.uValue()};
+    const auto UValue{window.uValue()};
     EXPECT_NEAR(UValue, 2.067558, 1e-5);
 
     const auto SHGC{window.shgc()};

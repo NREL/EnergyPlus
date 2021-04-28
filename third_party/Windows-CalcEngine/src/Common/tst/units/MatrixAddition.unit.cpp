@@ -38,7 +38,9 @@ TEST_F(TestMatrixAddition, TestAdditionException)
     try
     {
         auto c = a + b;
-    } catch(const std::runtime_error & err) {
+    }
+    catch(const std::runtime_error & err)
+    {
         EXPECT_EQ(err.what(), std::string("Matrices must be identical in size."));
     }
 }
@@ -69,7 +71,9 @@ TEST_F(TestMatrixAddition, TestSubractionException)
     try
     {
         auto c = a - b;
-    } catch(const std::runtime_error & err) {
+    }
+    catch(const std::runtime_error & err)
+    {
         EXPECT_EQ(err.what(), std::string("Matrices must be identical in size."));
     }
 }

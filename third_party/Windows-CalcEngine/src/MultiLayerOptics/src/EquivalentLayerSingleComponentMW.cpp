@@ -1,4 +1,5 @@
 #include <sstream>
+#include <stdexcept>
 
 #include "EquivalentLayerSingleComponentMW.hpp"
 #include "WCECommon.hpp"
@@ -12,8 +13,7 @@ namespace MultiLayerOptics
     ///   CSurfaceSeries
     ///////////////////////////////////////////////////////////////////////////
 
-    CSurfaceSeries::CSurfaceSeries(const CSeries &t_T,
-                                   const CSeries &t_R)
+    CSurfaceSeries::CSurfaceSeries(const CSeries & t_T, const CSeries & t_R)
     {
         m_Properties[Property::T] = t_T;
         m_Properties[Property::R] = t_R;
@@ -48,17 +48,16 @@ namespace MultiLayerOptics
     ///   CLayerSeries
     ///////////////////////////////////////////////////////////////////////////
 
-    CLayerSeries::CLayerSeries(const CSeries &t_Tf,
-                               const CSeries &t_Rf,
-                               const CSeries &t_Tb,
-                               const CSeries &t_Rb)
+    CLayerSeries::CLayerSeries(const CSeries & t_Tf,
+                               const CSeries & t_Rf,
+                               const CSeries & t_Tb,
+                               const CSeries & t_Rb)
     {
         m_Surfaces[Side::Front] = std::make_shared<CSurfaceSeries>(t_Tf, t_Rf);
         m_Surfaces[Side::Back] = std::make_shared<CSurfaceSeries>(t_Tb, t_Rb);
     }
 
-    CSeries CLayerSeries::getProperties(const Side t_Side,
-                                        const Property t_Property) const
+    CSeries CLayerSeries::getProperties(const Side t_Side, const Property t_Property) const
     {
         return m_Surfaces.at(t_Side)->getProperties(t_Property);
     }
@@ -67,11 +66,10 @@ namespace MultiLayerOptics
     ///   CEquivalentLayerSingleComponentMW
     ///////////////////////////////////////////////////////////////////////////
 
-    CEquivalentLayerSingleComponentMW::CEquivalentLayerSingleComponentMW(
-            const CSeries &t_Tf,
-            const CSeries &t_Tb,
-            const CSeries &t_Rf,
-            const CSeries &t_Rb)
+    CEquivalentLayerSingleComponentMW::CEquivalentLayerSingleComponentMW(const CSeries & t_Tf,
+                                                                         const CSeries & t_Tb,
+                                                                         const CSeries & t_Rf,
+                                                                         const CSeries & t_Rb)
     {
         m_Layer = std::make_shared<CLayerSeries>(t_Tf, t_Rf, t_Tb, t_Rb);
 
@@ -85,18 +83,17 @@ namespace MultiLayerOptics
         }
     }
 
-    void CEquivalentLayerSingleComponentMW::addLayer(const CSeries &t_Tf,
-                                                     const CSeries &t_Tb,
-                                                     const CSeries &t_Rf,
-                                                     const CSeries &t_Rb)
+    void CEquivalentLayerSingleComponentMW::addLayer(const CSeries & t_Tf,
+                                                     const CSeries & t_Tb,
+                                                     const CSeries & t_Rf,
+                                                     const CSeries & t_Rb)
     {
         size_t size = t_Tf.size();
 
         for(size_t i = 0; i < size; ++i)
         {
             std::shared_ptr<CEquivalentLayerSingleComponent> aLayer = m_EqLayerBySeries[i];
-            aLayer->addLayer(
-              t_Tf[i].value(), t_Rf[i].value(), t_Tb[i].value(), t_Rb[i].value());
+            aLayer->addLayer(t_Tf[i].value(), t_Rf[i].value(), t_Tb[i].value(), t_Rb[i].value());
         }
 
         CSeries tTotf;
@@ -124,9 +121,8 @@ namespace MultiLayerOptics
         m_Layer = std::make_shared<CLayerSeries>(tTotf, tRfTot, tTotb, tRbTot);
     }
 
-    CSeries
-      CEquivalentLayerSingleComponentMW::getProperties(const Property t_Property,
-                                                       const Side t_Side) const
+    CSeries CEquivalentLayerSingleComponentMW::getProperties(const Property t_Property,
+                                                             const Side t_Side) const
     {
         return m_Layer->getProperties(t_Side, t_Property);
     }

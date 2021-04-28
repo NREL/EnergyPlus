@@ -1,5 +1,6 @@
 #include <cassert>
 #include <algorithm>
+#include <stdexcept>
 
 #include "VenetianCell.hpp"
 #include "VenetianCellDescription.hpp"
@@ -40,9 +41,9 @@ namespace SingleLayerOptics
     //  CVenetianSlatEnergies
     ////////////////////////////////////////////////////////////////////////////////////////////
     CVenetianSlatEnergies::CVenetianSlatEnergies(
-		const CBeamDirection & t_BeamDirection,
-		const std::vector< SegmentIrradiance > & t_SlatIrradiances,
-		const std::vector< double > & t_SlatRadiances ) :
+      const CBeamDirection & t_BeamDirection,
+      const std::vector<SegmentIrradiance> & t_SlatIrradiances,
+      const std::vector<double> & t_SlatRadiances) :
         m_SlatIrradiances(t_SlatIrradiances),
         m_SlatRadiances(t_SlatRadiances),
         m_CalcDirection(std::make_shared<CBeamDirection>())
@@ -105,9 +106,9 @@ namespace SingleLayerOptics
     }
 
     std::shared_ptr<CVenetianSlatEnergies> CVenetianCellEnergy::CSlatEnergyResults::append(
-		const CBeamDirection & t_BeamDirection,
-		const std::vector< SegmentIrradiance > & t_SlatIrradiances,
-		const std::vector< double > & t_SlatRadiances )
+      const CBeamDirection & t_BeamDirection,
+      const std::vector<SegmentIrradiance> & t_SlatIrradiances,
+      const std::vector<double> & t_SlatRadiances)
     {
         std::shared_ptr<CVenetianSlatEnergies> aEnergy = std::make_shared<CVenetianSlatEnergies>(
           t_BeamDirection, t_SlatIrradiances, t_SlatRadiances);
@@ -250,8 +251,8 @@ namespace SingleLayerOptics
         return aSolution[numSeg];
     }
 
-    std::vector< SegmentIrradiance >
-      CVenetianCellEnergy::slatIrradiances( const CBeamDirection & t_IncomingDirection )
+    std::vector<SegmentIrradiance>
+      CVenetianCellEnergy::slatIrradiances(const CBeamDirection & t_IncomingDirection)
     {
         std::vector<SegmentIrradiance> aIrradiances;
 
@@ -307,8 +308,8 @@ namespace SingleLayerOptics
         return aIrradiances;
     }
 
-    std::vector< double > CVenetianCellEnergy::slatRadiances(
-		std::vector< SegmentIrradiance > & t_Irradiances )
+    std::vector<double>
+      CVenetianCellEnergy::slatRadiances(std::vector<SegmentIrradiance> & t_Irradiances)
     {
         size_t numSlats = t_Irradiances.size();
         std::vector<double> aRadiances(2 * numSlats - 2);
@@ -324,10 +325,8 @@ namespace SingleLayerOptics
             }
             else
             {
-                aRadiances[b[i]] =
-                  m_Tf * t_Irradiances[i].E_f + m_Rb * t_Irradiances[i].E_b;
-                aRadiances[f[i - 1]] =
-                  m_Tb * t_Irradiances[i].E_b + m_Rf * t_Irradiances[i].E_f;
+                aRadiances[b[i]] = m_Tf * t_Irradiances[i].E_f + m_Rb * t_Irradiances[i].E_b;
+                aRadiances[f[i - 1]] = m_Tb * t_Irradiances[i].E_b + m_Rf * t_Irradiances[i].E_f;
             }
         }
 
@@ -620,7 +619,7 @@ namespace SingleLayerOptics
         }
     }
 
-    void CVenetianCell::setSourceData(CSeries &t_SourceData)
+    void CVenetianCell::setSourceData(CSeries & t_SourceData)
     {
         CBaseCell::setSourceData(t_SourceData);
         generateVenetianEnergy();
@@ -692,10 +691,9 @@ namespace SingleLayerOptics
         return aCell->T_dir_dir(t_IncomingDirection, t_OutgoingDirection);
     }
 
-    std::vector<double>
-        CVenetianCell::T_dir_dif_band(const Side t_Side,
-                                      const CBeamDirection & t_IncomingDirection,
-                                      const CBeamDirection & t_OutgoingDirection)
+    std::vector<double> CVenetianCell::T_dir_dif_band(const Side t_Side,
+                                                      const CBeamDirection & t_IncomingDirection,
+                                                      const CBeamDirection & t_OutgoingDirection)
     {
         size_t size = m_EnergiesBand.size();
         std::vector<double> aProperties;
@@ -715,10 +713,9 @@ namespace SingleLayerOptics
         return aCell->R_dir_dir(t_IncomingDirection, t_OutgoingDirection);
     }
 
-    std::vector<double>
-        CVenetianCell::R_dir_dif_band(const Side t_Side,
-                                      const CBeamDirection & t_IncomingDirection,
-                                      const CBeamDirection & t_OutgoingDirection)
+    std::vector<double> CVenetianCell::R_dir_dif_band(const Side t_Side,
+                                                      const CBeamDirection & t_IncomingDirection,
+                                                      const CBeamDirection & t_OutgoingDirection)
     {
         size_t size = m_EnergiesBand.size();
         std::vector<double> aProperties;

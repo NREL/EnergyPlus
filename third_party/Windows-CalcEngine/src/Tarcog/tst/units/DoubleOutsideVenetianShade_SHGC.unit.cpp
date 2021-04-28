@@ -74,13 +74,13 @@ protected:
         auto Tirb = 0.42293224373137134;
 
         // from window
-        //auto Ef = 0.556472361088;
-        //auto Eb = 0.556472361088;
-        //auto Tirf = 0.422942101955;
-        //auto Tirb = 0.422942101955;
+        // auto Ef = 0.556472361088;
+        // auto Eb = 0.556472361088;
+        // auto Tirf = 0.422942101955;
+        // auto Tirb = 0.422942101955;
 
         auto aLayer1 = Tarcog::ISO15099::Layers::shading(
-            effectiveThickness, shadeLayerConductance, effOpenness, Ef, Tirf, Eb, Tirb);
+          effectiveThickness, shadeLayerConductance, effOpenness, Ef, Tirf, Eb, Tirb);
 
         // auto aLayer1 = Tarcog::ISO15099::Layers::solid(shadeLayerThickness,
         // shadeLayerConductance);

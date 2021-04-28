@@ -106,10 +106,7 @@ protected:
     }
 
 public:
-    [[nodiscard]] Tarcog::ISO15099::DualVisionVertical & getWindow()
-    {
-        return m_Window;
-    }
+    [[nodiscard]] Tarcog::ISO15099::DualVisionVertical & getWindow() { return m_Window; }
 };
 
 TEST_F(TestDoubleLowEVerticalSliderSHGCRun, Test1)

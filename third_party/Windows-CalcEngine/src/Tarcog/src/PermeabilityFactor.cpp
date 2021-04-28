@@ -101,6 +101,6 @@ namespace ThermalPermeability
                 opennessFraction = 0;
             return opennessFraction;
         }
-    }
+    }   // namespace Woven
 
 }   // namespace ThermalPermeability

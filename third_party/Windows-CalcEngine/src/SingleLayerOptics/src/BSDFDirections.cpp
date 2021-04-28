@@ -1,5 +1,6 @@
 #include <cassert>
 #include <algorithm>
+#include <stdexcept>
 
 #include "BSDFDirections.hpp"
 #include "BSDFPatch.hpp"
@@ -63,7 +64,7 @@ namespace SingleLayerOptics
             }
 
 
-			const auto nPhis = numPhiAngles[i - 1];
+            const auto nPhis = numPhiAngles[i - 1];
             CPhiLimits phiAngles(nPhis);
             auto phiLimits = phiAngles.getPhiLimits();
             double lowerPhi = phiLimits[0];
@@ -102,7 +103,7 @@ namespace SingleLayerOptics
         return m_Patches.size();
     }
 
-    const CBSDFPatch & CBSDFDirections::operator[]( size_t Index ) const
+    const CBSDFPatch & CBSDFDirections::operator[](size_t Index) const
     {
         return m_Patches[Index];
     }
@@ -129,15 +130,14 @@ namespace SingleLayerOptics
 
     size_t CBSDFDirections::getNearestBeamIndex(const double t_Theta, const double t_Phi) const
     {
-        auto it = std::find_if(
-          m_Patches.begin(), m_Patches.end(), [&](const CBSDFPatch & a) {
-              return a.isInPatch(t_Theta, t_Phi);
-          });
+        auto it = std::find_if(m_Patches.begin(), m_Patches.end(), [&](const CBSDFPatch & a) {
+            return a.isInPatch(t_Theta, t_Phi);
+        });
 
-		if(it == m_Patches.end())
-		{
-			throw std::runtime_error("Could not find nearest beam index");
-		}
+        if(it == m_Patches.end())
+        {
+            throw std::runtime_error("Could not find nearest beam index");
+        }
 
         size_t index = size_t(std::distance(m_Patches.begin(), it));
         return index;

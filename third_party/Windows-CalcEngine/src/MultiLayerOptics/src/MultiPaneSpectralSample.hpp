@@ -6,39 +6,42 @@
 
 #include "WCESpectralAveraging.hpp"
 
-namespace FenestrationCommon {
-
-	class CSeries;
-
+namespace FenestrationCommon
+{
+    class CSeries;
 }
 
-namespace SpectralAveraging {
+namespace SpectralAveraging
+{
+    class CSpectralSampleData;
+    // class CSample;
+}   // namespace SpectralAveraging
 
-	class CSpectralSampleData;
-	//class CSample;
-}
+namespace MultiLayerOptics
+{
+    class CMultiPaneSampleData;
 
-namespace MultiLayerOptics {
+    class CMultiPaneSpectralSample : public SpectralAveraging::CSpectralSample
+    {
+    public:
+        CMultiPaneSpectralSample(
+          const std::shared_ptr<SpectralAveraging::CSpectralSampleData> & t_SampleData,
+          const FenestrationCommon::CSeries & t_SourceData);
 
-	class CMultiPaneSampleData;
+        double getLayerAbsorbedEnergy(double const minLambda,
+                                      double const maxLambda,
+                                      size_t const Index);
+        double
+          getLayerAbsorptance(double const minLambda, double const maxLambda, size_t const Index);
 
-	class CMultiPaneSpectralSample : public SpectralAveraging::CSpectralSample {
-	public:
-		CMultiPaneSpectralSample(const std::shared_ptr< SpectralAveraging::CSpectralSampleData >& t_SampleData,
-                                 const FenestrationCommon::CSeries &t_SourceData );
+    private:
+        void reset();
+        void calculateProperties();
+        void integrateAndAppendAbsorptances(const FenestrationCommon::CSeries & t_Absorptances);
 
-		double getLayerAbsorbedEnergy( double const minLambda, double const maxLambda, size_t const Index );
-		double getLayerAbsorptance( double const minLambda, double const maxLambda, size_t const Index );
+        std::vector<FenestrationCommon::CSeries> m_AbsorbedLayersSource;
+    };
 
-	private:
-		void reset();
-		void calculateProperties();
-		void integrateAndAppendAbsorptances(const FenestrationCommon::CSeries &t_Absorptances );
-
-		std::vector< FenestrationCommon::CSeries > m_AbsorbedLayersSource;
-
-	};
-
-}
+}   // namespace MultiLayerOptics
 
 #endif

@@ -27,8 +27,7 @@ namespace Tarcog
             std::vector<double> calcBalanceMatrix();
 
         private:
-            void buildCell( Tarcog::ISO15099::CBaseLayer & t_Current,
-							size_t t_Index );
+            void buildCell(Tarcog::ISO15099::CBaseLayer & t_Current, size_t t_Index);
 
             FenestrationCommon::SquareMatrix m_MatrixA;
             std::vector<double> m_VectorB;

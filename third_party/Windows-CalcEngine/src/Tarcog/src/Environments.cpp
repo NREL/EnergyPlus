@@ -28,7 +28,7 @@ namespace Tarcog
                                                          airDirection,
                                                          skyTemperature,
                                                          skyModel,
-														 pressure,
+                                                         pressure,
                                                          fractionOfClearSky);
         }
     }   // namespace ISO15099

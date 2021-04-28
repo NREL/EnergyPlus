@@ -37,12 +37,10 @@ protected:
         auto solidLayerThickness = 0.005715;   // [m]
         auto solidLayerConductance = 1.0;
 
-        auto layer1 =
-          Tarcog::ISO15099::Layers::solid(solidLayerThickness, solidLayerConductance);
+        auto layer1 = Tarcog::ISO15099::Layers::solid(solidLayerThickness, solidLayerConductance);
         ASSERT_TRUE(layer1 != nullptr);
 
-        auto layer2 =
-          Tarcog::ISO15099::Layers::solid(solidLayerThickness, solidLayerConductance);
+        auto layer2 = Tarcog::ISO15099::Layers::solid(solidLayerThickness, solidLayerConductance);
         ASSERT_TRUE(layer2 != nullptr);
 
         auto shadeLayerThickness = 0.01;
@@ -64,7 +62,7 @@ protected:
         EffectiveLayers::EffectiveOpenness effOpenness{effectiveLayer.getEffectiveOpenness()};
 
         auto shadeLayer = Tarcog::ISO15099::Layers::shading(
-            shadeLayerThickness, shadeLayerConductance, effOpenness);
+          shadeLayerThickness, shadeLayerConductance, effOpenness);
 
         ASSERT_TRUE(shadeLayer != nullptr);
 
@@ -74,7 +72,7 @@ protected:
 
         auto gap2 = Tarcog::ISO15099::Layers::gap(gapThickness);
         ASSERT_TRUE(gap2 != nullptr);
-      
+
         Tarcog::ISO15099::CIGU aIGU(windowWidth, windowHeight);
         aIGU.addLayers({layer1, gap1, shadeLayer, gap2, layer2});
 

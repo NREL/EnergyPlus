@@ -56,7 +56,7 @@ TEST_F(TestCMADoubleVisionVerticalWindow, CMADualVerticalVision)
                                      frameDataWorstWorstSill};
 
     const auto width{1.2};
-    const auto height{1.5};    
+    const auto height{1.5};
 
     auto window{CMA::CMAWindowDualVisionVertical(width, height)};
 
@@ -84,5 +84,5 @@ TEST_F(TestCMADoubleVisionVerticalWindow, CMADualVerticalVision)
 
     const auto iguDimensions{window.getIGUDimensions()};
     EXPECT_NEAR(1.114250, iguDimensions.width, 1e-6);
-    EXPECT_NEAR(0.685687, iguDimensions.height, 1e-6);    
+    EXPECT_NEAR(0.685687, iguDimensions.height, 1e-6);
 }

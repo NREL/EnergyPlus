@@ -224,19 +224,20 @@ TEST_F(EquivalentSpecularLayer_102_103, TestAngle0)
 
     CMultiPaneSpecular aLayer = *getLayer();
 
-    const double T =
-      aLayer.getPropertySimple(minLambda, maxLambda, PropertySimple::T, Side::Front, Scattering::DirectDirect, angle, 0);
+    const double T = aLayer.getPropertySimple(
+      minLambda, maxLambda, PropertySimple::T, Side::Front, Scattering::DirectDirect, angle, 0);
     EXPECT_NEAR(0.652311, T, 1e-6);
 
-    const double Rf =
-      aLayer.getPropertySimple(minLambda, maxLambda, PropertySimple::R, Side::Front, Scattering::DirectDirect, angle, 0);
+    const double Rf = aLayer.getPropertySimple(
+      minLambda, maxLambda, PropertySimple::R, Side::Front, Scattering::DirectDirect, angle, 0);
     EXPECT_NEAR(0.124742, Rf, 1e-6);
 
-    const double Rb =
-      aLayer.getPropertySimple(minLambda, maxLambda, PropertySimple::R, Side::Back, Scattering::DirectDirect, angle, 0);
+    const double Rb = aLayer.getPropertySimple(
+      minLambda, maxLambda, PropertySimple::R, Side::Back, Scattering::DirectDirect, angle, 0);
     EXPECT_NEAR(0.116623, Rb, 1e-6);
 
-    const std::vector<double> Absorptance{ aLayer.getAbsorptanceLayers(minLambda, maxLambda, Side::Front, ScatteringSimple::Direct, angle, 0)};
+    const std::vector<double> Absorptance{aLayer.getAbsorptanceLayers(
+      minLambda, maxLambda, Side::Front, ScatteringSimple::Direct, angle, 0)};
 
     const double Abs1 =
       aLayer.getAbsorptanceLayer(1, Side::Front, ScatteringSimple::Direct, angle, 0);
@@ -452,13 +453,15 @@ TEST_F(EquivalentSpecularLayer_102_103, TestHemispherical)
     auto aLayer = *getLayer();
 
     const std::vector<double> absorptances{
-            aLayer.getAbsorptanceLayers(minLambda, maxLambda, Side::Front, ScatteringSimple::Diffuse)};
+      aLayer.getAbsorptanceLayers(minLambda, maxLambda, Side::Front, ScatteringSimple::Diffuse)};
 
-    double Abs1 = aLayer.getAbsorptanceLayer(minLambda, maxLambda, 1, Side::Front, ScatteringSimple::Diffuse);
+    double Abs1 =
+      aLayer.getAbsorptanceLayer(minLambda, maxLambda, 1, Side::Front, ScatteringSimple::Diffuse);
     EXPECT_NEAR(0.108915, Abs1, 1e-6);
     EXPECT_NEAR(0.108915, absorptances[0], 1e-6);
 
-    double Abs2 = aLayer.getAbsorptanceLayer(minLambda, maxLambda, 2, Side::Front, ScatteringSimple::Diffuse);
+    double Abs2 =
+      aLayer.getAbsorptanceLayer(minLambda, maxLambda, 2, Side::Front, ScatteringSimple::Diffuse);
     EXPECT_NEAR(0.126861, Abs2, 1e-6);
     EXPECT_NEAR(0.126861, absorptances[1], 1e-6);
 }

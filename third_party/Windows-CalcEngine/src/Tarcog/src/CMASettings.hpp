@@ -4,7 +4,6 @@
 
 namespace CMA
 {
-
     ///////////////////////////////////////////////////
     //  CMABestWorstUFactors
     ///////////////////////////////////////////////////
@@ -33,11 +32,14 @@ namespace CMA
         [[nodiscard]] double hcout();
 
     private:
-        [[nodiscard]] double heatFlow(double interiorRadiationFilmCoefficient, double exteriorRadiationFilmCoefficient) const;
+        [[nodiscard]] double heatFlow(double interiorRadiationFilmCoefficient,
+                                      double exteriorRadiationFilmCoefficient) const;
         [[nodiscard]] double hrout(double surfaceTemperature) const;
         [[nodiscard]] double hrin(double surfaceTemperature) const;
-        [[nodiscard]] double insideSurfaceTemperature(double interiorRadiationFilmCoefficient) const;
-        [[nodiscard]] double outsideSurfaceTemperature(double exteriorRadiationFilmCoefficient) const;
+        [[nodiscard]] double
+          insideSurfaceTemperature(double interiorRadiationFilmCoefficient) const;
+        [[nodiscard]] double
+          outsideSurfaceTemperature(double exteriorRadiationFilmCoefficient) const;
         void caluculate();
 
         double m_Hci{0};
@@ -52,7 +54,7 @@ namespace CMA
         double m_InsideAirTemperature{21};
         double m_OutsideAirTemperature{-18};
 
-        //! These two needs to be calculated through iterations 
+        //! These two needs to be calculated through iterations
         double m_Hri{0};
         double m_Hro{0};
 
@@ -61,4 +63,4 @@ namespace CMA
 
     //! Creates built in values for CMA U-factors
     CMABestWorstUFactors CreateBestWorstUFactorOption(Option option);
-}
+}   // namespace CMA

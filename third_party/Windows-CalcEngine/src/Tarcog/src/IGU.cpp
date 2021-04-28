@@ -26,7 +26,9 @@ namespace Tarcog
     namespace ISO15099
     {
         CIGU::CIGU(double const t_Width, double const t_Height, double const t_Tilt) :
-            m_Width(t_Width), m_Height(t_Height), m_Tilt(t_Tilt)
+            m_Width(t_Width),
+            m_Height(t_Height),
+            m_Tilt(t_Tilt)
         {}
 
         CIGU::CIGU(CIGU const & t_IGU)

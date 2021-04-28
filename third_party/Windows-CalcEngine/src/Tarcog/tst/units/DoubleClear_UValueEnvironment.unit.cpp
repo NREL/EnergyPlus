@@ -22,12 +22,8 @@ protected:
         auto tSky = 255.15;             // Kelvins
         auto solarRadiation = 789.0;
 
-        auto Outdoor =
-			Tarcog::ISO15099::Environments::outdoor( airTemperature,
-													 airSpeed,
-													 solarRadiation,
-													 tSky,
-													 Tarcog::ISO15099::SkyModel::AllSpecified);
+        auto Outdoor = Tarcog::ISO15099::Environments::outdoor(
+          airTemperature, airSpeed, solarRadiation, tSky, Tarcog::ISO15099::SkyModel::AllSpecified);
         ASSERT_TRUE(Outdoor != nullptr);
         Outdoor->setHCoeffModel(Tarcog::ISO15099::BoundaryConditionsCoeffModel::CalculateH);
 
@@ -64,9 +60,9 @@ protected:
         aIGU.addLayers({aSolidLayer1, gapLayer, aSolidLayer2});
 
         // Alternative way of adding layers.
-        //aIGU.addLayer(aSolidLayer1);
-        //aIGU.addLayer(gapLayer);
-        //aIGU.addLayer(aSolidLayer2);
+        // aIGU.addLayer(aSolidLayer1);
+        // aIGU.addLayer(gapLayer);
+        // aIGU.addLayer(aSolidLayer2);
 
         /////////////////////////////////////////////////////////
         /// System

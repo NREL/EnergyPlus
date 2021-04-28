@@ -8,11 +8,15 @@ using namespace FenestrationCommon;
 
 namespace MultiLayerOptics
 {
-    CEquivalentLayerSingleComponent::CEquivalentLayerSingleComponent(const double t_Tf, const double t_Rf, const double t_Tb, const double t_Rb) :
+    CEquivalentLayerSingleComponent::CEquivalentLayerSingleComponent(const double t_Tf,
+                                                                     const double t_Rf,
+                                                                     const double t_Tb,
+                                                                     const double t_Rb) :
         m_EquivalentLayer(std::make_shared<CLayerSingleComponent>(t_Tf, t_Rf, t_Tb, t_Rb))
     {}
 
-    CEquivalentLayerSingleComponent::CEquivalentLayerSingleComponent(const CLayerSingleComponent & t_Layer)
+    CEquivalentLayerSingleComponent::CEquivalentLayerSingleComponent(
+      const CLayerSingleComponent & t_Layer)
     {
         const double Tf = t_Layer.getProperty(Property::T, Side::Front);
         const double Rf = t_Layer.getProperty(Property::R, Side::Front);
@@ -22,7 +26,8 @@ namespace MultiLayerOptics
         m_EquivalentLayer = std::make_shared<CLayerSingleComponent>(Tf, Rf, Tb, Rb);
     }
 
-    void CEquivalentLayerSingleComponent::addLayer(const double t_Tf, const double t_Rf, const double t_Tb, const double t_Rb, const Side t_Side)
+    void CEquivalentLayerSingleComponent::addLayer(
+      const double t_Tf, const double t_Rf, const double t_Tb, const double t_Rb, const Side t_Side)
     {
         std::shared_ptr<CLayerSingleComponent> firstLayer = nullptr;
         std::shared_ptr<CLayerSingleComponent> secondLayer = nullptr;
@@ -48,7 +53,8 @@ namespace MultiLayerOptics
         m_EquivalentLayer = std::make_shared<CLayerSingleComponent>(Tf, Rf, Tb, Rb);
     }
 
-    void CEquivalentLayerSingleComponent::addLayer(const CLayerSingleComponent & t_Layer, const Side t_Side)
+    void CEquivalentLayerSingleComponent::addLayer(const CLayerSingleComponent & t_Layer,
+                                                   const Side t_Side)
     {
         const double Tf = t_Layer.getProperty(Property::T, Side::Front);
         const double Rf = t_Layer.getProperty(Property::R, Side::Front);
@@ -57,7 +63,8 @@ namespace MultiLayerOptics
         addLayer(Tf, Rf, Tb, Rb, t_Side);
     }
 
-    double CEquivalentLayerSingleComponent::getProperty(const Property t_Property, const Side t_Side) const
+    double CEquivalentLayerSingleComponent::getProperty(const Property t_Property,
+                                                        const Side t_Side) const
     {
         return m_EquivalentLayer->getProperty(t_Property, t_Side);
     }
@@ -67,17 +74,26 @@ namespace MultiLayerOptics
         return *m_EquivalentLayer;
     }
 
-    double CEquivalentLayerSingleComponent::interreflectance(const CLayerSingleComponent & t_Layer1, const CLayerSingleComponent & t_Layer2) const
+    double CEquivalentLayerSingleComponent::interreflectance(
+      const CLayerSingleComponent & t_Layer1, const CLayerSingleComponent & t_Layer2) const
     {
-        return 1 / (1 - t_Layer1.getProperty(Property::R, Side::Back) * t_Layer2.getProperty(Property::R, Side::Front));
+        return 1
+               / (1
+                  - t_Layer1.getProperty(Property::R, Side::Back)
+                      * t_Layer2.getProperty(Property::R, Side::Front));
     }
 
-    double CEquivalentLayerSingleComponent::T(const CLayerSingleComponent & t_Layer1, const CLayerSingleComponent & t_Layer2, Side t_Side) const
+    double CEquivalentLayerSingleComponent::T(const CLayerSingleComponent & t_Layer1,
+                                              const CLayerSingleComponent & t_Layer2,
+                                              Side t_Side) const
     {
-        return t_Layer1.getProperty(Property::T, t_Side) * t_Layer2.getProperty(Property::T, t_Side) * interreflectance(t_Layer1, t_Layer2);
+        return t_Layer1.getProperty(Property::T, t_Side) * t_Layer2.getProperty(Property::T, t_Side)
+               * interreflectance(t_Layer1, t_Layer2);
     }
 
-    double CEquivalentLayerSingleComponent::R(const CLayerSingleComponent & t_Layer1, const CLayerSingleComponent & t_Layer2, Side t_Side) const
+    double CEquivalentLayerSingleComponent::R(const CLayerSingleComponent & t_Layer1,
+                                              const CLayerSingleComponent & t_Layer2,
+                                              Side t_Side) const
     {
         const CLayerSingleComponent * firstLayer = nullptr;
         const CLayerSingleComponent * secondLayer = nullptr;
@@ -97,8 +113,10 @@ namespace MultiLayerOptics
         }
         Side opposite = oppositeSide(t_Side);
         return firstLayer->getProperty(Property::R, t_Side)
-               + firstLayer->getProperty(Property::T, t_Side) * firstLayer->getProperty(Property::T, opposite)
-                   * secondLayer->getProperty(Property::R, t_Side) * interreflectance(t_Layer1, t_Layer2);
+               + firstLayer->getProperty(Property::T, t_Side)
+                   * firstLayer->getProperty(Property::T, opposite)
+                   * secondLayer->getProperty(Property::R, t_Side)
+                   * interreflectance(t_Layer1, t_Layer2);
     }
 
 }   // namespace MultiLayerOptics

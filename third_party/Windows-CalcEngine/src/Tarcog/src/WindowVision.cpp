@@ -18,7 +18,7 @@ namespace Tarcog::ISO15099
         m_Frame({{FramePosition::Top, {width}},
                  {FramePosition::Bottom, {width}},
                  {FramePosition::Left, {height}},
-                 {FramePosition::Right, {height}}})        
+                 {FramePosition::Right, {height}}})
     {
         m_IGUSystem->setWidthAndHeight(width, height);
         m_IGUSystem->setInteriorAndExteriorSurfacesHeight(m_ExteriorSurfaceHeight);
@@ -38,7 +38,8 @@ namespace Tarcog::ISO15099
         }
 
         const auto COGWeightedUValue{m_IGUUvalue
-                                     * (area() - frameProjectedArea() - edgeOfGlassArea() - dividerArea() - dividerEdgeArea())};
+                                     * (area() - frameProjectedArea() - edgeOfGlassArea()
+                                        - dividerArea() - dividerEdgeArea())};
 
         auto dividerWeightedUValue{0.0};
         auto dividerWeightedEdgeUValue{0.0};
@@ -67,7 +68,8 @@ namespace Tarcog::ISO15099
             frameWeightedSHGC += frame.projectedArea() * frame.frameData().shgc(m_HcExterior);
         }
 
-        const auto COGWeightedSHGC{m_IGUSystem->getSHGC(tSol) * (area() - frameProjectedArea() - dividerArea())};
+        const auto COGWeightedSHGC{m_IGUSystem->getSHGC(tSol)
+                                   * (area() - frameProjectedArea() - dividerArea())};
 
         auto dividerWeightedSHGC{0.0};
         if(m_Divider.has_value())
@@ -152,7 +154,8 @@ namespace Tarcog::ISO15099
 
         for(auto & [key, frame] : m_Frame)
         {
-            frame.assignDividerArea(m_Divider->ProjectedFrameDimension * ConstantsData::EOGHeight, numOfDivs.at(key));
+            frame.assignDividerArea(m_Divider->ProjectedFrameDimension * ConstantsData::EOGHeight,
+                                    numOfDivs.at(key));
         }
     }
 

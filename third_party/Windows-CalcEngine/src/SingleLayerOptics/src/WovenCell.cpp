@@ -18,7 +18,8 @@ namespace SingleLayerOptics
     ////////////////////////////////////////////////////////////////////////////////////////////
     CWovenBase::CWovenBase(const std::shared_ptr<CMaterial> & t_MaterialProperties,
                            const std::shared_ptr<ICellDescription> & t_Cell) :
-        CBaseCell(t_MaterialProperties, t_Cell), CUniformDiffuseCell(t_MaterialProperties, t_Cell)
+        CBaseCell(t_MaterialProperties, t_Cell),
+        CUniformDiffuseCell(t_MaterialProperties, t_Cell)
     {}
 
     std::shared_ptr<CWovenCellDescription> CWovenBase::getCellAsWoven() const
@@ -39,7 +40,8 @@ namespace SingleLayerOptics
     ////////////////////////////////////////////////////////////////////////////////////////////
     CWovenCell::CWovenCell(const std::shared_ptr<CMaterial> & t_MaterialProperties,
                            const std::shared_ptr<ICellDescription> & t_Cell) :
-        CBaseCell(t_MaterialProperties, t_Cell), CWovenBase(t_MaterialProperties, t_Cell)
+        CBaseCell(t_MaterialProperties, t_Cell),
+        CWovenBase(t_MaterialProperties, t_Cell)
     {}
 
     double CWovenCell::T_dir_dir(const Side t_Side, const CBeamDirection & t_Direction)

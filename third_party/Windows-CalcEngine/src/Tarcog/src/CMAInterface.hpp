@@ -33,10 +33,9 @@ namespace CMA
     {
     public:
         BestWorst(T valueBest, T valueWorst) :
-            m_Value({{Option::Best, valueBest}, {Option::Worst, valueWorst}})
-        {}
+            m_Value({{Option::Best, valueBest}, {Option::Worst, valueWorst}}){}
 
-        [[nodiscard]] T value(Option option) const
+              [[nodiscard]] T value(Option option) const
         {
             assert(m_Value.count(option) != 0);
             return m_Value.at(option);

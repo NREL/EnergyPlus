@@ -205,8 +205,8 @@ namespace FenestrationCommon
         return newProperties;
     }
 
-    CSeries CSeries::operator*(const CSeries &other) {
-
+    CSeries CSeries::operator*(const CSeries & other)
+    {
         CSeries newProperty;
 
         const double WAVELENGTHTOLERANCE = 1e-10;
@@ -222,7 +222,7 @@ namespace FenestrationCommon
             if(std::abs(wv - testWv) > WAVELENGTHTOLERANCE)
             {
                 throw std::runtime_error(
-                        "Wavelengths of two vectors are not the same. Cannot preform multiplication.");
+                  "Wavelengths of two vectors are not the same. Cannot preform multiplication.");
             }
             newProperty.addProperty(wv, value);
         }
@@ -230,7 +230,8 @@ namespace FenestrationCommon
         return newProperty;
     }
 
-    CSeries CSeries::operator-(const CSeries &t_Series) const {
+    CSeries CSeries::operator-(const CSeries & t_Series) const
+    {
         const double WAVELENGTHTOLERANCE = 1e-10;
 
         CSeries newProperties;
@@ -245,7 +246,7 @@ namespace FenestrationCommon
             if(std::abs(wv - testWv) > WAVELENGTHTOLERANCE)
             {
                 throw std::runtime_error(
-                        "Wavelengths of two vectors are not the same. Cannot preform subtraction.");
+                  "Wavelengths of two vectors are not the same. Cannot preform subtraction.");
             }
 
             newProperties.addProperty(wv, value);
@@ -254,7 +255,8 @@ namespace FenestrationCommon
         return newProperties;
     }
 
-    CSeries operator-(const double val, const CSeries &other) {
+    CSeries operator-(const double val, const CSeries & other)
+    {
         CSeries newProperties;
 
         for(const auto & ot : other)
@@ -268,7 +270,8 @@ namespace FenestrationCommon
         return newProperties;
     }
 
-    CSeries CSeries::operator+(const CSeries &other) const {
+    CSeries CSeries::operator+(const CSeries & other) const
+    {
         const double WAVELENGTHTOLERANCE = 1e-10;
 
         CSeries newProperties;
@@ -283,7 +286,7 @@ namespace FenestrationCommon
             if(std::abs(wv - testWv) > WAVELENGTHTOLERANCE)
             {
                 throw std::runtime_error(
-                        "Wavelengths of two vectors are not the same. Cannot preform addition.");
+                  "Wavelengths of two vectors are not the same. Cannot preform addition.");
             }
 
             newProperties.addProperty(wv, value);

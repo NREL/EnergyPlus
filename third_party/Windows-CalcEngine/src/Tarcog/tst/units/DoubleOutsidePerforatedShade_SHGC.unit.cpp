@@ -70,7 +70,8 @@ protected:
         EffectiveLayers::EffectiveLayerPerforated effectiveLayerPerforated{
           windowWidth, windowHeight, thickness_31111, openness};
 
-        EffectiveLayers::EffectiveOpenness effOpenness{effectiveLayerPerforated.getEffectiveOpenness()};
+        EffectiveLayers::EffectiveOpenness effOpenness{
+          effectiveLayerPerforated.getEffectiveOpenness()};
 
         const auto effectiveThickness{effectiveLayerPerforated.effectiveThickness()};
 
@@ -80,7 +81,7 @@ protected:
         auto Tirb = 0.257367;
 
         auto aLayer1 = Tarcog::ISO15099::Layers::shading(
-            effectiveThickness, shadeLayerConductance, effOpenness, Ef, Tirf, Eb, Tirb);
+          effectiveThickness, shadeLayerConductance, effOpenness, Ef, Tirf, Eb, Tirb);
 
         aLayer1->setSolarAbsorptance(0.106659, solarRadiation);
 

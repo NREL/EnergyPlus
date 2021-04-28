@@ -35,7 +35,7 @@ namespace SingleLayerOptics
     public:
         CBSDFDirections(const std::vector<CBSDFDefinition> & t_Definitions, BSDFDirection t_Side);
         size_t size() const;
-        const CBSDFPatch & operator[]( size_t Index ) const;
+        const CBSDFPatch & operator[](size_t Index) const;
         std::vector<CBSDFPatch>::iterator begin();
         std::vector<CBSDFPatch>::iterator end();
 

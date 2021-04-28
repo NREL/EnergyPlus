@@ -21,7 +21,7 @@ namespace SingleLayerOptics
         // TODO: Maybe to refactor results to incoming and outgoing if not affecting speed.
         // This is not necessary before axisymmetry is introduced
         m_Results = std::make_shared<CBSDFIntegrator>(
-            m_BSDFHemisphere.getDirections(BSDFDirection::Incoming));
+          m_BSDFHemisphere.getDirections(BSDFDirection::Incoming));
     }
 
     void CBSDFLayer::setSourceData(CSeries & t_SourceData)
@@ -156,7 +156,7 @@ namespace SingleLayerOptics
         for(size_t i = 0; i < size; ++i)
         {
             std::shared_ptr<CBSDFIntegrator> aResults = std::make_shared<CBSDFIntegrator>(
-                m_BSDFHemisphere.getDirections(BSDFDirection::Incoming));
+              m_BSDFHemisphere.getDirections(BSDFDirection::Incoming));
             m_WVResults->push_back(aResults);
         }
     }
@@ -179,4 +179,4 @@ namespace SingleLayerOptics
     {
         return m_Cell;
     }
-} // namespace SingleLayerOptics
+}   // namespace SingleLayerOptics

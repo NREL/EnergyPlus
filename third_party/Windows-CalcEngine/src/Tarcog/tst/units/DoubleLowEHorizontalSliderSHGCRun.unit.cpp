@@ -105,10 +105,7 @@ protected:
     }
 
 public:
-    [[nodiscard]] Tarcog::ISO15099::DualVisionHorizontal & getWindow()
-    {
-        return m_Window;
-    }
+    [[nodiscard]] Tarcog::ISO15099::DualVisionHorizontal & getWindow() { return m_Window; }
 };
 
 TEST_F(TestDoubleLowEHorizontalSliderSHGCRun, Test1)

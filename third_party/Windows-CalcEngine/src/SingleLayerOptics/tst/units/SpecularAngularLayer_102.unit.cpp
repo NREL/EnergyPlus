@@ -696,11 +696,11 @@ TEST_F(TestSpecularAngularLayer_102, TestSpecular1)
     EXPECT_NEAR(0.780630538026433, tauDir, 1e-6);
 
     /*  std::shared_ptr< SquareMatrix > aT = aResults->getMatrix( Side::Front, PropertySimple::T );
-    
+    
 
       // Test only diagonal of transmittance matrix
       size_t size = aT->getSize();
-    
+    
 
       std::vector< double > correctResults;
       correctResults.push_back( 34.940061244564802 );
@@ -848,27 +848,27 @@ TEST_F(TestSpecularAngularLayer_102, TestSpecular1)
       correctResults.push_back( 16.978250544025638 );
       correctResults.push_back( 16.978250544025638 );
       correctResults.push_back( 16.978250544025638 );
-    
+    
 
       std::vector< double > calculatedResults;
       for( size_t i = 0; i < size; ++i ) {
         calculatedResults.push_back( (*aT)[i][i] );
       }
-    
+    
 
       EXPECT_EQ( correctResults.size(), calculatedResults.size() );
       for( size_t i = 0; i < size; ++i ) {
         EXPECT_NEAR( correctResults[i], calculatedResults[i], 1e-6 );
       }
-    
+    
 
       // Front reflectance
       std::shared_ptr< SquareMatrix > aRf = aResults->getMatrix( Side::Front, PropertySimple::R );
-    
+    
 
       correctResults.clear();
       calculatedResults.clear();
-    
+    
 
       correctResults.push_back( 3.1351336407416635 );
       correctResults.push_back( 3.2072370120929721 );
@@ -1015,12 +1015,12 @@ TEST_F(TestSpecularAngularLayer_102, TestSpecular1)
       correctResults.push_back( 34.322921163935874 );
       correctResults.push_back( 34.322921163935874 );
       correctResults.push_back( 34.322921163935874 );
-    
+    
 
       for( size_t i = 0; i < size; ++i ) {
         calculatedResults.push_back( (*aRf)[i][i] );
       }
-    
+    
 
       EXPECT_EQ( correctResults.size(), calculatedResults.size() );
       for( size_t i = 0; i < size; ++i ) {

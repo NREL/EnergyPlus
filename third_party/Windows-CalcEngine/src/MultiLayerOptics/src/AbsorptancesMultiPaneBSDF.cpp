@@ -1,4 +1,5 @@
 #include <cassert>
+#include <stdexcept>
 
 #include "AbsorptancesMultiPaneBSDF.hpp"
 #include "WCESingleLayerOptics.hpp"
@@ -9,12 +10,13 @@ using namespace FenestrationCommon;
 
 namespace MultiLayerOptics
 {
-    CAbsorptancesMultiPaneBSDF::CAbsorptancesMultiPaneBSDF(Side t_Side,
-                                                           const std::shared_ptr<std::vector<double>> & t_CommonWavelengths,
-                                                           const std::shared_ptr<CSeries> & t_SolarRadiation,
-                                                           const std::shared_ptr<CBSDFLayer> & t_Layer,
-                                                           FenestrationCommon::IntegrationType t_integrator,
-                                                           double normalizationCoefficient) :
+    CAbsorptancesMultiPaneBSDF::CAbsorptancesMultiPaneBSDF(
+      Side t_Side,
+      const std::shared_ptr<std::vector<double>> & t_CommonWavelengths,
+      const std::shared_ptr<CSeries> & t_SolarRadiation,
+      const std::shared_ptr<CBSDFLayer> & t_Layer,
+      FenestrationCommon::IntegrationType t_integrator,
+      double normalizationCoefficient) :
         m_CommonWavelengths(*t_CommonWavelengths),
         m_StateCalculated(false),
         m_Side(t_Side),
@@ -25,7 +27,8 @@ namespace MultiLayerOptics
         m_SolarRadiation = t_SolarRadiation->interpolate(m_CommonWavelengths);
 
         // Lambda matrix from spectral results. Same lambda is valid for any wavelength
-        // std::shared_ptr< const std::vector< double > > aLambdas = t_Layer->getResults()->lambdas();
+        // std::shared_ptr< const std::vector< double > > aLambdas =
+        // t_Layer->getResults()->lambdas();
         m_LambdaVector = t_Layer->getResults()->lambdaVector();
         m_Lambda = t_Layer->getResults()->lambdaMatrix();
 
@@ -63,7 +66,9 @@ namespace MultiLayerOptics
         m_RhosB.push_back(aRhosB);
     }
 
-    std::vector<double> CAbsorptancesMultiPaneBSDF::Abs(const double minLambda, const double maxLambda, const size_t Index)
+    std::vector<double> CAbsorptancesMultiPaneBSDF::Abs(const double minLambda,
+                                                        const double maxLambda,
+                                                        const size_t Index)
     {
         if(Index > m_TausF.size())
         {
@@ -81,7 +86,8 @@ namespace MultiLayerOptics
         return m_Abs[aLayerIndex];
     }
 
-    std::vector<double> CAbsorptancesMultiPaneBSDF::multVectors(const std::vector<double> & t_vec1, const std::vector<double> & t_vec2)
+    std::vector<double> CAbsorptancesMultiPaneBSDF::multVectors(const std::vector<double> & t_vec1,
+                                                                const std::vector<double> & t_vec2)
     {
         if(t_vec1.size() != t_vec2.size())
         {
@@ -96,7 +102,8 @@ namespace MultiLayerOptics
         return Result;
     }
 
-    std::vector<double> CAbsorptancesMultiPaneBSDF::divVectors(const std::vector<double> & t_vec1, const std::vector<double> & t_vec2)
+    std::vector<double> CAbsorptancesMultiPaneBSDF::divVectors(const std::vector<double> & t_vec1,
+                                                               const std::vector<double> & t_vec2)
     {
         if(t_vec1.size() != t_vec2.size())
         {
@@ -111,7 +118,8 @@ namespace MultiLayerOptics
         return Result;
     }
 
-    std::vector<double> CAbsorptancesMultiPaneBSDF::addVectors(const std::vector<double> & t_vec1, const std::vector<double> & t_vec2)
+    std::vector<double> CAbsorptancesMultiPaneBSDF::addVectors(const std::vector<double> & t_vec1,
+                                                               const std::vector<double> & t_vec2)
     {
         if(t_vec1.size() != t_vec2.size())
         {
@@ -227,7 +235,7 @@ namespace MultiLayerOptics
                 {
                     activeI = IminusM[i - 1][j];
                 }
-                
+
                 IplusM[i][j] = r * activeI;
                 IminusM[i][j] = t * activeI;
             }
@@ -259,10 +267,12 @@ namespace MultiLayerOptics
 
         for(size_t i = 0; i < m_NumOfLayers; ++i)
         {
-            m_Abs[i].resize( matrixSize );
+            m_Abs[i].resize(matrixSize);
         }
 
-        const auto totalSolar = m_SolarRadiation.integrate(m_Integrator, m_NormalizationCoefficient)->sum(minLambda, maxLambda);
+        const auto totalSolar =
+          m_SolarRadiation.integrate(m_Integrator, m_NormalizationCoefficient)
+            ->sum(minLambda, maxLambda);
 
         // calculation of solar absorptances
         for(size_t i = 0; i < matrixSize; ++i)
@@ -297,12 +307,14 @@ namespace MultiLayerOptics
                         IplusIncoming = (IplusV[j + 1][k])[i];
                     }
 
-                    const auto absValue = IminusIncoming + IplusIncoming - IminusOutgoing - IplusOutgoing;
+                    const auto absValue =
+                      IminusIncoming + IplusIncoming - IminusOutgoing - IplusOutgoing;
                     curSpectralProperties->addProperty(m_CommonWavelengths[k], absValue);
                 }
 
                 const CSeries absorbedIrradiance = (*curSpectralProperties) * m_SolarRadiation;
-                const CSeries integratedAbsorbed = *absorbedIrradiance.integrate(m_Integrator, m_NormalizationCoefficient);
+                const CSeries integratedAbsorbed =
+                  *absorbedIrradiance.integrate(m_Integrator, m_NormalizationCoefficient);
                 double value = integratedAbsorbed.sum(minLambda, maxLambda);
                 value = value / totalSolar;
                 m_Abs[j][i] = value;
@@ -312,7 +324,10 @@ namespace MultiLayerOptics
         m_StateCalculated = true;
     }
 
-    SquareMatrix CAbsorptancesMultiPaneBSDF::getDenomForRTCoeff(const SquareMatrix & t_Reflectance, const SquareMatrix & t_PreviousR) const {
+    SquareMatrix
+      CAbsorptancesMultiPaneBSDF::getDenomForRTCoeff(const SquareMatrix & t_Reflectance,
+                                                     const SquareMatrix & t_PreviousR) const
+    {
         const size_t matrixSize = t_Reflectance.size();
         SquareMatrix denominator(matrixSize);
         denominator.setIdentity();

@@ -6,7 +6,6 @@ namespace Tarcog
 {
     namespace ISO15099
     {
-
         CEnvironment::CEnvironment(double t_Pressure,
                                    double t_AirSpeed,
                                    AirHorizontalDirection t_AirDirection) :

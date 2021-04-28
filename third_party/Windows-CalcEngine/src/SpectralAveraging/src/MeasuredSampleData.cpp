@@ -218,7 +218,8 @@ namespace SpectralAveraging
         }
 
         const std::vector<double> spectralWl{getWavelengths()};
-        const std::vector<double> pvWl{m_PVData.at(std::make_pair(Side::Front, PVM::EQE)).getXArray()};
+        const std::vector<double> pvWl{
+          m_PVData.at(std::make_pair(Side::Front, PVM::EQE)).getXArray()};
 
         if(spectralWl.size() != pvWl.size())
         {

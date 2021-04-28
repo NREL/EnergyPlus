@@ -208,7 +208,7 @@ TEST_F(TestWovenShadeMultiWavelength, TestWovenMultiWavelength)
 
     EXPECT_EQ(correctResults.size(), aRf.size());
     for(size_t i = 0; i < size; ++i)
-    {     
+    {
         EXPECT_NEAR(correctResults[i], aRf(i, i), 1e-5);
     }
 }

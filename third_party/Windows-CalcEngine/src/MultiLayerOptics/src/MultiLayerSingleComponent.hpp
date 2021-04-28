@@ -5,33 +5,38 @@
 
 #include "WCECommon.hpp"
 
-namespace MultiLayerOptics {
+namespace MultiLayerOptics
+{
+    class CEquivalentLayerSingleComponent;
+    class CInterRefSingleComponent;
 
-	class CEquivalentLayerSingleComponent;
-	class CInterRefSingleComponent;
+    // Class to calculate multilayer optical properties for single component (direct or diffuse)
+    class CMultiLayerSingleComponent
+    {
+    public:
+        CMultiLayerSingleComponent(const double t_Tf = 0,
+                                   const double t_Rf = 0,
+                                   const double t_Tb = 0,
+                                   const double t_Rb = 0);
 
-	// Class to calculate multilayer optical properties for single component (direct or diffuse)
-	class CMultiLayerSingleComponent {
-	public:
-		CMultiLayerSingleComponent( const double t_Tf = 0, const double t_Rf = 0,
-				const double t_Tb = 0, const double t_Rb = 0 );
+        // Adding layer to front or back side of composition
+        void addLayer(const double t_Tf,
+                      const double t_Rf,
+                      const double t_Tb,
+                      const double t_Rb,
+                      FenestrationCommon::Side t_Side = FenestrationCommon::Side::Back) const;
 
-		// Adding layer to front or back side of composition
-		void addLayer( const double t_Tf, const double t_Rf, const double t_Tb, const double t_Rb,
-		               FenestrationCommon::Side t_Side = FenestrationCommon::Side::Back ) const;
+        // Get oprical properties of equivalent layer
+        double getProperty(const FenestrationCommon::Property t_Property,
+                           const FenestrationCommon::Side t_Side) const;
 
-		// Get oprical properties of equivalent layer
-		double getProperty( const FenestrationCommon::Property t_Property,
-		                    const FenestrationCommon::Side t_Side ) const;
+        double getLayerAbsorptance(const size_t Index, const FenestrationCommon::Side t_Side) const;
 
-		double getLayerAbsorptance( const size_t Index, const FenestrationCommon::Side t_Side ) const;
+    private:
+        std::shared_ptr<CInterRefSingleComponent> m_Inter;
+        std::shared_ptr<CEquivalentLayerSingleComponent> m_Equivalent;
+    };
 
-	private:
-		std::shared_ptr< CInterRefSingleComponent > m_Inter;
-		std::shared_ptr< CEquivalentLayerSingleComponent > m_Equivalent;
-
-	};
-
-}
+}   // namespace MultiLayerOptics
 
 #endif

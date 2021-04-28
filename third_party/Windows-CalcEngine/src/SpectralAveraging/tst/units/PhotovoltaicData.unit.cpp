@@ -71,7 +71,6 @@ TEST_F(TestPhotovoltaicData, TestDifferentWavelengthsOfInputData)
     {
         EXPECT_EQ(
           err.what(),
-          std::string(
-                  "Wavelengths in spectral and photovoltaic measurements do not match."));
+          std::string("Wavelengths in spectral and photovoltaic measurements do not match."));
     }
 }

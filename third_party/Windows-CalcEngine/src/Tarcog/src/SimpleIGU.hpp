@@ -3,7 +3,8 @@
 #include "IGUConfigurations.hpp"
 
 
-namespace Tarcog {
+namespace Tarcog
+{
     namespace ISO15099
     {
         class SimpleIGU : public IIGUSystem
@@ -25,7 +26,5 @@ namespace Tarcog {
             double m_SHGC;
             double m_Hc;
         };
-    }
-}
-
-
+    }   // namespace ISO15099
+}   // namespace Tarcog

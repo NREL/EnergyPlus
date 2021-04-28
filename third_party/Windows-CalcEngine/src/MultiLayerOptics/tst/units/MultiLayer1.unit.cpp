@@ -33,7 +33,7 @@ protected:
         CScatteringLayer aLayer3(aFront, aBack);
 
         m_Layer = CMultiLayerScattered::create({aLayer1, aLayer2, aLayer3});
-        
+
         // Additional layers can be inserted as following
         // m_Layer->addLayer(aLayer2);
         // m_Layer->addLayer(aLayer3);
@@ -62,10 +62,12 @@ TEST_F(TestMultiLayer1, TestTripleLayerFront)
     ///////////////////////////////////////////////
     Scattering aScattering = Scattering::DirectDirect;
 
-    double Tf = aLayer->getPropertySimple(minLambda, maxLambda, PropertySimple::T, aSide, aScattering);
+    double Tf =
+      aLayer->getPropertySimple(minLambda, maxLambda, PropertySimple::T, aSide, aScattering);
     EXPECT_NEAR(0.000486418, Tf, 1e-6);
 
-    double Rf = aLayer->getPropertySimple(minLambda, maxLambda, PropertySimple::R, aSide, aScattering);
+    double Rf =
+      aLayer->getPropertySimple(minLambda, maxLambda, PropertySimple::R, aSide, aScattering);
     EXPECT_NEAR(0.040339429, Rf, 1e-6);
 
     ///////////////////////////////////////////////
@@ -107,10 +109,12 @@ TEST_F(TestMultiLayer1, TestTripleLayerBack)
     ///////////////////////////////////////////////
     Scattering aScattering = Scattering::DirectDirect;
 
-    double Tb = aLayer->getPropertySimple(minLambda, maxLambda, PropertySimple::T, aSide, aScattering);
+    double Tb =
+      aLayer->getPropertySimple(minLambda, maxLambda, PropertySimple::T, aSide, aScattering);
     EXPECT_NEAR(0.002173682, Tb, 1e-6);
 
-    double Rb = aLayer->getPropertySimple(minLambda, maxLambda, PropertySimple::R, aSide, aScattering);
+    double Rb =
+      aLayer->getPropertySimple(minLambda, maxLambda, PropertySimple::R, aSide, aScattering);
     EXPECT_NEAR(0.250041102, Rb, 1e-6);
 
     ///////////////////////////////////////////////

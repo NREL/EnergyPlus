@@ -33,7 +33,7 @@ TEST_F(TestMatrixGeneral, TestSetIdentity)
 {
     SCOPED_TRACE("Begin Test: Test matrix set identity.");
 
-    SquareMatrix a{ { 1, 2 }, { 3, 4 } };
+    SquareMatrix a{{1, 2}, {3, 4}};
 
     a.setIdentity();
 
@@ -47,13 +47,15 @@ TEST_F(TestMatrixGeneral, TestSetDiagonalException)
 {
     SCOPED_TRACE("Begin Test: Test matrix set diagonal exception.");
 
-    SquareMatrix a{ { 1, 2 }, { 3, 4 } };
-    const std::vector<double> b = { 7, 8, 9 };
+    SquareMatrix a{{1, 2}, {3, 4}};
+    const std::vector<double> b = {7, 8, 9};
 
-    try {
+    try
+    {
         a.setDiagonal(b);
-    } catch(const std::runtime_error & err) {
+    }
+    catch(const std::runtime_error & err)
+    {
         EXPECT_EQ(err.what(), std::string("Matrix and vector must be same size."));
     }
-
 }

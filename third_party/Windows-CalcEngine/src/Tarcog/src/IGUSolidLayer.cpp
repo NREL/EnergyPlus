@@ -22,7 +22,9 @@ namespace Tarcog
           double const t_Conductivity,
           std::shared_ptr<Tarcog::ISO15099::ISurface> const & t_FrontSurface,
           std::shared_ptr<Tarcog::ISO15099::ISurface> const & t_BackSurface) :
-            CBaseIGULayer(t_Thickness), m_Conductivity(t_Conductivity), m_SolarAbsorptance(0)
+            CBaseIGULayer(t_Thickness),
+            m_Conductivity(t_Conductivity),
+            m_SolarAbsorptance(0)
         {
             if(t_FrontSurface != nullptr && t_BackSurface != nullptr)
             {
@@ -42,7 +44,9 @@ namespace Tarcog
                                        double const t_FrontIRTransmittance,
                                        double const t_BackEmissivity,
                                        double const t_BackIRTransmittance) :
-            CBaseIGULayer(t_Thickness), m_Conductivity(t_Conductivity), m_SolarAbsorptance(0)
+            CBaseIGULayer(t_Thickness),
+            m_Conductivity(t_Conductivity),
+            m_SolarAbsorptance(0)
         {
             m_Surface[Side::Front] =
               std::make_shared<CSurface>(t_FrontEmissivity, t_FrontIRTransmittance);

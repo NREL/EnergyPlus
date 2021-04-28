@@ -26,7 +26,9 @@ namespace MultiLayerOptics
     class CInterRef
     {
     public:
-        CInterRef(SingleLayerOptics::CScatteringLayer & t_Layer, const double t_Theta = 0, const double t_Phi = 0);
+        CInterRef(SingleLayerOptics::CScatteringLayer & t_Layer,
+                  const double t_Theta = 0,
+                  const double t_Phi = 0);
 
         void addLayer(SingleLayerOptics::CScatteringLayer & t_Layer,
                       const FenestrationCommon::Side t_Side = FenestrationCommon::Side::Back,
@@ -79,7 +81,9 @@ namespace MultiLayerOptics
 
         // Absorptance for each layer comes in two different forms: Absrobed from diffuse and
         // absorbled from direct.
-        std::map<std::pair<FenestrationCommon::Side, FenestrationCommon::ScatteringSimple>, std::vector<double>> m_Abs;
+        std::map<std::pair<FenestrationCommon::Side, FenestrationCommon::ScatteringSimple>,
+                 std::vector<double>>
+          m_Abs;
 
         bool m_StateCalculated;
         double m_Theta;
