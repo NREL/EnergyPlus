@@ -1,0 +1,19 @@
+name: clang-format
+on: [push, pull_request]
+jobs:
+  formatting-check:
+    name: Formatting Check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        path:
+          - 'src/EnergyPlus'
+          - 'tst/EnergyPlus/unit'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run clang-format style check for C/C++ programs.
+        uses: jidicula/clang-format-action@v3.2.0
+        with:
+          clang-format-version: '10'
+          check-path: ${{ matrix.path }}

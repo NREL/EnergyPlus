@@ -212,17 +212,16 @@ namespace General {
                               Real64 SlatThickness   // Slat thickness (m)
     );
 
-    Real64 POLYF(Real64 X,         // Cosine of angle of incidence
-                 Array1A<Real64> A // Polynomial coefficients
-    );
-
-    Real64 POLYF(Real64 X,               // Cosine of angle of incidence
-                 Array1<Real64> const &A // Polynomial coefficients
-    );
-
-    Real64 POLYF(Real64 X,                // Cosine of angle of incidence
-                 Array1S<Real64> const &A // Polynomial coefficients
-    );
+    constexpr Real64 POLYF(Real64 const X,          // Cosine of angle of incidence
+                           Array1D<Real64> const &A // Polynomial coefficients
+    )
+    {
+        if (X < 0.0 || X > 1.0) {
+            return 0.0;
+        } else {
+            return X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
+        }
+    }
 
     std::string &strip_trailing_zeros(std::string &InputString);
 
@@ -377,14 +376,14 @@ namespace General {
                                   bool &errFlag                             // Error flag set to true if error found here.
     );
 
-    template <typename T, class = typename std::enable_if<!std::is_same<T, std::string>::value>::type>
+    template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     inline void CheckCreatedZoneItemName(EnergyPlusData &state,
                                          std::string const &calledFrom,                  // routine called from
                                          std::string const &CurrentObject,               // object being parsed
                                          std::string const &ZoneName,                    // Zone Name associated
                                          std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
                                          std::string const &ItemName,                    // Item name (People, Lights, etc object)
-                                         Array1<T> const &Items,                         // Items to check for duplication Names
+                                         Container const &Items,                         // Items to check for duplication Names
                                          int const NumItems,                             // Number of items in ItemNames array
                                          std::string &ResultName,                        // Resultant name
                                          bool &errFlag                                   // Error flag set to true if error found here.

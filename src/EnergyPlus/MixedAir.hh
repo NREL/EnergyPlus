@@ -59,6 +59,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -608,10 +609,10 @@ struct MixedAirData : BaseGlobalStruct
     Array1D_string VentMechZoneOrListName;  // Zone or Zone List to apply mechanical ventilation rate
     Array1D_string DesignSpecZoneADObjName; // name of the design specification zone air distribution object
     Array1D_int DesignSpecZoneADObjIndex;   // index of the design specification zone air distribution object
-    Array1D<MixedAir::ControllerListProps> ControllerLists;
-    Array1D<MixedAir::OAControllerProps> OAController;
-    Array1D<MixedAir::OAMixerProps> OAMixer;
-    Array1D<MixedAir::VentilationMechanicalProps> VentilationMechanical;
+    EPVector<MixedAir::ControllerListProps> ControllerLists;
+    EPVector<MixedAir::OAControllerProps> OAController;
+    EPVector<MixedAir::OAMixerProps> OAMixer;
+    EPVector<MixedAir::VentilationMechanicalProps> VentilationMechanical;
     std::unordered_set<std::string> ControllerListUniqueNames;
     std::unordered_map<std::string, std::string> OAControllerUniqueNames;
     std::string CompType;
