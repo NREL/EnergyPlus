@@ -102,7 +102,8 @@ namespace WindowManager {
 
     std::pair<Real64, Real64> getSunWCEAngles(EnergyPlusData &state, const int t_SurfNum, const BSDFHemisphere t_Direction)
     {
-        return getWCECoordinates(state, t_SurfNum, state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, 3}), t_Direction);
+        return getWCECoordinates(
+            state, t_SurfNum, state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, 3}), t_Direction);
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -229,7 +230,8 @@ namespace WindowManager {
         aMap.at(t_ConstrNum).push_back(t_Layer);
     }
 
-    std::shared_ptr<CMultiLayerScattered> CWindowConstructionsSimplified::getEquivalentLayer(EnergyPlusData &state, WavelengthRange const t_Range, int const t_ConstrNum)
+    std::shared_ptr<CMultiLayerScattered>
+    CWindowConstructionsSimplified::getEquivalentLayer(EnergyPlusData &state, WavelengthRange const t_Range, int const t_ConstrNum)
     {
         auto it = m_Equivalent.find(std::make_pair(t_Range, t_ConstrNum));
         if (it == m_Equivalent.end()) {

@@ -6194,21 +6194,21 @@ All inputs for Speed 1 are required, followed by the optional inputs for other s
 \textbf{Speeds should be ordered from lower capacity to higher capacity/airflow rate, or a Fatal error will be thrown.}
 
 
-\paragraph{Field: Rated Water Heating Capacity at Speed \textless{}x\textgreater{} caca}\label{vshpwhheating-rated-water-heating-capacity-at-speed-x}
+\paragraph{Field: Rated Water Heating Capacity at Speed \textless{}x\textgreater{}}\label{vshpwhheating-rated-water-heating-capacity-at-speed-x}
 
 This numeric field defines the DX coil heating capacity in Watts at the rated evaporator inlet air temperatures, rated condenser inlet water temperature, rated evaporator air flow rate, and rated condenser water flow rate specified below for this speed.
 
 Values must be greater than 0. This value represents water heating capacity, and it may or may not include the impact of condenser pump heat (see field Condenser Pump Heat Included in Rated Heating Capacity above).
 
 
-\paragraph{Field: Rated Water Heating COP at Speed \textless{}x\textgreater{} caca}\label{vshpwhheating-rated-water-heating-cop-at-speed-x}
+\paragraph{Field: Rated Water Heating COP at Speed \textless{}x\textgreater{}}\label{vshpwhheating-rated-water-heating-cop-at-speed-x}
 
 This numeric field defines the DX coil's water heating coefficient of performance (COP = water heating capacity in watts divided by electrical power input in watts) at rated conditions (rated inlet temperatures and flow rates specified below).
 This input not only determines the electric energy use of the heat pump DX coil, but also the amount of total air cooling provided by the evaporator.
 The rated COP includes compressor power, and may or may not include condenser pump power or evaporator fan power (see field Evaporator Fan Power Included in Rated COP and field Condenser Pump Power Included in Rated COP). Values must be greater than 0. If this field is left blank, the default value is 3.2.
 
 
-\paragraph{Field: Rated Sensible Heat Ratio at Speed \textless{}x\textgreater{} caca}\label{vshpwhheating-rated-sensible-heat-ratio-at-speed-x}
+\paragraph{Field: Rated Sensible Heat Ratio at Speed \textless{}x\textgreater{}}\label{vshpwhheating-rated-sensible-heat-ratio-at-speed-x}
 
 This numeric field defines the gross air-side sensible heat ratio (SHR = gross sensible cooling capacity divided by gross total cooling capacity) of the DX coil at rated conditions (rated inlet temperatures and flow rates specified below). This value should not include the effect of evaporator fan heat, only sensible cooling and dehumidification by the coil alone.
 Values must be greater than or equal to 0.5, and less than or equal to 1.0. The default value is 0.85.

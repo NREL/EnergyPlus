@@ -109,22 +109,26 @@ TEST_F(EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test1)
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = 0;
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LowSpeedFluidCoolerUA = 0;
     state->dataFluidCoolers->SimpleFluidCooler(1).DesignEnteringWaterTemp = 50;
-    bool testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    bool testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(
+        *state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
     state->dataFluidCoolers->SimpleFluidCooler(1).DesignEnteringWaterTemp = -10;
-    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(
+        *state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_TRUE(testResult); // error message triggered
 
     state->dataFluidCoolers->SimpleFluidCooler(1).DesignEnteringWaterTemp = 50;
     state->dataFluidCoolers->SimpleFluidCooler(1).FluidCoolerLowSpeedNomCap = AutoSize;
     state->dataFluidCoolers->SimpleFluidCooler(1).FluidCoolerLowSpeedNomCapWasAutoSized = true;
-    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(
+        *state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
     state->dataFluidCoolers->SimpleFluidCooler(1).FluidCoolerLowSpeedNomCap = 0; // this should trigger the original error condition
     state->dataFluidCoolers->SimpleFluidCooler(1).FluidCoolerLowSpeedNomCapWasAutoSized = false;
-    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(
+        *state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_TRUE(testResult); // error message triggered
 
     state->dataFluidCoolers->SimpleFluidCooler.deallocate();
@@ -173,12 +177,14 @@ TEST_F(EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test2)
     AlphArray(4) = "UFactorTimesAreaAndDesignWaterFlowRate";
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = AutoSize;
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized = false;
-    bool testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    bool testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(
+        *state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_TRUE(testResult); // error message triggered
 
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = AutoSize;
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized = true;
-    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(
+        *state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
     state->dataFluidCoolers->SimpleFluidCooler.deallocate();
@@ -225,22 +231,26 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test3)
     AlphArray(4) = "UFactorTimesAreaAndDesignWaterFlowRate";
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = true;
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = 1;
-    bool testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateSingleSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    bool testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateSingleSpeedInputs(
+        *state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = true;
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = 0;
-    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateSingleSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateSingleSpeedInputs(
+        *state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = false;
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = 1;
-    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateSingleSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateSingleSpeedInputs(
+        *state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = false;
     state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = 0;
-    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateSingleSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateSingleSpeedInputs(
+        *state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_TRUE(testResult); // error message triggered
 }
 

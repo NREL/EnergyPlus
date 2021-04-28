@@ -92,7 +92,7 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;
     state->dataHeatBal->TotCrossMixing = NumOfCrossMixing;
     state->dataZoneEquip->CrossMixingReportFlag(1) = true;
-    DataHVACGlobals::TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 1.0;
     state->dataHeatBalFanSys->MCPI = 0.0;
     state->dataHeatBalFanSys->MCPV = 0.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -158,7 +158,7 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     state->dataZoneEquip->VentMCP.allocate(1);
 
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;
-    DataHVACGlobals::TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 1.0;
     state->dataHeatBalFanSys->MCPI(1) = 1.0;
     state->dataHeatBalFanSys->MCPI(2) = 1.5;
     state->dataHeatBalFanSys->MCPV(1) = 2.0;
@@ -201,8 +201,8 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
                      Psychrometrics::PsyHFnTdbW(state->dataHeatBalFanSys->MAT(1), state->dataHeatBalFanSys->ZoneAirHumRat(1)));
     EXPECT_NEAR(-deltah, state->dataHeatBal->ZnAirRpt(1).InfilTotalLoss, 0.0001);
     deltah = state->dataHeatBalFanSys->MCPV(1) / (Psychrometrics::PsyCpAirFnW(state->dataEnvrn->OutHumRat)) * 3600.0 *
-                    (Psychrometrics::PsyHFnTdbW(state->dataHeatBal->Zone(1).OutDryBulbTemp, state->dataEnvrn->OutHumRat) -
-                     Psychrometrics::PsyHFnTdbW(state->dataHeatBalFanSys->MAT(1), state->dataHeatBalFanSys->ZoneAirHumRat(1)));
+             (Psychrometrics::PsyHFnTdbW(state->dataHeatBal->Zone(1).OutDryBulbTemp, state->dataEnvrn->OutHumRat) -
+              Psychrometrics::PsyHFnTdbW(state->dataHeatBalFanSys->MAT(1), state->dataHeatBalFanSys->ZoneAirHumRat(1)));
     EXPECT_NEAR(-deltah, state->dataHeatBal->ZnAirRpt(1).VentilTotalLoss, 0.0001);
 }
 
@@ -220,7 +220,7 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
 
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;
-    DataHVACGlobals::TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 1.0;
     state->dataHeatBalFanSys->MCPI(1) = 1.0;
     state->dataHeatBalFanSys->MCPI(2) = 1.5;
     state->dataHeatBalFanSys->MCPV(1) = 2.0;
@@ -245,16 +245,16 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 1;
 
-    Fans::Fan.allocate(1);
+    state->dataFans->Fan.allocate(1);
     state->dataFans->NumFans = 1;
-    Fans::Fan(1).FanType_Num = DataHVACGlobals::FanType_ZoneExhaust;
-    Fans::Fan(1).OutletAirMassFlowRate = 1.0;
-    Fans::Fan(1).OutletAirTemp = 22.0;
-    Fans::Fan(1).OutletAirEnthalpy = Psychrometrics::PsyHFnTdbW(Fans::Fan(1).OutletAirTemp, 0.0005);
-    Fans::Fan(1).InletNodeNum = 1;
+    state->dataFans->Fan(1).FanType_Num = DataHVACGlobals::FanType_ZoneExhaust;
+    state->dataFans->Fan(1).OutletAirMassFlowRate = 1.0;
+    state->dataFans->Fan(1).OutletAirTemp = 22.0;
+    state->dataFans->Fan(1).OutletAirEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataFans->Fan(1).OutletAirTemp, 0.0005);
+    state->dataFans->Fan(1).InletNodeNum = 1;
 
-    DataLoopNode::Node.allocate(1);
-    DataLoopNode::Node(1).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node.allocate(1);
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
 
     // Call HVACManager
     ReportAirHeatBalance(*state);
@@ -275,14 +275,14 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     state->dataGlobal->isPulseZoneSizing = false;
     state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
     state->dataGlobal->WarmupFlag = false;
-    DataHVACGlobals::AirLoopsSimOnce = true;
+    state->dataHVACGlobal->AirLoopsSimOnce = true;
     state->dataEnvrn->StdRhoAir = 1.0;
 
-    DataHVACGlobals::NumPrimaryAirSys = 2;
-    state->dataAirSystemsData->PrimaryAirSystems.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataHVACGlobal->NumPrimaryAirSys = 2;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     state->dataAirSystemsData->PrimaryAirSystems(1).Name = "System 1";
     state->dataAirSystemsData->PrimaryAirSystems(2).Name = "System 2";
-        state->dataAirLoop->AirLoopFlow.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataAirLoop->AirLoopFlow.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     auto &thisAirLoopFlow1(state->dataAirLoop->AirLoopFlow(1));
     auto &thisAirLoopFlow2(state->dataAirLoop->AirLoopFlow(2));
 
@@ -298,7 +298,7 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     HVACManager::CheckAirLoopFlowBalance(*state);
     EXPECT_FALSE(has_err_output(true));
 
-    //Case 2 - Both loops are balanced
+    // Case 2 - Both loops are balanced
     thisAirLoopFlow1.SupFlow = 2.0;
     thisAirLoopFlow1.SysRetFlow = 1.0;
     thisAirLoopFlow1.OAFlow = 1.0;
@@ -310,7 +310,7 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     HVACManager::CheckAirLoopFlowBalance(*state);
     EXPECT_FALSE(has_err_output(true));
 
-    //Case 3 - Loop 1 is unbalanced
+    // Case 3 - Loop 1 is unbalanced
     thisAirLoopFlow1.SupFlow = 2.0;
     thisAirLoopFlow1.SysRetFlow = 1.0;
     thisAirLoopFlow1.OAFlow = 0.0;
@@ -321,15 +321,15 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
 
     HVACManager::CheckAirLoopFlowBalance(*state);
     EXPECT_TRUE(has_err_output(false));
-    std::string error_string = delimited_string({
-        "   ** Severe  ** CheckAirLoopFlowBalance: AirLoopHVAC System 1 is unbalanced. Supply is > return plus outdoor air.",
-        "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
-        "   **   ~~~   **   Flows [m3/s at standard density]: Supply=2.000000  Return=1.000000  Outdoor Air=0.000000",
-        "   **   ~~~   **   Imbalance=1.000000",
-        "   **   ~~~   **   This error will only be reported once per system." });
+    std::string error_string =
+        delimited_string({"   ** Severe  ** CheckAirLoopFlowBalance: AirLoopHVAC System 1 is unbalanced. Supply is > return plus outdoor air.",
+                          "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+                          "   **   ~~~   **   Flows [m3/s at standard density]: Supply=2.000000  Return=1.000000  Outdoor Air=0.000000",
+                          "   **   ~~~   **   Imbalance=1.000000",
+                          "   **   ~~~   **   This error will only be reported once per system."});
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    //Case 4 - Loop 2 is unbalanced
+    // Case 4 - Loop 2 is unbalanced
     thisAirLoopFlow1.SupFlow = 0.0;
     thisAirLoopFlow1.SysRetFlow = 0.0;
     thisAirLoopFlow1.OAFlow = 0.0;
@@ -340,12 +340,11 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
 
     HVACManager::CheckAirLoopFlowBalance(*state);
     EXPECT_TRUE(has_err_output(false));
-    error_string = delimited_string({
-        "   ** Severe  ** CheckAirLoopFlowBalance: AirLoopHVAC System 2 is unbalanced. Supply is > return plus outdoor air.",
-        "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
-        "   **   ~~~   **   Flows [m3/s at standard density]: Supply=3.000000  Return=2.000000  Outdoor Air=0.990000",
-        "   **   ~~~   **   Imbalance=1.000000E-002",
-        "   **   ~~~   **   This error will only be reported once per system." });
+    error_string =
+        delimited_string({"   ** Severe  ** CheckAirLoopFlowBalance: AirLoopHVAC System 2 is unbalanced. Supply is > return plus outdoor air.",
+                          "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+                          "   **   ~~~   **   Flows [m3/s at standard density]: Supply=3.000000  Return=2.000000  Outdoor Air=0.990000",
+                          "   **   ~~~   **   Imbalance=1.000000E-002",
+                          "   **   ~~~   **   This error will only be reported once per system."});
     EXPECT_TRUE(compare_err_stream(error_string, true));
-
 }

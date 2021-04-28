@@ -167,7 +167,8 @@ namespace OutputReportPredefined {
     // Creates an entry for predefined tables when the entry
     // is a real variable. numSigDigits defaults to 2, and if supplied must be in [0-9]
     // Internally it uses a Fortran-Style write statement, meaning numbers are rounded rather than trimmed
-    void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName, Real64 const tableEntryReal, Optional_int_const numSigDigits = _);
+    void PreDefTableEntry(
+        EnergyPlusData &state, int const columnIndex, std::string const &objName, Real64 const tableEntryReal, Optional_int_const numSigDigits = _);
 
     void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName, std::string const &tableEntryChar);
 
@@ -177,12 +178,18 @@ namespace OutputReportPredefined {
 
     void incrementTableEntry(EnergyPlusData &state);
 
-    void
-    AddCompSizeTableEntry(EnergyPlusData &state, std::string const &FieldType, std::string const &FieldName, std::string const &FieldDescription, Real64 const FieldValue);
+    void AddCompSizeTableEntry(EnergyPlusData &state,
+                               std::string const &FieldType,
+                               std::string const &FieldName,
+                               std::string const &FieldDescription,
+                               Real64 const FieldValue);
 
     void AddShadowRelateTableEntry(EnergyPlusData &state, int const castingField, int const receivingField, int const receivingKind);
 
-    int newPreDefReport(EnergyPlusData &state, std::string const &inReportName, std::string const &inReportAbrev, std::string const &inReportNamewithSpaces);
+    int newPreDefReport(EnergyPlusData &state,
+                        std::string const &inReportName,
+                        std::string const &inReportAbrev,
+                        std::string const &inReportNamewithSpaces);
 
     int newPreDefSubTable(EnergyPlusData &state, int const reportIndex, std::string const &subTableName);
 
@@ -192,7 +199,8 @@ namespace OutputReportPredefined {
 
 } // namespace OutputReportPredefined
 
-struct OutputReportPredefinedData : BaseGlobalStruct {
+struct OutputReportPredefinedData : BaseGlobalStruct
+{
 
     // Climate Summary Report
     int pdrClim = 0;
@@ -254,27 +262,27 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
 
     // DX Cooling Coil subtable
     int pdstDXCoolCoil = 0;
-    int pdchDXCoolCoilType = 0;             // DX cooling coil type
-    int pdchDXCoolCoilNetCapSI = 0;         // Standard Rated (Net) Cooling Capacity [W]
-    int pdchDXCoolCoilCOP = 0;              // EER/COP value in SI unit at AHRI std. 340/360 conditions [W/W]
-    int pdchDXCoolCoilSEERUserIP = 0;       // SEER value in IP unit at AHRI std. 210/240 conditions and user PLF curve [Btu/W-hr]
-    int pdchDXCoolCoilSEERStandardIP = 0;   // SEER value in IP unit at AHRI std. 210/240 conditions and default PLF curve and C_D value [Btu/W-hr]
-    int pdchDXCoolCoilEERIP = 0;            // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
-    int pdchDXCoolCoilIEERIP = 0;           // IEER value in IP unit at AHRI std. 340/360 conditions
+    int pdchDXCoolCoilType = 0;           // DX cooling coil type
+    int pdchDXCoolCoilNetCapSI = 0;       // Standard Rated (Net) Cooling Capacity [W]
+    int pdchDXCoolCoilCOP = 0;            // EER/COP value in SI unit at AHRI std. 340/360 conditions [W/W]
+    int pdchDXCoolCoilSEERUserIP = 0;     // SEER value in IP unit at AHRI std. 210/240 conditions and user PLF curve [Btu/W-hr]
+    int pdchDXCoolCoilSEERStandardIP = 0; // SEER value in IP unit at AHRI std. 210/240 conditions and default PLF curve and C_D value [Btu/W-hr]
+    int pdchDXCoolCoilEERIP = 0;          // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
+    int pdchDXCoolCoilIEERIP = 0;         // IEER value in IP unit at AHRI std. 340/360 conditions
 
     // DX Cooling Coil subtable per ANSI/ASHRAE Std 127 for Tests A, B, C and D
     int pdstDXCoolCoil2 = 0;
-    int pdchDXCoolCoilNetCapSIA = 0;        // Standard Rated (Net) Cooling Capacity [W], Test A
-    int pdchDXCoolCoilElecPowerA = 0;       // Standard Rated Electric Power [W], Test A
-    int pdchDXCoolCoilNetCapSIB = 0;        // Standard Rated (Net) Cooling Capacity [W], Test B
-    int pdchDXCoolCoilElecPowerB = 0;       // Standard Rated Electric Power [W], Test B
-    int pdchDXCoolCoilNetCapSIC = 0;        // Standard Rated (Net) Cooling Capacity [W], Test C
-    int pdchDXCoolCoilElecPowerC = 0;       // Standard Rated Electric Power [W], Test C
-    int pdchDXCoolCoilNetCapSID = 0;        // Standard Rated (Net) Cooling Capacity [W], Test D
-    int pdchDXCoolCoilElecPowerD = 0;       // Standard Rated Electric Power [W], Test D
+    int pdchDXCoolCoilNetCapSIA = 0;  // Standard Rated (Net) Cooling Capacity [W], Test A
+    int pdchDXCoolCoilElecPowerA = 0; // Standard Rated Electric Power [W], Test A
+    int pdchDXCoolCoilNetCapSIB = 0;  // Standard Rated (Net) Cooling Capacity [W], Test B
+    int pdchDXCoolCoilElecPowerB = 0; // Standard Rated Electric Power [W], Test B
+    int pdchDXCoolCoilNetCapSIC = 0;  // Standard Rated (Net) Cooling Capacity [W], Test C
+    int pdchDXCoolCoilElecPowerC = 0; // Standard Rated Electric Power [W], Test C
+    int pdchDXCoolCoilNetCapSID = 0;  // Standard Rated (Net) Cooling Capacity [W], Test D
+    int pdchDXCoolCoilElecPowerD = 0; // Standard Rated Electric Power [W], Test D
 
     // VAV DX Cooling Ratings Details
-    int pdstVAVDXCoolCoil = 0;              // details for Packaged VAV rating under AHRI 340/360
+    int pdstVAVDXCoolCoil = 0; // details for Packaged VAV rating under AHRI 340/360
     int pdchVAVDXCoolCoilType = 0;
     int pdchVAVDXFanName = 0;
     int pdchVAVDXCoolCoilNetCapSI = 0;
@@ -740,6 +748,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
     int pdchOaTmFctEcono = 0;
     int pdchOaTmFctDCV = 0;
     int pdchOaTmFctExhaust = 0;
+    int pdchOaTmFctMixedLimit = 0;
     int pdchOaTmFctLimit = 0;
     int pdchOaTmFctDemand = 0;
     int pdchOaTmFctEMS = 0;
@@ -751,6 +760,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
     int pdchOaAvFctEcono = 0;
     int pdchOaAvFctDCV = 0;
     int pdchOaAvFctExhaust = 0;
+    int pdchOaAvFctMixedLimit = 0;
     int pdchOaAvFctLimit = 0;
     int pdchOaAvFctDemand = 0;
     int pdchOaAvFctEMS = 0;
@@ -1163,22 +1173,22 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
     Real64 TotalTimeNotSimpleASH55EitherForABUPS = 0.0;
 
     // Totals for OA details report
-    Real64 TotalVozMax = 0.0; // total Voz (max of heating and cooling)
-    Real64 TotalAnyZoneBelowVozDynForOA = 0.0; // total time any zone below target Voz-Dyn
-    Real64 TotalAllZonesAtVozDynForOA = 0.0; // total time all zones at target Voz-Dyn
-    Real64 TotalAnyZoneAboveVozDynForOA = 0.0; // total time any zone above target Voz-Dyn
+    Real64 TotalVozMax = 0.0;                     // total Voz (max of heating and cooling)
+    Real64 TotalAnyZoneBelowVozDynForOA = 0.0;    // total time any zone below target Voz-Dyn
+    Real64 TotalAllZonesAtVozDynForOA = 0.0;      // total time all zones at target Voz-Dyn
+    Real64 TotalAnyZoneAboveVozDynForOA = 0.0;    // total time any zone above target Voz-Dyn
     Real64 TotalAnyZoneBelowVozDynOccForOA = 0.0; // total time any zone below target Voz-Dyn
-    Real64 TotalAllZonesAtVozDynOccForOA = 0.0; // total time all zones at target Voz-Dyn
+    Real64 TotalAllZonesAtVozDynOccForOA = 0.0;   // total time all zones at target Voz-Dyn
     Real64 TotalAnyZoneAboveVozDynOccForOA = 0.0; // total time any zone above target Voz-Dyn
-    Real64 TotalAnyZoneVentUnoccForOA = 0.0; // total time any zone has ventilation when unoccupied
+    Real64 TotalAnyZoneVentUnoccForOA = 0.0;      // total time any zone has ventilation when unoccupied
 
-    Real64 TotalAnyAirLoopBelowVozDynForOA = 0.0; // total time any air loop below target Voz-Dyn
-    Real64 TotalAllAirLoopsAtVozDynForOA = 0.0; // total time all air loops at target Voz-Dyn
-    Real64 TotalAnyAirLoopAboveVozDynForOA = 0.0; // total time any air loop above target Voz-Dyn
+    Real64 TotalAnyAirLoopBelowVozDynForOA = 0.0;    // total time any air loop below target Voz-Dyn
+    Real64 TotalAllAirLoopsAtVozDynForOA = 0.0;      // total time all air loops at target Voz-Dyn
+    Real64 TotalAnyAirLoopAboveVozDynForOA = 0.0;    // total time any air loop above target Voz-Dyn
     Real64 TotalAnyAirLoopBelowVozDynOccForOA = 0.0; // total time any air loop below target Voz-Dyn
-    Real64 TotalAllAirLoopsAtVozDynOccForOA = 0.0; // total time all air loops at target Voz-Dyn
+    Real64 TotalAllAirLoopsAtVozDynOccForOA = 0.0;   // total time all air loops at target Voz-Dyn
     Real64 TotalAnyAirLoopAboveVozDynOccForOA = 0.0; // total time any air loop above target Voz-Dyn
-    Real64 TotalAnyAirLoopVentUnoccForOA = 0.0; // total time any air loop has ventilation when unoccupied
+    Real64 TotalAnyAirLoopVentUnoccForOA = 0.0;      // total time any air loop has ventilation when unoccupied
 
     Array1D<OutputReportPredefined::reportNameType> reportName;
     Array1D<OutputReportPredefined::SubTableType> subTable;

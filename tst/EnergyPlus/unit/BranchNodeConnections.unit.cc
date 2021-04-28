@@ -114,9 +114,10 @@ TEST_F(EnergyPlusFixture, BranchNodeErrorCheck11Test)
     bool ErrorsFound = false;
 
     CheckNodeConnections(*state, ErrorsFound);
-    std::string const error_string = delimited_string(
-        {"   ** Severe  ** Node Connection Error, Node Name=\"BadNode\", The same zone node appears more than once.",
-         "   **   ~~~   ** Reference Object=TYPE1, Object Name=Object1", "   **   ~~~   ** Reference Object=TYPE3, Object Name=Object3"});
+    std::string const error_string =
+        delimited_string({"   ** Severe  ** Node Connection Error, Node Name=\"BadNode\", The same zone node appears more than once.",
+                          "   **   ~~~   ** Reference Object=TYPE1, Object Name=Object1",
+                          "   **   ~~~   ** Reference Object=TYPE3, Object Name=Object3"});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_TRUE(ErrorsFound); // Node check will fail on Check 11 -- zone node name must be unique
@@ -1118,7 +1119,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
     GetProjectData(*state);
     OutputReportPredefined::SetPredefinedTables(*state);
     SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     BranchInputManager::ManageBranchInput(*state);
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -2126,7 +2127,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
     GetProjectData(*state);
     OutputReportPredefined::SetPredefinedTables(*state);
     SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     BranchInputManager::ManageBranchInput(*state);
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->BeginEnvrnFlag = true;

@@ -101,8 +101,8 @@ namespace HeatPumpWaterToWaterSimple {
         bool ratedCapHeatWasAutoSized;           // true if RatedCapHeat was autosize on input
         Real64 RatedPowerHeat;                   // Rated Heating Compressor Power[W]
         bool ratedPowerHeatWasAutoSized;         // true if RatedPowerHeat was autosize on input
-        int HeatCapCurveIndex;                  // Index of the Heating capacity performance curve
-        int HeatPowCurveIndex;                  // Index of the Heating power consumption curve
+        int HeatCapCurveIndex;                   // Index of the Heating capacity performance curve
+        int HeatPowCurveIndex;                   // Index of the Heating power consumption curve
         int LoadSideInletNodeNum;                // Load Side Inlet Node
         int LoadSideOutletNodeNum;               // Load Side Outlet Node
         int SourceSideInletNodeNum;              // Source Side Inlet Node
@@ -156,10 +156,10 @@ namespace HeatPumpWaterToWaterSimple {
               ratedPowerCoolWasAutoSized(false), CoolCapCurveIndex(0), CoolPowCurveIndex(0), CoolCapNegativeCounter(0), CoolCapNegativeIndex(0),
               CoolPowerNegativeCounter(0), CoolPowerNegativeIndex(0), RatedLoadVolFlowHeat(0.0), ratedLoadVolFlowHeatWasAutoSized(false),
               RatedSourceVolFlowHeat(0.0), ratedSourceVolFlowHeatWasAutoSized(false), RatedCapHeat(0.0), ratedCapHeatWasAutoSized(false),
-              RatedPowerHeat(0.0), ratedPowerHeatWasAutoSized(false), HeatCapCurveIndex(0), HeatPowCurveIndex(0), LoadSideInletNodeNum(0), LoadSideOutletNodeNum(0),
-              SourceSideInletNodeNum(0), SourceSideOutletNodeNum(0), HeatCapNegativeCounter(0), HeatCapNegativeIndex(0), HeatPowerNegativeCounter(0),
-              HeatPowerNegativeIndex(0), SourceLoopNum(0), SourceLoopSideNum(0), SourceBranchNum(0), SourceCompNum(0), LoadLoopNum(0),
-              LoadLoopSideNum(0), LoadBranchNum(0), LoadCompNum(0), CondMassFlowIndex(0), refCOP(0.0), sizFac(0.0), companionIndex(0),
+              RatedPowerHeat(0.0), ratedPowerHeatWasAutoSized(false), HeatCapCurveIndex(0), HeatPowCurveIndex(0), LoadSideInletNodeNum(0),
+              LoadSideOutletNodeNum(0), SourceSideInletNodeNum(0), SourceSideOutletNodeNum(0), HeatCapNegativeCounter(0), HeatCapNegativeIndex(0),
+              HeatPowerNegativeCounter(0), HeatPowerNegativeIndex(0), SourceLoopNum(0), SourceLoopSideNum(0), SourceBranchNum(0), SourceCompNum(0),
+              LoadLoopNum(0), LoadLoopSideNum(0), LoadBranchNum(0), LoadCompNum(0), CondMassFlowIndex(0), refCOP(0.0), sizFac(0.0), companionIndex(0),
               companionIdentified(false), reportPower(0.0), reportEnergy(0.0), reportQLoad(0.0), reportQLoadEnergy(0.0), reportQSource(0.0),
               reportQSourceEnergy(0.0), reportLoadSideMassFlowRate(0.0), reportLoadSideInletTemp(0.0), reportLoadSideOutletTemp(0.0),
               reportSourceSideMassFlowRate(0.0), reportSourceSideInletTemp(0.0), reportSourceSideOutletTemp(0.0), MyPlantScanFlag(true),
@@ -199,7 +199,7 @@ namespace HeatPumpWaterToWaterSimple {
 
         void CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 MyLoad); // Operating Load
 
-        void UpdateGSHPRecords();
+        void UpdateGSHPRecords(EnergyPlusData &state);
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
     };
@@ -213,6 +213,8 @@ struct HeatPumpWaterToWaterSimpleData : BaseGlobalStruct
     bool GetInputFlag = true;
     Array1D<HeatPumpWaterToWaterSimple::GshpSpecs> GSHP;
     std::unordered_map<std::string, std::string> HeatPumpWaterUniqueNames;
+    Real64 CurrentSimTime = 0.0;
+    Real64 PrevSimTime = 0.0;
 
     void clear_state() override
     {
@@ -220,6 +222,8 @@ struct HeatPumpWaterToWaterSimpleData : BaseGlobalStruct
         this->GetInputFlag = true;
         this->GSHP.deallocate();
         this->HeatPumpWaterUniqueNames.clear();
+        this->CurrentSimTime = 0.0;
+        this->PrevSimTime = 0.0;
     }
 };
 

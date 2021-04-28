@@ -76,15 +76,22 @@ TEST_F(EnergyPlusFixture, ZonePlenum_InitAirZoneReturnPlenumTest)
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes = 2;
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InletNode.allocate(1); // Needed for the Update routine
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedNode.allocate(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes);
-    state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedMassFlowRate.allocate(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes);
-    state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedMassFlowRateMaxAvail.allocate(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes);
-    state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedMassFlowRateMinAvail.allocate(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes);
+    state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum)
+        .InducedMassFlowRate.allocate(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes);
+    state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum)
+        .InducedMassFlowRateMaxAvail.allocate(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes);
+    state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum)
+        .InducedMassFlowRateMinAvail.allocate(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes);
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedTemp.allocate(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes);
-    state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedHumRat.allocate(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes);
-    state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedEnthalpy.allocate(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes);
-    state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedPressure.allocate(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes);
+    state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum)
+        .InducedHumRat.allocate(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes);
+    state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum)
+        .InducedEnthalpy.allocate(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes);
+    state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum)
+        .InducedPressure.allocate(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes);
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedCO2.allocate(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes);
-    state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedGenContam.allocate(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes);
+    state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum)
+        .InducedGenContam.allocate(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes);
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InletNode(1) = 1;
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedMassFlowRate = 0.0;
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedMassFlowRateMaxAvail = 0.0;
@@ -96,53 +103,62 @@ TEST_F(EnergyPlusFixture, ZonePlenum_InitAirZoneReturnPlenumTest)
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedCO2 = 0.0;
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedGenContam = 0.0;
 
-    Node.allocate(4); // One node per plenum plus total of NumInducedNodes for all plenums)
+    state->dataLoopNodes->Node.allocate(4); // One node per plenum plus total of NumInducedNodes for all plenums)
     int ZoneNodeNum = 1;
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum = ZoneNodeNum;
-    Node(ZoneNodeNum).Temp = 24.2;
-    Node(ZoneNodeNum).HumRat = 0.0003;
-    Node(ZoneNodeNum).Enthalpy = 40000.0;
-    Node(ZoneNodeNum).Press = 99000.0;
-    Node(ZoneNodeNum).CO2 = 950.0;
-    Node(ZoneNodeNum).GenContam = 100.0;
+    state->dataLoopNodes->Node(ZoneNodeNum).Temp = 24.2;
+    state->dataLoopNodes->Node(ZoneNodeNum).HumRat = 0.0003;
+    state->dataLoopNodes->Node(ZoneNodeNum).Enthalpy = 40000.0;
+    state->dataLoopNodes->Node(ZoneNodeNum).Press = 99000.0;
+    state->dataLoopNodes->Node(ZoneNodeNum).CO2 = 950.0;
+    state->dataLoopNodes->Node(ZoneNodeNum).GenContam = 100.0;
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletPressure = 99000.0;
 
     int InducedNodeIndex = 1;
     int InducedNodeNum = 2;
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedNode(InducedNodeIndex) = InducedNodeNum;
-    Node(InducedNodeNum).MassFlowRate = 0.20;
-    Node(InducedNodeNum).MassFlowRateMaxAvail = 0.25;
-    Node(InducedNodeNum).MassFlowRateMinAvail = 0.10;
+    state->dataLoopNodes->Node(InducedNodeNum).MassFlowRate = 0.20;
+    state->dataLoopNodes->Node(InducedNodeNum).MassFlowRateMaxAvail = 0.25;
+    state->dataLoopNodes->Node(InducedNodeNum).MassFlowRateMinAvail = 0.10;
 
     InducedNodeIndex = 2;
     InducedNodeNum = 3;
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedNode(InducedNodeIndex) = InducedNodeNum;
-    Node(InducedNodeNum).MassFlowRate = 0.40;
-    Node(InducedNodeNum).MassFlowRateMaxAvail = 0.50;
-    Node(InducedNodeNum).MassFlowRateMinAvail = 0.22;
+    state->dataLoopNodes->Node(InducedNodeNum).MassFlowRate = 0.40;
+    state->dataLoopNodes->Node(InducedNodeNum).MassFlowRateMaxAvail = 0.50;
+    state->dataLoopNodes->Node(InducedNodeNum).MassFlowRateMinAvail = 0.22;
 
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletNode = 4;
 
     InitAirZoneReturnPlenum(*state, ZonePlenumNum);
     UpdateAirZoneReturnPlenum(*state, ZonePlenumNum);
 
-    EXPECT_EQ(Node(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum).CO2, Node(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletNode).CO2);
-    EXPECT_EQ(Node(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum).CO2, Node(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletNode).CO2);
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum).CO2,
+              state->dataLoopNodes->Node(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletNode).CO2);
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum).CO2,
+              state->dataLoopNodes->Node(state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletNode).CO2);
 
     for (InducedNodeIndex = 1; InducedNodeIndex <= state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes; ++InducedNodeIndex) {
         InducedNodeNum = state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedNode(InducedNodeIndex);
-        EXPECT_EQ(Node(InducedNodeNum).MassFlowRate, state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedMassFlowRate(InducedNodeIndex));
-        EXPECT_EQ(Node(InducedNodeNum).MassFlowRateMaxAvail, state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedMassFlowRateMaxAvail(InducedNodeIndex));
-        EXPECT_EQ(Node(InducedNodeNum).MassFlowRateMinAvail, state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedMassFlowRateMinAvail(InducedNodeIndex));
-        EXPECT_EQ(Node(ZoneNodeNum).Temp, state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedTemp(InducedNodeIndex));
-        EXPECT_EQ(Node(ZoneNodeNum).HumRat, state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedHumRat(InducedNodeIndex));
-        EXPECT_EQ(Node(ZoneNodeNum).Enthalpy, state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedEnthalpy(InducedNodeIndex));
-        EXPECT_EQ(Node(ZoneNodeNum).Press, state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedPressure(InducedNodeIndex));
-        EXPECT_EQ(Node(ZoneNodeNum).CO2, state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedCO2(InducedNodeIndex));
-        EXPECT_EQ(Node(ZoneNodeNum).GenContam, state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedGenContam(InducedNodeIndex));
-        EXPECT_EQ(Node(ZoneNodeNum).Temp, state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneTemp);
-        EXPECT_EQ(Node(ZoneNodeNum).HumRat, state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneHumRat);
-        EXPECT_EQ(Node(ZoneNodeNum).Enthalpy, state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneEnthalpy);
+        EXPECT_EQ(state->dataLoopNodes->Node(InducedNodeNum).MassFlowRate,
+                  state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedMassFlowRate(InducedNodeIndex));
+        EXPECT_EQ(state->dataLoopNodes->Node(InducedNodeNum).MassFlowRateMaxAvail,
+                  state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedMassFlowRateMaxAvail(InducedNodeIndex));
+        EXPECT_EQ(state->dataLoopNodes->Node(InducedNodeNum).MassFlowRateMinAvail,
+                  state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedMassFlowRateMinAvail(InducedNodeIndex));
+        EXPECT_EQ(state->dataLoopNodes->Node(ZoneNodeNum).Temp, state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedTemp(InducedNodeIndex));
+        EXPECT_EQ(state->dataLoopNodes->Node(ZoneNodeNum).HumRat,
+                  state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedHumRat(InducedNodeIndex));
+        EXPECT_EQ(state->dataLoopNodes->Node(ZoneNodeNum).Enthalpy,
+                  state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedEnthalpy(InducedNodeIndex));
+        EXPECT_EQ(state->dataLoopNodes->Node(ZoneNodeNum).Press,
+                  state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedPressure(InducedNodeIndex));
+        EXPECT_EQ(state->dataLoopNodes->Node(ZoneNodeNum).CO2, state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedCO2(InducedNodeIndex));
+        EXPECT_EQ(state->dataLoopNodes->Node(ZoneNodeNum).GenContam,
+                  state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedGenContam(InducedNodeIndex));
+        EXPECT_EQ(state->dataLoopNodes->Node(ZoneNodeNum).Temp, state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneTemp);
+        EXPECT_EQ(state->dataLoopNodes->Node(ZoneNodeNum).HumRat, state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneHumRat);
+        EXPECT_EQ(state->dataLoopNodes->Node(ZoneNodeNum).Enthalpy, state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneEnthalpy);
     }
 
     // Deallocate everything
@@ -158,5 +174,5 @@ TEST_F(EnergyPlusFixture, ZonePlenum_InitAirZoneReturnPlenumTest)
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedCO2.deallocate();
     state->dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedGenContam.deallocate();
     state->dataZonePlenum->ZoneRetPlenCond.deallocate();
-    Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
 }

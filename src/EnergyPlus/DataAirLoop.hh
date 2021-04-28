@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -249,8 +250,8 @@ namespace DataAirLoop {
 
         // Default Constructor
         OutsideAirSysProps()
-            : ControllerListNum(0), NumComponents(0), NumControllers(0), NumSimpleControllers(0), OAControllerIndex(0),
-              HeatExchangerFlag(false), AirLoopDOASNum(-1), DXCoolingCoilFlag(false)
+            : ControllerListNum(0), NumComponents(0), NumControllers(0), NumSimpleControllers(0), OAControllerIndex(0), HeatExchangerFlag(false),
+              AirLoopDOASNum(-1), DXCoolingCoilFlag(false)
 
         {
         }
@@ -278,36 +279,37 @@ namespace DataAirLoop {
 
 } // namespace DataAirLoop
 
-    struct DataAirLoopData : BaseGlobalStruct {
+struct DataAirLoopData : BaseGlobalStruct
+{
 
-        int NumOASystems = 0;               // Number of Outdoor Air Systems
-        bool AirLoopInputsFilled = false;   // Set to TRUE after first pass through air loop
-        Real64 LoopDXCoilRTF = 0.0;         // OnOff fan run time fraction in an HVAC Air Loop
+    int NumOASystems = 0;             // Number of Outdoor Air Systems
+    bool AirLoopInputsFilled = false; // Set to TRUE after first pass through air loop
+    Real64 LoopDXCoilRTF = 0.0;       // OnOff fan run time fraction in an HVAC Air Loop
 
-        Array1D<DataAirLoop::AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
-        Array1D<DataAirLoop::AirLoopOutsideAirConnectData> AirToOANodeInfo;
-        Array1D<DataAirLoop::DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
-        Array1D<DataAirLoop::AirLooptoZoneData> AirLoopZoneInfo;
-        Array1D<DataAirLoop::AirLoopControlData> AirLoopControlInfo;
-        Array1D<DataAirLoop::AirLoopFlowData> AirLoopFlow;
-        Array1D<DataAirLoop::OutsideAirSysProps> OutsideAirSys;
-        Array1D<DataAirLoop::AirLoopAFNData> AirLoopAFNInfo;
+    EPVector<DataAirLoop::AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
+    EPVector<DataAirLoop::AirLoopOutsideAirConnectData> AirToOANodeInfo;
+    EPVector<DataAirLoop::DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
+    EPVector<DataAirLoop::AirLooptoZoneData> AirLoopZoneInfo;
+    EPVector<DataAirLoop::AirLoopControlData> AirLoopControlInfo;
+    EPVector<DataAirLoop::AirLoopFlowData> AirLoopFlow;
+    EPVector<DataAirLoop::OutsideAirSysProps> OutsideAirSys;
+    EPVector<DataAirLoop::AirLoopAFNData> AirLoopAFNInfo;
 
-        void clear_state() override
-        {
-            this->NumOASystems = 0;
-            this->LoopDXCoilRTF = 0.0;
-            this->AirLoopInputsFilled = false;
-            this->AirLoopAFNInfo.deallocate();
-            this->AirToZoneNodeInfo.deallocate();
-            this->AirToOANodeInfo.deallocate();
-            this->PriAirSysAvailMgr.deallocate();
-            this->AirLoopZoneInfo.deallocate();
-            this->AirLoopControlInfo.deallocate();
-            this->AirLoopFlow.deallocate();
-            this->OutsideAirSys.deallocate();
-        }
-    };
+    void clear_state() override
+    {
+        this->NumOASystems = 0;
+        this->LoopDXCoilRTF = 0.0;
+        this->AirLoopInputsFilled = false;
+        this->AirLoopAFNInfo.deallocate();
+        this->AirToZoneNodeInfo.deallocate();
+        this->AirToOANodeInfo.deallocate();
+        this->PriAirSysAvailMgr.deallocate();
+        this->AirLoopZoneInfo.deallocate();
+        this->AirLoopControlInfo.deallocate();
+        this->AirLoopFlow.deallocate();
+        this->OutsideAirSys.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

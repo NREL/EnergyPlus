@@ -72,10 +72,11 @@ TEST_F(IdfParserFixture, decode)
 
     auto const output = IdfParser::decode(test_object);
 
-    EXPECT_EQ(std::vector<std::vector<std::string>>({{"Version", "8.3"},
-                                                     {"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000",
-                                                      "FullInteriorAndExterior", "25", "6"}}),
-              output);
+    EXPECT_EQ(
+        std::vector<std::vector<std::string>>(
+            {{"Version", "8.3"},
+             {"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000", "FullInteriorAndExterior", "25", "6"}}),
+        output);
 }
 
 TEST_F(IdfParserFixture, decode_success)
@@ -96,10 +97,11 @@ TEST_F(IdfParserFixture, decode_success)
 
     auto const output = IdfParser::decode(test_object, success);
 
-    EXPECT_EQ(std::vector<std::vector<std::string>>({{"Version", "8.3"},
-                                                     {"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000",
-                                                      "FullInteriorAndExterior", "25", "6"}}),
-              output);
+    EXPECT_EQ(
+        std::vector<std::vector<std::string>>(
+            {{"Version", "8.3"},
+             {"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000", "FullInteriorAndExterior", "25", "6"}}),
+        output);
     EXPECT_TRUE(success);
 }
 
@@ -229,10 +231,11 @@ TEST_F(IdfParserFixture, parse_idf)
 
     auto const output = parse_idf(test_object, index, success);
 
-    EXPECT_EQ(std::vector<std::vector<std::string>>({{"Version", "8.3"},
-                                                     {"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000",
-                                                      "FullInteriorAndExterior", "25", "6"}}),
-              output);
+    EXPECT_EQ(
+        std::vector<std::vector<std::string>>(
+            {{"Version", "8.3"},
+             {"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000", "FullInteriorAndExterior", "25", "6"}}),
+        output);
 
     EXPECT_EQ(test_object.size() - 1, index);
     EXPECT_TRUE(success);
@@ -255,9 +258,10 @@ TEST_F(IdfParserFixture, parse_object)
     }));
 
     auto const output_vector = parse_object(test_object, index, success);
-    EXPECT_EQ(std::vector<std::string>({"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000",
-                                        "FullInteriorAndExterior", "25", "6"}),
-              output_vector);
+    EXPECT_EQ(
+        std::vector<std::string>(
+            {"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000", "FullInteriorAndExterior", "25", "6"}),
+        output_vector);
 
     EXPECT_EQ(test_object.size() - 1, index);
     EXPECT_TRUE(success);

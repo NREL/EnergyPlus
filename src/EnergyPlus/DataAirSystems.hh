@@ -90,18 +90,18 @@ namespace DataAirSystems {
     struct AirLoopCompData // data for an individual component
     {
         // Members
-        std::string TypeOf;      // The 'keyWord' identifying  component type
-        std::string Name;        // Component name
-        int CompType_Num;        // Numeric designator for CompType (TypeOf)
-        int CompIndex;           // Component Index in whatever is using this component
+        std::string TypeOf;          // The 'keyWord' identifying  component type
+        std::string Name;            // Component name
+        int CompType_Num;            // Numeric designator for CompType (TypeOf)
+        int CompIndex;               // Component Index in whatever is using this component
         HVACSystemData *compPointer; // pointer to HVAC system
-        int FlowCtrl;            // Component flow control (ACTIVE/PASSIVE)
-        bool ON;                 // When true, the designated component or operation scheme is available
-        bool Parent;             // When true, the designated component is made up of sub-components
-        std::string NodeNameIn;  // Component inlet node name
-        std::string NodeNameOut; // Component outlet node name
-        int NodeNumIn;           // Component inlet node number
-        int NodeNumOut;          // Component outlet node number
+        int FlowCtrl;                // Component flow control (ACTIVE/PASSIVE)
+        bool ON;                     // When true, the designated component or operation scheme is available
+        bool Parent;                 // When true, the designated component is made up of sub-components
+        std::string NodeNameIn;      // Component inlet node name
+        std::string NodeNameOut;     // Component outlet node name
+        int NodeNumIn;               // Component inlet node number
+        int NodeNumOut;              // Component outlet node number
         bool MeteredVarsFound;
         int NumMeteredVars;
         int NumSubComps;
@@ -417,29 +417,30 @@ namespace DataAirSystems {
 
 } // namespace DataAirSystems
 
-    struct AirSystemsData : BaseGlobalStruct {
+struct AirSystemsData : BaseGlobalStruct
+{
 
-        Array1D<DataAirSystems::DefinePrimaryAirSystem> PrimaryAirSystems;
-        Array1D<DataAirSystems::ConnectionPoint> DemandSideConnect;               // Connections between loops
-        Array1D<DataAirSystems::ConnectZoneComp> ZoneCompToPlant;                 // Connections between loops
-        Array1D<DataAirSystems::ConnectZoneSubComp> ZoneSubCompToPlant;           // Connections between loops
-        Array1D<DataAirSystems::ConnectZoneSubSubComp> ZoneSubSubCompToPlant;     // Connections between loops
-        Array1D<DataAirSystems::ConnectAirSysComp> AirSysCompToPlant;             // Connections between loops
-        Array1D<DataAirSystems::ConnectAirSysSubComp> AirSysSubCompToPlant;       // Connections between loops
-        Array1D<DataAirSystems::ConnectAirSysSubSubComp> AirSysSubSubCompToPlant; // Connections between loops
+    EPVector<DataAirSystems::DefinePrimaryAirSystem> PrimaryAirSystems;
+    Array1D<DataAirSystems::ConnectionPoint> DemandSideConnect;               // Connections between loops
+    Array1D<DataAirSystems::ConnectZoneComp> ZoneCompToPlant;                 // Connections between loops
+    Array1D<DataAirSystems::ConnectZoneSubComp> ZoneSubCompToPlant;           // Connections between loops
+    Array1D<DataAirSystems::ConnectZoneSubSubComp> ZoneSubSubCompToPlant;     // Connections between loops
+    Array1D<DataAirSystems::ConnectAirSysComp> AirSysCompToPlant;             // Connections between loops
+    Array1D<DataAirSystems::ConnectAirSysSubComp> AirSysSubCompToPlant;       // Connections between loops
+    Array1D<DataAirSystems::ConnectAirSysSubSubComp> AirSysSubSubCompToPlant; // Connections between loops
 
-        void clear_state() override
-        {
-            this->PrimaryAirSystems.deallocate();
-            this->DemandSideConnect.deallocate();
-            this->ZoneCompToPlant.deallocate();
-            this->ZoneSubCompToPlant.deallocate();
-            this->ZoneSubSubCompToPlant.deallocate();
-            this->AirSysCompToPlant.deallocate();
-            this->AirSysSubCompToPlant.deallocate();
-            this->AirSysSubSubCompToPlant.deallocate();
-        }
-    };
+    void clear_state() override
+    {
+        this->PrimaryAirSystems.deallocate();
+        this->DemandSideConnect.deallocate();
+        this->ZoneCompToPlant.deallocate();
+        this->ZoneSubCompToPlant.deallocate();
+        this->ZoneSubSubCompToPlant.deallocate();
+        this->AirSysCompToPlant.deallocate();
+        this->AirSysSubCompToPlant.deallocate();
+        this->AirSysSubSubCompToPlant.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

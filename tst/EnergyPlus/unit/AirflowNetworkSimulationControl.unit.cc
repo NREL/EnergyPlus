@@ -164,7 +164,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 
     GetAirflowNetworkInput(*state);
 
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
+    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, state->dataAirflowNetwork->AirflowNetworkSimu.solver);
 
     state->dataHeatBal->Zone.deallocate();
     state->dataSurface->Surface.deallocate();
@@ -196,8 +196,10 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
     state->dataSurface->Surface(2).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
-    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;;
-    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;;
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    ;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    ;
     state->dataGlobal->NumOfZones = 1;
 
     state->dataHeatBal->TotPeople = 1; // Total number of people statements
@@ -260,7 +262,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 
     GetAirflowNetworkInput(*state);
 
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
+    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, state->dataAirflowNetwork->AirflowNetworkSimu.solver);
 
     state->dataHeatBal->Zone.deallocate();
     state->dataSurface->Surface.deallocate();

@@ -51,8 +51,8 @@
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirInletTempSizing.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
 
 namespace EnergyPlus {
@@ -89,7 +89,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(23.7, sizedValue, 0.001); // hard-sized value
-    sizer.autoSizedValue = 0.0;            // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     std::string eiooutput = std::string("");
 
@@ -102,7 +102,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(23.7, sizedValue, 0.001); // hard-sized value
-    sizer.autoSizedValue = 0.0;            // reset for next test
+    sizer.autoSizedValue = 0.0;           // reset for next test
 
     eiooutput =
         std::string("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n"
@@ -178,12 +178,12 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 6 - Zone Equipment, Induction Unit, add fan heat
-    Fans::Fan.allocate(1);
-    Fans::Fan(1).DeltaPress = 600.0;
-    Fans::Fan(1).MotEff = 0.9;
-    Fans::Fan(1).FanEff = 0.6;
-    Fans::Fan(1).MotInAirFrac = 0.5;
-    Fans::Fan(1).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
+    state->dataFans->Fan.allocate(1);
+    state->dataFans->Fan(1).DeltaPress = 600.0;
+    state->dataFans->Fan(1).MotEff = 0.9;
+    state->dataFans->Fan(1).FanEff = 0.6;
+    state->dataFans->Fan(1).MotInAirFrac = 0.5;
+    state->dataFans->Fan(1).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
     state->dataSize->DataFanIndex = 1;
     state->dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
     state->dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
@@ -215,7 +215,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(21.77, sizedValue, 0.0001); // no fan heat since DataFanInext = -1
-    sizer.autoSizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0;             // reset for next test
 
     // Test 9 - Zone Equipment w/ 10% OA
     state->dataSize->ZoneEqSizing(1).OAVolFlow =
@@ -235,7 +235,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     // Test 10 - Zone Equipment w/ AT Mixer at 20% of design flow
     state->dataSize->ZoneEqSizing(1).ATMixerCoolPriDryBulb = 17.4;
     state->dataSize->ZoneEqSizing(1).ATMixerVolFlow = 0.002 / state->dataEnvrn->StdRhoAir; // AT mass flow smaller than DesCoolMassFlow by factor of 5
-    Real64 mixedTemp2 = 0.8 * 23.9 + 0.2 * 17.4;                                 // 80% of ZoneHumRatAtCoolPeak, 20% of ATMixerCoolPriDryBulb
+    Real64 mixedTemp2 = 0.8 * 23.9 + 0.2 * 17.4; // 80% of ZoneHumRatAtCoolPeak, 20% of ATMixerCoolPriDryBulb
 
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -262,7 +262,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = false;
@@ -276,7 +276,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(18.0, sizedValue, 0.0001); // hard-sized value
-    sizer.autoSizedValue = 0.0;             // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test 12 - Airloop Equipment - DataDesInletAirTemp > 0, NumOACoils = 1
@@ -391,7 +391,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(27.44, sizedValue, 0.00001); // DOAS system hum rat
-    sizer.autoSizedValue = 0.0;               // reset for next test
+    sizer.autoSizedValue = 0.0;              // reset for next test
 
     // reset eio stream
     has_eio_output(true);

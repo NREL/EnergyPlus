@@ -172,7 +172,7 @@ TEST_F(EnergyPlusFixture, ReportCoolingPanel)
     state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).Power = -9.0;
     state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ConvPower = -4.0;
     state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).RadPower = -5.0;
-    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ReportCoolingPanel();
+    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ReportCoolingPanel(*state);
     EXPECT_NEAR(state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).TotPower, 10.0, 1.0);
     EXPECT_NEAR(state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).Power, 9.0, 1.0);
     EXPECT_NEAR(state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ConvPower, 4.0, 1.0);

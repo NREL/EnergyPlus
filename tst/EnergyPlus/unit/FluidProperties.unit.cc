@@ -65,9 +65,12 @@ using namespace EnergyPlus::FluidProperties;
 TEST_F(EnergyPlusFixture, FluidProperties_GetDensityGlycol)
 {
 
-    std::string const idf_objects = delimited_string({"FluidProperties:GlycolConcentration,", "  GLHXFluid,       !- Name",
-                                                      "  PropyleneGlycol, !- Glycol Type", "  ,                !- User Defined Glycol Name",
-                                                      "  0.3;             !- Glycol Concentration", " "});
+    std::string const idf_objects = delimited_string({"FluidProperties:GlycolConcentration,",
+                                                      "  GLHXFluid,       !- Name",
+                                                      "  PropyleneGlycol, !- Glycol Type",
+                                                      "  ,                !- User Defined Glycol Name",
+                                                      "  0.3;             !- Glycol Concentration",
+                                                      " "});
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());

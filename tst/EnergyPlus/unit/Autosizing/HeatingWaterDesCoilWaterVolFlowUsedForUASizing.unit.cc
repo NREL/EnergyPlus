@@ -49,8 +49,8 @@
 #include <gtest/gtest.h>
 
 #include <EnergyPlus/Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 
 namespace EnergyPlus {
 
@@ -167,7 +167,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesCoilWaterVolFlowUsedForUASizingGauntlet
     state->dataSize->ZoneEqSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
