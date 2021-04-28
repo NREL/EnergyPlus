@@ -407,10 +407,10 @@ namespace WaterToAirHeatPump {
                                 "System",
                                 "Summed",
                                 state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
@@ -419,10 +419,10 @@ namespace WaterToAirHeatPump {
                                 "System",
                                 "Summed",
                                 state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Cooling Coil Sensible Cooling Energy",
@@ -445,10 +445,10 @@ namespace WaterToAirHeatPump {
                                 "System",
                                 "Summed",
                                 state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
-                                _,
+                                {},
                                 "PLANTLOOPCOOLINGDEMAND",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
 
             // save the design source side flow rate for use by plant loop sizing algorithms
@@ -593,10 +593,10 @@ namespace WaterToAirHeatPump {
                                 "System",
                                 "Summed",
                                 state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
@@ -605,10 +605,10 @@ namespace WaterToAirHeatPump {
                                 "System",
                                 "Summed",
                                 state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Source Side Heat Transfer Energy",
@@ -617,10 +617,10 @@ namespace WaterToAirHeatPump {
                                 "System",
                                 "Summed",
                                 state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
 
             // save the design source side flow rate for use by plant loop sizing algorithms
@@ -948,11 +948,11 @@ namespace WaterToAirHeatPump {
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).BranchNum,
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompNum,
                                     errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {});
 
             if (state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName == "WATER") {
                 if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideUACoeff < DataGlobalConstants::rTinyValue) {
@@ -1501,7 +1501,7 @@ namespace WaterToAirHeatPump {
                                                            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LowPressClgError,
                                                            LoadSidePressure,
                                                            LoadSidePressure,
-                                                           _,
+                                                           {},
                                                            "[Pa]",
                                                            "[Pa]");
                         }
@@ -1518,7 +1518,7 @@ namespace WaterToAirHeatPump {
                                                            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HighPressClgError,
                                                            SourceSideInletTemp,
                                                            SourceSideInletTemp,
-                                                           _,
+                                                           {},
                                                            "SourceSideInletTemp[C]",
                                                            "SourceSideInletTemp[C]");
                         }
@@ -2048,7 +2048,7 @@ namespace WaterToAirHeatPump {
                                                        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LowPressHtgError,
                                                        SourceSidePressure,
                                                        SourceSidePressure,
-                                                       _,
+                                                       {},
                                                        "[Pa]",
                                                        "[Pa]");
                     }
@@ -2065,7 +2065,7 @@ namespace WaterToAirHeatPump {
                                                        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HighPressHtgError,
                                                        SourceSideInletTemp,
                                                        SourceSideInletTemp,
-                                                       _,
+                                                       {},
                                                        "SourceSideInletTemp[C]",
                                                        "SourceSideInletTemp[C]");
                     }

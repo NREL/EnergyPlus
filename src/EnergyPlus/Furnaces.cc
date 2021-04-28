@@ -3430,13 +3430,13 @@ namespace Furnaces {
                         state,
                         state.dataIntegratedHP->IntegratedHeatPumps(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).SCCoilIndex,
                         ErrorsFound,
-                        _,
+                        {},
                         state.dataIntegratedHP->IntegratedHeatPumps(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).SHCoilIndex);
                 } else {
                     SetVarSpeedCoilData(state,
                                         state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
                                         ErrorsFound,
-                                        _,
+                                        {},
                                         state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex);
                 }
             }
@@ -4317,7 +4317,7 @@ namespace Furnaces {
                                   state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
                                   ErrorsFound,
                                   state.dataFurnaces->Furnace(FurnaceNum).WaterCyclingMode,
-                                  _,
+                                  {},
                                   state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex);
             } else if (Alphas(8) == "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" &&
                        Alphas(10) == "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION") {
@@ -4328,7 +4328,7 @@ namespace Furnaces {
                 SetVarSpeedCoilData(state,
                                     state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
                                     ErrorsFound,
-                                    _,
+                                    {},
                                     state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex);
             } else {
                 ShowContinueError(state, "For " + CurrentModuleObject + " = " + Alphas(1));
@@ -5391,11 +5391,11 @@ namespace Furnaces {
                                             state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
                                             state.dataFurnaces->Furnace(FurnaceNum).CompNum,
                                             errFlag,
-                                            _,
-                                            _,
-                                            _,
-                                            _,
-                                            _);
+                                            {},
+                                            {},
+                                            {},
+                                            {},
+                                            {});
                     if (errFlag) {
                         ShowFatalError(state, "InitFurnace: Program terminated for previous conditions.");
                     }
@@ -5420,11 +5420,11 @@ namespace Furnaces {
                                             state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
                                             state.dataFurnaces->Furnace(FurnaceNum).CompNum,
                                             errFlag,
-                                            _,
-                                            _,
-                                            _,
-                                            _,
-                                            _);
+                                            {},
+                                            {},
+                                            {},
+                                            {},
+                                            {});
                     if (errFlag) {
                         ShowFatalError(state, "InitFurnace: Program terminated for previous conditions.");
                     }
@@ -5465,11 +5465,11 @@ namespace Furnaces {
                                             state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,
                                             state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp,
                                             errFlag,
-                                            _,
-                                            _,
-                                            _,
-                                            _,
-                                            _);
+                                            {},
+                                            {},
+                                            {},
+                                            {},
+                                            {});
                     if (errFlag) {
                         ShowFatalError(state, "InitFurnace: Program terminated for previous conditions.");
                     }
@@ -5493,11 +5493,11 @@ namespace Furnaces {
                                             state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,
                                             state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp,
                                             errFlag,
-                                            _,
-                                            _,
-                                            _,
-                                            _,
-                                            _);
+                                            {},
+                                            {},
+                                            {},
+                                            {},
+                                            {});
                     if (errFlag) {
                         ShowFatalError(state, "InitFurnace: Program terminated for previous conditions.");
                     }
@@ -9596,7 +9596,7 @@ namespace Furnaces {
             }
             //    Simulate the supplemental heating coil
             HeatingCoils::SimulateHeatingCoilComponents(
-                state, BlankString, FirstHVACIteration, HeatCoilLoad, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, _, true, FanOpMode);
+                state, BlankString, FirstHVACIteration, HeatCoilLoad, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, {}, true, FanOpMode);
 
         } else { // ELSE it's not a heat pump
             //   Simulate blow-thru fan
@@ -10477,7 +10477,7 @@ namespace Furnaces {
                                                            state.dataFurnaces->Furnace(FurnaceNum).HotWaterCoilMaxIterIndex2,
                                                            MaxHotWaterFlow,
                                                            MinWaterFlow,
-                                                           _,
+                                                           {},
                                                            "[kg/s]",
                                                            "[kg/s]");
                         }

@@ -268,7 +268,7 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->rNumericArgs,
                                                                  NumNums,
                                                                  IOStat,
-                                                                 _,
+                                                                 {},
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
@@ -515,10 +515,10 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ELECTRICITY",
                         "Cooling",
-                        _,
+                        {},
                         "Plant");
     SetupOutputVariable(state, "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->Report.QEvap, "System", "Average", this->Name);
     SetupOutputVariable(state,
@@ -528,10 +528,10 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "CHILLERS",
-                        _,
+                        {},
                         "Plant");
     SetupOutputVariable(
         state, "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->Report.EvapInletTemp, "System", "Average", this->Name);
@@ -548,10 +548,10 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
-                        _,
+                        {},
                         "Plant");
     SetupOutputVariable(
         state, "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->Report.CondInletTemp, "System", "Average", this->Name);
@@ -570,10 +570,10 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "PLANTLOOPHEATINGDEMAND",
                             "CHILLERS",
-                            _,
+                            {},
                             "Plant");
     } else {
         if (this->GenInputOutputNodesUsed) {
@@ -586,10 +586,10 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "CHILLERS",
-                                _,
+                                {},
                                 "Plant");
         } else {
             SetupOutputVariable(
@@ -601,10 +601,10 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 fluidNameSteam,
                                 "Cooling",
-                                _,
+                                {},
                                 "Plant");
         }
     }
@@ -632,10 +632,10 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                             this->CWCompNum,
                                             errFlag,
                                             this->TempLowLimitEvapOut,
-                                            _,
-                                            _,
+                                            {},
+                                            {},
                                             this->EvapInletNodeNum,
-                                            _);
+                                            {});
     if (this->CondInletNodeNum > 0) {
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
@@ -645,11 +645,11 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                 this->CDBranchNum,
                                                 this->CDCompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
+                                                {},
+                                                {},
+                                                {},
                                                 this->CondInletNodeNum,
-                                                _);
+                                                {});
         PlantUtilities::InterConnectTwoPlantLoopSides(
             state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_Absorption, true);
     }
@@ -662,11 +662,11 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                 this->GenBranchNum,
                                                 this->GenCompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
+                                                {},
+                                                {},
+                                                {},
                                                 this->GeneratorInletNodeNum,
-                                                _);
+                                                {});
         PlantUtilities::InterConnectTwoPlantLoopSides(
             state, this->CWLoopNum, this->CWLoopSideNum, this->GenLoopNum, this->GenCompNum, DataPlant::TypeOf_Chiller_Absorption, true);
     }

@@ -2117,7 +2117,7 @@ void SizeIHP(EnergyPlusData &state, int const DXCoilNum)
     SetVarSpeedCoilData(state,
                         state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilIndex,
                         ErrorsFound,
-                        _,
+                        {},
                         state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilIndex);
     if (ErrorsFound) {
         ShowSevereError(state,
@@ -2152,7 +2152,7 @@ void SizeIHP(EnergyPlusData &state, int const DXCoilNum)
     SetVarSpeedCoilData(state,
                         state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex,
                         ErrorsFound,
-                        _,
+                        {},
                         state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex);
 
     // size SCDWH air coil

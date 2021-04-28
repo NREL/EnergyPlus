@@ -461,10 +461,10 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
                                     "System",
                                     "NonState",
                                     Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name,
-                                    _,
+                                    {},
                                     "Electricity",
-                                    _,
-                                    _,
+                                    {},
+                                    {},
                                     "Building");
                 SetupOutputVariable(state,
                                     "Earth Tube Fan Electricity Rate",

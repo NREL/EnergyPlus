@@ -195,15 +195,15 @@ namespace StandardRatings {
         Array1A<Real64> const RatedAirVolFlowRate,                 // Reference air flow rate of DX coil [m3/s]
         Array1A<Real64> const FanPowerPerEvapAirFlowRateFromInput, // Reference fan power per evap air flow rate [W/(m3/s)]
         Optional_int_const RegionNum =
-            _, // Region number for calculating HSPF of single speed DX heating coil //Autodesk:OPTIONAL Used without PRESENT check
+            {}, // Region number for calculating HSPF of single speed DX heating coil //Autodesk:OPTIONAL Used without PRESENT check
         Optional<Real64 const> MinOATCompressor =
-            _, // Minimum OAT for heat pump compressor operation [C] //Autodesk:OPTIONAL Used without PRESENT check
+            {}, // Minimum OAT for heat pump compressor operation [C] //Autodesk:OPTIONAL Used without PRESENT check
         Optional<Real64 const> OATempCompressorOn =
-            _, // The outdoor temperature when the compressor is automatically turned //Autodesk:OPTIONAL Used without PRESENT check
+            {}, // The outdoor temperature when the compressor is automatically turned //Autodesk:OPTIONAL Used without PRESENT check
         Optional_bool_const OATempCompressorOnOffBlank =
-            _,                                 // Flag used to determine low temperature cut out factor //Autodesk:OPTIONAL Used without PRESENT check
-        Optional_int_const DefrostControl = _, // defrost control; 1=timed, 2=on-demand //Autodesk:OPTIONAL Used without PRESENT check
-        Optional_bool_const ASHRAE127StdRprt = _ // true if user wishes to report ASHRAE 127 standard ratings
+            {},                                 // Flag used to determine low temperature cut out factor //Autodesk:OPTIONAL Used without PRESENT check
+        Optional_int_const DefrostControl = {}, // defrost control; 1=timed, 2=on-demand //Autodesk:OPTIONAL Used without PRESENT check
+        Optional_bool_const ASHRAE127StdRprt = {}  // true if user wishes to report ASHRAE 127 standard ratings
     );
 
     void SingleSpeedDXHeatingCoilStandardRatings(
@@ -219,11 +219,11 @@ namespace StandardRatings {
         Real64 &NetHeatingCapRated,                         // Net Heating Coil capacity at Rated conditions,
         Real64 &NetHeatingCapH3Test,                        // Net Heating Coil capacity at H3 test conditions
         Real64 &HSPF,                                       // seasonale energy efficiency ratio of multi speed DX cooling coil
-        Optional_int_const RegionNum = _,                   // Region number for calculating HSPF of single speed DX heating coil
-        Optional<Real64 const> MinOATCompressor = _,        // Minimum OAT for heat pump compressor operation [C]
-        Optional<Real64 const> OATempCompressorOn = _,      // The outdoor temperature when the compressor is automatically turned
-        Optional_bool_const OATempCompressorOnOffBlank = _, // Flag used to determine low temperature cut out factor
-        Optional_int_const DefrostControl = _               // defrost control; 1=timed, 2=on-demand
+        Optional_int_const RegionNum = {},                   // Region number for calculating HSPF of single speed DX heating coil
+        Optional<Real64 const> MinOATCompressor = {},        // Minimum OAT for heat pump compressor operation [C]
+        Optional<Real64 const> OATempCompressorOn = {},      // The outdoor temperature when the compressor is automatically turned
+        Optional_bool_const OATempCompressorOnOffBlank = {}, // Flag used to determine low temperature cut out factor
+        Optional_int_const DefrostControl = {}                // defrost control; 1=timed, 2=on-demand
     );
 
     void SingleSpeedDXCoolingCoilStandardRatings(
@@ -299,11 +299,11 @@ namespace StandardRatings {
         Real64 &NetHeatingCapRatedHighTemp,                        // net heating capacity at maximum speed and High Temp
         Real64 &NetHeatingCapRatedLowTemp,                         // net heating capacity at maximum speed and low Temp
         Real64 &HSPF,                                              // seasonale energy efficiency ratio of multi speed DX cooling coil
-        Optional_int_const RegionNum = _,                          // Region number for calculating HSPF of single speed DX heating coil
-        Optional<Real64 const> MinOATCompressor = _,               // Minimum OAT for heat pump compressor operation [C]
-        Optional<Real64 const> OATempCompressorOn = _,             // The outdoor temperature when the compressor is automatically turned
-        Optional_bool_const OATempCompressorOnOffBlank = _,        // Flag used to determine low temperature cut out factor
-        Optional_int_const DefrostControl = _                      // defrost control; 1=timed, 2=on-demand
+        Optional_int_const RegionNum = {},                          // Region number for calculating HSPF of single speed DX heating coil
+        Optional<Real64 const> MinOATCompressor = {},               // Minimum OAT for heat pump compressor operation [C]
+        Optional<Real64 const> OATempCompressorOn = {},             // The outdoor temperature when the compressor is automatically turned
+        Optional_bool_const OATempCompressorOnOffBlank = {},        // Flag used to determine low temperature cut out factor
+        Optional_int_const DefrostControl = {}                       // defrost control; 1=timed, 2=on-demand
     );
 
     void ReportDXCoilRating(EnergyPlusData &state,

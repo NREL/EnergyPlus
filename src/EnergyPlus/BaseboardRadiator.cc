@@ -225,11 +225,11 @@ namespace BaseboardRadiator {
                               baseboard->Baseboard(BaseboardNum).Offset,
                               baseboard->Baseboard(BaseboardNum).ControlCompTypeNum,
                               baseboard->Baseboard(BaseboardNum).CompErrIndex,
-                              _,
-                              _,
-                              _,
-                              _,
-                              _,
+                              {},
+                              {},
+                              {},
+                              {},
+                              {},
                               baseboard->Baseboard(BaseboardNum).LoopNum,
                               baseboard->Baseboard(BaseboardNum).LoopSideNum,
                               baseboard->Baseboard(BaseboardNum).BranchNum);
@@ -479,10 +479,10 @@ namespace BaseboardRadiator {
                                 "System",
                                 "Sum",
                                 baseboard->Baseboard(BaseboardNum).EquipID,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "BASEBOARD",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -492,10 +492,10 @@ namespace BaseboardRadiator {
                                 "System",
                                 "Sum",
                                 baseboard->Baseboard(BaseboardNum).EquipID,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "BASEBOARD",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -599,11 +599,11 @@ namespace BaseboardRadiator {
                                     baseboard->Baseboard(BaseboardNum).BranchNum,
                                     baseboard->Baseboard(BaseboardNum).CompNum,
                                     errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {});
             if (errFlag) {
                 ShowFatalError(state, "InitBaseboard: Program terminated for previous conditions.");
             }

@@ -266,7 +266,7 @@ namespace CondenserLoopTowers {
                                                                      NumArray,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -673,7 +673,7 @@ namespace CondenserLoopTowers {
                                                                      NumArray,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -1125,7 +1125,7 @@ namespace CondenserLoopTowers {
                                                                      NumArray,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -2036,7 +2036,7 @@ namespace CondenserLoopTowers {
         // Locate the tower on the plant loops for later usage
         bool ErrorsFound = false;
         PlantUtilities::ScanPlantLoopsForObject(
-            state, this->Name, this->TowerType_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
+            state, this->Name, this->TowerType_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, {}, {}, {}, {}, {});
         if (ErrorsFound) {
             ShowFatalError(state, "initialize: Program terminated due to previous condition(s).");
         }
@@ -2155,7 +2155,7 @@ namespace CondenserLoopTowers {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HeatRejection",
                                 this->EndUseSubcategory,
@@ -2182,7 +2182,7 @@ namespace CondenserLoopTowers {
                                     "System",
                                     "Sum",
                                     this->Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "HeatRejection",
                                     "BasinHeater",
@@ -2208,7 +2208,7 @@ namespace CondenserLoopTowers {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HeatRejection",
                                 this->EndUseSubcategory,
@@ -2234,7 +2234,7 @@ namespace CondenserLoopTowers {
                                     "System",
                                     "Sum",
                                     this->Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "HeatRejection",
                                     "BasinHeater",
@@ -2260,7 +2260,7 @@ namespace CondenserLoopTowers {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HeatRejection",
                                 this->EndUseSubcategory,
@@ -2286,7 +2286,7 @@ namespace CondenserLoopTowers {
                                     "System",
                                     "Sum",
                                     this->Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "HeatRejection",
                                     "BasinHeater",
@@ -2312,7 +2312,7 @@ namespace CondenserLoopTowers {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HeatRejection",
                                 this->EndUseSubcategory,
@@ -2337,7 +2337,7 @@ namespace CondenserLoopTowers {
                                     "System",
                                     "Sum",
                                     this->Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "HeatRejection",
                                     "BasinHeater",
@@ -2368,10 +2368,10 @@ namespace CondenserLoopTowers {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "Water",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
             SetupOutputVariable(state,
                                 "Cooling Tower Starved Storage Tank Water Volume Flow Rate",
@@ -2394,10 +2394,10 @@ namespace CondenserLoopTowers {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "MainsWater",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
         } else { // tower water from mains and gets metered
             SetupOutputVariable(state,
@@ -2414,10 +2414,10 @@ namespace CondenserLoopTowers {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "Water",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Mains Water Volume",
@@ -2426,10 +2426,10 @@ namespace CondenserLoopTowers {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "MainsWater",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
         }
 

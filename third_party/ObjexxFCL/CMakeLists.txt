@@ -103,9 +103,6 @@ set(src
   src/ObjexxFCL/ObjexxFCL.fwd.hh
   src/ObjexxFCL/ObjexxFCL.hh
   src/ObjexxFCL/ObjexxFCL.Project.hh
-  src/ObjexxFCL/Omit.cc
-  src/ObjexxFCL/Omit.fwd.hh
-  src/ObjexxFCL/Omit.hh
   src/ObjexxFCL/Optional.fwd.hh
   src/ObjexxFCL/Optional.hh
   src/ObjexxFCL/ProxySentinel.hh

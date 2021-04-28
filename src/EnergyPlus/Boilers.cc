@@ -372,10 +372,10 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "BOILERS",
-                        _,
+                        {},
                         "Plant");
     SetupOutputVariable(state,
                         "Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
@@ -391,7 +391,7 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         this->BoilerFuelTypeForOutputVariable,
                         "Heating",
                         this->EndUseSubcategory,
@@ -408,7 +408,7 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ELECTRICITY",
                         "Heating",
                         "Boiler Parasitic",
@@ -432,11 +432,11 @@ void BoilerSpecs::oneTimeInit(EnergyPlusData &state)
                                             this->BranchNum,
                                             this->CompNum,
                                             errFlag,
-                                            _,
+                                            {},
                                             this->TempUpLimitBoilerOut,
-                                            _,
-                                            _,
-                                            _);
+                                            {},
+                                            {},
+                                            {});
     if (errFlag) {
         ShowFatalError(state, "InitBoiler: Program terminated due to previous condition(s).");
     }

@@ -486,7 +486,7 @@ std::string CreateCurrentDateTimeString()
     // value(8)   Milliseconds (0-999)
     std::string datestring; // supposedly returns blank when no date available.
 
-    date_and_time(datestring, _, _, value);
+    date_and_time(datestring, {}, {}, value);
     if (!datestring.empty()) {
         return EnergyPlus::format(" YMD={:4}.{:02}.{:02} {:02}:{:02}", value(1), value(2), value(3), value(5), value(6));
     } else {

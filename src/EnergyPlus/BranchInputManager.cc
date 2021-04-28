@@ -1185,7 +1185,7 @@ namespace BranchInputManager {
                             ConnectionType,
                             1,
                             ObjectIsParent,
-                            _,
+                            {},
                             cAlphaFields(Loop + 2));
                 if (NumNodes > 1) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
@@ -1227,7 +1227,7 @@ namespace BranchInputManager {
                             ConnectionType,
                             1,
                             ObjectIsParent,
-                            _,
+                            {},
                             cAlphaFields(Loop + 3));
                 if (NumNodes > 1) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");

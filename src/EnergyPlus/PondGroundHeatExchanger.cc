@@ -202,8 +202,8 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
                                                                  state.dataIPShortCut->rNumericArgs,
                                                                  NumNumbers,
                                                                  IOStatus,
-                                                                 _,
-                                                                 _,
+                                                                 {},
+                                                                 {},
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
@@ -408,11 +408,11 @@ void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(EnergyPlusData &st
                                                 this->BranchNum,
                                                 this->CompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                _,
-                                                _);
+                                                {},
+                                                {},
+                                                {},
+                                                {},
+                                                {});
         if (errFlag) {
             ShowFatalError(state, "InitPondGroundHeatExchanger: Program terminated due to previous condition(s).");
         }
@@ -835,7 +835,7 @@ Real64 PondGroundHeatExchangerData::CalcEffectiveness(EnergyPlusData &state,
                                        this->FrozenErrIndex,
                                        PondTemperature,
                                        PondTemperature,
-                                       _,
+                                       {},
                                        "[C]",
                                        "[C]");
         if (this->ConsecutiveFrozen >= state.dataGlobal->NumOfTimeStepInHour * 30) {

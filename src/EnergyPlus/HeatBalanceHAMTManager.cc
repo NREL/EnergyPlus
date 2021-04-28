@@ -1383,7 +1383,7 @@ namespace HeatBalanceHAMTManager {
                                                    state.dataSurface->Surface(sid).HighTempErrCount,
                                                    tempmax,
                                                    tempmax,
-                                                   _,
+                                                   {},
                                                    "C",
                                                    "C");
                 }
@@ -1412,7 +1412,7 @@ namespace HeatBalanceHAMTManager {
                                                    state.dataSurface->Surface(sid).HighTempErrCount,
                                                    tempmin,
                                                    tempmin,
-                                                   _,
+                                                   {},
                                                    "C",
                                                    "C");
                 }

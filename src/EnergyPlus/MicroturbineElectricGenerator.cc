@@ -892,10 +892,10 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ElectricityProduced",
                         "COGENERATION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(
@@ -917,10 +917,10 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         this->FuelType,
                         "COGENERATION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(
@@ -945,10 +945,10 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HEATRECOVERY",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -980,10 +980,10 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "Electricity",
                             "Cogeneration",
-                            _,
+                            {},
                             "Plant");
     }
 
@@ -1068,11 +1068,11 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
                                                 this->HRBranchNum,
                                                 this->HRCompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                _,
-                                                _);
+                                                {},
+                                                {},
+                                                {},
+                                                {},
+                                                {});
         if (errFlag) {
             ShowFatalError(state, "InitMTGenerators: Program terminated due to previous condition(s).");
         }

@@ -372,7 +372,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                                      NumNums,
                                                                      IOStat,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
         }

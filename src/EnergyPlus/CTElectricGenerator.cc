@@ -179,7 +179,7 @@ namespace CTElectricGenerator {
                                                                      NumArray,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -371,10 +371,10 @@ namespace CTElectricGenerator {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(
@@ -387,10 +387,10 @@ namespace CTElectricGenerator {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             this->FuelType,
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         //    general fuel use report (to match other generators)
@@ -416,10 +416,10 @@ namespace CTElectricGenerator {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(
@@ -432,10 +432,10 @@ namespace CTElectricGenerator {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(
@@ -719,11 +719,11 @@ namespace CTElectricGenerator {
                                                     this->HRBranchNum,
                                                     this->HRCompNum,
                                                     errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {});
             if (errFlag) {
                 ShowFatalError(state, "InitCTGenerators: Program terminated due to previous condition(s).");
             }

@@ -174,7 +174,7 @@ namespace WaterToAirHeatPumpSimple {
                                int const CompOp,
                                Real64 const PartLoadRatio,
                                bool const FirstHVACIteration,
-                               Optional<Real64 const> OnOffAirFlowRat = _ // ratio of comp on to comp off air flow rate
+                               Optional<Real64 const> OnOffAirFlowRat = {}  // ratio of comp on to comp off air flow rate
     );
 
     // MODULE SUBROUTINES:
@@ -270,8 +270,8 @@ namespace WaterToAirHeatPumpSimple {
                            int const SimpleWSHPNum,                  // Number of OA Controller
                            bool &ErrorsFound,                        // Set to true if certain errors found
                            int const WaterCyclingMode,               // the coil water flow mode (cycling, constant or constantondemand)
-                           Optional_int CompanionCoolingCoilNum = _, // Index to cooling coil for heating coil = SimpleWSHPNum
-                           Optional_int CompanionHeatingCoilNum = _  // Index to heating coil for cooling coil = SimpleWSHPNum
+                           Optional_int CompanionCoolingCoilNum = {}, // Index to cooling coil for heating coil = SimpleWSHPNum
+                           Optional_int CompanionHeatingCoilNum = {}   // Index to heating coil for cooling coil = SimpleWSHPNum
     );
 
 } // namespace WaterToAirHeatPumpSimple

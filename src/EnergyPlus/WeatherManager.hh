@@ -547,10 +547,10 @@ namespace WeatherManager {
     void SetDSTDateRanges(EnergyPlusData &state,
                           Array1D_int const &MonWeekDay, // Weekday of each day 1 of month
                           Array1D_int &DSTIdx,           // DST Index for each julian day (1:366)
-                          Optional_int DSTActStMon = _,
-                          Optional_int DSTActStDay = _,
-                          Optional_int DSTActEnMon = _,
-                          Optional_int DSTActEnDay = _);
+                          Optional_int DSTActStMon = {},
+                          Optional_int DSTActStDay = {},
+                          Optional_int DSTActEnMon = {},
+                          Optional_int DSTActEnDay = {})  ;
 
     void SetSpecialDayDates(EnergyPlusData &state, Array1D_int const &MonWeekDay); // Weekday of each day 1 of month
 

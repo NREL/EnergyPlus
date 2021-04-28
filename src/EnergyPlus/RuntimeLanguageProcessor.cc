@@ -161,7 +161,7 @@ void InitializeRuntimeLanguage(EnergyPlusData &state)
 
         GetRuntimeLanguageUserInput(state); // Load and parse all runtime language objects
 
-        date_and_time(datestring, _, _, datevalues);
+        date_and_time(datestring, {}, {}, datevalues);
         if (datestring != "") {
             state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->ActualDateAndTimeNum).Value =
                 SetErlValueNumber(double(sum(datevalues)));
@@ -1456,7 +1456,7 @@ int ProcessTokens(
                         NewNumTokens = NumTokens - NumSubTokens - 1;
                         if (NewNumTokens > 0) {
                             if (LastPos + 1 <= NumTokens) {
-                                Token({Pos + 1, NewNumTokens}) = Token({LastPos + 1, _});
+                                Token({Pos + 1, NewNumTokens}) = Token({LastPos + 1, {}});
                             }
                             Token.redimension(NewNumTokens);
                             Token(Pos).Type = TokenExpression;
@@ -1599,7 +1599,7 @@ int ProcessTokens(
                 // Replace the three tokens with one expression token
                 if ((NumOperands == 2) && (NumTokens - 2 > 0)) {
                     if (Pos + 2 <= NumTokens) {
-                        Token({Pos, NumTokens - 2}) = Token({Pos + 2, _});
+                        Token({Pos, NumTokens - 2}) = Token({Pos + 2, {}});
                     }
                     Token(Pos - 1).Type = TokenExpression;
                     Token(Pos - 1).Expression = ExpressionNum;
@@ -1967,7 +1967,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                             SeedIntARR(loop) = std::floor(Operand(1).Number) * loop;
                         }
                     }
-                    RANDOM_SEED(_, SeedIntARR);
+                    RANDOM_SEED({}, SeedIntARR);
                     ReturnValue = SetErlValueNumber(double(SeedIntARR(1))); // just return first number pass as seed
                     SeedIntARR.deallocate();
                 } else if (SELECT_CASE_var == FuncRhoAirFnPbTdbW) {
@@ -3265,15 +3265,15 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         FreqString,
                                         VarTypeString,
                                         "EMS",
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {},
                                         UnitsB);
                 }
                 // Last field is index key, no indexing here so mimic weather output data
@@ -3567,7 +3567,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         FreqString,
                                         VarTypeString,
                                         "EMS",
-                                        _,
+                                        {},
                                         ResourceTypeString,
                                         EndUseTypeString,
                                         EndUseSubCatString,
@@ -3580,10 +3580,10 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         FreqString,
                                         VarTypeString,
                                         "EMS",
-                                        _,
+                                        {},
                                         ResourceTypeString,
                                         EndUseTypeString,
-                                        _,
+                                        {},
                                         GroupTypeString);
                 }
             }

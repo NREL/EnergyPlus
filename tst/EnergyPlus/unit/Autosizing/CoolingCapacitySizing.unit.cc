@@ -86,7 +86,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "MyFan"));
     state->dataLoopNodes->Node(1).Press = 101325.0;
     state->dataLoopNodes->Node(1).Temp = 24.0;
-    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _, _, _);
+    state->dataHVACFan->fanObjs[0]->simulate(*state, {}, {}, {}, _);
 
     // this global state is what would be set up by E+ currently
     static std::string const routineName("CoolingCapacitySizingGauntlet");

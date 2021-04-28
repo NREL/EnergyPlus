@@ -477,10 +477,10 @@ namespace Humidifiers {
                                     "System",
                                     "Sum",
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "Water",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "SYSTEM");
                 SetupOutputVariable(state,
                                     "Humidifier Starved Storage Tank Water Volume Flow Rate",
@@ -496,10 +496,10 @@ namespace Humidifiers {
                                     "System",
                                     "Sum",
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "Water",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "SYSTEM");
                 SetupOutputVariable(state,
                                     "Humidifier Mains Water Volume",
@@ -508,10 +508,10 @@ namespace Humidifiers {
                                     "System",
                                     "Sum",
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "MainsWater",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "SYSTEM");
 
             } else {
@@ -529,10 +529,10 @@ namespace Humidifiers {
                                     "System",
                                     "Sum",
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "WATER",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Humidifier Mains Water Volume",
@@ -541,10 +541,10 @@ namespace Humidifiers {
                                     "System",
                                     "Sum",
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "MAINSWATER",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "System");
             }
             if (Humidifier(HumNum).HumType_Code == Humidifier_Steam_Electric) {
@@ -562,10 +562,10 @@ namespace Humidifiers {
                                     "System",
                                     "Sum",
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "ELECTRICITY",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "System");
             } else if (Humidifier(HumNum).HumType_Code == Humidifier_Steam_Gas) {
                 SetupOutputVariable(state,
@@ -589,10 +589,10 @@ namespace Humidifiers {
                                     "System",
                                     "Sum",
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "NATURALGAS",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Humidifier Auxiliary Electricity Rate",
@@ -608,10 +608,10 @@ namespace Humidifiers {
                                     "System",
                                     "Sum",
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "ELECTRICITY",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "System");
             }
         }

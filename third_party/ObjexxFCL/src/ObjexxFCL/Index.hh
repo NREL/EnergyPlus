@@ -13,8 +13,6 @@
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Omit.hh>
 
 // C++ Headers
 #include <cassert>
@@ -46,16 +44,6 @@ public: // Creation
 	Index( int const i ) :
 	 init_( true ),
 	 i_( i )
-	{}
-
-	// Omit Constructor
-	Index( Omit ) :
-	 init_( false ),
-	 i_( 0 )
-	{}
-
-	// Destructor
-	~Index()
 	{}
 
 public: // Assignment

@@ -172,8 +172,8 @@ namespace PlantUtilities {
     void SafeCopyPlantNode(EnergyPlusData &state,
                            int InletNodeNum,
                            int OutletNodeNum,
-                           Optional_int_const LoopNum = _,
-                           Optional<Real64 const> OutletTemp = _ // set on outlet node if present and water.
+                           Optional_int_const LoopNum = {},
+                           Optional<Real64 const> OutletTemp = {}  // set on outlet node if present and water.
     );
 
     Real64 BoundValueToNodeMinMaxAvail(EnergyPlusData &state, Real64 ValueToBound, int NodeNumToBoundWith);
@@ -194,11 +194,11 @@ namespace PlantUtilities {
                                  int &BranchNum,
                                  int &CompNum,
                                  bool &errFlag,
-                                 Optional<Real64 const> LowLimitTemp = _,
-                                 Optional<Real64 const> HighLimitTemp = _,
-                                 Optional_int CountMatchPlantLoops = _,
-                                 Optional_int_const InletNodeNumber = _,
-                                 Optional_int_const SingleLoopSearch = _);
+                                 Optional<Real64 const> LowLimitTemp = {},
+                                 Optional<Real64 const> HighLimitTemp = {},
+                                 Optional_int CountMatchPlantLoops = {},
+                                 Optional_int_const InletNodeNumber = {},
+                                 Optional_int_const SingleLoopSearch = {})  ;
 
     void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
                                   std::string const &CallerName, // really used for error messages
@@ -206,7 +206,7 @@ namespace PlantUtilities {
                                   int &LoopNum,                  // return value for plant loop
                                   int &LoopSideNum,              // return value for plant loop side
                                   int &BranchNum,
-                                  Optional_int CompNum = _);
+                                  Optional_int CompNum = {})  ;
 
     bool AnyPlantLoopSidesNeedSim(EnergyPlusData &state);
 
@@ -220,7 +220,7 @@ namespace PlantUtilities {
                            int NodeNumIn,                        // component water inlet node
                            int NodeNumOut,                       // component water outlet node
                            bool &ErrorsFound,                    // set to true if there's an error
-                           Optional_bool_const SupressErrors = _ // used for WSHP's where condenser loop may not be on a plant loop
+                           Optional_bool_const SupressErrors = {}  // used for WSHP's where condenser loop may not be on a plant loop
     );
 
     bool verifyTwoNodeNumsOnSamePlantLoop(EnergyPlusData &state, int nodeIndexA, int nodeIndexB);

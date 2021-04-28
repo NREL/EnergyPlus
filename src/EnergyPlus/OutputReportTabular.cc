@@ -219,7 +219,7 @@ void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t
         SetupUnitConversions(state);
         AddTOCLoadComponentTableSummaries(state);
         ort->UpdateTabularReportsGetInput = false;
-        date_and_time(_, _, _, ort->td);
+        date_and_time({}, {}, {}, ort->td);
     }
     if (state.dataGlobal->DoOutputReporting && ort->WriteTabularFiles &&
         (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
@@ -9046,8 +9046,8 @@ void WriteBEPSTable(EnergyPlusData &state)
                 }
 
                 // Erase the SubCategory (first column), using slicing
-                Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
-                Array1D_string columnHeadTemp(columnHead({2, _, _}));
+                Array2D_string tableBodyTemp(tableBody({2, {}, {}}, {{}, {}, {}}));
+                Array1D_string columnHeadTemp(columnHead({2, {}, {}}));
                 if (produceSQLite) {
                     if (state.dataSQLiteProcedures->sqlite) {
                         state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
@@ -10546,8 +10546,8 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
             }
 
             // Erase the SubCategory (first column), using slicing
-            Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
-            Array1D_string columnHeadTemp(columnHead({2, _, _}));
+            Array2D_string tableBodyTemp(tableBody({2, {}, {}}, {{}, {}, {}}));
+            Array1D_string columnHeadTemp(columnHead({2, {}, {}}));
 
             if (produceSQLite) {
                 if (state.dataSQLiteProcedures->sqlite) {
@@ -13364,7 +13364,7 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
     if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
         state.dataOutRptTab->TimeStepInDayGCLS =
             (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-        ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLS, _) = 0.0;
+        ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLS, {}) = 0.0;
         for (state.dataOutRptTab->iSurfGCLS = 1; state.dataOutRptTab->iSurfGCLS <= state.dataSurface->TotSurfaces; ++state.dataOutRptTab->iSurfGCLS) {
             state.dataOutRptTab->ZoneNumGCLS = state.dataSurface->Surface(state.dataOutRptTab->iSurfGCLS).Zone;
             if (state.dataOutRptTab->ZoneNumGCLS == 0) continue;
@@ -14312,59 +14312,59 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
 
         // PEOPLE
         resultCells(cSensInst, rPeople) =
-            MovingAvgAtMaxTime(state, ort->peopleInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            MovingAvgAtMaxTime(state, ort->peopleInstantSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensInst, rPeople) = true;
-        resultCells(cLatent, rPeople) = MovingAvgAtMaxTime(state, ort->peopleLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resultCells(cLatent, rPeople) = MovingAvgAtMaxTime(state, ort->peopleLatentSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cLatent, rPeople) = true;
-        resultCells(cSensDelay, rPeople) = MovingAvgAtMaxTime(state, peopleDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resultCells(cSensDelay, rPeople) = MovingAvgAtMaxTime(state, peopleDelaySeq(ObjexxFCL::IndexSlice{}), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensDelay, rPeople) = true;
 
         // LIGHTS
         resultCells(cSensInst, rLights) =
-            MovingAvgAtMaxTime(state, ort->lightInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            MovingAvgAtMaxTime(state, ort->lightInstantSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensInst, rLights) = true;
-        resultCells(cSensRA, rLights) = MovingAvgAtMaxTime(state, ort->lightRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resultCells(cSensRA, rLights) = MovingAvgAtMaxTime(state, ort->lightRetAirSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensRA, rLights) = true;
-        resultCells(cSensDelay, rLights) = MovingAvgAtMaxTime(state, lightDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resultCells(cSensDelay, rLights) = MovingAvgAtMaxTime(state, lightDelaySeq(ObjexxFCL::IndexSlice{}), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensDelay, rLights) = true;
 
         // EQUIPMENT
-        resultCells(cSensInst, rEquip) = MovingAvgAtMaxTime(state, ort->equipInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resultCells(cSensInst, rEquip) = MovingAvgAtMaxTime(state, ort->equipInstantSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensInst, rEquip) = true;
-        resultCells(cLatent, rEquip) = MovingAvgAtMaxTime(state, ort->equipLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resultCells(cLatent, rEquip) = MovingAvgAtMaxTime(state, ort->equipLatentSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cLatent, rEquip) = true;
-        resultCells(cSensDelay, rEquip) = MovingAvgAtMaxTime(state, equipDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resultCells(cSensDelay, rEquip) = MovingAvgAtMaxTime(state, equipDelaySeq(ObjexxFCL::IndexSlice{}), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensDelay, rEquip) = true;
 
         // REFRIGERATION EQUIPMENT
         resultCells(cSensInst, rRefrig) =
-            MovingAvgAtMaxTime(state, ort->refrigInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            MovingAvgAtMaxTime(state, ort->refrigInstantSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensInst, rRefrig) = true;
-        resultCells(cSensRA, rRefrig) = MovingAvgAtMaxTime(state, ort->refrigRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resultCells(cSensRA, rRefrig) = MovingAvgAtMaxTime(state, ort->refrigRetAirSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensRA, rRefrig) = true;
-        resultCells(cLatent, rRefrig) = MovingAvgAtMaxTime(state, ort->refrigLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resultCells(cLatent, rRefrig) = MovingAvgAtMaxTime(state, ort->refrigLatentSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cLatent, rRefrig) = true;
 
         // WATER USE EQUIPMENT
         resultCells(cSensInst, rWaterUse) =
-            MovingAvgAtMaxTime(state, ort->waterUseInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            MovingAvgAtMaxTime(state, ort->waterUseInstantSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensInst, rWaterUse) = true;
         resultCells(cLatent, rWaterUse) =
-            MovingAvgAtMaxTime(state, ort->waterUseLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            MovingAvgAtMaxTime(state, ort->waterUseLatentSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cLatent, rWaterUse) = true;
 
         // HVAC EQUIPMENT LOSSES
         resultCells(cSensInst, rHvacLoss) =
-            MovingAvgAtMaxTime(state, ort->hvacLossInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            MovingAvgAtMaxTime(state, ort->hvacLossInstantSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensInst, rHvacLoss) = true;
-        resultCells(cSensDelay, rHvacLoss) = MovingAvgAtMaxTime(state, hvacLossDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resultCells(cSensDelay, rHvacLoss) = MovingAvgAtMaxTime(state, hvacLossDelaySeq(ObjexxFCL::IndexSlice {}), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensDelay, rHvacLoss) = true;
 
         // POWER GENERATION EQUIPMENT
         resultCells(cSensInst, rPowerGen) =
-            MovingAvgAtMaxTime(state, ort->powerGenInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            MovingAvgAtMaxTime(state, ort->powerGenInstantSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensInst, rPowerGen) = true;
-        resultCells(cSensDelay, rPowerGen) = MovingAvgAtMaxTime(state, powerGenDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resultCells(cSensDelay, rPowerGen) = MovingAvgAtMaxTime(state, powerGenDelaySeq(ObjexxFCL::IndexSlice {}), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensDelay, rPowerGen) = true;
 
         // DOAS
@@ -14374,34 +14374,34 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
         resCellsUsd(cLatent, rDOAS) = true;
 
         // INFILTRATION
-        resultCells(cSensInst, rInfil) = MovingAvgAtMaxTime(state, ort->infilInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resultCells(cSensInst, rInfil) = MovingAvgAtMaxTime(state, ort->infilInstantSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensInst, rInfil) = true;
-        resultCells(cLatent, rInfil) = MovingAvgAtMaxTime(state, ort->infilLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resultCells(cLatent, rInfil) = MovingAvgAtMaxTime(state, ort->infilLatentSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cLatent, rInfil) = true;
 
         // ZONE VENTILATION
         resultCells(cSensInst, rZoneVent) =
-            MovingAvgAtMaxTime(state, ort->zoneVentInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            MovingAvgAtMaxTime(state, ort->zoneVentInstantSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensInst, rZoneVent) = true;
         resultCells(cLatent, rZoneVent) =
-            MovingAvgAtMaxTime(state, ort->zoneVentLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            MovingAvgAtMaxTime(state, ort->zoneVentLatentSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cLatent, rZoneVent) = true;
 
         // INTERZONE MIXING
         resultCells(cSensInst, rIntZonMix) =
-            MovingAvgAtMaxTime(state, ort->interZoneMixInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            MovingAvgAtMaxTime(state, ort->interZoneMixInstantSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensInst, rIntZonMix) = true;
         resultCells(cLatent, rIntZonMix) =
-            MovingAvgAtMaxTime(state, ort->interZoneMixLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            MovingAvgAtMaxTime(state, ort->interZoneMixLatentSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cLatent, rIntZonMix) = true;
 
         // FENESTRATION CONDUCTION
         resultCells(cSensInst, rFeneCond) =
-            MovingAvgAtMaxTime(state, feneCondInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            MovingAvgAtMaxTime(state, feneCondInstantSeq(desDaySelected, ObjexxFCL::IndexSlice{}, zoneIndex), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensInst, rFeneCond) = true;
 
         // FENESTRATION SOLAR
-        resultCells(cSensDelay, rFeneSolr) = MovingAvgAtMaxTime(state, feneSolarDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resultCells(cSensDelay, rFeneSolr) = MovingAvgAtMaxTime(state, feneSolarDelaySeq(ObjexxFCL::IndexSlice {}), NumOfTimeStepInDay, timeOfMax);
         resCellsUsd(cSensDelay, rFeneSolr) = true;
 
         // opaque surfaces - must combine individual surfaces by class and other side conditions
@@ -14416,7 +14416,8 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
                     curExtBoundCond = Ground;
                 }
             }
-            seqData = surfDelaySeq(_, kSurf);
+            seqData = surfDelaySeq(
+                ObjexxFCL::IndexSlice {}, kSurf);
             MovingAvg(seqData, NumOfTimeStepInDay, state.dataSize->NumTimeStepsInAvg, AvgData);
             singleSurfDelay = AvgData(timeOfMax);
             {

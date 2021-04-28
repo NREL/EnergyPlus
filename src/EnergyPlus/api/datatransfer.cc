@@ -837,7 +837,7 @@ int actualTime(EnergyPlusState)
 {
     std::string datestring;
     Array1D_int datevalues(8);
-    ObjexxFCL::date_and_time(datestring, _, _, datevalues);
+    ObjexxFCL::date_and_time(datestring, {}, {}, datevalues);
     return double(sum(datevalues({5, 8})));
 }
 
@@ -845,7 +845,7 @@ int actualDateTime(EnergyPlusState)
 {
     std::string datestring;
     Array1D_int datevalues(8);
-    ObjexxFCL::date_and_time(datestring, _, _, datevalues);
+    ObjexxFCL::date_and_time(datestring, {}, {}, datevalues);
     return double(sum(datevalues));
 }
 

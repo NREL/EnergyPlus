@@ -4437,7 +4437,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CalcFanCoilElecHeatCoilPLRResidual)
     state->dataLoopNodes->Node(InletNode).MassFlowRateMax = AirMassFlow;
     state->dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
     state->dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = AirMassFlow;
-    Calc4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMaxLS, _, 1.0);
+    Calc4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMaxLS, {}, 1.0);
     EXPECT_NEAR(QUnitOutMaxLS, 3022.5, 1.0);
 
     int MaxIter = 10;

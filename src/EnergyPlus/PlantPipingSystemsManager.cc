@@ -2126,11 +2126,11 @@ namespace PlantPipingSystemsManager {
                                                     thisCircuit->BranchNum,
                                                     thisCircuit->CompNum,
                                                     errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {});
             if (errFlag) {
                 ShowFatalError(state, "PipingSystems:" + RoutineName + ": Program terminated due to previous condition(s).");
             }
@@ -2645,8 +2645,8 @@ namespace PlantPipingSystemsManager {
                                    this->Extents.xMax,
                                    RegionType::XDirection,
                                    XPartitionsExist,
-                                   _,
-                                   _,
+                                   {},
+                                   {},
                                    this->XIndex,
                                    this->XWallIndex,
                                    this->InsulationXIndex);
@@ -2656,11 +2656,11 @@ namespace PlantPipingSystemsManager {
                                    this->Extents.yMax,
                                    RegionType::YDirection,
                                    YPartitionsExist,
-                                   _,
-                                   _,
-                                   _,
-                                   _,
-                                   _,
+                                   {},
+                                   {},
+                                   {},
+                                   {},
+                                   {},
                                    this->YIndex,
                                    this->YFloorIndex,
                                    this->InsulationYIndex);
@@ -2670,14 +2670,14 @@ namespace PlantPipingSystemsManager {
                                    this->Extents.zMax,
                                    RegionType::ZDirection,
                                    ZPartitionsExist,
-                                   _,
-                                   _,
-                                   _,
-                                   _,
-                                   _,
-                                   _,
-                                   _,
-                                   _,
+                                   {},
+                                   {},
+                                   {},
+                                   {},
+                                   {},
+                                   {},
+                                   {},
+                                   {},
                                    this->ZIndex,
                                    this->ZWallIndex,
                                    this->InsulationZIndex);
@@ -2687,10 +2687,10 @@ namespace PlantPipingSystemsManager {
                                    this->Extents.xMax,
                                    RegionType::XDirection,
                                    XPartitionsExist,
-                                   _,
-                                   _,
+                                   {},
+                                   {},
                                    this->XIndex,
-                                   _,
+                                   {},
                                    this->InsulationXIndex);
 
             this->createRegionList(YRegions,
@@ -2698,13 +2698,13 @@ namespace PlantPipingSystemsManager {
                                    this->Extents.yMax,
                                    RegionType::YDirection,
                                    YPartitionsExist,
-                                   _,
-                                   _,
-                                   _,
-                                   _,
-                                   _,
+                                   {},
+                                   {},
+                                   {},
+                                   {},
+                                   {},
                                    this->YIndex,
-                                   _,
+                                   {},
                                    this->InsulationYIndex);
 
             this->createRegionList(ZRegions,
@@ -2712,23 +2712,23 @@ namespace PlantPipingSystemsManager {
                                    this->Extents.zMax,
                                    RegionType::ZDirection,
                                    ZPartitionsExist,
-                                   _,
-                                   _,
-                                   _,
-                                   _,
-                                   _,
-                                   _,
-                                   _,
-                                   _,
+                                   {},
+                                   {},
+                                   {},
+                                   {},
+                                   {},
+                                   {},
+                                   {},
+                                   {},
                                    this->ZIndex,
-                                   _,
+                                   {},
                                    this->InsulationZIndex);
         } else {
             this->createRegionList(
                 XRegions, XPartitionRegions, this->Extents.xMax, RegionType::XDirection, XPartitionsExist, this->BasementZone.BasementWallXIndex);
 
             this->createRegionList(
-                YRegions, YPartitionRegions, this->Extents.yMax, RegionType::YDirection, YPartitionsExist, _, this->BasementZone.BasementFloorYIndex);
+                YRegions, YPartitionRegions, this->Extents.yMax, RegionType::YDirection, YPartitionsExist, {}, this->BasementZone.BasementFloorYIndex);
 
             this->createRegionList(ZRegions, ZPartitionRegions, this->Extents.zMax, RegionType::ZDirection, ZPartitionsExist);
         }

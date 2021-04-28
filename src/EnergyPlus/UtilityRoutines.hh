@@ -139,37 +139,37 @@ public:
 
 using OptionalOutputFileRef = Optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
 
-void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = {}, OptionalOutputFileRef OutUnit2 = {})  ;
 
-void ShowSevereError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowSevereError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = {}, OptionalOutputFileRef OutUnit2 = {})  ;
 
 void ShowSevereMessage(EnergyPlusData &state,
                        std::string const &ErrorMessage,
-                       OptionalOutputFileRef OutUnit1 = _,
-                       OptionalOutputFileRef OutUnit2 = _);
+                       OptionalOutputFileRef OutUnit1 = {},
+                       OptionalOutputFileRef OutUnit2 = {})  ;
 
-void ShowContinueError(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowContinueError(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = {}, OptionalOutputFileRef OutUnit2 = {})  ;
 
 void ShowContinueErrorTimeStamp(EnergyPlusData &state,
                                 std::string const &Message,
-                                OptionalOutputFileRef OutUnit1 = _,
-                                OptionalOutputFileRef OutUnit2 = _);
+                                OptionalOutputFileRef OutUnit1 = {},
+                                OptionalOutputFileRef OutUnit2 = {})  ;
 
-void ShowMessage(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowMessage(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = {}, OptionalOutputFileRef OutUnit2 = {})  ;
 
-void ShowWarningError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowWarningError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = {}, OptionalOutputFileRef OutUnit2 = {})  ;
 
 void ShowWarningMessage(EnergyPlusData &state,
                         std::string const &ErrorMessage,
-                        OptionalOutputFileRef OutUnit1 = _,
-                        OptionalOutputFileRef OutUnit2 = _);
+                        OptionalOutputFileRef OutUnit1 = {},
+                        OptionalOutputFileRef OutUnit2 = {})  ;
 
 void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
                                    std::string const &Message,             // Message automatically written to "error file" at end of simulation
                                    int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
-                                   Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
-                                   Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
-                                   Optional<Real64 const> ReportSumOf = _, // Track and report the sum of the values passed to this argument
+                                   Optional<Real64 const> ReportMaxOf = {}, // Track and report the max of the values passed to this argument
+                                   Optional<Real64 const> ReportMinOf = {}, // Track and report the min of the values passed to this argument
+                                   Optional<Real64 const> ReportSumOf = {}, // Track and report the sum of the values passed to this argument
                                    std::string const &ReportMaxUnits = "", // optional char string (<=15 length) of units for max value
                                    std::string const &ReportMinUnits = "", // optional char string (<=15 length) of units for min value
                                    std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
@@ -178,9 +178,9 @@ void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
 void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
                                     std::string const &Message,             // Message automatically written to "error file" at end of simulation
                                     int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
-                                    Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
-                                    Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
-                                    Optional<Real64 const> ReportSumOf = _, // Track and report the sum of the values passed to this argument
+                                    Optional<Real64 const> ReportMaxOf = {}, // Track and report the max of the values passed to this argument
+                                    Optional<Real64 const> ReportMinOf = {}, // Track and report the min of the values passed to this argument
+                                    Optional<Real64 const> ReportSumOf = {}, // Track and report the sum of the values passed to this argument
                                     std::string const &ReportMaxUnits = "", // optional char string (<=15 length) of units for max value
                                     std::string const &ReportMinUnits = "", // optional char string (<=15 length) of units for min value
                                     std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
@@ -189,9 +189,9 @@ void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
 void ShowRecurringContinueErrorAtEnd(EnergyPlusData &state,
                                      std::string const &Message,             // Message automatically written to "error file" at end of simulation
                                      int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
-                                     Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
-                                     Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
-                                     Optional<Real64 const> ReportSumOf = _, // Track and report the sum of the values passed to this argument
+                                     Optional<Real64 const> ReportMaxOf = {}, // Track and report the max of the values passed to this argument
+                                     Optional<Real64 const> ReportMinOf = {}, // Track and report the min of the values passed to this argument
+                                     Optional<Real64 const> ReportSumOf = {}, // Track and report the sum of the values passed to this argument
                                      std::string const &ReportMaxUnits = "", // optional char string (<=15 length) of units for max value
                                      std::string const &ReportMinUnits = "", // optional char string (<=15 length) of units for min value
                                      std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
@@ -200,15 +200,15 @@ void ShowRecurringContinueErrorAtEnd(EnergyPlusData &state,
 void StoreRecurringErrorMessage(EnergyPlusData &state,
                                 std::string const &ErrorMessage,             // Message automatically written to "error file" at end of simulation
                                 int &ErrorMsgIndex,                          // Recurring message index, if zero, next available index is assigned
-                                Optional<Real64 const> ErrorReportMaxOf = _, // Track and report the max of the values passed to this argument
-                                Optional<Real64 const> ErrorReportMinOf = _, // Track and report the min of the values passed to this argument
-                                Optional<Real64 const> ErrorReportSumOf = _, // Track and report the sum of the values passed to this argument
+                                Optional<Real64 const> ErrorReportMaxOf = {}, // Track and report the max of the values passed to this argument
+                                Optional<Real64 const> ErrorReportMinOf = {}, // Track and report the min of the values passed to this argument
+                                Optional<Real64 const> ErrorReportSumOf = {}, // Track and report the sum of the values passed to this argument
                                 std::string const &ErrorReportMaxUnits = "", // Units for "max" reporting
                                 std::string const &ErrorReportMinUnits = "", // Units for "min" reporting
                                 std::string const &ErrorReportSumUnits = ""  // Units for "sum" reporting
 );
 
-void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = {}, OptionalOutputFileRef OutUnit2 = {})  ;
 
 void SummarizeErrors(EnergyPlusData &state);
 

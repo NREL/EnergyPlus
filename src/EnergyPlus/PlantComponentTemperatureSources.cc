@@ -139,11 +139,11 @@ namespace PlantComponentTemperatureSources {
                                                     this->Location.branchNum,
                                                     this->Location.compNum,
                                                     errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
+                                                    {},
+                                                    {},
+                                                    {},
                                                     this->InletNodeNum,
-                                                    _);
+                                                    {});
             if (errFlag) {
                 ShowFatalError(state, RoutineName + ": Program terminated due to previous condition(s).");
             }
@@ -503,7 +503,7 @@ namespace PlantComponentTemperatureSources {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);

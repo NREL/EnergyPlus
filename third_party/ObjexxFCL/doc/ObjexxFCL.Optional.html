@@ -63,7 +63,7 @@
 				<li>The Type can be const-qualified.</li>
 				<li>Optional arguments are declared to accept a default Omit value so that they can be omitted. An Omit object named _ (underscore character) is provided.</li>
 				<li>Optional arguments can be omitted from a call if no following arguments are needed.</li>
-				<li>To omit Optional arguments followed by other arguments an Omit object can be passed. The supplied underscore object, _, can be used for consise usage, such as <span class="source">fxn( a, b, _, d )</span>.</li>
+				<li>To omit Optional arguments followed by other arguments an Omit object can be passed. The supplied underscore object, {}, can be used for consise usage, such as <span class="source">fxn( a, b, {}, d )</span>.</li>
 				<li>Optional arguments can automatically convert to the contained object.</li>
 				<li>Explicit conversion to the contained object is available with the syntax optional().</li>
 				<li>For dot and function call usage the explicit syntax is needed, such as <span class="source">optional().method()</span> or <span class="source">optional()( arg )</span>.</li>

@@ -364,10 +364,10 @@ namespace BaseboardElectric {
                                 "System",
                                 "Sum",
                                 thisBaseboard.EquipName,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "BASEBOARD",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(
@@ -380,10 +380,10 @@ namespace BaseboardElectric {
                                 "System",
                                 "Sum",
                                 thisBaseboard.EquipName,
-                                _,
+                                {},
                                 "Electricity",
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,

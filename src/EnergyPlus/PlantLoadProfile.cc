@@ -202,11 +202,11 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
                                     this->WLoopBranchNum,
                                     this->WLoopCompNum,
                                     errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {});
             if (errFlag) {
                 ShowFatalError(state, "InitPlantProfile: Program terminated for previous conditions.");
             }
@@ -362,7 +362,7 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
@@ -442,10 +442,10 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "Heating",
-                                _,
+                                {},
                                 "Plant"); // is EndUseKey right?
 
             SetupOutputVariable(state,
@@ -455,10 +455,10 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "Heating",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -468,10 +468,10 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
-                                _,
+                                {},
                                 "PLANTLOOPCOOLINGDEMAND",
                                 "Cooling",
-                                _,
+                                {},
                                 "Plant");
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {

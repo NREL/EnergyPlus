@@ -1647,10 +1647,10 @@ namespace HVACMultiSpeedHeatPump {
                                 "System",
                                 "Sum",
                                 MSHeatPump(MSHPNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Unitary System Heating Ancillary Electricity Energy",
@@ -1659,10 +1659,10 @@ namespace HVACMultiSpeedHeatPump {
                                 "System",
                                 "Sum",
                                 MSHeatPump(MSHPNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Unitary System Fan Part Load Ratio",
@@ -1900,11 +1900,11 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).HRBranchNum,
                                         MSHeatPump(MSHeatPumpNum).HRCompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
                 if (errFlag) {
                     ShowFatalError(state, "InitMSHeatPump: Program terminated for previous conditions.");
                 }
@@ -1923,11 +1923,11 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).BranchNum,
                                         MSHeatPump(MSHeatPumpNum).CompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
                 if (errFlag) {
                     ShowFatalError(state, "InitMSHeatPump: Program terminated for previous conditions.");
                 }
@@ -1961,11 +1961,11 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).BranchNum,
                                         MSHeatPump(MSHeatPumpNum).CompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
                 if (errFlag) {
                     ShowFatalError(state, "InitMSHeatPump: Program terminated for previous conditions.");
                 }
@@ -1995,11 +1995,11 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).SuppBranchNum,
                                         MSHeatPump(MSHeatPumpNum).SuppCompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
                 if (errFlag) {
                     ShowFatalError(state, "InitMSHeatPump: Program terminated for previous conditions.");
                 }
@@ -2033,11 +2033,11 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).SuppBranchNum,
                                         MSHeatPump(MSHeatPumpNum).SuppCompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
                 if (errFlag) {
                     ShowFatalError(state, "InitMSHeatPump: Program terminated for previous conditions.");
                 }
@@ -3703,10 +3703,10 @@ namespace HVACMultiSpeedHeatPump {
                     SimulateHeatingCoilComponents(state,
                                                   MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                                   FirstHVACIteration,
-                                                  _,
+                                                  {},
                                                   0,
-                                                  _,
-                                                  _,
+                                                  {},
+                                                  {},
                                                   MSHeatPump(MSHeatPumpNum).OpMode,
                                                   PartLoadFrac,
                                                   SpeedNum,
@@ -3715,10 +3715,10 @@ namespace HVACMultiSpeedHeatPump {
                     SimulateHeatingCoilComponents(state,
                                                   MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                                   FirstHVACIteration,
-                                                  _,
+                                                  {},
                                                   0,
-                                                  _,
-                                                  _,
+                                                  {},
+                                                  {},
                                                   MSHeatPump(MSHeatPumpNum).OpMode,
                                                   0.0,
                                                   SpeedNum,
@@ -3806,10 +3806,10 @@ namespace HVACMultiSpeedHeatPump {
                     SimulateHeatingCoilComponents(state,
                                                   MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                                   FirstHVACIteration,
-                                                  _,
+                                                  {},
                                                   0,
-                                                  _,
-                                                  _,
+                                                  {},
+                                                  {},
                                                   MSHeatPump(MSHeatPumpNum).OpMode,
                                                   PartLoadFrac,
                                                   SpeedNum,
@@ -3818,10 +3818,10 @@ namespace HVACMultiSpeedHeatPump {
                     SimulateHeatingCoilComponents(state,
                                                   MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                                   FirstHVACIteration,
-                                                  _,
+                                                  {},
                                                   0,
-                                                  _,
-                                                  _,
+                                                  {},
+                                                  {},
                                                   MSHeatPump(MSHeatPumpNum).OpMode,
                                                   0.0,
                                                   SpeedNum,
@@ -3908,10 +3908,10 @@ namespace HVACMultiSpeedHeatPump {
                     SimulateHeatingCoilComponents(state,
                                                   MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                                   FirstHVACIteration,
-                                                  _,
+                                                  {},
                                                   0,
-                                                  _,
-                                                  _,
+                                                  {},
+                                                  {},
                                                   MSHeatPump(MSHeatPumpNum).OpMode,
                                                   PartLoadFrac,
                                                   SpeedNum,
@@ -3920,10 +3920,10 @@ namespace HVACMultiSpeedHeatPump {
                     SimulateHeatingCoilComponents(state,
                                                   MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                                   FirstHVACIteration,
-                                                  _,
+                                                  {},
                                                   0,
-                                                  _,
-                                                  _,
+                                                  {},
+                                                  {},
                                                   MSHeatPump(MSHeatPumpNum).OpMode,
                                                   0.0,
                                                   SpeedNum,
@@ -4594,7 +4594,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex2,
                                                                MaxHotWaterFlow,
                                                                MinWaterFlow,
-                                                               _,
+                                                               {},
                                                                "[kg/s]",
                                                                "[kg/s]");
                             }

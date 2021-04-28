@@ -168,58 +168,6 @@ public: // Creation
 		size_ = computed_size();
 	}
 
-	// Omit Constructor
-	IndexSlice( Omit ) :
-	 l_init_( false ),
-	 u_init_( false ),
-	 scalar_( false ),
-	 l_( 1 ),
-	 u_( 0 ),
-	 s_( 1 ),
-	 size_( 0u )
-	{
-		assert( s_ != 0 );
-	}
-
-	// Lower Index + Omit Constructor
-	IndexSlice( int const l, Omit, int const s = 1 ) :
-	 l_init_( true ),
-	 u_init_( false ),
-	 scalar_( false ),
-	 l_( l ),
-	 u_( 0 ),
-	 s_( s ),
-	 size_( 0u )
-	{
-		assert( s_ != 0 );
-	}
-
-	// Omit + Upper Index Constructor
-	IndexSlice( Omit, int const u, int const s = 1 ) :
-	 l_init_( false ),
-	 u_init_( true ),
-	 scalar_( false ),
-	 l_( 1 ),
-	 u_( u ),
-	 s_( s ),
-	 size_( 0u )
-	{
-		assert( s_ != 0 );
-	}
-
-	// Omit + Omit Constructor
-	IndexSlice( Omit, Omit, int const s = 1 ) :
-	 l_init_( false ),
-	 u_init_( false ),
-	 scalar_( false ),
-	 l_( 1 ),
-	 u_( 0 ),
-	 s_( s ),
-	 size_( 0u )
-	{
-		assert( s_ != 0 );
-	}
-
 	// Destructor
 	~IndexSlice()
 	{}

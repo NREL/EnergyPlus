@@ -610,7 +610,7 @@ void GetAirPathData(EnergyPlusData &state)
                     DataLoopNode::NodeConnectionType::Inlet,
                     1,
                     ObjectIsParent,
-                    _,
+                    {},
                     cAlphaFields(8));
         if (ErrInList) {
             //      CALL ShowContinueError(state, RoutineName//TRIM(CurrentModuleObject)//'="'//TRIM(PrimaryAirSystem(AirSysNum)%Name)//  &
@@ -650,7 +650,7 @@ void GetAirPathData(EnergyPlusData &state)
                     DataLoopNode::NodeConnectionType::Outlet,
                     1,
                     ObjectIsParent,
-                    _,
+                    {},
                     cAlphaFields(9));
         if (ErrInList) {
             //      CALL ShowContinueError(state, RoutineName//TRIM(CurrentModuleObject)//'="'//TRIM(PrimaryAirSystem(AirSysNum)%Name)//  &
@@ -3529,7 +3529,7 @@ void SimAirLoopComponent(EnergyPlusData &state,
             // if the fan is here, it can't (yet) really be cycling fan operation, set this ugly global in the event that there are dx coils
             // involved but the fan should really run like constant volume and not cycle with compressor
             state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-            state.dataHVACFan->fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
+            state.dataHVACFan->fanObjs[CompIndex - 1]->simulate(state, {}, {}, {}, {}); // vector is 0 based, but CompIndex is 1 based so shift
 
         } else if (SELECT_CASE_var == Fan_ComponentModel) { // 'Fan:ComponentModel'
             Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
@@ -3540,7 +3540,7 @@ void SimAirLoopComponent(EnergyPlusData &state,
             //    CALL SimHXAssistedCoolingCoil(CompName,FirstHVACIteration,CoilOn,0.0,CompIndex,ContFanCycCoil)
         } else if (SELECT_CASE_var == WaterCoil_CoolingHXAsst) { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
             SimHXAssistedCoolingCoil(
-                state, CompName, FirstHVACIteration, CoilOn, DataPrecisionGlobals::constant_zero, CompIndex, ContFanCycCoil, _, _, _, QActual);
+                state, CompName, FirstHVACIteration, CoilOn, DataPrecisionGlobals::constant_zero, CompIndex, ContFanCycCoil, {}, {}, {}, QActual);
             if (QActual > 0.0) CoolingActive = true; // determine if coil is ON
 
         } else if (SELECT_CASE_var == WaterCoil_SimpleHeat) { // 'Coil:Heating:Water'
@@ -3561,24 +3561,24 @@ void SimAirLoopComponent(EnergyPlusData &state,
 
             // stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
         } else if (SELECT_CASE_var == Coil_ElectricHeat) { // 'Coil:Heating:Electric'
-            SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, _, CompIndex, QActual);
+            SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, {}, CompIndex, QActual);
             if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
 
             // stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
         } else if (SELECT_CASE_var == Coil_GasHeat) { // 'Coil:Heating:Fuel'
-            SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, _, CompIndex, QActual);
+            SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, {}, CompIndex, QActual);
             if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
             // stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
         } else if (SELECT_CASE_var == Coil_DeSuperHeat) { // 'Coil:Heating:Desuperheater' - heat reclaim
-            SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, _, CompIndex, QActual);
+            SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, {}, CompIndex, QActual);
             if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
 
         } else if (SELECT_CASE_var == DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
-            SimDXCoolingSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex, _, _, QActual);
+            SimDXCoolingSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex, {}, {}, QActual);
             if (QActual > 0.0) CoolingActive = true; // determine if coil is ON
 
         } else if (SELECT_CASE_var == DXHeatPumpSystem) { // 'CoilSystem:Heating:DX'
-            SimDXHeatPumpSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex, _, _, QActual);
+            SimDXHeatPumpSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex, {}, {}, QActual);
             if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
 
         } else if (SELECT_CASE_var == CoilUserDefined) { // Coil:UserDefined
@@ -3634,9 +3634,9 @@ void SimAirLoopComponent(EnergyPlusData &state,
                             CompIndex,
                             AirLoopControlInfo(AirLoopNum).FanOpMode,
                             state.dataAirLoop->AirLoopFlow(AirLoopNum).FanPLR,
-                            _,
-                            _,
-                            _,
+                            {},
+                            {},
+                            {},
                             AirLoopControlInfo(AirLoopNum).EconoActive,
                             AirLoopControlInfo(AirLoopNum).HighHumCtrlActive);
 

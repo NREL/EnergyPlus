@@ -149,7 +149,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::E
                                                                  state.dataIPShortCut->rNumericArgs,
                                                                  NumNumbers,
                                                                  IOStatus,
-                                                                 _,
+                                                                 {},
                                                                  state.dataIPShortCut->lAlphaFieldBlanks);
         if (!UtilityRoutines::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
             continue;

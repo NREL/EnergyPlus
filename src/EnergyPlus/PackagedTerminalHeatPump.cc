@@ -940,7 +940,7 @@ void GetPTUnit(EnergyPlusData &state)
                 SetVarSpeedCoilData(state,
                                     state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
                                     ErrorsFound,
-                                    _,
+                                    {},
                                     state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum);
                 state.dataPTHP->PTUnit(PTUnitNum).useVSCoilModel = true;
             }
@@ -2803,7 +2803,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                             state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
                                                             ErrorsFound,
                                                             state.dataPTHP->PTUnit(PTUnitNum).WaterCyclingMode,
-                                                            _,
+                                                            {},
                                                             state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum);
             }
         } else if (Alphas(9) == "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" &&
@@ -2812,7 +2812,7 @@ void GetPTUnit(EnergyPlusData &state)
                 SetVarSpeedCoilData(state,
                                     state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
                                     ErrorsFound,
-                                    _,
+                                    {},
                                     state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum);
                 state.dataPTHP->PTUnit(PTUnitNum).useVSCoilModel = true;
             }
@@ -4105,11 +4105,11 @@ void InitPTUnit(EnergyPlusData &state,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilCompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
                 if (errFlag) {
                     ShowContinueError(state,
                                       "Reference Unit=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
@@ -4142,11 +4142,11 @@ void InitPTUnit(EnergyPlusData &state,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilCompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
                 if (errFlag) {
                     ShowContinueError(state,
                                       "Reference Unit=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
@@ -4187,11 +4187,11 @@ void InitPTUnit(EnergyPlusData &state,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
                 if (errFlag) {
                     ShowFatalError(state, "InitPTUnit: Program terminated for previous conditions.");
                 }
@@ -4217,11 +4217,11 @@ void InitPTUnit(EnergyPlusData &state,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
                 if (errFlag) {
                     ShowFatalError(state, "InitPTUnit: Program terminated for previous conditions.");
                 }
@@ -6074,7 +6074,7 @@ void ControlPTUnitOutput(EnergyPlusData &state,
                                                        state.dataPTHP->PTUnit(PTUnitNum).IterErrIndex,
                                                        TempOutput,
                                                        TempOutput,
-                                                       _,
+                                                       {},
                                                        "{W}",
                                                        "{W}");
                     }
@@ -6298,7 +6298,7 @@ void CalcPTUnit(EnergyPlusData &state,
     if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == BlowThru) {
         if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(
-                state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                state, {}, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, {});
         } else {
             Fans::SimulateFanComponents(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -6569,7 +6569,7 @@ void CalcPTUnit(EnergyPlusData &state,
     if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == DrawThru) {
         if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(
-                state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                state, {}, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, {});
         } else {
             Fans::SimulateFanComponents(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -6712,7 +6712,7 @@ void CalcPTUnit(EnergyPlusData &state,
                                                            state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2,
                                                            MaxHotWaterFlow,
                                                            MinWaterFlow,
-                                                           _,
+                                                           {},
                                                            "[kg/s]",
                                                            "[kg/s]");
                         }
@@ -7032,7 +7032,7 @@ Real64 SupSATResidual(EnergyPlusData &state,
     // FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
     FirstHVACIteration = (Par(2) == 1.0);
     auto &thisUnit = state.dataPTHP->PTUnit(PTUnitNum);
-    SimulateHeatingCoilComponents(state, thisUnit.SuppHeatCoilName, FirstHVACIteration, TempSupHeater, thisUnit.SuppHeatCoilIndex, _, true);
+    SimulateHeatingCoilComponents(state, thisUnit.SuppHeatCoilName, FirstHVACIteration, TempSupHeater, thisUnit.SuppHeatCoilIndex, {}, true);
     SupSATResidual = state.dataLoopNodes->Node(thisUnit.AirOutNode).Temp - thisUnit.MaxSATSupHeat;
 
     return SupSATResidual;
@@ -8146,7 +8146,7 @@ void ControlVSHPOutput(EnergyPlusData &state,
                                                   FirstHVACIteration,
                                                   SupHeaterLoad,
                                                   state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                  _,
+                                                  {},
                                                   true);
                 } else if (SELECT_CASE_var == Coil_HeatingWater) {
                     mdot = 0.0;
@@ -8557,7 +8557,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
     if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == BlowThru) {
         if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(
-                state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                state, {}, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, {});
         } else {
             Fans::SimulateFanComponents(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -8750,7 +8750,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
     if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == DrawThru) {
         if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             state.dataHVACFan->fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(
-                state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                state, {}, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, {});
         } else {
             Fans::SimulateFanComponents(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -8896,7 +8896,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                                            state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2,
                                                            MaxHotWaterFlow,
                                                            state.dataPTHP->MinWaterFlow,
-                                                           _,
+                                                           {},
                                                            "[kg/s]",
                                                            "[kg/s]"); // Autodesk:Bug? Meant RoutineName + "Hot water...
                         }

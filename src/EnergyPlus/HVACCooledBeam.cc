@@ -376,10 +376,10 @@ namespace HVACCooledBeam {
                                 "System",
                                 "Sum",
                                 CoolBeam(CBNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Air Terminal Beam Chilled Water Energy",
@@ -388,10 +388,10 @@ namespace HVACCooledBeam {
                                 "System",
                                 "Sum",
                                 CoolBeam(CBNum).Name,
-                                _,
+                                {},
                                 "PLANTLOOPCOOLINGDEMAND",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Air Terminal Beam Sensible Cooling Rate",
@@ -544,11 +544,11 @@ namespace HVACCooledBeam {
                                     CoolBeam(CBNum).CWBranchNum,
                                     CoolBeam(CBNum).CWCompNum,
                                     errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {});
             if (errFlag) {
                 ShowFatalError(state, "InitCoolBeam: Program terminated for previous conditions.");
             }

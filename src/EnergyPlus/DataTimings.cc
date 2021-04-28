@@ -432,7 +432,7 @@ namespace DataTimings {
         // value(7)   Seconds (0-59)
         // value(8)   Milliseconds (0-999)
 
-        date_and_time(_, _, _, clockvalues);
+        date_and_time({}, {}, {}, clockvalues);
         calctime = clockvalues(5) * 3600.0 + clockvalues(6) * 60.0 + clockvalues(7) + clockvalues(8) / 1000.0;
 
         return calctime;

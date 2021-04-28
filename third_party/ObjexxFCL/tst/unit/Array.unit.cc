@@ -239,7 +239,7 @@ TEST( ArrayTest, UboundOfUnbounded )
 {
 	Array2D_int r( {-1,1}, {-1,1}, { 1, 2, 3, 4, 5, 6, 7, 8, 9 } );
 	Array2A_int u( r( -1, -1 ) ); // Unbounded tail proxy
-	u.dim( _, 3 );
+	u.dim( {}, 3 );
 	EXPECT_EQ( 1, lbound( u, 1 ) );
 	EXPECT_EQ( 1, lbound( u, 2 ) );
 	EXPECT_EQ( 3, ubound( u, 2 ) );

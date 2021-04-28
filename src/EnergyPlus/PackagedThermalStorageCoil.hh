@@ -423,7 +423,7 @@ namespace PackagedThermalStorageCoil {
                     int &CompIndex,
                     int const FanOpMode, // allows parent object to control fan mode
                     int &TESOpMode,
-                    Optional<Real64 const> PartLoadRatio = _ // part load ratio (for single speed cycling unit)
+                    Optional<Real64 const> PartLoadRatio = {}  // part load ratio (for single speed cycling unit)
     );
 
     void GetTESCoilInput(EnergyPlusData &state);
@@ -486,7 +486,7 @@ namespace PackagedThermalStorageCoil {
     void UpdateEvaporativeCondenserWaterUse(EnergyPlusData &state, int const TESCoilNum, Real64 const HumRatAfterEvap, int const InletNodeNum);
 
     void GetTESCoilIndex(
-        EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject = _);
+        EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject = {})  ;
 
     void GetTESCoilAirInletNode(
         EnergyPlusData &state, std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);

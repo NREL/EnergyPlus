@@ -11574,7 +11574,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurOASysNum = 0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    state->dataHVACFan->fanObjs[2]->simulate(*state, _, _, _, _);                 // triggers sizing call
+    state->dataHVACFan->fanObjs[2]->simulate(*state, {}, {}, {}, _);                 // triggers sizing call
     Real64 locFanSizeVdot = state->dataHVACFan->fanObjs[2]->designAirVolFlowRate; // get function
     Real64 locDesignHeatGain3 = state->dataHVACFan->fanObjs[2]->getFanDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain3, 402.0, 0.1);

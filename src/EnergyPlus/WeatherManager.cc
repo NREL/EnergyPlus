@@ -2570,9 +2570,9 @@ namespace WeatherManager {
                                                                               "Severe",
                                                                               ">= 0",
                                                                               (DirectRad >= 0.0),
-                                                                              _,
-                                                                              _,
-                                                                              _,
+                                                                              {},
+                                                                              {},
+                                                                              {},
                                                                               state.dataEnvrn->WeatherFileLocationTitle);
                     if (DiffuseRad < 9999.0)
                         state.dataInputProcessing->inputProcessor->rangeCheck(state,
@@ -2582,9 +2582,9 @@ namespace WeatherManager {
                                                                               "Severe",
                                                                               ">= 0",
                                                                               (DiffuseRad >= 0.0),
-                                                                              _,
-                                                                              _,
-                                                                              _,
+                                                                              {},
+                                                                              {},
+                                                                              {},
                                                                               state.dataEnvrn->WeatherFileLocationTitle);
                     if (WindDir < 999.0)
                         state.dataInputProcessing->inputProcessor->rangeCheck(state,
@@ -3717,7 +3717,7 @@ namespace WeatherManager {
         state.dataGlobal->WarmupFlag = true;
 
         Array1D_int Date0(8);
-        date_and_time(_, _, _, Date0);
+        date_and_time({}, {}, {}, Date0);
         int CurrentYear = Date0(1);
 
         if (state.dataGlobal->BeginSimFlag) {
@@ -3915,7 +3915,7 @@ namespace WeatherManager {
         case DDHumIndType::RelHumSch:
             // nothing to do -- DDHumIndModifier already contains the scheduled Relative Humidity
             ConstantHumidityRatio = false;
-            state.dataWeatherManager->TomorrowOutRelHum = state.dataWeatherManager->DDHumIndModifier(_, _, EnvrnNum);
+            state.dataWeatherManager->TomorrowOutRelHum = state.dataWeatherManager->DDHumIndModifier(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}, EnvrnNum);
             break;
         case DDHumIndType::WBProfDef:
         case DDHumIndType::WBProfDif:
@@ -3930,29 +3930,29 @@ namespace WeatherManager {
 
         int OSky; // Opaque Sky Cover (tenths)
         if (state.dataWeatherManager->DesDayInput(EnvrnNum).RainInd != 0) {
-            state.dataWeatherManager->TomorrowIsRain(_, _) = true;
+            state.dataWeatherManager->TomorrowIsRain(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}) = true;
             OSky = 10;
             state.dataWeatherManager->TomorrowLiquidPrecip = 3.0;
         } else {
-            state.dataWeatherManager->TomorrowIsRain(_, _) = false;
+            state.dataWeatherManager->TomorrowIsRain(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}) = false;
             OSky = 0;
             state.dataWeatherManager->TomorrowLiquidPrecip = 0.0;
         }
 
         Real64 GndReflet; // Ground Reflectivity
         if (state.dataWeatherManager->DesDayInput(EnvrnNum).SnowInd == 0) {
-            state.dataWeatherManager->TomorrowIsSnow(_, _) = false;
+            state.dataWeatherManager->TomorrowIsSnow(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}) = false;
             GndReflet = 0.2;
         } else { // Snow
-            state.dataWeatherManager->TomorrowIsSnow(_, _) = true;
+            state.dataWeatherManager->TomorrowIsSnow(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}) = true;
             GndReflet = 0.7;
         }
 
         // Some values are constant
 
-        state.dataWeatherManager->TomorrowOutBaroPress(_, _) = state.dataWeatherManager->DesDayInput(EnvrnNum).PressBarom;
-        state.dataWeatherManager->TomorrowWindSpeed(_, _) = state.dataWeatherManager->DesDayInput(EnvrnNum).WindSpeed;
-        state.dataWeatherManager->TomorrowWindDir(_, _) = state.dataWeatherManager->DesDayInput(EnvrnNum).WindDir;
+        state.dataWeatherManager->TomorrowOutBaroPress(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}) = state.dataWeatherManager->DesDayInput(EnvrnNum).PressBarom;
+        state.dataWeatherManager->TomorrowWindSpeed(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}) = state.dataWeatherManager->DesDayInput(EnvrnNum).WindSpeed;
+        state.dataWeatherManager->TomorrowWindDir(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}) = state.dataWeatherManager->DesDayInput(EnvrnNum).WindDir;
         state.dataWeatherManager->TomorrowAlbedo = 0.0;
 
         // resolve daily ranges
@@ -4210,14 +4210,14 @@ namespace WeatherManager {
                     state,
                     state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(EnvrnNum).WP_Type1).SchedulePtr,
                     state.dataWeatherManager->TomorrowSkyTemp);
-                state.dataWeatherManager->DDSkyTempScheduleValues(_, _, EnvrnNum) = state.dataWeatherManager->TomorrowSkyTemp;
+                state.dataWeatherManager->DDSkyTempScheduleValues(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}, EnvrnNum) = state.dataWeatherManager->TomorrowSkyTemp;
                 break;
             case EmissivityCalcType::DryBulbDelta:
                 ScheduleManager::GetSingleDayScheduleValues(
                     state,
                     state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(EnvrnNum).WP_Type1).SchedulePtr,
                     state.dataWeatherManager->TomorrowSkyTemp);
-                state.dataWeatherManager->DDSkyTempScheduleValues(_, _, EnvrnNum) = state.dataWeatherManager->TomorrowSkyTemp;
+                state.dataWeatherManager->DDSkyTempScheduleValues(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}, EnvrnNum) = state.dataWeatherManager->TomorrowSkyTemp;
                 for (int hour = 1; hour <= 24; ++hour) {
                     for (int ts = 1; ts <= state.dataGlobal->NumOfTimeStepInHour; ++ts) {
                         state.dataWeatherManager->TomorrowSkyTemp(ts, hour) =
@@ -4230,7 +4230,7 @@ namespace WeatherManager {
                     state,
                     state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(EnvrnNum).WP_Type1).SchedulePtr,
                     state.dataWeatherManager->TomorrowSkyTemp);
-                state.dataWeatherManager->DDSkyTempScheduleValues(_, _, EnvrnNum) = state.dataWeatherManager->TomorrowSkyTemp;
+                state.dataWeatherManager->DDSkyTempScheduleValues(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}, EnvrnNum) = state.dataWeatherManager->TomorrowSkyTemp;
                 for (int hour = 1; hour <= 24; ++hour) {
                     for (int ts = 1; ts <= state.dataGlobal->NumOfTimeStepInHour; ++ts) {
                         state.dataWeatherManager->TomorrowSkyTemp(ts, hour) =
@@ -6513,7 +6513,7 @@ namespace WeatherManager {
                                                                       (testval >= -90.0),
                                                                       "<= 70",
                                                                       (testval <= 70.0),
-                                                                      _,
+                                                                      {},
                                                                       state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     ErrorsFound = true;
@@ -6536,7 +6536,7 @@ namespace WeatherManager {
                     } else {
                         ScheduleManager::GetSingleDayScheduleValues(state,
                                                                     state.dataWeatherManager->DesDayInput(EnvrnNum).TempRangeSchPtr,
-                                                                    state.dataWeatherManager->DDDBRngModifier(_, _, EnvrnNum));
+                                                                    state.dataWeatherManager->DDDBRngModifier(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}, EnvrnNum));
                         int schPtr = General::FindNumberInList(state.dataWeatherManager->DesDayInput(EnvrnNum).TempRangeSchPtr,
                                                                state.dataWeatherManager->SPSiteScheduleNamePtr,
                                                                state.dataWeatherManager->NumSPSiteScheduleNamePtrs);
@@ -6579,7 +6579,7 @@ namespace WeatherManager {
                             }
                         }
                         if (state.dataIPShortCut->cAlphaArgs(3) == "TemperatureProfileSchedule") {
-                            Real64 testval = maxval(state.dataWeatherManager->DDDBRngModifier(_, _, EnvrnNum));
+                            Real64 testval = maxval(state.dataWeatherManager->DDDBRngModifier(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}, EnvrnNum));
                             if (MaxDryBulbEntered) {
                                 ShowWarningError(state,
                                                  state.dataIPShortCut->cCurrentModuleObject + "=\"" +
@@ -6594,7 +6594,7 @@ namespace WeatherManager {
                             }
                             state.dataWeatherManager->DesDayInput(EnvrnNum).MaxDryBulb = testval;
                         }
-                        Real64 testval = maxval(state.dataWeatherManager->DDDBRngModifier(_, _, EnvrnNum));
+                        Real64 testval = maxval(state.dataWeatherManager->DDDBRngModifier(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}, EnvrnNum));
                         testval = state.dataWeatherManager->DesDayInput(EnvrnNum).MaxDryBulb - testval;
                         bool errFlag = false;
                         state.dataInputProcessing->inputProcessor->rangeCheck(state,
@@ -6606,7 +6606,7 @@ namespace WeatherManager {
                                                                               (testval >= -90.0),
                                                                               "<= 70",
                                                                               (testval <= 70.0),
-                                                                              _,
+                                                                              {},
                                                                               state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                         if (errFlag) {
                             ErrorsFound = true;
@@ -6661,7 +6661,7 @@ namespace WeatherManager {
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue >= -90.0),
                                                                       "<= 70",
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue <= 70.0),
-                                                                      _,
+                                                                      {},
                                                                       state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     //        CALL ShowContinueError(state, TRIM(state.dataIPShortCut->cCurrentModuleObject)//': Occured in
@@ -6694,7 +6694,7 @@ namespace WeatherManager {
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue >= -90.0),
                                                                       "<= 70",
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue <= 70.0),
-                                                                      _,
+                                                                      {},
                                                                       state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     ErrorsFound = true;
@@ -6726,7 +6726,7 @@ namespace WeatherManager {
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue >= 0.0),
                                                                       "<= .03",
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue <= 0.03),
-                                                                      _,
+                                                                      {},
                                                                       state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     ErrorsFound = true;
@@ -6758,7 +6758,7 @@ namespace WeatherManager {
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue >= 0.0),
                                                                       "<= 130000",
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue <= 130000.0),
-                                                                      _,
+                                                                      {},
                                                                       state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     ErrorsFound = true;
@@ -6862,7 +6862,7 @@ namespace WeatherManager {
 
                         ScheduleManager::GetSingleDayScheduleValues(state,
                                                                     state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndSchPtr,
-                                                                    state.dataWeatherManager->DDHumIndModifier(_, _, EnvrnNum));
+                                                                    state.dataWeatherManager->DDHumIndModifier(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}, EnvrnNum));
 
                         int schPtr = General::FindNumberInList(state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndSchPtr,
                                                                state.dataWeatherManager->SPSiteScheduleNamePtr,
@@ -7004,7 +7004,7 @@ namespace WeatherManager {
                     } else {
                         ScheduleManager::GetSingleDayScheduleValues(state,
                                                                     state.dataWeatherManager->DesDayInput(EnvrnNum).BeamSolarSchPtr,
-                                                                    state.dataWeatherManager->DDBeamSolarValues(_, _, EnvrnNum));
+                                                                    state.dataWeatherManager->DDBeamSolarValues(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}, EnvrnNum));
                         int schPtr = General::FindNumberInList(state.dataWeatherManager->DesDayInput(EnvrnNum).BeamSolarSchPtr,
                                                                state.dataWeatherManager->SPSiteScheduleNamePtr,
                                                                state.dataWeatherManager->NumSPSiteScheduleNamePtrs);
@@ -7058,7 +7058,7 @@ namespace WeatherManager {
                     } else {
                         ScheduleManager::GetSingleDayScheduleValues(state,
                                                                     state.dataWeatherManager->DesDayInput(EnvrnNum).DiffuseSolarSchPtr,
-                                                                    state.dataWeatherManager->DDDiffuseSolarValues(_, _, EnvrnNum));
+                                                                    state.dataWeatherManager->DDDiffuseSolarValues(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}, EnvrnNum));
                         int schPtr = General::FindNumberInList(state.dataWeatherManager->DesDayInput(EnvrnNum).DiffuseSolarSchPtr,
                                                                state.dataWeatherManager->SPSiteScheduleNamePtr,
                                                                state.dataWeatherManager->NumSPSiteScheduleNamePtrs);

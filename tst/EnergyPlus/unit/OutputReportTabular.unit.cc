@@ -3479,7 +3479,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Zone",
                         "Sum",
                         "Lite1",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -3490,7 +3490,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Zone",
                         "Sum",
                         "Lite2",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -3501,7 +3501,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Zone",
                         "Sum",
                         "Lite3",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -3547,7 +3547,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Zone",
                         "Sum",
                         "Lite1",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -3558,7 +3558,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Zone",
                         "Sum",
                         "Lite2",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -3569,7 +3569,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Zone",
                         "Sum",
                         "Lite3",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -6453,7 +6453,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Zone",
                         "Sum",
                         "Lite1",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -6464,7 +6464,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Zone",
                         "Sum",
                         "Lite2",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -6475,7 +6475,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Zone",
                         "Sum",
                         "Lite3",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -7878,7 +7878,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Zone",
                         "Sum",
                         "Lite1",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -7889,7 +7889,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Zone",
                         "Sum",
                         "Lite2",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "AnotherEndUseSubCat");
@@ -7900,16 +7900,16 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Zone",
                         "Sum",
                         "Lite3",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
     SetupOutputVariable(
-        *state, "Heating Coal Energy", OutputProcessor::Unit::J, CoalHeating, "Zone", "Sum", "Lite4", _, "Coal", "Heating", "General");
+        *state, "Heating Coal Energy", OutputProcessor::Unit::J, CoalHeating, "Zone", "Sum", "Lite4", {}, "Coal", "Heating", "General");
     SetupOutputVariable(
-        *state, "Heating Gasoline Energy", OutputProcessor::Unit::J, GasolineHeating, "Zone", "Sum", "Lite5", _, "Gasoline", "Heating", "General");
+        *state, "Heating Gasoline Energy", OutputProcessor::Unit::J, GasolineHeating, "Zone", "Sum", "Lite5", {}, "Gasoline", "Heating", "General");
     SetupOutputVariable(
-        *state, "Heating Propane Energy", OutputProcessor::Unit::J, PropaneHeating, "Zone", "Sum", "Lite6", _, "Propane", "Heating", "General");
+        *state, "Heating Propane Energy", OutputProcessor::Unit::J, PropaneHeating, "Zone", "Sum", "Lite6", {}, "Propane", "Heating", "General");
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
     state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
@@ -8426,7 +8426,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
                         "Zone",
                         "Sum",
                         "Lite1",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -8437,7 +8437,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
                         "Zone",
                         "Sum",
                         "Lite2",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -9431,7 +9431,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "Zone",
                         "Sum",
                         "Lite1",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -9442,7 +9442,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "Zone",
                         "Sum",
                         "Lite2",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "AnotherEndUseSubCat");
@@ -9453,16 +9453,16 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "Zone",
                         "Sum",
                         "Lite3",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
     SetupOutputVariable(
-        *state, "Heating Coal Energy", OutputProcessor::Unit::J, CoalHeating, "Zone", "Sum", "Lite4", _, "Coal", "Heating", "General");
+        *state, "Heating Coal Energy", OutputProcessor::Unit::J, CoalHeating, "Zone", "Sum", "Lite4", {}, "Coal", "Heating", "General");
     SetupOutputVariable(
-        *state, "Heating Gasoline Energy", OutputProcessor::Unit::J, GasolineHeating, "Zone", "Sum", "Lite5", _, "Gasoline", "Heating", "General");
+        *state, "Heating Gasoline Energy", OutputProcessor::Unit::J, GasolineHeating, "Zone", "Sum", "Lite5", {}, "Gasoline", "Heating", "General");
     SetupOutputVariable(
-        *state, "Heating Propane Energy", OutputProcessor::Unit::J, PropaneHeating, "Zone", "Sum", "Lite6", _, "Propane", "Heating", "General");
+        *state, "Heating Propane Energy", OutputProcessor::Unit::J, PropaneHeating, "Zone", "Sum", "Lite6", {}, "Propane", "Heating", "General");
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
     state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;

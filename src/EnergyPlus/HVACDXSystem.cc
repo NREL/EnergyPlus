@@ -226,7 +226,7 @@ namespace HVACDXSystem {
                                          state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                          state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).FanOpMode,
                                          HXUnitOn,
-                                         _,
+                                         {},
                                          state.dataHVACDXSys->EconomizerFlag);
 
             } else if (SELECT_CASE_var == CoilDX_CoolingTwoSpeed) { // Coil:Cooling:DX:TwoSpeed
@@ -1418,7 +1418,7 @@ namespace HVACDXSystem {
                                                  state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                                  FanOpMode,
                                                  HXUnitOn,
-                                                 _,
+                                                 {},
                                                  state.dataHVACDXSys->EconomizerFlag);
                         NoOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) -
                                                                    PsyHFnTdbW(Node(InletNode).Temp, Node(OutletNode).HumRat));
@@ -1434,7 +1434,7 @@ namespace HVACDXSystem {
                                                  state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                                  FanOpMode,
                                                  HXUnitOn,
-                                                 _,
+                                                 {},
                                                  state.dataHVACDXSys->EconomizerFlag);
                         FullOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) -
                                                                      PsyHFnTdbW(Node(InletNode).Temp, Node(OutletNode).HumRat));
@@ -1491,7 +1491,7 @@ namespace HVACDXSystem {
                                                                  state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                                                  FanOpMode,
                                                                  HXUnitOn,
-                                                                 _,
+                                                                 {},
                                                                  state.dataHVACDXSys->EconomizerFlag);
                                         TempOutletTempDXCoil =
                                             state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
@@ -1511,7 +1511,7 @@ namespace HVACDXSystem {
                                                                  state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                                                  FanOpMode,
                                                                  HXUnitOn,
-                                                                 _,
+                                                                 {},
                                                                  state.dataHVACDXSys->EconomizerFlag);
                                         TempOutletTempDXCoil =
                                             state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
@@ -1627,7 +1627,7 @@ namespace HVACDXSystem {
                                                      state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                                      FanOpMode,
                                                      HXUnitOn,
-                                                     _,
+                                                     {},
                                                      state.dataHVACDXSys->EconomizerFlag);
 
                             OutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
@@ -1765,7 +1765,7 @@ namespace HVACDXSystem {
                                                                  state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                                                  FanOpMode,
                                                                  HXUnitOn,
-                                                                 _,
+                                                                 {},
                                                                  state.dataHVACDXSys->EconomizerFlag);
                                         OutletHumRatDXCoil =
                                             state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
@@ -1785,7 +1785,7 @@ namespace HVACDXSystem {
                                                                  state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                                                  FanOpMode,
                                                                  HXUnitOn,
-                                                                 _,
+                                                                 {},
                                                                  state.dataHVACDXSys->EconomizerFlag);
                                         OutletHumRatDXCoil =
                                             state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
@@ -3460,7 +3460,7 @@ namespace HVACDXSystem {
         HXUnitOn = (Par(4) == 1.0);
         FanOpMode = int(Par(5));
         CalcHXAssistedCoolingCoil(
-            state, CoilIndex, FirstHVACIteration, On, PartLoadRatio, HXUnitOn, FanOpMode, _, state.dataHVACDXSys->EconomizerFlag);
+            state, CoilIndex, FirstHVACIteration, On, PartLoadRatio, HXUnitOn, FanOpMode, {}, state.dataHVACDXSys->EconomizerFlag);
         OutletAirHumRat = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(CoilIndex);
         Residuum = Par(2) - OutletAirHumRat;
         return Residuum;

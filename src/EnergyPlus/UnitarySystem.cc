@@ -615,11 +615,11 @@ namespace UnitarySystems {
                                                         this->m_HRBranchNum,
                                                         this->m_HRCompNum,
                                                         state.dataUnitarySystems->initUnitarySystemsErrFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
+                                                        {},
+                                                        {},
+                                                        {},
+                                                        {},
+                                                        {});
                 if (state.dataUnitarySystems->initUnitarySystemsErrFlag) {
                     ShowFatalError(state, "InitUnitarySystems: Program terminated for previous conditions.");
                 }
@@ -666,11 +666,11 @@ namespace UnitarySystems {
                                                         this->CoolCoilBranchNum,
                                                         this->CoolCoilCompNum,
                                                         state.dataUnitarySystems->initUnitarySystemsErrFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
+                                                        {},
+                                                        {},
+                                                        {},
+                                                        {},
+                                                        {});
                 if (state.dataUnitarySystems->initUnitarySystemsErrFlag) {
                     ShowFatalError(state, "InitUnitarySystem: Program terminated for previous conditions.");
                 }
@@ -717,11 +717,11 @@ namespace UnitarySystems {
                                                         this->HeatCoilBranchNum,
                                                         this->HeatCoilCompNum,
                                                         state.dataUnitarySystems->initUnitarySystemsErrFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
+                                                        {},
+                                                        {},
+                                                        {},
+                                                        {},
+                                                        {});
                 if (state.dataUnitarySystems->initUnitarySystemsErrFlag) {
                     ShowFatalError(state, "InitUnitarySystem: Program terminated for previous conditions.");
                 }
@@ -776,11 +776,11 @@ namespace UnitarySystems {
                                                         this->m_SuppCoilBranchNum,
                                                         this->m_SuppCoilCompNum,
                                                         state.dataUnitarySystems->initUnitarySystemsErrFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
+                                                        {},
+                                                        {},
+                                                        {},
+                                                        {},
+                                                        {});
                 WaterCoils::SetCoilDesFlow(state,
                                            DataHVACGlobals::cAllCoilTypes(this->m_SuppHeatCoilType_Num),
                                            this->m_SuppHeatCoilName,
@@ -821,11 +821,11 @@ namespace UnitarySystems {
                                                         this->m_SuppCoilBranchNum,
                                                         this->m_SuppCoilCompNum,
                                                         state.dataUnitarySystems->initUnitarySystemsErrFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
+                                                        {},
+                                                        {},
+                                                        {},
+                                                        {},
+                                                        {});
                 if (state.dataUnitarySystems->initUnitarySystemsErrFlag) {
                     ShowFatalError(state, "InitUnitarySystems: Program terminated for previous conditions.");
                 }
@@ -3604,7 +3604,7 @@ namespace UnitarySystems {
                 }
 
                 DXCoils::SetDXCoolingCoilData(
-                    state, this->m_HeatingCoilIndex, errorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, loc_m_HeatingSizingRatio);
+                    state, this->m_HeatingCoilIndex, errorsFound, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, loc_m_HeatingSizingRatio);
             }
 
         } else if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
@@ -4257,33 +4257,33 @@ namespace UnitarySystems {
                     if (this->m_FanExists) {
                         errFlag = false;
                         DXCoils::SetDXCoolingCoilData(
-                            state, this->m_CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, loc_m_FanName);
+                            state, this->m_CoolingCoilIndex, errFlag, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, loc_m_FanName);
                         DXCoils::SetDXCoolingCoilData(
-                            state, this->m_CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, this->m_FanIndex);
+                            state, this->m_CoolingCoilIndex, errFlag, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, this->m_FanIndex);
                         DXCoils::SetDXCoolingCoilData(state,
                                                       this->m_CoolingCoilIndex,
                                                       errFlag,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
+                                                      {},
                                                       this->m_FanType_Num);
                         if (errFlag) {
                             ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
@@ -5198,12 +5198,12 @@ namespace UnitarySystems {
             this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) {
             this->m_WaterCyclingMode = DataHVACGlobals::WaterCycling;
             WaterToAirHeatPumpSimple::SetSimpleWSHPData(
-                state, this->m_CoolingCoilIndex, errorsFound, this->m_WaterCyclingMode, _, this->m_HeatingCoilIndex);
+                state, this->m_CoolingCoilIndex, errorsFound, this->m_WaterCyclingMode, {}, this->m_HeatingCoilIndex);
         }
 
         if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit &&
             this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
-            VariableSpeedCoils::SetVarSpeedCoilData(state, this->m_CoolingCoilIndex, errorsFound, _, this->m_HeatingCoilIndex);
+            VariableSpeedCoils::SetVarSpeedCoilData(state, this->m_CoolingCoilIndex, errorsFound, {}, this->m_HeatingCoilIndex);
         }
 
         // Add cooling coil to component sets array
@@ -6702,11 +6702,11 @@ namespace UnitarySystems {
         }
 
         if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-            VariableSpeedCoils::SetVarSpeedCoilData(state, this->m_CoolingCoilIndex, errorsFound, _, _, this->m_DesignSpecMSHPIndex);
+            VariableSpeedCoils::SetVarSpeedCoilData(state, this->m_CoolingCoilIndex, errorsFound, {}, {}, this->m_DesignSpecMSHPIndex);
         }
 
         if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
-            VariableSpeedCoils::SetVarSpeedCoilData(state, this->m_HeatingCoilIndex, errorsFound, _, _, this->m_DesignSpecMSHPIndex);
+            VariableSpeedCoils::SetVarSpeedCoilData(state, this->m_HeatingCoilIndex, errorsFound, {}, {}, this->m_DesignSpecMSHPIndex);
         }
 
         // set global logicals that denote coil type
@@ -7123,10 +7123,10 @@ namespace UnitarySystems {
                                             "System",
                                             "Sum",
                                             state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                            _,
+                                            {},
                                             "Electricity",
                                             "Cooling",
-                                            _,
+                                            {},
                                             "System");
                     }
                     if (state.dataUnitarySystems->unitarySys[sysNum].m_HeatCoilExists ||
@@ -7138,10 +7138,10 @@ namespace UnitarySystems {
                                             "System",
                                             "Sum",
                                             state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                            _,
+                                            {},
                                             "Electricity",
                                             "Heating",
-                                            _,
+                                            {},
                                             "System");
                     }
 
@@ -7458,11 +7458,11 @@ namespace UnitarySystems {
 
         if ((CoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) || (CoilType_Num == DataHVACGlobals::Coil_HeatingElectric)) {
             HeatingCoils::SimulateHeatingCoilComponents(
-                state, CompName, FirstHVACIteration, _, this->m_SuppHeatCoilIndex, _, _, this->m_FanOpMode, this->m_SuppHeatPartLoadFrac);
+                state, CompName, FirstHVACIteration, {}, this->m_SuppHeatCoilIndex, {}, {}, this->m_FanOpMode, this->m_SuppHeatPartLoadFrac);
 
         } else if (CoilType_Num == DataHVACGlobals::Coil_HeatingDesuperheater) {
             HeatingCoils::SimulateHeatingCoilComponents(
-                state, CompName, FirstHVACIteration, _, this->m_SuppHeatCoilIndex, _, _, this->m_FanOpMode, this->m_SuppHeatPartLoadFrac);
+                state, CompName, FirstHVACIteration, {}, this->m_SuppHeatCoilIndex, {}, {}, this->m_FanOpMode, this->m_SuppHeatPartLoadFrac);
 
         } else if (CoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
             WaterCoils::SimulateWaterCoilComponents(
@@ -7474,7 +7474,7 @@ namespace UnitarySystems {
                                                     FirstHVACIteration,
                                                     this->m_SuppHeatCoilIndex,
                                                     this->m_DesignSuppHeatingCapacity * this->m_SuppHeatPartLoadFrac,
-                                                    _,
+                                                    {},
                                                     this->m_FanOpMode,
                                                     this->m_SuppHeatPartLoadFrac);
         }
@@ -7697,7 +7697,7 @@ namespace UnitarySystems {
 
         if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _, _, _);
+                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, {}, {}, {}, {});
             } else {
                 Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
@@ -7790,7 +7790,7 @@ namespace UnitarySystems {
 
         if (this->m_FanExists && this->m_FanPlace == FanPlace::DrawThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _, _, _);
+                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, {}, {}, {}, {});
             } else {
                 Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
@@ -10639,15 +10639,15 @@ namespace UnitarySystems {
         if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
-                                                                       _,
-                                                                       _,
-                                                                       _,
-                                                                       _,
+                                                                       {},
+                                                                       {},
+                                                                       {},
+                                                                       {},
                                                                        state.dataUnitarySystems->m_massFlow1,
                                                                        state.dataUnitarySystems->m_runTimeFraction1,
                                                                        state.dataUnitarySystems->m_massFlow2,
                                                                        state.dataUnitarySystems->m_runTimeFraction2,
-                                                                       _);
+                                                                       {});
             } else {
                 Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
@@ -10677,15 +10677,15 @@ namespace UnitarySystems {
             if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru && state.dataHVACGlobal->OnOffFanPartLoadFraction < 1.0) {
                 if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
-                                                                           _,
-                                                                           _,
-                                                                           _,
-                                                                           _,
+                                                                           {},
+                                                                           {},
+                                                                           {},
+                                                                           {},
                                                                            state.dataUnitarySystems->m_massFlow1,
                                                                            state.dataUnitarySystems->m_runTimeFraction1,
                                                                            state.dataUnitarySystems->m_massFlow2,
                                                                            state.dataUnitarySystems->m_runTimeFraction2,
-                                                                           _);
+                                                                           {});
                 } else {
                     Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 }
@@ -10729,15 +10729,15 @@ namespace UnitarySystems {
             if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru && state.dataHVACGlobal->OnOffFanPartLoadFraction < 1.0) {
                 if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
-                                                                           _,
-                                                                           _,
-                                                                           _,
-                                                                           _,
+                                                                           {},
+                                                                           {},
+                                                                           {},
+                                                                           {},
                                                                            state.dataUnitarySystems->m_massFlow1,
                                                                            state.dataUnitarySystems->m_runTimeFraction1,
                                                                            state.dataUnitarySystems->m_massFlow2,
                                                                            state.dataUnitarySystems->m_runTimeFraction2,
-                                                                           _);
+                                                                           {});
                 } else {
                     Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 }
@@ -10763,15 +10763,15 @@ namespace UnitarySystems {
         if (this->m_FanExists && this->m_FanPlace == FanPlace::DrawThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
-                                                                       _,
-                                                                       _,
-                                                                       _,
-                                                                       _,
+                                                                       {},
+                                                                       {},
+                                                                       {},
+                                                                       {},
                                                                        state.dataUnitarySystems->m_massFlow1,
                                                                        state.dataUnitarySystems->m_runTimeFraction1,
                                                                        state.dataUnitarySystems->m_massFlow2,
                                                                        state.dataUnitarySystems->m_runTimeFraction2,
-                                                                       _);
+                                                                       {});
             } else {
                 Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
@@ -11229,10 +11229,10 @@ namespace UnitarySystems {
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric)) {
                 HeatCoilLoad = PartLoadRatio * m_DesignHeatingCapacity;
                 HeatingCoils::SimulateHeatingCoilComponents(
-                    state, CompName, FirstHVACIteration, HeatCoilLoad, this->m_HeatingCoilIndex, _, false, this->m_FanOpMode, PartLoadRatio);
+                    state, CompName, FirstHVACIteration, HeatCoilLoad, this->m_HeatingCoilIndex, {}, false, this->m_FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingDesuperheater) {
                 HeatingCoils::SimulateHeatingCoilComponents(
-                    state, CompName, FirstHVACIteration, HeatCoilLoad, this->m_HeatingCoilIndex, _, false, this->m_FanOpMode, PartLoadRatio);
+                    state, CompName, FirstHVACIteration, HeatCoilLoad, this->m_HeatingCoilIndex, {}, false, this->m_FanOpMode, PartLoadRatio);
 
             } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
 
@@ -11258,10 +11258,10 @@ namespace UnitarySystems {
                 HeatingCoils::SimulateHeatingCoilComponents(state,
                                                             CompName,
                                                             FirstHVACIteration,
-                                                            _,
+                                                            {},
                                                             0,
-                                                            _,
-                                                            _,
+                                                            {},
+                                                            {},
                                                             this->m_FanOpMode,
                                                             PartLoadRatio,
                                                             this->m_HeatingSpeedNum,
@@ -11286,7 +11286,7 @@ namespace UnitarySystems {
                                                         FirstHVACIteration,
                                                         this->m_HeatingCoilIndex,
                                                         this->m_DesignHeatingCapacity * PartLoadRatio,
-                                                        _,
+                                                        {},
                                                         this->m_FanOpMode,
                                                         PartLoadRatio);
 
@@ -11423,14 +11423,14 @@ namespace UnitarySystems {
                     auto const SELECT_CASE_var1(this->m_ControlType);
                     if (SELECT_CASE_var1 == ControlType::Setpoint) {
                         HeatingCoils::SimulateHeatingCoilComponents(
-                            state, CompName, FirstHVACIteration, _, this->m_SuppHeatCoilIndex, _, true, this->m_FanOpMode, PartLoadRatio);
+                            state, CompName, FirstHVACIteration, {}, this->m_SuppHeatCoilIndex, {}, true, this->m_FanOpMode, PartLoadRatio);
                     } else {
                         HeatingCoils::SimulateHeatingCoilComponents(state,
                                                                     CompName,
                                                                     FirstHVACIteration,
                                                                     SuppHeatCoilLoad,
                                                                     this->m_SuppHeatCoilIndex,
-                                                                    _,
+                                                                    {},
                                                                     true,
                                                                     this->m_FanOpMode,
                                                                     PartLoadRatio);
@@ -11438,7 +11438,7 @@ namespace UnitarySystems {
                 }
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingDesuperheater) {
                 HeatingCoils::SimulateHeatingCoilComponents(
-                    state, CompName, FirstHVACIteration, SuppHeatCoilLoad, this->m_SuppHeatCoilIndex, _, true, this->m_FanOpMode, PartLoadRatio);
+                    state, CompName, FirstHVACIteration, SuppHeatCoilLoad, this->m_SuppHeatCoilIndex, {}, true, this->m_FanOpMode, PartLoadRatio);
 
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
                 // if (present(SuppCoilLoad)) {
@@ -11477,7 +11477,7 @@ namespace UnitarySystems {
                            this->m_MaxSuppCoilFluidFlow * PartLoadRatio);
                 state.dataLoopNodes->Node(this->m_SuppCoilFluidInletNode).MassFlowRate = mdot;
                 SteamCoils::SimulateSteamCoilComponents(
-                    state, CompName, FirstHVACIteration, this->m_SuppHeatCoilIndex, SuppHeatCoilLoad, _, this->m_FanOpMode, PartLoadRatio);
+                    state, CompName, FirstHVACIteration, this->m_SuppHeatCoilIndex, SuppHeatCoilLoad, {}, this->m_FanOpMode, PartLoadRatio);
 
             } else {
             }
@@ -11642,7 +11642,7 @@ namespace UnitarySystems {
                                                                         this->m_CoolingCoilIndex,
                                                                         FanOpMode,
                                                                         HXUnitOn,
-                                                                        _,
+                                                                        {},
                                                                         state.dataUnitarySystems->economizerFlag);
                     if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) this->m_CompPartLoadRatio = PartLoadFrac;
                 } else if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
@@ -11710,7 +11710,7 @@ namespace UnitarySystems {
                            (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed)) { // COIL:COOLING:WATER
 
                     WaterCoils::SimulateWaterCoilComponents(
-                        state, CompName, FirstHVACIteration, this->m_CoolingCoilIndex, _, this->m_FanOpMode, PartLoadFrac);
+                        state, CompName, FirstHVACIteration, this->m_CoolingCoilIndex, {}, this->m_FanOpMode, PartLoadFrac);
 
                 } else if (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) {
 
@@ -11800,7 +11800,7 @@ namespace UnitarySystems {
                                                                             this->m_CoolingCoilIndex,
                                                                             FanOpMode,
                                                                             HXUnitOn,
-                                                                            _,
+                                                                            {},
                                                                             state.dataUnitarySystems->economizerFlag);
 
                         if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) this->m_CompPartLoadRatio = PartLoadFrac;
@@ -11921,7 +11921,7 @@ namespace UnitarySystems {
                                                              this->CoolCoilCompNum);
 
                         WaterCoils::SimulateWaterCoilComponents(
-                            state, CompName, FirstHVACIteration, this->m_CoolingCoilIndex, _, this->m_FanOpMode, PartLoadFrac);
+                            state, CompName, FirstHVACIteration, this->m_CoolingCoilIndex, {}, this->m_FanOpMode, PartLoadFrac);
 
                     } else if (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) {
 
@@ -12054,7 +12054,7 @@ namespace UnitarySystems {
                                                                                         this->m_CoolingCoilIndex,
                                                                                         FanOpMode,
                                                                                         HXUnitOn,
-                                                                                        _,
+                                                                                        {},
                                                                                         state.dataUnitarySystems->economizerFlag);
                                     TempOutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
                                 }
@@ -12072,7 +12072,7 @@ namespace UnitarySystems {
                                                                                         this->m_CoolingCoilIndex,
                                                                                         FanOpMode,
                                                                                         HXUnitOn,
-                                                                                        _,
+                                                                                        {},
                                                                                         state.dataUnitarySystems->economizerFlag);
                                     TempOutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
                                 }
@@ -12330,7 +12330,7 @@ namespace UnitarySystems {
                                                                             this->m_CoolingCoilIndex,
                                                                             FanOpMode,
                                                                             HXUnitOn,
-                                                                            _,
+                                                                            {},
                                                                             state.dataUnitarySystems->economizerFlag);
 
                         OutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
@@ -12549,7 +12549,7 @@ namespace UnitarySystems {
                                                                                             this->m_CoolingCoilIndex,
                                                                                             FanOpMode,
                                                                                             HXUnitOn,
-                                                                                            _,
+                                                                                            {},
                                                                                             state.dataUnitarySystems->economizerFlag);
                                         OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(this->m_CoolingCoilIndex);
                                     }
@@ -12568,7 +12568,7 @@ namespace UnitarySystems {
                                                                                             this->m_CoolingCoilIndex,
                                                                                             FanOpMode,
                                                                                             HXUnitOn,
-                                                                                            _,
+                                                                                            {},
                                                                                             state.dataUnitarySystems->economizerFlag);
                                         OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(this->m_CoolingCoilIndex);
                                     }
@@ -13191,12 +13191,12 @@ namespace UnitarySystems {
                                (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric) ||
                                (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingDesuperheater)) {
 
-                        HeatingCoils::SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, PartLoadFrac, CompIndex, _, _, FanOpMode);
+                        HeatingCoils::SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, PartLoadFrac, CompIndex, {}, {}, FanOpMode);
 
                     } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
 
                         WaterCoils::SimulateWaterCoilComponents(
-                            state, CompName, FirstHVACIteration, this->m_HeatingCoilIndex, _, this->m_FanOpMode, PartLoadFrac);
+                            state, CompName, FirstHVACIteration, this->m_HeatingCoilIndex, {}, this->m_FanOpMode, PartLoadFrac);
 
                     } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
 
@@ -13205,7 +13205,7 @@ namespace UnitarySystems {
                                                                 FirstHVACIteration,
                                                                 this->m_HeatingCoilIndex,
                                                                 1.0,
-                                                                _,
+                                                                {},
                                                                 this->m_FanOpMode,
                                                                 PartLoadFrac); // QCoilReq, simulate any load > 0 to get max capacity
 
@@ -13353,11 +13353,11 @@ namespace UnitarySystems {
                                    (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric)) {
 
                             HeatingCoils::SimulateHeatingCoilComponents(
-                                state, CompName, FirstHVACIteration, this->m_DesignHeatingCapacity, CompIndex, _, _, FanOpMode);
+                                state, CompName, FirstHVACIteration, this->m_DesignHeatingCapacity, CompIndex, {}, {}, FanOpMode);
 
                         } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingDesuperheater) {
 
-                            HeatingCoils::SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, ReqOutput, CompIndex, _, _, FanOpMode);
+                            HeatingCoils::SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, ReqOutput, CompIndex, {}, {}, FanOpMode);
 
                         } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
 
@@ -13372,7 +13372,7 @@ namespace UnitarySystems {
                                                                  this->HeatCoilCompNum);
 
                             WaterCoils::SimulateWaterCoilComponents(
-                                state, CompName, FirstHVACIteration, this->m_HeatingCoilIndex, _, this->m_FanOpMode, PartLoadFrac);
+                                state, CompName, FirstHVACIteration, this->m_HeatingCoilIndex, {}, this->m_FanOpMode, PartLoadFrac);
 
                         } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
 
@@ -13391,7 +13391,7 @@ namespace UnitarySystems {
                                                                     FirstHVACIteration,
                                                                     this->m_HeatingCoilIndex,
                                                                     1.0,
-                                                                    _,
+                                                                    {},
                                                                     this->m_FanOpMode,
                                                                     PartLoadFrac); // QCoilReq, simulate any load > 0 to get max capacity
 
@@ -13498,7 +13498,7 @@ namespace UnitarySystems {
                             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) {
 
                                 HeatingCoils::SimulateHeatingCoilComponents(
-                                    state, this->m_HeatingCoilName, FirstHVACIteration, ReqOutput, CompIndex, _, true, FanOpMode, PartLoadFrac);
+                                    state, this->m_HeatingCoilName, FirstHVACIteration, ReqOutput, CompIndex, {}, true, FanOpMode, PartLoadFrac);
                                 PartLoadFrac = ReqOutput / FullOutput;
                                 HeatCoilLoad = ReqOutput;
 
@@ -13786,7 +13786,7 @@ namespace UnitarySystems {
                     } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
 
                         WaterCoils::SimulateWaterCoilComponents(
-                            state, CompName, FirstHVACIteration, this->m_SuppHeatCoilIndex, _, this->m_FanOpMode, PartLoadFrac);
+                            state, CompName, FirstHVACIteration, this->m_SuppHeatCoilIndex, {}, this->m_FanOpMode, PartLoadFrac);
 
                     } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
 
@@ -13795,7 +13795,7 @@ namespace UnitarySystems {
                                                                 FirstHVACIteration,
                                                                 this->m_SuppHeatCoilIndex,
                                                                 1.0,
-                                                                _,
+                                                                {},
                                                                 this->m_FanOpMode,
                                                                 PartLoadFrac); // QCoilReq, simulate any load > 0 to get max capacity
 
@@ -13845,7 +13845,7 @@ namespace UnitarySystems {
                         } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingDesuperheater) {
 
                             HeatingCoils::SimulateHeatingCoilComponents(
-                                state, CompName, FirstHVACIteration, DataLoopNode::SensedLoadFlagValue, CompIndex, _, SuppHeatingCoilFlag, FanOpMode);
+                                state, CompName, FirstHVACIteration, DataLoopNode::SensedLoadFlagValue, CompIndex, {}, SuppHeatingCoilFlag, FanOpMode);
 
                         } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
 
@@ -13860,7 +13860,7 @@ namespace UnitarySystems {
                                                                  this->m_SuppCoilCompNum);
 
                             WaterCoils::SimulateWaterCoilComponents(
-                                state, CompName, FirstHVACIteration, this->m_SuppHeatCoilIndex, _, this->m_FanOpMode, PartLoadFrac);
+                                state, CompName, FirstHVACIteration, this->m_SuppHeatCoilIndex, {}, this->m_FanOpMode, PartLoadFrac);
 
                         } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
 
@@ -13879,7 +13879,7 @@ namespace UnitarySystems {
                                                                     FirstHVACIteration,
                                                                     this->m_SuppHeatCoilIndex,
                                                                     1.0,
-                                                                    _,
+                                                                    {},
                                                                     this->m_FanOpMode,
                                                                     PartLoadFrac); // QCoilReq, simulate any load > 0 to get max capacity
 
@@ -14263,7 +14263,7 @@ namespace UnitarySystems {
                    (CoilTypeNum == DataHVACGlobals::Coil_HeatingGas_MultiStage)) {
 
             HeatingCoils::SimulateHeatingCoilComponents(
-                state, CompName, FirstHVACIteration, _, CompIndex, _, _, this->m_FanOpMode, PartLoadFrac, SpeedNum, this->m_HeatingSpeedRatio);
+                state, CompName, FirstHVACIteration, {}, CompIndex, {}, {}, this->m_FanOpMode, PartLoadFrac, SpeedNum, this->m_HeatingSpeedRatio);
         } else {
         }
     }
@@ -14293,15 +14293,15 @@ namespace UnitarySystems {
         if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
-                                                                       _,
-                                                                       _,
-                                                                       _,
-                                                                       _,
+                                                                       {},
+                                                                       {},
+                                                                       {},
+                                                                       {},
                                                                        state.dataUnitarySystems->m_massFlow1,
                                                                        state.dataUnitarySystems->m_runTimeFraction1,
                                                                        state.dataUnitarySystems->m_massFlow2,
                                                                        state.dataUnitarySystems->m_runTimeFraction2,
-                                                                       _);
+                                                                       {});
             } else {
                 Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
@@ -14345,15 +14345,15 @@ namespace UnitarySystems {
         if (this->m_FanExists && this->m_FanPlace == FanPlace::DrawThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
-                                                                       _,
-                                                                       _,
-                                                                       _,
-                                                                       _,
+                                                                       {},
+                                                                       {},
+                                                                       {},
+                                                                       {},
                                                                        state.dataUnitarySystems->m_massFlow1,
                                                                        state.dataUnitarySystems->m_runTimeFraction1,
                                                                        state.dataUnitarySystems->m_massFlow2,
                                                                        state.dataUnitarySystems->m_runTimeFraction2,
-                                                                       _);
+                                                                       {});
             } else {
                 Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
@@ -15233,7 +15233,7 @@ namespace UnitarySystems {
                                                              PartLoadRatio,
                                                              HXUnitOn,
                                                              FanOpMode,
-                                                             _,
+                                                             {},
                                                              state.dataUnitarySystems->economizerFlag);
         Real64 OutletAirHumRat = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(CoilIndex);
         Residuum = Par[2] - OutletAirHumRat;
@@ -16036,7 +16036,7 @@ namespace UnitarySystems {
             min(state.dataLoopNodes->Node(thisSys.CoolCoilFluidOutletNodeNum).MassFlowRateMaxAvail, thisSys.MaxCoolCoilFluidFlow * PartLoadRatio);
         state.dataLoopNodes->Node(thisSys.CoolCoilFluidInletNode).MassFlowRate = mdot;
         WaterCoils::SimulateWaterCoilComponents(
-            state, thisSys.m_CoolingCoilName, FirstHVACIteration, thisSys.m_CoolingCoilIndex, _, _, PartLoadRatio);
+            state, thisSys.m_CoolingCoilName, FirstHVACIteration, thisSys.m_CoolingCoilIndex, {}, {}, PartLoadRatio);
 
         Real64 OutletAirHumRat = state.dataLoopNodes->Node(thisSys.CoolCoilOutletNodeNum).HumRat;
         Residuum = Par[3] - OutletAirHumRat;
@@ -16079,7 +16079,7 @@ namespace UnitarySystems {
             min(state.dataLoopNodes->Node(thisSys.CoolCoilFluidOutletNodeNum).MassFlowRateMaxAvail, thisSys.MaxCoolCoilFluidFlow * PartLoadRatio);
         state.dataLoopNodes->Node(thisSys.CoolCoilFluidInletNode).MassFlowRate = mdot;
         WaterCoils::SimulateWaterCoilComponents(
-            state, thisSys.m_CoolingCoilName, FirstHVACIteration, thisSys.m_CoolingCoilIndex, _, _, PartLoadRatio);
+            state, thisSys.m_CoolingCoilName, FirstHVACIteration, thisSys.m_CoolingCoilIndex, {}, {}, PartLoadRatio);
 
         OutletAirTemp = state.dataLoopNodes->Node(thisSys.CoolCoilOutletNodeNum).Temp;
         Residuum = Par[3] - OutletAirTemp;
@@ -16124,11 +16124,11 @@ namespace UnitarySystems {
         // heating coils using set point control pass DataLoopNode::SensedLoadFlagValue as QCoilReq to indicate temperature control
         if (!SuppHeatingCoilFlag) {
             HeatingCoils::SimulateHeatingCoilComponents(
-                state, thisSys.m_HeatingCoilName, FirstHVACIteration, HeatingLoad, thisSys.m_HeatingCoilIndex, _, _, FanOpMode, PartLoadFrac);
+                state, thisSys.m_HeatingCoilName, FirstHVACIteration, HeatingLoad, thisSys.m_HeatingCoilIndex, {}, {}, FanOpMode, PartLoadFrac);
             OutletAirTemp = state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp;
         } else {
             HeatingCoils::SimulateHeatingCoilComponents(
-                state, thisSys.m_SuppHeatCoilName, FirstHVACIteration, HeatingLoad, thisSys.m_SuppHeatCoilIndex, _, true, FanOpMode, PartLoadFrac);
+                state, thisSys.m_SuppHeatCoilName, FirstHVACIteration, HeatingLoad, thisSys.m_SuppHeatCoilIndex, {}, true, FanOpMode, PartLoadFrac);
             OutletAirTemp = state.dataLoopNodes->Node(thisSys.m_SuppCoilAirOutletNode).Temp;
         }
         Residuum = Par[3] - OutletAirTemp;
@@ -16175,13 +16175,13 @@ namespace UnitarySystems {
                 min(state.dataLoopNodes->Node(thisSys.HeatCoilFluidOutletNodeNum).MassFlowRateMaxAvail, thisSys.MaxHeatCoilFluidFlow * PartLoadFrac);
             state.dataLoopNodes->Node(thisSys.HeatCoilFluidInletNode).MassFlowRate = mdot;
             SteamCoils::SimulateSteamCoilComponents(
-                state, thisSys.m_HeatingCoilName, FirstHVACIteration, thisSys.m_HeatingCoilIndex, 1.0, _, thisSys.m_FanOpMode, PartLoadFrac);
+                state, thisSys.m_HeatingCoilName, FirstHVACIteration, thisSys.m_HeatingCoilIndex, 1.0, {}, thisSys.m_FanOpMode, PartLoadFrac);
         } else {
             mdot = min(state.dataLoopNodes->Node(thisSys.m_SuppCoilFluidOutletNodeNum).MassFlowRateMaxAvail,
                        thisSys.m_MaxSuppCoilFluidFlow * PartLoadFrac);
             state.dataLoopNodes->Node(thisSys.m_SuppCoilFluidInletNode).MassFlowRate = mdot;
             SteamCoils::SimulateSteamCoilComponents(
-                state, thisSys.m_SuppHeatCoilName, FirstHVACIteration, thisSys.m_SuppHeatCoilIndex, 1.0, _, thisSys.m_FanOpMode, PartLoadFrac);
+                state, thisSys.m_SuppHeatCoilName, FirstHVACIteration, thisSys.m_SuppHeatCoilIndex, 1.0, {}, thisSys.m_FanOpMode, PartLoadFrac);
         }
         OutletAirTemp = state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp; // RR this should be supp coil
         Residuum = Par[3] - OutletAirTemp;

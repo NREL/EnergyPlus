@@ -596,7 +596,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(4));
 
         if (!NodeListError) {
@@ -700,7 +700,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(5));
 
         if (!NodeListError) {
@@ -824,7 +824,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(3));
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -933,7 +933,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(6)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -1053,7 +1053,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(6)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -1172,7 +1172,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(6)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -1253,7 +1253,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(4)); // nodes whose min humidity ratio will be set
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -1283,7 +1283,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::Sensor,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(3)); // nodes of zones whose humidity is being controlled
         if (ErrInList) {
             //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
@@ -1363,7 +1363,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(2)); // nodes whose max humidity ratio will be set
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -1393,7 +1393,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::Sensor,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(3)); // nodes of zones whose humidity is being controlled
         if (ErrInList) {
             //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
@@ -1509,7 +1509,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(6)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -1715,7 +1715,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(7)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -1837,7 +1837,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(5)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -1943,7 +1943,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(5)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -2061,7 +2061,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(5)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -2224,7 +2224,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(3)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -2316,7 +2316,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(3)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -2409,7 +2409,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(3)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -2502,7 +2502,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(3)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -2595,7 +2595,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(3)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -2685,7 +2685,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(3)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -2799,7 +2799,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(4)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -2925,7 +2925,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(5)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -3092,7 +3092,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(4)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -3215,7 +3215,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(7));
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -3304,7 +3304,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(3));
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -3416,7 +3416,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(3)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
@@ -3527,7 +3527,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     DataLoopNode::NodeConnectionType::SetPoint,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFieldNames(3)); // setpoint nodes
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;

@@ -137,10 +137,10 @@ public:
                        Array1D<Real64> &Numbers,
                        int &NumNumbers,
                        int &Status,
-                       Optional<Array1D_bool> NumBlank = _,
-                       Optional<Array1D_bool> AlphaBlank = _,
-                       Optional<Array1D_string> AlphaFieldNames = _,
-                       Optional<Array1D_string> NumericFieldNames = _);
+                       Optional<Array1D_bool> NumBlank = {},
+                       Optional<Array1D_bool> AlphaBlank = {},
+                       Optional<Array1D_string> AlphaFieldNames = {},
+                       Optional<Array1D_string> NumericFieldNames = {})  ;
 
     int getIDFObjNum(EnergyPlusData &state, std::string const &Object, int const Number);
 
@@ -162,12 +162,12 @@ public:
                     std::string const &WhatFieldString,          // Descriptive field for string
                     std::string const &WhatObjectString,         // Descriptive field for object, Zone Name, etc.
                     std::string const &ErrorLevel,               // 'Warning','Severe','Fatal')
-                    Optional_string_const LowerBoundString = _,  // String for error message, if applicable
-                    Optional_bool_const LowerBoundCondition = _, // Condition for error condition, if applicable
-                    Optional_string_const UpperBoundString = _,  // String for error message, if applicable
-                    Optional_bool_const UpperBoundCondition = _, // Condition for error condition, if applicable
-                    Optional_string_const ValueString = _,       // Value with digits if to be displayed with error
-                    Optional_string_const WhatObjectName = _     // ObjectName -- used for error messages
+                    Optional_string_const LowerBoundString = {},  // String for error message, if applicable
+                    Optional_bool_const LowerBoundCondition = {}, // Condition for error condition, if applicable
+                    Optional_string_const UpperBoundString = {},  // String for error message, if applicable
+                    Optional_bool_const UpperBoundCondition = {}, // Condition for error condition, if applicable
+                    Optional_string_const ValueString = {},       // Value with digits if to be displayed with error
+                    Optional_string_const WhatObjectName = {}      // ObjectName -- used for error messages
     );
 
     void getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumeric);
@@ -259,10 +259,10 @@ private:
                             int &NumAlphas,
                             Array1D<Real64> &Numbers,
                             int &NumNumbers,
-                            Optional<Array1D_bool> NumBlank = _,
-                            Optional<Array1D_bool> AlphaBlank = _,
-                            Optional<Array1D_string> AlphaFieldNames = _,
-                            Optional<Array1D_string> NumericFieldNames = _);
+                            Optional<Array1D_bool> NumBlank = {},
+                            Optional<Array1D_bool> AlphaBlank = {},
+                            Optional<Array1D_string> AlphaFieldNames = {},
+                            Optional<Array1D_string> NumericFieldNames = {})  ;
 
     void addVariablesForMonthlyReport(EnergyPlusData &state, std::string const &reportName);
 

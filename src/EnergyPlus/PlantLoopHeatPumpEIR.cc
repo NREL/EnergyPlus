@@ -369,10 +369,10 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
                             "System",
                             "Sum",
                             this->name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
-                            _,
-                            _,
+                            {},
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Heat Pump Source Side Heat Transfer Rate",
@@ -400,7 +400,7 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
                                 "System",
                                 "Sum",
                                 this->name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Cooling",
                                 "Heat Pump",
@@ -413,7 +413,7 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
                                 "System",
                                 "Sum",
                                 this->name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
                                 "Heat Pump",
@@ -439,11 +439,11 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
                                                 this->loadSideLocation.branchNum,
                                                 this->loadSideLocation.compNum,
                                                 thisErrFlag,
-                                                _,
-                                                _,
-                                                _,
+                                                {},
+                                                {},
+                                                {},
                                                 this->loadSideNodes.inlet,
-                                                _);
+                                                {});
 
         if (thisErrFlag) {
             ShowSevereError(state,
@@ -469,11 +469,11 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
                                                     this->sourceSideLocation.branchNum,
                                                     this->sourceSideLocation.compNum,
                                                     thisErrFlag,
-                                                    _,
-                                                    _,
-                                                    _,
+                                                    {},
+                                                    {},
+                                                    {},
                                                     this->sourceSideNodes.inlet,
-                                                    _);
+                                                    {});
 
             if (thisErrFlag) {
                 ShowSevereError(state,

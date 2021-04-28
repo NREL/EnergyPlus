@@ -585,7 +585,7 @@ namespace WindowEquivalentLayer {
                       Real64 const IDIFF,                    // incident diffuse insolation (W/m2 aperture)
                       Real64 const ILIGHTS,                  // incident diffuse insolation (W/m2 aperture)
                       Array1S<Real64> SOURCE,                // returned: layer-by-layer flux of absorbed
-                      Optional<Array1S<Real64>> SourceBD = _ // returned: layer-by-layer flux of absorbed
+                      Optional<Array1S<Real64>> SourceBD = {}  // returned: layer-by-layer flux of absorbed
     );
 
     void NETRAD(int const NL,                  // # of layers, 1=outside .. NL=inside
@@ -643,7 +643,7 @@ namespace WindowEquivalentLayer {
     bool RB_SWP(EnergyPlusData &state,
                 CFSLAYER const &L,               // RB layer
                 CFSSWP &LSWP,                    // returned: equivalent layer properties set
-                Optional<Real64 const> THETA = _ // incident angle, 0 <= theta <= PI/2
+                Optional<Real64 const> THETA = {}  // incident angle, 0 <= theta <= PI/2
     );
 
     bool IS_LWP(CFSLAYER const &L, // IS layer
@@ -653,7 +653,7 @@ namespace WindowEquivalentLayer {
     bool IS_SWP(EnergyPlusData &state,
                 CFSLAYER const &L,               // PD layer
                 CFSSWP &LSWP,                    // returned: equivalent layer properties set
-                Optional<Real64 const> THETA = _ // incident angle, 0 <= theta <= PI/2
+                Optional<Real64 const> THETA = {}  // incident angle, 0 <= theta <= PI/2
     );
 
     void Fabric_EstimateDiffuseProps(EnergyPlusData &state, CFSSWP &SWP); // fabric short wave properties
@@ -666,8 +666,8 @@ namespace WindowEquivalentLayer {
     bool PD_SWP(EnergyPlusData &state,
                 CFSLAYER const &L,                    // PD layer
                 CFSSWP &LSWP,                         // returned: equivalent layer properties set
-                Optional<Real64 const> OHM_V_RAD = _, // vertical VB profile angles, radians
-                Optional<Real64 const> OHM_H_RAD = _  // horizonatl VB profile angles, radians
+                Optional<Real64 const> OHM_V_RAD = {}, // vertical VB profile angles, radians
+                Optional<Real64 const> OHM_H_RAD = {}   // horizonatl VB profile angles, radians
     );
 
     bool VB_LWP(EnergyPlusData &state,
@@ -678,7 +678,7 @@ namespace WindowEquivalentLayer {
     bool VB_SWP(EnergyPlusData &state,
                 CFSLAYER const &L,               // VB layer
                 CFSSWP &LSWP,                    // returned: equivalent off-normal properties
-                Optional<Real64 const> OMEGA = _ // incident profile angle (radians)
+                Optional<Real64 const> OMEGA = {}  // incident profile angle (radians)
     );
 
     bool VB_ShadeControl(EnergyPlusData &state,
@@ -710,8 +710,8 @@ namespace WindowEquivalentLayer {
                   CFSGAP &G,                        // returned
                   int const GType,                  // gap type (gtyOPENin, gtyOPENout or gtySEALED)
                   Real64 &TAS,                      // gap thickness, m
-                  Optional<Real64 const> xTMan = _, // re density calc -- temp (C) and pressure (Pa)
-                  Optional<Real64 const> xPMan = _  // re density calc -- temp (C) and pressure (Pa)
+                  Optional<Real64 const> xTMan = {}, // re density calc -- temp (C) and pressure (Pa)
+                  Optional<Real64 const> xPMan = {}   // re density calc -- temp (C) and pressure (Pa)
     );
 
     void AdjustVBGap(CFSGAP &G,        // gap, returned updated
@@ -743,7 +743,7 @@ namespace WindowEquivalentLayer {
     bool FEQX(Real64 const a, // values to compare, fractional tolerance
               Real64 const b,
               Real64 const tolF,
-              Optional<Real64> tolAbs = _ // absolute tolerance
+              Optional<Real64> tolAbs = {}  // absolute tolerance
     );
 
     Real64 TRadC(Real64 const J,    // radiosity, W/m2

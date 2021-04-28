@@ -454,10 +454,10 @@ namespace WaterToAirHeatPumpSimple {
                                 "System",
                                 "Summed",
                                 state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
@@ -466,10 +466,10 @@ namespace WaterToAirHeatPumpSimple {
                                 "System",
                                 "Summed",
                                 state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Cooling Coil Sensible Cooling Energy",
@@ -492,10 +492,10 @@ namespace WaterToAirHeatPumpSimple {
                                 "System",
                                 "Summed",
                                 state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                _,
+                                {},
                                 "PLANTLOOPCOOLINGDEMAND",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
 
             // create predefined report entries
@@ -631,10 +631,10 @@ namespace WaterToAirHeatPumpSimple {
                                 "System",
                                 "Summed",
                                 state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
@@ -643,10 +643,10 @@ namespace WaterToAirHeatPumpSimple {
                                 "System",
                                 "Summed",
                                 state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Source Side Heat Transfer Energy",
@@ -655,10 +655,10 @@ namespace WaterToAirHeatPumpSimple {
                                 "System",
                                 "Summed",
                                 state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
 
             // create predefined report entries
@@ -972,11 +972,11 @@ namespace WaterToAirHeatPumpSimple {
                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).BranchNum,
                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CompNum,
                                     errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {});
             if (errFlag) {
                 ShowFatalError(state, "InitSimpleWatertoAirHP: Program terminated for previous conditions.");
             }

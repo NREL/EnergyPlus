@@ -154,20 +154,20 @@ namespace HVACFan {
             present(pressureRise2)) {
             Real64 flowRatio1 = massFlowRate1 / m_maxAirMassFlowRate;
             Real64 flowRatio2 = massFlowRate2 / m_maxAirMassFlowRate;
-            calcSimpleSystemFan(state, _, pressureRise, flowRatio1, runTimeFraction1, flowRatio2, runTimeFraction2, pressureRise2);
+            calcSimpleSystemFan(state, {}, pressureRise, flowRatio1, runTimeFraction1, flowRatio2, runTimeFraction2, pressureRise2);
         } else if (!present(pressureRise) && present(massFlowRate1) && present(runTimeFraction1) && present(massFlowRate2) &&
                    present(runTimeFraction2) && !present(pressureRise2)) {
             Real64 flowRatio1 = massFlowRate1 / m_maxAirMassFlowRate;
             Real64 flowRatio2 = massFlowRate2 / m_maxAirMassFlowRate;
-            calcSimpleSystemFan(state, flowFraction, _, flowRatio1, runTimeFraction1, flowRatio2, runTimeFraction2, _);
+            calcSimpleSystemFan(state, flowFraction, {}, flowRatio1, runTimeFraction1, flowRatio2, runTimeFraction2, {});
         } else if (present(pressureRise) && present(flowFraction)) {
-            calcSimpleSystemFan(state, flowFraction, pressureRise, _, _, _, _, _);
+            calcSimpleSystemFan(state, flowFraction, pressureRise, {}, {}, {}, {}, {});
         } else if (present(pressureRise) && !present(flowFraction)) {
-            calcSimpleSystemFan(state, _, pressureRise, _, _, _, _, _);
+            calcSimpleSystemFan(state, {}, pressureRise, {}, {}, {}, {}, {});
         } else if (!present(pressureRise) && present(flowFraction)) {
-            calcSimpleSystemFan(state, flowFraction, _, _, _, _, _, _);
+            calcSimpleSystemFan(state, flowFraction, {}, {}, {}, {}, {}, {});
         } else {
-            calcSimpleSystemFan(state, _, _, _, _, _, _, _);
+            calcSimpleSystemFan(state, {}, {}, {}, {}, {}, {}, {});
         }
 
         update(state);
@@ -616,7 +616,7 @@ namespace HVACFan {
                             "System",
                             "Sum",
                             name,
-                            _,
+                            {},
                             "Electricity",
                             "Fans",
                             m_endUseSubcategoryName,

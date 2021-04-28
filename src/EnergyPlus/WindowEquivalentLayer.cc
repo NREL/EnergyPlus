@@ -343,7 +343,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
     // Calculate layers diffuse absorptance and system diffuse transmittance
     CalcEQLWindowOpticalProperty(state, CFS(EQLNum), isDIFF, SysAbs1, 0.0, 0.0, 0.0);
     state.dataConstruction->Construct(ConstrNum).TransDiffFrontEQL = SysAbs1(1, CFS(EQLNum).NL + 1);
-    state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, _, EQLNum) = SysAbs1;
+    state.dataWindowEquivalentLayer->CFSDiffAbsTrans(ObjexxFCL::IndexSlice{}, ObjexxFCL::IndexSlice{}, EQLNum) = SysAbs1;
     state.dataConstruction->Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = SysAbs1(1, {1, CFSMAXNL});
     state.dataConstruction->Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = SysAbs1(2, {1, CFSMAXNL});
     // get construction front and back diffuse effective reflectance
@@ -8243,8 +8243,8 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
             }
             IncAng = std::acos(state.dataHeatBal->CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum));
             CalcEQLWindowOpticalProperty(state, CFS(EQLNum), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor);
-            CFSAbs(_, {1, CFSMAXNL + 1}) = Abs1(_, {1, CFSMAXNL + 1});
-            state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, {1, CFSMAXNL + 1}, EQLNum) = Abs1(_, {1, CFSMAXNL + 1});
+            CFSAbs({}, {1, CFSMAXNL + 1}) = Abs1({}, {1, CFSMAXNL + 1});
+            state.dataWindowEquivalentLayer->CFSDiffAbsTrans({}, {1, CFSMAXNL + 1}, EQLNum) = Abs1({}, {1, CFSMAXNL + 1});
             state.dataConstruction->Construct(ConstrNum).TransDiff = Abs1(1, CFS(EQLNum).NL + 1);
             state.dataConstruction->Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = Abs1(1, {1, CFSMAXNL});
             state.dataConstruction->Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = Abs1(2, {1, CFSMAXNL});
@@ -8252,7 +8252,7 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
             state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack = CFS(EQLNum).L(CFS(EQLNum).NL).SWP_EL.RHOSBDD;
             if (!CFS(EQLNum).ISControlled) state.dataWindowEquivalentLayer->EQLDiffPropFlag(EQLNum) = false;
         } else {
-            CFSAbs(_, {1, CFSMAXNL + 1}) = state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, {1, CFSMAXNL + 1}, EQLNum);
+            CFSAbs({}, {1, CFSMAXNL + 1}) = state.dataWindowEquivalentLayer->CFSDiffAbsTrans({}, {1, CFSMAXNL + 1}, EQLNum);
             state.dataConstruction->Construct(ConstrNum).TransDiff = state.dataWindowEquivalentLayer->CFSDiffAbsTrans(1, CFS(EQLNum).NL + 1, EQLNum);
             state.dataConstruction->Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = CFSAbs(1, {1, CFSMAXNL});
             state.dataConstruction->Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = CFSAbs(2, {1, CFSMAXNL});

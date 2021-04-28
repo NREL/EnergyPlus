@@ -212,11 +212,11 @@ namespace SteamBaseboardRadiator {
                                           SteamBaseboardDesignDataObject.Offset,
                                           state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ControlCompTypeNum,
                                           state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompErrIndex,
-                                          _,
-                                          _,
-                                          _,
-                                          _,
-                                          _,
+                                          {},
+                                          {},
+                                          {},
+                                          {},
+                                          {},
                                           state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
                                           state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
                                           state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum);
@@ -789,10 +789,10 @@ namespace SteamBaseboardRadiator {
                                 "System",
                                 "Sum",
                                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "BASEBOARD",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Baseboard Convective Heating Energy",
@@ -815,10 +815,10 @@ namespace SteamBaseboardRadiator {
                                 "System",
                                 "Sum",
                                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "BASEBOARD",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Baseboard Steam Rate",
@@ -950,11 +950,11 @@ namespace SteamBaseboardRadiator {
                                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
                                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
                 state.dataSteamBaseboardRadiator->SetLoopIndexFlag(BaseboardNum) = false;
                 if (errFlag) {
                     ShowFatalError(state, "InitSteamBaseboard: Program terminated for previous conditions.");

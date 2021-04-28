@@ -869,7 +869,7 @@ namespace ScheduleManager {
                 ErrorsFound = true;
             }
             ProcessIntervalFields(state,
-                                  Alphas({4, _}),
+                                  Alphas({4, {}}),
                                   Numbers,
                                   NumFields,
                                   NumNumbers,
@@ -1501,7 +1501,7 @@ namespace ScheduleManager {
                         NumFields = NumNumbers;
                         ErrorHere = false;
                         ProcessIntervalFields(state,
-                                              Alphas({UntilFld, _}),
+                                              Alphas({UntilFld, {}}),
                                               Numbers,
                                               NumFields,
                                               NumNumbers,
@@ -3467,8 +3467,9 @@ namespace ScheduleManager {
                         SetMinuteValue(Min, SHr) = true;
                     }
                     for (Hr = SHr + 1; Hr <= EHr - 1; ++Hr) { // for intermediate hours
-                        MinuteValue(_, Hr) = Numbers(Count);
-                        SetMinuteValue(_, Hr) = true;
+                        MinuteValue(ObjexxFCL::IndexSlice{}, Hr) = Numbers(Count);
+                        SetMinuteValue(
+                            ObjexxFCL::IndexSlice {}, Hr) = true;
                     }
                     for (Min = 1; Min <= EMin; ++Min) { // for ending hour
                         MinuteValue(Min, EHr) = Numbers(Count);

@@ -141,8 +141,8 @@ TEST( RandomTest, RandomSeed )
 	// Just run them
 	RANDOM_SEED();
 	RANDOM_SEED( size );
-	RANDOM_SEED( _, put );
-	RANDOM_SEED( _, _, get );
+	RANDOM_SEED( {}, put );
+	RANDOM_SEED( {}, {}, get );
 }
 
 TEST( RandomTest, Srand )

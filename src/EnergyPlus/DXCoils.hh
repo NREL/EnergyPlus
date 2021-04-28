@@ -542,11 +542,11 @@ namespace DXCoils {
                    bool const FirstHVACIteration, // True when first HVAC iteration
                    int &CompIndex,
                    int const FanOpMode,                                   // allows parent object to control fan mode
-                   Optional<Real64 const> PartLoadRatio = _,              // part load ratio (for single speed cycling unit)
-                   Optional<Real64 const> OnOffAFR = _,                   // ratio of compressor on airflow to compressor off airflow
-                   Optional<Real64 const> CoilCoolingHeatingPLRRatio = _, // used for cycling fan RH control
-                   Optional<Real64 const> MaxCap = _,                     // maximum cooling capacity of VRF terminal units
-                   Optional<Real64 const> CompCyclingRatio = _            // cycling ratio of VRF condenser connected to this TU
+                   Optional<Real64 const> PartLoadRatio = {},              // part load ratio (for single speed cycling unit)
+                   Optional<Real64 const> OnOffAFR = {},                   // ratio of compressor on airflow to compressor off airflow
+                   Optional<Real64 const> CoilCoolingHeatingPLRRatio = {}, // used for cycling fan RH control
+                   Optional<Real64 const> MaxCap = {},                     // maximum cooling capacity of VRF terminal units
+                   Optional<Real64 const> CompCyclingRatio = {}             // cycling ratio of VRF condenser connected to this TU
     );
 
     void SimDXCoilMultiSpeed(EnergyPlusData &state,
@@ -554,10 +554,10 @@ namespace DXCoils {
                              Real64 const SpeedRatio,     // = (CompressorSpeed - CompressorSpeedMin) /
                              Real64 const CycRatio,       // cycling part load ratio for variable speed
                              int &CompIndex,
-                             Optional_int_const SpeedNum = _,  // Speed number for multispeed cooling coil onlyn
-                             Optional_int_const FanOpMode = _, // Fan operation mode
-                             Optional_int_const CompOp = _,    // Compressor on/off; 1=on, 0=off
-                             Optional_int_const SingleMode = _ // Single mode operation Yes/No; 1=Yes, 0=No
+                             Optional_int_const SpeedNum = {},  // Speed number for multispeed cooling coil onlyn
+                             Optional_int_const FanOpMode = {}, // Fan operation mode
+                             Optional_int_const CompOp = {},    // Compressor on/off; 1=on, 0=off
+                             Optional_int_const SingleMode = {}  // Single mode operation Yes/No; 1=Yes, 0=No
     );
 
     void SimDXCoilMultiMode(EnergyPlusData &state,
@@ -587,9 +587,9 @@ namespace DXCoils {
                         bool const FirstHVACIteration,                // true if this is the first iteration of HVAC
                         Real64 const PartLoadRatio,                   // sensible cooling load / full load sensible cooling capacity
                         int const FanOpMode,                          // Allows parent object to control fan operation
-                        Optional_int_const PerfMode = _,              // Performance mode for MultiMode DX coil; Always 1 for other coil types
-                        Optional<Real64 const> OnOffAirFlowRatio = _, // ratio of compressor on airflow to compressor off airflow
-                        Optional<Real64 const> CoolingHeatingPLR = _  // used for cycling fan RH control
+                        Optional_int_const PerfMode = {},              // Performance mode for MultiMode DX coil; Always 1 for other coil types
+                        Optional<Real64 const> OnOffAirFlowRatio = {}, // ratio of compressor on airflow to compressor off airflow
+                        Optional<Real64 const> CoolingHeatingPLR = {}   // used for cycling fan RH control
     );
 
     void CalcVRFCoolingCoil(EnergyPlusData &state,
@@ -599,24 +599,24 @@ namespace DXCoils {
                             Real64 const PartLoadRatio,                   // sensible cooling load / full load sensible cooling capacity
                             int const FanOpMode,                          // Allows parent object to control fan operation
                             Real64 const CompCycRatio,                    // cycling ratio of VRF condenser
-                            Optional_int_const PerfMode = _,              // Performance mode for MultiMode DX coil; Always 1 for other coil types
-                            Optional<Real64 const> OnOffAirFlowRatio = _, // ratio of compressor on airflow to compressor off airflow
-                            Optional<Real64 const> MaxCoolCap = _         // maximum capacity of DX coil
+                            Optional_int_const PerfMode = {},              // Performance mode for MultiMode DX coil; Always 1 for other coil types
+                            Optional<Real64 const> OnOffAirFlowRatio = {}, // ratio of compressor on airflow to compressor off airflow
+                            Optional<Real64 const> MaxCoolCap = {}          // maximum capacity of DX coil
     );
 
     void CalcDXHeatingCoil(EnergyPlusData &state,
                            int const DXCoilNum,                          // the number of the DX heating coil to be simulated
                            Real64 const PartLoadRatio,                   // sensible cooling load / full load sensible cooling capacity
                            int const FanOpMode,                          // Allows parent object to control fan mode
-                           Optional<Real64 const> OnOffAirFlowRatio = _, // ratio of compressor on airflow to compressor off airflow
-                           Optional<Real64 const> MaxHeatCap = _         // maximum allowed heating capacity
+                           Optional<Real64 const> OnOffAirFlowRatio = {}, // ratio of compressor on airflow to compressor off airflow
+                           Optional<Real64 const> MaxHeatCap = {}          // maximum allowed heating capacity
     );
 
     void CalcMultiSpeedDXCoil(EnergyPlusData &state,
                               int const DXCoilNum,     // the number of the DX heating coil to be simulated
                               Real64 const SpeedRatio, // = (CompressorSpeed - CompressorSpeedMin) / (CompressorSpeedMax - CompressorSpeedMin)
                               Real64 const CycRatio,   // cycling part load ratio
-                              Optional_bool_const ForceOn = _);
+                              Optional_bool_const ForceOn = {})  ;
 
     void CalcBasinHeaterPowerForMultiModeDXCoil(EnergyPlusData &state,
                                                 int const DXCoilNum,  // Index of coil being simulated
@@ -658,8 +658,8 @@ namespace DXCoils {
                             Real64 const QLatActual,              // Actual latent capacity
                             Real64 const EnteringDB,              // Entering air dry-bulb temperature
                             Real64 const EnteringWB,              // Entering air wet-bulb temperature
-                            Optional_int_const Mode = _,          // Performance mode for MultiMode DX coil; Always 1 for other coil types
-                            Optional<Real64 const> HeatingRTF = _ // Used to recalculate Toff for cycling fan systems
+                            Optional_int_const Mode = {},          // Performance mode for MultiMode DX coil; Always 1 for other coil types
+                            Optional<Real64 const> HeatingRTF = {}  // Used to recalculate Toff for cycling fan systems
     );
 
     void CalcTotCapSHR(EnergyPlusData &state,
@@ -741,7 +741,7 @@ namespace DXCoils {
                        std::string const &CoilType,         // must match coil types in this module
                        std::string const &CoilName,         // must match coil names for the coil type
                        bool &ErrorsFound,                   // set to true if problem
-                       Optional_bool_const PrintWarning = _ // prints warning when true
+                       Optional_bool_const PrintWarning = {}  // prints warning when true
     );
 
     Real64 GetMinOATCompressor(EnergyPlusData &state,
@@ -805,7 +805,7 @@ namespace DXCoils {
                              std::string const &CoilType,     // must match coil types in this module
                              std::string const &CoilName,     // must match coil names for the coil type
                              bool &ErrorsFound,               // set to true if problem
-                             Optional_int_const CoilIndex = _ // Coil index number
+                             Optional_int_const CoilIndex = {}  // Coil index number
     );
 
     Real64 GetDXCoilAirFlow(EnergyPlusData &state,
@@ -822,28 +822,28 @@ namespace DXCoils {
     void SetDXCoolingCoilData(EnergyPlusData &state,
                               int const DXCoilNum,                        // Number of DX Cooling Coil
                               bool &ErrorsFound,                          // Set to true if certain errors found
-                              Optional_int HeatingCoilPLFCurvePTR = _,    // Parameter equivalent of heating coil PLR curve index
-                              Optional_int CondenserType = _,             // Parameter equivalent of condenser type parameter
-                              Optional_int CondenserInletNodeNum = _,     // Parameter equivalent of condenser inlet node number
-                              Optional<Real64> MaxOATCrankcaseHeater = _, // Parameter equivalent of condenser Max OAT for Crank Case Heater temp
-                              Optional<Real64> MinOATCooling = _, // Parameter equivalent of condenser Min OAT for compressor cooling operation
-                              Optional<Real64> MaxOATCooling = _, // Parameter equivalent of condenser Max OAT for compressor cooling operation
-                              Optional<Real64> MinOATHeating = _, // Parameter equivalent of condenser Min OAT for compressor heating operation
-                              Optional<Real64> MaxOATHeating = _, // Parameter equivalent of condenser Max OAT for compressor heating operation
-                              Optional_int HeatingPerformanceOATType = _, // Parameter equivalent to condenser entering air temp type (1-db, 2=wb)
-                              Optional_int DefrostStrategy = _,
-                              Optional_int DefrostControl = _,
-                              Optional_int DefrostEIRPtr = _,
-                              Optional<Real64> DefrostFraction = _,
-                              Optional<Real64> DefrostCapacity = _,
-                              Optional<Real64> MaxOATDefrost = _,
-                              Optional_bool CoolingCoilPresent = _,
-                              Optional_bool HeatingCoilPresent = _,
-                              Optional<Real64> HeatSizeRatio = _,
-                              Optional<Real64> TotCap = _,
-                              Optional_int SupplyFanIndex = _,
-                              Optional_string SupplyFanName = _,
-                              Optional_int SupplyFan_TypeNum = _);
+                              Optional_int HeatingCoilPLFCurvePTR = {},    // Parameter equivalent of heating coil PLR curve index
+                              Optional_int CondenserType = {},             // Parameter equivalent of condenser type parameter
+                              Optional_int CondenserInletNodeNum = {},     // Parameter equivalent of condenser inlet node number
+                              Optional<Real64> MaxOATCrankcaseHeater = {}, // Parameter equivalent of condenser Max OAT for Crank Case Heater temp
+                              Optional<Real64> MinOATCooling = {}, // Parameter equivalent of condenser Min OAT for compressor cooling operation
+                              Optional<Real64> MaxOATCooling = {}, // Parameter equivalent of condenser Max OAT for compressor cooling operation
+                              Optional<Real64> MinOATHeating = {}, // Parameter equivalent of condenser Min OAT for compressor heating operation
+                              Optional<Real64> MaxOATHeating = {}, // Parameter equivalent of condenser Max OAT for compressor heating operation
+                              Optional_int HeatingPerformanceOATType = {}, // Parameter equivalent to condenser entering air temp type (1-db, 2=wb)
+                              Optional_int DefrostStrategy = {},
+                              Optional_int DefrostControl = {},
+                              Optional_int DefrostEIRPtr = {},
+                              Optional<Real64> DefrostFraction = {},
+                              Optional<Real64> DefrostCapacity = {},
+                              Optional<Real64> MaxOATDefrost = {},
+                              Optional_bool CoolingCoilPresent = {},
+                              Optional_bool HeatingCoilPresent = {},
+                              Optional<Real64> HeatSizeRatio = {},
+                              Optional<Real64> TotCap = {},
+                              Optional_int SupplyFanIndex = {},
+                              Optional_string SupplyFanName = {},
+                              Optional_int SupplyFan_TypeNum = {})  ;
 
     void SetCoilSystemHeatingDXFlag(EnergyPlusData &state,
                                     std::string const &CoilType, // must match coil types in this module

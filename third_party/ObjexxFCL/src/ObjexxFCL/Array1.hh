@@ -242,7 +242,7 @@ protected: // Creation
 	// Value Proxy Constructor
 	Array1( T const & t, ProxySentinel const & proxy ) :
 	 Super( t, proxy ),
-	 I_( _ )
+	 I_{}
 	{}
 
 	// Copy + IndexRange Proxy Constructor

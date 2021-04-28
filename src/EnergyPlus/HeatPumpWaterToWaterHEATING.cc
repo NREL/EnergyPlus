@@ -164,11 +164,11 @@ void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
                                                 this->SourceBranchNum,
                                                 this->SourceCompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
+                                                {},
+                                                {},
+                                                {},
                                                 this->SourceSideInletNodeNum,
-                                                _);
+                                                {});
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
                                                 DataPlant::TypeOf_HPWaterPEHeating,
@@ -177,11 +177,11 @@ void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
                                                 this->LoadBranchNum,
                                                 this->LoadCompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
+                                                {},
+                                                {},
+                                                {},
                                                 this->LoadSideInletNodeNum,
-                                                _);
+                                                {});
         if (errFlag) {
             ShowFatalError(state, "InitGshp: Program terminated due to previous condition(s).");
         }
@@ -403,10 +403,10 @@ void GetGshpInput(EnergyPlusData &state)
                             "System",
                             "Sum",
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name,
-                            _,
+                            {},
                             "Electricity",
                             "Heating",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,

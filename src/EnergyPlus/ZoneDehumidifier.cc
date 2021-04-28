@@ -516,10 +516,10 @@ namespace ZoneDehumidifier {
                                 "System",
                                 "Sum",
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "COOLING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Dehumidifier Off Cycle Parasitic Electricity Rate",
@@ -572,10 +572,10 @@ namespace ZoneDehumidifier {
                                     "System",
                                     "Sum",
                                     state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name,
-                                    _,
+                                    {},
                                     "OnSiteWater",
                                     "Condensate",
-                                    _,
+                                    {},
                                     "System");
             }
         }

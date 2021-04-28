@@ -971,7 +971,7 @@ void GetFanInput(EnergyPlusData &state)
                             "System",
                             "Sum",
                             Fan(FanNum).FanName,
-                            _,
+                            {},
                             "Electricity",
                             "Fans",
                             Fan(FanNum).EndUseSubcategoryName,

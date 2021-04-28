@@ -307,7 +307,7 @@ namespace WaterUse {
                                                                          state.dataIPShortCut->rNumericArgs,
                                                                          NumNumbers,
                                                                          IOStatus,
-                                                                         _,
+                                                                         {},
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
@@ -427,7 +427,7 @@ namespace WaterUse {
                                                                          state.dataIPShortCut->rNumericArgs,
                                                                          NumNumbers,
                                                                          IOStatus,
-                                                                         _,
+                                                                         {},
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
@@ -679,7 +679,7 @@ namespace WaterUse {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "Water",
                             "WATERSYSTEMS",
                             this->EndUseSubcatName,
@@ -691,7 +691,7 @@ namespace WaterUse {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "MainsWater",
                             "WATERSYSTEMS",
                             this->EndUseSubcatName,
@@ -722,7 +722,7 @@ namespace WaterUse {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "DISTRICTHEATING",
                                 "WATERSYSTEMS",
                                 this->EndUseSubcatName,
@@ -736,7 +736,7 @@ namespace WaterUse {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "DISTRICTHEATING",
                                 "WATERSYSTEMS",
                                 this->EndUseSubcatName,
@@ -750,7 +750,7 @@ namespace WaterUse {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "WATERSYSTEMS",
                                 this->EndUseSubcatName,
@@ -928,10 +928,10 @@ namespace WaterUse {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "WATERSYSTEMS",
-                                _,
+                                {},
                                 "Plant");
         }
     }
@@ -1127,11 +1127,11 @@ namespace WaterUse {
                                                     this->PlantLoopBranchNum,
                                                     this->PlantLoopCompNum,
                                                     errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {});
             if (errFlag) {
                 ShowFatalError(state, "InitConnections: Program terminated due to previous condition(s).");
             }

@@ -328,7 +328,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->rNumericArgs,
                                                                  NumNums,
                                                                  IOStat,
-                                                                 _,
+                                                                 {},
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
@@ -549,10 +549,10 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         "System",
                         "Sum",
                         ChillerName,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "CHILLERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state, "Chiller Heater Heating Rate", OutputProcessor::Unit::W, this->HeatingLoad, "System", "Average", ChillerName);
@@ -563,10 +563,10 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         "System",
                         "Sum",
                         ChillerName,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "BOILERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(
@@ -578,10 +578,10 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         "System",
                         "Sum",
                         ChillerName,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(
@@ -600,10 +600,10 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         "System",
                         "Sum",
                         ChillerName,
-                        _,
+                        {},
                         "Electricity",
                         "Cooling",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(
@@ -615,10 +615,10 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         "System",
                         "Sum",
                         ChillerName,
-                        _,
+                        {},
                         "Electricity",
                         "Heating",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(
@@ -712,10 +712,10 @@ void ExhaustAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                             this->CWCompNum,
                                             errFlag,
                                             this->CHWLowLimitTemp,
-                                            _,
-                                            _,
+                                            {},
+                                            {},
                                             this->ChillReturnNodeNum,
-                                            _);
+                                            {});
     if (errFlag) {
         ShowFatalError(state, "InitExhaustAbsorber: Program terminated due to previous condition(s).");
     }
@@ -728,11 +728,11 @@ void ExhaustAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                             this->HWBranchNum,
                                             this->HWCompNum,
                                             errFlag,
-                                            _,
-                                            _,
-                                            _,
+                                            {},
+                                            {},
+                                            {},
                                             this->HeatReturnNodeNum,
-                                            _);
+                                            {});
     if (errFlag) {
         ShowFatalError(state, "InitExhaustAbsorber: Program terminated due to previous condition(s).");
     }
@@ -746,11 +746,11 @@ void ExhaustAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                 this->CDBranchNum,
                                                 this->CDCompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
+                                                {},
+                                                {},
+                                                {},
                                                 this->CondReturnNodeNum,
-                                                _);
+                                                {});
         if (errFlag) {
             ShowFatalError(state, "InitExhaustAbsorber: Program terminated due to previous condition(s).");
         }

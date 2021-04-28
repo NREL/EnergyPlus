@@ -1162,9 +1162,9 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
                                             state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWBranchNum,
                                             state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWCompNum,
                                             ErrorsFound,
-                                            _,
-                                            _,
-                                            _,
+                                            {},
+                                            {},
+                                            {},
                                             state->dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode,
                                             _);
     EXPECT_FALSE(ErrorsFound);
@@ -1178,9 +1178,9 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
                                             state->dataLowTempRadSys->HydrRadSys(RadSysNum).CWBranchNum,
                                             state->dataLowTempRadSys->HydrRadSys(RadSysNum).CWCompNum,
                                             ErrorsFound,
-                                            _,
-                                            _,
-                                            _,
+                                            {},
+                                            {},
+                                            {},
                                             state->dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode,
                                             _);
     EXPECT_FALSE(ErrorsFound);

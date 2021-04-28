@@ -650,7 +650,7 @@ namespace ThermalComfort {
                                                    state.dataHeatBal->People(state.dataThermalComforts->PeopleNum).AirVelErrIndex,
                                                    state.dataThermalComforts->AirVel,
                                                    state.dataThermalComforts->AirVel,
-                                                   _,
+                                                   {},
                                                    "[m/s]",
                                                    "[m/s]");
                 }
@@ -1389,7 +1389,7 @@ namespace ThermalComfort {
                             state.dataThermalComforts->AnkleDraftAirVelWarningInd,
                             RelAirVel,
                             RelAirVel,
-                            _,
+                            {},
                             "[m/s]",
                             "[m/s]");
                     }
@@ -1400,7 +1400,7 @@ namespace ThermalComfort {
                             state.dataThermalComforts->AnkleDraftActMetWarningInd,
                             state.dataThermalComforts->ActMet,
                             state.dataThermalComforts->ActMet,
-                            _,
+                            {},
                             "[m/s]",
                             "[m/s]");
                     }
@@ -1411,7 +1411,7 @@ namespace ThermalComfort {
                             state.dataThermalComforts->AnkleDraftCloUnitWarningInd,
                             state.dataThermalComforts->CloUnit,
                             state.dataThermalComforts->CloUnit,
-                            _,
+                            {},
                             "[m/s]",
                             "[m/s]");
                     }

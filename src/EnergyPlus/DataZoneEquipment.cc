@@ -321,7 +321,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
         } else {
             UniqueNodeError = false;
-            CheckUniqueNodes(state, cAlphaFields(5), "NodeName", UniqueNodeError, AlphArray(5), _, AlphArray(1));
+            CheckUniqueNodes(state, cAlphaFields(5), "NodeName", UniqueNodeError, AlphArray(5), {}, AlphArray(1));
             if (UniqueNodeError) {
                 // ShowContinueError(state,  "Occurs for " + trim( cAlphaFields( 1 ) ) + " = " + trim( AlphArray( 1 ) ) );
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
@@ -696,7 +696,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                  "Zone Air Inlet Nodes",
                                  "NodeNumber",
                                  UniqueNodeError,
-                                 _,
+                                 {},
                                  NodeNums(NodeNum),
                                  state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                 if (UniqueNodeError) {
@@ -744,7 +744,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                  "Zone Air Exhaust Nodes",
                                  "NodeNumber",
                                  UniqueNodeError,
-                                 _,
+                                 {},
                                  NodeNums(NodeNum),
                                  state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                 if (UniqueNodeError) {
@@ -793,7 +793,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                  "Zone Return Air Nodes",
                                  "NodeNumber",
                                  UniqueNodeError,
-                                 _,
+                                 {},
                                  NodeNums(NodeNum),
                                  state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                 if (UniqueNodeError) {

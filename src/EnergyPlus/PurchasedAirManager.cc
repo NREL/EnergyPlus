@@ -290,7 +290,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                              "NodeName",
                              UniqueNodeError,
                              state.dataIPShortCut->cAlphaArgs(3),
-                             _,
+                             {},
                              state.dataIPShortCut->cAlphaArgs(1));
             if (UniqueNodeError) ErrorsFound = true;
             // If new (optional) exhaust air node name is present, then register it as inlet
@@ -322,7 +322,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                  "NodeName",
                                  UniqueNodeError,
                                  state.dataIPShortCut->cAlphaArgs(4),
-                                 _,
+                                 {},
                                  state.dataIPShortCut->cAlphaArgs(1));
                 if (UniqueNodeError) ErrorsFound = true;
             }
@@ -527,7 +527,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                  "NodeName",
                                  UniqueNodeError,
                                  state.dataIPShortCut->cAlphaArgs(13),
-                                 _,
+                                 {},
                                  state.dataIPShortCut->cAlphaArgs(1));
                 if (UniqueNodeError) ErrorsFound = true;
 
@@ -699,10 +699,10 @@ void GetPurchasedAir(EnergyPlusData &state)
                             "System",
                             "Sum",
                             PurchAir(PurchAirNum).Name,
-                            _,
+                            {},
                             "DISTRICTHEATING",
                             "Heating",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Sensible Cooling Energy",
@@ -725,10 +725,10 @@ void GetPurchasedAir(EnergyPlusData &state)
                             "System",
                             "Sum",
                             PurchAir(PurchAirNum).Name,
-                            _,
+                            {},
                             "DISTRICTCOOLING",
                             "Cooling",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Zone Ideal Loads Zone Sensible Heating Energy",
@@ -1366,7 +1366,7 @@ void InitPurchasedAir(EnergyPlusData &state,
                                           PurchAir(PurchAirNum).CoolErrIndex,
                                           PurchAir(PurchAirNum).MinCoolSuppAirTemp,
                                           PurchAir(PurchAirNum).MinCoolSuppAirTemp,
-                                          _,
+                                          {},
                                           "C",
                                           "C");
         }
@@ -1411,7 +1411,7 @@ void InitPurchasedAir(EnergyPlusData &state,
                                           PurchAir(PurchAirNum).HeatErrIndex,
                                           PurchAir(PurchAirNum).MaxHeatSuppAirTemp,
                                           PurchAir(PurchAirNum).MaxHeatSuppAirTemp,
-                                          _,
+                                          {},
                                           "C",
                                           "C");
         }

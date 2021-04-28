@@ -93,7 +93,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
                         "Zone",
                         "Sum",
                         "Lite1",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -104,7 +104,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
                         "Zone",
                         "Sum",
                         "Lite2",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -115,7 +115,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
                         "Zone",
                         "Sum",
                         "Lite3",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");

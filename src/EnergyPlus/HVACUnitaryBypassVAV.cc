@@ -1493,11 +1493,11 @@ namespace HVACUnitaryBypassVAV {
                                                             CBVAV(CBVAVNum).BranchNum,
                                                             CBVAV(CBVAVNum).CompNum,
                                                             ErrorFlag,
-                                                            _,
-                                                            _,
-                                                            _,
-                                                            _,
-                                                            _);
+                                                            {},
+                                                            {},
+                                                            {},
+                                                            {},
+                                                            {});
                     if (ErrorFlag) {
                         ShowFatalError(state, "InitCBVAV: Program terminated for previous conditions.");
                     }
@@ -1527,11 +1527,11 @@ namespace HVACUnitaryBypassVAV {
                                                             CBVAV(CBVAVNum).BranchNum,
                                                             CBVAV(CBVAVNum).CompNum,
                                                             ErrorFlag,
-                                                            _,
-                                                            _,
-                                                            _,
-                                                            _,
-                                                            _);
+                                                            {},
+                                                            {},
+                                                            {},
+                                                            {},
+                                                            {});
 
                     if (ErrorFlag) {
                         ShowFatalError(state, "InitCBVAV: Program terminated for previous conditions.");
@@ -2324,7 +2324,7 @@ namespace HVACUnitaryBypassVAV {
 
         if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::BlowThru) {
             if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[CBVAV(CBVAVNum).FanIndex]->simulate(state, 1.0 / OnOffAirFlowRatio, _, _, _);
+                state.dataHVACFan->fanObjs[CBVAV(CBVAVNum).FanIndex]->simulate(state, 1.0 / OnOffAirFlowRatio, {}, {}, {});
             } else {
                 Fans::SimulateFanComponents(
                     state, CBVAV(CBVAVNum).FanName, FirstHVACIteration, CBVAV(CBVAVNum).FanIndex, state.dataHVACUnitaryBypassVAV->FanSpeedRatio);
@@ -3589,7 +3589,7 @@ namespace HVACUnitaryBypassVAV {
 
         if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::DrawThru) {
             if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[CBVAV(CBVAVNum).FanIndex]->simulate(state, 1.0 / OnOffAirFlowRatio, _, _, _);
+                state.dataHVACFan->fanObjs[CBVAV(CBVAVNum).FanIndex]->simulate(state, 1.0 / OnOffAirFlowRatio, {}, {}, {});
             } else {
                 Fans::SimulateFanComponents(
                     state, CBVAV(CBVAVNum).FanName, FirstHVACIteration, CBVAV(CBVAVNum).FanIndex, state.dataHVACUnitaryBypassVAV->FanSpeedRatio);
@@ -3923,7 +3923,7 @@ namespace HVACUnitaryBypassVAV {
         int CoilIndex = int(Par(1));
         Real64 OnOffAirFlowFrac = Par(3); // Ratio of compressor ON to compressor OFF air mass flow rate
 
-        DXCoils::CalcDoe2DXCoil(state, CoilIndex, On, false, PartLoadFrac, DataHVACGlobals::ContFanCycCoil, _, OnOffAirFlowFrac);
+        DXCoils::CalcDoe2DXCoil(state, CoilIndex, On, false, PartLoadFrac, DataHVACGlobals::ContFanCycCoil, {}, OnOffAirFlowFrac);
 
         Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
         Real64 Residuum = Par(2) - OutletAirTemp;
@@ -4259,7 +4259,7 @@ namespace HVACUnitaryBypassVAV {
                                                            CBVAV(CBVAVNum).HotWaterCoilMaxIterIndex2,
                                                            MaxHotWaterFlow,
                                                            MinWaterFlow,
-                                                           _,
+                                                           {},
                                                            "[kg/s]",
                                                            "[kg/s]");
                         }

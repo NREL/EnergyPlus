@@ -214,11 +214,11 @@ void SimulateVRF(EnergyPlusData &state,
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).SourceBranchNum,
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).SourceCompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
+                                                {},
+                                                {},
+                                                {},
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).CondenserNodeNum,
-                                                _);
+                                                {});
 
         if (errFlag) {
             ShowSevereError(state, "GetVRFInput: Error scanning for plant loop data");
@@ -1828,7 +1828,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ShowContinueError(state,
                                       format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                     ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).CoolPLFFPLR, ErrorsFound, 0.7, _);
+                    SetCurveOutputMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).CoolPLFFPLR, ErrorsFound, 0.7, {});
                 }
 
                 if (MaxCurveVal > 1.0) {
@@ -1837,7 +1837,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ShowContinueError(state,
                                       format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                     ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).CoolPLFFPLR, ErrorsFound, _, 1.0);
+                    SetCurveOutputMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).CoolPLFFPLR, ErrorsFound, {}, 1.0);
                 }
             }
         }
@@ -2034,7 +2034,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ShowContinueError(state,
                                       format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                     ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).HeatPLFFPLR, ErrorsFound, 0.7, _);
+                    SetCurveOutputMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).HeatPLFFPLR, ErrorsFound, 0.7, {});
                 }
 
                 if (MaxCurveVal > 1.0) {
@@ -2043,7 +2043,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ShowContinueError(state,
                                       format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                     ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).HeatPLFFPLR, ErrorsFound, _, 1.0);
+                    SetCurveOutputMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).HeatPLFFPLR, ErrorsFound, {}, 1.0);
                 }
             }
         }
@@ -3750,37 +3750,37 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             SetDXCoolingCoilData(state,
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
                                                  ErrorsFound,
-                                                 _,
+                                                 {},
                                                  state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).CondenserType);
                             SetDXCoolingCoilData(state,
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
                                                  ErrorsFound,
-                                                 _,
-                                                 _,
+                                                 {},
+                                                 {},
                                                  state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).CondenserNodeNum);
                             SetDXCoolingCoilData(state,
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
                                                  ErrorsFound,
-                                                 _,
-                                                 _,
-                                                 _,
+                                                 {},
+                                                 {},
+                                                 {},
                                                  state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MaxOATCCHeater);
                             SetDXCoolingCoilData(state,
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
                                                  ErrorsFound,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
                                                  state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MinOATCooling);
                             SetDXCoolingCoilData(state,
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
                                                  ErrorsFound,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
                                                  state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MaxOATCooling);
 
                             state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).VRFIUPtr = VRFTUNum;
@@ -3859,37 +3859,37 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                         SetDXCoolingCoilData(state,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
                                              ErrorsFound,
-                                             _,
+                                             {},
                                              state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).CondenserType);
                         SetDXCoolingCoilData(state,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
                                              ErrorsFound,
-                                             _,
-                                             _,
+                                             {},
+                                             {},
                                              state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).CondenserNodeNum);
                         SetDXCoolingCoilData(state,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
                                              ErrorsFound,
-                                             _,
-                                             _,
-                                             _,
+                                             {},
+                                             {},
+                                             {},
                                              state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MaxOATCCHeater);
                         SetDXCoolingCoilData(state,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
                                              ErrorsFound,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
+                                             {},
+                                             {},
+                                             {},
+                                             {},
                                              state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MinOATCooling);
                         SetDXCoolingCoilData(state,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
                                              ErrorsFound,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
                                              state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MaxOATCooling);
 
                     } else {
@@ -3964,131 +3964,131 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             SetDXCoolingCoilData(state,
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                                  ErrorsFound,
-                                                 _,
+                                                 {},
                                                  state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).CondenserType);
                             SetDXCoolingCoilData(state,
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                                  ErrorsFound,
-                                                 _,
-                                                 _,
+                                                 {},
+                                                 {},
                                                  state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).CondenserNodeNum);
                             SetDXCoolingCoilData(state,
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                                  ErrorsFound,
-                                                 _,
-                                                 _,
-                                                 _,
+                                                 {},
+                                                 {},
+                                                 {},
                                                  state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MaxOATCCHeater);
                             SetDXCoolingCoilData(state,
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                                  ErrorsFound,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
                                                  state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MinOATHeating);
                             SetDXCoolingCoilData(state,
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                                  ErrorsFound,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
                                                  state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MaxOATHeating);
                             SetDXCoolingCoilData(
                                 state,
                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                 ErrorsFound,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _,
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
                                 state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).HeatingPerformanceOATType);
                             // Set defrost controls in child object to trip child object defrost calculations
                             SetDXCoolingCoilData(state,
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                                  ErrorsFound,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
                                                  state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).DefrostStrategy);
                             SetDXCoolingCoilData(state,
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                                  ErrorsFound,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
                                                  state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).DefrostControl);
                             SetDXCoolingCoilData(state,
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                                  ErrorsFound,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
                                                  state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).DefrostEIRPtr);
                             SetDXCoolingCoilData(state,
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                                  ErrorsFound,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
                                                  state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).DefrostFraction);
                             SetDXCoolingCoilData(state,
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                                  ErrorsFound,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
                                                  state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MaxOATDefrost);
                             // If defrost is disabled in the VRF condenser, it must be disabled in the DX coil
                             // Defrost primarily handled in parent object, set defrost capacity to 1 to avoid autosizing.
@@ -4097,19 +4097,19 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             SetDXCoolingCoilData(state,
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                                  ErrorsFound,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
                                                  1.0); // DefrostCapacity=1.0
 
                             state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).VRFIUPtr = VRFTUNum;
@@ -4140,23 +4140,23 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 SetDXCoolingCoilData(state,
                                                      state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                                      ErrorsFound,
-                                                     _,
-                                                     _,
-                                                     _,
-                                                     _,
-                                                     _,
-                                                     _,
-                                                     _,
-                                                     _,
-                                                     _,
-                                                     _,
-                                                     _,
-                                                     _,
-                                                     _,
-                                                     _,
-                                                     _,
-                                                     _,
-                                                     _,
+                                                     {},
+                                                     {},
+                                                     {},
+                                                     {},
+                                                     {},
+                                                     {},
+                                                     {},
+                                                     {},
+                                                     {},
+                                                     {},
+                                                     {},
+                                                     {},
+                                                     {},
+                                                     {},
+                                                     {},
+                                                     {},
+                                                     {},
                                                      state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatingCapacitySizeRatio);
                             } else if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).HeatingCapacitySizeRatio >
                                        1.0) {
@@ -4164,23 +4164,23 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                     state,
                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                     ErrorsFound,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {},
                                     state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).HeatingCapacitySizeRatio);
                             }
                         } else {
@@ -4235,120 +4235,120 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                         SetDXCoolingCoilData(state,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                              ErrorsFound,
-                                             _,
+                                             {},
                                              state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).CondenserType);
                         SetDXCoolingCoilData(state,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                              ErrorsFound,
-                                             _,
-                                             _,
+                                             {},
+                                             {},
                                              state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).CondenserNodeNum);
                         SetDXCoolingCoilData(state,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                              ErrorsFound,
-                                             _,
-                                             _,
-                                             _,
+                                             {},
+                                             {},
+                                             {},
                                              state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MaxOATCCHeater);
                         SetDXCoolingCoilData(state,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                              ErrorsFound,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
                                              state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MinOATHeating);
                         SetDXCoolingCoilData(
                             state,
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                             ErrorsFound,
-                            _,
-                            _,
-                            _,
-                            _,
-                            _,
-                            _,
-                            _,
-                            _,
+                            {},
+                            {},
+                            {},
+                            {},
+                            {},
+                            {},
+                            {},
+                            {},
                             state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).HeatingPerformanceOATType);
                         // Set defrost controls in child object to trip child object defrost calculations
                         SetDXCoolingCoilData(state,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                              ErrorsFound,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
                                              state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).DefrostStrategy);
                         SetDXCoolingCoilData(state,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                              ErrorsFound,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
                                              state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).DefrostControl);
                         SetDXCoolingCoilData(state,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                              ErrorsFound,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
                                              state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).DefrostEIRPtr);
                         SetDXCoolingCoilData(state,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                              ErrorsFound,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
                                              state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).DefrostFraction);
                         SetDXCoolingCoilData(state,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                              ErrorsFound,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
                                              state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MaxOATDefrost);
                         // If defrost is disabled in the VRF condenser, it must be disabled in the DX coil
                         // Defrost primarily handled in parent object, set defrost capacity to 1 to avoid autosizing.
@@ -4357,42 +4357,42 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                         SetDXCoolingCoilData(state,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                              ErrorsFound,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
-                                             _,
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
+                                             {},
                                              1.0); // DefrostCapacity=1.0
                         // Terminal unit heating to cooling sizing ratio has precedence over VRF system sizing ratio
                         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatingCapacitySizeRatio > 1.0) {
                             SetDXCoolingCoilData(state,
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                                  ErrorsFound,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
+                                                 {},
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatingCapacitySizeRatio);
                         } else if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).HeatingCapacitySizeRatio >
                                    1.0) {
@@ -4400,23 +4400,23 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 state,
                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                 ErrorsFound,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _,
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
                                 state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).HeatingCapacitySizeRatio);
                         }
                         // Check VRF DX heating coil heating capacity as a fuction of temperature performance curve. Only report here for
@@ -4718,22 +4718,22 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             SetDXCoolingCoilData(state,
                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
                                  ErrorsFound,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatingCoilPresent);
 
             //   check that curve types are present in VRF Condenser if cooling coil is present in terminal unit (can be blank)
@@ -4776,21 +4776,21 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             SetDXCoolingCoilData(state,
                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                  ErrorsFound,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolingCoilPresent);
 
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum > 0) {
@@ -5001,10 +5001,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 "System",
                                 "Sum",
                                 state.dataHVACVarRefFlow->VRFTU(VRFNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "COOLING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Total Cooling Rate",
@@ -5064,10 +5064,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 "System",
                                 "Sum",
                                 state.dataHVACVarRefFlow->VRFTU(VRFNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Total Heating Rate",
@@ -5159,10 +5159,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             "System",
                             "Sum",
                             state.dataHVACVarRefFlow->VRF(NumCond).Name,
-                            _,
+                            {},
                             state.dataHVACVarRefFlow->VRF(NumCond).FuelType,
                             "COOLING",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "VRF Heat Pump Heating " + state.dataHVACVarRefFlow->VRF(NumCond).FuelType + " Rate",
@@ -5178,10 +5178,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             "System",
                             "Sum",
                             state.dataHVACVarRefFlow->VRF(NumCond).Name,
-                            _,
+                            {},
                             state.dataHVACVarRefFlow->VRF(NumCond).FuelType,
                             "HEATING",
-                            _,
+                            {},
                             "System");
 
         SetupOutputVariable(state,
@@ -5335,10 +5335,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 "System",
                                 "Sum",
                                 state.dataHVACVarRefFlow->VRF(NumCond).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
         } else { // defrost energy applied to fuel type
             SetupOutputVariable(state,
@@ -5355,10 +5355,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 "System",
                                 "Sum",
                                 state.dataHVACVarRefFlow->VRF(NumCond).Name,
-                                _,
+                                {},
                                 state.dataHVACVarRefFlow->VRF(NumCond).FuelType,
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
         }
 
@@ -5413,10 +5413,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             "System",
                             "Sum",
                             state.dataHVACVarRefFlow->VRF(NumCond).Name,
-                            _,
+                            {},
                             "Electricity",
                             "COOLING",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "VRF Heat Pump Terminal Unit Cooling Load Rate",
@@ -5461,10 +5461,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 "System",
                                 "Sum",
                                 state.dataHVACVarRefFlow->VRF(NumCond).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
         }
 
@@ -5476,10 +5476,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 "System",
                                 "Sum",
                                 state.dataHVACVarRefFlow->VRF(NumCond).Name,
-                                _,
+                                {},
                                 "Water",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "VRF Heat Pump Evaporative Condenser Pump Electricity Rate",
@@ -5495,10 +5495,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 "System",
                                 "Sum",
                                 state.dataHVACVarRefFlow->VRF(NumCond).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "COOLING",
-                                _,
+                                {},
                                 "System");
 
             if (state.dataHVACVarRefFlow->VRF(NumCond).BasinHeaterPowerFTempDiff > 0.0) {
@@ -5516,10 +5516,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                     "System",
                                     "Sum",
                                     state.dataHVACVarRefFlow->VRF(NumCond).Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "COOLING",
-                                    _,
+                                    {},
                                     "System");
             }
 
@@ -5706,11 +5706,11 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilBranchNum,
                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilCompNum,
                                                     errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {});
 
             WaterCoils::SetCoilDesFlow(state,
                                        DataHVACGlobals::cAllCoilTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilType_Num),
@@ -5754,11 +5754,11 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilBranchNum,
                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilCompNum,
                                                     errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {});
             if (errFlag) {
                 ShowFatalError(state, RoutineName + ": Program terminated for previous conditions.");
             }
@@ -9655,10 +9655,10 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
         if (this->fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             if (OnOffAirFlowRatio > 0.0) {
                 state.dataHVACFan->fanObjs[this->FanIndex]->simulate(
-                    state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                    state, {}, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, {});
             } else {
                 state.dataHVACFan->fanObjs[this->FanIndex]->simulate(
-                    state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                    state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, {});
             }
         } else {
             Fans::SimulateFanComponents(state,
@@ -9684,7 +9684,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
                       OpMode,
                       PartLoadRatio,
                       OnOffAirFlowRatio,
-                      _,
+                      {},
                       state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond),
                       state.dataHVACVarRefFlow->VRF(this->VRFSysNum).VRFCondCyclingRatio);
         } else { // cooling coil is off
@@ -9708,10 +9708,10 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
                       OpMode,
                       PartLoadRatio,
                       OnOffAirFlowRatio,
-                      _,
+                      {},
                       state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond));
         } else {
-            SimDXCoil(state, "", Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, 0.0, OnOffAirFlowRatio, _);
+            SimDXCoil(state, "", Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, 0.0, OnOffAirFlowRatio, {});
         }
         state.dataHVACVarRefFlow->LoopDXHeatCoilRTF = state.dataAirLoop->LoopDXCoilRTF;
     } else {
@@ -9723,10 +9723,10 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
         if (this->fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             if (OnOffAirFlowRatio > 0.0) {
                 state.dataHVACFan->fanObjs[this->FanIndex]->simulate(
-                    state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                    state, {}, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, {});
             } else {
                 state.dataHVACFan->fanObjs[this->FanIndex]->simulate(
-                    state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                    state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, {});
             }
 
         } else {
@@ -12928,10 +12928,10 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             if (OnOffAirFlowRatio > 0.0) {
                 state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                    state, {}, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, {});
             } else {
                 state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                    state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, {});
             }
         } else {
             Fans::SimulateFanComponents(state,
@@ -12955,12 +12955,12 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
                       this->CoolCoilIndex,
                       OpMode,
                       PartLoadRatio,
-                      _,
-                      _,
+                      {},
+                      {},
                       state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond),
                       state.dataHVACVarRefFlow->VRF(this->VRFSysNum).VRFCondCyclingRatio);
         } else { // cooling coil is off
-            SimDXCoil(state, "", Off, FirstHVACIteration, this->CoolCoilIndex, OpMode, 0.0, _);
+            SimDXCoil(state, "", Off, FirstHVACIteration, this->CoolCoilIndex, OpMode, 0.0, {});
         }
         state.dataHVACVarRefFlow->LoopDXCoolCoilRTF = state.dataAirLoop->LoopDXCoilRTF;
     } else {
@@ -12979,11 +12979,11 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
                       this->HeatCoilIndex,
                       OpMode,
                       PartLoadRatio,
-                      _,
-                      _,
+                      {},
+                      {},
                       state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond));
         } else {
-            SimDXCoil(state, "", Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, 0.0, _);
+            SimDXCoil(state, "", Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, 0.0, {});
         }
         state.dataHVACVarRefFlow->LoopDXHeatCoilRTF = state.dataAirLoop->LoopDXCoilRTF;
     } else {
@@ -12995,10 +12995,10 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             if (OnOffAirFlowRatio > 0.0) {
                 state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                    state, {}, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, {});
             } else {
                 state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                    state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, {});
             }
 
         } else {
@@ -13267,10 +13267,10 @@ Real64 VRFTUAirFlowResidual_FluidTCtrl(EnergyPlusData &state,
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             if (temp > 0) {
                 state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                    state, {}, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, {});
             } else {
                 state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                    state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, {});
             }
         } else {
             Fans::SimulateFanComponents(state,

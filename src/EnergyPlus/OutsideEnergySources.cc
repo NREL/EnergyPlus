@@ -190,7 +190,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->rNumericArgs,
                                                                  NumNums,
                                                                  IOStat,
-                                                                 _,
+                                                                 {},
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames);
 
@@ -293,7 +293,7 @@ void OutsideEnergySourceSpecs::initialize(EnergyPlusData &state, Real64 MyLoad)
         // Locate the unit on the plant loops for later usage
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(
-            state, this->Name, this->EnergyType, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
+            state, this->Name, this->EnergyType, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, {}, {}, {}, {}, {});
         if (errFlag) {
             ShowFatalError(state, "InitSimVars: Program terminated due to previous condition(s).");
         }
@@ -328,10 +328,10 @@ void OutsideEnergySourceSpecs::initialize(EnergyPlusData &state, Real64 MyLoad)
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             typeName,
                             heatingOrCooling,
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(
             state, reportVarPrefix + hotOrChilled + "Water Rate", OutputProcessor::Unit::W, this->EnergyRate, "System", "Average", this->Name);

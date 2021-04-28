@@ -299,7 +299,7 @@ namespace Photovoltaics {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -453,7 +453,7 @@ namespace Photovoltaics {
                                                                          state.dataIPShortCut->rNumericArgs,
                                                                          NumNums,
                                                                          IOStat,
-                                                                         _,
+                                                                         {},
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
@@ -504,7 +504,7 @@ namespace Photovoltaics {
                                                                          state.dataIPShortCut->rNumericArgs,
                                                                          NumNums,
                                                                          IOStat,
-                                                                         _,
+                                                                         {},
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
@@ -564,7 +564,7 @@ namespace Photovoltaics {
                                                                          state.dataIPShortCut->rNumericArgs,
                                                                          NumNums,
                                                                          IOStat,
-                                                                         _,
+                                                                         {},
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
@@ -683,10 +683,10 @@ namespace Photovoltaics {
                                 "System",
                                 "Sum",
                                 state.dataPhotovoltaic->PVarray(PVnum).Name,
-                                _,
+                                {},
                                 "ElectricityProduced",
                                 "Photovoltaics",
-                                _,
+                                {},
                                 "Plant");
             SetupOutputVariable(state,
                                 "Generator PV Array Efficiency",

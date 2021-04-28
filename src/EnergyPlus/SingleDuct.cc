@@ -2534,11 +2534,11 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
                                     this->HWBranchIndex,
                                     this->HWCompIndex,
                                     errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {});
 
             if (errFlag) {
                 ShowContinueError(state, "Reference Unit=\"" + this->SysName + "\", type=" + this->SysType);
@@ -4046,11 +4046,11 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
                                   this->ControllerOffset,
                                   this->ControlCompTypeNum,
                                   this->CompErrIndex,
-                                  _,
+                                  {},
                                   SysOutletNode,
                                   MassFlow,
-                                  _,
-                                  _,
+                                  {},
+                                  {},
                                   this->HWLoopNum,
                                   this->HWLoopSide,
                                   this->HWBranchIndex);
@@ -4120,11 +4120,11 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
                                               this->ControllerOffset,
                                               this->ControlCompTypeNum,
                                               this->CompErrIndex,
-                                              _,
+                                              {},
                                               SysOutletNode,
                                               MassFlow,
-                                              _,
-                                              _,
+                                              {},
+                                              {},
                                               this->HWLoopNum,
                                               this->HWLoopSide,
                                               this->HWBranchIndex);
@@ -4510,11 +4510,11 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
                                   this->ControllerOffset,
                                   this->ControlCompTypeNum,
                                   this->CompErrIndex,
-                                  _,
+                                  {},
                                   SysOutletNode,
                                   MassFlow,
-                                  _,
-                                  _,
+                                  {},
+                                  {},
                                   this->HWLoopNum,
                                   this->HWLoopSide,
                                   this->HWBranchIndex);
@@ -4565,11 +4565,11 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
                                           this->ControllerOffset,
                                           this->ControlCompTypeNum,
                                           this->CompErrIndex,
-                                          _,
+                                          {},
                                           SysOutletNode,
                                           MassFlow,
-                                          _,
-                                          _,
+                                          {},
+                                          {},
                                           this->HWLoopNum,
                                           this->HWLoopSide,
                                           this->HWBranchIndex);
@@ -5258,11 +5258,11 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
                                   this->ControllerOffset,
                                   this->ControlCompTypeNum,
                                   this->CompErrIndex,
-                                  _,
+                                  {},
                                   this->ReheatAirOutletNode,
                                   MassFlow,
-                                  _,
-                                  _,
+                                  {},
+                                  {},
                                   this->HWLoopNum,
                                   this->HWLoopSide,
                                   this->HWBranchIndex);
@@ -5402,14 +5402,14 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
     if (FanType == DataHVACGlobals::FanType_SimpleVAV && FanOn == 1) {
         Fans::SimulateFanComponents(state, this->FanName, FirstHVACIteration, this->Fan_Index);
     } else if (FanType == DataHVACGlobals::FanType_SystemModelObject && FanOn == 1) {
-        state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, _, _, _, _);
+        state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, {}, {}, {}, {});
 
     } else { // pass through conditions
         state.dataHVACGlobal->TurnFansOff = true;
         if (FanType == DataHVACGlobals::FanType_SimpleVAV) {
             Fans::SimulateFanComponents(state, this->FanName, FirstHVACIteration, this->Fan_Index);
         } else if (FanType == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, _, _, state.dataHVACGlobal->TurnFansOff, _);
+            state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, {}, {}, state.dataHVACGlobal->TurnFansOff, {});
         }
         state.dataHVACGlobal->TurnFansOff = TurnFansOffSav;
         state.dataLoopNodes->Node(FanOutNode).MassFlowRate = state.dataLoopNodes->Node(FanInNode).MassFlowRate;

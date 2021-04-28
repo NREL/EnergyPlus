@@ -290,7 +290,7 @@ namespace Psychrometrics {
                                                state.dataPsychrometrics->iPsyErrIndex(iPsyRhFnTdbRhovLBnd0C),
                                                RHValue * 100.0,
                                                RHValue * 100.0,
-                                               _,
+                                               {},
                                                "%",
                                                "%");
             }
@@ -313,7 +313,7 @@ namespace Psychrometrics {
                                                state.dataPsychrometrics->iPsyErrIndex(iPsyRhFnTdbRhovLBnd0C),
                                                RHValue * 100.0,
                                                RHValue * 100.0,
-                                               _,
+                                               {},
                                                "%",
                                                "%");
             }
@@ -489,7 +489,7 @@ namespace Psychrometrics {
                                                state.dataPsychrometrics->iPsyErrIndex(iPsyTwbFnTdbWPb),
                                                TDB,
                                                TDB,
-                                               _,
+                                               {},
                                                "C",
                                                "C");
             }
@@ -518,7 +518,7 @@ namespace Psychrometrics {
                                                    state.dataPsychrometrics->iPsyErrIndex(iPsyTwbFnTdbWPb2),
                                                    W,
                                                    W,
-                                                   _,
+                                                   {},
                                                    "[]",
                                                    "[]");
                 }
@@ -653,7 +653,7 @@ namespace Psychrometrics {
                                                state.dataPsychrometrics->iPsyErrIndex(iPsyVFnTdbWPb),
                                                V,
                                                V,
-                                               _,
+                                               {},
                                                "m3/kg",
                                                "m3/kg");
             }
@@ -688,7 +688,7 @@ namespace Psychrometrics {
                                                state.dataPsychrometrics->iPsyErrIndex(iPsyWFnTdbH),
                                                W,
                                                W,
-                                               _,
+                                               {},
                                                "[]",
                                                "[]");
             }
@@ -768,7 +768,7 @@ namespace Psychrometrics {
                                                state.dataPsychrometrics->iPsyErrIndex(iPsyPsatFnTemp),
                                                T,
                                                T,
-                                               _,
+                                               {},
                                                "C",
                                                "C");
             }
@@ -858,7 +858,7 @@ namespace Psychrometrics {
                                                state.dataPsychrometrics->iPsyErrIndex(iPsyWFnTdbTwbPb),
                                                TWB,
                                                TWB,
-                                               _,
+                                               {},
                                                "C",
                                                "C");
             }
@@ -895,7 +895,7 @@ namespace Psychrometrics {
                                                state.dataPsychrometrics->iPsyErrIndex(iPsyWFnTdbTwbPb2),
                                                W,
                                                W,
-                                               _,
+                                               {},
                                                "[]",
                                                "[]");
             }
@@ -934,7 +934,7 @@ namespace Psychrometrics {
                                                state.dataPsychrometrics->iPsyErrIndex(iPsyTdpFnTdbTwbPb),
                                                TDP,
                                                TDP,
-                                               _,
+                                               {},
                                                "C",
                                                "C");
             }
@@ -1014,7 +1014,7 @@ namespace Psychrometrics {
                     FlagError = true;
                 }
                 ShowRecurringWarningErrorAtEnd(
-                    state, "Enthalpy out of range (PsyTsatFnHPb)", state.dataPsychrometrics->iPsyErrIndex(iPsyTsatFnHPb), HH, HH, _, "J/kg", "J/kg");
+                    state, "Enthalpy out of range (PsyTsatFnHPb)", state.dataPsychrometrics->iPsyErrIndex(iPsyTsatFnHPb), HH, HH, {}, "J/kg", "J/kg");
             }
         }
 #endif
@@ -1134,7 +1134,7 @@ namespace Psychrometrics {
                                                state.dataPsychrometrics->iPsyErrIndex(iPsyRhFnTdbRhov),
                                                RHValue * 100.0,
                                                RHValue * 100.0,
-                                               _,
+                                               {},
                                                "%",
                                                "%");
             }
@@ -1157,7 +1157,7 @@ namespace Psychrometrics {
                                                state.dataPsychrometrics->iPsyErrIndex(iPsyRhFnTdbRhov),
                                                RHValue * 100.0,
                                                RHValue * 100.0,
-                                               _,
+                                               {},
                                                "%",
                                                "%");
             }
@@ -1192,7 +1192,7 @@ namespace Psychrometrics {
                                                state.dataPsychrometrics->iPsyErrIndex(iPsyRhFnTdbWPb),
                                                RHValue * 100.0,
                                                RHValue * 100.0,
-                                               _,
+                                               {},
                                                "%",
                                                "%");
             }
@@ -1215,7 +1215,7 @@ namespace Psychrometrics {
                                                state.dataPsychrometrics->iPsyErrIndex(iPsyRhFnTdbWPb),
                                                RHValue * 100.0,
                                                RHValue * 100.0,
-                                               _,
+                                               {},
                                                "%",
                                                "%");
             }
@@ -1249,7 +1249,7 @@ namespace Psychrometrics {
                 ShowContinueError(state, state.dataPsychrometrics->String + " will be used. Simulation continues.");
             }
             ShowRecurringWarningErrorAtEnd(
-                state, "Entered Humidity Ratio invalid (PsyWFnTdpPb)", state.dataPsychrometrics->iPsyErrIndex(iPsyWFnTdpPb), W, W, _, "[]", "[]");
+                state, "Entered Humidity Ratio invalid (PsyWFnTdpPb)", state.dataPsychrometrics->iPsyErrIndex(iPsyWFnTdpPb), W, W, {}, "[]", "[]");
         }
     }
 #endif
@@ -1283,7 +1283,7 @@ namespace Psychrometrics {
                                                state.dataPsychrometrics->iPsyErrIndex(iPsyWFnTdbRhPb),
                                                W,
                                                W,
-                                               _,
+                                               {},
                                                "[]",
                                                "[]");
             }
@@ -1366,7 +1366,7 @@ namespace Psychrometrics {
                     FlagError = true;
                 }
                 ShowRecurringWarningErrorAtEnd(
-                    state, "Pressure out of range (PsyTsatFnPb)", state.dataPsychrometrics->iPsyErrIndex(iPsyTsatFnPb), Press, Press, _, "Pa", "Pa");
+                    state, "Pressure out of range (PsyTsatFnPb)", state.dataPsychrometrics->iPsyErrIndex(iPsyTsatFnPb), Press, Press, {}, "Pa", "Pa");
             }
         }
 #endif
@@ -1449,7 +1449,7 @@ namespace Psychrometrics {
                                                state.dataPsychrometrics->iPsyErrIndex(iPsyTsatFnPb2),
                                                tSat,
                                                tSat,
-                                               _,
+                                               {},
                                                "C",
                                                "C");
             }

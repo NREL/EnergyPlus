@@ -163,9 +163,9 @@ namespace ZonePlenum {
                           std::string const &CompName,
                           int const iCompType,
                           int &CompIndex,
-                          Optional_bool_const FirstHVACIteration = _, // Autodesk:OPTIONAL Used without PRESENT check
-                          Optional_bool_const FirstCall = _,          // Autodesk:OPTIONAL Used without PRESENT check
-                          Optional_bool PlenumInletChanged = _        // Autodesk:OPTIONAL Used without PRESENT check
+                          Optional_bool_const FirstHVACIteration = {}, // Autodesk:OPTIONAL Used without PRESENT check
+                          Optional_bool_const FirstCall = {},          // Autodesk:OPTIONAL Used without PRESENT check
+                          Optional_bool PlenumInletChanged = {}         // Autodesk:OPTIONAL Used without PRESENT check
     );
 
     void GetZonePlenumInput(EnergyPlusData &state);

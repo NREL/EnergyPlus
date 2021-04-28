@@ -685,8 +685,8 @@ namespace OutputProcessor {
                                  Month,
                                  DayOfMonth,
                                  state->dataGlobal->HourOfDay,
-                                 _,
-                                 _,
+                                 {},
+                                 {},
                                  DSTIndicator,
                                  DayTypes(CurDayType));
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay"}, "\n")));
@@ -701,9 +701,9 @@ namespace OutputProcessor {
                                  PrintTimeStamp,
                                  Month,
                                  DayOfMonth,
-                                 _,
-                                 _,
-                                 _,
+                                 {},
+                                 {},
+                                 {},
                                  DSTIndicator,
                                  DayTypes(CurDayType));
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0,WinterDesignDay"}, "\n")));
@@ -717,11 +717,11 @@ namespace OutputProcessor {
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  Month,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
                                  _);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12"}, "\n")));
 
@@ -733,12 +733,12 @@ namespace OutputProcessor {
                                  RunPeriodStampReportChr,
                                  DayOfSimChr,
                                  PrintTimeStamp,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
                                  _);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1"}, "\n")));
 
@@ -750,12 +750,12 @@ namespace OutputProcessor {
                                  RunPeriodStampReportChr,
                                  DayOfSimChr,
                                  PrintTimeStamp,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
-                                 _,
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
+                                 {},
                                  _);
 
         EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to WriteTimeStampFormatData: 999\n", ss->str());
@@ -1881,7 +1881,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1,keyedValue,variableName [m3/s] !TimeStep"}, "\n")));
 
@@ -1896,7 +1896,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"2,1,keyedValue,variableName [m3/s] !TimeStep"}, "\n")));
 
@@ -1911,7 +1911,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           "scheduleName");
         EXPECT_TRUE(compare_eso_stream(delimited_string({"3,1,keyedValue,variableName [m3/s] !TimeStep,scheduleName"}, "\n")));
 
@@ -1926,7 +1926,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepSystem,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"4,1,keyedValue,variableName [m3/s] !TimeStep"}, "\n")));
 
@@ -1942,7 +1942,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           aThirdTimeStepType,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"5,1,keyedValue,variableName [m3/s] !TimeStep"}, "\n")));
 
@@ -1957,7 +1957,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"6,1,keyedValue,variableName [m3/s] !Each Call"}, "\n")));
 
@@ -1972,7 +1972,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"7,1,keyedValue,variableName [m3/s] !Each Call"}, "\n")));
 
@@ -1987,7 +1987,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           "scheduleName");
         EXPECT_TRUE(compare_eso_stream(delimited_string({"8,1,keyedValue,variableName [m3/s] !Each Call,scheduleName"}, "\n")));
 
@@ -2002,7 +2002,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepSystem,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"9,1,keyedValue,variableName [m3/s] !Each Call"}, "\n")));
 
@@ -2017,7 +2017,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           aThirdTimeStepType,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"10,1,keyedValue,variableName [m3/s] !Each Call"}, "\n")));
 
@@ -2032,7 +2032,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(state->dataOutputProcessor->TrackingHourlyVariables);
         state->dataOutputProcessor->TrackingHourlyVariables = false;
@@ -2049,7 +2049,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(state->dataOutputProcessor->TrackingHourlyVariables);
         state->dataOutputProcessor->TrackingHourlyVariables = false;
@@ -2066,7 +2066,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           "scheduleName");
         EXPECT_TRUE(state->dataOutputProcessor->TrackingHourlyVariables);
         state->dataOutputProcessor->TrackingHourlyVariables = false;
@@ -2083,7 +2083,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepSystem,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(state->dataOutputProcessor->TrackingHourlyVariables);
         state->dataOutputProcessor->TrackingHourlyVariables = false;
@@ -2100,7 +2100,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           aThirdTimeStepType,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(state->dataOutputProcessor->TrackingHourlyVariables);
         state->dataOutputProcessor->TrackingHourlyVariables = false;
@@ -2117,7 +2117,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(state->dataOutputProcessor->TrackingDailyVariables);
         state->dataOutputProcessor->TrackingDailyVariables = false;
@@ -2135,7 +2135,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(state->dataOutputProcessor->TrackingDailyVariables);
         state->dataOutputProcessor->TrackingDailyVariables = false;
@@ -2153,7 +2153,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           "scheduleName");
         EXPECT_TRUE(state->dataOutputProcessor->TrackingDailyVariables);
         state->dataOutputProcessor->TrackingDailyVariables = false;
@@ -2171,7 +2171,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepSystem,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(state->dataOutputProcessor->TrackingDailyVariables);
         state->dataOutputProcessor->TrackingDailyVariables = false;
@@ -2189,7 +2189,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           aThirdTimeStepType,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(state->dataOutputProcessor->TrackingDailyVariables);
         state->dataOutputProcessor->TrackingDailyVariables = false;
@@ -2207,7 +2207,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(state->dataOutputProcessor->TrackingMonthlyVariables);
         state->dataOutputProcessor->TrackingMonthlyVariables = false;
@@ -2225,7 +2225,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(state->dataOutputProcessor->TrackingMonthlyVariables);
         state->dataOutputProcessor->TrackingMonthlyVariables = false;
@@ -2243,7 +2243,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           "scheduleName");
         EXPECT_TRUE(state->dataOutputProcessor->TrackingMonthlyVariables);
         state->dataOutputProcessor->TrackingMonthlyVariables = false;
@@ -2261,7 +2261,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepSystem,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(state->dataOutputProcessor->TrackingMonthlyVariables);
         state->dataOutputProcessor->TrackingMonthlyVariables = false;
@@ -2279,7 +2279,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           aThirdTimeStepType,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(state->dataOutputProcessor->TrackingMonthlyVariables);
         state->dataOutputProcessor->TrackingMonthlyVariables = false;
@@ -2297,7 +2297,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(state->dataOutputProcessor->TrackingRunPeriodVariables);
         state->dataOutputProcessor->TrackingRunPeriodVariables = false;
@@ -2315,7 +2315,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(state->dataOutputProcessor->TrackingRunPeriodVariables);
         state->dataOutputProcessor->TrackingRunPeriodVariables = false;
@@ -2333,7 +2333,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepZone,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           "scheduleName");
         EXPECT_TRUE(state->dataOutputProcessor->TrackingRunPeriodVariables);
         state->dataOutputProcessor->TrackingRunPeriodVariables = false;
@@ -2351,7 +2351,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           OutputProcessor::TimeStepType::TimeStepSystem,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(state->dataOutputProcessor->TrackingRunPeriodVariables);
         state->dataOutputProcessor->TrackingRunPeriodVariables = false;
@@ -2369,7 +2369,7 @@ namespace OutputProcessor {
                                           "variableName",
                                           aThirdTimeStepType,
                                           OutputProcessor::Unit::m3_s,
-                                          _,
+                                          {},
                                           _);
         EXPECT_TRUE(state->dataOutputProcessor->TrackingRunPeriodVariables);
         state->dataOutputProcessor->TrackingRunPeriodVariables = false;
@@ -3502,10 +3502,10 @@ namespace OutputProcessor {
                             "System",
                             "Sum",
                             "Cool-1",
-                            _,
+                            {},
                             "ELECTRICITY",
                             "Cooling",
-                            _, // EndUseSubKey
+                            {}, // EndUseSubKey
                             "Plant");
 
         Real64 light_consumption = 0.;
@@ -3516,7 +3516,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "RailroadCrossing", // EndUseSubKey
@@ -3533,10 +3533,10 @@ namespace OutputProcessor {
                             "System",
                             "Sum",
                             "Site",
-                            _,
+                            {},
                             "CO2",
                             "FuelOilNo2Emissions",
-                            _, // EndUseSubKey
+                            {}, // EndUseSubKey
                             "");
 
         int found;
@@ -3895,7 +3895,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE1-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -3910,7 +3910,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE2-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -3925,7 +3925,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE3-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -3940,7 +3940,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE4-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -3955,7 +3955,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE5-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4132,7 +4132,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE1-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4147,7 +4147,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE2-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4162,7 +4162,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE3-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4177,7 +4177,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE4-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4192,7 +4192,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE5-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4395,7 +4395,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE1-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4410,7 +4410,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE2-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4425,7 +4425,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE3-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4440,7 +4440,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE4-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4455,7 +4455,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE5-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4671,7 +4671,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE1-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4686,7 +4686,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE2-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4701,7 +4701,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE3-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4716,7 +4716,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE4-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4731,7 +4731,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE5-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4890,10 +4890,10 @@ namespace OutputProcessor {
                             "System",
                             "Sum",
                             PurchAir(1).Name,
-                            _,
+                            {},
                             "DISTRICTHEATING",
                             "Heating",
-                            _,
+                            {},
                             "System");
 
         PurchAir(1).TotHeatEnergy = 1.1;
@@ -5041,7 +5041,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE1-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -5128,7 +5128,7 @@ namespace OutputProcessor {
                             "Zone",
                             "Sum",
                             "SPACE1-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",

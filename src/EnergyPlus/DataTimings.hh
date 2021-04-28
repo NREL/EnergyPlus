@@ -100,8 +100,8 @@ namespace DataTimings {
     void epStartTime(std::string const &ctimingElementstring);
 
     void epStopTime(std::string const &ctimingElementstring,
-                    Optional_bool_const printit = _, // true if it should be printed here.
-                    Optional_string_const wprint = _ // only needed (and assumed, if printit is true)
+                    Optional_bool_const printit = {}, // true if it should be printed here.
+                    Optional_string_const wprint = {}  // only needed (and assumed, if printit is true)
     );
 
     void epSummaryTimes(Real64 &TimeUsed_CPUTime);

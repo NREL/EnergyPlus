@@ -4074,7 +4074,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     Real64 AirFlowRatio(1.0);
     int FanOpMode(2);
     int CompOp(1);
-    CalcDoe2DXCoil(*state, DXCoilNum, CompOp, true, PartLoadRatio, FanOpMode, _, AirFlowRatio);
+    CalcDoe2DXCoil(*state, DXCoilNum, CompOp, true, PartLoadRatio, FanOpMode, {}, AirFlowRatio);
     EXPECT_NEAR(17580.0, Coil.TotalCoolingEnergyRate, 0.0001);   // equals fully capacity
     EXPECT_NEAR(17580.0, Coil.SensCoolingEnergyRate, 0.0001);    // sensible cooling only
     EXPECT_NEAR(0.0, Coil.LatCoolingEnergyRate, 1.0E-11);        // zero latent cooling rate
@@ -4101,7 +4101,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     AirInletNode.HumRat = Coil.InletAirHumRat;
     AirInletNode.Enthalpy = Coil.InletAirEnthalpy;
     // run coil at full capacity
-    CalcDoe2DXCoil(*state, DXCoilNum, CompOp, true, PartLoadRatio, FanOpMode, _, AirFlowRatio);
+    CalcDoe2DXCoil(*state, DXCoilNum, CompOp, true, PartLoadRatio, FanOpMode, {}, AirFlowRatio);
     EXPECT_NEAR(17580.0, Coil.TotalCoolingEnergyRate, 0.0001);           // equals fully capacity
     EXPECT_NEAR(13104.577807007219, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate
     EXPECT_NEAR(4475.4221929927808, Coil.LatCoolingEnergyRate, 0.0001);  // latent cooling rate

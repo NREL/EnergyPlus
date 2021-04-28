@@ -150,10 +150,10 @@ namespace SteamCoils {
                                      std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
-                                     Optional<Real64 const> QCoilReq = _, // coil load to be met
-                                     Optional<Real64> QCoilActual = _,    // coil load actually delivered returned to calling component
-                                     Optional_int_const FanOpMode = _,
-                                     Optional<Real64 const> PartLoadRatio = _);
+                                     Optional<Real64 const> QCoilReq = {}, // coil load to be met
+                                     Optional<Real64> QCoilActual = {},    // coil load actually delivered returned to calling component
+                                     Optional_int_const FanOpMode = {},
+                                     Optional<Real64 const> PartLoadRatio = {})  ;
 
     void GetSteamCoilInput(EnergyPlusData &state);
 
@@ -263,8 +263,8 @@ namespace SteamCoils {
     void SetSteamCoilData(EnergyPlusData &state,
                           int const CoilNum,                           // index of hot steam heating Coil
                           bool &ErrorsFound,                           // Set to true if certain errors found
-                          Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
-                          Optional_int DesiccantDehumIndex = _         // Index for the desiccant dehum system where this caoil is used
+                          Optional_bool DesiccantRegenerationCoil = {}, // Flag that this coil is used as regeneration air heating coil
+                          Optional_int DesiccantDehumIndex = {}          // Index for the desiccant dehum system where this caoil is used
     );
 
 } // namespace SteamCoils

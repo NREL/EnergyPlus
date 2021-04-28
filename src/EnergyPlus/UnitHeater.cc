@@ -810,11 +810,11 @@ namespace UnitHeater {
                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWBranchNum,
                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWCompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
                 if (errFlag) {
                     ShowContinueError(state,
                                       "Reference Unit=\"" + state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name + "\", type=ZoneHVAC:UnitHeater");
@@ -1685,11 +1685,11 @@ namespace UnitHeater {
                                           ControlOffset,
                                           state.dataUnitHeaters->UnitHeat(UnitHeatNum).ControlCompTypeNum,
                                           state.dataUnitHeaters->UnitHeat(UnitHeatNum).CompErrIndex,
-                                          _,
-                                          _,
-                                          _,
-                                          _,
-                                          _,
+                                          {},
+                                          {},
+                                          {},
+                                          {},
+                                          {},
                                           state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum,
                                           state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopSide,
                                           state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWBranchNum);
@@ -1843,12 +1843,12 @@ namespace UnitHeater {
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
                                             FirstHVACIteration,
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index,
-                                            _,
+                                            {},
                                             ZoneCompTurnFansOn,
                                             ZoneCompTurnFansOff);
             } else {
                 state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(
-                    state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
             }
 
             {
@@ -1918,12 +1918,12 @@ namespace UnitHeater {
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
                                             FirstHVACIteration,
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index,
-                                            _,
+                                            {},
                                             ZoneCompTurnFansOn,
                                             ZoneCompTurnFansOff);
             } else {
                 state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(
-                    state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
             }
             {
                 auto const SELECT_CASE_var(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType);
@@ -1985,7 +1985,7 @@ namespace UnitHeater {
                                                 FirstHVACIteration,
                                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index,
                                                 QCoilReq,
-                                                _,
+                                                {},
                                                 FanOpMode,
                                                 PartLoadFrac);
                 } else if ((SELECT_CASE_var == state.dataUnitHeaters->ElectricCoil) || (SELECT_CASE_var == state.dataUnitHeaters->GasCoil)) {
@@ -2006,8 +2006,8 @@ namespace UnitHeater {
                                                   FirstHVACIteration,
                                                   QCoilReq,
                                                   state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index,
-                                                  _,
-                                                  _,
+                                                  {},
+                                                  {},
                                                   FanOpMode,
                                                   PartLoadFrac);
                 }

@@ -15,7 +15,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Optional.fwd.hh>
-#include <ObjexxFCL/Omit.hh>
 
 // C++ Headers
 #include <cassert>
@@ -83,12 +82,6 @@ public: // Creation
 	 own_( true )
 	{}
 
-	// Omit Constructor
-	Optional( Omit ) :
-	 ptr_( nullptr ),
-	 own_( false )
-	{}
-
 	// Destructor
 	~Optional()
 	{
@@ -134,16 +127,6 @@ public: // Assignment
 	{
 		assert( ptr_ != nullptr );
 		*ptr_ = val;
-		return *this;
-	}
-
-	// Omit Assignment
-	Optional &
-	operator =( Omit )
-	{
-		if ( own_ ) delete ptr_;
-		ptr_ = nullptr;
-		own_ = false;
 		return *this;
 	}
 
@@ -304,11 +287,6 @@ public: // Creation
 	 ptr_( const_cast< T * >( &val ) )
 	{}
 
-	// Omit Constructor
-	Optional( Omit ) :
-	 ptr_( nullptr )
-	{}
-
 	// Destructor
 	~Optional()
 	{}
@@ -348,14 +326,6 @@ public: // Assignment
 	{
 		assert( ptr_ != nullptr );
 		*ptr_ = val;
-		return *this;
-	}
-
-	// Omit Assignment
-	Optional &
-	operator =( Omit )
-	{
-		ptr_ = nullptr;
 		return *this;
 	}
 

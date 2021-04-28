@@ -7711,9 +7711,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     }
 
     // Initialize window luminance and fluxes for split-flux calculation
-    state.dataDaylightingManager->WLUMSK(IHR, _, _) = 0.0;
-    state.dataDaylightingManager->WLUMSU(IHR, _) = 0.0;
-    state.dataDaylightingManager->WLUMSUdisk(IHR, _) = 0.0;
+    state.dataDaylightingManager->WLUMSK(IHR, {}, {}) = 0.0;
+    state.dataDaylightingManager->WLUMSU(IHR, {}) = 0.0;
+    state.dataDaylightingManager->WLUMSUdisk(IHR, {}) = 0.0;
     FLFWSK = 0.0;
     FLFWSU = 0.0;
     FLFWSUdisk = 0.0;

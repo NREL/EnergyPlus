@@ -372,8 +372,8 @@ namespace HVACMultiSpeedHeatPump {
                            int const MSHeatPumpNum,              // Unit index
                            Real64 const PartLoadRatio,           // unit part load ratio
                            Real64 &OnOffAirFlowRatio,            // ratio of compressor ON airflow to average airflow over timestep
-                           Optional_int_const SpeedNum = _,      // Speed number
-                           Optional<Real64 const> SpeedRatio = _ // Speed ratio
+                           Optional_int_const SpeedNum = {},      // Speed number
+                           Optional<Real64 const> SpeedRatio = {}  // Speed ratio
     );
 
     void CalcNonDXHeatingCoils(EnergyPlusData &state,
@@ -382,7 +382,7 @@ namespace HVACMultiSpeedHeatPump {
                                Real64 const HeatingLoad,      // supplemental coil load to be met by unit (watts)
                                int const FanMode,             // fan operation mode
                                Real64 &HeatCoilLoadmet,       // Heating Load Met
-                               Optional<Real64 const> PartLoadFrac = _);
+                               Optional<Real64 const> PartLoadFrac = {})  ;
 
     Real64 HotWaterCoilResidual(EnergyPlusData &state,
                                 Real64 const HWFlow,       // hot water flow rate in kg/s

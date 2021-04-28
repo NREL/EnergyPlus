@@ -180,7 +180,7 @@ namespace PhotovoltaicThermalCollectors {
                                                                          state.dataIPShortCut->rNumericArgs,
                                                                          NumNumbers,
                                                                          IOStatus,
-                                                                         _,
+                                                                         {},
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
@@ -227,7 +227,7 @@ namespace PhotovoltaicThermalCollectors {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumbers,
                                                                      IOStatus,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -439,10 +439,10 @@ namespace PhotovoltaicThermalCollectors {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "SolarWater",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "Plant");
 
         } else if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
@@ -453,10 +453,10 @@ namespace PhotovoltaicThermalCollectors {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "SolarAir",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(
@@ -509,11 +509,11 @@ namespace PhotovoltaicThermalCollectors {
                                                         this->WLoopBranchNum,
                                                         this->WLoopCompNum,
                                                         errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
+                                                        {},
+                                                        {},
+                                                        {},
+                                                        {},
+                                                        {});
                 if (errFlag) {
                     ShowFatalError(state, "InitPVTcollectors: Program terminated for previous conditions.");
                 }

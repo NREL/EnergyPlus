@@ -723,15 +723,15 @@ namespace OutputReportTabular {
 
     void WriteSubtitle(EnergyPlusData &state, std::string const &subtitle);
 
-    void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, Optional_bool_const isBold = _);
+    void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, Optional_bool_const isBold = {})  ;
 
     void WriteTable(EnergyPlusData &state,
                     Array2S_string const body, // row,column
                     const Array1D_string &rowLabels,
                     const Array1D_string &columnLabels,
                     Array1D_int &widthColumn,
-                    Optional_bool_const transposeXML = _,
-                    Optional_string_const footnoteText = _);
+                    Optional_bool_const transposeXML = {},
+                    Optional_string_const footnoteText = {})  ;
 
     bool produceDualUnitsFlags(const int &iUnit_Sys,
                                const iUnitsStyle &unitsStyle_Tab,

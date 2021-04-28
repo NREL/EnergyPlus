@@ -1446,11 +1446,11 @@ namespace UnitVentilator {
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).HWBranchNum,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).HWCompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
                 if (errFlag) {
                     ShowContinueError(
                         state, "Reference Unit=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", type=ZoneHVAC:UnitVentilator");
@@ -1475,11 +1475,11 @@ namespace UnitVentilator {
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).CWBranchNum,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).CWCompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
                 if (errFlag) {
                     ShowContinueError(
                         state, "Reference Unit=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", type=ZoneHVAC:UnitVentilator");
@@ -3332,11 +3332,11 @@ namespace UnitVentilator {
                                                   ControlOffset,
                                                   state.dataUnitVentilators->UnitVent(UnitVentNum).ControlCompTypeNum,
                                                   state.dataUnitVentilators->UnitVent(UnitVentNum).CompErrIndex,
-                                                  _,
-                                                  _,
-                                                  _,
-                                                  _,
-                                                  _,
+                                                  {},
+                                                  {},
+                                                  {},
+                                                  {},
+                                                  {},
                                                   state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum,
                                                   state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopSide,
                                                   state.dataUnitVentilators->UnitVent(UnitVentNum).HWBranchNum);
@@ -3568,11 +3568,11 @@ namespace UnitVentilator {
                                           ControlOffset,
                                           state.dataUnitVentilators->UnitVent(UnitVentNum).ControlCompTypeNum,
                                           state.dataUnitVentilators->UnitVent(UnitVentNum).CompErrIndex,
-                                          _,
-                                          _,
-                                          _,
-                                          _,
-                                          _,
+                                          {},
+                                          {},
+                                          {},
+                                          {},
+                                          {},
                                           state.dataUnitVentilators->UnitVent(UnitVentNum).CWLoopNum,
                                           state.dataUnitVentilators->UnitVent(UnitVentNum).CWLoopSide,
                                           state.dataUnitVentilators->UnitVent(UnitVentNum).CWBranchNum);
@@ -3701,13 +3701,13 @@ namespace UnitVentilator {
                                             state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
                                             FirstHVACIteration,
                                             state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index,
-                                            _,
+                                            {},
                                             ZoneCompTurnFansOn,
                                             ZoneCompTurnFansOff);
             } else {
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0; // used for cycling fan, set to 1.0 to be sure
                 state.dataHVACFan->fanObjs[state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index]->simulate(
-                    state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
             }
 
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent) {
@@ -3816,12 +3816,12 @@ namespace UnitVentilator {
                                             state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
                                             FirstHVACIteration,
                                             state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index,
-                                            _,
+                                            {},
                                             ZoneCompTurnFansOn,
                                             ZoneCompTurnFansOff);
             } else {
                 state.dataHVACFan->fanObjs[state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index]->simulate(
-                    state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
             }
 
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent) {
@@ -3920,7 +3920,7 @@ namespace UnitVentilator {
                                                     FirstHVACIteration,
                                                     state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_Index,
                                                     QCoilReq,
-                                                    _,
+                                                    {},
                                                     FanOpMode,
                                                     PartLoadRatio);
 
@@ -3943,8 +3943,8 @@ namespace UnitVentilator {
                                                       FirstHVACIteration,
                                                       QCoilReq,
                                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_Index,
-                                                      _,
-                                                      _,
+                                                      {},
+                                                      {},
                                                       FanOpMode,
                                                       PartLoadRatio);
                     }

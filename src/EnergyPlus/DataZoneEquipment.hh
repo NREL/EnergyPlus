@@ -434,7 +434,7 @@ namespace DataZoneEquipment {
     bool CheckZoneEquipmentList(EnergyPlusData &state,
                                 std::string const &ComponentType, // Type of component
                                 std::string const &ComponentName, // Name of component
-                                Optional_int CtrlZoneNum = _);
+                                Optional_int CtrlZoneNum = {})  ;
 
     int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
 
@@ -460,8 +460,8 @@ namespace DataZoneEquipment {
                                       int ActualZoneNum,    // Zone index
                                       bool UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
                                       bool UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
-                                      Optional_bool_const PerPersonNotSet = _, // when calculation should not include occupants (e.g., dual duct)
-                                      Optional_bool_const MaxOAVolFlowFlag = _ // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
+                                      Optional_bool_const PerPersonNotSet = {}, // when calculation should not include occupants (e.g., dual duct)
+                                      Optional_bool_const MaxOAVolFlowFlag = {}  // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
     );
 
 } // namespace DataZoneEquipment

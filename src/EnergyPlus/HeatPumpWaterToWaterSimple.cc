@@ -412,10 +412,10 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                             "System",
                             "Sum",
                             state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
-                            _,
+                            {},
                             "Electricity",
                             "Cooling",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Energy",
@@ -584,10 +584,10 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                             "System",
                             "Sum",
                             state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
-                            _,
+                            {},
                             "Electricity",
                             "Heating",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Energy",
@@ -762,11 +762,11 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                                                 this->SourceBranchNum,
                                                 this->SourceCompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
+                                                {},
+                                                {},
+                                                {},
                                                 this->SourceSideInletNodeNum,
-                                                _);
+                                                {});
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
                                                 this->WWHPPlantTypeOfNum,
@@ -775,11 +775,11 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                                                 this->LoadBranchNum,
                                                 this->LoadCompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
+                                                {},
+                                                {},
+                                                {},
                                                 this->LoadSideInletNodeNum,
-                                                _);
+                                                {});
 
         if (!errFlag) {
             PlantUtilities::InterConnectTwoPlantLoopSides(

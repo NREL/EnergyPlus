@@ -59,7 +59,7 @@ RAND( int const iflag = 0 )
 
 // Random float on [0,(2^31)-1)
 float
-RANF( Optional< int const > iseed = _ );
+RANF( Optional< int const > iseed = {}  );
 
 // Random double on [0,1)
 double
@@ -104,9 +104,9 @@ IRAND( int const iflag )
 // Random Seed Interface
 void
 RANDOM_SEED(
- Optional< int > size = _,
- Optional< Array1D< int > const > put = _,
- Optional< Array1D< int > > get = _
+ Optional< int > size = {},
+ Optional< Array1D< int > const > put = {},
+ Optional< Array1D< int > > get = {}
 );
 
 // Random Seed Set

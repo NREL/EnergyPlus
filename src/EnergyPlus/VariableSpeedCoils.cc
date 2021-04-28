@@ -791,10 +791,10 @@ namespace VariableSpeedCoils {
                                 "System",
                                 "Summed",
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
@@ -803,10 +803,10 @@ namespace VariableSpeedCoils {
                                 "System",
                                 "Summed",
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Cooling Coil Sensible Cooling Energy",
@@ -829,10 +829,10 @@ namespace VariableSpeedCoils {
                                 "System",
                                 "Summed",
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                _,
+                                {},
                                 "PLANTLOOPCOOLINGDEMAND",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
 
             // for table output, being consistent with outher water-to-air coils
@@ -1300,10 +1300,10 @@ namespace VariableSpeedCoils {
                                 "System",
                                 "Summed",
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
@@ -1312,10 +1312,10 @@ namespace VariableSpeedCoils {
                                 "System",
                                 "Summed",
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Cooling Coil Sensible Cooling Energy",
@@ -1797,10 +1797,10 @@ namespace VariableSpeedCoils {
                                 "System",
                                 "Summed",
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
@@ -1809,10 +1809,10 @@ namespace VariableSpeedCoils {
                                 "System",
                                 "Summed",
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Source Side Heat Transfer Energy",
@@ -1821,10 +1821,10 @@ namespace VariableSpeedCoils {
                                 "System",
                                 "Summed",
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
 
             // create predefined report entries
@@ -2237,10 +2237,10 @@ namespace VariableSpeedCoils {
                                 "System",
                                 "Summed",
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
@@ -2249,10 +2249,10 @@ namespace VariableSpeedCoils {
                                 "System",
                                 "Summed",
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Source Side Heat Transfer Energy",
@@ -2825,10 +2825,10 @@ namespace VariableSpeedCoils {
                                 "System",
                                 "Summed",
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Cooling Coil Sensible Cooling Energy",
@@ -2851,10 +2851,10 @@ namespace VariableSpeedCoils {
                                 "System",
                                 "Summed",
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
 
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).IsDXCoilInZone) {
@@ -2865,10 +2865,10 @@ namespace VariableSpeedCoils {
                                     "System",
                                     "Summed",
                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                    _,
+                                    {},
                                     "ENERGYTRANSFER",
                                     "COOLINGCOILS",
-                                    _,
+                                    {},
                                     "System");
             } else {
                 SetupOutputVariable(state,
@@ -3019,10 +3019,10 @@ namespace VariableSpeedCoils {
                                             "System",
                                             "Sum",
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                            _,
+                                            {},
                                             "OnSiteWater",
                                             "Condensate",
-                                            _,
+                                            {},
                                             "System");
                     }
 
@@ -3041,10 +3041,10 @@ namespace VariableSpeedCoils {
                                             "System",
                                             "Sum",
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                            _,
+                                            {},
                                             "Water",
                                             "Cooling",
-                                            _,
+                                            {},
                                             "System");
                         SetupOutputVariable(state,
                                             "Cooling Coil Evaporative Condenser Mains Water Volume",
@@ -3053,10 +3053,10 @@ namespace VariableSpeedCoils {
                                             "System",
                                             "Sum",
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                            _,
+                                            {},
                                             "MainsWater",
                                             "Cooling",
-                                            _,
+                                            {},
                                             "System");
                         SetupOutputVariable(state,
                                             "Cooling Coil Evaporative Condenser Pump Electricity Rate",
@@ -3072,10 +3072,10 @@ namespace VariableSpeedCoils {
                                             "System",
                                             "Sum",
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                            _,
+                                            {},
                                             "Electricity",
                                             "COOLING",
-                                            _,
+                                            {},
                                             "System");
                         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterPowerFTempDiff > 0.0) {
                             SetupOutputVariable(state,
@@ -3092,10 +3092,10 @@ namespace VariableSpeedCoils {
                                                 "System",
                                                 "Sum",
                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                                _,
+                                                {},
                                                 "Electricity",
                                                 "COOLING",
-                                                _,
+                                                {},
                                                 "System");
                         }
                     }
@@ -3114,10 +3114,10 @@ namespace VariableSpeedCoils {
                                         "System",
                                         "Sum",
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                        _,
+                                        {},
                                         "Electricity",
                                         "COOLING",
-                                        _,
+                                        {},
                                         "System");
                 } else {
                     // air source heating coils
@@ -3228,10 +3228,10 @@ namespace VariableSpeedCoils {
                                         "System",
                                         "Sum",
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                        _,
+                                        {},
                                         "Electricity",
                                         "HEATING",
-                                        _,
+                                        {},
                                         "System");
                     SetupOutputVariable(state,
                                         "Heating Coil Crankcase Heater Electricity Rate",
@@ -3247,10 +3247,10 @@ namespace VariableSpeedCoils {
                                         "System",
                                         "Sum",
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                        _,
+                                        {},
                                         "Electricity",
                                         "HEATING",
-                                        _,
+                                        {},
                                         "System");
                 }
             } else {
@@ -3635,10 +3635,10 @@ namespace VariableSpeedCoils {
                                         "System",
                                         "Sum",
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                        _,
+                                        {},
                                         "Electricity",
                                         "HEATING",
-                                        _,
+                                        {},
                                         "System");
 
                     SetupOutputVariable(state,
@@ -3670,10 +3670,10 @@ namespace VariableSpeedCoils {
                                         "System",
                                         "Sum",
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                        _,
+                                        {},
                                         "Electricity",
                                         "HEATING",
-                                        _,
+                                        {},
                                         "System");
                 }
             }
@@ -3802,11 +3802,11 @@ namespace VariableSpeedCoils {
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BranchNum,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
                 if (errFlag) {
                     ShowFatalError(state, "InitVarSpeedCoil: Program terminated for previous conditions.");
                 }

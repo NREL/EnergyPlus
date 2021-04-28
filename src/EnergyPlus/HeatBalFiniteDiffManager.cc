@@ -2392,7 +2392,7 @@ namespace HeatBalFiniteDiffManager {
                                                   state.dataSurface->Surface(SurfNum).LowTempErrCount,
                                                   CheckTemperature,
                                                   CheckTemperature,
-                                                  _,
+                                                  {},
                                                   "C",
                                                   "C");
                 } else {
@@ -2402,7 +2402,7 @@ namespace HeatBalFiniteDiffManager {
                                                   state.dataSurface->Surface(SurfNum).LowTempErrCount,
                                                   CheckTemperature,
                                                   CheckTemperature,
-                                                  _,
+                                                  {},
                                                   "C",
                                                   "C");
                 }
@@ -2445,7 +2445,7 @@ namespace HeatBalFiniteDiffManager {
                                                   state.dataSurface->Surface(SurfNum).HighTempErrCount,
                                                   CheckTemperature,
                                                   CheckTemperature,
-                                                  _,
+                                                  {},
                                                   "C",
                                                   "C");
                 } else {
@@ -2455,7 +2455,7 @@ namespace HeatBalFiniteDiffManager {
                                                   state.dataSurface->Surface(SurfNum).HighTempErrCount,
                                                   CheckTemperature,
                                                   CheckTemperature,
-                                                  _,
+                                                  {},
                                                   "C",
                                                   "C");
                 }

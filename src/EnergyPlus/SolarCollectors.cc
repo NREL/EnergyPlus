@@ -197,7 +197,7 @@ namespace SolarCollectors {
                                                                          NumNumbers,
                                                                          IOStatus,
                                                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         _,
+                                                                         {},
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
@@ -432,7 +432,7 @@ namespace SolarCollectors {
                                                                          NumNumbers,
                                                                          IOStatus,
                                                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         _,
+                                                                         {},
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
@@ -742,10 +742,10 @@ namespace SolarCollectors {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "SolarWater",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "Plant");
         } else if (this->TypeNum == DataPlant::TypeOf_SolarCollectorICS) {
 
@@ -784,10 +784,10 @@ namespace SolarCollectors {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "SolarWater",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(
@@ -800,10 +800,10 @@ namespace SolarCollectors {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "SolarWater",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(
@@ -816,10 +816,10 @@ namespace SolarCollectors {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "SolarWater",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "Plant");
         }
     }
@@ -884,11 +884,11 @@ namespace SolarCollectors {
                                                         this->WLoopBranchNum,
                                                         this->WLoopCompNum,
                                                         errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
+                                                        {},
+                                                        {},
+                                                        {},
+                                                        {},
+                                                        {});
                 if (errFlag) {
                     ShowFatalError(state, "InitSolarCollector: Program terminated due to previous condition(s).");
                 }

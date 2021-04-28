@@ -1440,10 +1440,10 @@ namespace LowTempRadiantSystem {
                                 "System",
                                 "Sum",
                                 thisHydrSys.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Fluid Energy",
@@ -1452,10 +1452,10 @@ namespace LowTempRadiantSystem {
                                 "System",
                                 "Sum",
                                 thisHydrSys.Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Zone Radiant HVAC Cooling Rate", OutputProcessor::Unit::W, thisHydrSys.CoolPower, "System", "Average", thisHydrSys.Name);
@@ -1467,10 +1467,10 @@ namespace LowTempRadiantSystem {
                                 "System",
                                 "Sum",
                                 thisHydrSys.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Cooling Fluid Energy",
@@ -1479,10 +1479,10 @@ namespace LowTempRadiantSystem {
                                 "System",
                                 "Sum",
                                 thisHydrSys.Name,
-                                _,
+                                {},
                                 "PLANTLOOPCOOLINGDEMAND",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Mass Flow Rate",
@@ -1555,10 +1555,10 @@ namespace LowTempRadiantSystem {
                                 "System",
                                 "Sum",
                                 thisCFloSys.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Fluid Heat Transfer Energy",
@@ -1567,10 +1567,10 @@ namespace LowTempRadiantSystem {
                                 "System",
                                 "Sum",
                                 thisCFloSys.Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Zone Radiant HVAC Cooling Rate", OutputProcessor::Unit::W, thisCFloSys.CoolPower, "System", "Average", thisCFloSys.Name);
@@ -1581,10 +1581,10 @@ namespace LowTempRadiantSystem {
                                 "System",
                                 "Sum",
                                 thisCFloSys.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Cooling Fluid Heat Transfer Energy",
@@ -1593,10 +1593,10 @@ namespace LowTempRadiantSystem {
                                 "System",
                                 "Sum",
                                 thisCFloSys.Name,
-                                _,
+                                {},
                                 "PLANTLOOPCOOLINGDEMAND",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Mass Flow Rate",
@@ -1654,10 +1654,10 @@ namespace LowTempRadiantSystem {
                                 "System",
                                 "Sum",
                                 thisCFloSys.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Pumps",
-                                _,
+                                {},
                                 "Plant");
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Pump Mass Flow Rate",
@@ -1745,10 +1745,10 @@ namespace LowTempRadiantSystem {
                                 "System",
                                 "Sum",
                                 thisElecSys.Name,
-                                _,
+                                {},
                                 "ELECTRICITY",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Zone Radiant HVAC Heating Rate", OutputProcessor::Unit::W, thisElecSys.HeatPower, "System", "Average", thisElecSys.Name);
@@ -1759,10 +1759,10 @@ namespace LowTempRadiantSystem {
                                 "System",
                                 "Sum",
                                 thisElecSys.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
         }
     }
@@ -2031,11 +2031,11 @@ namespace LowTempRadiantSystem {
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWBranchNum,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWCompNum,
                                             errFlag,
-                                            _,
-                                            _,
-                                            _,
+                                            {},
+                                            {},
+                                            {},
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode,
-                                            _);
+                                            {});
                     if (errFlag) {
                         ShowFatalError(state, "InitLowTempRadiantSystem: Program terminated due to previous condition(s).");
                     }
@@ -2049,11 +2049,11 @@ namespace LowTempRadiantSystem {
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWBranchNum,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWCompNum,
                                             errFlag,
-                                            _,
-                                            _,
-                                            _,
+                                            {},
+                                            {},
+                                            {},
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode,
-                                            _);
+                                            {});
                     if (errFlag) {
                         ShowFatalError(state, "InitLowTempRadiantSystem: Program terminated due to previous condition(s).");
                     }
@@ -2076,11 +2076,11 @@ namespace LowTempRadiantSystem {
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWBranchNum,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWCompNum,
                                             errFlag,
-                                            _,
-                                            _,
-                                            _,
+                                            {},
+                                            {},
+                                            {},
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode,
-                                            _);
+                                            {});
                     if (errFlag) {
                         ShowFatalError(state, "InitLowTempRadiantSystem: Program terminated due to previous condition(s).");
                     }
@@ -2094,11 +2094,11 @@ namespace LowTempRadiantSystem {
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWBranchNum,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWCompNum,
                                             errFlag,
-                                            _,
-                                            _,
-                                            _,
+                                            {},
+                                            {},
+                                            {},
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode,
-                                            _);
+                                            {});
                     if (errFlag) {
                         ShowFatalError(state, "InitLowTempRadiantSystem: Program terminated due to previous condition(s).");
                     }
@@ -4048,7 +4048,7 @@ namespace LowTempRadiantSystem {
                                                            this->CondErrIndex,
                                                            DewPointTemp,
                                                            DewPointTemp,
-                                                           _,
+                                                           {},
                                                            "C",
                                                            "C");
                         }
@@ -4234,7 +4234,7 @@ namespace LowTempRadiantSystem {
                                                            this->CondErrIndex,
                                                            DewPointTemp,
                                                            DewPointTemp,
-                                                           _,
+                                                           {},
                                                            "C",
                                                            "C");
                         }
@@ -5204,7 +5204,7 @@ namespace LowTempRadiantSystem {
                                 this->CondErrIndex,
                                 DewPointTemp,
                                 DewPointTemp,
-                                _,
+                                {},
                                 "C",
                                 "C");
                         }
@@ -5274,7 +5274,7 @@ namespace LowTempRadiantSystem {
                                     this->CondErrIndex,
                                     DewPointTemp,
                                     DewPointTemp,
-                                    _,
+                                    {},
                                     "C",
                                     "C");
                             }

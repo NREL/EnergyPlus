@@ -168,7 +168,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                                                                      NumArray,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -281,7 +281,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                                                                      NumArray,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -423,10 +423,10 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ElectricityProduced",
                         "COGENERATION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state, "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->A42Model.QdotHR, "system", "Average", this->Name);
@@ -438,10 +438,10 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
                         "system",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "COGENERATION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state, "Generator Electric Efficiency", OutputProcessor::Unit::None, this->A42Model.ElecEff, "System", "Average", this->Name);
@@ -486,10 +486,10 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "NaturalGas",
                         "COGENERATION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(
@@ -650,11 +650,11 @@ void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state
                                                 this->CWBranchNum,
                                                 this->CWCompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                _,
-                                                _);
+                                                {},
+                                                {},
+                                                {},
+                                                {},
+                                                {});
 
         if (errFlag) {
             ShowFatalError(state, "InitMicroCHPNoNormalizeGenerators: Program terminated for previous conditions.");

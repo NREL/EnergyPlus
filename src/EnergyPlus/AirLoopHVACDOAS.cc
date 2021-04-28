@@ -509,11 +509,11 @@ namespace AirLoopHVACDOAS {
                                                                 thisDOAS.CWBranchNum,
                                                                 thisDOAS.CWCompNum,
                                                                 errorsFound,
-                                                                _,
-                                                                _,
-                                                                _,
-                                                                _,
-                                                                _);
+                                                                {},
+                                                                {},
+                                                                {},
+                                                                {},
+                                                                {});
                         if (errorsFound) { // is this really needed here, program fatals out later on when errorsFound = true
                             ShowFatalError(state, "GetAirLoopDOASInput: Program terminated for previous conditions.");
                         }
@@ -542,11 +542,11 @@ namespace AirLoopHVACDOAS {
                                                                 thisDOAS.HWBranchNum,
                                                                 thisDOAS.HWCompNum,
                                                                 errorsFound,
-                                                                _,
-                                                                _,
-                                                                _,
-                                                                _,
-                                                                _);
+                                                                {},
+                                                                {},
+                                                                {},
+                                                                {},
+                                                                {});
                         if (errorsFound) { // is this really needed here, program fatals out later on when errorsFound = true
                             ShowFatalError(state, "GetAirLoopDOASInput: Program terminated for previous conditions.");
                         }
@@ -582,11 +582,11 @@ namespace AirLoopHVACDOAS {
                                                                 thisDOAS.CWBranchNum,
                                                                 thisDOAS.CWCompNum,
                                                                 errorsFound,
-                                                                _,
-                                                                _,
-                                                                _,
-                                                                _,
-                                                                _);
+                                                                {},
+                                                                {},
+                                                                {},
+                                                                {},
+                                                                {});
                         if (errorsFound) { // is this really needed here, program fatals out later on when errorsFound = true
                             ShowFatalError(state, "GetAirLoopDOASInput: Program terminated for previous conditions.");
                         }

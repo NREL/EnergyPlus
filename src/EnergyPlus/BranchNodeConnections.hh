@@ -75,7 +75,7 @@ namespace BranchNodeConnections {
                                 int FluidStream,                         // Count on Fluid Streams
                                 bool IsParent,                           // True when node is a parent node
                                 bool &errFlag,                           // Will be True if errors already detected or if errors found here
-                                Optional_string_const InputFieldName = _ // Input Field Name
+                                Optional_string_const InputFieldName = {}  // Input Field Name
     );
 
     void OverrideNodeConnectionType(EnergyPlusData &state,
@@ -146,7 +146,7 @@ namespace BranchNodeConnections {
                        std::string const &CompName,          // Component Name
                        std::string const &InletNode,         // Inlet Node Name
                        std::string const &OutletNode,        // Outlet Node Name
-                       Optional_string_const Description = _ // Description
+                       Optional_string_const Description = {}  // Description
     );
 
     void TestInletOutletNodes(EnergyPlusData &state, bool &ErrorsFound);

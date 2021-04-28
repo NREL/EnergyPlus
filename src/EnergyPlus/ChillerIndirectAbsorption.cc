@@ -590,10 +590,10 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ELECTRICITY",
                         "Cooling",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state, "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->Report.QEvap, "System", "Average", this->Name);
@@ -605,10 +605,10 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "CHILLERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(
@@ -629,10 +629,10 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(
@@ -655,10 +655,10 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "EnergyTransfer",
                             "Cooling",
-                            _,
+                            {},
                             "Plant");
     } else {
         if (this->GenInputOutputNodesUsed) {
@@ -672,10 +672,10 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "CHILLERS",
-                                _,
+                                {},
                                 "Plant");
         } else {
             SetupOutputVariable(
@@ -688,10 +688,10 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 fluidNameSteam,
                                 "Cooling",
-                                _,
+                                {},
                                 "Plant");
         }
     }
@@ -724,10 +724,10 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                             this->CWCompNum,
                                             errFlag,
                                             this->TempLowLimitEvapOut,
-                                            _,
-                                            _,
+                                            {},
+                                            {},
                                             this->EvapInletNodeNum,
-                                            _);
+                                            {});
 
     PlantUtilities::ScanPlantLoopsForObject(state,
                                             this->Name,
@@ -737,11 +737,11 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                             this->CDBranchNum,
                                             this->CDCompNum,
                                             errFlag,
-                                            _,
-                                            _,
-                                            _,
+                                            {},
+                                            {},
+                                            {},
                                             this->CondInletNodeNum,
-                                            _);
+                                            {});
     PlantUtilities::InterConnectTwoPlantLoopSides(
         state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_Indirect_Absorption, true);
 
@@ -754,11 +754,11 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                 this->GenBranchNum,
                                                 this->GenCompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
+                                                {},
+                                                {},
+                                                {},
                                                 this->GeneratorInletNodeNum,
-                                                _);
+                                                {});
         PlantUtilities::InterConnectTwoPlantLoopSides(
             state, this->CWLoopNum, this->CWLoopSideNum, this->GenLoopNum, this->GenCompNum, DataPlant::TypeOf_Chiller_Indirect_Absorption, true);
     }

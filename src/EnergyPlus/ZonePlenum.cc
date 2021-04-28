@@ -378,7 +378,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                     DataLoopNode::NodeConnectionType::InducedAir,
                     1,
                     ObjectIsNotParent,
-                    _,
+                    {},
                     cAlphaFields(5));
 
         if (!NodeListError) {
@@ -416,7 +416,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                 state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedNode(NodeNum) = NodeNums(NodeNum);
                 UniqueNodeError = false;
                 if (!CheckPurchasedAirForReturnPlenum(state, ZonePlenumNum)) {
-                    CheckUniqueNodes(state, "Return Plenum Induced Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum));
+                    CheckUniqueNodes(state, "Return Plenum Induced Air Nodes", "NodeNumber", UniqueNodeError, {}, NodeNums(NodeNum));
                     if (UniqueNodeError) {
                         ShowContinueError(state, "Occurs for ReturnPlenum = " + AlphArray(1));
                         ErrorsFound = true;

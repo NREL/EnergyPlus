@@ -253,10 +253,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "COOLINGCOILS",
-                        _,
+                        {},
                         "System");
     SetupOutputVariable(
         state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, this->sensCoolingEnergyRate, "System", "Average", this->name);
@@ -274,10 +274,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->name,
-                        _,
+                        {},
                         "Electricity",
                         "COOLING",
-                        _,
+                        {},
                         "System");
 
     if (this->performance.compressorFuelType != DataGlobalConstants::ResourceType::Electricity) {
@@ -295,10 +295,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             "System",
                             "Sum",
                             this->name,
-                            _,
+                            {},
                             this->performance.compressorFuelTypeForOutput,
                             "COOLING",
-                            _,
+                            {},
                             "System");
     }
 
@@ -318,10 +318,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->name,
-                        _,
+                        {},
                         "Electricity",
                         "Cooling",
-                        _,
+                        {},
                         "System");
     // Ported from variable speed coil
     SetupOutputVariable(
@@ -376,10 +376,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             "System",
                             "Sum",
                             this->name,
-                            _,
+                            {},
                             "Electricity",
                             "COOLING",
-                            _,
+                            {},
                             "System");
     }
     if (this->condensateTankIndex > 0) {
@@ -397,10 +397,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             "System",
                             "Sum",
                             this->name,
-                            _,
+                            {},
                             "OnSiteWater",
                             "Condensate",
-                            _,
+                            {},
                             "System");
     }
     if (this->evaporativeCondSupplyTankIndex > 0) {
@@ -418,10 +418,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             "System",
                             "Sum",
                             this->name,
-                            _,
+                            {},
                             "Electricity",
                             "COOLING",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Coil Evaporative Condenser Water Volume Flow Rate",
@@ -437,10 +437,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             "System",
                             "Sum",
                             this->name,
-                            _,
+                            {},
                             "Water",
                             "Cooling",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Coil Evaporative Condenser Mains Supply Water Volume",
@@ -449,10 +449,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             "System",
                             "Sum",
                             this->name,
-                            _,
+                            {},
                             "MainsWater",
                             "Cooling",
-                            _,
+                            {},
                             "System");
     }
     if (this->SubcoolReheatFlag) {
@@ -484,10 +484,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             "System",
                             "Sum",
                             this->name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HEATRECOVERY",
-                            _,
+                            {},
                             "System");
     }
 

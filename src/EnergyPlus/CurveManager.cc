@@ -343,7 +343,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -428,7 +428,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -508,7 +508,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             ++CurveNum;
@@ -572,7 +572,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -637,7 +637,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -700,7 +700,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -783,7 +783,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -866,7 +866,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -928,7 +928,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -1015,7 +1015,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -1139,7 +1139,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -1219,7 +1219,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -1301,7 +1301,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -1353,7 +1353,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -1421,7 +1421,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -1487,7 +1487,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -1554,7 +1554,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -1619,7 +1619,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -1684,7 +1684,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -1749,7 +1749,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -1814,7 +1814,7 @@ namespace CurveManager {
                                                                          NumNumbers,
                                                                          IOStatus,
                                                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         _,
+                                                                         {},
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
@@ -1865,7 +1865,7 @@ namespace CurveManager {
                                                                              NumNumbers,
                                                                              IOStatus,
                                                                              state.dataIPShortCut->lNumericFieldBlanks,
-                                                                             _,
+                                                                             {},
                                                                              state.dataIPShortCut->cAlphaFieldNames,
                                                                              state.dataIPShortCut->cNumericFieldNames);
                     ++CurveNum;
@@ -3041,7 +3041,7 @@ namespace CurveManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(

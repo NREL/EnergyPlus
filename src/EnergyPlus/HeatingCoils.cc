@@ -453,10 +453,10 @@ namespace HeatingCoils {
                                 "System",
                                 "Sum",
                                 HeatingCoil(CoilNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Rate",
@@ -472,10 +472,10 @@ namespace HeatingCoils {
                                 "System",
                                 "Sum",
                                 HeatingCoil(CoilNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Rate",
@@ -589,10 +589,10 @@ namespace HeatingCoils {
                                 "System",
                                 "Sum",
                                 HeatingCoil(CoilNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Rate",
@@ -608,10 +608,10 @@ namespace HeatingCoils {
                                 "System",
                                 "Sum",
                                 HeatingCoil(CoilNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Rate",
@@ -742,10 +742,10 @@ namespace HeatingCoils {
                                 "System",
                                 "Sum",
                                 coil.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state, "Heating Coil Heating Rate", OutputProcessor::Unit::W, coil.HeatingCoilRate, "System", "Average", coil.Name);
             SetupOutputVariable(state,
@@ -755,10 +755,10 @@ namespace HeatingCoils {
                                 "System",
                                 "Sum",
                                 coil.Name,
-                                _,
+                                {},
                                 FuelType,
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Heating Coil " + FuelType + " Rate", OutputProcessor::Unit::W, coil.FuelUseRate, "System", "Average", coil.Name);
@@ -769,10 +769,10 @@ namespace HeatingCoils {
                                 "System",
                                 "Sum",
                                 coil.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state, "Heating Coil Electricity Rate", OutputProcessor::Unit::W, coil.ElecUseRate, "System", "Average", coil.Name);
             SetupOutputVariable(state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, coil.RTF, "System", "Average", coil.Name);
@@ -790,10 +790,10 @@ namespace HeatingCoils {
                                 "System",
                                 "Sum",
                                 coil.Name,
-                                _,
+                                {},
                                 FuelType,
                                 "Heating",
-                                _,
+                                {},
                                 "System");
         }
 
@@ -912,10 +912,10 @@ namespace HeatingCoils {
                                 "System",
                                 "Sum",
                                 HeatingCoil(CoilNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Rate",
@@ -931,10 +931,10 @@ namespace HeatingCoils {
                                 "System",
                                 "Sum",
                                 HeatingCoil(CoilNum).Name,
-                                _,
+                                {},
                                 "NaturalGas",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil NaturalGas Rate",
@@ -950,10 +950,10 @@ namespace HeatingCoils {
                                 "System",
                                 "Sum",
                                 HeatingCoil(CoilNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Rate",
@@ -983,10 +983,10 @@ namespace HeatingCoils {
                                 "System",
                                 "Sum",
                                 HeatingCoil(CoilNum).Name,
-                                _,
+                                {},
                                 "NaturalGas",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
         }
 
@@ -1291,10 +1291,10 @@ namespace HeatingCoils {
                                 "HVAC",
                                 "Sum",
                                 HeatingCoil(CoilNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Rate",
@@ -1310,10 +1310,10 @@ namespace HeatingCoils {
                                 "HVAC",
                                 "Sum",
                                 HeatingCoil(CoilNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Rate",

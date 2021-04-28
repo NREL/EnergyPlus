@@ -520,10 +520,10 @@ namespace ElectricBaseboardRadiator {
                                 "System",
                                 "Sum",
                                 ElecBaseboard(BaseboardNum).EquipName,
-                                _,
+                                {},
                                 "Electricity",
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Baseboard Electricity Rate",
@@ -539,10 +539,10 @@ namespace ElectricBaseboardRadiator {
                                 "System",
                                 "Sum",
                                 ElecBaseboard(BaseboardNum).EquipName,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "BASEBOARD",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,

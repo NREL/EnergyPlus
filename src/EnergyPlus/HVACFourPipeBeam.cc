@@ -379,10 +379,10 @@ namespace FourPipeBeam {
                                 "System",
                                 "Sum",
                                 thisBeam->name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Air Terminal Beam Sensible Cooling Rate",
@@ -400,10 +400,10 @@ namespace FourPipeBeam {
                                 "System",
                                 "Sum",
                                 thisBeam->name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Air Terminal Beam Sensible Heating Rate",
@@ -580,11 +580,11 @@ namespace FourPipeBeam {
                                         this->cWLocation.branchNum,
                                         this->cWLocation.compNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
+                                        {},
+                                        {},
+                                        {},
                                         this->cWInNodeNum,
-                                        _);
+                                        {});
                 if (errFlag) {
                     ShowFatalError(state, routineName + " Program terminated for previous conditions.");
                 }
@@ -598,11 +598,11 @@ namespace FourPipeBeam {
                                         this->hWLocation.branchNum,
                                         this->hWLocation.compNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
+                                        {},
+                                        {},
+                                        {},
                                         this->hWInNodeNum,
-                                        _);
+                                        {});
                 if (errFlag) {
                     ShowFatalError(state, routineName + " Program terminated for previous conditions.");
                 }

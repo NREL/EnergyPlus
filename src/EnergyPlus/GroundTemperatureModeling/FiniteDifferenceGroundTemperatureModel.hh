@@ -171,7 +171,7 @@ public:
 
     Real64 getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const depth, int const monthOfSim) override;
 
-    void evaluateSoilRhoCp(Optional<int const> cell = _, Optional_bool_const InitOnly = _);
+    void evaluateSoilRhoCp(Optional<int const> cell = {}, Optional_bool_const InitOnly = {})  ;
 
     Real64 interpolate(Real64 const x, Real64 const x_hi, Real64 const x_low, Real64 const y_hi, Real64 const y_low);
 

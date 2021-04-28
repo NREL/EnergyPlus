@@ -183,8 +183,8 @@ namespace SortAndStringUtilities {
         if (Alphas.size() > 1) {
             int iq;
             QsortPartition(Alphas, iAlphas, iq);
-            QsortC(Alphas({_, iq - 1}), iAlphas({_, iq - 1}));
-            QsortC(Alphas({iq, _}), iAlphas({iq, _}));
+            QsortC(Alphas({{}, iq - 1}), iAlphas({{}, iq - 1}));
+            QsortC(Alphas({iq, {}}), iAlphas({iq, {}}));
         }
     }
 

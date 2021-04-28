@@ -495,7 +495,7 @@ namespace HeatBalanceIntRadExchange {
 
         auto &ViewFactorReport(state.dataHeatBalIntRadExchg->ViewFactorReport);
 
-        ScanForReports(state, "ViewFactorInfo", ViewFactorReport, _, Option1);
+        ScanForReports(state, "ViewFactorInfo", ViewFactorReport, {}, Option1);
 
         if (ViewFactorReport) { // Print heading
             print(state.files.eio, "{}\n", "! <Surface View Factor and Grey Interchange Information>");
@@ -672,7 +672,7 @@ namespace HeatBalanceIntRadExchange {
                     print(state.files.eio, "\n");
 
                     for (int Findex : thisEnclosure.SurfaceReportNums) {
-                        RowSum = sum(SaveApproximateViewFactors(_, Findex));
+                        RowSum = sum(SaveApproximateViewFactors(ObjexxFCL::IndexSlice{}, Findex));
                         print(state.files.eio,
                               "{},{},{},{:.4R}",
                               "View Factor",
@@ -694,7 +694,7 @@ namespace HeatBalanceIntRadExchange {
                     print(state.files.eio, "\n");
 
                     for (int Findex : thisEnclosure.SurfaceReportNums) {
-                        RowSum = sum(thisEnclosure.F(_, Findex));
+                        RowSum = sum(thisEnclosure.F(ObjexxFCL::IndexSlice{}, Findex));
                         print(state.files.eio,
                               "{},{},{},{:.4R}",
                               "View Factor",
@@ -771,7 +771,7 @@ namespace HeatBalanceIntRadExchange {
 
                 RowSum = 0.0;
                 for (int Findex : thisEnclosure.SurfaceReportNums) {
-                    RowSum += sum(thisEnclosure.F(_, Findex));
+                    RowSum += sum(thisEnclosure.F(ObjexxFCL::IndexSlice{}, Findex));
                 }
                 RowSum = std::abs(RowSum - thisEnclosure.NumOfSurfaces);
                 FixedRowSum = std::abs(FixedRowSum - thisEnclosure.NumOfSurfaces);
@@ -804,7 +804,7 @@ namespace HeatBalanceIntRadExchange {
 
         bool ErrorsFound = false;
         bool ViewFactorReport = false;
-        General::ScanForReports(state, "ViewFactorInfo", ViewFactorReport, _, Option1);
+        General::ScanForReports(state, "ViewFactorInfo", ViewFactorReport, {}, Option1);
 
         if (ViewFactorReport) { // Print heading
             print(state.files.eio, "{}\n", "! <Solar View Factor Information>");
@@ -972,7 +972,7 @@ namespace HeatBalanceIntRadExchange {
                 print(state.files.eio, "\n");
 
                 for (int Findex : thisEnclosure.SurfaceReportNums) {
-                    Real64 RowSum = sum(SaveApproximateViewFactors(_, Findex));
+                    Real64 RowSum = sum(SaveApproximateViewFactors(ObjexxFCL::IndexSlice{}, Findex));
                     print(state.files.eio,
                           "Solar View Factor,{},{},{:.4R}",
                           state.dataSurface->Surface(thisEnclosure.SurfacePtr(Findex)).Name,
@@ -993,7 +993,7 @@ namespace HeatBalanceIntRadExchange {
                 print(state.files.eio, "\n");
 
                 for (int Findex : thisEnclosure.SurfaceReportNums) {
-                    Real64 RowSum = sum(thisEnclosure.F(_, Findex));
+                    Real64 RowSum = sum(thisEnclosure.F(ObjexxFCL::IndexSlice{}, Findex));
                     print(state.files.eio,
                           "{},{},{},{:.4R}",
                           "Solar View Factor",
@@ -1054,7 +1054,7 @@ namespace HeatBalanceIntRadExchange {
 
             Real64 RowSum = 0.0;
             for (int Findex : thisEnclosure.SurfaceReportNums) {
-                RowSum += sum(thisEnclosure.F(_, Findex));
+                RowSum += sum(thisEnclosure.F(ObjexxFCL::IndexSlice{}, Findex));
             }
             RowSum = std::abs(RowSum - thisEnclosure.NumOfSurfaces);
             FixedRowSum = std::abs(FixedRowSum - thisEnclosure.NumOfSurfaces);
@@ -1652,13 +1652,13 @@ namespace HeatBalanceIntRadExchange {
             ++NumIterations;
             for (i = 1; i <= N; ++i) {
                 // Determine row coefficients which will enforce closure.
-                Real64 const sum_FixedAF_i(sum(FixedAF(_, i)));
+                Real64 const sum_FixedAF_i(sum(FixedAF(ObjexxFCL::IndexSlice{}, i)));
                 if (std::abs(sum_FixedAF_i) > 1.0e-10) {
                     RowCoefficient(i) = A(i) / sum_FixedAF_i;
                 } else {
                     RowCoefficient(i) = 1.0;
                 }
-                FixedAF(_, i) *= RowCoefficient(i);
+                FixedAF(ObjexxFCL::IndexSlice{}, i) *= RowCoefficient(i);
             }
 
             //  Enforce reciprocity by averaging AiFij and AjFji

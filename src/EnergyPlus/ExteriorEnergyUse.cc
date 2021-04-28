@@ -241,7 +241,7 @@ namespace ExteriorEnergyUse {
                                 "Zone",
                                 "Sum",
                                 state.dataExteriorEnergyUse->ExteriorLights(Item).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Exterior Lights",
                                 EndUseSubcategoryName);
@@ -339,7 +339,7 @@ namespace ExteriorEnergyUse {
                                         "Zone",
                                         "Sum",
                                         state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).Name,
-                                        _,
+                                        {},
                                         TypeString,
                                         "ExteriorEquipment",
                                         EndUseSubcategoryName);
@@ -358,7 +358,7 @@ namespace ExteriorEnergyUse {
                                         "Zone",
                                         "Sum",
                                         state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).Name,
-                                        _,
+                                        {},
                                         TypeString,
                                         "ExteriorEquipment",
                                         EndUseSubcategoryName);
@@ -503,7 +503,7 @@ namespace ExteriorEnergyUse {
                                 "Zone",
                                 "Sum",
                                 state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).Name,
-                                _,
+                                {},
                                 "Water",
                                 "ExteriorEquipment",
                                 EndUseSubcategoryName);
@@ -514,7 +514,7 @@ namespace ExteriorEnergyUse {
                                 "Zone",
                                 "Sum",
                                 state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).Name,
-                                _,
+                                {},
                                 "MainsWater",
                                 "ExteriorEquipment",
                                 EndUseSubcategoryName);

@@ -321,10 +321,10 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             "System",
                             "Sum",
                             name_,
-                            _,
+                            {},
                             "ElectricityPurchased",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(
@@ -336,10 +336,10 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             "System",
                             "Sum",
                             name_,
-                            _,
+                            {},
                             "ElectricitySurplusSold",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(
@@ -351,10 +351,10 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             "System",
                             "Sum",
                             name_,
-                            _,
+                            {},
                             "ElectricityNet",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(
@@ -2031,11 +2031,11 @@ Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad(EnergyPlusData &state)
                                                     g->cogenLocation.branchNum,
                                                     g->cogenLocation.compNum,
                                                     plantNotFound,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {});
             if (!plantNotFound) g->plantInfoFound = true;
         }
         myCoGenSetupFlag_ = false;
@@ -2494,10 +2494,10 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                             "System",
                             "Sum",
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "POWERCONVERSION",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state, "Inverter Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, "System", "Average", name_);
         SetupOutputVariable(state, "Inverter Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, "System", "Sum", name_);
@@ -2509,7 +2509,7 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                             "System",
                             "Sum",
                             name_,
-                            _,
+                            {},
                             "Electricity",
                             "Cogeneration",
                             "DCtoACInverter Ancillary",
@@ -2892,10 +2892,10 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                             "System",
                             "Sum",
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "POWERCONVERSION",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state, "Converter Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, "System", "Average", name_);
         SetupOutputVariable(state, "Converter Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, "System", "Sum", name_);
@@ -2907,7 +2907,7 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                             "System",
                             "Sum",
                             name_,
-                            _,
+                            {},
                             "Electricity",
                             "Cogeneration",
                             "ACtoDCConverter Ancillary",
@@ -3398,10 +3398,10 @@ ElectricStorage::ElectricStorage( // main constructor
                             "System",
                             "Sum",
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "ELECTRICSTORAGE",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state, "Electric Storage Discharge Power", OutputProcessor::Unit::W, drawnPower_, "System", "Average", name_);
         SetupOutputVariable(state,
@@ -3411,10 +3411,10 @@ ElectricStorage::ElectricStorage( // main constructor
                             "System",
                             "Sum",
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "ELECTRICSTORAGE",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state, "Electric Storage Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, "System", "Average", name_);
         SetupOutputVariable(state, "Electric Storage Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, "System", "Sum", name_);
@@ -4480,7 +4480,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 "System",
                                 "Sum",
                                 name_,
-                                _,
+                                {},
                                 "Electricity",
                                 "ExteriorEquipment",
                                 "Transformer",
@@ -4494,10 +4494,10 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 "System",
                                 "Sum",
                                 name_,
-                                _,
+                                {},
                                 "ElectricityProduced",
                                 "POWERCONVERSION",
-                                _,
+                                {},
                                 "System");
         }
         if (usageMode_ == TransformerUse::powerBetweenLoadCenterAndBldg) {
@@ -4508,10 +4508,10 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 "System",
                                 "Sum",
                                 name_,
-                                _,
+                                {},
                                 "ElectricityProduced",
                                 "POWERCONVERSION",
-                                _,
+                                {},
                                 "System");
         }
 

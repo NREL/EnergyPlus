@@ -687,10 +687,10 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                             "System",
                             "Sum",
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "COOLINGPANEL",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Panel Total System Cooling Energy",
@@ -699,10 +699,10 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                             "System",
                             "Sum",
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "COOLINGPANEL",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Panel Convective Cooling Energy",
@@ -829,11 +829,11 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
                                     ThisCP.BranchNum,
                                     ThisCP.CompNum,
                                     errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {});
             if (errFlag) {
                 ShowFatalError(state, "InitCoolingPanel: Program terminated for previous conditions.");
             }
@@ -1358,7 +1358,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
                                                this->CondErrIndex,
                                                DewPointTemp,
                                                DewPointTemp,
-                                               _,
+                                               {},
                                                "C",
                                                "C");
             }

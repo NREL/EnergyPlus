@@ -151,7 +151,7 @@ namespace ICEngineElectricGenerator {
                                                                      NumArray,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -317,10 +317,10 @@ namespace ICEngineElectricGenerator {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(
@@ -333,10 +333,10 @@ namespace ICEngineElectricGenerator {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             this->FuelType,
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         //    general fuel use report to match other generators.
@@ -370,10 +370,10 @@ namespace ICEngineElectricGenerator {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(
@@ -386,10 +386,10 @@ namespace ICEngineElectricGenerator {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(
@@ -402,10 +402,10 @@ namespace ICEngineElectricGenerator {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(
@@ -613,7 +613,7 @@ namespace ICEngineElectricGenerator {
                                                this->ErrExhaustTempIndex,
                                                exhaustTemp,
                                                exhaustTemp,
-                                               _,
+                                               {},
                                                "[C]",
                                                "[C]");
                 QExhaustRec = 0.0;
@@ -779,11 +779,11 @@ namespace ICEngineElectricGenerator {
                                                     this->HRBranchNum,
                                                     this->HRCompNum,
                                                     errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {});
             if (errFlag) {
                 ShowFatalError(state, "InitICEngineGenerators: Program terminated due to previous condition(s).");
             }

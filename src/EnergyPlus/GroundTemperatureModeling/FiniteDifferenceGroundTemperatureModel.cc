@@ -859,7 +859,7 @@ void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
     }
 
     // Initialize freezing calculation variables
-    evaluateSoilRhoCp(_, true);
+    evaluateSoilRhoCp({}, true);
 
     // Initialize the groundTemps array
     groundTemps.dimension({1, state.dataWeatherManager->NumDaysInYear}, {1, totalNumCells}, 0.0);

@@ -578,7 +578,7 @@ void ControlCompOutput(EnergyPlusData &state,
                                            CompErrIndex,
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
-                                           _,
+                                           {},
                                            "%",
                                            "%");
             //}
@@ -587,7 +587,7 @@ void ControlCompOutput(EnergyPlusData &state,
                                            CompErrIndex,
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
-                                           _,
+                                           {},
                                            "%",
                                            "%");
             break; // It will not converge this time
@@ -1047,7 +1047,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     if (state.dataEnvrn->IsRain) HExt = 1000.0;
 
     //    Tso = sum( TH( 1, 1, SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-    Tso = sum_product_sub(state.dataHeatBalSurf->TH(1, 1, _), state.dataSurface->Surface, &SurfaceData::Area, SurfPtrARR) /
+    Tso = sum_product_sub(state.dataHeatBalSurf->TH(1, 1, ObjexxFCL::IndexSlice{}), state.dataSurface->Surface, &SurfaceData::Area, SurfPtrARR) /
           A; // Autodesk:F2C++ Functions handle array subscript usage
     //    Isc = sum( QRadSWOutIncident( SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
     Isc = sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident, state.dataSurface->Surface, &SurfaceData::Area, SurfPtrARR) /
@@ -1912,7 +1912,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
             if (state.dataAirLoop->AirToZoneNodeInfo(Count2).NumReturnNodes > 0) {
                 if (AllNodes(1) == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipReturnNodeNum(1)) {
                     const auto WAirLoop = Count2;
-                    ValRetAPaths(_, WAirLoop) = 0;
+                    ValRetAPaths(ObjexxFCL::IndexSlice{}, WAirLoop) = 0;
                     ValRetAPaths({1, CountNodes}, WAirLoop) = AllNodes({1, CountNodes});
                     break;
                 }

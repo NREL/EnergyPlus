@@ -473,7 +473,7 @@ void SimOAComponent(EnergyPlusData &state,
                 CompIndex = HVACFan::getFanObjectVectorIndex(state, CompName) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
             }
             if (Sim) {
-                state.dataHVACFan->fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
+                state.dataHVACFan->fanObjs[CompIndex - 1]->simulate(state, {}, {}, {}, {}); // vector is 0 based, but CompIndex is 1 based so shift
             }
         } else if (SELECT_CASE_var == Fan_ComponentModel) { // 'Fan:ComponentModel'
             if (Sim) {
@@ -540,13 +540,13 @@ void SimOAComponent(EnergyPlusData &state,
         } else if (SELECT_CASE_var == Coil_ElectricHeat) { // 'Coil:Heating:Electric'
             if (Sim) {
                 //     stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
-                SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, _, CompIndex);
+                SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, {}, CompIndex);
             }
             OAHeatingCoil = true;
         } else if (SELECT_CASE_var == Coil_GasHeat) { // 'Coil:Heating:Fuel'
             if (Sim) {
                 //     stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
-                SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, _, CompIndex);
+                SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, {}, CompIndex);
             }
             OAHeatingCoil = true;
         } else if (SELECT_CASE_var == WaterCoil_CoolingHXAsst) { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
@@ -632,7 +632,7 @@ void SimOAComponent(EnergyPlusData &state,
                     }
                 }
                 if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum > -1) {
-                    SimHeatRecovery(state, CompName, FirstHVACIteration, CompIndex, FanOpMode, AirloopPLR, _, _, _, _, _);
+                    SimHeatRecovery(state, CompName, FirstHVACIteration, CompIndex, FanOpMode, AirloopPLR, {}, {}, {}, {}, {});
                 } else {
                     SimHeatRecovery(state,
                                     CompName,
@@ -640,9 +640,9 @@ void SimOAComponent(EnergyPlusData &state,
                                     CompIndex,
                                     FanOpMode,
                                     AirloopPLR,
-                                    _,
-                                    _,
-                                    _,
+                                    {},
+                                    {},
+                                    {},
                                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).HeatRecoveryBypass,
                                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).HighHumCtrlActive);
                 }

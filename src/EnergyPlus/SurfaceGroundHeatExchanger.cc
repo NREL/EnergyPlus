@@ -220,8 +220,8 @@ namespace SurfaceGroundHeatExchanger {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumbers,
                                                                      IOStatus,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
@@ -494,11 +494,11 @@ namespace SurfaceGroundHeatExchanger {
                                     this->BranchNum,
                                     this->CompNum,
                                     errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {});
 
             if (errFlag) {
                 ShowFatalError(state, "InitSurfaceGroundHeatExchanger: Program terminated due to previous condition(s).");
@@ -534,7 +534,7 @@ namespace SurfaceGroundHeatExchanger {
                     this->CTFin = state.dataConstruction->Construct(Cons).CTFInside;         // Z coefficents
                     this->CTFout = state.dataConstruction->Construct(Cons).CTFOutside;       // X coefficents
                     this->CTFcross = state.dataConstruction->Construct(Cons).CTFCross;       // Y coefficents
-                    this->CTFflux({1, _}) = state.dataConstruction->Construct(Cons).CTFFlux; // F & f coefficents
+                    this->CTFflux({1, {}}) = state.dataConstruction->Construct(Cons).CTFFlux; // F & f coefficents
                     // QTF stuff
                     this->CTFSourceIn = state.dataConstruction->Construct(Cons).CTFSourceIn;     // Wi coefficents
                     this->CTFSourceOut = state.dataConstruction->Construct(Cons).CTFSourceOut;   // Wo coefficents
@@ -1200,7 +1200,7 @@ namespace SurfaceGroundHeatExchanger {
                                                this->FrozenErrIndex1,
                                                this->InletTemp,
                                                this->InletTemp,
-                                               _,
+                                               {},
                                                "[C]",
                                                "[C]");
                 this->InletTemp = max(this->InletTemp, 0.0);

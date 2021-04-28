@@ -241,7 +241,7 @@ namespace BranchInputManager {
     void GetConnectorList(EnergyPlusData &state,
                           std::string const &ConnectorListName, // Requested Connector List
                           ConnectorData &Connectoid,            // Returned Connector Data
-                          Optional_int_const NumInList = _      // Number of the current connector in the list of connectors
+                          Optional_int_const NumInList = {}       // Number of the current connector in the list of connectors
     );
 
     void GetLoopMixer(EnergyPlusData &state,
@@ -255,8 +255,8 @@ namespace BranchInputManager {
                       Array1D_string &InletNodeNames,       // Inlet Node IDs
                       Array1D_int &InletNodeNums,           // Inlet Node Numbers
                       bool &ErrorsFound,
-                      Optional_int_const ConnectorNumber = _, // number of the current item in connector list
-                      Optional_int MixerNumber = _            // Mixer number for this specific splitter
+                      Optional_int_const ConnectorNumber = {}, // number of the current item in connector list
+                      Optional_int MixerNumber = {}             // Mixer number for this specific splitter
     );
 
     void GetLoopSplitter(EnergyPlusData &state,
@@ -270,8 +270,8 @@ namespace BranchInputManager {
                          Array1D_string &OutletNodeNames,      // Outlet Node IDs
                          Array1D_int &OutletNodeNums,          // Outlet Node Numbers
                          bool &ErrorsFound,
-                         Optional_int_const ConnectorNumber = _, // number of the current item in connector list
-                         Optional_int SplitterNumber = _         // splitter number for this specific splitter
+                         Optional_int_const ConnectorNumber = {}, // number of the current item in connector list
+                         Optional_int SplitterNumber = {}          // splitter number for this specific splitter
     );
 
     std::string GetFirstBranchInletNodeName(EnergyPlusData &state, std::string const &BranchListName); // Branch List name to search
@@ -338,8 +338,8 @@ namespace BranchInputManager {
 
     void AuditBranches(EnergyPlusData &state,
                        bool mustprint,                     // true if the warning should be printed.
-                       Optional_string_const CompType = _, // when mustprint (ScanPlantLoop)  use CompType in error message and scan
-                       Optional_string_const CompName = _  // when mustprint (ScanPlantLoop)  use CompName in error message and scan
+                       Optional_string_const CompType = {}, // when mustprint (ScanPlantLoop)  use CompType in error message and scan
+                       Optional_string_const CompName = {}   // when mustprint (ScanPlantLoop)  use CompName in error message and scan
     );
 
     void TestBranchIntegrity(EnergyPlusData &state, bool &ErrFound); // ErrFound is a return value, true or false

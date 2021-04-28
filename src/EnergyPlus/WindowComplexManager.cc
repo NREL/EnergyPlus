@@ -2287,7 +2287,7 @@ namespace WindowComplexManager {
                 RayIndex = Basis.BasisIndex(1, ITheta);
                 return RayIndex;
             }
-            IPhUp = SearchAscTable(Phi, Basis.NPhis(ITheta) + 1, Basis.Phis(ITheta, _));
+            IPhUp = SearchAscTable(Phi, Basis.NPhis(ITheta) + 1, Basis.Phis(ITheta, ObjexxFCL::IndexSlice{}));
             IPhDn = IPhUp - 1;
             if (Phi <= Basis.Grid(Basis.BasisIndex(IPhDn, ITheta)).UpprPhi) {
                 IPhi = IPhDn;

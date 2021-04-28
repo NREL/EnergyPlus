@@ -735,9 +735,9 @@ namespace IceThermalStorage {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
@@ -839,7 +839,7 @@ namespace IceThermalStorage {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -1191,10 +1191,10 @@ namespace IceThermalStorage {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ELECTRICITY",
-                            _,
-                            _,
+                            {},
+                            {},
                             "System");
     }
 
@@ -1308,11 +1308,11 @@ namespace IceThermalStorage {
                                                     this->BranchNum,
                                                     this->CompNum,
                                                     errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {});
             if (errFlag) {
                 ShowFatalError(state, "InitSimpleIceStorage: Program terminated due to previous condition(s).");
             }

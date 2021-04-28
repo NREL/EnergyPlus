@@ -3080,7 +3080,7 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
         // Locate the hx on the plant loops for later usage
         bool errFlag = false;
         ScanPlantLoopsForObject(
-            state, this->name, TypeOf_GrndHtExchgSystem, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+            state, this->name, TypeOf_GrndHtExchgSystem, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, {}, {}, {}, {}, {});
         if (errFlag) {
             ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
         }
@@ -3174,7 +3174,7 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
         // Locate the hx on the plant loops for later usage
         bool errFlag = false;
         ScanPlantLoopsForObject(
-            state, this->name, TypeOf_GrndHtExchgSlinky, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+            state, this->name, TypeOf_GrndHtExchgSlinky, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, {}, {}, {}, {}, {});
         if (errFlag) {
             ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
         }

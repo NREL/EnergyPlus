@@ -1242,11 +1242,11 @@ namespace OutdoorAirUnit {
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).BranchNum,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).CompNum,
                                             errFlag,
-                                            _,
-                                            _,
-                                            _,
-                                            _,
-                                            _);
+                                            {},
+                                            {},
+                                            {},
+                                            {},
+                                            {});
                     if (errFlag) {
                         ShowFatalError(state, "InitOutdoorAirUnit: Program terminated for previous conditions.");
                     }
@@ -1672,12 +1672,12 @@ namespace OutdoorAirUnit {
 
         if (OutAirUnit(OAUnitNum).SFanMaxAirVolFlow == AutoSize) {
             if (OutAirUnit(OAUnitNum).SFanType != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(state, OutAirUnit(OAUnitNum).SFanName, true, OutAirUnit(OAUnitNum).SFan_Index, _, false, false);
+                Fans::SimulateFanComponents(state, OutAirUnit(OAUnitNum).SFanName, true, OutAirUnit(OAUnitNum).SFan_Index, {}, false, false);
                 OutAirUnit(OAUnitNum).SFanMaxAirVolFlow =
                     GetFanDesignVolumeFlowRate(state, cFanTypes(OutAirUnit(OAUnitNum).SFanType), OutAirUnit(OAUnitNum).SFanName, ErrorsFound);
 
             } else {
-                state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, _, _, _);
+                state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, {}, {}, {}, {});
                 OutAirUnit(OAUnitNum).SFanMaxAirVolFlow = state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->designAirVolFlowRate;
             }
         }
@@ -1689,7 +1689,7 @@ namespace OutdoorAirUnit {
                     OutAirUnit(OAUnitNum).EFanMaxAirVolFlow =
                         GetFanDesignVolumeFlowRate(state, cFanTypes(OutAirUnit(OAUnitNum).ExtFanType), OutAirUnit(OAUnitNum).ExtFanName, ErrorsFound);
                 } else {
-                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->simulate(state, _, _, _, _);
+                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->simulate(state, {}, {}, {}, {});
                     OutAirUnit(OAUnitNum).EFanMaxAirVolFlow = state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->designAirVolFlowRate;
                 }
             }
@@ -1703,7 +1703,7 @@ namespace OutdoorAirUnit {
                                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
                                                 true,
                                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex,
-                                                _,
+                                                {},
                                                 1,
                                                 0.0);
                 }
@@ -1714,7 +1714,7 @@ namespace OutdoorAirUnit {
                                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
                                                 true,
                                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex,
-                                                _,
+                                                {},
                                                 1,
                                                 0.0);
                 }
@@ -1870,11 +1870,11 @@ namespace OutdoorAirUnit {
                                                 OutAirUnit(OAUnitNum).SFanName,
                                                 FirstHVACIteration,
                                                 OutAirUnit(OAUnitNum).SFan_Index,
-                                                _,
+                                                {},
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
                 }
 
                 SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
@@ -1884,12 +1884,12 @@ namespace OutdoorAirUnit {
                                                     OutAirUnit(OAUnitNum).ExtFanName,
                                                     FirstHVACIteration,
                                                     OutAirUnit(OAUnitNum).ExtFan_Index,
-                                                    _,
+                                                    {},
                                                     ZoneCompTurnFansOn,
                                                     ZoneCompTurnFansOff); // why not turn on/off flags here?
                     } else {
                         state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->simulate(
-                            state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                            state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
                     }
                 }
 
@@ -1900,11 +1900,11 @@ namespace OutdoorAirUnit {
                                                 OutAirUnit(OAUnitNum).SFanName,
                                                 FirstHVACIteration,
                                                 OutAirUnit(OAUnitNum).SFan_Index,
-                                                _,
+                                                {},
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
                 }
                 if (OutAirUnit(OAUnitNum).ExtFan) {
                     if (OutAirUnit(OAUnitNum).ExtFanType != DataHVACGlobals::FanType_SystemModelObject) {
@@ -1912,12 +1912,12 @@ namespace OutdoorAirUnit {
                                                     OutAirUnit(OAUnitNum).ExtFanName,
                                                     FirstHVACIteration,
                                                     OutAirUnit(OAUnitNum).ExtFan_Index,
-                                                    _,
+                                                    {},
                                                     ZoneCompTurnFansOn,
                                                     ZoneCompTurnFansOff);
                     } else {
                         state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->simulate(
-                            state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                            state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
                     }
                 }
             }
@@ -1958,11 +1958,11 @@ namespace OutdoorAirUnit {
                                                 OutAirUnit(OAUnitNum).SFanName,
                                                 FirstHVACIteration,
                                                 OutAirUnit(OAUnitNum).SFan_Index,
-                                                _,
+                                                {},
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
                 }
                 DesOATemp = state.dataLoopNodes->Node(SFanOutletNode).Temp;
             } else if (OutAirUnit(OAUnitNum).FanPlace == DrawThru) {
@@ -2026,11 +2026,11 @@ namespace OutdoorAirUnit {
                                                 OutAirUnit(OAUnitNum).SFanName,
                                                 FirstHVACIteration,
                                                 OutAirUnit(OAUnitNum).SFan_Index,
-                                                _,
+                                                {},
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
                 }
 
                 OutAirUnit(OAUnitNum).FanEffect = true; // RE-Simulation to take over the supply fan effect
@@ -2041,11 +2041,11 @@ namespace OutdoorAirUnit {
                                                 OutAirUnit(OAUnitNum).SFanName,
                                                 FirstHVACIteration,
                                                 OutAirUnit(OAUnitNum).SFan_Index,
-                                                _,
+                                                {},
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
                 }
                 OutAirUnit(OAUnitNum).FanEffect = false;
             }
@@ -2055,11 +2055,11 @@ namespace OutdoorAirUnit {
                                                 OutAirUnit(OAUnitNum).ExtFanName,
                                                 FirstHVACIteration,
                                                 OutAirUnit(OAUnitNum).ExtFan_Index,
-                                                _,
+                                                {},
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->simulate(state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
                 }
             }
         } // ...end of system ON/OFF IF-THEN block
@@ -2270,7 +2270,7 @@ namespace OutdoorAirUnit {
             if (SELECT_CASE_var == HeatXchngr) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent',
                 // 'HeatExchanger:Desiccant:BalancedFlow'
                 if (Sim) {
-                    SimHeatRecovery(state, EquipName, FirstHVACIteration, CompIndex, ContFanCycCoil, _, _, _, _, false, false);
+                    SimHeatRecovery(state, EquipName, FirstHVACIteration, CompIndex, ContFanCycCoil, {}, {}, {}, {}, false, false);
                 }
                 // Desiccant Dehumidifier
             } else if (SELECT_CASE_var == Desiccant) { // 'Dehumidifier:Desiccant:NoFans'
@@ -2316,9 +2316,9 @@ namespace OutdoorAirUnit {
                                       0.0001,
                                       OutAirUnit(OAUnitNum).ControlCompTypeNum,
                                       OutAirUnit(OAUnitNum).CompErrIndex,
-                                      _,
-                                      _,
-                                      _,
+                                      {},
+                                      {},
+                                      {},
                                       2,
                                       SimCompNum,
                                       OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopNum,
@@ -2387,9 +2387,9 @@ namespace OutdoorAirUnit {
                                       0.001,
                                       OutAirUnit(OAUnitNum).ControlCompTypeNum,
                                       OutAirUnit(OAUnitNum).CompErrIndex,
-                                      _,
-                                      _,
-                                      _,
+                                      {},
+                                      {},
+                                      {},
                                       1,
                                       SimCompNum,
                                       OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopNum,
@@ -2436,9 +2436,9 @@ namespace OutdoorAirUnit {
                                       0.001,
                                       OutAirUnit(OAUnitNum).ControlCompTypeNum,
                                       OutAirUnit(OAUnitNum).CompErrIndex,
-                                      _,
-                                      _,
-                                      _,
+                                      {},
+                                      {},
+                                      {},
                                       1,
                                       SimCompNum,
                                       OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopNum,
@@ -2481,9 +2481,9 @@ namespace OutdoorAirUnit {
                                       0.001,
                                       OutAirUnit(OAUnitNum).ControlCompTypeNum,
                                       OutAirUnit(OAUnitNum).CompErrIndex,
-                                      _,
-                                      _,
-                                      _,
+                                      {},
+                                      {},
+                                      {},
                                       1,
                                       SimCompNum,
                                       OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopNum,

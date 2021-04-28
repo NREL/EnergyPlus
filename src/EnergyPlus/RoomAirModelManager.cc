@@ -298,7 +298,7 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumbers,
                                                                      Status,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -391,8 +391,8 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumbers,
                                                                      Status,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
@@ -416,8 +416,8 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumbers,
                                                                      Status,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::TwoGradInterpPattern;
@@ -499,8 +499,8 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumbers,
                                                                      Status,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).Name = state.dataIPShortCut->cAlphaArgs(1);
@@ -551,8 +551,8 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumbers,
                                                                      Status,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).Name = state.dataIPShortCut->cAlphaArgs(1);
@@ -699,8 +699,8 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumbers,
                                                                      Status,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
@@ -916,8 +916,8 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumbers,
                                                                      Status,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
@@ -983,7 +983,7 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumber,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -1067,7 +1067,7 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumber,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -1229,7 +1229,7 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumber,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -1300,7 +1300,7 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumber,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -1440,7 +1440,7 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumbers,
                                                                      status,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -1516,7 +1516,7 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumbers,
                                                                      status,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -1576,8 +1576,8 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumbers,
                                                                      status,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -1655,8 +1655,8 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumbers,
                                                                      status,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (mod((NumAlphas + NumNumbers - 1), 3) != 0) {
@@ -1746,8 +1746,8 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumbers,
                                                                      status,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (mod((NumAlphas + NumNumbers - 1), 4) != 0) {

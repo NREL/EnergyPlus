@@ -198,7 +198,7 @@ namespace ScheduleManager {
     int GetDayScheduleIndex(EnergyPlusData &state, std::string &ScheduleName);
 
     void GetScheduleValuesForDay(
-        EnergyPlusData &state, int const ScheduleIndex, Array2S<Real64> DayValues, Optional_int_const JDay = _, Optional_int_const CurDayofWeek = _);
+        EnergyPlusData &state, int const ScheduleIndex, Array2S<Real64> DayValues, Optional_int_const JDay = {}, Optional_int_const CurDayofWeek = {})  ;
 
     void GetSingleDayScheduleValues(EnergyPlusData &state,
                                     int const DayScheduleIndex, // Index of the DaySchedule for values
@@ -284,16 +284,16 @@ namespace ScheduleManager {
                                      int const ScheduleIndex,            // Which Day Schedule being tested
                                      Real64 const Minimum,               // Minimum desired value
                                      std::string const &MinString,       // Minimum indicator ('>', '>=')
-                                     Optional<Real64 const> Maximum = _, // Maximum desired value
-                                     Optional_string_const MaxString = _ // Maximum indicator ('<', ',=')
+                                     Optional<Real64 const> Maximum = {}, // Maximum desired value
+                                     Optional_string_const MaxString = {}  // Maximum indicator ('<', ',=')
     );
 
     bool CheckDayScheduleValueMinMax(EnergyPlusData &state,
                                      int const ScheduleIndex,            // Which Day Schedule being tested
                                      Real32 const Minimum,               // Minimum desired value
                                      std::string const &MinString,       // Minimum indicator ('>', '>=')
-                                     Optional<Real32 const> Maximum = _, // Maximum desired value
-                                     Optional_string_const MaxString = _ // Maximum indicator ('<', ',=')
+                                     Optional<Real32 const> Maximum = {}, // Maximum desired value
+                                     Optional_string_const MaxString = {}  // Maximum indicator ('<', ',=')
     );
 
     bool HasFractionalScheduleValue(EnergyPlusData &state, int const ScheduleIndex); // Which Schedule being tested

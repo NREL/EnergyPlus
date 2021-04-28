@@ -616,7 +616,8 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
         }
     }
 
-    CalcInteriorRadExchange(state, state.dataHeatBalSurf->TH(2, 1, _), 0, state.dataHeatBalSurf->SurfNetLWRadToSurf, _, "Main");
+    CalcInteriorRadExchange(state, state.dataHeatBalSurf->TH(2, 1, ObjexxFCL::IndexSlice{}), 0, state.dataHeatBalSurf->SurfNetLWRadToSurf,
+                            {}, "Main");
 
     if (state.dataSurface->AirflowWindows) WindowGapAirflowControl(state);
 
@@ -5776,9 +5777,9 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
     }
 
     if (present(ZoneToResimulate)) {
-        CalcInteriorRadExchange(state, state.dataHeatBalSurf->TH(2, 1, _), 0, state.dataHeatBalSurf->SurfNetLWRadToSurf, ZoneToResimulate, Outside);
+        CalcInteriorRadExchange(state, state.dataHeatBalSurf->TH(2, 1, ObjexxFCL::IndexSlice{}), 0, state.dataHeatBalSurf->SurfNetLWRadToSurf, ZoneToResimulate, Outside);
     } else {
-        CalcInteriorRadExchange(state, state.dataHeatBalSurf->TH(2, 1, _), 0, state.dataHeatBalSurf->SurfNetLWRadToSurf, _, Outside);
+        CalcInteriorRadExchange(state, state.dataHeatBalSurf->TH(2, 1, ObjexxFCL::IndexSlice{}), 0, state.dataHeatBalSurf->SurfNetLWRadToSurf, {}, Outside);
     }
 
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) { // Loop through all surfaces...
@@ -7309,7 +7310,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                                    state.dataHeatBalSurfMgr->calcHeatBalInsideSurfErrPointer,
                                                    MaxDelTemp,
                                                    MaxDelTemp,
-                                                   _,
+                                                   {},
                                                    "[C]",
                                                    "[C]");
                 }
@@ -8051,7 +8052,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                                    state.dataHeatBalSurfMgr->calcHeatBalInsideSurfErrPointer,
                                                    MaxDelTemp,
                                                    MaxDelTemp,
-                                                   _,
+                                                   {},
                                                    "[C]",
                                                    "[C]");
                 }
@@ -8157,7 +8158,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, S
                                                   surface.LowTempErrCount,
                                                   TH12,
                                                   TH12,
-                                                  _,
+                                                  {},
                                                   "C",
                                                   "C");
                 } else {
@@ -8166,7 +8167,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, S
                                                   surface.LowTempErrCount,
                                                   TH12,
                                                   TH12,
-                                                  _,
+                                                  {},
                                                   "C",
                                                   "C");
                 }
@@ -8201,7 +8202,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, S
                                                   surface.HighTempErrCount,
                                                   TH12,
                                                   TH12,
-                                                  _,
+                                                  {},
                                                   "C",
                                                   "C");
                 } else {
@@ -8210,7 +8211,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, S
                                                   surface.HighTempErrCount,
                                                   TH12,
                                                   TH12,
-                                                  _,
+                                                  {},
                                                   "C",
                                                   "C");
                 }

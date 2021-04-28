@@ -617,7 +617,7 @@ namespace PlantChillers {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ELECTRICITY",
                             "Cooling",
                             this->EndUseSubcategory,
@@ -631,10 +631,10 @@ namespace PlantChillers {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "CHILLERS",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(
             state, "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, "System", "Average", this->Name);
@@ -651,10 +651,10 @@ namespace PlantChillers {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HEATREJECTION",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state, "Chiller COP", OutputProcessor::Unit::W_W, this->ActualCOP, "System", "Average", this->Name);
         SetupOutputVariable(
@@ -683,10 +683,10 @@ namespace PlantChillers {
                                     "System",
                                     "Sum",
                                     this->Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "CHILLERS",
-                                    _,
+                                    {},
                                     "Plant");
             }
         }
@@ -702,10 +702,10 @@ namespace PlantChillers {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
             SetupOutputVariable(
                 state, "Chiller Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, this->HeatRecInletTemp, "System", "Average", this->Name);
@@ -798,10 +798,10 @@ namespace PlantChillers {
                                                     this->CWCompNum,
                                                     errFlag,
                                                     this->TempLowLimitEvapOut,
-                                                    _,
-                                                    _,
+                                                    {},
+                                                    {},
                                                     this->EvapInletNodeNum,
-                                                    _);
+                                                    {});
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
@@ -811,11 +811,11 @@ namespace PlantChillers {
                                                         this->CDBranchNum,
                                                         this->CDCompNum,
                                                         errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
+                                                        {},
+                                                        {},
+                                                        {},
                                                         this->CondInletNodeNum,
-                                                        _);
+                                                        {});
                 PlantUtilities::InterConnectTwoPlantLoopSides(
                     state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
             }
@@ -828,11 +828,11 @@ namespace PlantChillers {
                                                         this->HRBranchNum,
                                                         this->HRCompNum,
                                                         errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
+                                                        {},
+                                                        {},
+                                                        {},
                                                         this->HeatRecInletNodeNum,
-                                                        _);
+                                                        {});
                 PlantUtilities::InterConnectTwoPlantLoopSides(
                     state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, true);
             }
@@ -1434,7 +1434,7 @@ namespace PlantChillers {
                     ShowContinueError(state, this->MsgBuffer2);
                 } else {
                     ShowRecurringWarningErrorAtEnd(
-                        state, this->MsgBuffer1 + " error continues.", this->ErrCount1, this->MsgDataLast, this->MsgDataLast, _, "[C]", "[C]");
+                        state, this->MsgBuffer1 + " error continues.", this->ErrCount1, this->MsgDataLast, this->MsgDataLast, {}, "[C]", "[C]");
                 }
             }
         }
@@ -2684,10 +2684,10 @@ namespace PlantChillers {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "CHILLERS",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(
             state, "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, "System", "Average", this->Name);
@@ -2704,10 +2704,10 @@ namespace PlantChillers {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HEATREJECTION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(
@@ -2736,10 +2736,10 @@ namespace PlantChillers {
                                     "System",
                                     "Sum",
                                     this->Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "CHILLERS",
-                                    _,
+                                    {},
                                     "Plant");
             }
         }
@@ -2753,10 +2753,10 @@ namespace PlantChillers {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             this->FuelType,
                             "Cooling",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state, "Chiller COP", OutputProcessor::Unit::W_W, this->FuelCOP, "System", "Average", this->Name);
@@ -2777,10 +2777,10 @@ namespace PlantChillers {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(
@@ -2792,10 +2792,10 @@ namespace PlantChillers {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(
@@ -2807,10 +2807,10 @@ namespace PlantChillers {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(
@@ -2863,10 +2863,10 @@ namespace PlantChillers {
                                                     this->CWCompNum,
                                                     errFlag,
                                                     this->TempLowLimitEvapOut,
-                                                    _,
-                                                    _,
+                                                    {},
+                                                    {},
                                                     this->EvapInletNodeNum,
-                                                    _);
+                                                    {});
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
@@ -2876,11 +2876,11 @@ namespace PlantChillers {
                                                         this->CDBranchNum,
                                                         this->CDCompNum,
                                                         errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
+                                                        {},
+                                                        {},
+                                                        {},
                                                         this->CondInletNodeNum,
-                                                        _);
+                                                        {});
                 PlantUtilities::InterConnectTwoPlantLoopSides(
                     state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
             }
@@ -2893,11 +2893,11 @@ namespace PlantChillers {
                                                         this->HRBranchNum,
                                                         this->HRCompNum,
                                                         errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
+                                                        {},
+                                                        {},
+                                                        {},
                                                         this->HeatRecInletNodeNum,
-                                                        _);
+                                                        {});
                 PlantUtilities::InterConnectTwoPlantLoopSides(
                     state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, true);
             }
@@ -3486,7 +3486,7 @@ namespace PlantChillers {
                     ShowContinueError(state, this->MsgBuffer2);
                 } else {
                     ShowRecurringWarningErrorAtEnd(
-                        state, this->MsgBuffer1 + " error continues.", this->ErrCount1, this->MsgDataLast, this->MsgDataLast, _, "[C]", "[C]");
+                        state, this->MsgBuffer1 + " error continues.", this->ErrCount1, this->MsgDataLast, this->MsgDataLast, {}, "[C]", "[C]");
                 }
             }
         }
@@ -4696,10 +4696,10 @@ namespace PlantChillers {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "CHILLERS",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(
             state, "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, "System", "Average", this->Name);
@@ -4716,10 +4716,10 @@ namespace PlantChillers {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HEATREJECTION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(
@@ -4748,10 +4748,10 @@ namespace PlantChillers {
                                     "System",
                                     "Sum",
                                     this->Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "CHILLERS",
-                                    _,
+                                    {},
                                     "Plant");
             }
         }
@@ -4765,10 +4765,10 @@ namespace PlantChillers {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HeatRecovery",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(
@@ -4781,10 +4781,10 @@ namespace PlantChillers {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             this->FuelType,
                             "Cooling",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -4841,10 +4841,10 @@ namespace PlantChillers {
                                                     this->CWCompNum,
                                                     errFlag,
                                                     this->TempLowLimitEvapOut,
-                                                    _,
-                                                    _,
+                                                    {},
+                                                    {},
                                                     this->EvapInletNodeNum,
-                                                    _);
+                                                    {});
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
@@ -4854,11 +4854,11 @@ namespace PlantChillers {
                                                         this->CDBranchNum,
                                                         this->CDCompNum,
                                                         errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
+                                                        {},
+                                                        {},
+                                                        {},
                                                         this->CondInletNodeNum,
-                                                        _);
+                                                        {});
                 PlantUtilities::InterConnectTwoPlantLoopSides(
                     state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
             }
@@ -4871,11 +4871,11 @@ namespace PlantChillers {
                                                         this->HRBranchNum,
                                                         this->HRCompNum,
                                                         errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
+                                                        {},
+                                                        {},
+                                                        {},
                                                         this->HeatRecInletNodeNum,
-                                                        _);
+                                                        {});
                 PlantUtilities::InterConnectTwoPlantLoopSides(
                     state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, true);
             }
@@ -5495,7 +5495,7 @@ namespace PlantChillers {
                     ShowContinueError(state, this->MsgBuffer2);
                 } else {
                     ShowRecurringWarningErrorAtEnd(
-                        state, this->MsgBuffer1 + " error continues.", this->ErrCount1, this->MsgDataLast, this->MsgDataLast, _, "[C]", "[C]");
+                        state, this->MsgBuffer1 + " error continues.", this->ErrCount1, this->MsgDataLast, this->MsgDataLast, {}, "[C]", "[C]");
                 }
             }
         }
@@ -6254,7 +6254,7 @@ namespace PlantChillers {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -6529,10 +6529,10 @@ namespace PlantChillers {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ELECTRICITY",
                             "Cooling",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state, "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, "System", "Average", this->Name);
         SetupOutputVariable(state,
@@ -6542,10 +6542,10 @@ namespace PlantChillers {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "CHILLERS",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(
             state, "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, "System", "Average", this->Name);
@@ -6563,10 +6563,10 @@ namespace PlantChillers {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HEATREJECTION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(
@@ -6595,10 +6595,10 @@ namespace PlantChillers {
                                     "System",
                                     "Sum",
                                     this->Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "CHILLERS",
-                                    _,
+                                    {},
                                     "Plant");
             }
         }
@@ -6642,11 +6642,11 @@ namespace PlantChillers {
                                                     this->CWBranchNum,
                                                     this->CWCompNum,
                                                     errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
+                                                    {},
+                                                    {},
+                                                    {},
                                                     this->EvapInletNodeNum,
-                                                    _);
+                                                    {});
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
@@ -6656,11 +6656,11 @@ namespace PlantChillers {
                                                         this->CDBranchNum,
                                                         this->CDCompNum,
                                                         errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
+                                                        {},
+                                                        {},
+                                                        {},
                                                         this->CondInletNodeNum,
-                                                        _);
+                                                        {});
                 PlantUtilities::InterConnectTwoPlantLoopSides(
                     state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
             }
@@ -7241,7 +7241,7 @@ namespace PlantChillers {
                     ShowContinueError(state, this->MsgBuffer2);
                 } else {
                     ShowRecurringWarningErrorAtEnd(
-                        state, this->MsgBuffer1 + " error continues.", this->ErrCount1, this->MsgDataLast, this->MsgDataLast, _, "[C]", "[C]");
+                        state, this->MsgBuffer1 + " error continues.", this->ErrCount1, this->MsgDataLast, this->MsgDataLast, {}, "[C]", "[C]");
                 }
             }
         }

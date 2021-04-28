@@ -132,15 +132,15 @@ void ControlCompOutput(EnergyPlusData &state,
                        Real64 const ControlOffset,                // really the tolerance
                        int &ControlCompTypeNum,                   // Internal type num for CompType
                        int &CompErrIndex,                         // for Recurring error call
-                       Optional_int_const TempInNode = _,         // inlet node for output calculation
-                       Optional_int_const TempOutNode = _,        // outlet node for output calculation
-                       Optional<Real64 const> AirMassFlow = _,    // air mass flow rate
-                       Optional_int_const Action = _,             // 1=reverse; 2=normal
-                       Optional_int_const EquipIndex = _,         // Identifier for equipment of Outdoor Air Unit "ONLY"
-                       Optional_int_const LoopNum = _,            // for plant components, plant loop index
-                       Optional_int_const LoopSide = _,           // for plant components, plant loop side index
-                       Optional_int_const BranchIndex = _,        // for plant components, plant branch index
-                       Optional_int_const ControlledZoneIndex = _ // controlled zone index for the zone containing the component
+                       Optional_int_const TempInNode = {},         // inlet node for output calculation
+                       Optional_int_const TempOutNode = {},        // outlet node for output calculation
+                       Optional<Real64 const> AirMassFlow = {},    // air mass flow rate
+                       Optional_int_const Action = {},             // 1=reverse; 2=normal
+                       Optional_int_const EquipIndex = {},         // Identifier for equipment of Outdoor Air Unit "ONLY"
+                       Optional_int_const LoopNum = {},            // for plant components, plant loop index
+                       Optional_int_const LoopSide = {},           // for plant components, plant loop side index
+                       Optional_int_const BranchIndex = {},        // for plant components, plant branch index
+                       Optional_int_const ControlledZoneIndex = {}  // controlled zone index for the zone containing the component
 );
 
 bool BBConvergeCheck(int const SimCompNum, Real64 const MaxFlow, Real64 const MinFlow);
@@ -191,12 +191,12 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   Real64 const QdotSource,       // Source/sink term, e.g. electricity exported from solar cell [W]
                                   Real64 &TsBaffle,              // Temperature of baffle (both sides) use lagged value on input [C]
                                   Real64 &TaGap,                 // Temperature of air gap (assumed mixed) use lagged value on input [C]
-                                  Optional<Real64> HcGapRpt = _,
-                                  Optional<Real64> HrGapRpt = _,
-                                  Optional<Real64> IscRpt = _,
-                                  Optional<Real64> MdotVentRpt = _,
-                                  Optional<Real64> VdotWindRpt = _,
-                                  Optional<Real64> VdotBouyRpt = _);
+                                  Optional<Real64> HcGapRpt = {},
+                                  Optional<Real64> HrGapRpt = {},
+                                  Optional<Real64> IscRpt = {},
+                                  Optional<Real64> MdotVentRpt = {},
+                                  Optional<Real64> VdotWindRpt = {},
+                                  Optional<Real64> VdotBouyRpt = {})  ;
 
 //****************************************************************************
 

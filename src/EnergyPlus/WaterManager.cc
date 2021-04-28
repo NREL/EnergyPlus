@@ -234,8 +234,8 @@ namespace WaterManager {
                                                                              rNumericArgs,
                                                                              NumNumbers,
                                                                              IOStatus,
-                                                                             _,
-                                                                             _,
+                                                                             {},
+                                                                             {},
                                                                              cAlphaFieldNames,
                                                                              cNumericFieldNames);
                     state.dataWaterData->AnyWaterSystemsInModel = true;
@@ -390,8 +390,8 @@ namespace WaterManager {
                                                                              rNumericArgs,
                                                                              NumNumbers,
                                                                              IOStatus,
-                                                                             _,
-                                                                             _,
+                                                                             {},
+                                                                             {},
                                                                              cAlphaFieldNames,
                                                                              cNumericFieldNames);
                     state.dataWaterData->RainCollector(Item).Name = cAlphaArgs(1);
@@ -508,7 +508,7 @@ namespace WaterManager {
                                                                              rNumericArgs,
                                                                              NumNumbers,
                                                                              IOStatus,
-                                                                             _,
+                                                                             {},
                                                                              lAlphaFieldBlanks,
                                                                              cAlphaFieldNames,
                                                                              cNumericFieldNames);
@@ -765,7 +765,7 @@ namespace WaterManager {
                                     "System",
                                     "Sum",
                                     state.dataWaterData->WaterStorage(Item).Name,
-                                    _,
+                                    {},
                                     "MainsWater",
                                     "WaterSystem",
                                     state.dataWaterData->WaterStorage(Item).QualitySubCategoryName,
@@ -866,10 +866,10 @@ namespace WaterManager {
                                     "System",
                                     "Sum",
                                     state.dataWaterData->RainCollector(Item).Name,
-                                    _,
+                                    {},
                                     "OnSiteWater",
                                     "Rainwater",
-                                    _,
+                                    {},
                                     "System");
             }
 
@@ -895,10 +895,10 @@ namespace WaterManager {
                                     "System",
                                     "Sum",
                                     state.dataWaterData->GroundwaterWell(Item).Name,
-                                    _,
+                                    {},
                                     "OnSiteWater",
                                     "Wellwater",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Water System Groundwater Well Pump Electricity Rate",
@@ -914,10 +914,10 @@ namespace WaterManager {
                                     "System",
                                     "Sum",
                                     state.dataWaterData->GroundwaterWell(Item).Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "WaterSystems",
-                                    _,
+                                    {},
                                     "System");
             }
 

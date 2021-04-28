@@ -226,11 +226,11 @@ namespace HWBaseboardRadiator {
                                       HWBaseboardDesignDataObject.Offset,
                                       HWBaseboard(BaseboardNum).ControlCompTypeNum,
                                       HWBaseboard(BaseboardNum).CompErrIndex,
-                                      _,
-                                      _,
-                                      _,
-                                      _,
-                                      _,
+                                      {},
+                                      {},
+                                      {},
+                                      {},
+                                      {},
                                       HWBaseboard(BaseboardNum).LoopNum,
                                       HWBaseboard(BaseboardNum).LoopSideNum,
                                       HWBaseboard(BaseboardNum).BranchNum);
@@ -755,10 +755,10 @@ namespace HWBaseboardRadiator {
                                 "System",
                                 "Sum",
                                 HWBaseboard(BaseboardNum).EquipID,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "BASEBOARD",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -782,10 +782,10 @@ namespace HWBaseboardRadiator {
                                 "System",
                                 "Sum",
                                 HWBaseboard(BaseboardNum).EquipID,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "BASEBOARD",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Baseboard Hot Water Mass Flow Rate",
@@ -950,11 +950,11 @@ namespace HWBaseboardRadiator {
                                         HWBaseboard(BaseboardNum).BranchNum,
                                         HWBaseboard(BaseboardNum).CompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
                 if (errFlag) {
                     ShowFatalError(state, "InitHWBaseboard: Program terminated for previous conditions.");
                 }

@@ -168,7 +168,7 @@ namespace OutputReportPredefined {
     // is a real variable. numSigDigits defaults to 2, and if supplied must be in [0-9]
     // Internally it uses a Fortran-Style write statement, meaning numbers are rounded rather than trimmed
     void PreDefTableEntry(
-        EnergyPlusData &state, int const columnIndex, std::string const &objName, Real64 const tableEntryReal, Optional_int_const numSigDigits = _);
+        EnergyPlusData &state, int const columnIndex, std::string const &objName, Real64 const tableEntryReal, Optional_int_const numSigDigits = {})  ;
 
     void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName, std::string const &tableEntryChar);
 

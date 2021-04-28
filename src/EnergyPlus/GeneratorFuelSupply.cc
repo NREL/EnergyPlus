@@ -145,8 +145,8 @@ namespace GeneratorFuelSupply {
                                                                          NumArray,
                                                                          NumNums,
                                                                          IOStat,
-                                                                         _,
-                                                                         _,
+                                                                         {},
+                                                                         {},
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);

@@ -1320,10 +1320,10 @@ namespace HeatRecovery {
                                 "System",
                                 "Sum",
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEAT RECOVERY FOR HEATING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heat Exchanger Sensible Cooling Rate",
@@ -1367,10 +1367,10 @@ namespace HeatRecovery {
                                 "System",
                                 "Sum",
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEAT RECOVERY FOR COOLING",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -1387,10 +1387,10 @@ namespace HeatRecovery {
                                 "System",
                                 "Sum",
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name,
-                                _,
+                                {},
                                 "ELECTRICITY",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "System");
         }
 

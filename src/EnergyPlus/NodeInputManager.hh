@@ -94,8 +94,8 @@ namespace NodeInputManager {
                      DataLoopNode::NodeConnectionType const NodeConnectionType, // Node Connection Type (see DataLoopNode)
                      int const NodeFluidStream,                                 // Which Fluid Stream (1,2,3,...)
                      bool const ObjectIsParent,                                 // True/False
-                     Optional_bool_const IncrementFluidStream = _,              // True/False
-                     Optional_string_const InputFieldName = _                   // Input Field Name
+                     Optional_bool_const IncrementFluidStream = {},              // True/False
+                     Optional_string_const InputFieldName = {}                    // Input Field Name
     );
 
     void SetupNodeVarsForReporting(EnergyPlusData &state);
@@ -116,7 +116,7 @@ namespace NodeInputManager {
                           DataLoopNode::NodeConnectionType const NodeConnectionType, // Node Connection Type (see DataLoopNode)
                           int const NodeFluidStream,                                 // Which Fluid Stream (1,2,3,...)
                           bool const ObjectIsParent,                                 // True/False
-                          Optional_string_const InputFieldName = _                   // Input Field Name
+                          Optional_string_const InputFieldName = {}                    // Input Field Name
     );
 
     void InitUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName);
@@ -125,9 +125,9 @@ namespace NodeInputManager {
                           std::string const &NodeTypes,
                           std::string const &CheckType,
                           bool &ErrorsFound,
-                          Optional_string_const CheckName = _,
-                          Optional_int_const CheckNumber = _,
-                          Optional_string_const ObjectName = _);
+                          Optional_string_const CheckName = {},
+                          Optional_int_const CheckNumber = {},
+                          Optional_string_const ObjectName = {})  ;
 
     void EndUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName);
 

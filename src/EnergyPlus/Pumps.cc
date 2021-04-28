@@ -1183,7 +1183,7 @@ void GetPumpInput(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 state.dataPumps->PumpEquip(PumpNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Pumps",
                                 state.dataPumps->PumpEquip(PumpNum).EndUseSubcategoryName,
@@ -1241,7 +1241,7 @@ void GetPumpInput(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 state.dataPumps->PumpEquip(PumpNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Pumps",
                                 state.dataPumps->PumpEquip(PumpNum).EndUseSubcategoryName,
@@ -1467,11 +1467,11 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
                                 state.dataPumps->PumpEquip(PumpNum).BranchNum,
                                 state.dataPumps->PumpEquip(PumpNum).CompNum,
                                 errFlag,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _);
+                                {},
+                                {},
+                                {},
+                                {},
+                                {});
         plloopnum = state.dataPumps->PumpEquip(PumpNum).LoopNum;
         lsnum = state.dataPumps->PumpEquip(PumpNum).LoopSideNum;
         brnum = state.dataPumps->PumpEquip(PumpNum).BranchNum;

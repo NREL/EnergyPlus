@@ -1724,8 +1724,8 @@ namespace RefrigeratedCase {
                                   int &IndexPtr,
                                   int SysType,
                                   bool &ErrorsFound,
-                                  Optional_string_const ThisObjectType = _,
-                                  const Optional_bool_const &SuppressWarning = _);
+                                  Optional_string_const ThisObjectType = {},
+                                  const Optional_bool_const &SuppressWarning = {})  ;
 
     void ReportRefrigerationComponents(EnergyPlusData &state);
 

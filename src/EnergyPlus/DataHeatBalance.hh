@@ -1904,9 +1904,9 @@ namespace DataHeatBalance {
 
     void CalcScreenTransmittance(EnergyPlusData &state,
                                  int SurfaceNum,
-                                 Optional<Real64 const> Phi = _,     // Optional sun altitude relative to surface outward normal (radians)
-                                 Optional<Real64 const> Theta = _,   // Optional sun azimuth relative to surface outward normal (radians)
-                                 Optional_int_const ScreenNumber = _ // Optional screen number
+                                 Optional<Real64 const> Phi = {},     // Optional sun altitude relative to surface outward normal (radians)
+                                 Optional<Real64 const> Theta = {},   // Optional sun azimuth relative to surface outward normal (radians)
+                                 Optional_int_const ScreenNumber = {}  // Optional screen number
     );
 
     std::string DisplayMaterialRoughness(int Roughness); // Roughness String

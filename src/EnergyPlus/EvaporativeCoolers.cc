@@ -271,7 +271,7 @@ namespace EvaporativeCoolers {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -370,7 +370,7 @@ namespace EvaporativeCoolers {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -501,7 +501,7 @@ namespace EvaporativeCoolers {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -953,10 +953,10 @@ namespace EvaporativeCoolers {
                                 "System",
                                 "Sum",
                                 EvapCond(EvapCoolNum).EvapCoolerName,
-                                _,
+                                {},
                                 "Electricity",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Evaporative Cooler Electricity Rate",
@@ -974,10 +974,10 @@ namespace EvaporativeCoolers {
                                     "System",
                                     "Sum",
                                     EvapCond(EvapCoolNum).EvapCoolerName,
-                                    _,
+                                    {},
                                     "Water",
                                     "Cooling",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Evaporative Cooler Mains Water Volume",
@@ -986,10 +986,10 @@ namespace EvaporativeCoolers {
                                     "System",
                                     "Sum",
                                     EvapCond(EvapCoolNum).EvapCoolerName,
-                                    _,
+                                    {},
                                     "MainsWater",
                                     "Cooling",
-                                    _,
+                                    {},
                                     "System");
 
             } else if (EvapCond(EvapCoolNum).EvapWaterSupplyMode == WaterSupply::FromTank) {
@@ -1000,10 +1000,10 @@ namespace EvaporativeCoolers {
                                     "System",
                                     "Sum",
                                     EvapCond(EvapCoolNum).EvapCoolerName,
-                                    _,
+                                    {},
                                     "Water",
                                     "Cooling",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Evaporative Cooler Starved Water Volume",
@@ -1012,10 +1012,10 @@ namespace EvaporativeCoolers {
                                     "System",
                                     "Sum",
                                     EvapCond(EvapCoolNum).EvapCoolerName,
-                                    _,
+                                    {},
                                     "Water",
                                     "Cooling",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Evaporative Cooler Starved Mains Water Volume",
@@ -1024,10 +1024,10 @@ namespace EvaporativeCoolers {
                                     "System",
                                     "Sum",
                                     EvapCond(EvapCoolNum).EvapCoolerName,
-                                    _,
+                                    {},
                                     "MainsWater",
                                     "Cooling",
-                                    _,
+                                    {},
                                     "System");
             }
         }
@@ -4069,10 +4069,10 @@ namespace EvaporativeCoolers {
                                 "System",
                                 "Sum",
                                 ZoneEvapUnit(UnitLoop).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Evaporative Cooler Unit Sensible Cooling Rate",
@@ -4622,12 +4622,12 @@ namespace EvaporativeCoolers {
                                             ZoneEvapUnit(UnitNum).FanName,
                                             false,
                                             ZoneEvapUnit(UnitNum).FanIndex,
-                                            _,
+                                            {},
                                             state.dataHVACGlobal->ZoneCompTurnFansOn,
                                             state.dataHVACGlobal->ZoneCompTurnFansOff);
             } else {
                 state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(
-                    state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                    state, {}, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, {});
             }
         }
 
@@ -4644,12 +4644,12 @@ namespace EvaporativeCoolers {
                                             ZoneEvapUnit(UnitNum).FanName,
                                             false,
                                             ZoneEvapUnit(UnitNum).FanIndex,
-                                            _,
+                                            {},
                                             state.dataHVACGlobal->ZoneCompTurnFansOn,
                                             state.dataHVACGlobal->ZoneCompTurnFansOff);
             } else {
                 state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(
-                    state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                    state, {}, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, {});
             }
         }
 
@@ -4819,9 +4819,9 @@ namespace EvaporativeCoolers {
             Node(ZoneEvapUnit(UnitNum).FanOutletNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                 Fans::SimulateFanComponents(
-                    state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                    state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             } else {
-                state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
             }
         }
 
@@ -4835,9 +4835,9 @@ namespace EvaporativeCoolers {
         if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::DrawThruFan) {
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                 Fans::SimulateFanComponents(
-                    state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                    state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             } else {
-                state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
             }
         }
 
@@ -4939,9 +4939,9 @@ namespace EvaporativeCoolers {
             Node(ZoneEvapUnit(UnitNum).FanOutletNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                 Fans::SimulateFanComponents(
-                    state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                    state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             } else {
-                state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
             }
         }
 
@@ -4955,9 +4955,9 @@ namespace EvaporativeCoolers {
         if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::DrawThruFan) {
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                 Fans::SimulateFanComponents(
-                    state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                    state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             } else {
-                state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
             }
         }
 

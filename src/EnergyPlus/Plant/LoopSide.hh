@@ -194,8 +194,8 @@ namespace DataPlant {
         void UpdateAnyLoopDemandAlterations(EnergyPlusData &state, int BranchNum, int CompNum);
 
         void SimulateAllLoopSidePumps(EnergyPlusData &state,
-                                      Optional<PlantLocation const> SpecificPumpLocation = _,
-                                      Optional<Real64 const> SpecificPumpFlowRate = _);
+                                      Optional<PlantLocation const> SpecificPumpLocation = {},
+                                      Optional<Real64 const> SpecificPumpFlowRate = {})  ;
 
         void AdjustPumpFlowRequestByEMSControls(int BranchNum, int CompNum, Real64 &FlowToRequest);
 

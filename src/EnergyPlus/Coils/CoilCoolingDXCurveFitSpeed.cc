@@ -183,7 +183,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
             ShowContinueError(state, "..." + fieldName + "=\"" + curveName + "\" has out of range values.");
             ShowContinueError(state, format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
             ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-            CurveManager::SetCurveOutputMinMaxValues(state, this->indexPLRFPLF, errorsFound, 0.7, _);
+            CurveManager::SetCurveOutputMinMaxValues(state, this->indexPLRFPLF, errorsFound, 0.7, {});
         }
 
         if (MaxCurveVal > 1.0) {
@@ -191,7 +191,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
             ShowContinueError(state, "..." + fieldName + " = " + curveName + " has out of range value.");
             ShowContinueError(state, format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
             ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-            CurveManager::SetCurveOutputMinMaxValues(state, this->indexPLRFPLF, errorsFound, _, 1.0);
+            CurveManager::SetCurveOutputMinMaxValues(state, this->indexPLRFPLF, errorsFound, {}, 1.0);
         }
     }
 

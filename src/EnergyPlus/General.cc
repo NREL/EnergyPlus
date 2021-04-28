@@ -1938,7 +1938,7 @@ int FindNumberInList(int const WhichNumber, Array1A_int const ListOfItems, int c
     int FindNumberInList;
 
     // Argument array dimensioning
-    ListOfItems.dim(_);
+    ListOfItems.dim({});
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Count;

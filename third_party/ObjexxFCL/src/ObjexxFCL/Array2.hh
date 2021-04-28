@@ -211,7 +211,7 @@ protected: // Creation
 	// Value Proxy Constructor
 	Array2( T const & t, ProxySentinel const & proxy ) :
 	 Super( t, proxy ),
-	 I1_( _ ),
+	 I1_( ),
 	 I2_( 1 ),
 	 z1_( I1_.size() ),
 	 z2_( 1u )

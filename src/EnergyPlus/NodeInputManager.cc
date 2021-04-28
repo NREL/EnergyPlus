@@ -773,7 +773,7 @@ int GetOnlySingleNode(EnergyPlusData &state,
                 NodeConnectionType,
                 NodeFluidStream,
                 ObjectIsParent,
-                _,
+                {},
                 InputFieldName);
 
     if (NumNodes > 1) {

@@ -149,7 +149,7 @@ namespace MatrixDataManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             ++MatNum;

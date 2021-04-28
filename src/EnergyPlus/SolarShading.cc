@@ -6846,8 +6846,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                     if (CFS(EQLNum).ISControlled) {
                         WindowEquivalentLayer::CalcEQLOpticalProperty(state, SurfNum, isDIFF, state.dataSolarShading->AbsSolDiffEQL);
                     } else {
-                        state.dataSolarShading->AbsSolDiffEQL(_, {1, CFS(EQLNum).NL + 1}) =
-                            state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, {1, CFS(EQLNum).NL + 1}, EQLNum);
+                        state.dataSolarShading->AbsSolDiffEQL({}, {1, CFS(EQLNum).NL + 1}) =
+                            state.dataWindowEquivalentLayer->CFSDiffAbsTrans({}, {1, CFS(EQLNum).NL + 1}, EQLNum);
                     }
                     state.dataConstruction->Construct(ConstrNum).TransDiff = state.dataSolarShading->AbsSolDiffEQL(1, CFS(EQLNum).NL + 1);
 

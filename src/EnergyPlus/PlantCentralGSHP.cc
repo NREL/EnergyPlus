@@ -579,7 +579,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->rNumericArgs,
                                                                  NumNums,
                                                                  IOStat,
-                                                                 _,
+                                                                 {},
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
@@ -794,10 +794,10 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ELECTRICITY",
                         "Cooling",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -807,10 +807,10 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ELECTRICITY",
                         "Heating",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -836,10 +836,10 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "CHILLERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -849,10 +849,10 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "BOILER",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -862,10 +862,10 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(
@@ -1165,7 +1165,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->rNumericArgs,
                                                                  NumNums,
                                                                  IOStat,
-                                                                 _,
+                                                                 {},
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
@@ -1521,11 +1521,11 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                 this->CWBranchNum,
                                                 this->CWCompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
+                                                {},
+                                                {},
+                                                {},
                                                 this->CHWInletNodeNum,
-                                                _);
+                                                {});
 
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
@@ -1535,11 +1535,11 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                 this->HWBranchNum,
                                                 this->HWCompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
+                                                {},
+                                                {},
+                                                {},
                                                 this->HWInletNodeNum,
-                                                _);
+                                                {});
 
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
@@ -1549,11 +1549,11 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                 this->GLHEBranchNum,
                                                 this->GLHECompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
+                                                {},
+                                                {},
+                                                {},
                                                 this->GLHEInletNodeNum,
-                                                _);
+                                                {});
 
         PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                       this->CWLoopNum,
@@ -2414,7 +2414,7 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                                               this->ChillerHeater(ChillerHeaterNum).ChillerEIRRefTempErrorIndex,
                                               CondDeltaTemp,
                                               CondDeltaTemp,
-                                              _,
+                                              {},
                                               "deltaC",
                                               "deltaC");
                 QCondenser = 0.0;

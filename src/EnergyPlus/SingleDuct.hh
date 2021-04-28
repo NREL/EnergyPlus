@@ -341,9 +341,9 @@ namespace SingleDuct {
                                    std::string const &SDSName,
                                    int &SDSIndex,
                                    bool &ErrorsFound,
-                                   Optional_string_const ThisObjectType = _,
-                                   Optional_int DamperInletNode = _, // Damper inlet node number
-                                   Optional_int DamperOutletNode = _ // Damper outlet node number
+                                   Optional_string_const ThisObjectType = {},
+                                   Optional_int DamperInletNode = {}, // Damper inlet node number
+                                   Optional_int DamperOutletNode = {}  // Damper outlet node number
     );
 
     void SimATMixer(EnergyPlusData &state, std::string const &SysName, bool FirstHVACIteration, int &SysIndex);
@@ -367,7 +367,7 @@ namespace SingleDuct {
 
     void SetATMixerPriFlow(EnergyPlusData &state,
                            int ATMixerNum,                               // Air terminal mixer index
-                           Optional<Real64 const> PriAirMassFlowRate = _ // Air terminal mixer primary air mass flow rate [kg/s]
+                           Optional<Real64 const> PriAirMassFlowRate = {}  // Air terminal mixer primary air mass flow rate [kg/s]
     );
 
     void setATMixerSizingProperties(EnergyPlusData &state,

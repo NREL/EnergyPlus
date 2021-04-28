@@ -67,7 +67,7 @@ TEST( DimensionSliceTest, ConstructionIndexRangeSliceMultiplier )
 TEST( DimensionSliceTest, ConstructionIndexRangeSliceOmitMultiplier )
 {
 	IndexRange r( -5, 3 );
-	IndexSlice s( -3, _, 2 );
+	IndexSlice s( -3, {}, 2 );
 	DimensionSlice d( r, s, 3 );
 	EXPECT_EQ( s.s() * 3, d.m() );
 	EXPECT_EQ( 6, d.m() );

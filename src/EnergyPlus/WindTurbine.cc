@@ -662,10 +662,10 @@ namespace WindTurbine {
                                 "System",
                                 "Sum",
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name,
-                                _,
+                                {},
                                 "ElectricityProduced",
                                 "WINDTURBINE",
-                                _,
+                                {},
                                 "Plant");
             SetupOutputVariable(state,
                                 "Generator Turbine Local Wind Speed",

@@ -400,10 +400,10 @@ namespace SteamCoils {
                                 "System",
                                 "Sum",
                                 state.dataSteamCoils->SteamCoil(CoilNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Rate",
@@ -526,11 +526,11 @@ namespace SteamCoils {
                                     state.dataSteamCoils->SteamCoil(CoilNum).BranchNum,
                                     state.dataSteamCoils->SteamCoil(CoilNum).CompNum,
                                     errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {});
             if (errFlag) {
                 ShowFatalError(state, "InitSteamCoil: Program terminated for previous conditions.");
             }

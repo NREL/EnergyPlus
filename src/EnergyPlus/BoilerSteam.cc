@@ -185,8 +185,8 @@ namespace BoilerSteam {
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
@@ -316,11 +316,11 @@ namespace BoilerSteam {
                                                 this->BranchNum,
                                                 this->CompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                _,
-                                                _);
+                                                {},
+                                                {},
+                                                {},
+                                                {},
+                                                {});
         if (errFlag) {
             ShowFatalError(state, "InitBoiler: Program terminated due to previous condition(s).");
         }
@@ -447,10 +447,10 @@ namespace BoilerSteam {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "BOILERS",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
@@ -466,7 +466,7 @@ namespace BoilerSteam {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             this->BoilerFuelTypeForOutputVariable,
                             "Heating",
                             this->EndUseSubcategory,
@@ -642,7 +642,7 @@ namespace BoilerSteam {
                                           this->PressErrIndex,
                                           this->BoilerPressCheck,
                                           this->BoilerPressCheck,
-                                          _,
+                                          {},
                                           "[Pa]",
                                           "[Pa]");
         }

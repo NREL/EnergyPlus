@@ -1561,11 +1561,11 @@ namespace VentilatedSlab {
                                         state.dataVentilatedSlab->VentSlab(Item).HWBranchNum,
                                         state.dataVentilatedSlab->VentSlab(Item).HWCompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
                 if (errFlag) {
                     ShowContinueError(state,
                                       "Reference Unit=\"" + state.dataVentilatedSlab->VentSlab(Item).Name + "\", type=ZoneHVAC:VentilatedSlab");
@@ -3227,13 +3227,13 @@ namespace VentilatedSlab {
 
                     if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                         state.dataHVACFan->fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->simulate(
-                            state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                            state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
                     } else if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                         Fans::SimulateFanComponents(state,
                                                     state.dataVentilatedSlab->VentSlab(Item).FanName,
                                                     FirstHVACIteration,
                                                     state.dataVentilatedSlab->VentSlab(Item).Fan_Index,
-                                                    _,
+                                                    {},
                                                     ZoneCompTurnFansOn,
                                                     ZoneCompTurnFansOff);
                     }
@@ -3261,11 +3261,11 @@ namespace VentilatedSlab {
                                               0.001,
                                               state.dataVentilatedSlab->VentSlab(Item).ControlCompTypeNum,
                                               state.dataVentilatedSlab->VentSlab(Item).CompErrIndex,
-                                              _,
-                                              _,
-                                              _,
-                                              _,
-                                              _,
+                                              {},
+                                              {},
+                                              {},
+                                              {},
+                                              {},
                                               state.dataVentilatedSlab->VentSlab(Item).HWLoopNum,
                                               state.dataVentilatedSlab->VentSlab(Item).HWLoopSide,
                                               state.dataVentilatedSlab->VentSlab(Item).HWBranchNum);
@@ -3499,13 +3499,13 @@ namespace VentilatedSlab {
                     SimVentSlabOAMixer(state, Item);
                     if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                         state.dataHVACFan->fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->simulate(
-                            state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                            state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
                     } else if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                         Fans::SimulateFanComponents(state,
                                                     state.dataVentilatedSlab->VentSlab(Item).FanName,
                                                     FirstHVACIteration,
                                                     state.dataVentilatedSlab->VentSlab(Item).Fan_Index,
-                                                    _,
+                                                    {},
                                                     ZoneCompTurnFansOn,
                                                     ZoneCompTurnFansOff);
                     }
@@ -3526,11 +3526,11 @@ namespace VentilatedSlab {
                                       0.001,
                                       state.dataVentilatedSlab->VentSlab(Item).ControlCompTypeNum,
                                       state.dataVentilatedSlab->VentSlab(Item).CompErrIndex,
-                                      _,
-                                      _,
-                                      _,
-                                      _,
-                                      _,
+                                      {},
+                                      {},
+                                      {},
+                                      {},
+                                      {},
                                       state.dataVentilatedSlab->VentSlab(Item).CWLoopNum,
                                       state.dataVentilatedSlab->VentSlab(Item).CWLoopSide,
                                       state.dataVentilatedSlab->VentSlab(Item).CWBranchNum);
@@ -3560,13 +3560,13 @@ namespace VentilatedSlab {
             state.dataLoopNodes->Node(FanOutletNode).MassFlowRateMinAvail = 0.0;
             if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->simulate(
-                    state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
             } else if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                 Fans::SimulateFanComponents(state,
                                             state.dataVentilatedSlab->VentSlab(Item).FanName,
                                             FirstHVACIteration,
                                             state.dataVentilatedSlab->VentSlab(Item).Fan_Index,
-                                            _,
+                                            {},
                                             ZoneCompTurnFansOn,
                                             ZoneCompTurnFansOff);
             }
@@ -3623,13 +3623,13 @@ namespace VentilatedSlab {
         SimVentSlabOAMixer(state, Item);
         if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             state.dataHVACFan->fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->simulate(
-                state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
         } else if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
             Fans::SimulateFanComponents(state,
                                         state.dataVentilatedSlab->VentSlab(Item).FanName,
                                         FirstHVACIteration,
                                         state.dataVentilatedSlab->VentSlab(Item).Fan_Index,
-                                        _,
+                                        {},
                                         ZoneCompTurnFansOn,
                                         ZoneCompTurnFansOff);
         }
@@ -4112,7 +4112,7 @@ namespace VentilatedSlab {
                                                                    state.dataVentilatedSlab->VentSlab(Item).CondErrIndex,
                                                                    DewPointTemp,
                                                                    DewPointTemp,
-                                                                   _,
+                                                                   {},
                                                                    "C",
                                                                    "C");
                                 }
@@ -4400,7 +4400,7 @@ namespace VentilatedSlab {
                                                                    state.dataVentilatedSlab->VentSlab(Item).CondErrIndex,
                                                                    DewPointTemp,
                                                                    DewPointTemp,
-                                                                   _,
+                                                                   {},
                                                                    "C",
                                                                    "C");
                                 }

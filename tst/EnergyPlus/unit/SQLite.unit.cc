@@ -295,8 +295,8 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteTimeIndexRecord)
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
     state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(3, 1, 1, 0, 2017, 1);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(2, 1, 1, 0, 2017, 1, 1, 1, _, _, 0, "WinterDesignDay");
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(1, 1, 1, 0, 2017, 1, 2, 2, _, _, 0, "SummerDesignDay");
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(2, 1, 1, 0, 2017, 1, 1, 1, {}, {}, 0, "WinterDesignDay");
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(1, 1, 1, 0, 2017, 1, 2, 2, {}, {}, 0, "SummerDesignDay");
     state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(0, 1, 1, 0, 2017, 1, 1, 1, 60, 0, 0, "WinterDesignDay");
     state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(-1, 1, 1, 0, 2017, 1, 2, 2, 60, 0, 0, "SummerDesignDay");
     state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(-1, 1, 1, 1, 2017, 1, 3, 3, 60, 0, 0, "SummerDesignDay", true);
@@ -329,24 +329,24 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteTimeIndexRecord)
     EXPECT_EQ(7ul, result.size());
 
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(0, 1, 1, 1, 2017, 1, 3, 3, 60, 0, 0, _, true);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(0, 1, 1, 1, 2017, 1, 3, 3, 60, 0, _, "SummerDesignDay", true);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(0, 1, 1, 1, 2017, 1, 3, 3, 60, _, 0, "SummerDesignDay", true);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(0, 1, 1, 1, 2017, 1, 3, 3, _, 0, 0, "SummerDesignDay", true);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(0, 1, 1, 1, 2017, 1, 3, _, 60, 0, 0, "SummerDesignDay", true);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(0, 1, 1, 1, 2017, 1, _, 3, 60, 0, 0, "SummerDesignDay", true);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(0, 1, 1, 1, 2017, _, 3, 3, 60, 0, 0, "SummerDesignDay", true);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(1, 1, 1, 1, 2017, 1, 3, 3, 60, 0, 0, _, true);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(1, 1, 1, 1, 2017, 1, 3, 3, 60, 0, _, "SummerDesignDay", true);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(1, 1, 1, 1, 2017, 1, 3, _, 60, 0, 0, "SummerDesignDay", true);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(1, 1, 1, 1, 2017, 1, _, 3, 60, 0, 0, "SummerDesignDay", true);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(1, 1, 1, 1, 2017, _, 3, 3, 60, 0, 0, "SummerDesignDay", true);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(2, 1, 1, 1, 2017, 1, 3, 3, 60, 0, 0, _, true);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(2, 1, 1, 1, 2017, 1, 3, 3, 60, 0, _, "SummerDesignDay", true);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(2, 1, 1, 1, 2017, 1, 3, _, 60, 0, 0, "SummerDesignDay", true);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(2, 1, 1, 1, 2017, 1, _, 3, 60, 0, 0, "SummerDesignDay", true);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(2, 1, 1, 1, 2017, _, 3, 3, 60, 0, 0, "SummerDesignDay", true);
-    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(3, 1, 1, 1, 2017, _, 3, 3, 60, 0, 0, "SummerDesignDay", true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(0, 1, 1, 1, 2017, 1, 3, 3, 60, 0, 0, {}, true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(0, 1, 1, 1, 2017, 1, 3, 3, 60, 0, {}, "SummerDesignDay", true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(0, 1, 1, 1, 2017, 1, 3, 3, 60, {}, 0, "SummerDesignDay", true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(0, 1, 1, 1, 2017, 1, 3, 3, {}, 0, 0, "SummerDesignDay", true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(0, 1, 1, 1, 2017, 1, 3, {}, 60, 0, 0, "SummerDesignDay", true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(0, 1, 1, 1, 2017, 1, {}, 3, 60, 0, 0, "SummerDesignDay", true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(0, 1, 1, 1, 2017, {}, 3, 3, 60, 0, 0, "SummerDesignDay", true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(1, 1, 1, 1, 2017, 1, 3, 3, 60, 0, 0, {}, true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(1, 1, 1, 1, 2017, 1, 3, 3, 60, 0, {}, "SummerDesignDay", true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(1, 1, 1, 1, 2017, 1, 3, {}, 60, 0, 0, "SummerDesignDay", true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(1, 1, 1, 1, 2017, 1, {}, 3, 60, 0, 0, "SummerDesignDay", true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(1, 1, 1, 1, 2017, {}, 3, 3, 60, 0, 0, "SummerDesignDay", true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(2, 1, 1, 1, 2017, 1, 3, 3, 60, 0, 0, {}, true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(2, 1, 1, 1, 2017, 1, 3, 3, 60, 0, {}, "SummerDesignDay", true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(2, 1, 1, 1, 2017, 1, 3, {}, 60, 0, 0, "SummerDesignDay", true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(2, 1, 1, 1, 2017, 1, {}, 3, 60, 0, 0, "SummerDesignDay", true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(2, 1, 1, 1, 2017, {}, 3, 3, 60, 0, 0, "SummerDesignDay", true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(3, 1, 1, 1, 2017, {}, 3, 3, 60, 0, 0, "SummerDesignDay", true);
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }
 

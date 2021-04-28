@@ -25,20 +25,20 @@ namespace ObjexxFCL {
 void
 GET_ENVIRONMENT_VARIABLE(
  std::string const & name,
- Optional< std::string > value = _,
- Optional< int > length = _,
- Optional< int > status = _,
- Optional< bool const > trim_name = _
+ Optional< std::string > value = {},
+ Optional< int > length = {},
+ Optional< int > status = {},
+ Optional< bool const > trim_name = {}
 );
 
 // Get Environment Variable
 void
 get_environment_variable(
  std::string const & name,
- Optional< std::string > value = _,
- Optional< int > length = _,
- Optional< int > status = _,
- Optional< bool const > trim_name = _
+ Optional< std::string > value = {},
+ Optional< int > length = {},
+ Optional< int > status = {},
+ Optional< bool const > trim_name = {}
 );
 
 // Get Environment Variable

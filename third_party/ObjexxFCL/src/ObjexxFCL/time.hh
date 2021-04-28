@@ -57,9 +57,9 @@ CLOCK();
 // System Clock
 void
 SYSTEM_CLOCK(
- Optional< std::int32_t > count = _,
- Optional< std::int32_t > count_rate = _,
- Optional< std::int32_t > count_max = _
+ Optional< std::int32_t > count = {},
+ Optional< std::int32_t > count_rate = {},
+ Optional< std::int32_t > count_max = {}
 );
 
 // Process CPU Time (s)
@@ -141,19 +141,19 @@ DATE4( std::string & day );
 // Current Date and Time
 void
 DATE_AND_TIME(
- Optional< std::string > date = _,
- Optional< std::string > time = _,
- Optional< std::string > zone = _,
- Optional< Array1D< int > > values = _
+ Optional< std::string > date = {},
+ Optional< std::string > time = {},
+ Optional< std::string > zone = {},
+ Optional< Array1D< int > > values = {}
 );
 
 // Current Date and Time
 void
 date_and_time(
- Optional< std::string > date = _,
- Optional< std::string > time = _,
- Optional< std::string > zone = _,
- Optional< Array1D< int > > values = _
+ Optional< std::string > date = {},
+ Optional< std::string > time = {},
+ Optional< std::string > zone = {},
+ Optional< Array1D< int > > values = {}
 );
 
 // Sleep for Given Seconds

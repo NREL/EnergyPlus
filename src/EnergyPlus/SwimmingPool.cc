@@ -640,10 +640,10 @@ void SwimmingPoolData::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "MainsWater",
                         "Heating",
-                        _,
+                        {},
                         "System");
     SetupOutputVariable(
         state, "Indoor Pool Makeup Water Temperature", OutputProcessor::Unit::C, this->CurMakeupWaterTemp, "System", "Average", this->Name);
@@ -664,10 +664,10 @@ void SwimmingPoolData::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATINGCOILS",
-                        _,
+                        {},
                         "System");
     SetupOutputVariable(
         state, "Indoor Pool Radiant to Convection by Cover", OutputProcessor::Unit::W, this->RadConvertToConvect, "System", "Average", this->Name);
@@ -723,11 +723,11 @@ void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(EnergyPlusData &state)
                                                     this->HWBranchNum,
                                                     this->HWCompNum,
                                                     errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
+                                                    {},
+                                                    {},
+                                                    {},
                                                     this->WaterInletNode,
-                                                    _);
+                                                    {});
             if (errFlag) {
                 ShowFatalError(state, RoutineName + ": Program terminated due to previous condition(s).");
             }

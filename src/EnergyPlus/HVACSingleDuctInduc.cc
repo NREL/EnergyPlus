@@ -567,11 +567,11 @@ namespace HVACSingleDuctInduc {
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWBranchNum,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWCompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
             }
             if (errFlag) {
                 ShowContinueError(state,
@@ -589,11 +589,11 @@ namespace HVACSingleDuctInduc {
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWBranchNum,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWCompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
             }
             if (errFlag) {
                 ShowContinueError(state,
@@ -1383,7 +1383,7 @@ namespace HVACSingleDuctInduc {
                                                        state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWCoilFailNum2,
                                                        MaxHotWaterFlow,
                                                        MinHotWaterFlow,
-                                                       _,
+                                                       {},
                                                        "[kg/s]",
                                                        "[kg/s]");
                     }
@@ -1440,7 +1440,7 @@ namespace HVACSingleDuctInduc {
                                                        state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWCoilFailNum2,
                                                        MaxColdWaterFlow,
                                                        MinColdWaterFlow,
-                                                       _,
+                                                       {},
                                                        "[kg/s]",
                                                        "[kg/s]");
                     }

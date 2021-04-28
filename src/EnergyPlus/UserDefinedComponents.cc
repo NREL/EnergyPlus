@@ -581,10 +581,10 @@ namespace UserDefinedComponents {
                                                                          rNumericArgs,
                                                                          NumNums,
                                                                          IOStat,
-                                                                         _,
+                                                                         {},
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
-                                                                         _);
+                                                                         {});
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name = cAlphaArgs(1);
@@ -1044,10 +1044,10 @@ namespace UserDefinedComponents {
                                                                          rNumericArgs,
                                                                          NumNums,
                                                                          IOStat,
-                                                                         _,
+                                                                         {},
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
-                                                                         _);
+                                                                         {});
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 // ErrorsFound will be set to True if problem was found, left untouched otherwise
@@ -1443,10 +1443,10 @@ namespace UserDefinedComponents {
                                                                          rNumericArgs,
                                                                          NumNums,
                                                                          IOStat,
-                                                                         _,
+                                                                         {},
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
-                                                                         _);
+                                                                         {});
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name = cAlphaArgs(1);
 
@@ -1892,10 +1892,10 @@ namespace UserDefinedComponents {
                                                                          rNumericArgs,
                                                                          NumNums,
                                                                          IOStat,
-                                                                         _,
+                                                                         {},
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
-                                                                         _);
+                                                                         {});
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name = cAlphaArgs(1);
 
@@ -2397,9 +2397,9 @@ namespace UserDefinedComponents {
                                                         this->Loop(ConnectionNum).BranchNum,
                                                         this->Loop(ConnectionNum).CompNum,
                                                         errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
+                                                        {},
+                                                        {},
+                                                        {},
                                                         this->Loop(ConnectionNum).InletNodeNum);
                 if (errFlag) {
                     ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
@@ -2550,9 +2550,9 @@ namespace UserDefinedComponents {
                                                             this->Loop(loop).BranchNum,
                                                             this->Loop(loop).CompNum,
                                                             errFlag,
-                                                            _,
-                                                            _,
-                                                            _,
+                                                            {},
+                                                            {},
+                                                            {},
                                                             this->Loop(loop).InletNodeNum);
                     if (errFlag) {
                         ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
@@ -2641,9 +2641,9 @@ namespace UserDefinedComponents {
                                                             this->Loop(loop).BranchNum,
                                                             this->Loop(loop).CompNum,
                                                             errFlag,
-                                                            _,
-                                                            _,
-                                                            _,
+                                                            {},
+                                                            {},
+                                                            {},
                                                             this->Loop(loop).InletNodeNum);
                     if (errFlag) {
                         ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");

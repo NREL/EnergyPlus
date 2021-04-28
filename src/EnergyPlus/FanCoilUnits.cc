@@ -1143,11 +1143,11 @@ namespace FanCoilUnits {
                                         FanCoil(FanCoilNum).HeatCoilBranchNum,
                                         FanCoil(FanCoilNum).HeatCoilCompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
 
                 if (errFlag) {
                     ShowContinueError(state, "Reference Unit=\"" + FanCoil(FanCoilNum).Name + "\", type=" + FanCoil(FanCoilNum).UnitType);
@@ -1176,11 +1176,11 @@ namespace FanCoilUnits {
                                         FanCoil(FanCoilNum).CoolCoilBranchNum,
                                         FanCoil(FanCoilNum).CoolCoilCompNum,
                                         errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {});
                 if (errFlag) {
                     ShowContinueError(state, "Reference Unit=\"" + FanCoil(FanCoilNum).Name + "\", type=" + FanCoil(FanCoilNum).UnitType);
                     ShowFatalError(state, "InitFanCoilUnits: Program terminated for previous conditions.");
@@ -1635,7 +1635,7 @@ namespace FanCoilUnits {
                         FanCoil(FanCoilNum).FanAirVolFlow =
                             GetFanDesignVolumeFlowRate(state, cFanTypes(FanCoil(FanCoilNum).FanType_Num), FanCoil(FanCoilNum).FanName, ErrorsFound);
                     } else {
-                        state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, _, _, _, _);
+                        state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, {}, {}, {}, {});
                         FanCoil(FanCoilNum).FanAirVolFlow = state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->designAirVolFlowRate;
                     }
                 }
@@ -1676,7 +1676,7 @@ namespace FanCoilUnits {
                 FanCoil(FanCoilNum).FanAirVolFlow =
                     GetFanDesignVolumeFlowRate(state, cFanTypes(FanCoil(FanCoilNum).FanType_Num), FanCoil(FanCoilNum).FanName, ErrorsFound);
             } else {
-                state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, _, _, _, _);
+                state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, {}, {}, {}, {});
                 FanCoil(FanCoilNum).FanAirVolFlow = state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->designAirVolFlowRate;
             }
             //   Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
@@ -3765,7 +3765,7 @@ namespace FanCoilUnits {
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
                 }
             } else if (FanCoil(FanCoilNum).SpeedFanSel == 2) {
 
@@ -3778,7 +3778,7 @@ namespace FanCoilUnits {
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
                 }
             } else if (FanCoil(FanCoilNum).SpeedFanSel == 3) {
 
@@ -3791,7 +3791,7 @@ namespace FanCoilUnits {
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, {}, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
                 }
             } else { // using 1.0 here for fan speed ratio seems wrong if FCU max flow rate is different than the fan maximum flow rate
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
@@ -3803,17 +3803,17 @@ namespace FanCoilUnits {
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, 0.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, 0.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
                 }
             }
             if (FanCoil(FanCoilNum).CCoilType_Num == CCoil::HXAssist) {
                 SimHXAssistedCoolingCoil(
                     state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, On, 0.0, FanCoil(FanCoilNum).CCoilName_Index, ContFanCycCoil);
             } else {
-                SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index, _, 1, PLR);
+                SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index, {}, 1, PLR);
             }
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
-                SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).HCoilName, FirstHVACIteration, FanCoil(FanCoilNum).HCoilName_Index, _, 1, PLR);
+                SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).HCoilName, FirstHVACIteration, FanCoil(FanCoilNum).HCoilName_Index, {}, 1, PLR);
             } else {
                 if (Node(FanCoil(FanCoilNum).CoolCoilFluidInletNode).MassFlowRate > 0.0) ElecHeaterControl = 0.0;
                 SimulateHeatingCoilComponents(state,
@@ -3821,7 +3821,7 @@ namespace FanCoilUnits {
                                               FirstHVACIteration,
                                               FanCoil(FanCoilNum).DesignHeatingCapacity * PartLoad * ElecHeaterControl,
                                               FanCoil(FanCoilNum).HCoilName_Index,
-                                              _,
+                                              {},
                                               false,
                                               ContFanCycCoil,
                                               PartLoad);
@@ -3840,16 +3840,16 @@ namespace FanCoilUnits {
                 // FanFlowRatio needs to be accurate here for new fan model
                 Real64 ActFanFlowRatio = state.dataFanCoilUnits->FanFlowRatio * PartLoad;
                 state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(
-                    state, ActFanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state, ActFanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
             }
             if (FanCoil(FanCoilNum).CCoilType_Num == CCoil::HXAssist) {
                 SimHXAssistedCoolingCoil(
                     state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, On, 0.0, FanCoil(FanCoilNum).CCoilName_Index, ContFanCycCoil);
             } else {
-                SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index, _, 1, PLR);
+                SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index, {}, 1, PLR);
             }
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
-                SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).HCoilName, FirstHVACIteration, FanCoil(FanCoilNum).HCoilName_Index, _, 1, PLR);
+                SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).HCoilName, FirstHVACIteration, FanCoil(FanCoilNum).HCoilName_Index, {}, 1, PLR);
             } else {
                 if (Node(FanCoil(FanCoilNum).CoolCoilFluidInletNode).MassFlowRate > 0.0) ElecHeaterControl = 0.0;
                 Real64 QZnReq = 0.0;
@@ -3865,7 +3865,7 @@ namespace FanCoilUnits {
                                               FirstHVACIteration,
                                               QZnReq,
                                               FanCoil(FanCoilNum).HCoilName_Index,
-                                              _,
+                                              {},
                                               false,
                                               FanCoil(FanCoilNum).FanOpMode, // FanCoil(FanCoilNum).FanOpMode, // ContFanCycCoil, CycFanCycCoil
                                               PartLoad);
@@ -3887,7 +3887,7 @@ namespace FanCoilUnits {
                                             ZoneCompTurnFansOn,
                                             ZoneCompTurnFansOff);
             } else {
-                state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, {});
             }
 
             if (FanCoil(FanCoilNum).CCoilType_Num == CCoil::HXAssist) {
@@ -3905,7 +3905,7 @@ namespace FanCoilUnits {
                                               FirstHVACIteration,
                                               FanCoil(FanCoilNum).DesignHeatingCapacity * PartLoad * ElecHeaterControl,
                                               FanCoil(FanCoilNum).HCoilName_Index,
-                                              _,
+                                              {},
                                               false,
                                               ContFanCycCoil,
                                               PartLoad);
@@ -4037,7 +4037,7 @@ namespace FanCoilUnits {
                              FanCoil(FanCoilNum).CoolCoilBranchNum,
                              FanCoil(FanCoilNum).CoolCoilCompNum);
         // no load output, requires setting eHeatCoilCyclingR = 0.0, for electric heating coils
-        Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutNoHC, _, 0.0);
+        Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutNoHC, {}, 0.0);
 
         QCoilCoolSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
         QCoilHeatSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
@@ -4614,7 +4614,7 @@ namespace FanCoilUnits {
                             if (FanCoil(FanCoilNum).ConvgErrCountH < 2) {
                                 ShowWarningError(state, "Electric heating coil control failed in fan coil unit " + FanCoil(FanCoilNum).Name);
                                 ShowContinueError(state, "  Iteration limit exceeded in calculating electric heating coil capacity modulation ");
-                                Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, _, eHeatCoilPLR);
+                                Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, {}, eHeatCoilPLR);
                                 ShowContinueErrorTimeStamp(state, format("Load Request = {}, Final Capacity = {}", QZnReq, QUnitOut));
                                 ShowContinueErrorTimeStamp(
                                     state, format("Electric heating coil part load ratio used during last iterations = {}", eHeatCoilPLR));
@@ -4644,7 +4644,7 @@ namespace FanCoilUnits {
                     PLR = eHeatCoilPLR;
                     // at the end calculate output
                     if (FanCoil(FanCoilNum).FanOpMode == ContFanCycCoil) {
-                        Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, _, eHeatCoilPLR);
+                        Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, {}, eHeatCoilPLR);
                     } else {
                         Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, PLR);
                     }

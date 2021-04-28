@@ -7117,9 +7117,9 @@ namespace HeatBalanceManager {
                                  GasName(IGas),
                                  state.dataMaterial->Material(MaterNum).GasFract(IGas),
                                  state.dataMaterial->Material(MaterNum).GasWght(IGas),
-                                 state.dataMaterial->Material(MaterNum).GasCon(_, IGas),
-                                 state.dataMaterial->Material(MaterNum).GasVis(_, IGas),
-                                 state.dataMaterial->Material(MaterNum).GasCp(_, IGas));
+                                 state.dataMaterial->Material(MaterNum).GasCon(ObjexxFCL::IndexSlice{}, IGas),
+                                 state.dataMaterial->Material(MaterNum).GasVis(ObjexxFCL::IndexSlice{}, IGas),
+                                 state.dataMaterial->Material(MaterNum).GasCp(ObjexxFCL::IndexSlice{}, IGas));
                         // Nominal resistance of gap at room temperature (based on first gas in mixture)
                         state.dataHeatBal->NominalR(MaterNum) =
                             state.dataMaterial->Material(MaterNum).Thickness /
@@ -7270,13 +7270,13 @@ namespace HeatBalanceManager {
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
                     NextLine = W5DataFile.readLine();
                     ++FileLineCount;
-                    if (!readItem(NextLine.data.substr(5), AbsSol(_, IGlass))) {
+                    if (!readItem(NextLine.data.substr(5), AbsSol(ObjexxFCL::IndexSlice{}, IGlass))) {
                         ShowSevereError(state,
                                         format("HeatBalanceManager: SearchWindow5DataFile: Error in Read of AbsSol values. For Glass={}", IGlass));
                         ShowContinueError(state,
                                           format("Line (~{}) in error (first 100 characters)={}", FileLineCount, NextLine.data.substr(0, 100)));
                         ErrorsFound = true;
-                    } else if (any_lt(AbsSol(_, IGlass), 0.0) || any_gt(AbsSol(_, IGlass), 1.0)) {
+                    } else if (any_lt(AbsSol(ObjexxFCL::IndexSlice{}, IGlass), 0.0) || any_gt(AbsSol(ObjexxFCL::IndexSlice{}, IGlass), 1.0)) {
                         ShowSevereError(
                             state,
                             format("HeatBalanceManager: SearchWindow5DataFile: Error in Read of AbsSol values. (out of range [0,1]) For Glass={}",
@@ -7356,7 +7356,7 @@ namespace HeatBalanceManager {
                 W5LsqFit(CosPhiIndepVar, Tvis, 6, 1, 10, state.dataConstruction->Construct(ConstrNum).TransVisBeamCoef);
                 W5LsqFit(CosPhiIndepVar, Rfsol, 6, 1, 10, state.dataConstruction->Construct(ConstrNum).ReflSolBeamFrontCoef);
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
-                    W5LsqFit(CosPhiIndepVar, AbsSol(_, IGlass), 6, 1, 10, state.dataConstruction->Construct(ConstrNum).AbsBeamCoef(IGlass));
+                    W5LsqFit(CosPhiIndepVar, AbsSol(ObjexxFCL::IndexSlice{}, IGlass), 6, 1, 10, state.dataConstruction->Construct(ConstrNum).AbsBeamCoef(IGlass));
                 }
 
                 // For comparing fitted vs. input distribution in incidence angle
@@ -9040,7 +9040,7 @@ namespace HeatBalanceManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
@@ -9182,7 +9182,7 @@ namespace HeatBalanceManager {
                                                                      NumNumbers,
                                                                      IOStatus,
                                                                      locNumericFieldBlanks,
-                                                                     _,
+                                                                     {},
                                                                      locAlphaFieldNames,
                                                                      locNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,

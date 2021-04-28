@@ -174,7 +174,7 @@ namespace EvaporativeFluidCoolers {
                                                                      NumArray,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -479,7 +479,7 @@ namespace EvaporativeFluidCoolers {
                                                                      NumArray,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -929,10 +929,10 @@ namespace EvaporativeFluidCoolers {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "Water",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -950,10 +950,10 @@ namespace EvaporativeFluidCoolers {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "Water",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -963,10 +963,10 @@ namespace EvaporativeFluidCoolers {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "MainsWater",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
 
         } else { // Evaporative fluid cooler water from mains and gets metered
@@ -985,10 +985,10 @@ namespace EvaporativeFluidCoolers {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "Water",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -998,10 +998,10 @@ namespace EvaporativeFluidCoolers {
                                 "System",
                                 "Sum",
                                 this->Name,
-                                _,
+                                {},
                                 "MainsWater",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
         }
 
@@ -1025,10 +1025,10 @@ namespace EvaporativeFluidCoolers {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "Electricity",
                             "HeatRejection",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -1168,7 +1168,7 @@ namespace EvaporativeFluidCoolers {
         if (this->OneTimeFlagForEachEvapFluidCooler) {
             // Locate the tower on the plant loops for later usage
             PlantUtilities::ScanPlantLoopsForObject(
-                state, this->Name, this->TypeOf_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
+                state, this->Name, this->TypeOf_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, {}, {}, {}, {}, {});
 
             if (ErrorsFound) {
                 ShowFatalError(state, "InitEvapFluidCooler: Program terminated due to previous condition(s).");

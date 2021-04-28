@@ -3139,7 +3139,7 @@ namespace SurfaceGeometry {
                     }
                 }
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex.allocate(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
-                GetVertices(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides, state.dataIPShortCut->rNumericArgs({2, _}));
+                GetVertices(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides, state.dataIPShortCut->rNumericArgs({2, {}}));
                 CheckConvexity(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
                 if (state.dataReportFlag->MakeMirroredDetachedShading) {
                     MakeMirrorSurface(state, SurfNum);
@@ -3829,7 +3829,7 @@ namespace SurfaceGeometry {
                 }
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex.allocate(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewVertex.allocate(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
-                GetVertices(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides, state.dataIPShortCut->rNumericArgs({3, _}));
+                GetVertices(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides, state.dataIPShortCut->rNumericArgs({3, {}}));
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area <= 0.0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", Surface Area <= 0.0; Entered Area={:.2T}",
@@ -4850,7 +4850,7 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier = 1.0;
             }
 
-            GetVertices(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides, state.dataIPShortCut->rNumericArgs({4, _}));
+            GetVertices(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides, state.dataIPShortCut->rNumericArgs({4, {}}));
 
             CheckConvexity(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).windowShadingControlList.clear();
@@ -6145,7 +6145,7 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides = state.dataIPShortCut->rNumericArgs(1);
             }
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex.allocate(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
-            GetVertices(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides, state.dataIPShortCut->rNumericArgs({2, _}));
+            GetVertices(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides, state.dataIPShortCut->rNumericArgs({2, {}}));
             CheckConvexity(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
             //    IF (SurfaceTmp(SurfNum)%Sides == 3) THEN
             //      CALL ShowWarningError(state, TRIM(cCurrentModuleObject)//'="'//TRIM(SurfaceTmp(SurfNum)%Name)//  &

@@ -217,9 +217,9 @@ void SimDXCoil(EnergyPlusData &state,
         if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) {
 
             if (present(CoilCoolingHeatingPLRRatio)) {
-                CalcDoe2DXCoil(state, DXCoilNum, CompOp, FirstHVACIteration, PartLoadRatio, FanOpMode, _, AirFlowRatio, CoilCoolingHeatingPLRRatio);
+                CalcDoe2DXCoil(state, DXCoilNum, CompOp, FirstHVACIteration, PartLoadRatio, FanOpMode, {}, AirFlowRatio, CoilCoolingHeatingPLRRatio);
             } else {
-                CalcDoe2DXCoil(state, DXCoilNum, CompOp, FirstHVACIteration, PartLoadRatio, FanOpMode, _, AirFlowRatio);
+                CalcDoe2DXCoil(state, DXCoilNum, CompOp, FirstHVACIteration, PartLoadRatio, FanOpMode, {}, AirFlowRatio);
             }
 
         } else if (SELECT_CASE_var == CoilDX_HeatingEmpirical) {
@@ -235,7 +235,7 @@ void SimDXCoil(EnergyPlusData &state,
 
         } else if (SELECT_CASE_var == CoilVRF_Cooling) {
 
-            CalcVRFCoolingCoil(state, DXCoilNum, 1, FirstHVACIteration, PartLoadRatio, FanOpMode, CompCycRatio, _, AirFlowRatio, MaxCap);
+            CalcVRFCoolingCoil(state, DXCoilNum, 1, FirstHVACIteration, PartLoadRatio, FanOpMode, CompCycRatio, {}, AirFlowRatio, MaxCap);
 
         } else if (SELECT_CASE_var == CoilVRF_Heating) {
 
@@ -243,11 +243,11 @@ void SimDXCoil(EnergyPlusData &state,
 
         } else if (SELECT_CASE_var == CoilVRF_FluidTCtrl_Cooling) {
 
-            CalcVRFCoolingCoil_FluidTCtrl(state, DXCoilNum, 1, FirstHVACIteration, PartLoadRatio, FanOpMode, CompCycRatio, _, _);
+            CalcVRFCoolingCoil_FluidTCtrl(state, DXCoilNum, 1, FirstHVACIteration, PartLoadRatio, FanOpMode, CompCycRatio, {}, {});
 
         } else if (SELECT_CASE_var == CoilVRF_FluidTCtrl_Heating) {
 
-            CalcVRFHeatingCoil_FluidTCtrl(state, CompOp, DXCoilNum, PartLoadRatio, FanOpMode, _, MaxCap);
+            CalcVRFHeatingCoil_FluidTCtrl(state, CompOp, DXCoilNum, PartLoadRatio, FanOpMode, {}, MaxCap);
 
         } else {
             ShowSevereError(state, "Error detected in DX Coil=" + CompName);
@@ -1174,7 +1174,7 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                     ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
+                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, {});
                 }
 
                 if (MaxCurveVal > 1.0) {
@@ -1183,7 +1183,7 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                     ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
+                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, {}, 1.0);
                 }
             }
         }
@@ -1745,7 +1745,7 @@ void GetDXCoils(EnergyPlusData &state)
                                         state,
                                         format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                                     ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, 0.7, _);
+                                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, 0.7, {});
                                 }
 
                                 if (MaxCurveVal > 1.0) {
@@ -1755,7 +1755,7 @@ void GetDXCoils(EnergyPlusData &state)
                                         state,
                                         format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                                     ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, _, 1.0);
+                                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, {}, 1.0);
                                 }
                             }
                         }
@@ -2235,7 +2235,7 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                     ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
+                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, {});
                 }
 
                 if (MaxCurveVal > 1.0) {
@@ -2244,7 +2244,7 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                     ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
+                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, {}, 1.0);
                 }
             }
         }
@@ -2688,7 +2688,7 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                     ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
+                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, {});
                 }
 
                 if (MaxCurveVal > 1.0) {
@@ -2697,7 +2697,7 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                     ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
+                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, {}, 1.0);
                 }
             }
         }
@@ -3491,7 +3491,7 @@ void GetDXCoils(EnergyPlusData &state)
                         ShowContinueError(state,
                                           format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                         ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
+                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, {});
                     }
 
                     if (MaxCurveVal > 1.0) {
@@ -3501,7 +3501,7 @@ void GetDXCoils(EnergyPlusData &state)
                         ShowContinueError(state,
                                           format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                         ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
+                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, {}, 1.0);
                     }
                 }
             }
@@ -3873,7 +3873,7 @@ void GetDXCoils(EnergyPlusData &state)
                         ShowContinueError(state,
                                           format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                         ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
+                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, {});
                     }
 
                     if (MaxCurveVal > 1.0) {
@@ -3883,7 +3883,7 @@ void GetDXCoils(EnergyPlusData &state)
                         ShowContinueError(state,
                                           format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                         ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
+                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, {}, 1.0);
                     }
                 }
             }
@@ -4323,7 +4323,7 @@ void GetDXCoils(EnergyPlusData &state)
                         ShowContinueError(state,
                                           format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                         ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, 0.7, _);
+                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, 0.7, {});
                     }
 
                     if (MaxCurveVal > 1.0) {
@@ -4334,7 +4334,7 @@ void GetDXCoils(EnergyPlusData &state)
                         ShowContinueError(state,
                                           format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                         ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, _, 1.0);
+                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, {}, 1.0);
                     }
                 }
             }
@@ -4860,8 +4860,8 @@ void GetDXCoils(EnergyPlusData &state)
                         ShowContinueError(state,
                                           format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                         ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, 0.7, _);
+                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, {});
+                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, 0.7, {});
                     }
 
                     if (MaxCurveVal > 1.0) {
@@ -4872,7 +4872,7 @@ void GetDXCoils(EnergyPlusData &state)
                         ShowContinueError(state,
                                           format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                         ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, _, 1.0);
+                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, {}, 1.0);
                     }
                 }
             }
@@ -5466,10 +5466,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, "System", "Average", Coil.Name);
@@ -5488,10 +5488,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "COOLING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name);
@@ -5521,10 +5521,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     "OnSiteWater",
                                     "Condensate",
-                                    _,
+                                    {},
                                     "System");
             }
 
@@ -5547,10 +5547,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     "Water",
                                     "Cooling",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Cooling Coil Evaporative Condenser Mains Supply Water Volume",
@@ -5559,10 +5559,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     "MainsWater",
                                     "Cooling",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Cooling Coil Evaporative Condenser Pump Electricity Rate",
@@ -5578,10 +5578,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "COOLING",
-                                    _,
+                                    {},
                                     "System");
                 if (Coil.BasinHeaterPowerFTempDiff > 0.0) {
                     SetupOutputVariable(state,
@@ -5598,10 +5598,10 @@ void GetDXCoils(EnergyPlusData &state)
                                         "System",
                                         "Sum",
                                         Coil.Name,
-                                        _,
+                                        {},
                                         "Electricity",
                                         "COOLING",
-                                        _,
+                                        {},
                                         "System");
                 }
             }
@@ -5639,10 +5639,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Heating Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecHeatingPower, "System", "Average", Coil.Name);
@@ -5653,10 +5653,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Heating Coil Defrost Electricity Rate", OutputProcessor::Unit::W, Coil.DefrostPower, "System", "Average", Coil.Name);
@@ -5667,10 +5667,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Crankcase Heater Electricity Rate",
@@ -5686,10 +5686,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name);
@@ -5739,10 +5739,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, "System", "Average", Coil.Name);
@@ -5761,10 +5761,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "COOLING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name);
@@ -5788,10 +5788,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     "Water",
                                     "Cooling",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Cooling Coil Evaporative Condenser Mains Supply Water Volume",
@@ -5800,10 +5800,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     "MainsWater",
                                     "Cooling",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Cooling Coil Evaporative Condenser Pump Electricity Rate",
@@ -5819,10 +5819,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "COOLING",
-                                    _,
+                                    {},
                                     "System");
                 if (Coil.BasinHeaterPowerFTempDiff > 0.0) {
                     SetupOutputVariable(state,
@@ -5839,10 +5839,10 @@ void GetDXCoils(EnergyPlusData &state)
                                         "System",
                                         "Sum",
                                         Coil.Name,
-                                        _,
+                                        {},
                                         "Electricity",
                                         "COOLING",
-                                        _,
+                                        {},
                                         "System");
                 }
             }
@@ -5864,10 +5864,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     "ENERGYTRANSFER",
                                     "COOLINGCOILS",
-                                    _,
+                                    {},
                                     "System");
             } else {
                 SetupOutputVariable(
@@ -5900,10 +5900,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "DHW",
-                                    _,
+                                    {},
                                     "Plant");
             }
 
@@ -5937,10 +5937,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "DHW",
-                                _,
+                                {},
                                 "Plant");
         }
 
@@ -5956,10 +5956,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, "System", "Average", Coil.Name);
@@ -5978,10 +5978,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "COOLING",
-                                _,
+                                {},
                                 "System");
 
             if (Coil.FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
@@ -5994,10 +5994,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     Coil.FuelType,
                                     "COOLING",
-                                    _,
+                                    {},
                                     "System");
             }
 
@@ -6014,10 +6014,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     "Water",
                                     "Cooling",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Cooling Coil Evaporative Condenser Mains Supply Water Volume",
@@ -6026,10 +6026,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     "MainsWater",
                                     "Cooling",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Cooling Coil Evaporative Condenser Pump Electricity Rate",
@@ -6045,10 +6045,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "COOLING",
-                                    _,
+                                    {},
                                     "System");
                 if (Coil.BasinHeaterPowerFTempDiff > 0.0) {
                     SetupOutputVariable(state,
@@ -6065,10 +6065,10 @@ void GetDXCoils(EnergyPlusData &state)
                                         "System",
                                         "Sum",
                                         Coil.Name,
-                                        _,
+                                        {},
                                         "Electricity",
                                         "COOLING",
-                                        _,
+                                        {},
                                         "System");
                 }
             }
@@ -6096,10 +6096,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Heating Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecHeatingPower, "System", "Average", Coil.Name);
@@ -6110,10 +6110,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
 
             if (Coil.FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
@@ -6126,10 +6126,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     Coil.FuelType,
                                     "HEATING",
-                                    _,
+                                    {},
                                     "System");
             }
 
@@ -6148,10 +6148,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     Coil.FuelType,
                                     "HEATING",
-                                    _,
+                                    {},
                                     "System");
             } else {
                 SetupOutputVariable(
@@ -6163,10 +6163,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "HEATING",
-                                    _,
+                                    {},
                                     "System");
             }
 
@@ -6184,10 +6184,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name);
@@ -6232,10 +6232,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, "System", "Average", Coil.Name);
@@ -6262,10 +6262,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     "OnSiteWater",
                                     "Condensate",
-                                    _,
+                                    {},
                                     "System");
             }
         }
@@ -6283,10 +6283,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name);
@@ -6305,10 +6305,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, "System", "Average", Coil.Name);
@@ -6341,10 +6341,10 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System",
                                     "Sum",
                                     Coil.Name,
-                                    _,
+                                    {},
                                     "OnSiteWater",
                                     "Condensate",
-                                    _,
+                                    {},
                                     "System");
             }
         }
@@ -6362,10 +6362,10 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 Coil.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(
                 state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name);
@@ -6587,10 +6587,10 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
                                             "System",
                                             "Sum",
                                             state.dataDXCoils->DXCoil(DXCoilNumTemp).Name,
-                                            _,
+                                            {},
                                             "Electricity",
                                             "COOLING",
-                                            _,
+                                            {},
                                             "System");
                         state.dataDXCoils->DXCoil(DXCoilNumTemp).ReportCoolingCoilCrankcasePower = false;
                     }
@@ -6692,13 +6692,13 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
 
             // calculate coil model at rating point
             if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
-                CalcDoe2DXCoil(state, DXCoilNum, 1.0, false, 1.0, 1.0, _, 1.0);
+                CalcDoe2DXCoil(state, DXCoilNum, 1.0, false, 1.0, 1.0, {}, 1.0);
             } else if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
                 CalcMultiSpeedDXCoil(state, DXCoilNum, 1.0, 1.0);
             } else if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == DataHVACGlobals::CoilVRF_Cooling) {
-                CalcVRFCoolingCoil(state, DXCoilNum, 1, false, 1.0, 1.0, 1.0, _, _, _);
+                CalcVRFCoolingCoil(state, DXCoilNum, 1, false, 1.0, 1.0, 1.0, {}, {}, {});
             } else if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling) {
-                CalcVRFCoolingCoil_FluidTCtrl(state, DXCoilNum, 1, false, 1.0, 1.0, 1.0, _, _);
+                CalcVRFCoolingCoil_FluidTCtrl(state, DXCoilNum, 1, false, 1.0, 1.0, 1.0, {}, {});
             }
 
             // coil outlets
@@ -6871,9 +6871,9 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
             if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatingEmpirical) {
                 CalcDXHeatingCoil(state, DXCoilNum, 1.0, 1.0, 1.0);
             } else if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_Heating) {
-                CalcDXHeatingCoil(state, DXCoilNum, 1.0, 1.0, _, _);
+                CalcDXHeatingCoil(state, DXCoilNum, 1.0, 1.0, {}, {});
             } else if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating) {
-                CalcVRFHeatingCoil_FluidTCtrl(state, 1.0, DXCoilNum, 1.0, 1.0, _, _);
+                CalcVRFHeatingCoil_FluidTCtrl(state, 1.0, DXCoilNum, 1.0, 1.0, {}, {});
             }
             // coil outlets
             Real64 RatedOutletWetBulb(0.0);
@@ -7464,7 +7464,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                             state.dataSize->SysSizingRunDone ? state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixTempAtCoolPeak : 26;
                     }
                 }
-                CalcVRFCoilCapModFac(state, 0, _, CompName, CoilInTemp, _, _, _, state.dataSize->DataTotCapCurveValue);
+                CalcVRFCoilCapModFac(state, 0, {}, CompName, CoilInTemp, {}, {}, {}, state.dataSize->DataTotCapCurveValue);
             } else if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedCooling) {
                 SizingMethod = CoolingCapacitySizing;
                 CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name;
@@ -8734,7 +8734,7 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
                 Coil.HCapFTempErrorIndex,
                 HeatCapFTemp,
                 HeatCapFTemp,
-                _,
+                {},
                 "[C]",
                 "[C]");
             HeatCapFTemp = 0.0;
@@ -8773,7 +8773,7 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
                 Coil.HCOPFTempErrorIndex,
                 HeatCOPFTemp,
                 HeatCOPFTemp,
-                _,
+                {},
                 "[C]",
                 "[C]");
             HeatCOPFTemp = 0.0;
@@ -9248,7 +9248,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
                                                state.dataDXCoils->DXCoil(DXCoilNum).LowAmbErrIndex,
                                                state.dataDXCoils->DXCoil(DXCoilNum).LowTempLast,
                                                state.dataDXCoils->DXCoil(DXCoilNum).LowTempLast,
-                                               _,
+                                               {},
                                                "[C]",
                                                "[C]");
             } else {
@@ -9259,7 +9259,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
                                                state.dataDXCoils->DXCoil(DXCoilNum).LowAmbErrIndex,
                                                state.dataDXCoils->DXCoil(DXCoilNum).LowTempLast,
                                                state.dataDXCoils->DXCoil(DXCoilNum).LowTempLast,
-                                               _,
+                                               {},
                                                "[C]",
                                                "[C]");
             }
@@ -10289,7 +10289,7 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
                                            state.dataDXCoils->DXCoil(DXCoilNum).LowAmbErrIndex,
                                            state.dataDXCoils->DXCoil(DXCoilNum).LowTempLast,
                                            state.dataDXCoils->DXCoil(DXCoilNum).LowTempLast,
-                                           _,
+                                           {},
                                            "[C]",
                                            "[C]");
         }
@@ -10309,7 +10309,7 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
                                            state.dataDXCoils->DXCoil(DXCoilNum).HighAmbErrIndex,
                                            state.dataDXCoils->DXCoil(DXCoilNum).HighTempLast,
                                            state.dataDXCoils->DXCoil(DXCoilNum).HighTempLast,
-                                           _,
+                                           {},
                                            "[C]",
                                            "[C]");
         }
@@ -14535,14 +14535,14 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                 PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, state.dataLoopNodes->Node(FanInletNode).HumRat);
             if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->simulate(
-                    state, _, true, false, FanStaticPressureRise);
+                    state, {}, true, false, FanStaticPressureRise);
                 FanPowerCorrection = state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->fanPower();
             } else {
                 Fans::SimulateFanComponents(state,
                                             state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName,
                                             true,
                                             state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex,
-                                            _,
+                                            {},
                                             true,
                                             false,
                                             FanStaticPressureRise);
@@ -14687,14 +14687,14 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
 
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                     state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->simulate(
-                        state, _, true, false, FanStaticPressureRise);
+                        state, {}, true, false, FanStaticPressureRise);
                     FanPowerCorrection = state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->fanPower();
                 } else {
                     Fans::SimulateFanComponents(state,
                                                 state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName,
                                                 true,
                                                 state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex,
-                                                _,
+                                                {},
                                                 true,
                                                 false,
                                                 FanStaticPressureRise);
@@ -15087,13 +15087,13 @@ Real64 CalcTwoSpeedDXCoilIEERResidual(EnergyPlusData &state,
             PsyWFnTdbTwbPb(state, IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, state.dataEnvrn->OutBaroPress, RoutineName);
         state.dataLoopNodes->Node(FanInletNodeNum).Enthalpy = PsyHFnTdbW(IndoorUnitInletDryBulb, state.dataLoopNodes->Node(FanInletNodeNum).HumRat);
         if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
+            state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, {}, true, false, FanStaticPressureRise);
         } else {
             Fans::SimulateFanComponents(state,
                                         state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName,
                                         true,
                                         state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex,
-                                        _,
+                                        {},
                                         true,
                                         false,
                                         FanStaticPressureRise);
@@ -16861,7 +16861,7 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
     //         }
     //         ShowRecurringWarningErrorAtEnd(state,  DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Low condenser inlet
     // temperature error continues...", DXCoil( DXCoilNum ).LowAmbErrIndex, DXCoil( DXCoilNum ).LowTempLast, DXCoil( DXCoilNum ).LowTempLast,
-    // _,
+    // {},
     // "[C]", "[C]" );
     //     }
     // }
@@ -16876,7 +16876,7 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
     //         ShowRecurringWarningErrorAtEnd(state,  DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - High condenser inlet
     // temperature error continues...", DXCoil( DXCoilNum ).HighAmbErrIndex, DXCoil( DXCoilNum ).HighTempLast, DXCoil( DXCoilNum
     // ).HighTempLast,
-    // _, "[C]", "[C]" );
+    // {}, "[C]", "[C]" );
     //     }
     // }
 

@@ -880,11 +880,11 @@ void InitPIU(EnergyPlusData &state,
                                     state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum,
                                     state.dataPowerInductionUnits->PIU(PIUNum).HWCompNum,
                                     errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+                                    {},
+                                    {},
+                                    {},
+                                    {},
+                                    {});
             if (errFlag) {
                 ShowFatalError(state, "InitPIU: Program terminated due to previous condition(s).");
             }
@@ -1816,13 +1816,13 @@ void CalcSeriesPIU(EnergyPlusData &state,
                 state, state.dataPowerInductionUnits->PIU(PIUNum).MixerName, state.dataPowerInductionUnits->PIU(PIUNum).Mixer_Num); // fire the mixer
             if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->simulate(
-                    state, _, PIUTurnFansOn, PIUTurnFansOff, _);
+                    state, {}, PIUTurnFansOn, PIUTurnFansOff, {});
             } else if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                 Fans::SimulateFanComponents(state,
                                             state.dataPowerInductionUnits->PIU(PIUNum).FanName,
                                             FirstHVACIteration,
                                             state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index,
-                                            _,
+                                            {},
                                             PIUTurnFansOn,
                                             PIUTurnFansOff); // fire the fan
             }
@@ -1864,13 +1864,13 @@ void CalcSeriesPIU(EnergyPlusData &state,
     SimAirMixer(state, state.dataPowerInductionUnits->PIU(PIUNum).MixerName, state.dataPowerInductionUnits->PIU(PIUNum).Mixer_Num);
     // fire the fan
     if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-        state.dataHVACFan->fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
+        state.dataHVACFan->fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->simulate(state, {}, PIUTurnFansOn, PIUTurnFansOff, {});
     } else if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
         Fans::SimulateFanComponents(state,
                                     state.dataPowerInductionUnits->PIU(PIUNum).FanName,
                                     FirstHVACIteration,
                                     state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index,
-                                    _,
+                                    {},
                                     PIUTurnFansOn,
                                     PIUTurnFansOff); // fire the fan
     }
@@ -1919,9 +1919,9 @@ void CalcSeriesPIU(EnergyPlusData &state,
                                   state.dataPowerInductionUnits->PIU(PIUNum).CompErrIndex,
                                   HCoilInAirNode,
                                   OutletNode,
-                                  _,
-                                  _,
-                                  _,
+                                  {},
+                                  {},
+                                  {},
                                   state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum,
                                   state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide,
                                   state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum);
@@ -2129,13 +2129,13 @@ void CalcParallelPIU(EnergyPlusData &state,
 
             if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->simulate(
-                    state, _, PIUTurnFansOn, PIUTurnFansOff, _);
+                    state, {}, PIUTurnFansOn, PIUTurnFansOff, {});
             } else if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                 Fans::SimulateFanComponents(state,
                                             state.dataPowerInductionUnits->PIU(PIUNum).FanName,
                                             FirstHVACIteration,
                                             state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index,
-                                            _,
+                                            {},
                                             PIUTurnFansOn,
                                             PIUTurnFansOff); // fire the fan
             }
@@ -2181,13 +2181,13 @@ void CalcParallelPIU(EnergyPlusData &state,
     // fire the fan
 
     if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-        state.dataHVACFan->fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
+        state.dataHVACFan->fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->simulate(state, {}, PIUTurnFansOn, PIUTurnFansOff, {});
     } else if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
         Fans::SimulateFanComponents(state,
                                     state.dataPowerInductionUnits->PIU(PIUNum).FanName,
                                     FirstHVACIteration,
                                     state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index,
-                                    _,
+                                    {},
                                     PIUTurnFansOn,
                                     PIUTurnFansOff); // fire the fan
     }
@@ -2236,9 +2236,9 @@ void CalcParallelPIU(EnergyPlusData &state,
                                   state.dataPowerInductionUnits->PIU(PIUNum).CompErrIndex,
                                   HCoilInAirNode,
                                   OutletNode,
-                                  _,
-                                  _,
-                                  _,
+                                  {},
+                                  {},
+                                  {},
                                   state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum,
                                   state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide,
                                   state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum);

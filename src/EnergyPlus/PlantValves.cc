@@ -291,11 +291,11 @@ namespace PlantValves {
                                                         this->BranchNum,
                                                         this->CompNum,
                                                         errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
+                                                        {},
+                                                        {},
+                                                        {},
+                                                        {},
+                                                        {});
 
                 if (errFlag) {
                     ShowFatalError(state, "InitPlantValves: Program terminated due to previous condition(s).");

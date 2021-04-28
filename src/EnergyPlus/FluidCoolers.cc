@@ -434,10 +434,10 @@ void FluidCoolerspecs::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "Electricity",
                         "HeatRejection",
-                        _,
+                        {},
                         "Plant");
 }
 
@@ -733,7 +733,7 @@ void FluidCoolerspecs::oneTimeInit(EnergyPlusData &state)
     bool ErrorsFound = false;
     // Locate the tower on the plant loops for later usage
     PlantUtilities::ScanPlantLoopsForObject(
-        state, this->Name, this->FluidCoolerType_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
+        state, this->Name, this->FluidCoolerType_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, {}, {}, {}, {}, {});
 
     if (ErrorsFound) {
         ShowFatalError(state, "InitFluidCooler: Program terminated due to previous condition(s).");

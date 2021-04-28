@@ -986,9 +986,9 @@ namespace HVACHXAssistedCoolingCoil {
                             PartLoadRatio,
                             HXUnitOn,
                             CompanionCoilIndexNum,
-                            _,
+                            {},
                             EconomizerFlag,
-                            _,
+                            {},
                             state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num);
 
             if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {

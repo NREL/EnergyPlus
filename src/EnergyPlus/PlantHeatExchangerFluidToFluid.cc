@@ -541,10 +541,10 @@ void HeatExchangerStruct::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         this->HeatTransferMeteringEndUse,
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -635,11 +635,11 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                                 this->DemandSideLoop.branchNum,
                                                 this->DemandSideLoop.compNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
+                                                {},
+                                                {},
+                                                {},
                                                 this->DemandSideLoop.inletNodeNum,
-                                                _);
+                                                {});
 
         if (this->DemandSideLoop.loopSideNum != DataPlant::DemandSide) { // throw error
             ShowSevereError(state,
@@ -657,11 +657,11 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                                 this->SupplySideLoop.branchNum,
                                                 this->SupplySideLoop.compNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
+                                                {},
+                                                {},
+                                                {},
                                                 this->SupplySideLoop.inletNodeNum,
-                                                _);
+                                                {});
 
         if (this->SupplySideLoop.loopSideNum != DataPlant::SupplySide) { // throw error
             ShowSevereError(state,
@@ -753,11 +753,11 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                                         this->OtherCompSupplySideLoop.branchNum,
                                                         this->OtherCompSupplySideLoop.compNum,
                                                         errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
+                                                        {},
+                                                        {},
+                                                        {},
                                                         this->OtherCompSupplySideLoop.inletNodeNum,
-                                                        _);
+                                                        {});
             }
             if (this->OtherCompDemandSideLoop.inletNodeNum > 0) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
@@ -768,11 +768,11 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                                         this->OtherCompDemandSideLoop.branchNum,
                                                         this->OtherCompDemandSideLoop.compNum,
                                                         errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
+                                                        {},
+                                                        {},
+                                                        {},
                                                         this->OtherCompDemandSideLoop.inletNodeNum,
-                                                        _);
+                                                        {});
             }
         }
 

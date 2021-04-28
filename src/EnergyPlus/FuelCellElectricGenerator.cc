@@ -203,8 +203,8 @@ namespace FuelCellElectricGenerator {
                                                                      NumArray,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
@@ -240,7 +240,7 @@ namespace FuelCellElectricGenerator {
                                                                      NumArray,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
+                                                                     {},
                                                                      lAlphaBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
@@ -400,8 +400,8 @@ namespace FuelCellElectricGenerator {
                                                                      NumArray,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
@@ -609,8 +609,8 @@ namespace FuelCellElectricGenerator {
                                                                      NumArray,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
@@ -723,8 +723,8 @@ namespace FuelCellElectricGenerator {
                                                                      NumArray,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
@@ -800,8 +800,8 @@ namespace FuelCellElectricGenerator {
                                                                      NumArray,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
@@ -911,8 +911,8 @@ namespace FuelCellElectricGenerator {
                                                                      NumArray,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
@@ -971,8 +971,8 @@ namespace FuelCellElectricGenerator {
                                                                      NumArray,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
@@ -1030,8 +1030,8 @@ namespace FuelCellElectricGenerator {
                                                                          NumArray,
                                                                          NumNums,
                                                                          IOStat,
-                                                                         _,
-                                                                         _,
+                                                                         {},
+                                                                         {},
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
@@ -1120,10 +1120,10 @@ namespace FuelCellElectricGenerator {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state, "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->Report.qHX, "System", "Average", this->Name);
@@ -1135,10 +1135,10 @@ namespace FuelCellElectricGenerator {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -1148,10 +1148,10 @@ namespace FuelCellElectricGenerator {
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "NaturalGas",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(
@@ -3373,11 +3373,11 @@ namespace FuelCellElectricGenerator {
                                                     this->CWBranchNum,
                                                     this->CWCompNum,
                                                     errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {},
+                                                    {});
 
             // if there is a stack cooler option it might be connected to plant as well
 

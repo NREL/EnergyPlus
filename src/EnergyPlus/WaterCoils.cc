@@ -469,10 +469,10 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "System",
                             "Sum",
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HEATINGCOILS",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Heating Coil Source Side Heat Transfer Energy",
@@ -481,10 +481,10 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "System",
                             "Sum",
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                            _,
+                            {},
                             "PLANTLOOPHEATINGDEMAND",
                             "HEATINGCOILS",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Heating Coil Heating Rate",
@@ -664,10 +664,10 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "System",
                             "Sum",
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "COOLINGCOILS",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Coil Source Side Heat Transfer Energy",
@@ -676,10 +676,10 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "System",
                             "Sum",
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                            _,
+                            {},
                             "PLANTLOOPCOOLINGDEMAND",
                             "COOLINGCOILS",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Coil Sensible Cooling Energy",
@@ -719,10 +719,10 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                                _,
+                                {},
                                 "OnSiteWater",
                                 "Condensate",
-                                _,
+                                {},
                                 "System");
         }
     }
@@ -892,10 +892,10 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "System",
                             "Sum",
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "COOLINGCOILS",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Coil Source Side Heat Transfer Energy",
@@ -904,10 +904,10 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "System",
                             "Sum",
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                            _,
+                            {},
                             "PLANTLOOPCOOLINGDEMAND",
                             "COOLINGCOILS",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Coil Sensible Cooling Energy",
@@ -954,10 +954,10 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                 "System",
                                 "Sum",
                                 state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                                _,
+                                {},
                                 "OnSiteWater",
                                 "Condensate",
-                                _,
+                                {},
                                 "System");
         }
     }
@@ -1133,11 +1133,11 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
                                 state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopBranchNum,
                                 state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopCompNum,
                                 errFlag,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _);
+                                {},
+                                {},
+                                {},
+                                {},
+                                {});
         if (errFlag) {
             ShowFatalError(state, "InitWaterCoil: Program terminated for previous conditions.");
         }

@@ -64,7 +64,7 @@ struct EnergyPlusData;
 namespace InternalHeatGains {
 
     void ManageInternalHeatGains(EnergyPlusData &state,
-                                 Optional_bool_const InitOnly = _); // when true, just calls the get input, if appropriate and returns.
+                                 Optional_bool_const InitOnly = {})  ; // when true, just calls the get input, if appropriate and returns.
 
     void GetInternalHeatGainsInput(EnergyPlusData &state);
 
@@ -84,7 +84,7 @@ namespace InternalHeatGains {
 
     void CheckLightsReplaceableMinMaxForZone(EnergyPlusData &state, int const WhichZone); // Zone Number
 
-    void UpdateInternalGainValues(EnergyPlusData &state, Optional_bool_const SuppressRadiationUpdate = _, Optional_bool_const SumLatentGains = _);
+    void UpdateInternalGainValues(EnergyPlusData &state, Optional_bool_const SuppressRadiationUpdate = {}, Optional_bool_const SumLatentGains = {})  ;
 
     void SumAllInternalConvectionGains(EnergyPlusData &state,
                                        int const ZoneNum,        // zone index pointer for which zone to sum gains for

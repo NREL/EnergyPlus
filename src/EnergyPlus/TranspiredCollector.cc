@@ -746,10 +746,10 @@ namespace TranspiredCollector {
                                 "System",
                                 "Sum",
                                 state.dataTranspiredCollector->UTSC(Item).Name,
-                                _,
+                                {},
                                 "SolarAir",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -1085,7 +1085,7 @@ namespace TranspiredCollector {
                                            state.dataTranspiredCollector->UTSC(UTSCNum).VsucErrIndex,
                                            Vsuction,
                                            Vsuction,
-                                           _,
+                                           {},
                                            "[m/s]",
                                            "[m/s]");
         }
@@ -1173,7 +1173,7 @@ namespace TranspiredCollector {
               AreaSum; // Autodesk:F2C++ Functions handle array subscript usage
         //        Tso = sum( TH( UTSC( UTSCNum ).SurfPtrs, 1, 1 ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array
         // subscript usage: Replaced by below
-        Tso = sum_product_sub(state.dataHeatBalSurf->TH(1, 1, _),
+        Tso = sum_product_sub(state.dataHeatBalSurf->TH(1, 1, ObjexxFCL::IndexSlice{}),
                               state.dataSurface->Surface,
                               &SurfaceData::Area,
                               state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /

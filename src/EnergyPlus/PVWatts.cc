@@ -180,10 +180,10 @@ namespace PVWatts {
                             "System",
                             "Sum",
                             m_name,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "Photovoltaics",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state, "Generator PV Cell Temperature", OutputProcessor::Unit::C, m_cellTemperature, "System", "Average", m_name);
         SetupOutputVariable(state, "Plane of Array Irradiance", OutputProcessor::Unit::W_m2, m_planeOfArrayIrradiance, "System", "Average", m_name);

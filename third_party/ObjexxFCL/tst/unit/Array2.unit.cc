@@ -163,7 +163,7 @@ TEST( Array2Test, ConstructArgument )
 	EXPECT_EQ( 1, E2.u2() );
 	EXPECT_EQ( 31459, E2( 1, 1 ) );
 	EXPECT_EQ( 31459, E2( 2, 1 ) );
-	E2.dim( _, 1 );
+	E2.dim( {}, 1 );
 	EXPECT_EQ( 1u, E2.size2() );
 	EXPECT_EQ( 1, E2.l1() );
 	EXPECT_EQ( -1, E2.u1() );

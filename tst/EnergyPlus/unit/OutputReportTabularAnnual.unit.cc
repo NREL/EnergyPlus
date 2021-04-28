@@ -137,7 +137,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Zone",
                         "Sum",
                         "Lite1",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -148,7 +148,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Zone",
                         "Sum",
                         "Lite2",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -159,7 +159,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Zone",
                         "Sum",
                         "Lite3",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -211,7 +211,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Zone",
                         "Sum",
                         "Lite1",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -222,7 +222,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Zone",
                         "Sum",
                         "Lite2",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -233,7 +233,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Zone",
                         "Sum",
                         "Lite3",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -339,7 +339,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
                         "Zone",
                         "Sum",
                         "Lite1",
-                        _,
+                        {},
                         "Electricity",
                         "Facility",
                         "General"); // create an electric meter
@@ -397,7 +397,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
                         "Zone",
                         "Sum",
                         "Lite1",
-                        _,
+                        {},
                         "Electricity",
                         "Facility",
                         "General"); // create an electric meter

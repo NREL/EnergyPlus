@@ -644,7 +644,7 @@ void ReformulatedEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ELECTRICITY",
                         "Cooling",
                         this->EndUseSubcategory,
@@ -659,10 +659,10 @@ void ReformulatedEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "CHILLERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(
@@ -689,10 +689,10 @@ void ReformulatedEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         "System",
                         "Sum",
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state, "Chiller COP", OutputProcessor::Unit::W_W, this->ActualCOP, "System", "Average", this->Name);
@@ -726,10 +726,10 @@ void ReformulatedEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                             "System",
                             "Sum",
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HEATRECOVERY",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(
@@ -768,10 +768,10 @@ void ReformulatedEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
                                             this->CWCompNum,
                                             errFlag,
                                             this->TempLowLimitEvapOut,
-                                            _,
-                                            _,
+                                            {},
+                                            {},
                                             this->EvapInletNodeNum,
-                                            _);
+                                            {});
     if (this->CondenserType != DataPlant::CondenserType::AirCooled) {
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
@@ -781,11 +781,11 @@ void ReformulatedEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
                                                 this->CDBranchNum,
                                                 this->CDCompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
+                                                {},
+                                                {},
+                                                {},
                                                 this->CondInletNodeNum,
-                                                _);
+                                                {});
         PlantUtilities::InterConnectTwoPlantLoopSides(
             state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_ElectricReformEIR, true);
     }
@@ -798,11 +798,11 @@ void ReformulatedEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
                                                 this->HRBranchNum,
                                                 this->HRCompNum,
                                                 errFlag,
-                                                _,
-                                                _,
-                                                _,
+                                                {},
+                                                {},
+                                                {},
                                                 this->HeatRecInletNodeNum,
-                                                _);
+                                                {});
         PlantUtilities::InterConnectTwoPlantLoopSides(
             state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, DataPlant::TypeOf_Chiller_ElectricReformEIR, true);
     }

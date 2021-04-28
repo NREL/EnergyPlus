@@ -133,36 +133,6 @@ public: // Creation
 		assert( legal() );
 	}
 
-	// Omit Constructor
-	IndexRange( Omit const ) :
-	 l_( 1 ),
-	 u_( -1 ),
-	 size_( npos )
-	{}
-
-	// Lower Index + Omit Constructor
-	IndexRange( int const l, Omit const ) :
-	 l_( l ),
-	 u_( l_ - 2 ),
-	 size_( npos )
-	{}
-
-	// Omit + Upper Index Constructor
-	IndexRange( Omit const, int const u ) :
-	 l_( u + 2 ),
-	 u_( u ),
-	 size_( npos )
-	{
-		assert( legal() );
-	}
-
-	// Omit + Omit Constructor
-	IndexRange( Omit const, Omit const ) :
-	 l_( 1 ),
-	 u_( -1 ),
-	 size_( npos )
-	{}
-
 	// Destructor
 	~IndexRange()
 	{}

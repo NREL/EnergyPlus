@@ -58,7 +58,7 @@ int main(int argc, const char *argv[])
     // this was pulled from EnergyPlusPgm.cc and needs to be removed once the release is done
     Array1D_int value(8);
     std::string datestring; // supposedly returns blank when no date available.
-    date_and_time(datestring, _, _, value);
+    date_and_time(datestring, {}, {}, value);
     if (!datestring.empty()) {
         state.dataStrGlobals->CurrentDateTime =
             EnergyPlus::format(" YMD={:4}.{:02}.{:02} {:02}:{:02}", value(1), value(2), value(3), value(5), value(6));

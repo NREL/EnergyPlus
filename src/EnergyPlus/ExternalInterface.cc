@@ -177,8 +177,8 @@ void GetExternalInterfaceInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->rNumericArgs,
                                                                  NumNumbers,
                                                                  IOStatus,
-                                                                 _,
-                                                                 _,
+                                                                 {},
+                                                                 {},
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "PtolemyServer")) { // The BCVTB interface is activated.
@@ -1065,8 +1065,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                      state.dataIPShortCut->rNumericArgs,
                                                                      NumNumbers,
                                                                      IOStatus,
-                                                                     _,
-                                                                     _,
+                                                                     {},
+                                                                     {},
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             // Get the FMU name
@@ -1142,8 +1142,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                          state.dataIPShortCut->rNumericArgs,
                                                                          NumNumbers,
                                                                          IOStatus,
-                                                                         _,
-                                                                         _,
+                                                                         {},
+                                                                         {},
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name)) {
@@ -1338,8 +1338,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                              state.dataIPShortCut->rNumericArgs,
                                                                              NumNumbers,
                                                                              IOStatus,
-                                                                             _,
-                                                                             _,
+                                                                             {},
+                                                                             {},
                                                                              state.dataIPShortCut->cAlphaFieldNames,
                                                                              state.dataIPShortCut->cNumericFieldNames);
                     if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name) &&
@@ -1486,8 +1486,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                          state.dataIPShortCut->rNumericArgs,
                                                                          NumNumbers,
                                                                          IOStatus,
-                                                                         _,
-                                                                         _,
+                                                                         {},
+                                                                         {},
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name)) {
@@ -1511,8 +1511,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                              state.dataIPShortCut->rNumericArgs,
                                                                              NumNumbers,
                                                                              IOStatus,
-                                                                             _,
-                                                                             _,
+                                                                             {},
+                                                                             {},
                                                                              state.dataIPShortCut->cAlphaFieldNames,
                                                                              state.dataIPShortCut->cNumericFieldNames);
                     if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name) &&
@@ -1599,8 +1599,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                          state.dataIPShortCut->rNumericArgs,
                                                                          NumNumbers,
                                                                          IOStatus,
-                                                                         _,
-                                                                         _,
+                                                                         {},
+                                                                         {},
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), state.dataExternalInterface->FMU(i).Name)) {
@@ -1624,8 +1624,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                              state.dataIPShortCut->rNumericArgs,
                                                                              NumNumbers,
                                                                              IOStatus,
-                                                                             _,
-                                                                             _,
+                                                                             {},
+                                                                             {},
                                                                              state.dataIPShortCut->cAlphaFieldNames,
                                                                              state.dataIPShortCut->cNumericFieldNames);
                     if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), state.dataExternalInterface->FMU(i).Name) &&
@@ -1708,8 +1708,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                          state.dataIPShortCut->rNumericArgs,
                                                                          NumNumbers,
                                                                          IOStatus,
-                                                                         _,
-                                                                         _,
+                                                                         {},
+                                                                         {},
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), state.dataExternalInterface->FMU(i).Name)) {
@@ -1733,8 +1733,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                              state.dataIPShortCut->rNumericArgs,
                                                                              NumNumbers,
                                                                              IOStatus,
-                                                                             _,
-                                                                             _,
+                                                                             {},
+                                                                             {},
                                                                              state.dataIPShortCut->cAlphaFieldNames,
                                                                              state.dataIPShortCut->cNumericFieldNames);
                     if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), state.dataExternalInterface->FMU(i).Name) &&
@@ -2281,8 +2281,8 @@ void ValidateRunControl(EnergyPlusData &state)
                                                                  state.dataIPShortCut->rNumericArgs,
                                                                  NumNumbers,
                                                                  IOStatus,
-                                                                 _,
-                                                                 _,
+                                                                 {},
+                                                                 {},
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
         if (state.dataIPShortCut->cAlphaArgs(5) == "NO") { // This run does not have a weather file simulation.
@@ -2554,8 +2554,8 @@ void VerifyExternalInterfaceObject(EnergyPlusData &state)
                                                              state.dataIPShortCut->rNumericArgs,
                                                              NumNumbers,
                                                              IOStatus,
-                                                             _,
-                                                             _,
+                                                             {},
+                                                             {},
                                                              state.dataIPShortCut->cAlphaFieldNames,
                                                              state.dataIPShortCut->cNumericFieldNames);
     if ((!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "PtolemyServer")) &&

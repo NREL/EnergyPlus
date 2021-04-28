@@ -1968,10 +1968,10 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                                                                 BranchNum,
                                                                 CompNum,
                                                                 errFlag1,
-                                                                _,
-                                                                _,
+                                                                {},
+                                                                {},
                                                                 NumSearchResults,
-                                                                _,
+                                                                {},
                                                                 LoopNum);
 
                         if (errFlag1) {

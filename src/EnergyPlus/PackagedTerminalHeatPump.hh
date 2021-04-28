@@ -507,8 +507,8 @@ namespace PackagedTerminalHeatPump {
                         int ZoneNum,                          // Zone index
                         Real64 PartLoadRatio,                 // unit part load ratio
                         Real64 &OnOffAirFlowRatio,            // ratio of compressor ON airflow to average airflow over timestep
-                        Optional_int_const SpeedNum = _,      // Speed number
-                        Optional<Real64 const> SpeedRatio = _ // Speed ratio
+                        Optional_int_const SpeedNum = {},      // Speed number
+                        Optional<Real64 const> SpeedRatio = {}  // Speed ratio
     );
 
     void SetOnOffMassFlowRateVSCoil(EnergyPlusData &state,

@@ -100,7 +100,7 @@ TEST( ArraySTest, Array2SSingleIndexSlice )
 TEST( ArraySTest, Array2D1SSlice )
 {
 	Array2D_int A( 2, 2, { 11, 12, 21, 22 } );
-	Array1S_int S( A( _, 2 ) );
+	Array1S_int S( A( {}, 2 ) );
 	EXPECT_EQ( 2u, S.size() );
 	EXPECT_EQ( 1, S.l() );
 	EXPECT_EQ( 2, S.u() );
@@ -113,7 +113,7 @@ TEST( ArraySTest, Array2D1SSlice )
 TEST( ArraySTest, Array2D1SSlice65 )
 {
 	Array2D_int A( 6, 5, 999 );
-	Array1S_int S( A( _, 2 ) );
+	Array1S_int S( A( {}, 2 ) );
 	EXPECT_EQ( 6u, S.size() );
 	EXPECT_EQ( 1, S.l() );
 	EXPECT_EQ( 6, S.u() );

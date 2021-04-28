@@ -3070,8 +3070,8 @@ namespace OutputProcessor {
                                          state.dataEnvrn->Month,
                                          state.dataEnvrn->DayOfMonth,
                                          state.dataGlobal->HourOfDay,
-                                         _,
-                                         _,
+                                         {},
+                                         {},
                                          state.dataEnvrn->DSTIndicator,
                                          DayTypes(CurDayType));
                 if (state.dataResultsFramework->resultsFramework->HRMeters.rDataFrameEnabled()) {
@@ -3173,9 +3173,9 @@ namespace OutputProcessor {
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          state.dataEnvrn->Month,
                                          state.dataEnvrn->DayOfMonth,
-                                         _,
-                                         _,
-                                         _,
+                                         {},
+                                         {},
+                                         {},
                                          state.dataEnvrn->DSTIndicator,
                                          DayTypes(CurDayType));
                 if (state.dataResultsFramework->resultsFramework->DYMeters.rDataFrameEnabled()) {
@@ -4069,8 +4069,8 @@ namespace OutputProcessor {
                                                                                 Month,
                                                                                 DayOfMonth,
                                                                                 Hour,
-                                                                                _,
-                                                                                _,
+                                                                                {},
+                                                                                {},
                                                                                 DST,
                                                                                 DayType,
                                                                                 state.dataGlobal->WarmupFlag);
@@ -4094,9 +4094,9 @@ namespace OutputProcessor {
                                                                                 state.dataGlobal->CalendarYear,
                                                                                 Month,
                                                                                 DayOfMonth,
-                                                                                _,
-                                                                                _,
-                                                                                _,
+                                                                                {},
+                                                                                {},
+                                                                                {},
                                                                                 DST,
                                                                                 DayType,
                                                                                 state.dataGlobal->WarmupFlag);
@@ -6349,8 +6349,8 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      state.dataEnvrn->Month,
                                      state.dataEnvrn->DayOfMonth,
                                      state.dataGlobal->HourOfDay,
-                                     _,
-                                     _,
+                                     {},
+                                     {},
                                      state.dataEnvrn->DSTIndicator,
                                      DayTypes(CurDayType));
             TimePrint = false;
@@ -6452,9 +6452,9 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      true,
                                      state.dataEnvrn->Month,
                                      state.dataEnvrn->DayOfMonth,
-                                     _,
-                                     _,
-                                     _,
+                                     {},
+                                     {},
+                                     {},
                                      state.dataEnvrn->DSTIndicator,
                                      DayTypes(CurDayType));
             TimePrint = false;
@@ -8678,7 +8678,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
 
     //  See if Report Variables should be turned on
     SortByName = false;
-    ScanForReports(state, "VariableDictionary", DoReport, _, VarOption1, VarOption2);
+    ScanForReports(state, "VariableDictionary", DoReport, {}, VarOption1, VarOption2);
     //  IF (.not. DoReport) RETURN
 
     if (DoReport) {

@@ -48,8 +48,8 @@ TEST( IndexSliceTest, ConstructionList )
 
 TEST( IndexSliceTest, ConstructionOmit )
 {
-	IndexSlice r( -3, _, 3 );
-	EXPECT_EQ( IndexSlice( -3, _, 3 ), r );
+	IndexSlice r( -3, {}, 3 );
+	EXPECT_EQ( IndexSlice( -3, {}, 3 ), r );
 	EXPECT_EQ( -3, r.l() );
 	EXPECT_TRUE( ! r.u_initialized() );
 	EXPECT_EQ( 0u, r.size() );

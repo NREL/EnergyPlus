@@ -580,7 +580,7 @@ void CheckPlantMixerSplitterConsistency(EnergyPlusData &state, int const LoopNum
                                               state.dataPlnt->PlantLoop(LoopNum).MFErrIndex1,
                                               AbsDifference,
                                               AbsDifference,
-                                              _,
+                                              {},
                                               "kg/s",
                                               "kg/s");
                 if (AbsDifference > DataBranchAirLoopPlant::MassFlowTolerance * 10.0) {
@@ -632,7 +632,7 @@ void CheckPlantMixerSplitterConsistency(EnergyPlusData &state, int const LoopNum
                                               state.dataPlnt->PlantLoop(LoopNum).MFErrIndex2,
                                               AbsDifference,
                                               AbsDifference,
-                                              _,
+                                              {},
                                               "kg/s",
                                               "kg/s");
             }
@@ -717,7 +717,7 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, int con
                                        "Plant loop falling below lower temperature limit, PlantLoop=\"" + state.dataPlnt->PlantLoop(LoopNum).Name +
                                            "\"",
                                        state.dataPlnt->PlantLoop(LoopNum).MinTempErrIndex,
-                                       _,
+                                       {},
                                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp);
 
         if (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp <
