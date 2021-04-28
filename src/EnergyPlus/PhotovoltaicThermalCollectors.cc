@@ -1145,7 +1145,6 @@ namespace PhotovoltaicThermalCollectors {
                     } else {
                         BypassFraction = 0.0;
                     }
-
                     BypassFraction = max(0.0, BypassFraction);
                     PotentialOutletTemp = DewPointInlet;
                 }
@@ -1220,6 +1219,7 @@ namespace PhotovoltaicThermalCollectors {
                     PotentialHeatGain = 0.0;
                     PotentialOutletTemp = Tinlet;
                 }
+
             }
 
             this->Report.ThermEfficiency = Eff;
@@ -1231,6 +1231,7 @@ namespace PhotovoltaicThermalCollectors {
             this->Report.MdotWorkFluid = mdot;
             this->Report.ToutletWorkFluid = PotentialOutletTemp;
             this->Report.BypassStatus = BypassFraction;
+
             if (PotentialHeatGain > 0.0) this->BIPVT.LastCollectorTemp = Tcollector;
 
         } else if (this->CoolingUseful && this->BypassDamperOff && (mdot > 0.0) && (GetCurrentScheduleValue(this->BIPVT.SchedPtr) > 0.0)) {
