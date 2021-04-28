@@ -41,7 +41,6 @@ private: // Friend
 protected: // Types
 
 	typedef  internal::InitializerSentinel  InitializerSentinel;
-	typedef  internal::ProxySentinel  ProxySentinel;
 
 public: // Types
 

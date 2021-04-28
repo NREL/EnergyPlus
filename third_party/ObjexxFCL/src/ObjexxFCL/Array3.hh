@@ -40,7 +40,6 @@ private: // Friend
 protected: // Types
 
 	typedef  internal::InitializerSentinel  InitializerSentinel;
-	typedef  internal::ProxySentinel  ProxySentinel;
 
 public: // Types
 
@@ -186,101 +185,6 @@ protected: // Creation
 		assert( size_of( I1, I2, I3 ) == l.size() );
 	}
 
-	// Default Proxy Constructor
-	Array3( ProxySentinel const & proxy ) :
-	 Super( proxy ),
-	 z1_( 0u ),
-	 z2_( 0u ),
-	 z3_( 0u )
-	{}
-
-	// Copy Proxy Constructor
-	Array3( Array3 const & a, ProxySentinel const & proxy ) :
-	 Super( a, proxy ),
-	 I1_( a.I1_ ),
-	 I2_( a.I2_ ),
-	 I3_( a.I3_ ),
-	 z1_( a.z1_ ),
-	 z2_( a.z2_ ),
-	 z3_( a.z3_ )
-	{}
-
-	// Slice Proxy Constructor
-	Array3( Array3S< T > const & a, ProxySentinel const & proxy ) :
-	 Super( a, proxy ),
-	 I1_( a.u1() ),
-	 I2_( a.u2() ),
-	 I3_( a.u3() ),
-	 z1_( I1_.size() ),
-	 z2_( I2_.size() ),
-	 z3_( I3_.size() )
-	{}
-
-	// Base Proxy Constructor
-	Array3( Base const & a, ProxySentinel const & proxy ) :
-	 Super( a, proxy ),
-	 I1_( a.isize() ),
-	 I2_( 1 ),
-	 I3_( 1 ),
-	 z1_( I1_.size() ),
-	 z2_( 1u ),
-	 z3_( 1u )
-	{}
-
-	// Value Proxy Constructor
-	Array3( T const & t, ProxySentinel const & proxy ) :
-	 Super( t, proxy ),
-	 I1_( _ ),
-	 I2_( 1 ),
-	 I3_( 1 ),
-	 z1_( I1_.size() ),
-	 z2_( 1u ),
-	 z3_( 1u )
-	{}
-
-	// Copy + IndexRange Proxy Constructor
-	Array3( Array3 const & a, IR const & I1, IR const & I2, IR const & I3, ProxySentinel const & proxy ) :
-	 Super( a, proxy ),
-	 I1_( I1 ),
-	 I2_( I2 ),
-	 I3_( I3 ),
-	 z1_( I1_.size() ),
-	 z2_( I2_.size() ),
-	 z3_( I3_.size() )
-	{}
-
-	// Slice + IndexRange Proxy Constructor
-	Array3( Array3S< T > const & a, IR const & I1, IR const & I2, IR const & I3, ProxySentinel const & proxy ) :
-	 Super( a, proxy ),
-	 I1_( I1 ),
-	 I2_( I2 ),
-	 I3_( I3 ),
-	 z1_( I1_.size() ),
-	 z2_( I2_.size() ),
-	 z3_( I3_.size() )
-	{}
-
-	// Base + IndexRange Proxy Constructor
-	Array3( Base const & a, IR const & I1, IR const & I2, IR const & I3, ProxySentinel const & proxy ) :
-	 Super( a, proxy ),
-	 I1_( I1 ),
-	 I2_( I2 ),
-	 I3_( I3 ),
-	 z1_( I1_.size() ),
-	 z2_( I2_.size() ),
-	 z3_( I3_.size() )
-	{}
-
-	// Value + IndexRange Proxy Constructor
-	Array3( T const & t, IR const & I1, IR const & I2, IR const & I3, ProxySentinel const & proxy ) :
-	 Super( t, proxy ),
-	 I1_( I1 ),
-	 I2_( I2 ),
-	 I3_( I3 ),
-	 z1_( I1_.size() ),
-	 z2_( I2_.size() ),
-	 z3_( I3_.size() )
-	{}
 
 public: // Creation
 
