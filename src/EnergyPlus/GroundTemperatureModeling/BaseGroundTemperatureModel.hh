@@ -58,14 +58,24 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-using GroundTemperatureManager::Type;
+enum class GroundTempObjType
+{
+    Unassigned = -1,
+    KusudaGroundTemp,
+    FiniteDiffGroundTemp,
+    SiteBuildingSurfaceGroundTemp,
+    SiteShallowGroundTemp,
+    SiteDeepGroundTemp,
+    SiteFCFactorMethodGroundTemp,
+    XingGroundTemp
+};
 
 // Base class
 class BaseGroundTempsModel
 {
 public:
     // Public Members
-    GroundTemperatureManager::Type objectType;
+    GroundTempObjType objectType;
     std::string objectName;
     bool errorsFound;
 
@@ -76,7 +86,7 @@ public:
     BaseGroundTempsModel &operator=(BaseGroundTempsModel &&) = delete;
 
     // Default Constructor
-    BaseGroundTempsModel() : objectType(GroundTemperatureManager::Type::Unassigned), errorsFound(false)
+    BaseGroundTempsModel() : objectType(GroundTempObjType::Unassigned), errorsFound(false)
     {
     }
 

@@ -65,7 +65,7 @@ namespace EnergyPlus {
 
 // Site:GroundTemperature:Deep factory
 std::shared_ptr<SiteDeepGroundTemps>
-SiteDeepGroundTemps::DeepGTMFactory(EnergyPlusData &state, GroundTemperatureManager::Type objectType, std::string objectName)
+SiteDeepGroundTemps::DeepGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -88,7 +88,7 @@ SiteDeepGroundTemps::DeepGTMFactory(EnergyPlusData &state, GroundTemperatureMana
     // New shared pointer for this model object
     std::shared_ptr<SiteDeepGroundTemps> thisModel(new SiteDeepGroundTemps());
 
-    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(Type::SiteDeepGroundTemp));
+    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteDeepGroundTemp));
     int numCurrObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     thisModel->objectType = objectType;

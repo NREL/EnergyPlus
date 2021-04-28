@@ -64,20 +64,9 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
+class BaseGroundTempsModel;
 
 namespace GroundTemperatureManager {
-
-    enum class Type
-    {
-        Unassigned = -1,
-        KusudaGroundTemp,
-        FiniteDiffGroundTemp,
-        SiteBuildingSurfaceGroundTemp,
-        SiteShallowGroundTemp,
-        SiteDeepGroundTemp,
-        SiteFCFactorMethodGroundTemp,
-        XingGroundTemp
-    };
 
     std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &type, std::string const &name);
 

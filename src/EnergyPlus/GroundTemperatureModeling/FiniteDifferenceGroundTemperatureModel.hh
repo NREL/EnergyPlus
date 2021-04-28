@@ -138,7 +138,7 @@ public:
     Array1D<instanceOfWeatherData> weatherDataArray;
 
     static std::shared_ptr<FiniteDiffGroundTempsModel>
-    FiniteDiffGTMFactory(EnergyPlusData &state, GroundTemperatureManager::Type objectType, std::string objectName);
+    FiniteDiffGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName);
 
     void getWeatherData(EnergyPlusData &state);
 
