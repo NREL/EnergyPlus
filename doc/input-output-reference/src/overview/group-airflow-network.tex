@@ -349,13 +349,12 @@ AirflowNetwork:SimulationControl,
       1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
 \end{lstlisting}
 
-If the AirflowNetwork:SimulationControl object is not provided in an input file, the defaul input object will be created by the program internally, as long as follwoing conditions are satisfied:
-
-The number of AirflowNetwork:MultiZone:Zone object >= 1
-
-The number of AirflowNetwork:MultiZone:Surface >= 2
-
-The defaul input object is shown below:
+If the AirflowNetwork:SimulationControl object is not provided in an input file, the default input object will be created by the program internally, as long as following conditions are satisfied:
+\begin{itemize}
+\item The number of AirflowNetwork:MultiZone:Zone objects >= 1
+\item The number of AirflowNetwork:MultiZone:Surface objects >= 2
+\end{itemize}
+The default input object is shown below:
 
 \begin{lstlisting}
 AirflowNetwork:SimulationControl,
