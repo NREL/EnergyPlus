@@ -639,69 +639,6 @@ public: // Modifier
 		return *this;
 	}
 
-	// Attach to Super Array
-	Array1A &
-	attach( Super const & a )
-	{
-		Base::attach( a );
-		I_.assign( a.I_ );
-		return *this;
-	}
-
-	// Attach to Non-Const Super Array
-	Array1A &
-	attach( Super & a )
-	{
-		Base::attach( a );
-		I_.assign( a.I_ );
-		return *this;
-	}
-
-	// Attach to Base Array
-	Array1A &
-	attach( Base const & a )
-	{
-		Base::attach< 1 >( a );
-		I_ = a.isize();
-		return *this;
-	}
-
-	// Attach to Non-Const Base Array
-	Array1A &
-	attach( Base & a )
-	{
-		Base::attach< 1 >( a );
-		I_ = a.isize();
-		return *this;
-	}
-
-	// Attach to Value
-	Array1A &
-	attach( T const & t )
-	{
-		Base::attach< 1 >( t );
-		I_ = _;
-		return *this;
-	}
-
-	// Attach to Non-Const Value
-	Array1A &
-	attach( T & t )
-	{
-		Base::attach< 1 >( t );
-		I_ = _;
-		return *this;
-	}
-
-	// Detach from Source Array
-	Array1A &
-	detach()
-	{
-		Base::detach();
-		I_.clear();
-		return *this;
-	}
-
 protected: // Functions
 
 	// Dimension by IndexRange
