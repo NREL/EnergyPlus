@@ -25,7 +25,6 @@
 #include "ObjexxFCL.unit.hh"
 
 // C++ Headers
-#include <array>
 #include <string>
 
 #ifdef _MSC_VER

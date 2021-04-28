@@ -752,20 +752,6 @@ public: // Predicate
 		return ( data_ != nullptr );
 	}
 
-	// Contiguous?
-	bool
-	contiguous() const
-	{
-		return true;
-	}
-
-	// Data Size Bounded?
-	bool
-	capacity_bounded() const
-	{
-		return ( capacity_ != npos );
-	}
-
 	// Active Array Empty?
 	bool
 	empty() const
@@ -778,34 +764,6 @@ public: // Predicate
 	size_bounded() const
 	{
 		return ( size_ != npos );
-	}
-
-	// Active Array Size Unbounded?
-	bool
-	size_unbounded() const
-	{
-		return ( size_ == npos );
-	}
-
-	// All Elements Default Valued?
-	bool
-	is_default() const
-	{
-		T const def( Traits::initial_array_value() );
-		for ( size_type i = 0; i < size_; ++i ) {
-			if ( data_[ i ] != def ) return false;
-		}
-		return true;
-	}
-
-	// All Elements Zero?
-	bool
-	is_zero() const
-	{
-		for ( size_type i = 0; i < size_; ++i ) {
-			if ( data_[ i ] != T( 0 ) ) return false;
-		}
-		return true;
 	}
 
 	// Memory Can Overlap a Range?
@@ -1003,24 +961,6 @@ public: // Modifier
 		return *this;
 	}
 
-	// Assign Zero to all Elements
-	//  Can't be virtual (for covariant return) or will try to instantiate for all value types
-	void
-	zero()
-	{
-		if ( data_ ) std::fill_n( data_, size_, T( 0 ) );
-	}
-
-	// Invert (Elemental)
-	void
-	invert()
-	{
-		T const one( 1 );
-		for ( size_type i = 0; i < size_; ++i ) {
-			assert( data_[ i ] != T( 0 ) );
-			data_[ i ] = one / data_[ i ];
-		}
-	}
 
 public: // Comparison: Predicate
 

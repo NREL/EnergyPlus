@@ -20,7 +20,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1.all.hh>
-#include <ObjexxFCL/Array2.all.hh>
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Vector2.hh>
 #include <ObjexxFCL/Vector3.hh>
