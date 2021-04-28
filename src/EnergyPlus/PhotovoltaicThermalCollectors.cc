@@ -1443,6 +1443,8 @@ namespace PhotovoltaicThermalCollectors {
 
         tsurr =
             std::pow((std::pow((tamb + 273.15), 4) * 0.5 * (1 - std::cos(slope)) + std::pow((tsky + 273.15), 4) * 0.5 * (1 - std::cos(slope))), 0.25);
+        tsurrK = tsurr + degc_to_kelvin;
+        tpvgK = tpvg + degc_to_kelvin;
         hrad_surr = sigma * emiss_pvg * (pow(tsurrK, 2) + pow(tpvgK, 2)) * (tsurrK + tpvgK);
 
         dhyd = 4 * w * l / (2 * (w + l));
@@ -1480,7 +1482,7 @@ namespace PhotovoltaicThermalCollectors {
             t1K = t1 + degc_to_kelvin;
             t2K = t2 + degc_to_kelvin;
             tsurrK = tsurr + degc_to_kelvin;
-            tpvgK = tpvg + 273.15;
+            tpvgK = tpvg + degc_to_kelvin;
             hrad12 = sigma * (pow(t1K, 2) + pow(t2K, 2)) * (t1K + t2K) / (1 / emiss_b + 1 / emiss_2 - 1);
             hrad_surr = sigma * emiss_pvg * (pow(tsurrK, 2) + pow(tpvgK, 2)) * (tsurrK + tpvgK);
 
