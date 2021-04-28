@@ -55,25 +55,24 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
+#include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/SystemReports.hh>
-#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UnitVentilator.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/WindowAC.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
@@ -375,6 +374,5 @@ TEST_F(EnergyPlusFixture, ReportMaxVentilationLoads_ZoneEquip)
 
     EXPECT_NEAR(state->dataSysRpts->ZoneTargetVentilationFlowVoz(1), expectedVoz, 0.001);
     EXPECT_NEAR(state->dataSysRpts->ZoneOAMassFlow(1), 98765432.1, 0.001);
-
 }
 } // namespace EnergyPlus
