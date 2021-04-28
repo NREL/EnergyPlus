@@ -34,21 +34,21 @@ set(src
   src/ObjexxFCL/Array2S.fwd.hh
   src/ObjexxFCL/Array2S.hh
   src/ObjexxFCL/Array3.all.fwd.hh
-        src/ObjexxFCL/Array3.fwd.hh
+  src/ObjexxFCL/Array3.fwd.hh
   src/ObjexxFCL/Array3.hh
   src/ObjexxFCL/Array3D.fwd.hh
   src/ObjexxFCL/Array3D.hh
   src/ObjexxFCL/Array3S.fwd.hh
   src/ObjexxFCL/Array3S.hh
   src/ObjexxFCL/Array4.all.fwd.hh
-        src/ObjexxFCL/Array4.fwd.hh
+  src/ObjexxFCL/Array4.fwd.hh
   src/ObjexxFCL/Array4.hh
   src/ObjexxFCL/Array4D.fwd.hh
   src/ObjexxFCL/Array4D.hh
   src/ObjexxFCL/Array4S.fwd.hh
   src/ObjexxFCL/Array4S.hh
   src/ObjexxFCL/Array5.all.fwd.hh
-        src/ObjexxFCL/Array5.fwd.hh
+  src/ObjexxFCL/Array5.fwd.hh
   src/ObjexxFCL/Array5.hh
   src/ObjexxFCL/Array5D.fwd.hh
   src/ObjexxFCL/Array5D.hh
@@ -113,8 +113,6 @@ set(src
   src/ObjexxFCL/random.hh
   src/ObjexxFCL/Reference.fwd.hh
   src/ObjexxFCL/Reference.hh
-  src/ObjexxFCL/string.constants.cc
-  src/ObjexxFCL/string.constants.hh
   src/ObjexxFCL/string.functions.cc
   src/ObjexxFCL/string.functions.hh
   src/ObjexxFCL/time.cc
@@ -134,15 +132,15 @@ set( test_src
   tst/unit/Array1.unit.cc
   tst/unit/Array1S.unit.cc
   tst/unit/Array2.unit.cc
-        tst/unit/Array3.unit.cc
-        tst/unit/Array4.unit.cc
-        tst/unit/Array5.unit.cc
-        tst/unit/ArrayS.unit.cc
+  tst/unit/Array3.unit.cc
+  tst/unit/Array4.unit.cc
+  tst/unit/Array5.unit.cc
+  tst/unit/ArrayS.unit.cc
   tst/unit/bit.unit.cc
-        tst/unit/CArray.unit.cc
+  tst/unit/CArray.unit.cc
   tst/unit/CArrayA.unit.cc
-        tst/unit/char.functions.unit.cc
-        tst/unit/command.unit.cc
+  tst/unit/char.functions.unit.cc
+  tst/unit/command.unit.cc
   tst/unit/Cstring.unit.cc
   tst/unit/DimensionSlice.unit.cc
   tst/unit/environment.unit.cc
@@ -153,14 +151,14 @@ set( test_src
   tst/unit/IndexSlice.unit.cc
   tst/unit/main.cc
   tst/unit/MArray.unit.cc
-        tst/unit/member.functions.unit.cc
+  tst/unit/member.functions.unit.cc
   tst/unit/numeric.unit.cc
   tst/unit/ObjexxFCL.unit.hh
   tst/unit/Optional.unit.cc
   tst/unit/random.unit.cc
   tst/unit/Reference.Optional.unit.cc
   tst/unit/Reference.unit.cc
-        tst/unit/string.functions.unit.cc
+  tst/unit/string.functions.unit.cc
   tst/unit/time.unit.cc
   tst/unit/TypeTraits.unit.cc
   tst/unit/Vector2.unit.cc
