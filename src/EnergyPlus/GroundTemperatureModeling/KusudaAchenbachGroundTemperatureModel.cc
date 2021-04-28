@@ -126,8 +126,8 @@ KusudaGroundTempsModel::KusudaGTMFactory(EnergyPlusData &state, GroundTempObjTyp
                 Real64 minSurfTemp(100);  // Set high month 1 temp will be lower and actually get updated
                 Real64 maxSurfTemp(-100); // Set low initially but will get updated
 
-                std::shared_ptr<BaseGroundTempsModel> shallowObj =
-                    GetGroundTempModelAndInit(state, state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteShallowGroundTemp)), "");
+                std::shared_ptr<BaseGroundTempsModel> shallowObj = GetGroundTempModelAndInit(
+                    state, state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteShallowGroundTemp)), "");
 
                 for (int monthIndex = 1; monthIndex <= 12; ++monthIndex) {
                     Real64 currMonthTemp = shallowObj->getGroundTempAtTimeInMonths(state, 0.0, monthIndex);

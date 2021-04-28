@@ -99,7 +99,8 @@ FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, GroundTe
     std::shared_ptr<FiniteDiffGroundTempsModel> thisModel(new FiniteDiffGroundTempsModel());
 
     // Search through finite diff models here
-    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::FiniteDiffGroundTemp));
+    std::string const cCurrentModuleObject =
+        state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::FiniteDiffGroundTemp));
     int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {

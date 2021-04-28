@@ -90,17 +90,23 @@ namespace GroundTemperatureManager {
         // Set object type
         if (objectType_str_UPPERCase == UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::KusudaGroundTemp)))) {
             objectType = GroundTempObjType::KusudaGroundTemp;
-        } else if (objectType_str_UPPERCase == UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::FiniteDiffGroundTemp)))) {
+        } else if (objectType_str_UPPERCase ==
+                   UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::FiniteDiffGroundTemp)))) {
             objectType = GroundTempObjType::FiniteDiffGroundTemp;
-        } else if (objectType_str_UPPERCase == UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteBuildingSurfaceGroundTemp)))) {
+        } else if (objectType_str_UPPERCase ==
+                   UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteBuildingSurfaceGroundTemp)))) {
             objectType = GroundTempObjType::SiteBuildingSurfaceGroundTemp;
-        } else if (objectType_str_UPPERCase == UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteShallowGroundTemp)))) {
+        } else if (objectType_str_UPPERCase ==
+                   UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteShallowGroundTemp)))) {
             objectType = GroundTempObjType::SiteShallowGroundTemp;
-        } else if (objectType_str_UPPERCase == UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteDeepGroundTemp)))) {
+        } else if (objectType_str_UPPERCase ==
+                   UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteDeepGroundTemp)))) {
             objectType = GroundTempObjType::SiteDeepGroundTemp;
-        } else if (objectType_str_UPPERCase == UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteFCFactorMethodGroundTemp)))) {
+        } else if (objectType_str_UPPERCase ==
+                   UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteFCFactorMethodGroundTemp)))) {
             objectType = GroundTempObjType::SiteFCFactorMethodGroundTemp;
-        } else if (objectType_str_UPPERCase == UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::XingGroundTemp)))) {
+        } else if (objectType_str_UPPERCase ==
+                   UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::XingGroundTemp)))) {
             objectType = GroundTempObjType::XingGroundTemp;
         } else {
             // Error out if no ground temperature object types recognized
