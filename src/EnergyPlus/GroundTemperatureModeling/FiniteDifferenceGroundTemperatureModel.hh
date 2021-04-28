@@ -59,18 +59,16 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
-#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 
 namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
 
-using GroundTemperatureManager::objectType;
-
 // Derived class for Finite-Difference Model
 class FiniteDiffGroundTempsModel : public BaseGroundTempsModel
 {
+
     static int constexpr maxYearsToIterate = 10;
 
     Real64 rhoCp_soil_liq_1;

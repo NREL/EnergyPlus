@@ -51,11 +51,14 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 
 namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
+
+using GroundTemperatureManager::Type;
 
 // Base class
 class BaseGroundTempsModel
