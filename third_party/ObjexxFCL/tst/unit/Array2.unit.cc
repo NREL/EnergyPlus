@@ -839,49 +839,31 @@ TEST( Array2Test, Predicates )
 	Array2D_int A1;
 	EXPECT_FALSE( A1.active() );
 	EXPECT_FALSE( A1.allocated() );
-	EXPECT_TRUE( A1.contiguous() );
-	EXPECT_TRUE( A1.capacity_bounded() );
 	EXPECT_TRUE( A1.empty() );
 	EXPECT_TRUE( A1.size_bounded() );
-	EXPECT_FALSE( A1.size_unbounded() );
 	EXPECT_TRUE( A1.owner() );
 	EXPECT_FALSE( A1.proxy() );
-	EXPECT_TRUE( A1.is_default() );
-	EXPECT_TRUE( A1.is_zero() );
 
 	Array2D_int A2( 2, 3 ); // Uninitialized
 	EXPECT_TRUE( A2.active() );
 	EXPECT_TRUE( A2.allocated() );
-	EXPECT_TRUE( A2.contiguous() );
-	EXPECT_TRUE( A2.capacity_bounded() );
 	EXPECT_FALSE( A2.empty() );
-	EXPECT_TRUE( A2.capacity_bounded() );
 	EXPECT_TRUE( A2.owner() );
 	EXPECT_FALSE( A2.proxy() );
 
 	Array2D_int A3( 2, 3, 31459 );
 	EXPECT_TRUE( A3.active() );
 	EXPECT_TRUE( A3.allocated() );
-	EXPECT_TRUE( A3.contiguous() );
-	EXPECT_TRUE( A3.capacity_bounded() );
 	EXPECT_FALSE( A3.empty() );
-	EXPECT_TRUE( A3.capacity_bounded() );
 	EXPECT_TRUE( A3.owner() );
 	EXPECT_FALSE( A3.proxy() );
-	EXPECT_FALSE( A3.is_default() );
-	EXPECT_FALSE( A3.is_zero() );
 
 	Array2D_int A4( 2, 3, { 11, 12, 13, 21, 22, 23 } );
 	EXPECT_TRUE( A4.active() );
 	EXPECT_TRUE( A4.allocated() );
-	EXPECT_TRUE( A4.contiguous() );
-	EXPECT_TRUE( A4.capacity_bounded() );
 	EXPECT_FALSE( A4.empty() );
-	EXPECT_TRUE( A4.capacity_bounded() );
 	EXPECT_TRUE( A4.owner() );
 	EXPECT_FALSE( A4.proxy() );
-	EXPECT_FALSE( A4.is_default() );
-	EXPECT_FALSE( A4.is_zero() );
 }
 
 TEST( Array2Test, PredicateComparisonsValues )
@@ -1207,57 +1189,6 @@ TEST( Array2Test, ModifierClear )
 	EXPECT_EQ( 0, A3.u1() );
 	EXPECT_EQ( 1, A3.l2() );
 	EXPECT_EQ( 0, A3.u2() );
-}
-
-TEST( Array2Test, ModifierZero )
-{
-	// Changes nothing about an empty array
-	Array2D_int A1;
-	A1.zero();
-	EXPECT_TRUE( eq( Array2D_int(), A1 ) );
-
-	// Initializes an uninitialized array with actual dimensions
-	Array2D_int A2( 2, 3 );
-	A2.zero();
-	for ( int i1 = A2.l1(); i1 <= A2.u1(); ++i1 ) {
-		for ( int i2 = A2.l2(); i2 <= A2.u2(); ++i2 ) {
-			EXPECT_EQ( 0, A2( i1, i2 ) );
-		}
-	}
-
-	// Zeroes out an array with contents
-	Array2D_int A3( 2, 3, 31459 );
-	for ( int i1 = A3.l1(); i1 <= A3.u1(); ++i1 ) {
-		for ( int i2 = A3.l2(); i2 <= A3.u2(); ++i2 ) {
-			EXPECT_EQ( 31459, A3( i1, i2 ) );
-		}
-	}
-	A3.zero();
-	for ( int i1 = A3.l1(); i1 <= A3.u1(); ++i1 ) {
-		for ( int i2 = A3.l2(); i2 <= A3.u2(); ++i2 ) {
-			EXPECT_EQ( 0, A3( i1, i2 ) );
-		}
-	}
-}
-
-TEST( Array2Test, ModifierInvert )
-{
-	// Changes nothing about an empty array
-	Array2D_double A1;
-	A1.invert();
-	EXPECT_TRUE( eq( Array2D_double(), A1 ) );
-
-	// Illegal to call on an uninitialized array
-
-	// Inverts values of an initialized array
-	Array2D_double A2( 2, 3, { 1.0, 10.0, 100.0, 0.1, 0.01, 0.001 } );
-	A2.invert();
-	EXPECT_TRUE( eq( Array2D_double( 2, 3, { 1.0, 0.1, 0.01, 10.0, 100.0, 1000.0 } ), A2 ) );
-
-	// Inverts values of an initialized array
-	Array2D_double A3( 2, 3, { -1.0, -10.0, -100.0, -0.1, -0.01, -0.001 } );
-	A3.invert();
-	EXPECT_TRUE( eq( Array2D_double( 2, 3, { -1.0, -0.1, -0.01, -10.0, -100.0, -1000.0 } ), A3 ) );
 }
 
 TEST( Array2Test, ModifierAllocateDeallocate )

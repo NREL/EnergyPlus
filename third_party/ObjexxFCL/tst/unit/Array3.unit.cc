@@ -162,49 +162,31 @@ TEST( Array3Test, Predicates )
 	Array3D_int A1;
 	EXPECT_FALSE( A1.active() );
 	EXPECT_FALSE( A1.allocated() );
-	EXPECT_TRUE( A1.contiguous() );
-	EXPECT_TRUE( A1.capacity_bounded() );
 	EXPECT_TRUE( A1.empty() );
 	EXPECT_TRUE( A1.size_bounded() );
-	EXPECT_FALSE( A1.size_unbounded() );
 	EXPECT_TRUE( A1.owner() );
 	EXPECT_FALSE( A1.proxy() );
-	EXPECT_TRUE( A1.is_default() );
-	EXPECT_TRUE( A1.is_zero() );
 
 	Array3D_int A2( 2, 3, 2 ); // Uninitialized
 	EXPECT_TRUE( A2.active() );
 	EXPECT_TRUE( A2.allocated() );
-	EXPECT_TRUE( A2.contiguous() );
-	EXPECT_TRUE( A2.capacity_bounded() );
 	EXPECT_FALSE( A2.empty() );
-	EXPECT_TRUE( A2.capacity_bounded() );
 	EXPECT_TRUE( A2.owner() );
 	EXPECT_FALSE( A2.proxy() );
 
 	Array3D_int A3( 2, 3, 2, 31459 );
 	EXPECT_TRUE( A3.active() );
 	EXPECT_TRUE( A3.allocated() );
-	EXPECT_TRUE( A3.contiguous() );
-	EXPECT_TRUE( A3.capacity_bounded() );
 	EXPECT_FALSE( A3.empty() );
-	EXPECT_TRUE( A3.capacity_bounded() );
 	EXPECT_TRUE( A3.owner() );
 	EXPECT_FALSE( A3.proxy() );
-	EXPECT_FALSE( A3.is_default() );
-	EXPECT_FALSE( A3.is_zero() );
 
 	Array3D_int A4( 2, 2, 2, { 111, 112, 121, 122, 211, 212, 221, 222 } );
 	EXPECT_TRUE( A4.active() );
 	EXPECT_TRUE( A4.allocated() );
-	EXPECT_TRUE( A4.contiguous() );
-	EXPECT_TRUE( A4.capacity_bounded() );
 	EXPECT_FALSE( A4.empty() );
-	EXPECT_TRUE( A4.capacity_bounded() );
 	EXPECT_TRUE( A4.owner() );
 	EXPECT_FALSE( A4.proxy() );
-	EXPECT_FALSE( A4.is_default() );
-	EXPECT_FALSE( A4.is_zero() );
 }
 
 TEST( Array3Test, PredicateComparisonsValues )

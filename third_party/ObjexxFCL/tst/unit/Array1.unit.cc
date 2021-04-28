@@ -464,17 +464,6 @@ TEST( Array1Test, ConstArgConstruct )
 	EXPECT_TRUE( eq( Array1D_int( 10, 22 ), a ) );
 }
 
-TEST( Array1Test, ProxyAttach )
-{
-	Array1D_int u( 10, 22 );
-	Array1D_int v( 10, 33 );
-	Array1A_int p;
-	p.attach( u ).dimension( 5 );
-	EXPECT_TRUE( eq( Array1D_int( 5, 22 ), p ) );
-	p.attach( v );
-	EXPECT_TRUE( eq( Array1D_int( 10, 33 ), p ) );
-}
-
 TEST( Array1Test, Operators )
 {
 	Array1D_int A( 3, 33 );
@@ -1462,12 +1451,6 @@ TEST( Array1Test, FunctionCount )
 	EXPECT_EQ( 0u, count( A3, 1 ) );
 }
 
-TEST( Array1Test, FunctionContiguous )
-{
-	Array1D_double A;
-	EXPECT_TRUE( contiguous( A ) );
-}
-
 TEST( Array1Test, FunctionLUBound )
 {
 	Array1D_double A( { 1.0, 2.0, 3.0, 4.0, 5.0 } );
@@ -1506,22 +1489,6 @@ TEST( Array1Test, FunctionISize )
 	EXPECT_EQ( int( size( A ) ), isize( A ) );
 }
 
-TEST( Array1Test, FunctionReshape )
-{
-	Array1D_double A( { 1.0, 2.0, 3.0, 4.0, 5.0 } );
-	EXPECT_EQ( 5u, A.size() );
-	Array1D_double E( { 1.0, 2.0, 3.0, 4.0, 5.0 } );
-	EXPECT_TRUE( eq( E, reshape( A, std::array< int, 1 >{ { 5 } } ) ) );
-	EXPECT_TRUE( eq( E, reshape( { 1.0, 2.0, 3.0, 4.0, 5.0 }, std::array< int, 1 >{ { 5 } } ) ) );
-	EXPECT_TRUE( eq( E, reshape1( A, Array1D_int( 1, { 5 } ) ) ) );
-#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
-	EXPECT_TRUE( eq( E, reshape1( A, std::initializer_list< int >( { 5 } ) ) ) );
-#else
-	EXPECT_TRUE( eq( E, reshape1( A, { 5 } ) ) );
-#endif
-	EXPECT_TRUE( eq( E, reshape1( { 1.0, 2.0, 3.0, 4.0, 5.0 }, Array1D_int( 1, { 5 } ) ) ) );
-}
-
 TEST( Array1Test, FunctionPack )
 {
 	Array1D_double A1;
@@ -1538,15 +1505,6 @@ TEST( Array1Test, FunctionPack )
 	Array1D_double const E3( { 2.0, 4.0 } );
 	Array1D_bool const M( { false, true, false, true, false } );
 	EXPECT_TRUE( eq( E3, pack( A3, M ) ) );
-}
-
-TEST( Array1Test, FunctionUnpack )
-{
-	Array1D_int const a( { 1, 2, 3 } );
-	Array1D_bool const mask( 5, { true, false, true, false, true } );
-	EXPECT_TRUE( eq( Array1D_int( 5, { 1, 42, 2, 42, 3 } ), unpack( a, mask, 42 ) ) );
-	Array1D_int const f( 5, { 11, 12, 13, 14, 15 } );
-	EXPECT_TRUE( eq( Array1D_int( 5, { 1, 12, 2, 14, 3 } ), unpack( a, mask, f ) ) );
 }
 
 TEST( Array1Test, FunctionEOShift )

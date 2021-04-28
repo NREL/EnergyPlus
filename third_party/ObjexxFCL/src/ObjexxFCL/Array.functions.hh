@@ -459,14 +459,6 @@ count( Array2< bool > const & a, int const dim )
 
 // contiguous /////
 
-template< typename T >
-inline
-bool
-contiguous( Array< T > const & a )
-{
-	return a.contiguous();
-}
-
 // lbound /////
 
 template< typename T >
@@ -912,111 +904,6 @@ isize( A< T > const & a, int const dim )
 
 // reshape /////
 
-template< typename T >
-inline
-Array1D< T >
-reshape( Array< T > const & a )
-{
-	return Array1D< T >( a );
-}
-
-template< typename T, typename I >
-inline
-Array1D< T >
-reshape( Array< T > const & a, std::array< I, 1 > const & shape )
-{
-	return Array1D< T >( shape[ 0 ], a );
-}
-
-template< typename T, typename I >
-inline
-Array2D< T >
-reshape( Array< T > const & a, std::array< I, 2 > const & shape )
-{
-	return Array2D< T >( shape[ 0 ], shape[ 1 ], a );
-}
-
-template< typename T, typename I >
-inline
-Array3D< T >
-reshape( Array< T > const & a, std::array< I, 3 > const & shape )
-{
-	return Array3D< T >( shape[ 0 ], shape[ 1 ], shape[ 2 ], a );
-}
-
-template< typename T, typename I >
-inline
-Array4D< T >
-reshape( Array< T > const & a, std::array< I, 4 > const & shape )
-{
-	return Array4D< T >( shape[ 0 ], shape[ 1 ], shape[ 2 ], shape[ 3 ], a );
-}
-
-template< typename T, typename I >
-inline
-Array5D< T >
-reshape( Array< T > const & a, std::array< I, 5 > const & shape )
-{
-	return Array5D< T >( shape[ 0 ], shape[ 1 ], shape[ 2 ], shape[ 3 ], shape[ 4 ], a );
-}
-
-template< typename T >
-inline
-Array1D< T >
-reshape( std::initializer_list< T > const & l )
-{
-	return Array1D< T >( l.size(), l );
-}
-
-template< typename T, typename I >
-inline
-Array1D< T >
-reshape( std::initializer_list< T > const & l, std::array< I, 1 > const & shape )
-{
-	return Array1D< T >( shape[ 0 ], l );
-}
-
-template< typename T, typename I >
-inline
-Array2D< T >
-reshape( std::initializer_list< T > const & l, std::array< I, 2 > const & shape )
-{
-	return Array2D< T >( shape[ 0 ], shape[ 1 ], l );
-}
-
-template< typename T, typename I >
-inline
-Array3D< T >
-reshape( std::initializer_list< T > const & l, std::array< I, 3 > const & shape )
-{
-	return Array3D< T >( shape[ 0 ], shape[ 1 ], shape[ 2 ], l );
-}
-
-template< typename T, typename I >
-inline
-Array4D< T >
-reshape( std::initializer_list< T > const & l, std::array< I, 4 > const & shape )
-{
-	return Array4D< T >( shape[ 0 ], shape[ 1 ], shape[ 2 ], shape[ 3 ], l );
-}
-
-template< typename T, typename I >
-inline
-Array5D< T >
-reshape( std::initializer_list< T > const & l, std::array< I, 5 > const & shape )
-{
-	return Array5D< T >( shape[ 0 ], shape[ 1 ], shape[ 2 ], shape[ 3 ], shape[ 4 ], l );
-}
-
-template< typename T, typename I >
-inline
-Array1D< T >
-reshape1( Array< T > const & a, Array1< I > const & shape )
-{
-	assert( shape.size() == 1 );
-	return Array1D< T >( shape[ 0 ], a );
-}
-
 template< typename T, typename I >
 inline
 Array2D< T >
@@ -1024,15 +911,6 @@ reshape2( Array< T > const & a, Array1< I > const & shape )
 {
 	assert( shape.size() == 2 );
 	return Array2D< T >( shape[ 0 ], shape[ 1 ], a );
-}
-
-template< typename T, typename I >
-inline
-Array1D< T >
-reshape1( std::initializer_list< T > const & l, Array1< I > const & shape )
-{
-	assert( shape.size() == 1 );
-	return Array1D< T >( shape[ 0 ], l );
 }
 
 template< typename T, typename I >
@@ -1046,29 +924,11 @@ reshape2( std::initializer_list< T > const & l, Array1< I > const & shape )
 
 template< typename T, typename I >
 inline
-Array1D< T >
-reshape1( Array< T > const & a, std::initializer_list< I > const & shape )
-{
-	assert( shape.size() == 1 );
-	return Array1D< T >( shape.begin()[ 0 ], a );
-}
-
-template< typename T, typename I >
-inline
 Array2D< T >
 reshape2( Array< T > const & a, std::initializer_list< I > const & shape )
 {
 	assert( shape.size() == 2 );
 	return Array2D< T >( shape.begin()[ 0 ], shape.begin()[ 1 ], a );
-}
-
-template< typename T, typename I >
-inline
-Array1D< T >
-reshape1( std::initializer_list< T > const & l, std::initializer_list< I > const & shape )
-{
-	assert( shape.size() == 1 );
-	return Array1D< T >( shape.begin()[ 0 ], l );
 }
 
 template< typename T, typename I >
@@ -1110,45 +970,6 @@ pack( Array1< T > const & a, Array1< bool > const & mask )
 	Array1D< T > r( static_cast< int >( n ) );
 	for ( size_type i = 0, e = mask.size(), k = 0; i < e; ++i ) {
 		if ( mask[ i ] ) r[ k++ ] = a[ i ];
-	}
-	return r;
-}
-
-// unpack /////
-
-template< typename T >
-inline
-Array1D< T >
-unpack( Array1< T > const & a, Array1< bool > const & mask, T const & f )
-{
-	assert( mask.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array1D< T > r( mask.isize(), f );
-	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
-		if ( mask[ l ] ) {
-			r[ l ] = a[ i ];
-			++i;
-		}
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array1D< T >
-unpack( Array1< T > const & a, Array1< bool > const & mask, Array1< T > const & f )
-{
-	assert( mask.size_bounded() );
-	assert( mask.conformable( f ) );
-	typedef  BArray::size_type  size_type;
-	Array1D< T > r( f );
-	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
-		if ( mask[ l ] ) {
-			r[ l ] = a[ i ];
-			++i;
-		}
 	}
 	return r;
 }

@@ -150,27 +150,17 @@ TEST( Array4Test, Predicates )
 	Array4D_int A1;
 	EXPECT_FALSE( A1.active() );
 	EXPECT_FALSE( A1.allocated() );
-	EXPECT_TRUE( A1.contiguous() );
-	EXPECT_TRUE( A1.capacity_bounded() );
 	EXPECT_TRUE( A1.empty() );
 	EXPECT_TRUE( A1.size_bounded() );
-	EXPECT_FALSE( A1.size_unbounded() );
 	EXPECT_TRUE( A1.owner() );
 	EXPECT_FALSE( A1.proxy() );
-	EXPECT_TRUE( A1.is_default() );
-	EXPECT_TRUE( A1.is_zero() );
 
 	Array4D_int A3( 2, 3, 2, 2, 31459 );
 	EXPECT_TRUE( A3.active() );
 	EXPECT_TRUE( A3.allocated() );
-	EXPECT_TRUE( A3.contiguous() );
-	EXPECT_TRUE( A3.capacity_bounded() );
 	EXPECT_FALSE( A3.empty() );
-	EXPECT_TRUE( A3.capacity_bounded() );
 	EXPECT_TRUE( A3.owner() );
 	EXPECT_FALSE( A3.proxy() );
-	EXPECT_FALSE( A3.is_default() );
-	EXPECT_FALSE( A3.is_zero() );
 
 	Array4D_int A4( 2, 2, 2, 2, {
 	 1111,
@@ -192,14 +182,9 @@ TEST( Array4Test, Predicates )
 	} );
 	EXPECT_TRUE( A4.active() );
 	EXPECT_TRUE( A4.allocated() );
-	EXPECT_TRUE( A4.contiguous() );
-	EXPECT_TRUE( A4.capacity_bounded() );
 	EXPECT_FALSE( A4.empty() );
-	EXPECT_TRUE( A4.capacity_bounded() );
 	EXPECT_TRUE( A4.owner() );
 	EXPECT_FALSE( A4.proxy() );
-	EXPECT_FALSE( A4.is_default() );
-	EXPECT_FALSE( A4.is_zero() );
 }
 
 TEST( Array4Test, PredicateComparisonsValues )

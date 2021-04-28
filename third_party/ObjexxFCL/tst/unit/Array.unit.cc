@@ -34,8 +34,6 @@ TEST( ArrayTest, DefaultConstruction )
 {
 	Array2D_int A, B;
 	EXPECT_EQ( 0u, A.size() );
-	A.zero(); // Now safe against VC Checked Iterators
-	EXPECT_EQ( 0u, A.size() );
 }
 
 TEST( ArrayTest, Construction2DIndexRangeInitializerList )
@@ -209,18 +207,6 @@ TEST( ArrayTest, Pow2D )
 	Array2D_int B( pow( A, 2 ) );
 	Array2D_int S( 3, 3, 144 );
 	EXPECT_TRUE( eq( S, B ) );
-}
-
-TEST( ArrayTest, Sum2DDim1 )
-{
-	Array2D_int A( 3, 3, reshape( { 11, 12, 13, 21, 22, 23, 31, 32, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( Array1D_int( 3, { 63, 66, 69 } ), sum( A, 1 ) ) );
-}
-
-TEST( ArrayTest, Sum2DDim2 )
-{
-	Array2D_int A( 3, 3, reshape( { 11, 12, 13, 21, 22, 23, 31, 32, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( Array1D_int( 3, { 36, 66, 96 } ), sum( A, 2 ) ) );
 }
 
 TEST( ArrayTest, Generation2DValueMinusArray )

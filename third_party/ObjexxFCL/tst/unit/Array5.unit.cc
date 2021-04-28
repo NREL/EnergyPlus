@@ -127,24 +127,16 @@ TEST( Array5Test, Predicates )
 	Array5D<int> A1;
 	EXPECT_FALSE( A1.active() );
 	EXPECT_FALSE( A1.allocated() );
-	EXPECT_TRUE( A1.contiguous() );
-	EXPECT_TRUE( A1.capacity_bounded() );
 	EXPECT_TRUE( A1.empty() );
 	EXPECT_TRUE( A1.size_bounded() );
-	EXPECT_FALSE( A1.size_unbounded() );
 	EXPECT_TRUE( A1.owner() );
 	EXPECT_FALSE( A1.proxy() );
-	EXPECT_TRUE( A1.is_default() );
-	EXPECT_TRUE( A1.is_zero() );
 
 	Array5D<int> A2;
         A2.allocate( 2, 3, 2, 2, 3 ); // Uninitialized
 	EXPECT_TRUE( A2.active() );
 	EXPECT_TRUE( A2.allocated() );
-	EXPECT_TRUE( A2.contiguous() );
-	EXPECT_TRUE( A2.capacity_bounded() );
 	EXPECT_FALSE( A2.empty() );
-	EXPECT_TRUE( A2.capacity_bounded() );
 	EXPECT_TRUE( A2.owner() );
 	EXPECT_FALSE( A2.proxy() );
 }
