@@ -52,10 +52,10 @@
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus //BITF.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/TARCOGParams.hh>
-#include <EnergyPlus//BITF.hh>
 
 namespace EnergyPlus {
 
