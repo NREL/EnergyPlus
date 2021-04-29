@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -121,8 +122,8 @@ struct BaseboardElectricData : BaseGlobalStruct
 {
     int NumBaseboards = 0;
     bool getInputFlag = true;
-    Array1D<BaseboardElectric::BaseboardParams> Baseboard;
-    Array1D<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
+    EPVector<BaseboardElectric::BaseboardParams> Baseboard;
+    EPVector<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
     bool MyOneTimeFlag = true;
     bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
     Array1D_bool MyEnvrnFlag;

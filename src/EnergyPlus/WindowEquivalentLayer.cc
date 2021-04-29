@@ -517,9 +517,8 @@ void CalcEQLWindowSHGCAndTransNormal(EnergyPlusData &state,
     HCOUT = 15.0;
     if (FS.L(1).LTYPE == LayerType::ltyROLLB || FS.L(1).LTYPE == LayerType::ltyDRAPE || FS.L(1).LTYPE == LayerType::ltyINSCRN ||
         FS.L(1).LTYPE == LayerType::ltyVBHOR ||
-        FS.L(1).LTYPE ==
-            LayerType::ltyVBVER) { // Exterior Roller Blind Present | Exterior Drape Fabric | Exterior Insect Screen Present | Exterior Venetian
-                                   // Blind Present
+        FS.L(1).LTYPE == LayerType::ltyVBVER) { // Exterior Roller Blind Present | Exterior Drape Fabric | Exterior Insect Screen Present | Exterior
+                                                // Venetian Blind Present
         // Reduced convection coefficient due to external attachment
         HCOUT = 12.25;
     }
@@ -882,7 +881,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     TRMIN = root_4(rmir / DataGlobalConstants::StefanBoltzmann); // TODO check model equation.
 
     NL = state.dataWindowEquivLayer->CFS(EQLNum).NL;
-    QAllSWwinAbs({1, NL + 1}) = state.dataHeatBal->SurfWinQRadSWwinAbs({1, NL + 1}, SurfNum);
+    QAllSWwinAbs({1, NL + 1}) = state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, {1, NL + 1});
     //  Solve energy balance(s) for temperature at each node/layer and
     //  heat flux, including components, between each pair of nodes/layers
     ASHWAT_ThermalCalc(state,
