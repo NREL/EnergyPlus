@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -88,6 +89,7 @@ namespace EnergyPlus::PlantLoadProfile {
 
 // Using/Aliasing
 using DataPlant::TypeOf_PlantLoadProfile;
+using DataPlant::TypeOf_PlantLoadProfileSteam;
 using PlantUtilities::InitComponentNodes;
 using PlantUtilities::ScanPlantLoopsForObject;
 using PlantUtilities::SetComponentFlowRate;
@@ -137,26 +139,74 @@ void PlantProfileData::simulate(EnergyPlusData &state,
 
     // Using/Aliasing
     using FluidProperties::GetSpecificHeatGlycol;
+    using FluidProperties::GetSatTemperatureRefrig;
+    using DataEnvironment::StdPressureSeaLevel;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     static std::string const RoutineName("SimulatePlantProfile");
     Real64 DeltaTemp;
+    Real64 EnthSteamInDry;
+    Real64 EnthSteamOutWet;
+    Real64 LatentHeatSteam;
+    static std::string const fluidNameSteam("STEAM");
+    int FluidIndex;
+    Real64 CpWater;
+    Real64 TempWaterAtmPress;
 
     this->InitPlantProfile(state);
 
-    if (this->MassFlowRate > 0.0) {
-        Real64 Cp = GetSpecificHeatGlycol(state,
-                                          state.dataPlnt->PlantLoop(this->WLoopNum).FluidName,
-                                          this->InletTemp,
-                                          state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex,
-                                          RoutineName);
-        DeltaTemp = this->Power / (this->MassFlowRate * Cp);
-    } else {
-        this->Power = 0.0;
-        DeltaTemp = 0.0;
+    if (this->TypeNum == TypeOf_PlantLoadProfile) {
+        if (this->MassFlowRate > 0.0) {
+            Real64 Cp = GetSpecificHeatGlycol(state,
+                                              state.dataPlnt->PlantLoop(this->WLoopNum).FluidName,
+                                              this->InletTemp,
+                                              state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex,
+                                              RoutineName);
+            DeltaTemp = this->Power / (this->MassFlowRate * Cp);
+        } else {
+            this->Power = 0.0;
+            DeltaTemp = 0.0;
+        }
+        this->OutletTemp = this->InletTemp - DeltaTemp;
+    } else if (this->TypeNum == TypeOf_PlantLoadProfileSteam) {
+        if (((this->MassFlowRate) > 0.0) && (this->Power > 0.0)) {
+            // Steam heat exchangers would not have effectivness, since all of the steam is
+            // converted to water and only then the steam trap allows it to leave the heat
+            // exchanger, subsequently heat exchange is latent heat + subcooling.
+
+            FluidIndex = FluidProperties::FindRefrigerant(state, "Steam");
+            EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, this->InletTemp, 1.0, FluidIndex, RoutineName);
+            EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, this->InletTemp, 0.0, FluidIndex, RoutineName);
+            LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
+
+            CpWater = FluidProperties::GetSatSpecificHeatRefrig(state, fluidNameSteam, this->InletTemp, 0.0, FluidIndex, RoutineName);
+
+            // Steam Mass Flow Rate Required
+            this->MassFlowRate = this->Power / (LatentHeatSteam + this->DegOfSubcooling * CpWater);
+
+            SetComponentFlowRate(state,
+                                 this->MassFlowRate,
+                                 this->InletNode,
+                                 this->OutletNode,
+                                 this->WLoopNum,
+                                 this->WLoopSideNum,
+                                 this->WLoopBranchNum,
+                                 this->WLoopCompNum);
+
+            // In practice Sensible & Superheated heat transfer is negligible compared to latent part.
+            // This is required for outlet water temperature, otherwise it will be saturation temperature.
+            // Steam Trap drains off all the Water formed.
+            // Here Degree of Subcooling is used to calculate hot water return temperature.
+
+            // Calculating Water outlet temperature
+            TempWaterAtmPress = GetSatTemperatureRefrig(state, fluidNameSteam, StdPressureSeaLevel, FluidIndex, RoutineName);
+            this->OutletTemp = TempWaterAtmPress - this->LoopSubcoolReturn;
+        }
     }
 
-    this->OutletTemp = this->InletTemp - DeltaTemp;
+
+
+    
 
     this->UpdatePlantProfile(state);
     this->ReportPlantProfile(state);
