@@ -224,14 +224,14 @@ namespace DXCoils {
         Real64 TotalHeatingEnergyRate;
         Real64 ElecHeatingConsumption;
         Real64 ElecHeatingPower;
-        Real64 HeatingCoilRuntimeFraction;                          // Run time fraction of the DX heating unit
-        int DefrostStrategy;                                        // defrost strategy; 1=reverse-cycle, 2=resistive
+        Real64 HeatingCoilRuntimeFraction;                // Run time fraction of the DX heating unit
+        int DefrostStrategy;                              // defrost strategy; 1=reverse-cycle, 2=resistive
         StandardRatings::HPdefrostControl DefrostControl; // defrost control; 1=timed, 2=on-demand
-        int EIRFPLR;                                                // index of energy input ratio vs part-load ratio curve
-        int DefrostEIRFT;                                           // index of defrost mode total cooling capacity for reverse cycle heat pump
-        int RegionNum;                                              // Region number for calculating HSPF of single speed DX heating coil
-        Real64 MinOATCompressor;                                    // Minimum OAT for heat pump compressor operation
-        Real64 OATempCompressorOn;                                  // The outdoor tempearture when the compressor is automatically turned back on,
+        int EIRFPLR;                                      // index of energy input ratio vs part-load ratio curve
+        int DefrostEIRFT;                                 // index of defrost mode total cooling capacity for reverse cycle heat pump
+        int RegionNum;                                    // Region number for calculating HSPF of single speed DX heating coil
+        Real64 MinOATCompressor;                          // Minimum OAT for heat pump compressor operation
+        Real64 OATempCompressorOn;                        // The outdoor tempearture when the compressor is automatically turned back on,
         // if applicable, following automatic shut off. This field is used only for
         // HSPF calculation.
         Real64 MaxOATCompressor;        // Maximum OAT for VRF heat pump compressor operation
