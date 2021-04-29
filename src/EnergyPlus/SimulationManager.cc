@@ -1269,7 +1269,7 @@ namespace SimulationManager {
                         if (fields.find("inside_surface_heat_balance_convergence_check") != fields.end()) { // not required field, has default value
                             std::string convergenceCheckInput = fields.at("inside_surface_heat_balance_convergence_check");
                             if (convergenceCheckInput != "ALLZONES") {
-                                state.dataHeatBalSurf->insideSurfHeatBalConvAllZones = false;
+                                state.dataHeatBalSurf->insideSurfHeatBalConvergeAllZones = false;
                             }
                             ShowWarningError(state,
                                              "PerformancePrecisionTradeoffs using the Advanced Override Mode, "

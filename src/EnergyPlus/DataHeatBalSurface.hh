@@ -87,7 +87,7 @@ struct HeatBalSurfData : BaseGlobalStruct
     Real64 MaxSurfaceTempLimitBeforeFatal = 500.0; // 2.5 times MaxSurfaceTempLimit
     int MinIterations = 1;                         // Minimum number of iterations for surface heat balance
     Real64 IterDampConst = 5.0;                    // Damping constant for inside surface temperature iterations
-    bool insideSurfHeatBalConvAllZones = true;     // Inside Surface Heat Balance Convergence Check true for AllZones, false for individual zones
+    bool insideSurfHeatBalConvergeAllZones = true; // Inside Surface Heat Balance Convergence Check: true for AllZones, false for individual zones
     // Variables Dimensioned to Max Number of Heat Transfer Surfaces (maxhts)
     Array1D<Real64> CTFConstInPart;  // Constant Inside Portion of the CTF calculation
     Array1D<Real64> CTFConstOutPart; // Constant Outside Portion of the CTF calculation
@@ -269,7 +269,7 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->MaxSurfaceTempLimitBeforeFatal = 500.0;
         this->MinIterations = 1;
         this->IterDampConst = 5.0;
-        this->insideSurfHeatBalConvAllZones = true;
+        this->insideSurfHeatBalConvergeAllZones = true;
         this->CTFConstInPart.deallocate();
         this->CTFConstOutPart.deallocate();
         this->CTFCross0.deallocate();

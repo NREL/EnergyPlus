@@ -741,8 +741,11 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
     } // ...end of surfaces DO loop for initializing temperature history terms for the surface heat balances
 
-    // Zero out all of the radiant system heat balance coefficient arrays
-    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) { // Loop through all surfaces...
+    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        // Reset surface iteration counters
+        state.dataHeatBal->ZoneInsideSurfIterations(zoneNum) = 0;
+
+        // Zero out all of the radiant system heat balance coefficient arrays
         int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
         for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
@@ -2075,6 +2078,15 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                             "Zone",
                             "State",
                             state.dataHeatBal->Zone(loop).Name);
+        if (state.dataGlobal->DisplayAdvancedReportVariables) {
+            SetupOutputVariable(state,
+                                "Zone Surface Inside Face Heat Balance Calculation Iteration Count",
+                                OutputProcessor::Unit::None,
+                                state.dataHeatBal->ZoneInsideSurfIterations(loop),
+                                "ZONE",
+                                "Sum",
+                                state.dataHeatBal->Zone(loop).Name);
+        }
     }
 
     SetupOutputVariable(state,
@@ -7679,7 +7691,8 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 
         // Loop over non-window surfaces
         for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
-            if (state.dataHeatBal->ZoneInsideSurfConverged(zoneNum)) continue;
+            if (!state.dataHeatBalSurf->insideSurfHeatBalConvergeAllZones && state.dataHeatBal->ZoneInsideSurfConverged(zoneNum)) continue;
+            ++state.dataHeatBal->ZoneInsideSurfIterations(zoneNum);
             int const firstNonWinSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
             int const lastNonWinSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             Real64 const iterDampConstant = state.dataHeatBalSurf->IterDampConst; // local for vectorization
@@ -8045,7 +8058,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 
         } // ...end of loop to check for convergence
 
-        // if (MaxDelTemp <= state.dataHeatBal->MaxAllowedDelTemp) Converged = true;
+        if (state.dataHeatBalSurf->insideSurfHeatBalConvergeAllZones && (MaxDelTemp <= state.dataHeatBal->MaxAllowedDelTemp)) Converged = true;
 
 #ifdef EP_Count_Calls
         state.dataTimingsData->NumMaxInsideSurfIterations =
