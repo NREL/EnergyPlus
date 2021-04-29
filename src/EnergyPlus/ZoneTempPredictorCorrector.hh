@@ -403,14 +403,14 @@ struct ZoneTempPredictorCorrectorData : BaseGlobalStruct
 
     // Object Data
     std::unordered_set<std::string> HumidityControlZoneUniqueNames;
-    Array1D<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleHeating;
-    Array1D<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleCooling;
-    Array1D<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleHeatCool;
-    Array1D<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointDualHeatCool;
-    Array1D<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleHeatingFanger;
-    Array1D<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleCoolingFanger;
-    Array1D<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleHeatCoolFanger;
-    Array1D<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointDualHeatCoolFanger;
+    EPVector<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleHeating;
+    EPVector<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleCooling;
+    EPVector<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleHeatCool;
+    EPVector<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointDualHeatCool;
+    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleHeatingFanger;
+    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleCoolingFanger;
+    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleHeatCoolFanger;
+    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointDualHeatCoolFanger;
     ZoneTempPredictorCorrector::AdaptiveComfortDailySetPointSchedule AdapComfortDailySetPointSchedule;
 
     Array1D<Real64> AdapComfortSetPointSummerDesDay;

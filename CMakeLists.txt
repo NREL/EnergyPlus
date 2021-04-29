@@ -24,6 +24,21 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_17)
 
+add_library(cpp_pch_files INTERFACE)
+option(ENABLE_PCH "Enable Precompiled Headers" ON)
+if(ENABLE_PCH)
+  # This sets a global PCH parameter, each project will build its own PCH, which is a good idea if any #define's change
+  #
+  # consider breaking this out per project as necessary
+  target_precompile_headers(
+    cpp_pch_files
+    INTERFACE
+    "${PROJECT_SOURCE_DIR}/src/EnergyPlus/Data/EnergyPlusData.hh"
+    "${PROJECT_SOURCE_DIR}/third_party/ObjexxFCL/src/ObjexxFCL/Array.functions.hh"
+    "${PROJECT_SOURCE_DIR}/third_party/nlohmann/json.hpp"
+    )
+endif()
+
 add_library(project_fp_options INTERFACE)
 
 add_library(project_warnings INTERFACE)
