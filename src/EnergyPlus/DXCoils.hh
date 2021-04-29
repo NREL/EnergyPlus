@@ -226,7 +226,7 @@ namespace DXCoils {
         Real64 ElecHeatingPower;
         Real64 HeatingCoilRuntimeFraction;                          // Run time fraction of the DX heating unit
         int DefrostStrategy;                                        // defrost strategy; 1=reverse-cycle, 2=resistive
-        Optional<StandardRatings::HPdefrostControl> DefrostControl; // defrost control; 1=timed, 2=on-demand
+        StandardRatings::HPdefrostControl DefrostControl; // defrost control; 1=timed, 2=on-demand
         int EIRFPLR;                                                // index of energy input ratio vs part-load ratio curve
         int DefrostEIRFT;                                           // index of defrost mode total cooling capacity for reverse cycle heat pump
         int RegionNum;                                              // Region number for calculating HSPF of single speed DX heating coil
