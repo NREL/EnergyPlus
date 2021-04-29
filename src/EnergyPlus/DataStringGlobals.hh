@@ -90,7 +90,7 @@ namespace DataStringGlobals {
 
 struct DataStringGlobalsData : BaseGlobalStruct
 {
-
+    std::string outputCacheFileName = "eplusout.cache";
     std::string outputMddFileName = "eplusout.mdd";
     std::string outputRddFileName = "eplusout.rdd";
     std::string outputShdFileName = "eplusout.shd";

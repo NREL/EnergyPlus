@@ -361,6 +361,9 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
         EXPECT_TRUE(compare_err_stream(""));
     }
 
+    // Temporary hack
+    state->dataGlobal->RunningFromUnittest = true;
+
     return successful_processing;
 }
 

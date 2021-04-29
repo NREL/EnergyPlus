@@ -164,6 +164,10 @@ struct DataGlobal : BaseGlobalStruct
     int FDsimDay = 0;
     int FDnumIterYears = 0;
 
+    // This is a temporary hack for running unit tests with the cache
+    // Do not merge to develop until an appropriate solution is implemented
+    bool RunningFromUnittest = false;
+
     void clear_state() override
     {
         this->BeginDayFlag = false;
@@ -263,6 +267,7 @@ struct DataGlobal : BaseGlobalStruct
         this->CountNonZoneEquip = true;
         this->FDsimDay = 0;
         this->FDnumIterYears = 0;
+        this->RunningFromUnittest = false;
     }
 };
 

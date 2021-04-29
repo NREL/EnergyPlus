@@ -439,6 +439,7 @@ namespace CommandLineInterface {
         state.dataStrGlobals->outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
         state.files.dfs.fileName = outputFilePrefix + normalSuffix + ".dfs";
         state.dataStrGlobals->outputGLHEFileName = outputFilePrefix + normalSuffix + ".glhe";
+        state.dataStrGlobals->outputCacheFileName = outputFilePrefix + normalSuffix + ".cache";
         state.files.edd.fileName = outputFilePrefix + normalSuffix + ".edd";
         state.dataStrGlobals->outputIperrFileName = outputFilePrefix + normalSuffix + ".iperr";
         state.files.sln.fileName = outputFilePrefix + normalSuffix + ".sln";

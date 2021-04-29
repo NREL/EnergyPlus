@@ -48,6 +48,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Cache.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -128,15 +130,15 @@ void arrayToJSON(Array1D<Real64> const &arr, nlohmann::json &j, std::string cons
 void loadCache(EnergyPlusData &state)
 {
     // load cache file if it exists
-    if (FileSystem::fileExists(state.dataCache->cacheFilePath)) {
+    if (FileSystem::fileExists(state.dataStrGlobals->outputCacheFileName) && !state.dataGlobal->RunningFromUnittest) {
         state.dataCache->cacheExists = true;
-        readJSONfile(state, state.dataCache->cacheFilePath, state.dataCache->cache);
+        readJSONfile(state, state.dataStrGlobals->outputCacheFileName, state.dataCache->cache);
     }
 }
 
 void writeCache(EnergyPlusData &state)
 {
-    writeJSONfile(state.dataCache->cache, state.dataCache->cacheFilePath);
+    writeJSONfile(state.dataCache->cache, state.dataStrGlobals->outputCacheFileName);
 }
 
 } // namespace EnergyPlus::Cache

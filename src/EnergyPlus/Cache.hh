@@ -96,14 +96,11 @@ struct CacheData : BaseGlobalStruct
 {
 
     nlohmann::json cache;
-    std::string cacheFilePath =
-        FileSystem::getAbsolutePath(FileSystem::getParentDirectoryPath(FileSystem::getProgramPath())) + "/" + Cache::cacheName;
     bool cacheExists = false;
 
     void clear_state() override
     {
         this->cache.clear();
-        this->cacheFilePath.clear();
         this->cacheExists = false;
     }
 };
