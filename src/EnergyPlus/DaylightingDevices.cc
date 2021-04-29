@@ -990,6 +990,7 @@ namespace DaylightingDevices {
                         state.dataSurface->Surface(SurfNum).BaseSurf = SurfNum;
                         state.dataSurface->Surface(SurfNum).HeatTransSurf = true;
                         state.dataSurface->Surface(SurfNum).Construction = ConstrNum; // Kludge to allow shading surface to be a heat transfer surface
+                        state.dataSurface->SurfActiveConstruction(SurfNum) = ConstrNum;
                         state.dataConstruction->Construct(ConstrNum).IsUsed = true;
                     }
                 }
@@ -1516,9 +1517,9 @@ namespace DaylightingDevices {
             TotTDDPipeGain = state.dataSurface->SurfWinTransSolar(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) -
                              state.dataHeatBal->SurfQRadSWOutIncident(DiffSurf) * state.dataSurface->Surface(DiffSurf).Area +
                              QRefl * (1.0 - state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso / transDiff) +
-                             state.dataHeatBal->SurfWinQRadSWwinAbs(1, state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) *
+                             state.dataHeatBal->SurfWinQRadSWwinAbs(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome, 1) *
                                  state.dataSurface->Surface(DiffSurf).Area / 2.0 +
-                             state.dataHeatBal->SurfWinQRadSWwinAbs(1, DiffSurf) * state.dataSurface->Surface(DiffSurf).Area /
+                             state.dataHeatBal->SurfWinQRadSWwinAbs(DiffSurf, 1) * state.dataSurface->Surface(DiffSurf).Area /
                                  2.0; // Solar entering pipe | Solar exiting pipe | Absorbed due to
                                       // reflections on the way out | Inward absorbed solar from dome
                                       // glass | Inward absorbed solar from diffuser glass

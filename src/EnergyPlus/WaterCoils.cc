@@ -2492,9 +2492,8 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp = sizerCWDesAirOutTemp.size(state, TempSize, ErrorsFound);
             state.dataSize->DataDesOutletAirTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp;
 
-            if (state.dataSize->CurSysNum >
-                0) { // This call can be deleted at a future time and remove the if ( CurZoneEqNum > 0 ) check above. This will
-                     // change the order of the eio file.
+            if (state.dataSize->CurSysNum > 0) { // This call can be deleted at a future time and remove the if ( CurZoneEqNum > 0 ) check above. This
+                                                 // will change the order of the eio file.
                 if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                     bPRINT = false;      // no field for detailed water coil, should print this to eio anyway
                     TempSize = AutoSize; // coil report
