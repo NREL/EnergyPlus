@@ -308,12 +308,19 @@ namespace PhotovoltaicThermalCollectors {
             tmpBIPVTperf(Item).EffCollHeight = DataIPShortCuts::rNumericArgs(2);
             tmpBIPVTperf(Item).EffCollWidth = DataIPShortCuts::rNumericArgs(3);
             tmpBIPVTperf(Item).PVTranAbsProduct = DataIPShortCuts::rNumericArgs(4);
-            tmpBIPVTperf(Item).BackMatTranAbsProduct = DataIPShortCuts::rNumericArgs(5);
-            tmpBIPVTperf(Item).PVAreaFract = DataIPShortCuts::rNumericArgs(6);
-            tmpBIPVTperf(Item).PVRTop = DataIPShortCuts::rNumericArgs(7);
-            tmpBIPVTperf(Item).PVRBot = DataIPShortCuts::rNumericArgs(8);
-            tmpBIPVTperf(Item).PVGEmiss = DataIPShortCuts::rNumericArgs(9);
-            tmpBIPVTperf(Item).BackMatEmiss = DataIPShortCuts::rNumericArgs(10);
+            tmpBIPVTperf(Item).PVCellTransAbsProduct = DataIPShortCuts::rNumericArgs(5);
+            tmpBIPVTperf(Item).PVBackTransAbsProduct = DataIPShortCuts::rNumericArgs(6);
+            tmpBIPVTperf(Item).BackMatTranAbsProduct = DataIPShortCuts::rNumericArgs(7);
+            tmpBIPVTperf(Item).CladTranAbsProduct = DataIPShortCuts::rNumericArgs(8);
+            tmpBIPVTperf(Item).PVAreaFract = DataIPShortCuts::rNumericArgs(9);
+            tmpBIPVTperf(Item).PVCellAreaFract = DataIPShortCuts::rNumericArgs(10);
+            tmpBIPVTperf(Item).PVRTop = DataIPShortCuts::rNumericArgs(11);
+            tmpBIPVTperf(Item).PVRBot = DataIPShortCuts::rNumericArgs(12);
+            tmpBIPVTperf(Item).PVGEmiss = DataIPShortCuts::rNumericArgs(13);
+            tmpBIPVTperf(Item).BackMatEmiss = DataIPShortCuts::rNumericArgs(14);
+            tmpBIPVTperf(Item).ThGlass = DataIPShortCuts::rNumericArgs(15);
+            tmpBIPVTperf(Item).RIndGlass = DataIPShortCuts::rNumericArgs(16);
+            tmpBIPVTperf(Item).ECoffGlass = DataIPShortCuts::rNumericArgs(17);
             if (DataIPShortCuts::lAlphaFieldBlanks(3)) {
                 tmpBIPVTperf(Item).SchedPtr = ScheduleAlwaysOn;
             } else {
