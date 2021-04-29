@@ -72,29 +72,30 @@ namespace AirflowNetworkBalanceManager {
     struct AirflowNetworkReportVars
     {
         // Members
-        Real64 InfilVolume;        // Volume of Air {m3} due to infiltration
-        Real64 InfilMass;          // Mass of Air {kg} due to infiltration
-        Real64 InfilAirChangeRate; // Infiltration air change rate {ach}
-        Real64 VentilHeatLoss;     // Heat Gain {W} due to ventilation
-        Real64 VentilHeatGain;     // Heat Loss {W} due to ventilation
-        Real64 VentilVolume;       // Volume of Air {m3} due to ventilation
-        Real64 VentilMass;         // Mass of Air {kg} due to ventilation
-        Real64 VentilFanElec;      // Fan Electricity {W} due to ventilation
-        Real64 VentilAirTemp;      // Air Temp {C} of ventilation
-        Real64 MixVolume;          // Mixing volume of Air {m3}
-        Real64 MixMass;            // Mixing mass of air {kg}
-        Real64 ExfilSensiLoss;     // Sensible heat Loss rate {W} due to exfiltration
-        Real64 ExfilLatentLoss;    // Latent heat Loss rate {W} due to exfiltration
-        Real64 ExfilTotalLoss;     // Total heat Loss rate {W} due to exfiltration
-        Real64 ExfilMass;          // Mass of Air {kg} due to exfiltration
-        Real64 InletMass;          // Total zone inlet mass of air {kg}
-        Real64 OutletMass;         // Total zone outlet mass of air {kg}
+        Real64 InfilVolume;         // Volume of Air {m3} due to infiltration
+        Real64 InfilMass;           // Mass of Air {kg} due to infiltration
+        Real64 InfilAirChangeRate;  // Infiltration air change rate {ach}
+        Real64 VentilHeatLoss;      // Heat Gain {W} due to ventilation
+        Real64 VentilHeatGain;      // Heat Loss {W} due to ventilation
+        Real64 VentilVolume;        // Volume of Air {m3} due to ventilation
+        Real64 VentilMass;          // Mass of Air {kg} due to ventilation
+        Real64 VentilAirChangeRate; // Ventilation air change rate {ach}
+        Real64 VentilFanElec;       // Fan Electricity {W} due to ventilation
+        Real64 VentilAirTemp;       // Air Temp {C} of ventilation
+        Real64 MixVolume;           // Mixing volume of Air {m3}
+        Real64 MixMass;             // Mixing mass of air {kg}
+        Real64 ExfilSensiLoss;      // Sensible heat Loss rate {W} due to exfiltration
+        Real64 ExfilLatentLoss;     // Latent heat Loss rate {W} due to exfiltration
+        Real64 ExfilTotalLoss;      // Total heat Loss rate {W} due to exfiltration
+        Real64 ExfilMass;           // Mass of Air {kg} due to exfiltration
+        Real64 InletMass;           // Total zone inlet mass of air {kg}
+        Real64 OutletMass;          // Total zone outlet mass of air {kg}
 
         // Default Constructor
         AirflowNetworkReportVars()
             : InfilVolume(0.0), InfilMass(0.0), InfilAirChangeRate(0.0), VentilHeatLoss(0.0), VentilHeatGain(0.0), VentilVolume(0.0), VentilMass(0.0),
-              VentilFanElec(0.0), VentilAirTemp(0.0), MixVolume(0.0), MixMass(0.0), ExfilSensiLoss(0.0), ExfilLatentLoss(0.0), ExfilTotalLoss(0.0),
-              ExfilMass(0.0), InletMass(0.0), OutletMass(0.0)
+              VentilAirChangeRate(0.0), VentilFanElec(0.0), VentilAirTemp(0.0), MixVolume(0.0), MixMass(0.0), ExfilSensiLoss(0.0),
+              ExfilLatentLoss(0.0), ExfilTotalLoss(0.0), ExfilMass(0.0), InletMass(0.0), OutletMass(0.0)
         {
         }
     };
@@ -171,7 +172,7 @@ namespace AirflowNetworkBalanceManager {
 
     void CalcSingleSidedCps(EnergyPlusData &state, std::vector<std::vector<Real64>> &valsByFacade, int numWindDirs = 36);
 
-    Real64 GetZoneInfilAirChangeRate(EnergyPlusData &state, int ZoneNum); // hybrid ventilation system controlled zone number
+    Real64 GetZoneOutdoorAirChangeRate(EnergyPlusData &state, int ZoneNum); // hybrid ventilation system controlled zone number
 
     int GetAirLoopNumber(EnergyPlusData &state, int NodeNumber); // Get air loop number for each distribution node and linkage
 
