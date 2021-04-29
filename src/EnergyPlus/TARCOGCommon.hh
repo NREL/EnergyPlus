@@ -53,9 +53,9 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/TARCOGParams.hh>
-#include <EnergyPlus/DataSurfaces.hh>
 
 namespace EnergyPlus {
 
