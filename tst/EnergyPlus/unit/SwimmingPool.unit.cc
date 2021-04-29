@@ -245,6 +245,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     state->dataSwimmingPools->Pool.allocate(state->dataSwimmingPools->NumSwimmingPools);
     state->dataSurface->Surface.allocate(1);
     state->dataConstruction->Construct.allocate(1);
+    state->dataSurface->SurfIsPool.allocate(1);
 
     // testing variables
     static std::string const Alpha1("FirstString");
@@ -341,13 +342,13 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     state->dataConstruction->Construct(state->dataSurface->Surface(poolReference.SurfacePtr).Construction).SourceSinkPresent = false;
     state->dataSurface->Surface(poolReference.SurfacePtr).Zone = 7;
     state->dataSurface->Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = false;
-    state->dataSurface->Surface(poolReference.SurfacePtr).IsPool = false;
+    state->dataSurface->SurfIsPool(poolReference.SurfacePtr) = false;
     poolReference.ZonePtr = 0;
 
     poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1, Alpha2, AlphaField2, ErrFnd);
 
     EXPECT_FALSE(ErrFnd);
     EXPECT_TRUE(state->dataSurface->Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool);
-    EXPECT_TRUE(state->dataSurface->Surface(poolReference.SurfacePtr).IsPool);
+    EXPECT_TRUE(state->dataSurface->SurfIsPool(poolReference.SurfacePtr));
     EXPECT_EQ(state->dataSurface->Surface(poolReference.SurfacePtr).Zone, poolReference.ZonePtr);
 }

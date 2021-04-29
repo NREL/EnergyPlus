@@ -689,9 +689,6 @@ namespace SurfaceGeometry {
                 cNominalU = "**";
             }
 
-            // save the U-value nominal for use later in tabular report
-            state.dataSurface->Surface(SurfNum).UNomWOFilm = cNominalU;
-            state.dataSurface->Surface(SurfNum).UNomFilm = cNominalUwithConvCoeffs;
             // populate the predefined report related to u-values with films
             // only exterior surfaces including underground
             auto const SurfaceClass(state.dataSurface->Surface(SurfNum).Class);
@@ -903,6 +900,13 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfSurroundingSurfacesNum.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfHasLinkedOutAirNode.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfLinkedOutAirNode.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfExtEcoRoof.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfExtCavityPresent.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfExtCavNum.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIsPV.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIsICS.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIsPool.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfICSPtr.allocate(state.dataSurface->TotSurfaces);
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfShadowSurfPossibleObstruction(SurfNum) = false;
             state.dataSurface->SurfShadowSurfRecSurfNum(SurfNum) = 0;
@@ -912,6 +916,13 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfSurroundingSurfacesNum(SurfNum) = 0;
             state.dataSurface->SurfHasLinkedOutAirNode(SurfNum) = false;
             state.dataSurface->SurfLinkedOutAirNode(SurfNum) = 0;
+            state.dataSurface->SurfExtEcoRoof(SurfNum) = false;
+            state.dataSurface->SurfExtCavityPresent(SurfNum) = false;
+            state.dataSurface->SurfExtCavNum(SurfNum) = 0;
+            state.dataSurface->SurfIsPV(SurfNum) = false;
+            state.dataSurface->SurfIsICS(SurfNum) = false;
+            state.dataSurface->SurfIsPool(SurfNum) = false;
+            state.dataSurface->SurfICSPtr(SurfNum) = 0;
         }
     }
 
@@ -2422,7 +2433,9 @@ namespace SurfaceGeometry {
         LayNumOutside = 0;
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             // Check for EcoRoof and only 1 allowed to be used.
-            if (!state.dataSurface->Surface(SurfNum).ExtEcoRoof) continue;
+            if (state.dataSurface->Surface(SurfNum).Construction > 0)
+                state.dataSurface->SurfExtEcoRoof(SurfNum) = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsEcoRoof;
+            if (!state.dataSurface->SurfExtEcoRoof(SurfNum)) continue;
             if (LayNumOutside == 0) {
                 LayNumOutside = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).LayerPoint(1);
                 continue;
@@ -3805,9 +3818,9 @@ namespace SurfaceGeometry {
                 }
 
                 // Set the logical flag for the EcoRoof presented, this is only based on the flag in the construction type
-                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction > 0)
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtEcoRoof =
-                        state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).TypeIsEcoRoof;
+//                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction > 0)
+//                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtEcoRoof =
+//                        state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).TypeIsEcoRoof;
 
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = state.dataIPShortCut->rNumericArgs(1);
                 if (state.dataIPShortCut->lNumericFieldBlanks(1))
@@ -4171,9 +4184,9 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtWind = true;
 
                     // Set the logical flag for the EcoRoof presented, this is only based on the flag in the construction type
-                    if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction > 0)
-                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtEcoRoof =
-                            state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).TypeIsEcoRoof;
+//                    if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction > 0)
+//                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtEcoRoof =
+//                            state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).TypeIsEcoRoof;
 
                 } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == state.dataSurfaceGeometry->UnreconciledZoneSurface) {
                     if (GettingIZSurfaces) {
@@ -7208,8 +7221,8 @@ namespace SurfaceGeometry {
                 state.dataSurface->ExtVentedCavity(Item).SurfPtrs(ThisSurf) = Found;
 
                 // now set info in Surface structure
-                state.dataSurface->Surface(Found).ExtCavNum = Item;
-                state.dataSurface->Surface(Found).ExtCavityPresent = true;
+                state.dataSurface->SurfExtCavNum(Found) = Item;
+                state.dataSurface->SurfExtCavityPresent(Found) = true;
             }
 
             if (ErrorsFound) continue; // previous inner do loop may have detected problems that need to be cycle'd again to avoid crash
@@ -14303,8 +14316,8 @@ namespace SurfaceGeometry {
                     for (CollectorNum = 1; CollectorNum <= NumOfCollectors; ++CollectorNum) {
                         if (UtilityRoutines::SameString(state.dataSurface->Surface(SurfNum).Name, TmpCandidateICSSurfaceNames(CollectorNum)) &&
                             UtilityRoutines::SameString(TmpCandidateICSBCTypeNames(CollectorNum), "OTHERSIDECONDITIONSMODEL")) {
-                            state.dataSurface->Surface(SurfNum).IsICS = true;
-                            state.dataSurface->Surface(SurfNum).ICSPtr = CollectorNum;
+                            state.dataSurface->SurfIsICS(SurfNum) = true;
+                            state.dataSurface->SurfICSPtr(SurfNum) = CollectorNum;
                         }
                     }
                 }

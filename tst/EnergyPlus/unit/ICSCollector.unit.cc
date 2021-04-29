@@ -103,8 +103,11 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataSurface->Surface(SurfNum).Construction = ConstrNum;
     state->dataSurface->Surface(SurfNum).BaseSurf = SurfNum;
     state->dataSurface->Surface(SurfNum).Zone = ZoneNum;
-    state->dataSurface->Surface(SurfNum).IsICS = true;
     state->dataSurface->Surface(SurfNum).ExtWind = false;
+    state->dataSurface->SurfIsICS.allocate(NumOfSurf);
+    state->dataSurface->SurfICSPtr.allocate(NumOfSurf);
+    state->dataSurface->SurfIsICS(SurfNum) = true;
+    
     // allocate construction variable data
     state->dataConstruction->Construct.allocate(ConstrNum);
     state->dataConstruction->Construct(ConstrNum).LayerPoint.allocate(MatNum);

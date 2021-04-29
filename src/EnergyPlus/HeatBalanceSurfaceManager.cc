@@ -1314,6 +1314,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         state.dataSurface->SurfIntConvCoeff(SurfNum) = 0.0;
         state.dataSurface->SurfExtConvCoeff(SurfNum) = 0.0;
         state.dataSurface->SurfTAirRef(SurfNum) = 0;
+
     }
 
     // Use the total number of surfaces to allocate variables to avoid a surface number limit
@@ -2271,9 +2272,9 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
                 state.dataEnvrn->GroundTempFC;
         }
 
-        if (Surface(SurfNum).ExtCavityPresent) {
-            state.dataSurface->ExtVentedCavity(Surface(SurfNum).ExtCavNum).TbaffleLast = 20.0;
-            state.dataSurface->ExtVentedCavity(Surface(SurfNum).ExtCavNum).TairLast = 20.0;
+        if (state.dataSurface->SurfExtCavityPresent(SurfNum)) {
+            state.dataSurface->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TbaffleLast = 20.0;
+            state.dataSurface->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TairLast = 20.0;
         }
 
         // Initialize Kiva convection algorithms
@@ -6122,7 +6123,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                     if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF ||
                         Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
 
-                        if (Surface(SurfNum).ExtCavityPresent) {
+                        if (state.dataSurface->SurfExtCavityPresent(SurfNum)) {
                             CalcExteriorVentedCavity(state, SurfNum);
                         }
 
@@ -6131,7 +6132,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
 
                     } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
                                Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
-                        if (Surface(SurfNum).ExtCavityPresent) {
+                        if (state.dataSurface->SurfExtCavityPresent(SurfNum)) {
                             CalcExteriorVentedCavity(state, SurfNum);
                         }
                     }
@@ -6144,7 +6145,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
 
                     Real64 TempExt;
 
-                    if (Surface(SurfNum).ExtEcoRoof) {
+                    if (state.dataSurface->SurfExtEcoRoof(SurfNum)) {
                         CalcEcoRoof(state, SurfNum, zoneNum, ConstrNum, TempExt);
                         continue;
                     }
@@ -6796,8 +6797,8 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                           (state.dataHeatBalFanSys->QRadSurfAFNDuct(SurfNum) / state.dataGlobal->TimeStepZoneSec));
                     Real64 const TempDiv(1.0 / (construct.CTFInside(0) - construct.CTFCross(0) + HConvIn_surf + IterDampConst));
                     // Calculate the current inside surface temperature
-                    if ((!surface.IsPool) ||
-                        ((surface.IsPool) && (std::abs(state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum)) < PoolIsOperatingLimit) &&
+                    if ((!state.dataSurface->SurfIsPool(SurfNum)) ||
+                        ((state.dataSurface->SurfIsPool(SurfNum)) && (std::abs(state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum)) < PoolIsOperatingLimit) &&
                          (std::abs(state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum)) < PoolIsOperatingLimit))) {
                         if (construct.SourceSinkPresent) {
                             state.dataHeatBalSurf->TempSurfInTmp(SurfNum) =
@@ -6909,8 +6910,8 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                             (state.dataHeatBalFanSys->QRadSurfAFNDuct(SurfNum) / state.dataGlobal->TimeStepZoneSec));
                         Real64 const TempDiv(1.0 / (construct.CTFInside(0) + HConvIn_surf + IterDampConst));
                         // Calculate the current inside surface temperature
-                        if ((!surface.IsPool) ||
-                            ((surface.IsPool) && (std::abs(state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum)) < PoolIsOperatingLimit) &&
+                        if ((!state.dataSurface->SurfIsPool(SurfNum)) ||
+                            ((state.dataSurface->SurfIsPool(SurfNum)) && (std::abs(state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum)) < PoolIsOperatingLimit) &&
                              (std::abs(state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum)) < PoolIsOperatingLimit))) {
                             if (construct.SourceSinkPresent) {
                                 state.dataHeatBalSurf->TempSurfInTmp(SurfNum) =
@@ -7500,7 +7501,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                     state.dataHeatBalSurf->IsSource(surfNum) = 0;
                     state.dataHeatBalSurf->IsNotSource(surfNum) = 1;
                 }
-                if (!Surface(surfNum).IsPool) {
+                if (!state.dataSurface->SurfIsPool(surfNum)) {
                     state.dataHeatBalSurf->IsPoolSurf(surfNum) = 0;
                     state.dataHeatBalSurf->IsNotPoolSurf(surfNum) = 1;
                 }
@@ -7528,7 +7529,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
             }
 
             // The special heat balance terms for pools are used only when the pool is operating, so IsPool can change
-            if (Surface(surfNum).IsPool) {
+            if (state.dataSurface->SurfIsPool(surfNum)) {
                 if ((std::abs(state.dataHeatBalFanSys->QPoolSurfNumerator(surfNum)) >= PoolIsOperatingLimit) ||
                     (std::abs(state.dataHeatBalFanSys->PoolHeatTransCoefs(surfNum)) >= PoolIsOperatingLimit)) {
                     state.dataHeatBalSurf->IsPoolSurf(surfNum) = 1;
@@ -8667,7 +8668,7 @@ void CalcExteriorVentedCavity(EnergyPlusData &state, int const SurfNum) // index
     Real64 OutHumRatExt;
     auto &Surface(state.dataSurface->Surface);
 
-    CavNum = Surface(SurfNum).ExtCavNum;
+    CavNum = state.dataSurface->SurfExtCavNum(SurfNum);
 
     TempExt = Surface(SurfNum).OutDryBulbTemp;
 

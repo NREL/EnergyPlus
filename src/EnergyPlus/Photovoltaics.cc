@@ -323,7 +323,7 @@ namespace Photovoltaics {
             } else {
                 // Found one -- make sure has right parameters for PV
                 SurfNum = state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr;
-                state.dataSurface->Surface(SurfNum).IsPV = true;
+                state.dataSurface->SurfIsPV(SurfNum) = true;
 
                 if (!state.dataSurface->Surface(SurfNum).ExtSolar) {
                     ShowWarningError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));

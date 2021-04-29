@@ -436,7 +436,7 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
         ErrorsFound = true;
     } else { // ( Pool( Item ).SurfacePtr > 0 )
         state.dataSurface->Surface(this->SurfacePtr).IsRadSurfOrVentSlabOrPool = true;
-        state.dataSurface->Surface(this->SurfacePtr).IsPool = true;
+        state.dataSurface->SurfIsPool(this->SurfacePtr) = true;
         this->ZonePtr = state.dataSurface->Surface(this->SurfacePtr).Zone;
         // Check to make sure pool surface is a floor
         if (state.dataSurface->Surface(this->SurfacePtr).Class != DataSurfaces::SurfaceClass::Floor) {

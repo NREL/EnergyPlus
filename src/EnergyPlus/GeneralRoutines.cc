@@ -995,9 +995,9 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
             HPlenARR(ThisSurf) = Sigma * AbsExt * AbsThermSurf * (pow_4(TsBaffK) - pow_4(TsoK)) / (TsBaffK - TsoK);
         }
         // Added for ICS collector OSCM
-        if (state.dataSurface->Surface(SurfPtr).IsICS) {
+        if (state.dataSurface->SurfIsICS(SurfPtr)) {
             ICSCollectorIsOn = true;
-            CollectorNum = state.dataSurface->Surface(SurfPtr).ICSPtr;
+            CollectorNum = state.dataSurface->SurfICSPtr(SurfPtr);
         }
     }
 
