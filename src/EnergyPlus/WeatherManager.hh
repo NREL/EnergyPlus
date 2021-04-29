@@ -60,6 +60,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -943,7 +944,7 @@ struct WeatherManagerData : BaseGlobalStruct
                            // holiday, non-zero=holiday type) | Sine of the solar declination angle | Cosine of the solar declination
                            // angle | Value of the equation of time formula
     // NOLINTNEXTLINE(cert-err58-cpp)
-    Array1D<WeatherManager::DayWeatherVariables> DesignDay; // Design day environments
+    EPVector<WeatherManager::DayWeatherVariables> DesignDay; // Design day environments
     // NOLINTNEXTLINE(cert-err58-cpp)
     WeatherManager::MissingData Missing; // Dry Bulb Temperature (C) | Dew Point Temperature (C) | Relative Humidity (%) | Atmospheric Pressure (Pa) |
                                          // Wind Direction (deg) | Wind Speed/Velocity (m/s) | Total Sky Cover (tenths) | Opaque Sky Cover (tenths) |
@@ -951,19 +952,19 @@ struct WeatherManagerData : BaseGlobalStruct
                                          // Number of Days since last snow | Albedo | Rain/Liquid Precipitation (mm)
     WeatherManager::MissingDataCounts Missed;              // NOLINT(cert-err58-cpp)
     WeatherManager::RangeDataCounts OutOfRange;            // NOLINT(cert-err58-cpp)
-    Array1D<WeatherManager::DesignDayData> DesDayInput;    // Design day Input Data NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::DesignDayData> DesDayInput;   // Design day Input Data NOLINT(cert-err58-cpp)
     Array1D<WeatherManager::EnvironmentData> Environment;  // Environment data NOLINT(cert-err58-cpp)
     Array1D<WeatherManager::RunPeriodData> RunPeriodInput; // NOLINT(cert-err58-cpp)
     std::unordered_map<std::string, std::string> RunPeriodInputUniqueNames;
-    Array1D<WeatherManager::RunPeriodData> RunPeriodDesignInput; // NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::RunPeriodData> RunPeriodDesignInput; // NOLINT(cert-err58-cpp)
     std::unordered_map<std::string, std::string> RunPeriodDesignInputUniqueNames;
-    Array1D<WeatherManager::TypicalExtremeData> TypicalExtremePeriods; // NOLINT(cert-err58-cpp)
-    WeatherManager::DaylightSavingPeriodData EPWDST;                   // Daylight Saving Period Data from EPW file NOLINT(cert-err58-cpp)
-    WeatherManager::DaylightSavingPeriodData IDFDST;                   // Daylight Saving Period Data from IDF file NOLINT(cert-err58-cpp)
-    WeatherManager::DaylightSavingPeriodData DST;                      // Daylight Saving Period Data, if active NOLINT(cert-err58-cpp)
-    Array1D<WeatherManager::WeatherProperties> WPSkyTemperature;       // NOLINT(cert-err58-cpp)
-    Array1D<WeatherManager::SpecialDayData> SpecialDays;               // NOLINT(cert-err58-cpp)
-    Array1D<WeatherManager::DataPeriodData> DataPeriods;               // NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::TypicalExtremeData> TypicalExtremePeriods; // NOLINT(cert-err58-cpp)
+    WeatherManager::DaylightSavingPeriodData EPWDST;                    // Daylight Saving Period Data from EPW file NOLINT(cert-err58-cpp)
+    WeatherManager::DaylightSavingPeriodData IDFDST;                    // Daylight Saving Period Data from IDF file NOLINT(cert-err58-cpp)
+    WeatherManager::DaylightSavingPeriodData DST;                       // Daylight Saving Period Data, if active NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::WeatherProperties> WPSkyTemperature;       // NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::SpecialDayData> SpecialDays;               // NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::DataPeriodData> DataPeriods;               // NOLINT(cert-err58-cpp)
 
     std::shared_ptr<BaseGroundTempsModel> siteShallowGroundTempsPtr;
     std::shared_ptr<BaseGroundTempsModel> siteBuildingSurfaceGroundTempsPtr;

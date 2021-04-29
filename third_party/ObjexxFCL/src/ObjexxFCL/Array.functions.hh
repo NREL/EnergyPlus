@@ -3756,7 +3756,7 @@ maxloc( Array2< T > const & a, int const dim, std::size_t const crossover = Type
 				}
 			}
 		} else { // Cache-friendly large array method
-			Array1D< T > val( a.empty() ? Array1D< T >( as2, std::numeric_limits< T >::max() ) : a( a.l1(), _ ) );
+			Array1D< T > val( a.empty() ? Array1D< T >( as2, std::numeric_limits< T >::lowest() ) : a( a.l1(), _ ) );
 			size_type l( as2 );
 			for ( int i1 = 2; i1 <= as1; ++i1 ) {
 				for ( int i2 = 1; i2 <= as2; ++i2, ++l ) {
