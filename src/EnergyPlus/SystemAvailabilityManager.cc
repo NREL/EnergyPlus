@@ -4917,7 +4917,7 @@ namespace SystemAvailabilityManager {
         // on and open windows or doors.
 
         using namespace DataAirLoop;
-        using AirflowNetworkBalanceManager::GetZoneInfilAirChangeRate;
+        using AirflowNetworkBalanceManager::GetZoneOutdoorAirChangeRate;
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
         using CurveManager::CurveValue;
         using DataHeatBalance::HybridControlTypeClose;
@@ -5037,7 +5037,7 @@ namespace SystemAvailabilityManager {
 
                     if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ANControlTypeSchedPtr > 0 && HybridVentModeOA) {
                         ManageAirflowNetworkBalance(state, true);
-                        ACH = GetZoneInfilAirChangeRate(state, ZoneNum);
+                        ACH = GetZoneOutdoorAirChangeRate(state, ZoneNum);
                     }
                     if (ACH > OASetPoint) {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl =
