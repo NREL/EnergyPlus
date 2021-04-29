@@ -64,10 +64,7 @@
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Shape.hh>
-
-#define BITF(B) (1 << (int(B)))
-#define BITF_TEST_ANY(V, B) (((V) & (B)) != 0)
-#define BITF_TEST_NONE(V, B) (((V) & (B)) == 0)
+#include <EnergyPlus/BITF.hh>
 
 namespace EnergyPlus {
 

@@ -24,7 +24,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_17)
 
-add_library(cpp_pch_files INTERFACE)
+add_library(cpp_pch_files INTERFACE src/EnergyPlus/BITF.hh)
 option(ENABLE_PCH "Enable Precompiled Headers" ON)
 if(ENABLE_PCH)
   # This sets a global PCH parameter, each project will build its own PCH, which is a good idea if any #define's change
