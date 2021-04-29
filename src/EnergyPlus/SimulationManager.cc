@@ -1266,6 +1266,17 @@ namespace SimulationManager {
                                                     state.dataHeatBalSurf->IterDampConst));
                             advancedModeUsed = true;
                         }
+                        if (fields.find("inside_surface_heat_balance_convergence_check") != fields.end()) { // not required field, has default value
+                            std::string convergenceCheckInput = fields.at("inside_surface_heat_balance_convergence_check");
+                            if (convergenceCheckInput != "ALLZONES") {
+                                state.dataHeatBalSurf->insideSurfHeatBalConvAllZones = false;
+                            }
+                            ShowWarningError(state,
+                                             "PerformancePrecisionTradeoffs using the Advanced Override Mode, "
+                                             "inside_surface_heat_balance_convergence_check set to" +
+                                                 convergenceCheckInput);
+                            advancedModeUsed = true;
+                        }
                         if (advancedModeUsed) {
                             ShowContinueError(state,
                                               "...Care should be used when using the Advanced Override Mode. Results may be significantly different "
