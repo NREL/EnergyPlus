@@ -45,22 +45,15 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus Headers
-#include <EnergyPlus/TARCOGParams.hh>
+#ifndef ENERGYPLUS_BITF_HH
+#define ENERGYPLUS_BITF_HH
 
-namespace EnergyPlus::TARCOGParams {
+// This is a bitfield alternative to using the comparison(== and !=) operators for multiple comparisons in one statement. It is advantageous to use
+// BITF if the argument can be interpreted as an int/enum-class and if there are two or more comparisons. The BITF_ANY and BITF_NONE will return
+// boolean values. An example of using BITF can be found in the TARCOGCommon.hh file.
 
-// MODULE INFORMATION:
-//       AUTHOR         Simon Vidanovic
-//       DATE WRITTEN   June/22/2010
-//       MODIFIED       na
-//       RE-ENGINEERED  na
+#define BITF(B) (1 << (int(B)))
+#define BITF_TEST_ANY(V, B) (((V) & (B)) != 0)
+#define BITF_TEST_NONE(V, B) (((V) & (B)) == 0)
 
-//  Revision: 6.0.36  (June/22/2010)
-//   - Initial setup, extracted from TARCOG.fi
-//   - Moved Standards and MaxGas into GasParams module (gasses project)
-
-// PURPOSE OF THIS MODULE:
-// Module which contains common TARCOG parameters and constants
-
-} // namespace EnergyPlus::TARCOGParams
+#endif // ENERGYPLUS_BITF_HH
