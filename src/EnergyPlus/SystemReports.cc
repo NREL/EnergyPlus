@@ -57,7 +57,6 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -4885,9 +4884,10 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
                 }
                 state.dataSysRpts->SysTargetVentilationFlowVoz(AirLoopNum) +=
                     termUnitOAFrac * state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum);
-                Real64 naturalVentVol = +state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity +
-                                        state.dataHeatBal->ZonePreDefRep(ActualZoneNum).AFNVentVolTotalStdDen;
-                state.dataSysRpts->SysNatVentFlow(AirLoopNum) += termUnitOAFrac * naturalVentVol;
+                Real64 naturalVentFlow = (state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity +
+                                          state.dataHeatBal->ZonePreDefRep(ActualZoneNum).AFNVentVolStdDen) /
+                                         (TimeStepSys * DataGlobalConstants::SecInHour);
+                state.dataSysRpts->SysNatVentFlow(AirLoopNum) += termUnitOAFrac * naturalVentFlow;
 
                 if (state.dataHeatBal->ZonePreDefRep(ActualZoneNum).isOccupied) {
                     state.dataSysRpts->SysAnyZoneOccupied(AirLoopNum) = true;
@@ -4938,10 +4938,9 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
             state.dataSysRpts->ZoneOAVolFlowStdRho(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour;
 
         // set time mechanical+natural ventilation is below, at, or above target Voz-dyn
-        // MJWToDo - InfilVolume should be NatVentVolume or similar after this is split in AFN
-        Real64 afnVentVol = state.dataHeatBal->ZonePreDefRep(ActualZoneNum).AFNVentVolTotalStdDen;
-        Real64 totMechNatVentVolStdRho =
-            state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum) + state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + afnVentVol;
+        Real64 totMechNatVentVolStdRho = state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum) +
+                                         state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity +
+                                         state.dataHeatBal->ZonePreDefRep(ActualZoneNum).AFNVentVolStdDen;
         Real64 targetVoz = state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour;
         // Allow 1% tolerance
         if (totMechNatVentVolStdRho < (0.99 * targetVoz)) {
@@ -4990,7 +4989,7 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
                 state.dataHeatBal->ZonePreDefRep(ActualZoneNum).SimpVentVolMin = state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity;
             }
             state.dataHeatBal->ZonePreDefRep(ActualZoneNum).SimpVentVolTotalOccStdDen +=
-                state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + afnVentVol;
+                state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity;
             // target ventilation Voz-dyn
             state.dataSysRpts->AnyZoneTimeBelowVozDynOcc = state.dataSysRpts->AnyZoneTimeBelowVozDyn;
             state.dataSysRpts->AllZonesTimeAtVozDynOcc = state.dataSysRpts->AllZonesTimeAtVozDyn;
@@ -5009,8 +5008,7 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
         // accumulate during occupancy or not
         state.dataHeatBal->ZonePreDefRep(ActualZoneNum).MechVentVolTotalStdDen += state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum);
         state.dataHeatBal->ZonePreDefRep(ActualZoneNum).InfilVolTotalStdDen += state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeStdDensity;
-        state.dataHeatBal->ZonePreDefRep(ActualZoneNum).SimpVentVolTotalStdDen +=
-            state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + afnVentVol;
+        state.dataHeatBal->ZonePreDefRep(ActualZoneNum).SimpVentVolTotalStdDen += state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity;
         state.dataHeatBal->ZonePreDefRep(ActualZoneNum).VozTargetTotal += targetVoz;
         state.dataHeatBal->ZonePreDefRep(ActualZoneNum).VozTargetTimeBelow += state.dataSysRpts->ZoneTimeBelowVozDyn(CtrlZoneNum);
         state.dataHeatBal->ZonePreDefRep(ActualZoneNum).VozTargetTimeAt += state.dataSysRpts->ZoneTimeAtVozDyn(CtrlZoneNum);
@@ -5071,7 +5069,6 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
             state.dataSysRpts->SysNatVentFlow(sysNum) * TimeStepSys * DataGlobalConstants::SecInHour;
 
         // set time mechanical+natural ventilation is below, at, or above target Voz-dyn
-        // MJWToDo - InfilVolume should be NatVentVolume or similar after this is split in AFN
         Real64 totMechNatVentVolFlowStdRho = mechVentFlow + state.dataSysRpts->SysNatVentFlow(sysNum);
 
         Real64 targetFlowVoz = state.dataSysRpts->SysTargetVentilationFlowVoz(sysNum);

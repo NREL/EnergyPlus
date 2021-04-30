@@ -714,49 +714,49 @@ namespace WindowManager {
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).tBareSolCoef(_, IGlass));
+                             state.dataConstruction->Construct(ConstrNum).tBareSolCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              tBareVisPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).tBareVisCoef(_, IGlass));
+                             state.dataConstruction->Construct(ConstrNum).tBareVisCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              rfBareSolPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).rfBareSolCoef(_, IGlass));
+                             state.dataConstruction->Construct(ConstrNum).rfBareSolCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              rfBareVisPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).rfBareVisCoef(_, IGlass));
+                             state.dataConstruction->Construct(ConstrNum).rfBareVisCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              rbBareSolPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).rbBareSolCoef(_, IGlass));
+                             state.dataConstruction->Construct(ConstrNum).rbBareSolCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              rbBareVisPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).rbBareVisCoef(_, IGlass));
+                             state.dataConstruction->Construct(ConstrNum).rbBareVisCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              afBareSolPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).afBareSolCoef(_, IGlass));
+                             state.dataConstruction->Construct(ConstrNum).afBareSolCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              abBareSolPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).abBareSolCoef(_, IGlass));
+                             state.dataConstruction->Construct(ConstrNum).abBareSolCoef(IGlass));
                 }
             }
 
@@ -1496,7 +1496,7 @@ namespace WindowManager {
                          6,
                          1,
                          TotalIPhi,
-                         state.dataConstruction->Construct(ConstrNum).ReflSolBeamBackCoef({1, 6}));
+                         state.dataConstruction->Construct(ConstrNum).ReflSolBeamBackCoef);
                 W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                          state.dataWindowManager->tvisPhi,
                          6,
@@ -1512,7 +1512,7 @@ namespace WindowManager {
                              1,
                              TotalIPhi,
                              state.dataWindowManager->CoeffsCurveFit);
-                    state.dataConstruction->Construct(ConstrNum).AbsBeamCoef({1, 6}, IGlass) = state.dataWindowManager->CoeffsCurveFit;
+                    state.dataConstruction->Construct(ConstrNum).AbsBeamCoef(IGlass) = state.dataWindowManager->CoeffsCurveFit;
                     // Back absorptance coefficients for glass layers
                     IGlassBack = NGlass - IGlass + 1;
                     state.dataWindowManager->DepVarCurveFit({1, TotalIPhi}) = state.dataWindowManager->solabsBackPhi(IGlassBack, {1, TotalIPhi});
@@ -1522,7 +1522,7 @@ namespace WindowManager {
                              1,
                              TotalIPhi,
                              state.dataWindowManager->CoeffsCurveFit);
-                    state.dataConstruction->Construct(ConstrNum).AbsBeamBackCoef({1, 6}, IGlass) = state.dataWindowManager->CoeffsCurveFit;
+                    state.dataConstruction->Construct(ConstrNum).AbsBeamBackCoef(IGlass) = state.dataWindowManager->CoeffsCurveFit;
                 }
 
                 // To check goodness of fit //Tuned
@@ -1697,10 +1697,14 @@ namespace WindowManager {
             state.dataConstruction->Construct(ConstrNum).ReflSolBeamFrontCoef = 0.0;
             state.dataConstruction->Construct(ConstrNum).ReflSolBeamBackCoef = 0.0;
             state.dataConstruction->Construct(ConstrNum).TransVisBeamCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNum).AbsBeamCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNum).AbsBeamBackCoef = 0.0;
             state.dataConstruction->Construct(ConstrNum).AbsDiff = 0.0;
             state.dataConstruction->Construct(ConstrNum).AbsDiffBack = 0.0;
+            for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
+                for (int index = 1; index <= DataSurfaces::MaxPolyCoeff; ++index) {
+                    state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsBeamCoef(Layer)(index) = 0.0;
+                    state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsBeamBackCoef(Layer)(index) = 0.0;
+                }
+            }
         }
 
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
@@ -1775,8 +1779,7 @@ namespace WindowManager {
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfWinSolarDiffusing(SurfNum) = false;
             if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window &&
-                state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment &&
-                state.dataSurface->Surface(SurfNum).StormWinConstruction == 0) {
+                state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment && state.dataSurface->SurfWinStormWinConstr(SurfNum) == 0) {
                 ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
                 MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
                 if (state.dataMaterial->Material(MatNum).SolarDiffusing) {
@@ -2092,9 +2095,8 @@ namespace WindowManager {
         y30ils1 = 0.0;
         y30new = 0.0;
 
-        for (i = 2; i <= state.dataWindowManager->nume;
-             ++i) { // Autodesk:BoundsViolation e|wle|p(i-1) @ i=1: Changed start index from 1 to 2: wle values prevented this
-                    // violation from occurring in practice
+        for (i = 2; i <= state.dataWindowManager->nume; ++i) { // Autodesk:BoundsViolation e|wle|p(i-1) @ i=1: Changed start index from 1 to 2: wle
+                                                               // values prevented this violation from occurring in practice
             // Restrict to visible range
             if (state.dataWindowManager->wle(i) >= 0.37 && state.dataWindowManager->wle(i) <= 0.78) {
                 Interpolate(state.dataWindowManager->wlt3,
@@ -2241,10 +2243,7 @@ namespace WindowManager {
         int BlNum;      // Window blind number
         int SurfNumAdj; // An interzone surface's number in the adjacent zone
         int ZoneNumAdj; // An interzone surface's adjacent zone number
-        int ConstrNum;  // Construction number
-        // unused INTEGER           :: ConstrNumSh                  ! Shaded construction number
-        int IConst; // Construction number
-        int TotLay; // Total number of layers in a construction
+        int TotLay;     // Total number of layers in a construction
         //   (sum of solid layers and gap layers)
         int TotGlassLay;          // Total number of glass layers in a construction
         int Lay;                  // Layer number
@@ -2300,6 +2299,7 @@ namespace WindowManager {
         // Shorthand references
         auto &window(state.dataSurface->SurfaceWindow(SurfNum));
         auto &surface(state.dataSurface->Surface(SurfNum));
+        int ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
 
         if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
 
@@ -2309,7 +2309,6 @@ namespace WindowManager {
             CalcComplexWindowThermal(
                 state, SurfNum, temp, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, DataBSDFWindow::noCondition);
 
-            ConstrNum = surface.Construction;
             TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
             state.dataWindowManager->ngllayer =
                 state.dataConstruction->Construct(ConstrNum).TotSolidLayers; // Simon: This is necessary to keep for frame calculations
@@ -2357,10 +2356,6 @@ namespace WindowManager {
             }
 
         } else { // regular window, not BSDF, not EQL Window
-
-            ConstrNum = surface.Construction;
-            if (state.dataSurface->SurfWinStormWinFlag(SurfNum) > 0) ConstrNum = surface.StormWinConstruction;
-
             // Added for thermochromic windows
             state.dataWindowManager->locTCFlag = (state.dataConstruction->Construct(ConstrNum).TCFlag == 1);
 
@@ -2391,6 +2386,7 @@ namespace WindowManager {
                         // Use the new TC window construction
                         ConstrNum = IDConst(iMinDT(1));
                         surface.Construction = ConstrNum;
+                        state.dataSurface->SurfActiveConstruction(SurfNum) = ConstrNum;
                         state.dataSurface->SurfWinSpecTemp(SurfNum) =
                             state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).TCLayer).SpecTemp;
                     }
@@ -2482,8 +2478,8 @@ namespace WindowManager {
             // absorbed at each face. Assumes equal split between faces of short-wave absorbed in glass layer.
 
             for (IGlass = 1; IGlass <= TotGlassLay; ++IGlass) {
-                state.dataWindowManager->AbsRadGlassFace(2 * IGlass - 1) = state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) / 2.0;
-                state.dataWindowManager->AbsRadGlassFace(2 * IGlass) = state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) / 2.0;
+                state.dataWindowManager->AbsRadGlassFace(2 * IGlass - 1) = state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) / 2.0;
+                state.dataWindowManager->AbsRadGlassFace(2 * IGlass) = state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) / 2.0;
             }
 
             // IR from zone internal gains (lights, equipment and people) absorbed on zone-side face
@@ -2519,10 +2515,9 @@ namespace WindowManager {
             //   and glass 2, gap 2 is between glass 2 and blind/shade, and gap 3 is between
             //   blind/shade and glass 3.
 
-            IConst = ConstrNum;
+            int IConst = ConstrNum;
             if (ANY_SHADE_SCREEN(ShadeFlag) || ANY_BLIND(ShadeFlag)) {
-                IConst = surface.activeShadedConstruction;
-                if (state.dataSurface->SurfWinStormWinFlag(SurfNum) > 0) IConst = surface.activeStormWinShadedConstruction;
+                IConst = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
             }
             TotLay = state.dataConstruction->Construct(IConst).TotLayers;
             IGlass = 0;
@@ -3249,9 +3244,7 @@ namespace WindowManager {
         Real64 ConvHeatGainFrZoneSideOfShade; // Convective heat gain to zone from side of interior shade facing zone (W)
         Real64 ConvHeatGainFrZoneSideOfGlass; // Convective heat gain to zone from side of glass facing zone when
         //  no interior shade/blind is present (W)
-        Real64 IncidentSolar; // Solar incident on outside of window (W)
-        int ConstrNum;        // Construction number, bare and with shading device
-        int ConstrNumSh;
+        Real64 IncidentSolar;         // Solar incident on outside of window (W)
         Real64 TransDiff;             // Diffuse shortwave transmittance
         Real64 FacRhoIR25;            // Intermediate variable
         Real64 FacRhoIR63;            // Intermediate variable
@@ -3909,12 +3902,8 @@ namespace WindowManager {
 
             // Correct WinHeatGain for interior diffuse shortwave (solar and shortwave from lights) transmitted
             // back out window
-            ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-            ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
-            if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) {
-                ConstrNum = state.dataSurface->Surface(SurfNum).StormWinConstruction;
-                ConstrNumSh = state.dataSurface->Surface(SurfNum).activeStormWinShadedConstruction;
-            }
+            int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
+            int const ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
 
             TransDiff = state.dataConstruction->Construct(ConstrNum).TransDiff; // Default value for TransDiff here
             if (NOT_SHADED(ShadeFlag)) {
@@ -4076,8 +4065,7 @@ namespace WindowManager {
         //               Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
         // DATA AirProps / 1.29, -0.4d-2, 2.41d-2, 7.6d-5, 1.73d-5, 1.0d-7, 0.72,   1.8d-3  /
 
-        ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
-        if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNumSh = state.dataSurface->Surface(SurfNum).activeStormWinShadedConstruction;
+        ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
         ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
         nglassfaces = 2 * state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers;
         TotGaps = state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers;
@@ -6781,18 +6769,18 @@ namespace WindowManager {
                 state.dataWindowManager->emis(2 * IGlass) = state.dataMaterial->Material(LayPtr).AbsorpThermalBack;
                 state.dataWindowManager->tir(2 * IGlass - 1) = state.dataMaterial->Material(LayPtr).TransThermal;
                 state.dataWindowManager->tir(2 * IGlass) = state.dataMaterial->Material(LayPtr).TransThermal;
-                AbsBeamNorm(IGlass) = POLYF(1.0, state.dataConstruction->Construct(ConstrNum).AbsBeamCoef({1, 6}, IGlass));
+                AbsBeamNorm(IGlass) = POLYF(1.0, state.dataConstruction->Construct(ConstrNum).AbsBeamCoef(IGlass));
                 if (ShadeFlag == WinShadingType::IntBlind) { // Interior blind on
-                    AbsBeamNorm(IGlass) = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).AbsBeamCoef({1, 6}, IGlass));
+                    AbsBeamNorm(IGlass) = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).AbsBeamCoef(IGlass));
                     AGlDiffBack = state.dataConstruction->Construct(ConstrNumBare).AbsDiffBack(IGlass);
                     AbsBeamNorm(IGlass) += TBmBm * AGlDiffBack * RhoBlFront / (1.0 - RhoBlFront * RGlDiffBack);
                 } else if (ShadeFlag == WinShadingType::ExtBlind) { // Exterior blind on
-                    AbsBeamNorm(IGlass) = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).AbsBeamCoef({1, 6}, IGlass));
+                    AbsBeamNorm(IGlass) = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).AbsBeamCoef(IGlass));
                     AbsBeamNorm(IGlass) = TBlBmBm * AbsBeamNorm(IGlass) + (TBlBmBm * RGlFront * RhoBlBack + TBlBmDif) *
                                                                               state.dataConstruction->Construct(ConstrNumBare).AbsDiff(IGlass) /
                                                                               (1.0 - RGlDiffFront * RhoBlDiffBack);
                 } else if (ShadeFlag == WinShadingType::ExtScreen) { // Exterior screen on
-                    AbsBeamNorm(IGlass) = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).AbsBeamCoef({1, 6}, IGlass));
+                    AbsBeamNorm(IGlass) = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).AbsBeamCoef(IGlass));
                     AbsBeamNorm(IGlass) = TScBmBm * AbsBeamNorm(IGlass) + (TScBmBm * RGlFront * RScBack + TScBmDif) *
                                                                               state.dataConstruction->Construct(ConstrNumBare).AbsDiff(IGlass) /
                                                                               (1.0 - RGlDiffFront * RScDifBack);

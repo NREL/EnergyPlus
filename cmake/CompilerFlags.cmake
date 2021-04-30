@@ -8,6 +8,13 @@ endif()
 
 # Make sure expat is compiled as a static library
 target_compile_definitions(project_options INTERFACE -DXML_STATIC)
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  option(BUILD_TIME_TRACE "Enable -ftime-trace for investigating build times on clang" OFF)
+  mark_as_advanced(BUILD_TIME_TRACE)
+  if (BUILD_TIME_TRACE)
+    target_compile_options(project_options INTERFACE -ftime-trace)
+  endif()
+endif()
 
 if(APPLE)
   # Force no auto ptr

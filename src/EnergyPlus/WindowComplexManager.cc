@@ -2588,7 +2588,7 @@ namespace WindowComplexManager {
 
         // Deflection
         // Tarcog requires deflection as input parameters.  Deflection is NOT used in EnergyPlus simulations
-        int CalcDeflection; // Deflection calculation flag:
+        TARCOGParams::DeflectionCalculation CalcDeflection; // Deflection calculation flag:
         //    0 - no deflection calculations
         //    1 - perform deflection calculation (input is Pressure/Temp)
         //    2 - perform deflection calculation (input is measured deflection)
@@ -2601,7 +2601,7 @@ namespace WindowComplexManager {
         //                 1 - ISO 15099,
         //                 2 - EN673 / ISO 10292 Declared,
         //                 3 - EN673 / ISO 10292 Design.
-        int ThermalMod(0); // Thermal model:
+        TARCOGParams::TARCOGThermalModel ThermalMod = TARCOGParams::TARCOGThermalModel::ISO15099; // Thermal model:
         //                 0 - ISO15099
         //                 1 - Scaled Cavity Width (SCW)
         //                 2 - Convective Scalar Model (CSM)
@@ -2730,7 +2730,7 @@ namespace WindowComplexManager {
 
         // fill local vars
 
-        CalcDeflection = 0;
+        CalcDeflection = TARCOGParams::DeflectionCalculation::NONE;
         CalcSHGC = 0;
 
         if (CalcCondition == DataBSDFWindow::noCondition) {
@@ -2981,7 +2981,7 @@ namespace WindowComplexManager {
 
             if ((state.dataMaterial->Material(LayPtr).Group == WindowGlass) || (state.dataMaterial->Material(LayPtr).Group == WindowSimpleGlazing)) {
                 ++IGlass;
-                LayerType(IGlass) = 0; // this marks specular layer type
+                LayerType(IGlass) = TARCOGParams::TARCOGLayerType::SPECULAR; // this marks specular layer type
                 thick(IGlass) = state.dataMaterial->Material(LayPtr).Thickness;
                 scon(IGlass) = state.dataMaterial->Material(LayPtr).Conductivity;
                 emis(2 * IGlass - 1) = state.dataMaterial->Material(LayPtr).AbsorpThermalFront;
@@ -3073,7 +3073,7 @@ namespace WindowComplexManager {
         if (CalcCondition == DataBSDFWindow::noCondition) {
             // now calculate correct areas for multipliers
             for (Lay = 1; Lay <= nlayer; ++Lay) {
-                if (LayerType(Lay) != 0) { // Layer is shading
+                if (LayerType(Lay) != TARCOGParams::TARCOGLayerType::SPECULAR) { // Layer is shading
                     // before changing multipliers, need to determine which one is dominant gap width
                     if (Lay == 1) { // Exterior shading device
                         dominantGapWidth = gap(Lay);
@@ -3108,7 +3108,7 @@ namespace WindowComplexManager {
             // if (dir.ne.0.0d0) then
             for (IGlass = 1; IGlass <= nlayer; ++IGlass) {
                 // IF (dir > 0.0D0 ) THEN
-                asol(IGlass) = state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum);
+                asol(IGlass) = state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass);
                 // ELSE
                 //  asol(IGLASS) = 0.0D0
                 // ENDIF
@@ -3515,8 +3515,8 @@ namespace WindowComplexManager {
                 state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k) = theta(2 * k);
 
                 // temperatures for reporting
-                state.dataHeatBal->SurfWinFenLaySurfTempFront(k, SurfNum) = theta(2 * k - 1) - DataGlobalConstants::KelvinConv;
-                state.dataHeatBal->SurfWinFenLaySurfTempBack(k, SurfNum) = theta(2 * k) - DataGlobalConstants::KelvinConv;
+                state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, k) = theta(2 * k - 1) - DataGlobalConstants::KelvinConv;
+                state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, k) = theta(2 * k) - DataGlobalConstants::KelvinConv;
                 // thetas(k) = theta(k)
             }
         }

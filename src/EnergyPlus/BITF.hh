@@ -45,98 +45,15 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef BaseSizerWithScalableInputs_hh_INCLUDED
-#define BaseSizerWithScalableInputs_hh_INCLUDED
+#ifndef ENERGYPLUS_BITF_HH
+#define ENERGYPLUS_BITF_HH
 
-#include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
-#include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
-#include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/api/TypeDefs.h>
-#include <string>
+// This is a bitfield alternative to using the comparison(== and !=) operators for multiple comparisons in one statement. It is advantageous to use
+// BITF if the argument can be interpreted as an int/enum-class and if there are two or more comparisons. The BITF_ANY and BITF_NONE will return
+// boolean values. An example of using BITF can be found in the TARCOGCommon.hh file.
 
-namespace EnergyPlus {
+#define BITF(B) (1 << (int(B)))
+#define BITF_TEST_ANY(V, B) (((V) & (B)) != 0)
+#define BITF_TEST_NONE(V, B) (((V) & (B)) == 0)
 
-struct EnergyPlusData;
-
-struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs
-{
-
-    bool zoneCoolingOnlyFan = false;
-    bool zoneHeatingOnlyFan = false;
-    bool dataHRFlowSizingFlag = false;
-    Real64 dataFracOfAutosizedCoolingAirflow = 0.0;
-    Real64 dataFracOfAutosizedHeatingAirflow = 0.0;
-    Real64 dataFlowPerCoolingCapacity = 0.0;
-    Real64 dataAutosizedCoolingCapacity = 0.0;
-    Real64 dataFlowPerHeatingCapacity = 0.0;
-    Real64 dataAutosizedHeatingCapacity = 0.0;
-
-    // capacity sizing
-    Real64 dataCoilSizingAirInTemp = 0.0;
-    Real64 dataCoilSizingAirInHumRat = 0.0;
-    Real64 dataCoilSizingAirOutTemp = 0.0;
-    Real64 dataCoilSizingAirOutHumRat = 0.0;
-    Real64 dataCoilSizingFanCoolLoad = 0.0;
-    Real64 dataCoilSizingCapFT = 0.0;
-    Real64 dataTotCapCurveIndex = 0.0;
-    Real64 dataTotCapCurveValue = 0.0;
-    Real64 dataFracOfAutosizedCoolingCapacity = 0.0;
-    Real64 dataFracOfAutosizedHeatingCapacity = 0.0;
-    Real64 dataCoolCoilCap = 0.0;
-    Real64 dataCoilIsSuppHeater = false;
-    Real64 suppHeatCap = 0.0;
-    Real64 unitaryHeatCap = 0.0;
-
-    int zoneHVACSizingIndex = 0;
-    EPVector<DataSizing::ZoneHVACSizingData> zoneHVACSizing;
-
-    void initializeWithinEP(EnergyPlusData &state,
-                            std::string const &_compType,
-                            std::string const &_compName,
-                            bool const &_printWarningFlag,
-                            std::string const &_callingRoutine) override;
-
-    void clearState()
-    {
-        BaseSizerWithFanHeatInputs::clearState();
-        zoneCoolingOnlyFan = false;
-        zoneHeatingOnlyFan = false;
-        dataHRFlowSizingFlag = false;
-        dataFracOfAutosizedCoolingAirflow = 0.0;
-        dataFracOfAutosizedHeatingAirflow = 0.0;
-        dataFlowPerCoolingCapacity = 0.0;
-        dataAutosizedCoolingCapacity = 0.0;
-        dataFlowPerHeatingCapacity = 0.0;
-        dataAutosizedHeatingCapacity = 0.0;
-        dataCoilSizingAirInTemp = 0.0;
-        dataCoilSizingAirInHumRat = 0.0;
-        dataCoilSizingAirOutTemp = 0.0;
-        dataCoilSizingAirOutHumRat = 0.0;
-        dataCoilSizingFanCoolLoad = 0.0;
-        dataCoilSizingCapFT = 0.0;
-        dataTotCapCurveIndex = 0.0;
-        dataTotCapCurveValue = 0.0;
-        dataFracOfAutosizedCoolingCapacity = 0.0;
-        dataFracOfAutosizedHeatingCapacity = 0.0;
-        dataCoolCoilCap = 0.0;
-        dataCoilIsSuppHeater = false;
-        suppHeatCap = 0.0;
-        unitaryHeatCap = 0.0;
-        zoneHVACSizingIndex = 0;
-        zoneHVACSizing.clear();
-    }
-
-    void setHVACSizingIndexData(int const index);
-};
-
-struct BaseSizerWithScalableInputsData : BaseGlobalStruct
-{
-
-    void clear_state() override
-    {
-    }
-};
-
-} // namespace EnergyPlus
-
-#endif
+#endif // ENERGYPLUS_BITF_HH
