@@ -345,9 +345,9 @@ namespace CostEstimateManager {
                         if ((SELECT_CASE_var == "COIL:DX") || (SELECT_CASE_var == "COIL:COOLING:DX:SINGLESPEED")) {
                             if (UtilityRoutines::FindItem(parentObjName, state.dataDXCoils->DXCoil) > 0) coilFound = true;
                         } else if (SELECT_CASE_var == "COIL:COOLING:DX") {
-                            auto &v = state.dataCoilCooingDX->coilCoolingDXs;
-                            auto isInCoils = [&parentObjName](const CoilCoolingDX &coil) { return coil.name == parentObjName; };
-                            if (std::find_if(v.begin(), v.end(), isInCoils) != v.end()) coilFound = true;
+                            if (CoilCoolingDX::factory(state, parentObjName) != -1) {
+                                coilFound = true;
+                            }
                         }
                         if (!coilFound) {
                             ShowWarningError(state,
@@ -603,7 +603,7 @@ namespace CostEstimateManager {
 
                     ThisConstructStr = state.dataCostEstimateManager->CostLineItem(Item).ParentObjName;
                     ThisConstructID = UtilityRoutines::FindItem(ThisConstructStr, state.dataConstruction->Construct);
-                    // need to determine unique surfacs... some surfaces are shared by zones and hence doubled
+                    // need to determine unique surfaces... some surfaces are shared by zones and hence doubled
                     uniqueSurfMask.dimension(state.dataSurface->TotSurfaces, true); // init to true and change duplicates to false
                     SurfMultipleARR.dimension(state.dataSurface->TotSurfaces, 1.0);
                     for (surf = 1; surf <= state.dataSurface->TotSurfaces; ++surf) {
@@ -704,16 +704,21 @@ namespace CostEstimateManager {
                     WildcardObjNames = false;
                     auto &parentObjName = state.dataCostEstimateManager->CostLineItem(Item).ParentObjName;
                     bool coilFound = false;
-                    thisCoil = 0;
                     //  check for wildcard * in object name..
                     if (parentObjName == "*") { // wildcard, apply to all such components
                         WildcardObjNames = true;
                     } else if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
+                        // Purposefully not calling the factory here
+                        // Input validation happens before we get to this point
+                        // The factory throws a severe error when the coil is not found
+                        // Finding the coil like this here to protects against another SevereError being thrown out of context
                         auto &v = state.dataCoilCooingDX->coilCoolingDXs;
                         auto isInCoils = [&parentObjName](const CoilCoolingDX &coil) { return coil.name == parentObjName; };
                         auto it = std::find_if(v.begin(), v.end(), isInCoils);
-                        thisCoil = std::distance(v.begin(), it);
-                        coilFound = true;
+                        if (it != v.end()) {
+                            thisCoil = std::distance(v.begin(), it);
+                            coilFound = true;
+                        }
                     }
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap > 0.0) {
@@ -742,7 +747,7 @@ namespace CostEstimateManager {
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerEach > 0.0) {
                         if (WildcardObjNames)
                             state.dataCostEstimateManager->CostLineItem(Item).Qty = double(state.dataCoilCooingDX->coilCoolingDXs.size());
-                        if (thisCoil > 0) state.dataCostEstimateManager->CostLineItem(Item).Qty = 1.0;
+                        if (coilFound) state.dataCostEstimateManager->CostLineItem(Item).Qty = 1.0;
                         state.dataCostEstimateManager->CostLineItem(Item).ValuePer = state.dataCostEstimateManager->CostLineItem(Item).PerEach;
                         state.dataCostEstimateManager->CostLineItem(Item).LineSubTotal =
                             state.dataCostEstimateManager->CostLineItem(Item).Qty * state.dataCostEstimateManager->CostLineItem(Item).ValuePer;
@@ -753,8 +758,8 @@ namespace CostEstimateManager {
                         if (WildcardObjNames) {
                             Real64 Qty(0.0);
                             for (auto const &e : state.dataCoilCooingDX->coilCoolingDXs) {
-                                // TODO: Using 0 index to match above Coil:DX object
-                                Real64 COP = e.performance.normalMode.speeds[0].original_input_specs.gross_rated_cooling_COP;
+                                auto &maxSpeed = e.performance.normalMode.speeds.back();
+                                Real64 COP = maxSpeed.original_input_specs.gross_rated_cooling_COP;
                                 Qty += COP * e.performance.normalMode.ratedGrossTotalCap;
                             }
                             state.dataCostEstimateManager->CostLineItem(Item).Qty = Qty / 1000.0;
@@ -765,10 +770,8 @@ namespace CostEstimateManager {
                                 state.dataCostEstimateManager->CostLineItem(Item).Qty * state.dataCostEstimateManager->CostLineItem(Item).ValuePer;
                         }
                         if (coilFound) {
-
-                            Real64 COP = state.dataCoilCooingDX->coilCoolingDXs[thisCoil]
-                                             .performance.normalMode.speeds[0]
-                                             .original_input_specs.gross_rated_cooling_COP;
+                            auto &maxSpeed = state.dataCoilCooingDX->coilCoolingDXs[thisCoil].performance.normalMode.speeds.back();
+                            Real64 COP = maxSpeed.original_input_specs.gross_rated_cooling_COP;
                             state.dataCostEstimateManager->CostLineItem(Item).Qty =
                                 COP * state.dataCoilCooingDX->coilCoolingDXs[thisCoil].performance.normalMode.ratedGrossTotalCap / 1000.0;
                             state.dataCostEstimateManager->CostLineItem(Item).Units = "kW*COP (total, rated) ";
