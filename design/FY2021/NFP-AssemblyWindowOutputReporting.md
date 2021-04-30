@@ -3,7 +3,7 @@ Assembly Window Output Reporting
 
 **Jason Glazer, GARD Analytics**
 
- - April 27, 2021
+ - April 30, 2021
  
 
 ## Justification for New Feature ##
@@ -162,7 +162,12 @@ of the frame and divider.</ins>
 and the WINDOW program for the u-factor, SHGC, and visible transmittance, 
 both glass and assembly. This differences are based on algorithmic differences
 between the two programs even though they do share some code in the Windows 
-Calculation Engine, other portions of the algorithms differ.</ins>
+Calculation Engine, other portions of the algorithms differ. In addition, the 
+reported values may not match the NFRC rated values seen on a label because of 
+differences between the calculations in EnergyPlus and the exact NFRC rating 
+procedures including grouping of products.</ins>
+
+
 
 
 ## Input Description ##
@@ -433,7 +438,8 @@ The current version of those tables is shown below:
   </tr>
 </table>
 
-The new columns are propsed to be added after the glass only u-factor, SHGC and VT:
+The new columns are propsed to be added after the glass only u-factor, SHGC and 
+VT and a new footnote has been added:
 
 <b>Exterior Fenestration</b><br><br>
 <!-- FullName:Envelope Summary_Entire Facility_Exterior Fenestration-->
@@ -668,6 +674,8 @@ The new columns are propsed to be added after the glass only u-factor, SHGC and 
     <td align="right">&nbsp;</td>
   </tr>
 </table>
+<i>Note: Values shown on this table may not match results from the WINDOW program or the NFRC label.</i>
+
 <br><br>
 <b>Interior Fenestration</b><br><br>
 <!-- FullName:Envelope Summary_Entire Facility_Interior Fenestration-->
@@ -700,6 +708,11 @@ The new columns are propsed to be added after the glass only u-factor, SHGC and 
     <td align="right">&nbsp;</td>
   </tr>
 </table>
+<i>Note: Values shown on this table may not match results from the WINDOW program or the NFRC label.</i>
+<br>
+
+
+### EIO Report ###
 
 In addition the EIO report includes the WindowConstruction data if the following is included in the IDF file
 
