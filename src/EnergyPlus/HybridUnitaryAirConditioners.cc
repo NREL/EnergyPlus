@@ -99,7 +99,7 @@ void SimZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     if (CompIndex == 0) {
         CompNum = UtilityRoutines::FindItemInList(CompName, state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner);
         if (CompNum == 0) {
-            ShowFatalError(state, "SimZoneHybridUnitaryAirConditioners: Zone evaporative cooler unit not found.");
+            ShowFatalError(state, "SimZoneHybridUnitaryAirConditioners: ZoneHVAC:HybridUnitaryHVAC not found.");
         }
         CompIndex = CompNum;
     } else {
