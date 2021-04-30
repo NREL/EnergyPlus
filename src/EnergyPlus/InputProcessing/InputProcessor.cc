@@ -545,23 +545,8 @@ bool InputProcessor::getDefaultValue(EnergyPlusData &state, std::string const &o
 void InputProcessor::getFieldValue(
     EnergyPlusData &state, std::string const &objectType, json const &ep_object, std::string const &fieldName, std::string &value)
 {
-    auto find_iterators = objectCacheMap.find(objectType);
-    if (find_iterators == objectCacheMap.end()) {
-        auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(objectType));
-        if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
-            ShowFatalError(state, "InputProcessor::fieldValue: Invalid object type = " + objectType);
-        }
-        auto tempObjectType = tmp_umit->second;
-        find_iterators = objectCacheMap.find(tempObjectType);
-    }
-
-    auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
-    auto const &epJSON_schema_it_val = epJSON_schema_it.value();
-    auto const &schema_obj_props = getPatternProperties(state, epJSON_schema_it_val);
-    auto const &schema_field_obj = schema_obj_props[fieldName];
-    if (schema_field_obj.empty()) {
-        ShowFatalError(state, "InputProcessor::fieldValue: Invalid field name = " + fieldName + "for object type = " + objectType);
-    }
+    json schema_field_obj;
+    getFieldSchema(state, objectType, fieldName, schema_field_obj);
     bool isDefaulted = false;
     auto it = ep_object.find(fieldName);
     if (it != ep_object.end()) {
@@ -585,23 +570,8 @@ void InputProcessor::getFieldValue(
 void InputProcessor::getFieldValue(
     EnergyPlusData &state, std::string const &objectType, json const &ep_object, std::string const &fieldName, Real64 &value)
 {
-    auto find_iterators = objectCacheMap.find(objectType);
-    if (find_iterators == objectCacheMap.end()) {
-        auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(objectType));
-        if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
-            ShowFatalError(state, "InputProcessor::fieldValue: Invalid object type = " + objectType);
-        }
-        auto tempObjectType = tmp_umit->second;
-        find_iterators = objectCacheMap.find(tempObjectType);
-    }
-
-    auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
-    auto const &epJSON_schema_it_val = epJSON_schema_it.value();
-    auto const &schema_obj_props = getPatternProperties(state, epJSON_schema_it_val);
-    auto const &schema_field_obj = schema_obj_props[fieldName];
-    if (schema_field_obj.empty()) {
-        ShowFatalError(state, "InputProcessor::fieldValue: Invalid field name = " + fieldName + "for object type = " + objectType);
-    }
+    json schema_field_obj;
+    getFieldSchema(state, objectType, fieldName, schema_field_obj);
     bool isDefaulted = false;
     auto it = ep_object.find(fieldName);
     if (it != ep_object.end()) {
@@ -627,6 +597,27 @@ void InputProcessor::getFieldValue(
         }
     }
 }
+void InputProcessor::getFieldSchema(EnergyPlusData &state, std::string const &objectType, std::string const &fieldName, json &schema_field_obj)
+{
+    auto find_iterators = objectCacheMap.find(objectType);
+    if (find_iterators == objectCacheMap.end()) {
+        auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(objectType));
+        if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
+            ShowFatalError(state, "InputProcessor::fieldValue: Invalid object type = " + objectType);
+        }
+        auto tempObjectType = tmp_umit->second;
+        find_iterators = objectCacheMap.find(tempObjectType);
+    }
+
+    auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
+    auto const &epJSON_schema_it_val = epJSON_schema_it.value();
+    auto const &schema_obj_props = getPatternProperties(state, epJSON_schema_it_val);
+    schema_field_obj = schema_obj_props[fieldName];
+    if (schema_field_obj.empty()) {
+        ShowFatalError(state, "InputProcessor::fieldValue: Invalid field name = " + fieldName + "for object type = " + objectType);
+    }
+}
+
 std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string const &field_value, json const &schema_field_obj)
 {
     std::pair<std::string, bool> output;

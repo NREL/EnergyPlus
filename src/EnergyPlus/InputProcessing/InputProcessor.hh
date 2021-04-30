@@ -131,6 +131,8 @@ public:
 
     void getFieldValue(EnergyPlusData &state, std::string const &objectType, json const &ep_object, std::string const &fieldName, std::string &value);
 
+    void getFieldSchema(EnergyPlusData &state, std::string const &objectType, std::string const &fieldName, json &schema_field_obj);
+
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
     void getObjectItem(EnergyPlusData &state,
