@@ -256,6 +256,8 @@ bit_move( I const & from, P const & frompos, L const & len, I to, P const & topo
 }
 
 // Value Reinterpreted as Another Type
+// note that this is Undefined Behavior and it is being used
+// in E+
 template< typename I, typename U >
 inline
 U

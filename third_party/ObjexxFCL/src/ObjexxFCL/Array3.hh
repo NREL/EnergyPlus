@@ -111,7 +111,7 @@ protected: // Creation
 	{}
 
 	// Move Constructor
-	Array3( Array3 && a ) NOEXCEPT :
+	Array3( Array3 && a ) noexcept :
 	 Super( std::move( a ) ),
 	 I1_( a.I1_ ),
 	 I2_( a.I2_ ),
@@ -161,7 +161,7 @@ protected: // Creation
 	{}
 
 	// IndexRange + InitializerSentinel Constructor
-	Array3( IR const & I1, IR const & I2, IR const & I3, InitializerSentinel const & initialized ) :
+	Array3( IR const & I1, IR const & I2, IR const & I3, InitializerSentinel initialized ) :
 	 Super( size_of( I1, I2, I3 ), initialized ),
 	 I1_( I1 ),
 	 I2_( I2 ),
@@ -190,8 +190,7 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~Array3()
-	{}
+	~Array3() = default;
 
 public: // Assignment: Array
 

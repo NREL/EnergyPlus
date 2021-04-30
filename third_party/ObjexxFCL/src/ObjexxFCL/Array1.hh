@@ -104,8 +104,7 @@ protected: // Types
 protected: // Creation
 
 	// Default Constructor
-	Array1()
-	{}
+	Array1() = default;
 
 	// Copy Constructor
 	Array1( Array1 const & a ) :
@@ -114,7 +113,7 @@ protected: // Creation
 	{}
 
 	// Move Constructor
-	Array1( Array1 && a ) NOEXCEPT :
+	Array1( Array1 && a ) noexcept :
 	 Super( std::move( a ) ),
 	 I_( a.I_ )
 	{
@@ -153,7 +152,7 @@ protected: // Creation
 	{}
 
 	// IndexRange + InitializerSentinel Constructor
-	Array1( IR const & I, InitializerSentinel const & initialized ) :
+	Array1( IR const & I, InitializerSentinel initialized ) :
 	 Super( size_of( I ), initialized ),
 	 I_( I )
 	{}
@@ -217,54 +216,54 @@ protected: // Creation
 	{}
 
 	// Default Proxy Constructor
-	Array1( ProxySentinel const & proxy ) :
+	Array1( ProxySentinel proxy ) :
 	 Super( proxy )
 	{}
 
 	// Copy Proxy Constructor
-	Array1( Array1 const & a, ProxySentinel const & proxy ) :
+	Array1( Array1 const & a, ProxySentinel proxy ) :
 	 Super( a, proxy ),
 	 I_( a.I_ )
 	{}
 
 	// Slice Proxy Constructor
-	Array1( Array1S< T > const & a, ProxySentinel const & proxy ) :
+	Array1( Array1S< T > const & a, ProxySentinel proxy ) :
 	 Super( a, proxy ),
 	 I_( a.u() )
 	{}
 
 	// Base Proxy Constructor
-	Array1( Base const & a, ProxySentinel const & proxy ) :
+	Array1( Base const & a, ProxySentinel proxy ) :
 	 Super( a, proxy ),
 	 I_( a.isize() )
 	{}
 
 	// Value Proxy Constructor
-	Array1( T const & t, ProxySentinel const & proxy ) :
+	Array1( T const & t, ProxySentinel proxy ) :
 	 Super( t, proxy ),
 	 I_( _ )
 	{}
 
 	// Copy + IndexRange Proxy Constructor
-	Array1( Array1 const & a, IR const & I, ProxySentinel const & proxy ) :
+	Array1( Array1 const & a, IR const & I, ProxySentinel proxy ) :
 	 Super( a, proxy ),
 	 I_( I )
 	{}
 
 	// Slice + IndexRange Proxy Constructor
-	Array1( Array1S< T > const & a, IR const & I, ProxySentinel const & proxy ) :
+	Array1( Array1S< T > const & a, IR const & I, ProxySentinel proxy ) :
 	 Super( a, proxy ),
 	 I_( I )
 	{}
 
 	// Base + IndexRange Proxy Constructor
-	Array1( Base const & a, IR const & I, ProxySentinel const & proxy ) :
+	Array1( Base const & a, IR const & I, ProxySentinel proxy ) :
 	 Super( a, proxy ),
 	 I_( I )
 	{}
 
 	// Value + IndexRange Proxy Constructor
-	Array1( T const & t, IR const & I, ProxySentinel const & proxy ) :
+	Array1( T const & t, IR const & I, ProxySentinel proxy ) :
 	 Super( t, proxy ),
 	 I_( I )
 	{}
@@ -273,8 +272,7 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~Array1()
-	{}
+	~Array1() = default;
 
 public: // Assignment: Array
 

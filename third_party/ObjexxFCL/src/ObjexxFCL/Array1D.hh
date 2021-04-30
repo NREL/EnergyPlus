@@ -116,7 +116,7 @@ public: // Creation
 	{}
 
 	// Move Constructor
-	Array1D( Array1D && a ) NOEXCEPT :
+	Array1D( Array1D && a ) noexcept :
 	 Super( std::move( a ) )
 	{
 	}
@@ -171,7 +171,7 @@ public: // Creation
 
 	// IndexRange + Initializer Value Constructor
 	Array1D( IR const & I, T const & t ) :
-	 Super( I, InitializerSentinel() )
+	 Super( I, InitializerSentinel{} )
 	{
 		setup_real();
 		initialize( t );
@@ -179,7 +179,7 @@ public: // Creation
 
 	// IndexRange + Initializer Function Constructor
 	Array1D( IR const & I, InitializerFunction const & fxn ) :
-	 Super( I, InitializerSentinel() )
+	 Super( I, InitializerSentinel{} )
 	{
 		setup_real();
 		initialize( fxn );
@@ -196,7 +196,7 @@ public: // Creation
 	// IndexRange + Super Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array1D( IR const & I, Array1< U > const & a ) :
-	 Super( I, InitializerSentinel() )
+	 Super( I, InitializerSentinel{} )
 	{
 		assert( conformable( a ) );
 		setup_real();
@@ -207,7 +207,7 @@ public: // Creation
 	// IndexRange + Slice Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array1D( IR const & I, Array1S< U > const & a ) :
-	 Super( I, InitializerSentinel() )
+	 Super( I, InitializerSentinel{} )
 	{
 		assert( conformable( a ) );
 		setup_real();
@@ -220,7 +220,7 @@ public: // Creation
 	// Super + IndexRange Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array1D( Array1< U > const & a, IR const & I ) :
-	 Super( I, InitializerSentinel() )
+	 Super( I, InitializerSentinel{} )
 	{
 		assert( conformable( a ) );
 		setup_real();
@@ -230,7 +230,7 @@ public: // Creation
 	// IndexRange + Base Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array1D( IR const & I, Array< U > const & a ) :
-	 Super( I, InitializerSentinel() )
+	 Super( I, InitializerSentinel{} )
 	{
 		assert( size_ == a.size() );
 		setup_real();
@@ -240,7 +240,7 @@ public: // Creation
 	// Base + IndexRange Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array1D( Array< U > const & a, IR const & I ) :
-	 Super( I, InitializerSentinel() )
+	 Super( I, InitializerSentinel{} )
 	{
 		assert( size_ == a.size() );
 		setup_real();
@@ -283,7 +283,7 @@ public: // Creation
 	// Initializer List Index Range + Initializer Value Constructor Template
 	template< typename U >
 	Array1D( std::initializer_list< U > const l, T const & t ) :
-	 Super( IR( l ), InitializerSentinel() )
+	 Super( IR( l ), InitializerSentinel{} )
 	{
 		assert( l.size() == 2 );
 		setup_real();
@@ -293,7 +293,7 @@ public: // Creation
 	// Initializer List Index Range + Initializer Function Constructor Template
 	template< typename U >
 	Array1D( std::initializer_list< U > const l, InitializerFunction const & fxn ) :
-	 Super( IR( l ), InitializerSentinel() )
+	 Super( IR( l ), InitializerSentinel{} )
 	{
 		assert( l.size() == 2 );
 		setup_real();
@@ -303,7 +303,7 @@ public: // Creation
 	// Initializer List Index Range + Super Constructor Template
 	template< typename U, typename V, class = typename std::enable_if< std::is_constructible< T, V >::value >::type >
 	Array1D( std::initializer_list< U > const l, Array1< V > const & a ) :
-	 Super( IR( l ), InitializerSentinel() )
+	 Super( IR( l ), InitializerSentinel{} )
 	{
 		assert( l.size() == 2 );
 		assert( conformable( a ) );
@@ -314,7 +314,7 @@ public: // Creation
 	// Initializer List Index Range + Base Constructor Template
 	template< typename U, typename V, class = typename std::enable_if< std::is_constructible< T, V >::value >::type >
 	Array1D( std::initializer_list< U > const l, Array< V > const & a ) :
-	 Super( IR( l ), InitializerSentinel() )
+	 Super( IR( l ), InitializerSentinel{} )
 	{
 		assert( l.size() == 2 );
 		assert( size_ == a.size() );
@@ -453,14 +453,13 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~Array1D()
-	{}
+	~Array1D() = default;
 
 private: // Creation
 
 	// IndexRange Raw Constructor
 	explicit
-	Array1D( IR const & I, InitializerSentinel const & initialized ) :
+	Array1D( IR const & I, InitializerSentinel initialized ) :
 	 Super( I, initialized )
 	{
 		setup_real();
@@ -485,7 +484,7 @@ public: // Assignment: Array
 
 	// Move Assignment
 	Array1D &
-	operator =( Array1D && a ) NOEXCEPT
+	operator =( Array1D && a ) noexcept
 	{
 		if ( conformable( a ) ) {
 			Base::conformable_move( a );
@@ -1043,7 +1042,7 @@ public: // Modifier
 			size_ = new_size;
 			return *this;
 		} else { // Allocate new space
-			Array1D o( I, InitializerSentinel() );
+			Array1D o( I, InitializerSentinel{} );
 			auto const l_( l() );
 			auto const I_l_( I.l() );
 			auto const l_max_( std::max( l_, I_l_ ) );
@@ -1123,7 +1122,7 @@ public: // Modifier
 			size_ = new_size;
 			return *this;
 		} else { // Allocate new space
-			Array1D o( I, InitializerSentinel() );
+			Array1D o( I, InitializerSentinel{} );
 			auto const l_( l() );
 			auto const I_l_( I.l() );
 			auto const l_max_( std::max( l_, I_l_ ) );
@@ -1171,7 +1170,7 @@ public: // Modifier
 	append( T const & t )
 	{
 		if ( capacity_ == size_ ) { // Grow by 1
-			Array1D o( IndexRange( l(), u() + 1 ), InitializerSentinel() );
+			Array1D o( IndexRange( l(), u() + 1 ), InitializerSentinel{} );
 			for ( int i = l(), e = u(); i <= e; ++i ) {
 				new ( &o( i ) ) T( move_if( operator ()( i ) ) );
 			}
@@ -1191,7 +1190,7 @@ public: // Modifier
 	append( T && t )
 	{
 		if ( capacity_ == size_ ) { // Grow by 1
-			Array1D o( IndexRange( l(), u() + 1 ), InitializerSentinel() );
+			Array1D o( IndexRange( l(), u() + 1 ), InitializerSentinel{} );
 			for ( int i = l(), e = u(); i <= e; ++i ) {
 				new ( &o( i ) ) T( std::move( operator ()( i ) ) );
 			}

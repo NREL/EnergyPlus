@@ -118,7 +118,7 @@ public: // Creation
 	{}
 
 	// Move Constructor
-	Array2D( Array2D && a ) NOEXCEPT :
+	Array2D( Array2D && a ) noexcept :
 	 Super( std::move( a ) )
 	{
 	}
@@ -161,7 +161,7 @@ public: // Creation
 
 	// IndexRange + Initializer Value Constructor
 	Array2D( IR const & I1, IR const & I2, T const & t ) :
-	 Super( I1, I2, InitializerSentinel() )
+	 Super( I1, I2, InitializerSentinel{} )
 	{
 		setup_real();
 		initialize( t );
@@ -170,7 +170,7 @@ public: // Creation
 
 	// IndexRange + Initializer Function Constructor
 	Array2D( IR const & I1, IR const & I2, InitializerFunction const & fxn ) :
-	 Super( I1, I2, InitializerSentinel() )
+	 Super( I1, I2, InitializerSentinel{} )
 	{
 		setup_real();
 		initialize( fxn );
@@ -188,7 +188,7 @@ public: // Creation
 	// IndexRange + Super Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array2D( IR const & I1, IR const & I2, Array2< U > const & a ) :
-	 Super( I1, I2, InitializerSentinel() )
+	 Super( I1, I2, InitializerSentinel{} )
 	{
 		assert( conformable( a ) );
 		setup_real();
@@ -198,7 +198,7 @@ public: // Creation
 	// IndexRange + Slice Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array2D( IR const & I1, IR const & I2, Array2S< U > const & a ) :
-	 Super( I1, I2, InitializerSentinel() )
+	 Super( I1, I2, InitializerSentinel{} )
 	{
 		assert( conformable( a ) );
 		setup_real();
@@ -213,7 +213,7 @@ public: // Creation
 	// Super + IndexRange Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array2D( Array2< U > const & a, IR const & I1, IR const & I2 ) :
-	 Super( I1, I2, InitializerSentinel() )
+	 Super( I1, I2, InitializerSentinel{} )
 	{
 		assert( conformable( a ) );
 		setup_real();
@@ -223,7 +223,7 @@ public: // Creation
 	// IndexRange + Base Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array2D( IR const & I1, IR const & I2, Array< U > const & a ) :
-	 Super( I1, I2, InitializerSentinel() )
+	 Super( I1, I2, InitializerSentinel{} )
 	{
 		assert( size_ == a.size() );
 		setup_real();
@@ -233,7 +233,7 @@ public: // Creation
 	// Base + IndexRange Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array2D( Array< U > const & a, IR const & I1, IR const & I2 ) :
-	 Super( I1, I2, InitializerSentinel() )
+	 Super( I1, I2, InitializerSentinel{} )
 	{
 		assert( size_ == a.size() );
 		setup_real();
@@ -299,14 +299,13 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~Array2D()
-	{}
+	~Array2D() = default;
 
 private: // Creation
 
 	// IndexRange Raw Constructor
 	explicit
-	Array2D( IR const & I1, IR const & I2, InitializerSentinel const & initialized ) :
+	Array2D( IR const & I1, IR const & I2, InitializerSentinel initialized ) :
 	 Super( I1, I2, initialized )
 	{
 		setup_real();
@@ -330,7 +329,7 @@ public: // Assignment: Array
 
 	// Move Assignment
 	Array2D &
-	operator =( Array2D && a ) NOEXCEPT
+	operator =( Array2D && a ) noexcept
 	{
 		if ( conformable( a ) ) {
 			Base::conformable_move( a );

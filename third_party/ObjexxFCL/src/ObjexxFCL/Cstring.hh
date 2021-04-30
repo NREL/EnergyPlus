@@ -13,9 +13,6 @@
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/noexcept.hh>
-
 // C++ Headers
 #include <algorithm>
 #include <cassert>
@@ -63,7 +60,7 @@ public: // Creation
 	}
 
 	// Move Constructor
-	Cstring( Cstring && s ) NOEXCEPT :
+	Cstring( Cstring && s ) noexcept :
 	 str_( s.str_ )
 	{
 		s.str_ = nullptr;
@@ -186,7 +183,7 @@ public: // Assignment
 
 	// Move Assignment
 	Cstring &
-	operator =( Cstring && s ) NOEXCEPT
+	operator =( Cstring && s ) noexcept
 	{
 		assert( this != &s );
 		delete[] str_;

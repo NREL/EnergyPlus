@@ -112,7 +112,7 @@ protected: // Creation
 	{}
 
 	// Move Constructor
-	Array2( Array2 && a ) NOEXCEPT :
+	Array2( Array2 && a ) noexcept :
 	 Super( std::move( a ) ),
 	 I1_( a.I1_ ),
 	 I2_( a.I2_ ),
@@ -154,7 +154,7 @@ protected: // Creation
 	{}
 
 	// IndexRange + InitializerSentinel Constructor
-	Array2( IR const & I1, IR const & I2, InitializerSentinel const & initialized ) :
+	Array2( IR const & I1, IR const & I2, InitializerSentinel initialized ) :
 	 Super( size_of( I1, I2 ), initialized ),
 	 I1_( I1 ),
 	 I2_( I2 ),
@@ -175,14 +175,14 @@ protected: // Creation
 	}
 
 	// Default Proxy Constructor
-	Array2( ProxySentinel const & proxy ) :
+	Array2( ProxySentinel proxy ) :
 	 Super( proxy ),
 	 z1_( 0u ),
 	 z2_( 0u )
 	{}
 
 	// Copy Proxy Constructor
-	Array2( Array2 const & a, ProxySentinel const & proxy ) :
+	Array2( Array2 const & a, ProxySentinel proxy ) :
 	 Super( a, proxy ),
 	 I1_( a.I1_ ),
 	 I2_( a.I2_ ),
@@ -191,7 +191,7 @@ protected: // Creation
 	{}
 
 	// Slice Proxy Constructor
-	Array2( Array2S< T > const & a, ProxySentinel const & proxy ) :
+	Array2( Array2S< T > const & a, ProxySentinel proxy ) :
 	 Super( a, proxy ),
 	 I1_( a.u1() ),
 	 I2_( a.u2() ),
@@ -200,7 +200,7 @@ protected: // Creation
 	{}
 
 	// Base Proxy Constructor
-	Array2( Base const & a, ProxySentinel const & proxy ) :
+	Array2( Base const & a, ProxySentinel proxy ) :
 	 Super( a, proxy ),
 	 I1_( a.isize() ),
 	 I2_( 1 ),
@@ -209,7 +209,7 @@ protected: // Creation
 	{}
 
 	// Value Proxy Constructor
-	Array2( T const & t, ProxySentinel const & proxy ) :
+	Array2( T const & t, ProxySentinel proxy ) :
 	 Super( t, proxy ),
 	 I1_( _ ),
 	 I2_( 1 ),
@@ -218,7 +218,7 @@ protected: // Creation
 	{}
 
 	// Copy + IndexRange Proxy Constructor
-	Array2( Array2 const & a, IR const & I1, IR const & I2, ProxySentinel const & proxy ) :
+	Array2( Array2 const & a, IR const & I1, IR const & I2, ProxySentinel proxy ) :
 	 Super( a, proxy ),
 	 I1_( I1 ),
 	 I2_( I2 ),
@@ -227,7 +227,7 @@ protected: // Creation
 	{}
 
 	// Slice + IndexRange Proxy Constructor
-	Array2( Array2S< T > const & a, IR const & I1, IR const & I2, ProxySentinel const & proxy ) :
+	Array2( Array2S< T > const & a, IR const & I1, IR const & I2, ProxySentinel proxy ) :
 	 Super( a, proxy ),
 	 I1_( I1 ),
 	 I2_( I2 ),
@@ -236,7 +236,7 @@ protected: // Creation
 	{}
 
 	// Base + IndexRange Proxy Constructor
-	Array2( Base const & a, IR const & I1, IR const & I2, ProxySentinel const & proxy ) :
+	Array2( Base const & a, IR const & I1, IR const & I2, ProxySentinel proxy ) :
 	 Super( a, proxy ),
 	 I1_( I1 ),
 	 I2_( I2 ),
@@ -245,7 +245,7 @@ protected: // Creation
 	{}
 
 	// Value + IndexRange Proxy Constructor
-	Array2( T const & t, IR const & I1, IR const & I2, ProxySentinel const & proxy ) :
+	Array2( T const & t, IR const & I1, IR const & I2, ProxySentinel proxy ) :
 	 Super( t, proxy ),
 	 I1_( I1 ),
 	 I2_( I2 ),
@@ -257,8 +257,7 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~Array2()
-	{}
+	~Array2() = default;
 
 public: // Assignment: Array
 

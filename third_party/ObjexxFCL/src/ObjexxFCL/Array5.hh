@@ -118,7 +118,7 @@ protected: // Creation
 	{}
 
 	// Move Constructor
-	Array5( Array5 && a ) NOEXCEPT :
+	Array5( Array5 && a ) noexcept :
 	 Super( std::move( a ) ),
 	 I1_( a.I1_ ),
 	 I2_( a.I2_ ),
@@ -139,8 +139,7 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~Array5()
-	{}
+	~Array5() = default;
 
 public: // Assignment: Array
 

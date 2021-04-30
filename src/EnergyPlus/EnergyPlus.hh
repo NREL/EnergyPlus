@@ -79,16 +79,13 @@ typedef std::int64_t Int64;
 #include <ObjexxFCL/Array4D.fwd.hh>
 #include <ObjexxFCL/Array5D.fwd.hh>
 #include <ObjexxFCL/MArray1.fwd.hh>
-#include <ObjexxFCL/Omit.fwd.hh>
+#include <ObjexxFCL/Omit.hh>
 #include <ObjexxFCL/Optional.fwd.hh>
 #include <ObjexxFCL/Reference.fwd.hh>
 #include <ObjexxFCL/Vector2.fwd.hh>
 #include <ObjexxFCL/Vector3.fwd.hh>
 #include <ObjexxFCL/Vector4.fwd.hh>
 
-namespace ObjexxFCL {
-extern Omit const _;
-} // namespace ObjexxFCL
 using ObjexxFCL::_;
 
 using ObjexxFCL::Array1;

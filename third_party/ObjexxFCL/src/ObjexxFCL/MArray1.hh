@@ -92,8 +92,7 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~MArray1()
-	{}
+	~MArray1() = default;
 
 public: // Assignment: Array
 

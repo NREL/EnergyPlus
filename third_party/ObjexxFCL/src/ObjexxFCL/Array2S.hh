@@ -139,8 +139,7 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~Array2S()
-	{}
+	~Array2S() = default;
 
 public: // Assignment: Array
 

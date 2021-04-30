@@ -73,14 +73,11 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~MArray()
-	{}
-
-protected: // Assignment
+	~MArray() = default;
 
 	// Copy Assignment
 	MArray &
-	operator =( MArray const & a ); // Disallow
+	operator =( MArray const & a ) = delete;
 
 public: // Predicate
 

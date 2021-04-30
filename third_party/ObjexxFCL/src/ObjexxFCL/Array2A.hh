@@ -83,83 +83,82 @@ public: // Creation
 
 	// Default Constructor
 	Array2A() :
-	 Super( ProxySentinel() )
+	 Super( ProxySentinel{} )
 	{}
 
 	// Copy Constructor
 	Array2A( Array2A const & a ) :
-	 Super( a, ProxySentinel() )
+	 Super( a, ProxySentinel{} )
 	{
 		shift_set( a.shift_ );
 	}
 
 	// Super Constructor
 	Array2A( Super const & a ) :
-	 Super( a, ProxySentinel() )
+	 Super( a, ProxySentinel{} )
 	{
 		shift_set( a.shift_ );
 	}
 
 	// Slice Constructor
 	Array2A( Array2S< T > const & a ) :
-	 Super( a, ProxySentinel() )
+	 Super( a, ProxySentinel{} )
 	{
 		shift_set( a.shift() );
 	}
 
 	// Base Constructor
 	Array2A( Base const & a ) :
-	 Super( a, ProxySentinel() )
+	 Super( a, ProxySentinel{} )
 	{
 		shift_set( 2 );
 	}
 
 	// Value Constructor
 	Array2A( T const & t ) :
-	 Super( t, ProxySentinel() )
+	 Super( t, ProxySentinel{} )
 	{
 		shift_set( 2 );
 	}
 
 	// Copy + IndexRange Constructor
 	Array2A( Array2A const & a, IR const & I1, IR const & I2 ) :
-	 Super( a, I1, I2, ProxySentinel() )
+	 Super( a, I1, I2, ProxySentinel{} )
 	{
 		dimension_argument();
 	}
 
 	// Super + IndexRange Constructor
 	Array2A( Super const & a, IR const & I1, IR const & I2 ) :
-	 Super( a, I1, I2, ProxySentinel() )
+	 Super( a, I1, I2, ProxySentinel{} )
 	{
 		dimension_argument();
 	}
 
 	// Slice + IndexRange Constructor
 	Array2A( Array2S< T > const & a, IR const & I1, IR const & I2 ) :
-	 Super( a, I1, I2, ProxySentinel() )
+	 Super( a, I1, I2, ProxySentinel{} )
 	{
 		dimension_argument();
 	}
 
 	// Base + IndexRange Constructor
 	Array2A( Base const & a, IR const & I1, IR const & I2 ) :
-	 Super( a, I1, I2, ProxySentinel() )
+	 Super( a, I1, I2, ProxySentinel{} )
 	{
 		dimension_argument();
 	}
 
 	// Value + IndexRange Constructor
 	Array2A( T const & t, IR const & I1, IR const & I2 ) :
-	 Super( t, I1, I2, ProxySentinel() )
+	 Super( t, I1, I2, ProxySentinel{} )
 	{
 		dimension_argument();
 	}
 
 	// Destructor
 	virtual
-	~Array2A()
-	{}
+	~Array2A() = default;
 
 public: // Assignment: Array
 

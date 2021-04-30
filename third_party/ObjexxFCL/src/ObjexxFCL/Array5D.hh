@@ -134,7 +134,7 @@ public: // Creation
 	{}
 
 	// Move Constructor
-	Array5D( Array5D && a ) NOEXCEPT :
+	Array5D( Array5D && a ) noexcept :
 	 Super( std::move( a ) )
 	{
 	}
@@ -155,7 +155,7 @@ public: // Creation
 
 	// IndexRange + Initializer Value Constructor
 	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, T const & t ) :
-	 Super( I1, I2, I3, I4, I5, InitializerSentinel() )
+	 Super( I1, I2, I3, I4, I5, InitializerSentinel{} )
 	{
 		setup_real();
 		initialize( t );
@@ -172,7 +172,7 @@ public: // Creation
 	// Super + IndexRange Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array5D( Array5< U > const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 ) :
-	 Super( I1, I2, I3, I4, I5, InitializerSentinel() )
+	 Super( I1, I2, I3, I4, I5, InitializerSentinel{} )
 	{
 		assert( conformable( a ) );
 		setup_real();
@@ -182,7 +182,7 @@ public: // Creation
 	// IndexRange + Base Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Array< U > const & a ) :
-	 Super( I1, I2, I3, I4, I5, InitializerSentinel() )
+	 Super( I1, I2, I3, I4, I5, InitializerSentinel{} )
 	{
 		assert( size_ == a.size() );
 		setup_real();
@@ -192,7 +192,7 @@ public: // Creation
 	// Base + IndexRange Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array5D( Array< U > const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 ) :
-	 Super( I1, I2, I3, I4, I5, InitializerSentinel() )
+	 Super( I1, I2, I3, I4, I5, InitializerSentinel{} )
 	{
 		assert( size_ == a.size() );
 		setup_real();
@@ -210,8 +210,7 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~Array5D()
-	{}
+	~Array5D() = default;
 
 
 public: // Assignment: Array
@@ -232,7 +231,7 @@ public: // Assignment: Array
 
 	// Move Assignment
 	Array5D &
-	operator =( Array5D && a ) NOEXCEPT
+	operator =( Array5D && a ) noexcept
 	{
 		if ( conformable( a ) ) {
 			Base::conformable_move( a );

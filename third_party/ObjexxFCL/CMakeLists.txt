@@ -59,7 +59,6 @@ set(src
   src/ObjexxFCL/ArrayS.functions.hh
   src/ObjexxFCL/ArrayS.fwd.hh
   src/ObjexxFCL/ArrayS.hh
-  src/ObjexxFCL/BArray.cc
   src/ObjexxFCL/BArray.fwd.hh
   src/ObjexxFCL/BArray.hh
   src/ObjexxFCL/bit.hh
@@ -97,14 +96,11 @@ set(src
   src/ObjexxFCL/MArrayR.fwd.hh
   src/ObjexxFCL/MArrayR.hh
   src/ObjexxFCL/member.functions.hh
-  src/ObjexxFCL/noexcept.hh
   src/ObjexxFCL/numeric.cc
   src/ObjexxFCL/numeric.hh
   src/ObjexxFCL/ObjexxFCL.fwd.hh
   src/ObjexxFCL/ObjexxFCL.hh
   src/ObjexxFCL/ObjexxFCL.Project.hh
-  src/ObjexxFCL/Omit.cc
-  src/ObjexxFCL/Omit.fwd.hh
   src/ObjexxFCL/Omit.hh
   src/ObjexxFCL/Optional.fwd.hh
   src/ObjexxFCL/Optional.hh

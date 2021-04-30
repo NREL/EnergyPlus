@@ -123,7 +123,7 @@ public: // Creation
 	{}
 
 	// Move Constructor
-	Array3D( Array3D && a ) NOEXCEPT :
+	Array3D( Array3D && a ) noexcept :
 	 Super( std::move( a ) )
 	{
 	}
@@ -169,7 +169,7 @@ public: // Creation
 
 	// IndexRange + Initializer Value Constructor
 	Array3D( IR const & I1, IR const & I2, IR const & I3, T const & t ) :
-	 Super( I1, I2, I3, InitializerSentinel() )
+	 Super( I1, I2, I3, InitializerSentinel{} )
 	{
 		setup_real();
 		initialize( t );
@@ -177,7 +177,7 @@ public: // Creation
 
 	// IndexRange + Initializer Function Constructor
 	Array3D( IR const & I1, IR const & I2, IR const & I3, InitializerFunction const & fxn ) :
-	 Super( I1, I2, I3, InitializerSentinel() )
+	 Super( I1, I2, I3, InitializerSentinel{} )
 	{
 		setup_real();
 		initialize( fxn );
@@ -194,7 +194,7 @@ public: // Creation
 	// IndexRange + Super Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array3D( IR const & I1, IR const & I2, IR const & I3, Array3< U > const & a ) :
-	 Super( I1, I2, I3, InitializerSentinel() )
+	 Super( I1, I2, I3, InitializerSentinel{} )
 	{
 		assert( conformable( a ) );
 		setup_real();
@@ -204,7 +204,7 @@ public: // Creation
 	// IndexRange + Slice Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array3D( IR const & I1, IR const & I2, IR const & I3, Array3S< U > const & a ) :
-	 Super( I1, I2, I3, InitializerSentinel() )
+	 Super( I1, I2, I3, InitializerSentinel{} )
 	{
 		assert( conformable( a ) );
 		setup_real();
@@ -222,7 +222,7 @@ public: // Creation
 	// Super + IndexRange Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array3D( Array3< U > const & a, IR const & I1, IR const & I2, IR const & I3 ) :
-	 Super( I1, I2, I3, InitializerSentinel() )
+	 Super( I1, I2, I3, InitializerSentinel{} )
 	{
 		assert( conformable( a ) );
 		setup_real();
@@ -232,7 +232,7 @@ public: // Creation
 	// IndexRange + Base Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array3D( IR const & I1, IR const & I2, IR const & I3, Array< U > const & a ) :
-	 Super( I1, I2, I3, InitializerSentinel() )
+	 Super( I1, I2, I3, InitializerSentinel{} )
 	{
 		assert( size_ == a.size() );
 		setup_real();
@@ -242,7 +242,7 @@ public: // Creation
 	// Base + IndexRange Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array3D( Array< U > const & a, IR const & I1, IR const & I2, IR const & I3 ) :
-	 Super( I1, I2, I3, InitializerSentinel() )
+	 Super( I1, I2, I3, InitializerSentinel{} )
 	{
 		assert( size_ == a.size() );
 		setup_real();
@@ -289,14 +289,13 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~Array3D()
-	{}
+	~Array3D() = default;
 
 private: // Creation
 
 	// IndexRange Raw Constructor
 	explicit
-	Array3D( IR const & I1, IR const & I2, IR const & I3, InitializerSentinel const & initialized ) :
+	Array3D( IR const & I1, IR const & I2, IR const & I3, InitializerSentinel initialized ) :
 	 Super( I1, I2, I3, initialized )
 	{
 		setup_real();
@@ -320,7 +319,7 @@ public: // Assignment: Array
 
 	// Move Assignment
 	Array3D &
-	operator =( Array3D && a ) NOEXCEPT
+	operator =( Array3D && a ) noexcept
 	{
 		if ( conformable( a ) ) {
 			Base::conformable_move( a );

@@ -130,7 +130,7 @@ protected: // Creation
 	}
 
 	// Move Constructor
-	Array( Array && a ) NOEXCEPT :
+	Array( Array && a ) noexcept :
 	 BArray( std::move( a ) ),
 	 owner_( a.owner_ ),
 	 capacity_( a.capacity_ ),
@@ -212,7 +212,7 @@ protected: // Creation
 	}
 
 	// Size + InitializerSentinel Constructor
-	Array( size_type const size, InitializerSentinel const & ) :
+	Array( size_type const size, InitializerSentinel ) :
 	 owner_( true ),
 	 capacity_( size_of( size ) ),
 	 size_( capacity_ ),
@@ -339,7 +339,7 @@ protected: // Creation
 	}
 
 	// Default Proxy Constructor
-	Array( ProxySentinel const & ) :
+	Array( ProxySentinel ) :
 	 owner_( false ),
 	 capacity_( 0u ),
 	 size_( 0u ),
@@ -350,7 +350,7 @@ protected: // Creation
 	{}
 
 	// Array Proxy Constructor
-	Array( Array const & a, ProxySentinel const & ) :
+	Array( Array const & a, ProxySentinel ) :
 	 owner_( false ),
 	 capacity_( a.capacity_ ),
 	 size_( a.size_ ),
@@ -361,7 +361,7 @@ protected: // Creation
 	{}
 
 	// Slice Proxy Constructor
-	Array( ArrayS< T > const & a, ProxySentinel const & ) :
+	Array( ArrayS< T > const & a, ProxySentinel ) :
 	 owner_( false ),
 	 capacity_( a.size() ),
 	 size_( a.size() ),
@@ -375,7 +375,7 @@ protected: // Creation
 
 
 	// Value Proxy Constructor
-	Array( T const & t, ProxySentinel const & ) :
+	Array( T const & t, ProxySentinel ) :
 	 owner_( false ),
 	 capacity_( npos ), // Unknown
 	 size_( npos ), // Unbounded
@@ -419,7 +419,7 @@ protected: // Assignment: Array
 
 	// Move Assignment
 	void
-	operator =( Array && a ) NOEXCEPT
+	operator =( Array && a ) noexcept
 	{
 		assert( this != &a );
 		assert( owner_ == a.owner_ );

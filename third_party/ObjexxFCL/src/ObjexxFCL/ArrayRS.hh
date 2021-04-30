@@ -98,8 +98,7 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~ArrayRS()
-	{}
+	~ArrayRS() = default;
 
 public: // Predicate
 
