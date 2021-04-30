@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,9 +51,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -63,74 +63,74 @@ using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, DataPlant_AnyPlantLoopSidesNeedSim)
 {
-    TotNumLoops = 3;
-    PlantLoop.allocate(TotNumLoops);
-    for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+    state->dataPlnt->TotNumLoops = 3;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
     }
 
-    EXPECT_TRUE(PlantUtilities::AnyPlantLoopSidesNeedSim()); // SimLoopSideNeeded is set to true in default ctor
-    PlantUtilities::SetAllPlantSimFlagsToValue(false);       // Set all SimLoopSideNeeded to false
-    EXPECT_FALSE(PlantUtilities::AnyPlantLoopSidesNeedSim());
+    EXPECT_TRUE(PlantUtilities::AnyPlantLoopSidesNeedSim(*state)); // SimLoopSideNeeded is set to true in default ctor
+    PlantUtilities::SetAllPlantSimFlagsToValue(*state, false);     // Set all SimLoopSideNeeded to false
+    EXPECT_FALSE(PlantUtilities::AnyPlantLoopSidesNeedSim(*state));
 }
 
 TEST_F(EnergyPlusFixture, DataPlant_verifyTwoNodeNumsOnSamePlantLoop)
 {
 
     // not using the DataPlantTest base class because of how specific this one is and that one is very general
-    if (PlantLoop.allocated()) PlantLoop.deallocate();
-    TotNumLoops = 2;
-    PlantLoop.allocate(2);
-    PlantLoop(1).LoopSide.allocate(2);
-    PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    PlantLoop(2).LoopSide.allocate(2);
-    PlantLoop(2).LoopSide(1).Branch.allocate(1);
-    PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
-    PlantLoop(2).LoopSide(2).Branch.allocate(1);
-    PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
+    if (state->dataPlnt->PlantLoop.allocated()) state->dataPlnt->PlantLoop.deallocate();
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
 
     // initialize all node numbers to zero
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
-    PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 0;
-    PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumOut = 0;
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
-    PlantLoop(2).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 0;
-    PlantLoop(2).LoopSide(2).Branch(1).Comp(1).NodeNumOut = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumOut = 0;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 0;
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp(1).NodeNumOut = 0;
 
     // specify the node numbers of interest
     int const nodeNumA = 1;
     int const nodeNumB = 2;
 
     // first test, expected pass
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
-    PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 2;
-    EXPECT_TRUE(PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop(nodeNumA, nodeNumB));
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 2;
+    EXPECT_TRUE(PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop(*state, nodeNumA, nodeNumB));
 
     // reset node numbers
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
-    PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 0;
 
     // second test, expected false
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
-    EXPECT_FALSE(PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop(nodeNumA, nodeNumB));
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
+    EXPECT_FALSE(PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop(*state, nodeNumA, nodeNumB));
 
-    TotNumLoops = 0;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp.deallocate();
-    PlantLoop(1).LoopSide(1).Branch.deallocate();
-    PlantLoop(1).LoopSide(2).Branch(1).Comp.deallocate();
-    PlantLoop(1).LoopSide(2).Branch.deallocate();
-    PlantLoop(1).LoopSide.deallocate();
-    PlantLoop(2).LoopSide(1).Branch(1).Comp.deallocate();
-    PlantLoop(2).LoopSide(1).Branch.deallocate();
-    PlantLoop(2).LoopSide(2).Branch(1).Comp.deallocate();
-    PlantLoop(2).LoopSide(2).Branch.deallocate();
-    PlantLoop(2).LoopSide.deallocate();
-    PlantLoop.deallocate();
+    state->dataPlnt->TotNumLoops = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.deallocate();
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.deallocate();
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.deallocate();
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.deallocate();
+    state->dataPlnt->PlantLoop(1).LoopSide.deallocate();
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.deallocate();
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.deallocate();
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp.deallocate();
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch.deallocate();
+    state->dataPlnt->PlantLoop(2).LoopSide.deallocate();
+    state->dataPlnt->PlantLoop.deallocate();
 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,215 +48,212 @@
 #ifndef DataGlobalConstants_hh_INCLUDED
 #define DataGlobalConstants_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
+// C++ Headers
+#include <map>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace DataGlobalConstants {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // End Use Parameters
-    extern int const NumEndUses;
+    enum class EndUse
+    {
+        Heating,
+        Cooling,
+        InteriorLights,
+        ExteriorLights,
+        InteriorEquipment,
+        ExteriorEquipment,
+        Fans,
+        Pumps,
+        HeatRejection,
+        Humidification,
+        HeatRecovery,
+        WaterSystem,
+        Refrigeration,
+        Cogeneration
+    };
 
-    extern int const endUseHeating;
-    extern int const endUseCooling;
-    extern int const endUseInteriorLights;
-    extern int const endUseExteriorLights;
-    extern int const endUseInteriorEquipment;
-    extern int const endUseExteriorEquipment;
-    extern int const endUseFans;
-    extern int const endUsePumps;
-    extern int const endUseHeatRejection;
-    extern int const endUseHumidification;
-    extern int const endUseHeatRecovery;
-    extern int const endUseWaterSystem;
-    extern int const endUseRefrigeration;
-    extern int const endUseCogeneration;
+    enum class ResourceType
+    {
+        None,
+        Electricity,
+        Natural_Gas,
+        Gasoline,
+        Diesel,
+        Coal,
+        FuelOil_1,
+        FuelOil_2,
+        Propane,
+        Water,
+        EnergyTransfer,
+        Steam,
+        DistrictCooling,
+        DistrictHeating,
+        ElectricityProduced,
+        ElectricityPurchased,
+        ElectricitySurplusSold,
+        ElectricityNet,
+        SolarWater,
+        SolarAir,
+        SO2,
+        NOx,
+        N2O,
+        PM,
+        PM2_5,
+        PM10,
+        CO,
+        CO2,
+        CH4,
+        NH3,
+        NMVOC,
+        Hg,
+        Pb,
+        NuclearHigh,
+        NuclearLow,
+        WaterEnvironmentalFactors,
+        CarbonEquivalent,
+        Source,
+        PlantLoopHeatingDemand,
+        PlantLoopCoolingDemand,
+        OnSiteWater,
+        MainsWater,
+        RainWater,
+        WellWater,
+        Condensate,
+        OtherFuel1,
+        OtherFuel2
+    };
 
-    // Resource Types
-    extern std::string const cRT_None;
-    extern std::string const cRT_NoneUC;
-    extern int const iRT_None;
-    extern std::string const cRT_Electricity;
-    extern std::string const cRT_ElectricityUC;
-    extern int const iRT_Electricity;
-    extern std::string const cRT_Natural_Gas;
-    extern std::string const cRT_Natural_GasUC;
-    extern int const iRT_Natural_Gas;
-    extern std::string const cRT_Gas;
-    extern std::string const cRT_GasUC;
-    extern int const iRT_Gas;
-    extern std::string const cRT_Gasoline;
-    extern std::string const cRT_GasolineUC;
-    extern int const iRT_Gasoline;
-    extern std::string const cRT_Diesel;
-    extern std::string const cRT_DieselUC;
-    extern int const iRT_Diesel;
-    extern std::string const cRT_Coal;
-    extern std::string const cRT_CoalUC;
-    extern int const iRT_Coal;
-    extern std::string const cRT_FuelOil_1;
-    extern std::string const cRT_FuelOil_1UC;
-    extern int const iRT_FuelOil_1;
-    extern std::string const cRT_FuelOil_2;
-    extern std::string const cRT_FuelOil_2UC;
-    extern int const iRT_FuelOil_2;
-    extern std::string const cRT_Propane;
-    extern std::string const cRT_PropaneUC;
-    extern int const iRT_Propane;
-    extern std::string const cRT_Water;
-    extern std::string const cRT_WaterUC;
-    extern int const iRT_Water;
-    extern std::string const cRT_EnergyTransfer;
-    extern std::string const cRT_EnergyTransferUC;
-    extern int const iRT_EnergyTransfer;
-    extern std::string const cRT_Steam;
-    extern std::string const cRT_SteamUC;
-    extern int const iRT_Steam;
-    extern std::string const cRT_DistrictCooling;
-    extern std::string const cRT_DistrictCoolingUC;
-    extern int const iRT_DistrictCooling;
-    extern std::string const cRT_DistrictHeating;
-    extern std::string const cRT_DistrictHeatingUC;
-    extern int const iRT_DistrictHeating;
-    extern std::string const cRT_ElectricityProduced;
-    extern std::string const cRT_ElectricityProducedUC;
-    extern int const iRT_ElectricityProduced;
-    extern std::string const cRT_ElectricityPurchased;
-    extern std::string const cRT_ElectricityPurchasedUC;
-    extern int const iRT_ElectricityPurchased;
-    extern std::string const cRT_ElectricitySurplusSold;
-    extern std::string const cRT_ElectricitySurplusSoldUC;
-    extern int const iRT_ElectricitySurplusSold;
-    extern std::string const cRT_ElectricityNet;
-    extern std::string const cRT_ElectricityNetUC;
-    extern int const iRT_ElectricityNet;
-    extern std::string const cRT_SolarWater;
-    extern std::string const cRT_SolarWaterUC;
-    extern int const iRT_SolarWater;
-    extern std::string const cRT_SolarAir;
-    extern std::string const cRT_SolarAirUC;
-    extern int const iRT_SolarAir;
-    extern std::string const cRT_SO2;
-    extern std::string const cRT_SO2UC;
-    extern int const iRT_SO2;
-    extern std::string const cRT_NOx;
-    extern std::string const cRT_NOxUC;
-    extern int const iRT_NOx;
-    extern std::string const cRT_N2O;
-    extern std::string const cRT_N2OUC;
-    extern int const iRT_N2O;
-    extern std::string const cRT_PM;
-    extern std::string const cRT_PMUC;
-    extern int const iRT_PM;
-    extern std::string const cRT_PM2_5;
-    extern std::string const cRT_PM2_5UC;
-    extern int const iRT_PM2_5;
-    extern std::string const cRT_PM10;
-    extern std::string const cRT_PM10UC;
-    extern int const iRT_PM10;
-    extern std::string const cRT_CO;
-    extern std::string const cRT_COUC;
-    extern int const iRT_CO;
-    extern std::string const cRT_CO2;
-    extern std::string const cRT_CO2UC;
-    extern int const iRT_CO2;
-    extern std::string const cRT_CH4;
-    extern std::string const cRT_CH4UC;
-    extern int const iRT_CH4;
-    extern std::string const cRT_NH3;
-    extern std::string const cRT_NH3UC;
-    extern int const iRT_NH3;
-    extern std::string const cRT_NMVOC;
-    extern std::string const cRT_NMVOCUC;
-    extern int const iRT_NMVOC;
-    extern std::string const cRT_Hg;
-    extern std::string const cRT_HgUC;
-    extern int const iRT_Hg;
-    extern std::string const cRT_Pb;
-    extern std::string const cRT_PbUC;
-    extern int const iRT_Pb;
-    extern std::string const cRT_NuclearHigh;
-    extern std::string const cRT_NuclearHighUC;
-    extern int const iRT_NuclearHigh;
-    extern std::string const cRT_NuclearLow;
-    extern std::string const cRT_NuclearLowUC;
-    extern int const iRT_NuclearLow;
-    extern std::string const cRT_WaterEnvironmentalFactors;
-    extern std::string const cRT_WaterEnvironmentalFactorsUC;
-    extern int const iRT_WaterEnvironmentalFactors;
-    extern std::string const cRT_CarbonEquivalent;
-    extern std::string const cRT_CarbonEquivalentUC;
-    extern int const iRT_CarbonEquivalent;
-    extern std::string const cRT_Source;
-    extern std::string const cRT_SourceUC;
-    extern int const iRT_Source;
-    extern std::string const cRT_PlantLoopHeatingDemand;
-    extern std::string const cRT_PlantLoopHeatingDemandUC;
-    extern int const iRT_PlantLoopHeatingDemand;
-    extern std::string const cRT_PlantLoopCoolingDemand;
-    extern std::string const cRT_PlantLoopCoolingDemandUC;
-    extern int const iRT_PlantLoopCoolingDemand;
-    extern std::string const cRT_OnSiteWater;
-    extern std::string const cRT_OnSiteWaterUC;
-    extern int const iRT_OnSiteWater;
-    extern std::string const cRT_MainsWater;
-    extern std::string const cRT_MainsWaterUC;
-    extern int const iRT_MainsWater;
-    extern std::string const cRT_RainWater;
-    extern std::string const cRT_RainWaterUC;
-    extern int const iRT_RainWater;
-    extern std::string const cRT_WellWater;
-    extern std::string const cRT_WellWaterUC;
-    extern int const iRT_WellWater;
-    extern std::string const cRT_Condensate;
-    extern std::string const cRT_CondensateUC;
-    extern int const iRT_Condensate;
-    extern std::string const cRT_OtherFuel1;
-    extern std::string const cRT_OtherFuel1UC;
-    extern int const iRT_OtherFuel1;
-    extern std::string const cRT_OtherFuel2;
-    extern std::string const cRT_OtherFuel2UC;
-    extern int const iRT_OtherFuel2;
-    extern int const NumOfResourceTypes;
-    extern int const ResourceTypeInitialOffset; // to reach "ValidTypes"
-    extern Array1D_string const cRT_ValidTypes;
+    enum class CallIndicator
+    {
+        BeginDay,
+        DuringDay,
+        EndDay,
+        EndZoneSizingCalc,
+        EndSysSizingCalc
+    };
 
-    extern int const iGeneratorICEngine;
-    extern int const iGeneratorCombTurbine;
-    extern int const iGeneratorPV;
-    extern int const iGeneratorFuelCell;
-    extern int const iGeneratorMicroCHP;
-    extern int const iGeneratorMicroturbine;
-    extern int const iGeneratorWindTurbine;
-    extern int const iGeneratorPVWatts;
+    // Parameters for KindOfSim
+    enum class KindOfSim
+    {
+        Unassigned = 0,
+        DesignDay = 1,
+        RunPeriodDesign = 2,
+        RunPeriodWeather = 3,
+        HVACSizeDesignDay = 4,       // a regular design day run during HVAC Sizing Simulation
+        HVACSizeRunPeriodDesign = 5, // a weather period design day run during HVAC Sizing Simulation
+        ReadAllWeatherData = 6       // a weather period for reading all weather data prior to the simulation
+    };
 
-    extern int const iEvapCoolerDirectCELDEKPAD;
-    extern int const iEvapCoolerInDirectCELDEKPAD;
-    extern int const iEvapCoolerInDirectWETCOIL;
-    extern int const iEvapCoolerInDirectRDDSpecial;
-    extern int const iEvapCoolerDirectResearchSpecial;
+    Real64 constexpr MaxEXPArg = 709.78;       // maximum exponent in EXP() function
+    Real64 constexpr Pi = 3.14159265358979324; // Pi 3.1415926535897932384626435
+    Real64 constexpr PiOvr2 = Pi / 2.0;        // Pi/2
+    Real64 constexpr TwoPi = 2.0 * Pi;         // 2*Pi 6.2831853071795864769252868
+    Real64 constexpr GravityConstant = 9.807;
+    Real64 constexpr DegToRadians = Pi / 180.0;                           // Conversion for Degrees to Radians
+    Real64 constexpr RadToDeg = 180.0 / Pi;                               // Conversion for Radians to Degrees
+    Real64 constexpr SecInHour = 3600.0;                                  // Conversion for hours to seconds
+    Real64 constexpr HoursInDay = 24.0;                                   // Number of Hours in Day
+    Real64 constexpr SecsInDay = SecInHour * HoursInDay;                  // Number of seconds in Day
+    Real64 constexpr BigNumber = std::numeric_limits<Real64>::max();      // Max Number real used for initializations
+    Real64 constexpr rTinyValue = std::numeric_limits<Real64>::epsilon(); // Tiny value to replace use of TINY(x)
+    std::string::size_type constexpr MaxNameLength =
+        100;                              // Maximum Name Length in Characters -- should be the same as MaxAlphaArgLength in InputProcessor module
+    Real64 constexpr KelvinConv = 273.15; // Conversion factor for C to K and K to C
+    Real64 constexpr InitConvTemp = 5.05; // [deg C], standard init vol to mass flow conversion temp
+    Real64 constexpr AutoCalculate = -99999.0;        // automatically calculate some fields.
+    Real64 constexpr CWInitConvTemp = 5.05;           // [deg C], standard init chilled water vol to mass flow conversion temp
+    Real64 constexpr HWInitConvTemp = 60.0;           // [deg C], standard init hot water vol to mass flow conversion temp
+    Real64 constexpr SteamInitConvTemp = 100.0;       // [deg C], standard init steam vol to mass flow conversion temp
+    Real64 constexpr StefanBoltzmann = 5.6697E-8;     // Stefan-Boltzmann constant in W/(m2*K4)
+    Real64 constexpr UniversalGasConst = 8314.462175; // Universal Gas Constant (J/mol*K)
+    Real64 constexpr convertJtoGJ = 1.0E-9;           // Conversion factor for J to GJ
+    int constexpr MaxSpeedLevels = 10;                // Maximum number of speed that supports
+    int constexpr ScheduleAlwaysOn = -1;              // Value when passed to schedule routines gives back 1.0 (on)
+    int constexpr MaxCTFTerms = 19; // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataGlobalConstants
-
-    // Functions
-
-    int AssignResourceTypeNum(std::string const &ResourceTypeChar);
-
-    std::string GetResourceTypeChar(int const ResourceTypeNum);
+    ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar);
+    std::string GetResourceTypeChar(ResourceType ResourceTypeNum);
 
 } // namespace DataGlobalConstants
+
+struct DataGlobalConstantsData : BaseGlobalStruct
+{
+    std::map<DataGlobalConstants::EndUse, int> iEndUse = {
+        {DataGlobalConstants::EndUse::Heating, 1},
+        {DataGlobalConstants::EndUse::Cooling, 2},
+        {DataGlobalConstants::EndUse::InteriorLights, 3},
+        {DataGlobalConstants::EndUse::ExteriorLights, 4},
+        {DataGlobalConstants::EndUse::InteriorEquipment, 5},
+        {DataGlobalConstants::EndUse::ExteriorEquipment, 6},
+        {DataGlobalConstants::EndUse::Fans, 7},
+        {DataGlobalConstants::EndUse::Pumps, 8},
+        {DataGlobalConstants::EndUse::HeatRejection, 9},
+        {DataGlobalConstants::EndUse::Humidification, 10},
+        {DataGlobalConstants::EndUse::HeatRecovery, 11},
+        {DataGlobalConstants::EndUse::WaterSystem, 12},
+        {DataGlobalConstants::EndUse::Refrigeration, 13},
+        {DataGlobalConstants::EndUse::Cogeneration, 14},
+    };
+    static int constexpr iEndUseSize = 14;
+
+    std::vector<DataGlobalConstants::ResourceType> AllResourceTypes = {DataGlobalConstants::ResourceType::None,
+                                                                       DataGlobalConstants::ResourceType::Electricity,
+                                                                       DataGlobalConstants::ResourceType::Natural_Gas,
+                                                                       DataGlobalConstants::ResourceType::Gasoline,
+                                                                       DataGlobalConstants::ResourceType::Diesel,
+                                                                       DataGlobalConstants::ResourceType::Coal,
+                                                                       DataGlobalConstants::ResourceType::FuelOil_1,
+                                                                       DataGlobalConstants::ResourceType::FuelOil_2,
+                                                                       DataGlobalConstants::ResourceType::Propane,
+                                                                       DataGlobalConstants::ResourceType::Water,
+                                                                       DataGlobalConstants::ResourceType::EnergyTransfer,
+                                                                       DataGlobalConstants::ResourceType::Steam,
+                                                                       DataGlobalConstants::ResourceType::DistrictCooling,
+                                                                       DataGlobalConstants::ResourceType::DistrictHeating,
+                                                                       DataGlobalConstants::ResourceType::ElectricityProduced,
+                                                                       DataGlobalConstants::ResourceType::ElectricityPurchased,
+                                                                       DataGlobalConstants::ResourceType::ElectricitySurplusSold,
+                                                                       DataGlobalConstants::ResourceType::ElectricityNet,
+                                                                       DataGlobalConstants::ResourceType::SolarWater,
+                                                                       DataGlobalConstants::ResourceType::SolarAir,
+                                                                       DataGlobalConstants::ResourceType::SO2,
+                                                                       DataGlobalConstants::ResourceType::NOx,
+                                                                       DataGlobalConstants::ResourceType::N2O,
+                                                                       DataGlobalConstants::ResourceType::PM,
+                                                                       DataGlobalConstants::ResourceType::PM2_5,
+                                                                       DataGlobalConstants::ResourceType::PM10,
+                                                                       DataGlobalConstants::ResourceType::CO,
+                                                                       DataGlobalConstants::ResourceType::CO2,
+                                                                       DataGlobalConstants::ResourceType::CH4,
+                                                                       DataGlobalConstants::ResourceType::NH3,
+                                                                       DataGlobalConstants::ResourceType::NMVOC,
+                                                                       DataGlobalConstants::ResourceType::Hg,
+                                                                       DataGlobalConstants::ResourceType::Pb,
+                                                                       DataGlobalConstants::ResourceType::NuclearHigh,
+                                                                       DataGlobalConstants::ResourceType::NuclearLow,
+                                                                       DataGlobalConstants::ResourceType::WaterEnvironmentalFactors,
+                                                                       DataGlobalConstants::ResourceType::CarbonEquivalent,
+                                                                       DataGlobalConstants::ResourceType::Source,
+                                                                       DataGlobalConstants::ResourceType::PlantLoopHeatingDemand,
+                                                                       DataGlobalConstants::ResourceType::PlantLoopCoolingDemand,
+                                                                       DataGlobalConstants::ResourceType::OnSiteWater,
+                                                                       DataGlobalConstants::ResourceType::MainsWater,
+                                                                       DataGlobalConstants::ResourceType::RainWater,
+                                                                       DataGlobalConstants::ResourceType::WellWater,
+                                                                       DataGlobalConstants::ResourceType::Condensate,
+                                                                       DataGlobalConstants::ResourceType::OtherFuel1,
+                                                                       DataGlobalConstants::ResourceType::OtherFuel2};
+
+    void clear_state() override
+    {
+        // nothing to clear
+    }
+};
 
 } // namespace EnergyPlus
 

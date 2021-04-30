@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,11 +51,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PierceSurface.hh>
-
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Vector3.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -67,7 +65,7 @@ using namespace ObjexxFCL;
 using DataVectorTypes::Vector;
 using Vector2D = DataSurfaces::Surface2D::Vector2D;
 
-TEST(PierceSurfaceTest, Rectangular)
+TEST_F(EnergyPlusFixture, PierceSurfaceTest_Rectangular)
 {
     DataSurfaces::SurfaceData floor;
     floor.Vertex.dimension(4);
@@ -139,7 +137,7 @@ TEST(PierceSurfaceTest, Rectangular)
     }
 }
 
-TEST(PierceSurfaceTest, Triangular)
+TEST_F(EnergyPlusFixture, PierceSurfaceTest_Triangular)
 {
     DataSurfaces::SurfaceData floor;
     floor.Vertex.dimension(3);
@@ -198,7 +196,7 @@ TEST(PierceSurfaceTest, Triangular)
     }
 }
 
-TEST(PierceSurfaceTest, ConvexOctagonal)
+TEST_F(EnergyPlusFixture, PierceSurfaceTest_ConvexOctagonal)
 {
     int const N(8); // Number of vertices and edges
     Real64 const TwoPi(8.0 * std::atan(1.0));
@@ -261,12 +259,18 @@ TEST(PierceSurfaceTest, ConvexOctagonal)
     }
 }
 
-TEST(PierceSurfaceTest, Convex8Sides)
+TEST_F(EnergyPlusFixture, PierceSurfaceTest_Convex8Sides)
 {
     DataSurfaces::SurfaceData floor;
     floor.Vertex.dimension(8);
-    floor.Vertex = {Vector(0, 0, 0), Vector(0.5, -0.25, 0), Vector(1, 0, 0), Vector(1.25, 0.5, 0),
-                    Vector(1, 1, 0), Vector(0.5, 1.25, 0),  Vector(0, 1, 0), Vector(-0.25, 0.5, 0)};
+    floor.Vertex = {Vector(0, 0, 0),
+                    Vector(0.5, -0.25, 0),
+                    Vector(1, 0, 0),
+                    Vector(1.25, 0.5, 0),
+                    Vector(1, 1, 0),
+                    Vector(0.5, 1.25, 0),
+                    Vector(0, 1, 0),
+                    Vector(-0.25, 0.5, 0)};
     floor.IsConvex = true;
     floor.set_computed_geometry();
     DataSurfaces::Surface2D const &floor2d(floor.surface2d);
@@ -321,7 +325,7 @@ TEST(PierceSurfaceTest, Convex8Sides)
     }
 }
 
-TEST(PierceSurfaceTest, ConvexNGon)
+TEST_F(EnergyPlusFixture, PierceSurfaceTest_ConvexNGon)
 {
     int const N(32); // Number of vertices and edges
     Real64 const TwoPi(8.0 * std::atan(1.0));
@@ -386,7 +390,7 @@ TEST(PierceSurfaceTest, ConvexNGon)
     }
 }
 
-TEST(PierceSurfaceTest, NonconvexBoomerang)
+TEST_F(EnergyPlusFixture, PierceSurfaceTest_NonconvexBoomerang)
 {
     DataSurfaces::SurfaceData boomerang;
     boomerang.Vertex.dimension(4);
@@ -422,12 +426,12 @@ TEST(PierceSurfaceTest, NonconvexBoomerang)
     }
 }
 
-TEST(PierceSurfaceTest, NonconvexUShape)
+TEST_F(EnergyPlusFixture, PierceSurfaceTest_NonconvexUShape)
 {
     DataSurfaces::SurfaceData ushape;
     ushape.Vertex.dimension(8);
-    ushape.Vertex = {Vector(0, 0, 0), Vector(3, 0, 0), Vector(3, 2, 0), Vector(2, 2, 0),
-                     Vector(2, 1, 0), Vector(1, 1, 0), Vector(1, 2, 0), Vector(0, 2, 0)};
+    ushape.Vertex = {
+        Vector(0, 0, 0), Vector(3, 0, 0), Vector(3, 2, 0), Vector(2, 2, 0), Vector(2, 1, 0), Vector(1, 1, 0), Vector(1, 2, 0), Vector(0, 2, 0)};
     ushape.IsConvex = false;
     ushape.set_computed_geometry();
     DataSurfaces::Surface2D const &ushape2d(ushape.surface2d);
@@ -495,12 +499,18 @@ TEST(PierceSurfaceTest, NonconvexUShape)
     }
 }
 
-TEST(PierceSurfaceTest, NonconvexStar4)
+TEST_F(EnergyPlusFixture, PierceSurfaceTest_NonconvexStar4)
 {
     DataSurfaces::SurfaceData star;
     star.Vertex.dimension(8);
-    star.Vertex = {Vector(0, 0, 0), Vector(2, 1, 0), Vector(4, 0, 0), Vector(3, 2, 0),
-                   Vector(4, 4, 0), Vector(2, 3, 0), Vector(0, 4, 0), Vector(1, 2, 0)}; // 4-pointed star resting on 2 vertices
+    star.Vertex = {Vector(0, 0, 0),
+                   Vector(2, 1, 0),
+                   Vector(4, 0, 0),
+                   Vector(3, 2, 0),
+                   Vector(4, 4, 0),
+                   Vector(2, 3, 0),
+                   Vector(0, 4, 0),
+                   Vector(1, 2, 0)}; // 4-pointed star resting on 2 vertices
     star.IsConvex = false;
     star.set_computed_geometry();
     DataSurfaces::Surface2D const &star2d(star.surface2d);

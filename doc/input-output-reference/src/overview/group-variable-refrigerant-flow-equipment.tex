@@ -22,7 +22,7 @@ The EnergyPlus connection methodology is shown as dashed and greyed arrows in Fi
 
 \begin{itemize}
 \item
- For zone equipment the zone inlet and zone exhaust node names are defined in a \emph{\hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}} object (bottom of figure) and the terminal unit type and name are specified in a \emph{\hyperref[zonehvacequipmentlist]{ZoneHVAC:EquipmentList}} object. For air loop equipment the terminal unit type and name and inlet and outlet node names are defined in the AirloopHVAC branch (top left of figure). For outside air system equipment the terminal unit type and name are defined in the \emph{\hyperef[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList}} (top right of figure) and the terminal unit inlet node will typically (but not necessarily) be an outside air node and the terminal unit outlet node will typically connect to the \emph{\hyperef[outdoorairmixer]{OutdoorAir:Mixer}} object.
+ For zone equipment the zone inlet and zone exhaust node names are defined in a \emph{\hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}} object (bottom of figure) and the terminal unit type and name are specified in a \emph{\hyperref[zonehvacequipmentlist]{ZoneHVAC:EquipmentList}} object. For air loop equipment the terminal unit type and name and inlet and outlet node names are defined in the AirloopHVAC branch (top left of figure). For outside air system equipment the terminal unit type and name are defined in the \emph{\hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList}} (top right of figure) and the terminal unit inlet node will typically (but not necessarily) be an outside air node and the terminal unit outlet node will typically connect to the \emph{\hyperref[outdoorairmixer]{OutdoorAir:Mixer}} object.
 \item
   A \emph{\hyperref[zonehvacterminalunitvariablerefrigerantflow]{ZoneHVAC:TerminalUnit:VariableRefrigerantFlow}} object will specify the terminal unit's air inlet and air outlet node names. For zone equipment the zone exhaust node is the terminal unit inlet node and the zone inlet node is the terminal unit outlet node. For air loop and outdoor air system equipment the terminal unit inlet and outlet node names identify the order of the equipment in the air loop.
 \item
@@ -47,9 +47,9 @@ EnergyPlus object type and object name, and node name relationships are also sho
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics{media/image311.png}
+\includegraphics[width=0.5\linewidth]{media/image311.png}
 \emph{(a) VRF model based on system curves (VRF-SysCurve)}
-\includegraphics{media/image312.png}
+\includegraphics[width=0.5\linewidth]{media/image312.png}
 \emph{(b) VRF model based on physics (VRF-FluidTCtrl)}
 \caption{Variable Refrigerant Flow Object Links \protect \label{fig:variable-refrigerant-flow-object-links}}
 \end{figure}
@@ -519,9 +519,9 @@ AirConditioner:VariableRefrigerantFlow,
 \item
   HVAC,Average,VRF Heat Pump Maximum Capacity Heating Rate {[}W{]}
 \item
-  HVAC,Average,VRF Heat Pump Crankcase Heater Electric Power {[}W{]}
+  HVAC,Average,VRF Heat Pump Crankcase Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,VRF Heat Pump Crankcase Heater Electric Energy {[}J{]}
+  HVAC,Sum,VRF Heat Pump Crankcase Heater Electricity Energy {[}J{]}
 \item
   HVAC,Average,VRF Heat Pump Terminal Unit Heating Load Rate {[}W{]}
 \item
@@ -547,13 +547,13 @@ Evap-cooled:
 \item
   HVAC,Sum,VRF Heat Pump Evaporative Condenser Water Use Volume {[}m3{]}
 \item
-  HVAC,Average,VRF Heat Pump Evaporative Condenser Pump Electric Power {[}W{]}
+  HVAC,Average,VRF Heat Pump Evaporative Condenser Pump Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,VRF Heat Pump Evaporative Condenser Pump Electric Energy {[}J{]}
+  HVAC,Sum,VRF Heat Pump Evaporative Condenser Pump Electricity Energy {[}J{]}
 \item
-  HVAC,Average,VRF Heat Pump Basin Heater Electric Power {[}W{]}
+  HVAC,Average,VRF Heat Pump Basin Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Average,VRF Heat Pump Basin Heater Electric Energy {[}J{]}
+  HVAC,Average,VRF Heat Pump Basin Heater Electricity Energy {[}J{]}
 \item
   HVAC,Average,VRF Heat Pump Heat Recovery Status Change Multiplier {[]}
 \end{itemize}
@@ -575,22 +575,22 @@ Electric Fuel type (default):
 
 \begin{itemize}
 \item
-  HVAC,Average,VRF Heat Pump Cooling Electric Power {[}W{]}
+  HVAC,Average,VRF Heat Pump Cooling Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,VRF Heat Pump Cooling Electric Energy {[}J{]}
+  HVAC,Sum,VRF Heat Pump Cooling Electricity Energy {[}J{]}
 \item
-  HVAC,Average,VRF Heat Pump Heating Electric Power {[}W{]}
+  HVAC,Average,VRF Heat Pump Heating Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,VRF Heat Pump Heating Electric Energy {[}J{]}
+  HVAC,Sum,VRF Heat Pump Heating Electricity Energy {[}J{]}
 \end{itemize}
 
 Electric defrost always used for Defrost Strategy = Resistive regardless of fuel type
 
 \begin{itemize}
 \item
-  HVAC,Average,VRF Heat Pump Defrost Electric Power {[}W{]}
+  HVAC,Average,VRF Heat Pump Defrost Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,VRF Heat Pump Defrost Electric Energy {[}J{]}
+  HVAC,Sum,VRF Heat Pump Defrost Electricity Energy {[}J{]}
 \end{itemize}
 
 Alternate Fuel types (e.g., FuelType = NaturalGas):
@@ -620,19 +620,19 @@ This output field is the operating total cooling capacity of the variable refrig
 
 This output field is the operating total heating capacity of the variable refrigerant flow heat pump in Watts. The capacity includes any degradation due to defrost mode. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. This value should match the sum of the individual zone terminal unit output variables for Zone VRF Air Terminal Total Heating Rate.
 
-\paragraph{VRF Heat Pump Cooling Electric Power {[}W{]}}\label{vrf-heat-pump-cooling-electric-power-w}
+\paragraph{VRF Heat Pump Cooling Electricity Rate {[}W{]}}\label{vrf-heat-pump-cooling-electric-power-w}
 
 This output field is the cooling mode electricity consumption rate of the variable refrigerant flow heat pump in Watts. The consumption includes electricity used by the compressor and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Cooling NaturalGas Consumption Rate).
 
-\paragraph{VRF Heat Pump Cooling Electric Energy {[}J{]}}\label{vrf-heat-pump-cooling-electric-energy-j}
+\paragraph{VRF Heat Pump Cooling Electricity Energy {[}J{]}}\label{vrf-heat-pump-cooling-electric-energy-j}
 
 This output field is the cooling mode electricity consumption of the variable refrigerant flow heat pump in Joules for the time period being reported. The consumption includes electricity used by the compressor and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects). The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Cooling NaturalGas Consumption). The resource type meter will also be modified to reflect the chosen fuel type (e.g., Resource Type = NaturalGas).
 
-\paragraph{VRF Heat Pump Heating Electric Power {[}W{]}}\label{vrf-heat-pump-heating-electric-power-w}
+\paragraph{VRF Heat Pump Heating Electricity Rate {[}W{]}}\label{vrf-heat-pump-heating-electric-power-w}
 
 This output field is the heating mode electricity consumption rate of the variable refrigerant flow heat pump in Watts. The consumption includes electricity used by the compressor and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Heating NaturalGas Consumption Rate).
 
-\paragraph{VRF Heat Pump Heating Electric Energy {[}J{]}}\label{vrf-heat-pump-heating-electric-energy-j}
+\paragraph{VRF Heat Pump Heating Electricity Energy {[}J{]}}\label{vrf-heat-pump-heating-electric-energy-j}
 
 This output field is the heating mode electricity consumption of the variable refrigerant flow heat pump in Joules for the time period being reported. The consumption includes electricity used by the compressor and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (Ref. Output:Meter objects). The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Heating NaturalGas Consumption). The resource type meter will also be modified to reflect the chosen fuel type (e.g., Resource Type = NaturalGas).
 
@@ -648,11 +648,11 @@ This is the operating heating coefficient of performance for the heat pump. This
 
 This is the operating coefficient of performance for the heat pump. This value is calculated using the ratio of the total terminal unit coil capacity (cooling plus heating and accounts for piping losses) and total system electric consumption rate (compressor, crankcase heater, evaporative condenser water pump, defrost, and terminal unit parasitic electric consumption rate). This output variable does not include pump power for a water-cooled system. This value is specific to overall system performance, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-\paragraph{VRF Heat Pump Defrost Electric Power {[}W{]}}\label{vrf-heat-pump-defrost-electric-power-w}
+\paragraph{VRF Heat Pump Defrost Electricity Rate {[}W{]}}\label{vrf-heat-pump-defrost-electric-power-w}
 
 This is the electricity consumption rate of the heat pump defrost in Watts when the unit is in defrost mode (timed, reverse-cycle). . The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump NaturalGas Defrost Consumption Rate).
 
-\paragraph{VRF Heat Pump Defrost Electric Energy {[}J{]}}\label{vrf-heat-pump-defrost-electric-energy-j}
+\paragraph{VRF Heat Pump Defrost Electricity Energy {[}J{]}}\label{vrf-heat-pump-defrost-electric-energy-j}
 
 This is the electricity consumption of the heat pump in Joules for the time step being reported. This consumption is applicable when the unit is in defrost mode (reverse-cycle or resistive). This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (Ref. Output:Meter objects). The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump NaturalGas Defrost Consumption). The resource type meter will also be modified to reflect the chosen fuel type (e.g., Resource Type = NaturalGas).
 
@@ -708,11 +708,11 @@ This output field is the sum of the terminal unit cooling coil loads in Watts fo
 
 This output field is the sum of the terminal unit heating coil loads in Watts for the current time step being reported. This value is derived directly from the heating coils and represents the total heating load on the VRF system after piping losses have been accounted for. The total heating load will be less than the variable refrigerant flow total heating capacity reported when piping losses are modeled (i.e., when piping losses are \textless{} 1).
 
-\paragraph{VRF Heat Pump Crankcase Heater Electric Power {[}W{]}}\label{vrf-heat-pump-crankcase-heater-electric-power-w}
+\paragraph{VRF Heat Pump Crankcase Heater Electricity Rate {[}W{]}}\label{vrf-heat-pump-crankcase-heater-electric-power-w}
 
 This output field is the average electricity consumption rate of the heat pump's crankcase heaters in Watts for the time step being reported.
 
-\paragraph{VRF Heat Pump Crankcase Heater Electric Energy {[}J{]}}\label{vrf-heat-pump-crankcase-heater-electric-energy-j}
+\paragraph{VRF Heat Pump Crankcase Heater Electricity Energy {[}J{]}}\label{vrf-heat-pump-crankcase-heater-electric-energy-j}
 
 This output field is the electricity consumption rate of the heat pump's crankcase heaters in Joules for the time step being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (ref. Output:Meter objects).
 
@@ -720,19 +720,19 @@ This output field is the electricity consumption rate of the heat pump's crankca
 
 This output is the amount of water used to evaporatively cool the condenser coil inlet air, in cubic meters. This output is also added to a meter with Resource Type = Water, End Use Key = Cooling, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{VRF Heat Pump Evaporative Condenser Pump Electric Power {[}W{]}}\label{vrf-heat-pump-evaporative-condenser-pump-electric-power-w}
+\paragraph{VRF Heat Pump Evaporative Condenser Pump Electricity Rate {[}W{]}}\label{vrf-heat-pump-evaporative-condenser-pump-electric-power-w}
 
 This is the average electricity consumption rate of the evaporative condenser water pump in Watts for the time step being reported.
 
-\paragraph{VRF Heat Pump Evaporative Condenser Pump Electric Energy {[}J{]}}\label{vrf-heat-pump-evaporative-condenser-pump-electric-energy-j}
+\paragraph{VRF Heat Pump Evaporative Condenser Pump Electricity Energy {[}J{]}}\label{vrf-heat-pump-evaporative-condenser-pump-electric-energy-j}
 
 This is the electricity consumption rate of the evaporative condenser water pump in Joules for the time step being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{VRF Heat Pump Basin Heater Electric Power {[}W{]}}\label{vrf-heat-pump-basin-heater-electric-power-w}
+\paragraph{VRF Heat Pump Basin Heater Electricity Rate {[}W{]}}\label{vrf-heat-pump-basin-heater-electric-power-w}
 
 This output is the electric consumption rate of the heat pump's basin heater (for evaporatively-cooled condenser type) in Watts. This basin heater only operates when the variable refrigerant flow heat pump's compressor(s) is off and therefore is reported as 0 anytime the compressor operates. If the compressor is cycling (see VRF Heat Pump Cycling Ratio output variable above), the basin heater electric power is proportional to one minus the cycling ratio of the compressor (i.e., the basin heater is on when the compressor is off).
 
-\paragraph{VRF Heat Pump Basin Heater Electric Energy {[}J{]}}\label{vrf-heat-pump-basin-heater-electric-energy-j}
+\paragraph{VRF Heat Pump Basin Heater Electricity Energy {[}J{]}}\label{vrf-heat-pump-basin-heater-electric-energy-j}
 
 This output is the electric consumption of the heat pump's basin heater (for evaporatively-cooled condenser type) in Joules. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects).
 
@@ -1130,7 +1130,7 @@ In addition to the output variables described for the VRF-SysCurve model in Sect
 \item
   VRF Heat Pump Compressor Rotating Speed {[}rev/min{]}
 \item
-  VRF Heat Pump Compressor Electric Power {[}W{]}
+  VRF Heat Pump Compressor Electricity Rate {[}W{]}
 \item
   VRF Heat Pump Indoor Unit Evaporating Temperature {[}C{]}
 \item
@@ -1157,7 +1157,7 @@ Note: refer to the rdd file after a simulation for exact output variable names
 
 This output only applies for the VRF-FluidTCtrl model. This is the rotating speed of the compressor, which indicates the loading index.
 
-\paragraph{VRF Heat Pump Compressor Electric Power {[}W{]}}\label{vrf-heat-pump-compressor-electric-power-at-cooling-mode-w}
+\paragraph{VRF Heat Pump Compressor Electricity Rate {[}W{]}}\label{vrf-heat-pump-compressor-electric-power-at-cooling-mode-w}
 
 This output only applies for the VRF-FluidTCtrl model. This is the electric power of the compressor running. This value is related with the compressor speed as well as the operational conditions, i.e., evaporating and condensing temperatures of the system.
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,9 +55,14 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace Photovoltaics {
 
@@ -68,28 +73,16 @@ namespace Photovoltaics {
     // DERIVED TYPE DEFINITIONS:
     //   see DataPhotovoltaics.cc
 
-    extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Photovoltaics
-
-    // The following subroutines are used for the SIMPLE model
-
-    // The following subroutines and functions are used for only the EQUIVALENT ONE-DIODE model
-
-    // The following subroutines and functions are used for the Sandia model.
-
-    //  OO get set methods for coupling to exterior vented baffle cavity mounting configurations
-
-    // Functions
-
-    void SimPVGenerator(int const GeneratorType,          // type of Generator !unused1208
-                        std::string const &GeneratorName, // user specified name of Generator
+    void SimPVGenerator(EnergyPlusData &state,
+                        GeneratorType const GeneratorType, // type of Generator
+                        std::string const &GeneratorName,  // user specified name of Generator
                         int &GeneratorIndex,
                         bool const RunFlag, // is PV ON or OFF as determined by schedules in ElecLoadCenter
-                        Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on" !unused1208
+                        Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on"
     );
 
-    void GetPVGeneratorResults(int const GeneratorType, // type of Generator !unused1208
+    void GetPVGeneratorResults(EnergyPlusData &state,
+                               GeneratorType const GeneratorType, // type of Generator
                                int const GeneratorIndex,
                                Real64 &GeneratorPower,  // electrical power
                                Real64 &GeneratorEnergy, // electrical energy
@@ -98,36 +91,37 @@ namespace Photovoltaics {
 
     // *************
 
-    void GetPVInput();
+    void GetPVInput(EnergyPlusData &state);
 
-    int GetPVZone(int const SurfNum);
+    int GetPVZone(EnergyPlusData &state, int const SurfNum);
 
     // **************************************
 
-    void CalcSimplePV(int const thisPV,
-                      bool const RunFlag // unused1208
-    );
+    void CalcSimplePV(EnergyPlusData &state, int const thisPV);
 
-    void ReportPV(int const PVnum);
+    void ReportPV(EnergyPlusData &state, int const PVnum);
 
     // *************
 
-    void CalcSandiaPV(int const PVnum,   // ptr to current PV system
+    void CalcSandiaPV(EnergyPlusData &state,
+                      int const PVnum,   // ptr to current PV system
                       bool const RunFlag // controls if generator is scheduled *ON*
     );
 
     // ********************
     // begin routines for Equivalent one-diode model by Bradley/Ulleberg
 
-    void InitTRNSYSPV(int const PVnum); // the number of the GENERATOR:PHOTOVOLTAICS (passed in)
+    void InitTRNSYSPV(EnergyPlusData &state, int const PVnum); // the number of the GENERATOR:PHOTOVOLTAICS (passed in)
 
     // *************
 
-    void CalcTRNSYSPV(int const PVnum,   // BTG added intent
+    void CalcTRNSYSPV(EnergyPlusData &state,
+                      int const PVnum,   // BTG added intent
                       bool const RunFlag // BTG added intent    !flag tells whether the PV is ON or OFF
     );
 
-    void POWER(Real64 const IO,   // passed in from CalcPV
+    void POWER(EnergyPlusData &state,
+               Real64 const IO,   // passed in from CalcPV
                Real64 const IL,   // passed in from CalcPV
                Real64 const RSER, // passed in from CalcPV
                Real64 const AA,   // passed in from CalcPV
@@ -137,9 +131,10 @@ namespace Photovoltaics {
                Real64 &PP         // power [W]
     );
 
-    void NEWTON(Real64 &XX,
-                std::function<Real64(Real64 const, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> FXX,
-                std::function<Real64(Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> DER,
+    void NEWTON(EnergyPlusData &state,
+                Real64 &XX,
+                std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> FXX,
+                std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> DER,
                 Real64 const &II, // Autodesk Aliased to XX in some calls
                 Real64 const &VV, // Autodesk Aliased to XX in some calls
                 Real64 const IO,
@@ -149,13 +144,23 @@ namespace Photovoltaics {
                 Real64 const XS,
                 Real64 const EPS);
 
-    void SEARCH(Real64 &A, Real64 &B, Real64 &P, int &K, Real64 &IO, Real64 &IL, Real64 &RSER, Real64 &AA, Real64 const EPS, int const KMAX);
+    void SEARCH(EnergyPlusData &state,
+                Real64 &A,
+                Real64 &B,
+                Real64 &P,
+                int &K,
+                Real64 &IO,
+                Real64 &IL,
+                Real64 &RSER,
+                Real64 &AA,
+                Real64 const EPS,
+                int const KMAX);
 
-    Real64 FUN(Real64 const II, Real64 const VV, Real64 const IL, Real64 const IO, Real64 const RSER, Real64 const AA);
+    Real64 FUN(EnergyPlusData &state, Real64 const II, Real64 const VV, Real64 const IL, Real64 const IO, Real64 const RSER, Real64 const AA);
 
-    Real64 FI(Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA);
+    Real64 FI(EnergyPlusData &state, Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA);
 
-    Real64 FV(Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA);
+    Real64 FV(EnergyPlusData &state, Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA);
 
     // End routines for Equivalent One-Diode model as implemented by Bradley
     //************************************************************************
@@ -296,13 +301,14 @@ namespace Photovoltaics {
                      Real64 const mBVoc        // change in BVoc with irradiance
     );
 
-    void SetVentedModuleQdotSource(int const VentModNum,
+    void SetVentedModuleQdotSource(EnergyPlusData &state,
+                                   int const VentModNum,
                                    Real64 const QSource // source term in Watts
     );
 
-    void GetExtVentedCavityIndex(int const SurfacePtr, int &VentCavIndex);
+    void GetExtVentedCavityIndex(EnergyPlusData &state, int const SurfacePtr, int &VentCavIndex);
 
-    void GetExtVentedCavityTsColl(int const VentModNum, Real64 &TsColl);
+    void GetExtVentedCavityTsColl(EnergyPlusData &state, int const VentModNum, Real64 &TsColl);
 
     // -------------------------------------------------------------------------------
 
@@ -317,6 +323,26 @@ namespace Photovoltaics {
     //     Tel: (608) 274-2577
 
 } // namespace Photovoltaics
+
+struct PhotovoltaicStateData : BaseGlobalStruct
+{
+
+    Array1D_bool CheckEquipName;
+    bool GetInputFlag = true; // one time get input flag
+    bool MyOneTimeFlag = true;
+    bool firstTime = true;
+    Real64 PVTimeStep; // internal timestep (in seconds) for cell temperature mode 3
+    Array1D_bool MyEnvrnFlag;
+
+    void clear_state() override
+    {
+        CheckEquipName.clear();
+        GetInputFlag = true;
+        MyOneTimeFlag = true;
+        firstTime = true;
+        MyEnvrnFlag.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

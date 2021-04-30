@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,62 +49,75 @@
 #define DaylightingDevices_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataDaylightingDevices.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DaylightingDevices {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS: na
-    // DERIVED TYPE DEFINITIONS: na
-    // MODULE VARIABLE TYPE DECLARATIONS: na
+    void InitDaylightingDevices(EnergyPlusData &state);
 
-    // MODULE VARIABLE DECLARATIONS:
-    extern Array1D<Real64> COSAngle; // List of cosines of incident angle
+    void GetTDDInput(EnergyPlusData &state);
 
-    // SUBROUTINE SPECIFICATIONS:
-
-    // Functions
-
-    void InitDaylightingDevices(OutputFiles &outputFiles);
-
-    void GetTDDInput();
-
-    void GetShelfInput();
+    void GetShelfInput(EnergyPlusData &state);
 
     Real64 CalcPipeTransBeam(Real64 const R,    // Reflectance of surface, constant (can be made R = f(theta) later)
                              Real64 const A,    // Aspect ratio, L / d
                              Real64 const Theta // Angle of entry in radians
     );
 
-    Real64 CalcTDDTransSolIso(int const PipeNum); // TDD pipe object number
+    Real64 CalcTDDTransSolIso(EnergyPlusData &state, int const PipeNum); // TDD pipe object number
 
-    Real64 CalcTDDTransSolHorizon(int const PipeNum); // TDD pipe object number
+    Real64 CalcTDDTransSolHorizon(EnergyPlusData &state, int const PipeNum); // TDD pipe object number
 
-    Real64 CalcTDDTransSolAniso(int const PipeNum, // TDD pipe object number
+    Real64 CalcTDDTransSolAniso(EnergyPlusData &state,
+                                int const PipeNum, // TDD pipe object number
                                 Real64 const COSI  // Cosine of the incident angle
     );
 
-    Real64 TransTDD(int const PipeNum,      // TDD pipe object number
-                    Real64 const COSI,      // Cosine of the incident angle
-                    int const RadiationType // Radiation type flag
+    Real64 TransTDD(EnergyPlusData &state,
+                    int const PipeNum,                                   // TDD pipe object number
+                    Real64 const COSI,                                   // Cosine of the incident angle
+                    DataDaylightingDevices::iRadType const RadiationType // Radiation type flag
     );
 
-    Real64 InterpolatePipeTransBeam(Real64 const COSI,               // Cosine of the incident angle
+    Real64 InterpolatePipeTransBeam(EnergyPlusData &state,
+                                    Real64 const COSI,               // Cosine of the incident angle
                                     const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
     );
 
-    int FindTDDPipe(int const WinNum);
+    int FindTDDPipe(EnergyPlusData &state, int const WinNum);
 
-    void DistributeTDDAbsorbedSolar();
+    void DistributeTDDAbsorbedSolar(EnergyPlusData &state);
 
-    void CalcViewFactorToShelf(int const ShelfNum); // Daylighting shelf object number
+    void CalcViewFactorToShelf(EnergyPlusData &state, int const ShelfNum); // Daylighting shelf object number
 
-    void FigureTDDZoneGains();
+    void FigureTDDZoneGains(EnergyPlusData &state);
 
 } // namespace DaylightingDevices
+
+struct DaylightingDevicesData : BaseGlobalStruct
+{
+
+    Array1D<Real64> COSAngle = Array1D<Real64>(DataDaylightingDevices::NumOfAngles); // List of cosines of incident angle
+    bool ShelfReported = false;
+    bool GetTDDInputErrorsFound = false;   // Set to true if errors in input, fatal at end of routine
+    bool GetShelfInputErrorsFound = false; // Set to true if errors in input, fatal at end of routine
+    bool MyEnvrnFlag = true;
+
+    void clear_state() override
+    {
+        this->COSAngle = Array1D<Real64>(DataDaylightingDevices::NumOfAngles);
+        this->ShelfReported = false;
+        this->GetTDDInputErrorsFound = false;
+        this->GetShelfInputErrorsFound = false;
+        this->MyEnvrnFlag = true;
+    }
+};
 
 } // namespace EnergyPlus
 

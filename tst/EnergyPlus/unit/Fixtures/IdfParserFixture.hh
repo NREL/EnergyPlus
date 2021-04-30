@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -80,7 +80,7 @@ protected:
 
     // This function creates a string based on a vector of string inputs that is delimited by DataStringGlobals::NL by default, but any
     // delimiter can be passed in to this funciton. This allows for cross platform output string comparisons.
-    std::string delimited_string(std::vector<std::string> const &strings, std::string const &delimiter = DataStringGlobals::NL)
+    std::string delimited_string(std::vector<std::string> const &strings, std::string const &delimiter = "\n")
     {
         std::ostringstream compare_text;
         for (auto const &str : strings) {

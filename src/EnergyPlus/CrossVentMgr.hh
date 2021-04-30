@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,59 +49,48 @@
 #define CrossVentMgr_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace CrossVentMgr {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
+    void ManageUCSDCVModel(EnergyPlusData &state, int ZoneNum);
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
+    void InitUCSDCV(EnergyPlusData &state, int ZoneNum);
 
-    // MODULE VARIABLE DECLARATIONS:
-    extern Real64 HAT_J;           // HAT_J Convection Coefficient times Area times Temperature for Jet subzone
-    extern Real64 HA_J;            // HA_J  Convection Coefficient times Area for Jet subzone
-    extern Real64 HAT_R;           // HAT_R Convection Coefficient times Area times Temperature for Recirculation subzone
-    extern Real64 HA_R;            // HA_J  Convection Coefficient times Area for Recirculation subzone
-    extern Real64 const Cjet1;     // First correlation constant for the jet velocity
-    extern Real64 const Cjet2;     // Second correlation constant for the jet velocity
-    extern Real64 const Crec1;     // First correlation constant for the recirculation velocity
-    extern Real64 const Crec2;     // Second correlation constant for the recirculation velocity
-    extern Real64 const CjetTemp;  // Correlation constant for the jet temperature rise
-    extern Real64 const CrecTemp;  // Correlation constant for the recirculation temperature rise
-    extern Real64 const CrecFlow1; // First correlation constant for the recirculation flow rate
-    extern Real64 const CrecFlow2; // Second correlation constant for the recirculation flow rate
+    void HcUCSDCV(EnergyPlusData &state, int ZoneNum);
 
-    // SUBROUTINE SPECIFICATIONS:
+    void EvolveParaUCSDCV(EnergyPlusData &state, int ZoneNum);
 
-    // Functions
-
-    void ManageUCSDCVModel(int const ZoneNum); // index number for the specified zone
-
-    //**************************************************************************************************
-
-    void InitUCSDCV(int const ZoneNum);
-
-    //**************************************************************************************************
-
-    void HcUCSDCV(int const ZoneNum);
-
-    //**************************************************************************************************
-
-    void EvolveParaUCSDCV(int const ZoneNum);
-
-    //**************************************************************************************************
-
-    void CalcUCSDCV(int const ZoneNum); // Which Zonenum
-
-    // Clears the global data.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
+    void CalcUCSDCV(EnergyPlusData &state, int ZoneNum);
 
 } // namespace CrossVentMgr
+
+struct CrossVentMgrData : BaseGlobalStruct
+{
+    Real64 HAT_J = 0.0; // HAT_J Convection Coefficient times Area times Temperature for Jet subzone
+    Real64 HA_J = 0.0;  // HA_J  Convection Coefficient times Area for Jet subzone
+    Real64 HAT_R = 0.0; // HAT_R Convection Coefficient times Area times Temperature for Recirculation subzone
+    Real64 HA_R = 0.0;  // HA_J  Convection Coefficient times Area for Recirculation subzone
+
+    bool InitUCSDCV_MyOneTimeFlag = true;
+    Array1D_bool InitUCSDCV_MyEnvrnFlag;
+
+    void clear_state() override
+    {
+        this->HAT_J = 0.0;
+        this->HA_J = 0.0;
+        this->HAT_R = 0.0;
+        this->HA_R = 0.0;
+        this->InitUCSDCV_MyOneTimeFlag = true;
+        this->InitUCSDCV_MyEnvrnFlag.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

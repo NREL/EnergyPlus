@@ -50,37 +50,40 @@
 
 #include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/api/runtime.h>
+#include <EnergyPlus/api/state.h>
 
 int outdoorDewPointActuator = -1;
 int outdoorTempSensor = -1;
 int outdoorDewPointSensor = -1;
 int handlesRetrieved = 0;
 
-void afterZoneTimeStepHandler()
+void afterZoneTimeStepHandler(EnergyPlusState state)
 {
     printf("STARTING A NEW TIME STEP\n");
     if (handlesRetrieved == 0) {
-        if (!apiDataFullyReady()) return;
-        outdoorDewPointActuator = getActuatorHandle("Weather Data", "Outdoor Dew Point", "Environment");
-        outdoorTempSensor = getVariableHandle("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
-        outdoorDewPointSensor = getVariableHandle("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
+        if (!apiDataFullyReady(state)) return;
+        outdoorDewPointActuator = getActuatorHandle(state, "Weather Data", "Outdoor Dew Point", "Environment");
+        outdoorTempSensor = getVariableHandle(state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
+        outdoorDewPointSensor = getVariableHandle(state, "SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
         printf("Got handles %d, %d, %d", outdoorDewPointActuator, outdoorTempSensor, outdoorDewPointSensor);
         if (outdoorDewPointActuator == -1 || outdoorTempSensor == -1 || outdoorDewPointSensor == -1) {
             exit(1);
         }
         handlesRetrieved = 1;
     }
-    setActuatorValue(outdoorDewPointActuator, -25.0);
-    Real64 oa_temp = getVariableValue(outdoorTempSensor);
+    setActuatorValue(state, outdoorDewPointActuator, -25.0);
+    Real64 oa_temp = getVariableValue(state, outdoorTempSensor);
     printf("Reading outdoor temp via getVariable, value is: %8.4f \n", oa_temp);
-    Real64 dp_temp = getVariableValue(outdoorDewPointSensor);
+    Real64 dp_temp = getVariableValue(state, outdoorDewPointSensor);
     printf("Actuated Dew Point temp value is: %8.4f \n", dp_temp);
 }
 
-int main(int argc, const char * argv[]) {
-    callbackEndOfZoneTimeStepAfterZoneReporting(afterZoneTimeStepHandler);
-    requestVariable("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
-    requestVariable("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
-    energyplus(argc, argv);
+int main(int argc, const char *argv[])
+{
+    EnergyPlusState state = stateNew();
+    callbackEndOfZoneTimeStepAfterZoneReporting(state, afterZoneTimeStepHandler);
+    requestVariable(state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
+    requestVariable(state, "SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
+    energyplus(state, argc, argv);
     return 0;
 }

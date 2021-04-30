@@ -1,9 +1,0 @@
-[submodule "vendor/glfw"]
-	path = vendor/glfw
-	url = https://github.com/glfw/glfw.git
-[submodule "vendor/libtess2"]
-	path = vendor/libtess2
-	url = https://github.com/memononen/libtess2.git
-[submodule "vendor/googletest"]
-	path = vendor/googletest
-	url = https://github.com/google/googletest.git

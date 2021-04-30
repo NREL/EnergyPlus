@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,6 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/WindowModel.hh>
@@ -67,15 +68,13 @@ namespace WindowManager {
     {
     }
 
-    std::unique_ptr<CWindowModel> CWindowModel::WindowModelFactory(std::string const &objectName)
+    std::unique_ptr<CWindowModel> CWindowModel::WindowModelFactory(EnergyPlusData &state, std::string const &objectName)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   July 2016
         //       MODIFIED       na
         //       RE-ENGINEERED  na
-
-        using namespace DataIPShortCuts;
 
         // PURPOSE OF THIS SUBROUTINE:
         // Reads input and creates instance of WindowModel object
@@ -84,11 +83,12 @@ namespace WindowManager {
         int IOStat;
 
         std::unique_ptr<CWindowModel> aModel = std::unique_ptr<CWindowModel>(new CWindowModel());
-        int numCurrModels = inputProcessor->getNumObjectsFound(objectName);
+        int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, objectName);
         if (numCurrModels > 0) {
-            inputProcessor->getObjectItem(objectName, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+            state.dataInputProcessing->inputProcessor->getObjectItem(
+                state, objectName, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
             EnumParser<WindowsModel> aParser;
-            aModel->m_Model = aParser.StringToEnum(cAlphaArgs(1));
+            aModel->m_Model = aParser.StringToEnum(state, state.dataIPShortCut->cAlphaArgs(1));
         }
 
         return aModel;
@@ -112,12 +112,12 @@ namespace WindowManager {
     {
     }
 
-    std::unique_ptr<CWindowOpticalModel> CWindowOpticalModel::WindowOpticalModelFactory()
+    std::unique_ptr<CWindowOpticalModel> CWindowOpticalModel::WindowOpticalModelFactory(EnergyPlusData &state)
     {
         // Process input data and counts if number of complex fenestration objects is greater
         // than zero in which case it will use BSDF window model
         std::unique_ptr<CWindowOpticalModel> aModel = std::unique_ptr<CWindowOpticalModel>(new CWindowOpticalModel());
-        int numCurrModels = inputProcessor->getNumObjectsFound("Construction:ComplexFenestrationState");
+        int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:ComplexFenestrationState");
 
         if (numCurrModels > 0) {
             aModel->m_Model = WindowsOpticalModel::BSDF;

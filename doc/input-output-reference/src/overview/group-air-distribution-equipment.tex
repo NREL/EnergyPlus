@@ -1,4 +1,4 @@
-\section{Group -- Air Distribution Equipment}\label{group-air-distribution-equipment}
+\section{Group -- Zone HVAC Air Loop Terminal Units}\label{group-zone-HVAC-air-loop-terminal-units}
 
 The systems described in the Air Distribution Units (ADU's) are shown below. A variety of air terminal units are available for connecting air systems to thermal zones. These single description ADU's contain the reference to the components and the actual controls in one block of input. The idea is that the control volume is drawn tightly around the controls and loosely around the components. This allows complex interactions to take place between all of the components that respond to the Zone Thermostatic Control output. The coils that are referenced in the ADU's are explained fully in the ``Coils'' section of this manual.
 
@@ -6,25 +6,25 @@ The systems described in the Air Distribution Units (ADU's) are shown below. A v
 
 The AirTerminal:SingleDuct:ConstantVolume:Reheat or terminal reheat system is a constant volume reheat system. The systems cooling capabilities are provided by way of cooling coil that supplies cooling to the entire supply air volume. The cooling coil is controlled by a controller setpoint specified for the cooling coil. Zone control is accomplished by heating (reheating) the airflow into each zone as determined by the zone thermostat. Currently the reheat can be supplied by a electric, gas, or hot water coil that tries to meet the zone demand.
 
-\subsubsection{Inputs}\label{inputs-1-001}
+\subsubsection{Inputs}
 
-\paragraph{Field: Name}\label{field-name-1-000}
+\paragraph{Field: Name}
 
 Unique name for the terminal reheat Air Distribution Unit (ADU).
 
-\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-1}
+\paragraph{Field: Availability Schedule Name}
 
 Schedule that this component will operate or is available to operate. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.
 
-\paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name}
+\paragraph{Field: Air Outlet Node Name}
 
 The outlet node from the ADU to the zone. This is the same node as the reheat component air outlet node.
 
-\paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name}
+\paragraph{Field: Air Inlet Node Name}
 
 The air-inlet node name that connects the air splitter to the individual zone ADU. This is the same node as the reheat component air inlet node.
 
-\paragraph{Field: Maximum Air Flow Rate}\label{field-maximum-air-flow-rate-1}
+\paragraph{Field: Maximum Air Flow Rate}
 
 The design constant volume flow rate (m\(^{3}\)/sec) specified for the terminal reheat ADU.
 
@@ -63,6 +63,17 @@ The coil is controlled by knowing the zone demand determined by the zone thermos
 
 This is the upper limit on the temperature in degrees C of the air leaving the terminal unit -- reheat coil (and being delivered to the zone). If the user leaves this field blank, no maximum reheat air temperature is enforced.
 
+\subsubsection{Outputs}
+
+\begin{itemize}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\end{itemize}
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
+
 An IDF example:
 
 \begin{lstlisting}
@@ -79,10 +90,6 @@ AirTerminal:SingleDuct:ConstantVolume:Reheat,
       0.0,  !- Min Reheat Water Flow {m3/s}
       0.001;  !- Convergence Tolerance
 \end{lstlisting}
-
-\subsubsection{Outputs}
-
-There are no outputs for the constant volume reheat air terminal.
 
 \subsection{AirTerminal:SingleDuct:ConstantVolume:NoReheat}\label{airterminalsingleductconstantvolumenoreheat}
 The AirTerminal:SingleDuct:ConstantVolume:NoReheat object creates the capability of supplying central system air directly to a zone without any zone level thermostat control. The supply air temperature is controlled by the central system controller. It is typically used with a unitary system and furnaces which controls the system supply temperature and flow rate with continuous or cycling fan. When used without the Design Specification Outdoor Air Object Name, the terminal unit is passive and accepts any flow rate supplied by the central system, but will never exceed the maximum air flow rate.
@@ -111,7 +118,7 @@ This is an air outlet node from the air distribution unit. This node name should
 
 The design maximum volume flow rate~ (m\(^{3}\)/sec). This field is autosizable.
 
-\paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-DSOA-object-name}
+\paragraph{Field: Design Specification Outdoor Air Object Name}
 
 This field is used to modulate the terminal unit flow rate based on the specified outdoor air requirement. When the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object is entered, the terminal unit will adjust flow to meet this outdoor air requirement and no more. Load is still "Uncontrolled." If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based on either the current or design occupancy as specified in the \textit{Per Person Ventilation Rate Mode} input field below. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. The requested flow rate may not be fully met if the system is operating with cycling fan. The volume flow rate is converted to mass flow rate using the standard density of air at Pressure = 101325 Pa, Temperature = 20C, and Humidity Ratio = 0.0. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. This field is optional.
 
@@ -121,7 +128,14 @@ This field specifies the occupancy level to use when calculating the ventilation
 
 \subsubsection{Outputs}
 
-There are no outputs for the constant volume NoReheat air terminal.
+\begin{itemize}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\end{itemize}
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 An IDF example:
 
@@ -266,7 +280,7 @@ This field specifies a maximum supply air temperature (°C) leaving the reheat c
 
 This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object. When this field is used, the terminal unit will increase flow as needed to meet this outdoor air requirement. If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based on the current number of occupants in the zone. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. See documentation for the zone HVAC outdoor air object for further information (Ref \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir}).
 
-\paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
+\paragraph{Field: Minimum Air Flow Turndown Schedule Name}
 
 This field adjusts the \textit{Constant Minimum Air Flow Fraction}, \textit{Fixed Minimum Air Flow Rate}, or \textit{Minimum Air Flow Fraction Schedule} value by multiplying it using this schedule. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1.
 
@@ -357,7 +371,7 @@ This output is the variable air volume damper position required to meet the zone
 
 This output is the value for the minimum air flow fraction setting on a VAV terminal.~~ This is the average value over the frequency being reported. The minimum air flow fraction is defined as the lower limit on the terminal unit air mass flow rate divided by the terminal units maximum air mass flow rate.
 
-\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s}
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
 
 This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
@@ -434,7 +448,7 @@ The maximum hot water or steam volumetric flow rate in m\(^{3}\)/s through the u
 
 The minimum hot water or steam volumetric flow rate in m\(^{3}\)/s through the unit's heating coil. The steam volumetric flow rate is calculated at 100C and 101325 Pa. If the heating coil is not a hot water or steam coil this field should be left blank.
 
-\paragraph{Field: Heating Convergence Tolerance}\label{field-heating-convergence-tolerance}
+\paragraph{Field: Heating Convergence Tolerance}
 
 The control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. The model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically, this is the fraction:
 
@@ -448,7 +462,7 @@ The control tolerance for the unit heating output. The unit is controlled by mat
 
 The default is 0.001.
 
-\paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
+\paragraph{Field: Minimum Air Flow Turndown Schedule Name}
 
 This field adjusts \textit{Zone Minimum Air Flow Fraction} by multiplying it using this schedule. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1 and the VAV air terminal uses the fixed fraction specified in in the field \textit{Zone Minimum Air Flow Fraction}.
 
@@ -515,11 +529,20 @@ Schedule:Compact,
 
 \subsubsection{Outputs}\label{outputs-3}
 
-HVAC,Average,Zone Air Terminal VAV Damper Position {[]}
+\begin{itemize}
+\item
+  HVAC,Average,Zone Air Terminal VAV Damper Position {[]}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\end{itemize}
 
 \paragraph{Zone Air Terminal VAV Damper Position}\label{zone-air-terminal-vav-damper-position-1}
 
 This output is the variable air volume flow fraction required to meet the zone load. This is the average value over the frequency being reported. The flow fraction is defined as the terminal unit air mass flow rate divided by the terminal unit's maximum air mass flow rate.
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 \subsection{AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat}\label{airterminalsingleductvavheatandcoolreheat}
 
@@ -602,7 +625,7 @@ The coil is controlled by knowing the zone demand determined by the zone thermos
 
 This is the upper limit on the temperature in degrees C of the air leaving the terminal unit -- reheat coil (and being delivered to the zone). If the user leaves this field blank, no maximum reheat air temperature is enforced.
 
-\paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
+\paragraph{Field: Minimum Air Flow Turndown Schedule Name}
 
 This field adjusts the \textit{Zone Minimum Air Flow Fraction} by multiplying it using this schedule. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1 and uses the fixed fraction specified in the field \textit{Zone Minimum Air Flow Fraction}.
 
@@ -635,11 +658,20 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
 
 \subsubsection{Outputs}\label{outputs-4}
 
-HVAC,Average,Zone Air Terminal VAV Damper Position {[]}
+\begin{itemize}
+\item
+  HVAC,Average,Zone Air Terminal VAV Damper Position {[]}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\end{itemize}
 
 \paragraph{Zone Air Terminal VAV Damper Position {[]}}\label{zone-air-terminal-vav-damper-position-2}
 
 This output is the damper position required to meet the zone load. This is the average value over the simulation timestep being reported. The damper position is defined as the terminal unit air mass flow rate divided by the terminal unit's maximum air mass flow rate.
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 \subsection{AirTerminal:SingleDuct:VAV:NoReheat}\label{airterminalsingleductvavnoreheat}
 
@@ -693,7 +725,7 @@ The name of a schedule that determines the value of the minimum air flow fractio
 
 This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object. When this field is used, the terminal unit will increase flow as needed to meet this outdoor air requirement. If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based on the current number of occupants in the zone. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. See documentation for the zone HVAC outdoor air object for further information (Ref \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir}).
 
-\paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
+\paragraph{Field: Minimum Air Flow Turndown Schedule Name}
 
 This field adjusts the \textit{Constant Minimum Air Flow Fraction}, \textit{Fixed Minimum Air Flow Rate}, or \textit{Minimum Air Flow Fraction Schedule} value by multiplying it using this schedule. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1.
 
@@ -759,7 +791,7 @@ An IDF example:
 
 This output is the damper position required to meet the zone load. This is the average value over the simulation timestep being reported. The damper position is defined as the terminal unit air mass flow rate divided by the terminal unit's maximum air mass flow rate.
 
-\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s-1}
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
 
 This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
@@ -803,7 +835,7 @@ This numeric field defines the design maximum volume flow rate (m\(^{3}\)/sec) s
 
 This numeric field defines the minimum air volume flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. This value must be between 0 and 1.
 
-\paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
+\paragraph{Field: Minimum Air Flow Turndown Schedule Name}
 
 This field adjusts the \textit{Zone Minimum Air Flow Fraction} by multiplying it using this schedule. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1 and uses the fixed fraction specified in the field \textit{Zone Minimum Air Flow Fraction}.
 
@@ -822,11 +854,20 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,
 
 \subsubsection{Outputs}\label{outputs-6}
 
-HVAC,Average,Zone Air Terminal VAV Damper Position {[]}
+\begin{itemize}
+\item
+  HVAC,Average,Zone Air Terminal VAV Damper Position {[]}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\end{itemize}
 
 \paragraph{Zone Air Terminal VAV Damper Position {[]}}\label{zone-air-terminal-vav-damper-position-4}
 
 This output is the damper position required to meet the zone load. This is the average value over the simulation timestep being reported. The damper position is defined as the terminal unit air mass flow rate divided by the terminal unit's maximum air mass flow rate.
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 \subsection{AirTerminal:SingleDuct:SeriesPIU:Reheat}\label{airterminalsingleductseriespiureheat}
 
@@ -953,6 +994,8 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
 
 \begin{itemize}
 \item
+  HVAC,Average,Zone Air Terminal Primary Damper Position {[]}
+\item
   HVAC,Average,Zone Air Terminal Heating Rate {[}W{]}
 \item
   HVAC,Sum,Zone Air Terminal Heating Energy {[}J{]}
@@ -960,7 +1003,13 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
   HVAC,Average,Zone Air Terminal Sensible Cooling Rate {[}W{]}
 \item
   HVAC,Sum,Zone Air Terminal Sensible Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
 \end{itemize}
+
+\paragraph{Zone Air Terminal Primary Damper Position {[]}}\label{zone-air-terminal-series-piu-primary-damper-position}
+
+This output is the variable air volume primary damper position required to meet the zone load. This is the average value over the frequency being reported. The damper position is defined as the terminal unit primary air mass flow rate divided by the terminal unit's maximum primary air mass flow rate.
 
 \paragraph{Zone Air Terminal Heating Rate {[}W{]}}\label{zone-air-terminal-heating-rate-w}
 
@@ -977,6 +1026,10 @@ This field reports the dry air sensible heat extraction rate of the series PIU t
 \paragraph{Zone Air Terminal Sensible Cooling Energy {[}J{]}}\label{zone-air-terminal-sensible-cooling-energy-j-1}
 
 This field reports the dry air sensible heat extraction of the series PIU terminal unit from the zone it is serving in Joules over the timestep being reported. This is determined by outlet and zone air conditions, the mass flow rate through the terminal unit, and the timestep.
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 \subsection{AirTerminal:SingleDuct:ParallelPIU:Reheat}\label{airterminalsingleductparallelpiureheat}
 
@@ -1109,14 +1162,22 @@ AirTerminal:SingleDuct:ParallelPIU:Reheat,
 
 \begin{itemize}
 \item
+  HVAC,Average,Zone Air Terminal Primary Damper Position {[]}
+\item
   HVAC,Average,Zone Air Terminal Heating Rate {[}W{]}
 \item
   HVAC,Sum,Zone Air Terminal Heating Energy {[}J{]}
 \item
   HVAC,Average,Zone Air Terminal Sensible Cooling Rate {[}W{]}
 \item
-  HVAC,Sum, Zone Air Terminal Sensible Cooling Energy {[}J{]}
+  HVAC,Sum,Zone Air Terminal Sensible Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
 \end{itemize}
+
+\paragraph{Zone Air Terminal Primary Damper Position {[]}}\label{zone-air-terminal-parallel-piu-primary-damper-position}
+
+This output is the variable air volume primary damper position required to meet the zone load. This is the average value over the frequency being reported. The damper position is defined as the terminal unit primary air mass flow rate divided by the terminal unit's maximum primary air mass flow rate.
 
 \paragraph{Zone Air Terminal Heating Rate {[}W{]}}\label{zone-air-terminal-heating-rate-w-1}
 
@@ -1133,6 +1194,10 @@ This field reports the sensible heat extraction rate of the parallel PIU termina
 \paragraph{Zone Air Terminal Sensible Cooling Energy {[}J{]}}\label{zone-air-terminal-sensible-cooling-energy-j-2}
 
 This field reports the dry air sensible heat extraction of the parallel PIU terminal unit from the zone it is serving in Joules over the timestep being reported. This is determined by outlet and zone air conditions, the mass flow rate through the terminal unit, and the timestep.
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 \subsection{AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction}\label{airterminalsingleductconstantvolumefourpipeinduction}
 
@@ -1297,7 +1362,14 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
 
 \subsubsection{Outputs}\label{outputs-9}
 
-There are no specific outputs for the four pipe induction terminal units.
+\begin{itemize}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\end{itemize}
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 \subsection{AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam}\label{airterminalsingleductconstantvolumefourpipebeam}
 
@@ -1478,6 +1550,10 @@ Heating by the primary air to the zone, exclusive of any cooling or heating done
 
 Air flow rate from the central air handler into the zone in m3/s. Note that this does not include any of the secondary air flow that is induced by the convector and nozzle action (the model does not resolve secondary air flow rate and the result are not available).
 
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
+
 \subsection{AirTerminal:SingleDuct:ConstantVolume:CooledBeam}\label{airterminalsingleductconstantvolumecooledbeam}
 
 The Cooled Beam system is a mixed air-hydronic system. A central, single-duct forced-air system supplies conditioned ventilation air to the zones. Sensible cooling is done by chilled water circulating through ceiling mounted cooled beam units. Chilled water flow rate through the cooled beam units is varied to meet the zone sensible cooling load. Any dehumidification is done by the central ventilation air system. Heating is usually accomplished with hot water radiators. Thermodynamically, the cooled beam system resembles the four-pipe induction unit.
@@ -1645,6 +1721,8 @@ An example input is:
   HVAC,Average,Zone Air Terminal Supply Air Sensible Heating Rate {[}W{]}
 \item
   HVAC,Sum,Zone Air Terminal Beam Chilled Water Energy {[}J{]}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
 \end{itemize}
 
 \paragraph{Zone Air Terminal Beam Sensible Cooling Rate {[}W{]}}\label{zone-air-terminal-beam-sensible-cooling-rate-w-1}
@@ -1674,6 +1752,10 @@ Heating by the supply air to the zone, exclusive of any cooling done by the beam
 \paragraph{Zone Air Terminal Beam Chilled Water Energy {[}J{]}}\label{zone-air-terminal-beam-chilled-water-energy-j}
 
 The heat transfer energy for the chilled water serving the beams, in Joules.
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 \subsection{AirTerminal:SingleDuct:Mixer}\label{airterminalsingleductmixer}
 
@@ -1755,7 +1837,7 @@ This input field allows user to specify the mixer connection type. Valid choices
 
 This field allows modifying the behavior of this air terminal so that it is modulated to supply the required outdoor air to the zone.  This field is optional. When the name of an \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object is entered, the model is changed to adjust the flow rate to provide the volume of outdoor air described by that object.  This feature allows modeling demand controlled ventilation on a zone-by-zone basis using the Outdoor Air Flow per Person rate (specified in the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object) and the number of occupants (specified in the \hyperref[people]{People} object schedules).  If the outdoor air fraction of the supply air is 1.0, as for a dedicated outdoor air system, the air flow rate will match the outdoor air requirement.  When the outdoor air fraction is less than 1.0, as for a recirculating air system, the terminal air flow will be modulated upward to account for the increased total air flow needed to provide the required flow rate of outdoor air.   The total air flow rate will not exceed the Maximum Air Flow Rate specified above. The volume flow rate is converted to mass flow rate using the standard density of air at Pressure = 101325 Pa, Temperature = 20C, and Humidity Ratio = 0.0.
 
-\paragraph{Field: Per Person Ventilation Rate Mode}\label{field-per-person-ventilation-rate-mode}
+\paragraph{Field: Per Person Ventilation Rate Mode}
 
 This field specifies how the outdoor air ventilation rates are calculated when based on a rate per person.~ It can be either based on the current number of people as affected by time-varying occupancy schedules, or on the constant value for the maximum number of people.~~ Enter the key CurrentOccupancy for the former and DesignOccupancy for the later.
 
@@ -1885,7 +1967,7 @@ The minimum flow rate to the zone while the system is operating, specified as a 
 
 This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object. When this field is used, the terminal unit will increase flow as needed to meet this outdoor air requirement. If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based on the current number of occupants in the zone. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. See documentation for the zone HVAC outdoor air object for further information (Ref \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir}).
 
-\paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
+\paragraph{Field: Minimum Air Flow Turndown Schedule Name}
 
 This field adjusts \textit{Zone Minimum Air Flow Fraction} by multiplying it using this schedule. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1 and the VAV air terminal uses the fixed fraction specified in in the field \textit{Zone Minimum Air Flow Fraction}.
 
@@ -1957,7 +2039,7 @@ This output is the damper position of the cold air stream in a dual duct air ter
 
 This output is the damper position of the hot air stream in a dual duct air terminal. This is the average value over the frequency being reported. The damper position is defined as the terminal unit hot air mass flow rate divided by the terminal unit's maximum hot air mass flow rate.
 
-\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s-2}
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
 
 This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outdoor air system.
 
@@ -1999,7 +2081,7 @@ Max total airflow rate (in m3/s) at the terminal unit outlet including both the 
 
 This field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object.~ This field is required for this object.~ The terminal unit will modulate the Outdoor Air stream to meet this outdoor air requirement.~ If Outdoor Air Flow per Person is applied, then the outdoor air required will be based on either the current number of occupants in the zone, as for demand controlled ventilation, or the design level of occupants depending on the setting in the next field.
 
-\paragraph{Field: Per Person Ventilation Rate Mode}\label{field-per-person-ventilation-rate-mode}
+\paragraph{Field: Per Person Ventilation Rate Mode}
 
 This field specifies how the outdoor air ventilation rates are calculated when based on a rate per person.~ It can be either based on the current number of people as affected by time-varying occupancy schedules, or on the constant value for the maximum number of people.~~ Enter the key CurrentOccupancy for the former and DesignOccupancy for the later.
 

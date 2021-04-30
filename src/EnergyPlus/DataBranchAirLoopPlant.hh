@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -59,31 +60,28 @@ namespace EnergyPlus {
 
 namespace DataBranchAirLoopPlant {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     // Parameters for tolerance
-    extern Real64 const MassFlowTolerance; // minimum significant mass flow rate (kg/s)
+    constexpr Real64 MassFlowTolerance(0.000000001); // minimum significant mass flow rate (kg/s)
 
-    // Pressure Curve Type: None, pressure, or generic curve (if generic it will be a postive value which is the curve manager index)
-    extern int const PressureCurve_Error;
-    extern int const PressureCurve_None;
-    extern int const PressureCurve_Pressure;
-    extern int const PressureCurve_Generic;
+    // Pressure Curve Type: None, pressure, or generic curve (if generic it will be a positive value which is the curve manager index)
+    enum class PressureCurveType
+    {
+        Unassigned = -2,
+        Error = -1,
+        None = 0,
+        Pressure = 1,
+        Generic = 2
+    };
 
     // Parameters for flow Control Types for branch flow resolution inside splitter/mixers
-    extern int const ControlType_Unknown;
-    extern int const ControlType_Active;       // 'Active'
-    extern int const ControlType_Passive;      // 'Passive'
-    extern int const ControlType_SeriesActive; // 'SeriesActive'
-    extern int const ControlType_Bypass;       // 'Bypass
-    extern Array1D_string const cControlType;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumPressureCurves;
+    enum class ControlTypeEnum
+    {
+        Unknown,
+        Active,
+        Passive,
+        SeriesActive,
+        Bypass
+    };
 
     // Types
 
@@ -99,6 +97,7 @@ namespace DataBranchAirLoopPlant {
         Real64 ConstantF;             // - Constant value of f (if applicable)               [-]
         bool EMSOverrideOn;           // if TRUE, then EMS is calling to override curve value
         Real64 EMSOverrideCurveValue; // Value of curve result EMS is directing to use
+
         //  report variables.
         Real64 CurveOutput;
         Real64 CurveInput1; // - MassFlow                                         [kg/s]
@@ -112,13 +111,20 @@ namespace DataBranchAirLoopPlant {
         {
         }
     };
-
-    // Object Data
-    extern Array1D<PlantPressureCurveData> PressureCurve;
-
-    void clear_state();
-
 } // namespace DataBranchAirLoopPlant
+
+struct DataBranchAirLoopPlantData : BaseGlobalStruct
+{
+
+    int NumPressureCurves = 0;
+    Array1D<DataBranchAirLoopPlant::PlantPressureCurveData> PressureCurve;
+
+    void clear_state() override
+    {
+        this->NumPressureCurves = 0;
+        this->PressureCurve.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

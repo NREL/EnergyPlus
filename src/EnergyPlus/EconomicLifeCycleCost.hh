@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,12 +48,18 @@
 #ifndef EconomicLifeCycleCost_hh_INCLUDED
 #define EconomicLifeCycleCost_hh_INCLUDED
 
+// C++ Headers
+#include <map>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -64,117 +70,116 @@ namespace EconomicLifeCycleCost {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    extern int const disConvBeginOfYear;
-    extern int const disConvMidYear;
-    extern int const disConvEndOfYear;
+    enum class iDiscConv
+    {
+        BeginOfYear,
+        MidYear,
+        EndOfYear,
+    };
 
-    extern int const inflAppConstantDollar;
-    extern int const inflAppCurrentDollar;
+    enum class iInflAppr
+    {
+        ConstantDollar,
+        CurrentDollar,
+    };
 
-    // ModifiedAcceleratedCostRecoverySystem or Straight Line
-    extern int const depMethMACRS3;
-    extern int const depMethMACRS5;
-    extern int const depMethMACRS7;
-    extern int const depMethMACRS10;
-    extern int const depMethMACRS15;
-    extern int const depMethMACRS20;
-    extern int const depMethStraight27;
-    extern int const depMethStraight31;
-    extern int const depMethStraight39;
-    extern int const depMethStraight40;
-    extern int const depMethNone;
+    enum class iDeprMethod
+    {
+        MACRS3,
+        MACRS5,
+        MACRS7,
+        MACRS10,
+        MACRS15,
+        MACRS20,
+        Straight27,
+        Straight31,
+        Straight39,
+        Straight40,
+        None,
+    };
 
-    extern int const costCatMaintenance;
-    extern int const costCatRepair;
-    extern int const costCatOperation;
-    extern int const costCatReplacement;
-    extern int const costCatMinorOverhaul;
-    extern int const costCatMajorOverhaul;
-    extern int const costCatOtherOperational;
-    extern int const costCatConstruction;
-    extern int const costCatSalvage;
-    extern int const costCatOtherCapital;
-    extern int const costCatWater;
-    extern int const costCatEnergy;
-    extern int const costCatTotEnergy;
-    extern int const costCatTotOper;
-    extern int const costCatTotCaptl;
-    extern int const costCatTotGrand;
+    constexpr int costCatMaintenance(1);
+    constexpr int costCatRepair(2);
+    constexpr int costCatOperation(3);
+    constexpr int costCatReplacement(4);
+    constexpr int costCatMinorOverhaul(5);
+    constexpr int costCatMajorOverhaul(6);
+    constexpr int costCatOtherOperational(7);
+    constexpr int costCatConstruction(8);
+    constexpr int costCatSalvage(9);
+    constexpr int costCatOtherCapital(10);
+    constexpr int costCatWater(11);
+    constexpr int costCatEnergy(12);
+    constexpr int costCatTotEnergy(13);
+    constexpr int costCatTotOper(14);
+    constexpr int costCatTotCaptl(15);
+    constexpr int costCatTotGrand(16);
 
-    extern int const countOfCostCat; // count of the number of cost categories
+    constexpr int countOfCostCat(16); // count of the number of cost categories
 
     // The NIST supplement includes UPV* factors for
     //   Electricity
     //   Natural gas
-    //   Distillate oil - FuelOil#1
+    //   Distillate oil - FuelOilNo1
     //   Liquified petroleum gas - Propane
-    //   Residual oil - FuelOil#2
+    //   Residual oil - FuelOilNo2
     //   Coal
 
-    extern int const startServicePeriod;
-    extern int const startBasePeriod;
+    enum class iStartCosts
+    {
+        ServicePeriod,
+        BasePeriod,
+    };
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
+    enum class iSourceKind
+    {
+        Unassigned,
+        Recurring,
+        Nonrecurring,
+        Resource,
+        Sum,
+    };
 
-    // MODULE VARIABLE DECLARATIONS:
+    enum class iPrValKind
+    {
+        Unassigned,
+        Energy,
+        NonEnergy,
+        NotComputed,
+    };
 
-    // related to LifeCycleCost:Parameters
-    extern bool LCCparamPresent;       // If a LifeCycleCost:Parameters object is present
-    extern std::string LCCname;        // Name
-    extern int discountConvension;     // Discounting Convention
-    extern int inflationApproach;      // Inflation Approach
-    extern Real64 realDiscountRate;    // Real Discount Rate
-    extern Real64 nominalDiscountRate; // Nominal Discount Rate
-    extern Real64 inflation;           // Inflation
-    extern int baseDateMonth;          // Base Date Month (1=Jan, 12=Dec)
-    extern int baseDateYear;           // Base Date Year  1900-2100
-    extern int serviceDateMonth;       // Service Date Month (1=Jan, 12=Dec)
-    extern int serviceDateYear;        // Service Date Year 1900-2100
-    extern int lengthStudyYears;       // Length of Study Period in Years
-    extern int lengthStudyTotalMonths; // Length of Study expressed in months (years x 12)
-    extern Real64 taxRate;             // Tax rate
-    extern int depreciationMethod;     // Depreciation Method
-    // derived
-    extern int lastDateMonth; // Last Date Month (the month before the base date month)
-    extern int lastDateYear;  // Last Date Year (base date year + length of study period in years)
-
-    extern int numRecurringCosts;
-
-    extern int numNonrecurringCost;
-
-    extern int numUsePriceEscalation;
-
-    extern int numUseAdjustment;
-
-    extern int numCashFlow;
-    extern int const skRecurring;
-    extern int const skNonrecurring;
-    extern int const skResource;
-    extern int const skSum;
-    extern int const pvkEnergy;
-    extern int const pvkNonEnergy;
-    extern int const pvkNotComputed;
-    extern int numResourcesUsed;
-
-    // present value factors
-    extern Array1D<Real64> SPV;
-    extern Array2D<Real64> energySPV; // yearly equivalent to FEMP UPV* values
-
-    // arrays related to computing after tax cashflow and present value
-    extern Array1D<Real64> DepreciatedCapital;
-    extern Array1D<Real64> TaxableIncome;
-    extern Array1D<Real64> Taxes;
-    extern Array1D<Real64> AfterTaxCashFlow;
-    extern Array1D<Real64> AfterTaxPresentValue;
-
-    extern Array1D_string const MonthNames;
-
-    // arrays related to escalated energy costs
-    extern Array1D<Real64> EscalatedTotEnergy; 
-    extern Array2D<Real64> EscalatedEnergy; 
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
+    constexpr const char *MonthNames(int const &i)
+    {
+        switch (i) {
+        case 1:
+            return "January";
+        case 2:
+            return "February";
+        case 3:
+            return "March";
+        case 4:
+            return "April";
+        case 5:
+            return "May";
+        case 6:
+            return "June";
+        case 7:
+            return "July";
+        case 8:
+            return "August";
+        case 9:
+            return "September";
+        case 10:
+            return "October";
+        case 11:
+            return "November";
+        case 12:
+            return "December";
+        default:
+            assert(false);
+            return "";
+        }
+    }
 
     // Types
 
@@ -185,7 +190,7 @@ namespace EconomicLifeCycleCost {
         std::string lineItem;        // Line Item
         int category;                // Category
         Real64 cost;                 // Cost
-        int startOfCosts;            // Start of Costs
+        iStartCosts startOfCosts;    // Start of Costs
         int yearsFromStart;          // Years from Start 0 - 100
         int monthsFromStart;         // Months from Start 0 - 11
         int totalMonthsFromStart;    // Total months (12 x years) + months
@@ -196,8 +201,8 @@ namespace EconomicLifeCycleCost {
 
         // Default Constructor
         RecurringCostsType()
-            : category(costCatMaintenance), cost(0.0), startOfCosts(startServicePeriod), yearsFromStart(0), monthsFromStart(0), totalMonthsFromStart(0),
-              repeatPeriodYears(0), repeatPeriodMonths(0), totalRepeatPeriodMonths(0), annualEscalationRate(0.0)
+            : category(costCatMaintenance), cost(0.0), startOfCosts(iStartCosts::ServicePeriod), yearsFromStart(0), monthsFromStart(0),
+              totalMonthsFromStart(0), repeatPeriodYears(0), repeatPeriodMonths(0), totalRepeatPeriodMonths(0), annualEscalationRate(0.0)
         {
         }
     };
@@ -209,14 +214,15 @@ namespace EconomicLifeCycleCost {
         std::string lineItem;     // Line Item
         int category;             // Category
         Real64 cost;              // Cost
-        int startOfCosts;         // Start of Costs
+        iStartCosts startOfCosts; // Start of Costs
         int yearsFromStart;       // Years from Start 0 - 100
         int monthsFromStart;      // Months from Start 0 - 11
         int totalMonthsFromStart; // Total months (12 x years) + months
 
         // Default Constructor
         NonrecurringCostType()
-            : category(costCatConstruction), cost(0.0), startOfCosts(startServicePeriod), yearsFromStart(0), monthsFromStart(0), totalMonthsFromStart(0)
+            : category(costCatConstruction), cost(0.0), startOfCosts(iStartCosts::ServicePeriod), yearsFromStart(0), monthsFromStart(0),
+              totalMonthsFromStart(0)
         {
         }
     };
@@ -224,15 +230,15 @@ namespace EconomicLifeCycleCost {
     struct UsePriceEscalationType
     {
         // Members
-        std::string name;           // Name
-        int resource;               // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-        int escalationStartYear;    // Escalation Start Year 1900-2100
-        int escalationStartMonth;   // Escalation Start Month 1 to 12
-        Array1D<Real64> Escalation; // Escalation by year, first year is baseDateYear
+        std::string name;                           // Name
+        DataGlobalConstants::ResourceType resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
+        int escalationStartYear;                    // Escalation Start Year 1900-2100
+        int escalationStartMonth;                   // Escalation Start Month 1 to 12
+        Array1D<Real64> Escalation;                 // Escalation by year, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
-        UsePriceEscalationType() : resource(0), escalationStartYear(0), escalationStartMonth(0)
+        UsePriceEscalationType() : resource(DataGlobalConstants::ResourceType::None), escalationStartYear(0), escalationStartMonth(0)
         {
         }
     };
@@ -240,13 +246,13 @@ namespace EconomicLifeCycleCost {
     struct UseAdjustmentType
     {
         // Members
-        std::string name;           // Name
-        int resource;               // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-        Array1D<Real64> Adjustment; // Adjustment by year, first year is baseDateYear
+        std::string name;                           // Name
+        DataGlobalConstants::ResourceType resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
+        Array1D<Real64> Adjustment;                 // Adjustment by year, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
-        UseAdjustmentType() : resource(0)
+        UseAdjustmentType() : resource(DataGlobalConstants::ResourceType::None)
         {
         }
     };
@@ -254,36 +260,31 @@ namespace EconomicLifeCycleCost {
     struct CashFlowType
     {
         // Members
-        std::string name;         // Name - just for labeling output - use Category for aggregation
-        int SourceKind;           // 1=recurring, 2=nonrecurring, 3=resource
-        int Resource;             // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-        int Category;             // uses "costCat" constants above
-        Array1D<Real64> mnAmount; // cashflow dollar amount by month, first year is baseDateYear
+        std::string name;                           // Name - just for labeling output - use Category for aggregation
+        iSourceKind SourceKind;                     // 1=recurring, 2=nonrecurring, 3=resource
+        DataGlobalConstants::ResourceType Resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
+        int Category;                               // uses "costCat" constants above
+        Array1D<Real64> mnAmount;                   // cashflow dollar amount by month, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
         Array1D<Real64> yrAmount;  // cashflow dollar amount by year, first year is baseDateYear
-        int pvKind;                // kind of present value 1=energy, 2=non-energy,3=not computed but summed
+        iPrValKind pvKind;         // kind of present value 1=energy, 2=non-energy,3=not computed but summed
         Real64 presentValue;       // total present value for cashflow
         Real64 orginalCost;        // original cost from recurring, non-recurring or energy cost
         Array1D<Real64> yrPresVal; // present value by year, first year is baseDateYear
 
         // Default Constructor
-        CashFlowType() : SourceKind(0), Resource(0), Category(0), pvKind(0), presentValue(0.), orginalCost(0.)
+        CashFlowType()
+            : SourceKind(iSourceKind::Unassigned), Resource(DataGlobalConstants::ResourceType::None), Category(0), pvKind(iPrValKind::Unassigned),
+              presentValue(0.), orginalCost(0.)
         {
         }
     };
 
-    // Object Data
-    extern Array1D<RecurringCostsType> RecurringCosts;
-    extern Array1D<NonrecurringCostType> NonrecurringCost;
-    extern Array1D<UsePriceEscalationType> UsePriceEscalation;
-    extern Array1D<UseAdjustmentType> UseAdjustment;
-    extern Array1D<CashFlowType> CashFlow;
-
     // Functions
 
-    void GetInputForLifeCycleCost();
+    void GetInputForLifeCycleCost(EnergyPlusData &state);
 
-    void ComputeLifeCycleCostAndReport();
+    void ComputeLifeCycleCostAndReport(EnergyPlusData &state);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -293,17 +294,17 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputLifeCycleCostParameters();
+    void GetInputLifeCycleCostParameters(EnergyPlusData &state);
 
-    void GetInputLifeCycleCostRecurringCosts();
+    void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state);
 
-    void GetInputLifeCycleCostNonrecurringCost();
+    void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state);
 
-    void GetInputLifeCycleCostUsePriceEscalation();
+    void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state);
 
-    void GetInputLifeCycleCostUseAdjustment();
+    void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state);
 
-    int MonthToMonthNumber(std::string const &inMonthString, int const inDefaultMonth);
+    int MonthToMonthNumber(std::string const &inMonthString, int const &inDefaultMonth);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -313,13 +314,13 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ExpressAsCashFlows();
+    void ExpressAsCashFlows(EnergyPlusData &state);
 
-    void ComputeEscalatedEnergyCosts();
+    void ComputeEscalatedEnergyCosts(EnergyPlusData &state);
 
-    void ComputePresentValue();
+    void ComputePresentValue(EnergyPlusData &state);
 
-    void ComputeTaxAndDepreciation();
+    void ComputeTaxAndDepreciation(EnergyPlusData &state);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -329,11 +330,124 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularLifeCycleCostReport();
-
-    void clear_state();
+    void WriteTabularLifeCycleCostReport(EnergyPlusData &state);
 
 } // namespace EconomicLifeCycleCost
+
+struct EconomicLifeCycleCostData : BaseGlobalStruct
+{
+    // related to LifeCycleCost:Parameters
+    bool LCCparamPresent = false; // If a LifeCycleCost:Parameters object is present
+    std::string LCCname;          // Name
+    EconomicLifeCycleCost::iDiscConv discountConvention = EconomicLifeCycleCost::iDiscConv::EndOfYear;     // Discounting Convention
+    EconomicLifeCycleCost::iInflAppr inflationApproach = EconomicLifeCycleCost::iInflAppr::ConstantDollar; // Inflation Approach
+    Real64 realDiscountRate = 0.0;                                                                         // Real Discount Rate
+    Real64 nominalDiscountRate = 0.0;                                                                      // Nominal Discount Rate
+    Real64 inflation = 0.0;                                                                                // Inflation
+    int baseDateMonth = 0;                                                                                 // Base Date Month (1=Jan, 12=Dec)
+    int baseDateYear = 0;                                                                                  // Base Date Year  1900-2100
+    int serviceDateMonth = 0;                                                                              // Service Date Month (1=Jan, 12=Dec)
+    int serviceDateYear = 0;                                                                               // Service Date Year 1900-2100
+    int lengthStudyYears = 0;                                                                              // Length of Study Period in Years
+    int lengthStudyTotalMonths = 0; // Length of Study expressed in months (years x 12)
+    Real64 taxRate = 0.0;           // Tax rate
+    EconomicLifeCycleCost::iDeprMethod depreciationMethod = EconomicLifeCycleCost::iDeprMethod::None; // Depreciation Method
+    // derived
+    int lastDateMonth = 0; // Last Date Month (the month before the base date month)
+    int lastDateYear = 0;  // Last Date Year (base date year + length of study period in years)
+    int numRecurringCosts = 0;
+    int numNonrecurringCost = 0;
+    int numUsePriceEscalation = 0;
+    int numUseAdjustment = 0;
+    int numCashFlow = 0;
+    int numResourcesUsed = 0;
+    bool GetInput_GetLifeCycleCostInput = true;
+
+    // from former statics in GetInputLifeCycleCostUsePriceEscalation()
+    int UsePriceEscalation_escStartYear = 0;
+    int UsePriceEscalation_escNumYears = 0;
+    int UsePriceEscalation_escEndYear = 0;
+    int UsePriceEscalation_earlierEndYear = 0;
+    int UsePriceEscalation_laterStartYear = 0;
+    int UsePriceEscalation_curEsc = 0;
+    int UsePriceEscalation_curFld = 0;
+
+    // from former statics in ExpressAsCashFlows
+    int ExpressAsCashFlows_baseMonths1900 = 0;    // number of months since 1900 for base period
+    int ExpressAsCashFlows_serviceMonths1900 = 0; // number of months since 1900 for service period
+
+    // present value factors
+    Array1D<Real64> SPV;
+    std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> energySPV; // yearly equivalent to FEMP UPV* values
+
+    // arrays related to computing after tax cashflow and present value
+    Array1D<Real64> DepreciatedCapital;
+    Array1D<Real64> TaxableIncome;
+    Array1D<Real64> Taxes;
+    Array1D<Real64> AfterTaxCashFlow;
+    Array1D<Real64> AfterTaxPresentValue;
+
+    // arrays related to escalated energy costs
+    Array1D<Real64> EscalatedTotEnergy;
+    std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> EscalatedEnergy;
+
+    EPVector<EconomicLifeCycleCost::RecurringCostsType> RecurringCosts;
+    EPVector<EconomicLifeCycleCost::NonrecurringCostType> NonrecurringCost;
+    EPVector<EconomicLifeCycleCost::UsePriceEscalationType> UsePriceEscalation;
+    EPVector<EconomicLifeCycleCost::UseAdjustmentType> UseAdjustment;
+    EPVector<EconomicLifeCycleCost::CashFlowType> CashFlow;
+
+    void clear_state() override
+    {
+        this->LCCparamPresent = false;
+        this->LCCname.clear();
+        this->discountConvention = EconomicLifeCycleCost::iDiscConv::EndOfYear;
+        this->inflationApproach = EconomicLifeCycleCost::iInflAppr::ConstantDollar;
+        this->realDiscountRate = 0.0;
+        this->nominalDiscountRate = 0.0;
+        this->inflation = 0.0;
+        this->baseDateMonth = 0;
+        this->baseDateYear = 0;
+        this->serviceDateMonth = 0;
+        this->serviceDateYear = 0;
+        this->lengthStudyYears = 0;
+        this->lengthStudyTotalMonths = 0;
+        this->taxRate = 0.0;
+        this->depreciationMethod = EconomicLifeCycleCost::iDeprMethod::None;
+        this->lastDateMonth = 0;
+        this->lastDateYear = 0;
+        this->numRecurringCosts = 0;
+        this->numNonrecurringCost = 0;
+        this->numUsePriceEscalation = 0;
+        this->numUseAdjustment = 0;
+        this->numCashFlow = 0;
+        this->numResourcesUsed = 0;
+        this->GetInput_GetLifeCycleCostInput = true;
+        this->UsePriceEscalation_escStartYear = 0;
+        this->UsePriceEscalation_escNumYears = 0;
+        this->UsePriceEscalation_escEndYear = 0;
+        this->UsePriceEscalation_earlierEndYear = 0;
+        this->UsePriceEscalation_laterStartYear = 0;
+        this->UsePriceEscalation_curEsc = 0;
+        this->UsePriceEscalation_curFld = 0;
+        this->ExpressAsCashFlows_baseMonths1900 = 0;
+        this->ExpressAsCashFlows_serviceMonths1900 = 0;
+        this->SPV.deallocate();
+        this->energySPV.clear();
+        this->DepreciatedCapital.deallocate();
+        this->TaxableIncome.deallocate();
+        this->Taxes.deallocate();
+        this->AfterTaxCashFlow.deallocate();
+        this->AfterTaxPresentValue.deallocate();
+        this->EscalatedTotEnergy.deallocate();
+        this->EscalatedEnergy.clear();
+        this->RecurringCosts.deallocate();
+        this->NonrecurringCost.deallocate();
+        this->UsePriceEscalation.deallocate();
+        this->UseAdjustment.deallocate();
+        this->CashFlow.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

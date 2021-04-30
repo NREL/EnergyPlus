@@ -44,7 +44,6 @@
 # (To distribute this file outside of CMake, substitute the full
 #  License text for the above reference.)
 
-
 set(_MS_MINGW_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR})
 include(CheckLanguage)
 include(ExternalProject)
@@ -52,17 +51,11 @@ include(CMakeParseArguments)
 
 function(_setup_mingw_config_and_build source_dir build_dir)
   # Look for a MinGW gfortran.
-  find_program(MINGW_GFORTRAN
-    NAMES gfortran
-    PATHS
-      c:/MinGW/bin
-      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\MinGW;InstallLocation]/bin"
-    )
+  find_program(MINGW_GFORTRAN NAMES gfortran
+               PATHS c:/MinGW/bin "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\MinGW;InstallLocation]/bin")
   if(NOT MINGW_GFORTRAN)
-    message(FATAL_ERROR
-      "gfortran not found, please install MinGW with the gfortran option."
-      "Or set the cache variable MINGW_GFORTRAN to the full path. "
-      " This is required to build")
+    message(FATAL_ERROR "gfortran not found, please install MinGW with the gfortran option."
+                        "Or set the cache variable MINGW_GFORTRAN to the full path. " " This is required to build")
   endif()
 
   # Validate the MinGW gfortran we found.
@@ -89,21 +82,13 @@ function(_setup_mingw_config_and_build source_dir build_dir)
   get_filename_component(MINGW_PATH ${MINGW_GFORTRAN} PATH)
   file(TO_NATIVE_PATH "${MINGW_PATH}" MINGW_PATH)
   string(REPLACE "\\" "\\\\" MINGW_PATH "${MINGW_PATH}")
-  configure_file(
-    ${_MS_MINGW_SOURCE_DIR}/CMakeAddFortranSubdirectory/config_mingw.cmake.in
-    ${build_dir}/config_mingw.cmake
-    @ONLY)
-  configure_file(
-    ${_MS_MINGW_SOURCE_DIR}/CMakeAddFortranSubdirectory/build_mingw.cmake.in
-    ${build_dir}/build_mingw.cmake
-    @ONLY)
+  configure_file(${_MS_MINGW_SOURCE_DIR}/CMakeAddFortranSubdirectory/config_mingw.cmake.in ${build_dir}/config_mingw.cmake @ONLY)
+  configure_file(${_MS_MINGW_SOURCE_DIR}/CMakeAddFortranSubdirectory/build_mingw.cmake.in ${build_dir}/build_mingw.cmake @ONLY)
 endfunction()
 
 function(_add_fortran_library_link_interface library depend_library)
-  set_target_properties(${library} PROPERTIES
-    IMPORTED_LINK_INTERFACE_LIBRARIES_NOCONFIG "${depend_library}")
+  set_target_properties(${library} PROPERTIES IMPORTED_LINK_INTERFACE_LIBRARIES_NOCONFIG "${depend_library}")
 endfunction()
-
 
 function(cmake_add_fortran_subdirectory subdir)
   # Parse arguments to function
@@ -112,10 +97,7 @@ function(cmake_add_fortran_subdirectory subdir)
   set(multiValueArgs LIBRARIES LINK_LIBRARIES CMAKE_COMMAND_LINE)
   cmake_parse_arguments(ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
   if(NOT ARGS_NO_EXTERNAL_INSTALL)
-    message(FATAL_ERROR
-      "Option NO_EXTERNAL_INSTALL is required (for forward compatibility) "
-      "but was not given."
-      )
+    message(FATAL_ERROR "Option NO_EXTERNAL_INSTALL is required (for forward compatibility) " "but was not given.")
   endif()
 
   # if we are not using MSVC without fortran support
@@ -139,39 +121,35 @@ function(cmake_add_fortran_subdirectory subdir)
   set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/${subdir}")
   foreach(dir_var library_dir binary_dir)
     if(NOT IS_ABSOLUTE "${${dir_var}}")
-      get_filename_component(${dir_var}
-        "${CMAKE_CURRENT_BINARY_DIR}/${${dir_var}}" ABSOLUTE)
+      get_filename_component(${dir_var} "${CMAKE_CURRENT_BINARY_DIR}/${${dir_var}}" ABSOLUTE)
     endif()
   endforeach()
   # create build and configure wrapper scripts
   _setup_mingw_config_and_build("${source_dir}" "${build_dir}")
   # create the external project
-  externalproject_add(${project_name}_build
+  ExternalProject_Add(
+    ${project_name}_build
     SOURCE_DIR ${source_dir}
     BINARY_DIR ${build_dir}
-    CONFIGURE_COMMAND ${CMAKE_COMMAND}
-    -P ${build_dir}/config_mingw.cmake
-    BUILD_COMMAND ${CMAKE_COMMAND}
-    -P ${build_dir}/build_mingw.cmake
-    INSTALL_COMMAND ""
-    )
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${build_dir}/config_mingw.cmake
+    BUILD_COMMAND ${CMAKE_COMMAND} -P ${build_dir}/build_mingw.cmake
+    INSTALL_COMMAND "")
+
+  set_target_properties(${project_name}_build PROPERTIES FOLDER Auxiliary)
+
   # make the external project always run make with each build
-  externalproject_add_step(${project_name}_build forcebuild
-    COMMAND ${CMAKE_COMMAND}
-    -E remove
-    ${CMAKE_CURRENT_BUILD_DIR}/${project_name}-prefix/src/${project_name}-stamp/${project_name}-build
+  ExternalProject_Add_Step(
+    ${project_name}_build forcebuild
+    COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BUILD_DIR}/${project_name}-prefix/src/${project_name}-stamp/${project_name}-build
     DEPENDEES configure
     DEPENDERS build
-    ALWAYS 1
-    )
+    ALWAYS 1)
   # create imported targets for all libraries
   foreach(lib ${libraries})
     add_library(${lib} SHARED IMPORTED GLOBAL)
     set_property(TARGET ${lib} APPEND PROPERTY IMPORTED_CONFIGURATIONS NOCONFIG)
-    set_target_properties(${lib} PROPERTIES
-      IMPORTED_IMPLIB_NOCONFIG   "${library_dir}/lib${lib}.lib"
-      IMPORTED_LOCATION_NOCONFIG "${binary_dir}/lib${lib}.dll"
-      )
+    set_target_properties(${lib} PROPERTIES IMPORTED_IMPLIB_NOCONFIG "${library_dir}/lib${lib}.lib" IMPORTED_LOCATION_NOCONFIG
+                                                                                                    "${binary_dir}/lib${lib}.dll")
     add_dependencies(${lib} ${project_name}_build)
   endforeach()
 

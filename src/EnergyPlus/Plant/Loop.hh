@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,21 +48,35 @@
 #ifndef PlantTopologyLoop_hh_INCLUDED
 #define PlantTopologyLoop_hh_INCLUDED
 
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/LoopSide.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+
 namespace DataPlant {
+
+    // "Both" is used as a special flag and is never assigned to the loop's TypeOfLoop member
+    enum class LoopType
+    {
+        Unassigned,
+        Plant,
+        Condenser,
+        Both
+    };
 
     struct PlantLoopData
     {
         // Members
-        std::string Name;      // Name of the component list
-        std::string FluidName; // Name of the fluid specified for this loop
-        int FluidType;         // Type of fluid in the loop
-        int FluidIndex;        // Index for Fluid in FluidProperties
-        int MFErrIndex;        // for recurring mass flow errors
-        int MFErrIndex1;       // for recurring mass flow errors
-        int MFErrIndex2;       // for recurring mass flow errors
+        std::string Name;                      // Name of the component list
+        std::string FluidName;                 // Name of the fluid specified for this loop
+        DataLoopNode::NodeFluidType FluidType; // Type of fluid in the loop
+        int FluidIndex;                        // Index for Fluid in FluidProperties
+        int MFErrIndex;                        // for recurring mass flow errors
+        int MFErrIndex1;                       // for recurring mass flow errors
+        int MFErrIndex2;                       // for recurring mass flow errors
         // (see CheckPlantMixerSplitterConsistency)
         // Loop Operating Setpoints and Limits
         int TempSetPointNodeNum;         // Node Number for Loop Temp SP associated with SP manager
@@ -83,24 +97,24 @@ namespace DataPlant {
         bool EMSCtrl;
         Real64 EMSValue;
         // Loop Inlet and Outlet Nodes
-        Array1D<HalfLoopData> LoopSide;  // Half loop data (Demand side or Supply Side)
-        std::string OperationScheme;     // Operation scheme name for the loop
-        int NumOpSchemes;                // Number of items in list identified by "OpScheme"
-        Array1D<OperationData> OpScheme; // Operation scheme data
-        int LoadDistribution;            // Load distribution scheme 1 for optimal, 2 for overloading
-        int PlantSizNum;                 // index to corresponding plant sizing data array
-        int LoopDemandCalcScheme;        // Load distribution scheme 1 SingleSetPoint,
+        Array1D<HalfLoopData> LoopSide;                        // Half loop data (Demand side or Supply Side)
+        std::string OperationScheme;                           // Operation scheme name for the loop
+        int NumOpSchemes;                                      // Number of items in list identified by "OpScheme"
+        Array1D<OperationData> OpScheme;                       // Operation scheme data
+        DataPlant::iLoadingScheme LoadDistribution;            // Load distribution scheme 1 for optimal, 2 for overloading
+        int PlantSizNum;                                       // index to corresponding plant sizing data array
+        DataPlant::iLoopDemandCalcScheme LoopDemandCalcScheme; // Load distribution scheme 1 SingleSetPoint,
         // 2 DualSetPointwithDeadBand
-        int CommonPipeType;
-        int EconPlantSideSensedNodeNum;          // DSU review, should move these out of here
-        int EconCondSideSensedNodeNum;           // DSU review, should move these out of here
-        int EconPlacement;                       // DSU review, should move these out of here
-        int EconBranch;                          // DSU review, should move these out of here
-        int EconComp;                            // DSU review, should move these out of here
-        Real64 EconControlTempDiff;              // DSU review, should move these out of here
+        DataPlant::iCommonPipeType CommonPipeType;
+        int EconPlantSideSensedNodeNum;
+        int EconCondSideSensedNodeNum;
+        int EconPlacement;
+        int EconBranch;
+        int EconComp;
+        Real64 EconControlTempDiff;
         bool LoopHasConnectionComp;
-        int TypeOfLoop;
-        int PressureSimType;
+        LoopType TypeOfLoop;
+        DataPlant::iPressSimType PressureSimType;
         bool HasPressureComponents;
         Real64 PressureDrop;
         bool UsePressureForPumpCalcs;
@@ -110,35 +124,34 @@ namespace DataPlant {
         Real64 HeatingDemand;       // Plant Loop Heating Demand[W]
         Real64 DemandNotDispatched; // Plant Loop Demand that was not distributed [W]
         Real64 UnmetDemand;         // Plant Loop Unmet Demand [W]
-        Real64 BypassFrac;            // Debug Variable
-        Real64 InletNodeFlowrate;     // Debug Variable
-        Real64 InletNodeTemperature;  // Debug Variable
-        Real64 OutletNodeFlowrate;    // Debug Variable
-        Real64 OutletNodeTemperature; // Debug Variable
+        Real64 BypassFrac;
+        Real64 InletNodeFlowrate;
+        Real64 InletNodeTemperature;
+        Real64 OutletNodeFlowrate;
+        Real64 OutletNodeTemperature;
         int LastLoopSideSimulated;
 
         // Default Constructor
         PlantLoopData()
-            : FluidType(0), FluidIndex(1), // default to water
+            : FluidType(DataLoopNode::NodeFluidType::blank), FluidIndex(1), // default to water
               MFErrIndex(0), MFErrIndex1(0), MFErrIndex2(0), TempSetPointNodeNum(0), MaxBranch(0), MinTemp(0.0), MaxTemp(0.0), MinTempErrIndex(0),
               MaxTempErrIndex(0), MinVolFlowRate(0.0), MaxVolFlowRate(0.0), MaxVolFlowRateWasAutoSized(false), MinMassFlowRate(0.0),
-              MaxMassFlowRate(0.0), Volume(0.0), VolumeWasAutoSized(false), // true if Volume was set to autocalculate
-              CirculationTime(2.0), Mass(0.0), EMSCtrl(false), EMSValue(0.0), NumOpSchemes(0), LoadDistribution(0), PlantSizNum(0),
-              LoopDemandCalcScheme(0), CommonPipeType(0), EconPlantSideSensedNodeNum(0), EconCondSideSensedNodeNum(0), EconPlacement(0),
-              EconBranch(0), EconComp(0), EconControlTempDiff(0.0), LoopHasConnectionComp(false), TypeOfLoop(0), PressureSimType(1),
-              HasPressureComponents(false), PressureDrop(0.0), UsePressureForPumpCalcs(false), PressureEffectiveK(0.0),
-              CoolingDemand(0.0), HeatingDemand(0.0), DemandNotDispatched(0.0), UnmetDemand(0.0), BypassFrac(0.0),
-              InletNodeFlowrate(0.0), InletNodeTemperature(0.0), OutletNodeFlowrate(0.0), OutletNodeTemperature(0.0), LastLoopSideSimulated(0)
+              MaxMassFlowRate(0.0), Volume(0.0), VolumeWasAutoSized(false), CirculationTime(2.0), Mass(0.0), EMSCtrl(false), EMSValue(0.0),
+              NumOpSchemes(0), LoadDistribution(DataPlant::iLoadingScheme::Unassigned), PlantSizNum(0),
+              LoopDemandCalcScheme(DataPlant::iLoopDemandCalcScheme::Unassigned), CommonPipeType(DataPlant::iCommonPipeType::No),
+              EconPlantSideSensedNodeNum(0), EconCondSideSensedNodeNum(0), EconPlacement(0), EconBranch(0), EconComp(0), EconControlTempDiff(0.0),
+              LoopHasConnectionComp(false), TypeOfLoop(LoopType::Unassigned), PressureSimType(DataPlant::iPressSimType::NoPressure),
+              HasPressureComponents(false), PressureDrop(0.0), UsePressureForPumpCalcs(false), PressureEffectiveK(0.0), CoolingDemand(0.0),
+              HeatingDemand(0.0), DemandNotDispatched(0.0), UnmetDemand(0.0), BypassFrac(0.0), InletNodeFlowrate(0.0), InletNodeTemperature(0.0),
+              OutletNodeFlowrate(0.0), OutletNodeTemperature(0.0), LastLoopSideSimulated(0)
         {
         }
 
+        void UpdateLoopSideReportVars(EnergyPlusData &state, Real64 OtherSideDemand, Real64 LocalRemLoopDemand);
 
-        void UpdateLoopSideReportVars(Real64 OtherSideDemand, Real64 LocalRemLoopDemand);
+        void CheckLoopExitNode(EnergyPlusData &state, bool FirstHVACIteration);
 
-        void CheckLoopExitNode(bool FirstHVACIteration);
-
-        void CalcUnmetPlantDemand();
-
+        void CalcUnmetPlantDemand(EnergyPlusData &state);
     };
 } // namespace DataPlant
 } // namespace EnergyPlus

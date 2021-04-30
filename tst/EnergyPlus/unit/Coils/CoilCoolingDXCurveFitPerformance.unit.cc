@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,27 +49,28 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include "CoilCoolingDXFixture.hh"
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 
 using namespace EnergyPlus;
 
-TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInput )
+TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInput)
 {
     std::string idf_objects = this->getPerformanceObjectString("coilPerformance", false, 2);
-    EXPECT_TRUE(process_idf( idf_objects, false ));
-    CoilCoolingDXCurveFitPerformance thisPerf("coilPerformance");
+    EXPECT_TRUE(process_idf(idf_objects, false));
+    CoilCoolingDXCurveFitPerformance thisPerf(*state, "coilPerformance");
     EXPECT_EQ("COILPERFORMANCE", thisPerf.name);
     EXPECT_EQ("BASEOPERATINGMODE", thisPerf.normalMode.name);
-    EXPECT_EQ(thisPerf.hasAlternateMode,coilNormalMode);
+    EXPECT_EQ(thisPerf.hasAlternateMode, DataHVACGlobals::coilNormalMode);
 }
 
-TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInputAlternateMode )
+TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInputAlternateMode)
 {
     std::string idf_objects = this->getPerformanceObjectString("coilPerformance", true, 2);
-    EXPECT_TRUE(process_idf( idf_objects, false ));
-    CoilCoolingDXCurveFitPerformance thisPerf("coilPerformance");
+    EXPECT_TRUE(process_idf(idf_objects, false));
+    CoilCoolingDXCurveFitPerformance thisPerf(*state, "coilPerformance");
     EXPECT_EQ("COILPERFORMANCE", thisPerf.name);
     EXPECT_EQ("BASEOPERATINGMODE", thisPerf.normalMode.name);
-    EXPECT_EQ(thisPerf.hasAlternateMode,coilEnhancedMode);
+    EXPECT_EQ(thisPerf.hasAlternateMode, DataHVACGlobals::coilEnhancedMode);
 }

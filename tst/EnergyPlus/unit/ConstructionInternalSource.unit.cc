@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,6 +51,8 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 
@@ -64,12 +66,16 @@ TEST_F(EnergyPlusFixture, ConstructionInternalSource)
 {
 
     std::string const idf_objects = delimited_string({
-        "	Construction:InternalSource,	",
-        "	Slab Floor with Radiant, !- Name",
+        "	ConstructionProperty:InternalHeatSource,	",
+        "	Radiant Source,          !- Name",
+        "	Slab Floor with Radiant, !- Construction Name",
         "	4,                       !- Source Present After Layer Number",
         "	4,                       !- Temperature Calculation Requested After Layer Number",
         "	2,                       !- Dimensions for the CTF Calculation",
         "	0.3048,                  !- Tube Spacing {m}",
+        "	0.0;                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
+        "	Construction,	",
+        "	Slab Floor with Radiant, !- Name",
         "	CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer",
         "	INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2",
         "	GYP1,                    !- Layer 3",
@@ -81,7 +87,7 @@ TEST_F(EnergyPlusFixture, ConstructionInternalSource)
 
     bool errorsFound(false);
 
-    GetConstructData(errorsFound);
+    GetConstructData(*state, errorsFound);
 
-    EXPECT_NEAR(0.1524, Construct(1).ThicknessPerpend, 0.0001);
+    EXPECT_NEAR(0.1524, state->dataConstruction->Construct(1).ThicknessPerpend, 0.0001);
 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,12 +51,12 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/Photovoltaics.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 
@@ -81,55 +81,55 @@ TEST_F(EnergyPlusFixture, PV_ReportPV_ZoneIndexNonZero)
 {
     // unit test for issue #6222, test to make sure zone index in surface on which PV is placed is not zero so zone multiplier is applied properly
 
-    EnergyPlus::DataPhotovoltaics::PVarray.deallocate();
-    DataHeatBalance::Zone.deallocate();
-    DataSurfaces::Surface.deallocate();
+    state->dataPhotovoltaic->PVarray.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+    state->dataSurface->Surface.deallocate();
 
-    EnergyPlus::DataPhotovoltaics::PVarray.allocate(3);
-    DataHeatBalance::Zone.allocate(2);
-    DataSurfaces::Surface.allocate(3);
+    state->dataPhotovoltaic->PVarray.allocate(3);
+    state->dataHeatBal->Zone.allocate(2);
+    state->dataSurface->Surface.allocate(3);
 
-    DataGlobals::NumOfZones = 2;
-    DataHeatBalance::Zone(1).Name = "Zone1";
-    DataHeatBalance::Zone(1).ListMultiplier = 1.0;
-    DataHeatBalance::Zone(1).Multiplier = 5.0;
-    DataHeatBalance::Zone(2).Name = "Zone2";
-    DataHeatBalance::Zone(2).ListMultiplier = 10.0;
-    DataHeatBalance::Zone(2).Multiplier = 1.0;
+    state->dataGlobal->NumOfZones = 2;
+    state->dataHeatBal->Zone(1).Name = "Zone1";
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(1).Multiplier = 5.0;
+    state->dataHeatBal->Zone(2).Name = "Zone2";
+    state->dataHeatBal->Zone(2).ListMultiplier = 10.0;
+    state->dataHeatBal->Zone(2).Multiplier = 1.0;
 
-    EnergyPlus::DataPhotovoltaics::NumPVs = 3;
-    EnergyPlus::DataPhotovoltaics::PVarray(1).SurfacePtr = 1;
-    EnergyPlus::DataPhotovoltaics::PVarray(1).CellIntegrationMode = -9999;
-    EnergyPlus::DataPhotovoltaics::PVarray(2).SurfacePtr = 2;
-    EnergyPlus::DataPhotovoltaics::PVarray(2).CellIntegrationMode = -9999;
-    EnergyPlus::DataPhotovoltaics::PVarray(3).SurfacePtr = 3;
-    EnergyPlus::DataPhotovoltaics::PVarray(3).CellIntegrationMode = -9999;
+    state->dataPhotovoltaic->NumPVs = 3;
+    state->dataPhotovoltaic->PVarray(1).SurfacePtr = 1;
+    state->dataPhotovoltaic->PVarray(1).CellIntegrationMode = EnergyPlus::DataPhotovoltaics::CellIntegration::Unassigned;
+    state->dataPhotovoltaic->PVarray(2).SurfacePtr = 2;
+    state->dataPhotovoltaic->PVarray(2).CellIntegrationMode = EnergyPlus::DataPhotovoltaics::CellIntegration::Unassigned;
+    state->dataPhotovoltaic->PVarray(3).SurfacePtr = 3;
+    state->dataPhotovoltaic->PVarray(3).CellIntegrationMode = EnergyPlus::DataPhotovoltaics::CellIntegration::Unassigned;
 
-    DataSurfaces::Surface(1).Zone = 1;
-    DataSurfaces::Surface(1).ZoneName = "Zone1";
-    DataSurfaces::Surface(2).Zone = 0;
-    DataSurfaces::Surface(2).ZoneName = "Zone2";
-    DataSurfaces::Surface(3).Zone = 0;
-    DataSurfaces::Surface(3).ZoneName = "None";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "Zone1";
+    state->dataSurface->Surface(2).Zone = 0;
+    state->dataSurface->Surface(2).ZoneName = "Zone2";
+    state->dataSurface->Surface(3).Zone = 0;
+    state->dataSurface->Surface(3).ZoneName = "None";
 
     // Test 1: Zone 1--PV has multiplier, Zone index already set
-    EnergyPlus::DataPhotovoltaics::PVarray(1).Report.DCPower = 1000.0;
-    EnergyPlus::DataPhotovoltaics::PVarray(1).Zone = Photovoltaics::GetPVZone(EnergyPlus::DataPhotovoltaics::PVarray(1).SurfacePtr);
-    Photovoltaics::ReportPV(1);
-    EXPECT_EQ(EnergyPlus::DataPhotovoltaics::PVarray(1).Zone, 1);
-    EXPECT_NEAR(EnergyPlus::DataPhotovoltaics::PVarray(1).Report.DCPower, 5000.0, 0.1);
+    state->dataPhotovoltaic->PVarray(1).Report.DCPower = 1000.0;
+    state->dataPhotovoltaic->PVarray(1).Zone = Photovoltaics::GetPVZone(*state, state->dataPhotovoltaic->PVarray(1).SurfacePtr);
+    Photovoltaics::ReportPV(*state, 1);
+    EXPECT_EQ(state->dataPhotovoltaic->PVarray(1).Zone, 1);
+    EXPECT_NEAR(state->dataPhotovoltaic->PVarray(1).Report.DCPower, 5000.0, 0.1);
 
     // Test 2: Zone 2--PV has multiplier, Zone index not set yet
-    EnergyPlus::DataPhotovoltaics::PVarray(2).Report.DCPower = 1000.0;
-    EnergyPlus::DataPhotovoltaics::PVarray(2).Zone = Photovoltaics::GetPVZone(EnergyPlus::DataPhotovoltaics::PVarray(2).SurfacePtr);
-    Photovoltaics::ReportPV(2);
-    EXPECT_EQ(EnergyPlus::DataPhotovoltaics::PVarray(2).Zone, 2);
-    EXPECT_NEAR(EnergyPlus::DataPhotovoltaics::PVarray(2).Report.DCPower, 10000.0, 0.1);
+    state->dataPhotovoltaic->PVarray(2).Report.DCPower = 1000.0;
+    state->dataPhotovoltaic->PVarray(2).Zone = Photovoltaics::GetPVZone(*state, state->dataPhotovoltaic->PVarray(2).SurfacePtr);
+    Photovoltaics::ReportPV(*state, 2);
+    EXPECT_EQ(state->dataPhotovoltaic->PVarray(2).Zone, 2);
+    EXPECT_NEAR(state->dataPhotovoltaic->PVarray(2).Report.DCPower, 10000.0, 0.1);
 
     // Test 3: Zone 3--PV not attached to any zone, Zone Index does not get set
-    EnergyPlus::DataPhotovoltaics::PVarray(3).Report.DCPower = 1000.0;
-    EnergyPlus::DataPhotovoltaics::PVarray(3).Zone = Photovoltaics::GetPVZone(EnergyPlus::DataPhotovoltaics::PVarray(3).SurfacePtr);
-    Photovoltaics::ReportPV(3);
-    EXPECT_EQ(EnergyPlus::DataPhotovoltaics::PVarray(3).Zone, 0);
-    EXPECT_NEAR(EnergyPlus::DataPhotovoltaics::PVarray(3).Report.DCPower, 1000.0, 0.1);
+    state->dataPhotovoltaic->PVarray(3).Report.DCPower = 1000.0;
+    state->dataPhotovoltaic->PVarray(3).Zone = Photovoltaics::GetPVZone(*state, state->dataPhotovoltaic->PVarray(3).SurfacePtr);
+    Photovoltaics::ReportPV(*state, 3);
+    EXPECT_EQ(state->dataPhotovoltaic->PVarray(3).Zone, 0);
+    EXPECT_NEAR(state->dataPhotovoltaic->PVarray(3).Report.DCPower, 1000.0, 0.1);
 }

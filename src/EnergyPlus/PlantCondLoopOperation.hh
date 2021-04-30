@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,37 +52,15 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace PlantCondLoopOperation {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern int const HeatingOp; // Constant for Heating Operation
-    extern int const CoolingOp; // Constant for Cooling Operation
-    extern int const DualOp;    // Constant for Cooling or Heating Operation
-
-    extern bool const TurnItemOn;  // Convenient for calling TurnPlantItemOnOff instead of hardwired true/false
-    extern bool const TurnItemOff; // Convenient for calling TurnPlantItemOnOff instead of hardwired true/false
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE  !SUBROUTINE SPECIFICATIONS FOR MODULE
-    // Driver Routines
-    // Get Input Routines
-    // Initialization Routines
-    // Load Distribution/Calculation Routines
-
-    // ON/OFF Utility Routines
-
-    // PLANT EMS Utility Routines
-
-    // Functions
-    void clear_state();
-
-    void ManagePlantLoadDistribution(int const LoopNum,     // PlantLoop data structure loop counter
+    void ManagePlantLoadDistribution(EnergyPlusData &state,
+                                     int const LoopNum,     // PlantLoop data structure loop counter
                                      int const LoopSideNum, // PlantLoop data structure LoopSide counter
                                      int const BranchNum,   // PlantLoop data structure branch counter
                                      int const CompNum,     // PlantLoop data structure component counter
@@ -92,89 +70,84 @@ namespace PlantCondLoopOperation {
                                      bool &LoopShutDownFlag, // EMS flag to tell loop solver to shut down pumps
                                      bool &LoadDistributionWasPerformed);
 
-    // Beginning of GetInput subroutines for the Module
-    //******************************************************************************
+    void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK);
 
-    void GetPlantOperationInput(bool &GetInputOK);
+    void GetOperationSchemeInput(EnergyPlusData &state);
 
-    void GetOperationSchemeInput();
-
-    void FindRangeBasedOrUncontrolledInput(std::string &CurrentModuleObject, // for ease in renaming
+    void FindRangeBasedOrUncontrolledInput(EnergyPlusData &state,
+                                           std::string &CurrentModuleObject, // for ease in renaming
                                            int const NumSchemes,             // May be set here and passed on
                                            int const LoopNum,                // May be set here and passed on
                                            int const SchemeNum,              // May be set here and passed on
                                            bool &ErrorsFound                 // May be set here and passed on
     );
 
-    void FindDeltaTempRangeInput(std::string &CurrentModuleObject, // for ease in renaming
+    void FindDeltaTempRangeInput(EnergyPlusData &state,
+                                 std::string &CurrentModuleObject, // for ease in renaming
                                  int const NumSchemes,             // May be set here and passed on
                                  int const LoopNum,                // May be set here and passed on
                                  int const SchemeNum,              // May be set here and passed on
                                  bool &ErrorsFound                 // May be set here and passed on
     );
 
-    void LoadEquipList(int const LoopNum,   // May be set here and passed on
+    void LoadEquipList(EnergyPlusData &state,
+                       int const LoopNum,   // May be set here and passed on
                        int const SchemeNum, // May be set here and passed on
                        int const ListNum,   // May be set here and passed on
                        bool &ErrorsFound    // May be set here and passed on
     );
 
-    void FindCompSPInput(std::string &CurrentModuleObject, // for ease in renaming
+    void FindCompSPInput(EnergyPlusData &state,
+                         std::string &CurrentModuleObject, // for ease in renaming
                          int const NumSchemes,             // May be set here and passed on
                          int const LoopNum,                // May be set here and passed on
                          int const SchemeNum,              // May be set here and passed on
                          bool &ErrorsFound                 // May be set here and passed on
     );
 
-    void GetUserDefinedOpSchemeInput(std::string &CurrentModuleObject, // for ease in renaming
+    void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
+                                     std::string &CurrentModuleObject, // for ease in renaming
                                      int const NumSchemes,             // May be set here and passed on
                                      int const LoopNum,                // May be set here and passed on
                                      int const SchemeNum,              // May be set here and passed on
                                      bool &ErrorsFound                 // May be set here and passed on
     );
 
-    // End of GetInput subroutines for the Module
-    //******************************************************************************
+    void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration);
 
-    // Beginning Initialization Section of the Plant Loop Module
-    //******************************************************************************
-
-    void InitLoadDistribution(bool const FirstHVACIteration);
-
-    // End Initialization Section of the Plant Loop Module
-    //******************************************************************************
-
-    // Begin Load Calculation/Distribution Section of the Plant Loop Module
-    //******************************************************************************
-
-    void DistributePlantLoad(int const LoopNum,
+    void DistributePlantLoad(EnergyPlusData &state,
+                             int const LoopNum,
                              int const LoopSideNum,
                              int const CurSchemePtr, // use as index in PlantLoop()OpScheme() data structure
                              int const ListPtr,      // use as index in PlantLoop()OpScheme() data structure
                              Real64 const LoopDemand,
                              Real64 &RemLoopDemand);
 
-    void AdjustChangeInLoadForLastStageUpperRangeLimit(int const LoopNum,         // component topology
-                                                       int const CurOpSchemePtr,  // currect active operation scheme
+    void AdjustChangeInLoadForLastStageUpperRangeLimit(EnergyPlusData &state,
+                                                       int const LoopNum,         // component topology
+                                                       int const CurOpSchemePtr,  // current active operation scheme
                                                        int const CurEquipListPtr, // current equipment list
                                                        Real64 &ChangeInLoad       // positive magnitude of load change
     );
 
-    void AdjustChangeInLoadByHowServed(int const LoopNum,     // component topology
+    void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
+                                       int const LoopNum,     // component topology
                                        int const LoopSideNum, // component topology
                                        int const BranchNum,   // component topology
                                        int const CompNum,     // component topology
                                        Real64 &ChangeInLoad   // positive magnitude of load change
     );
 
-    void FindCompSPLoad(int const LoopNum,
+    void FindCompSPLoad(EnergyPlusData &state,
+                        int const LoopNum,
                         int const LoopSideNum,
                         int const BranchNum,
                         int const CompNum,
                         int const OpNum // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
     );
 
-    void DistributeUserDefinedPlantLoad(int const LoopNum,
+    void DistributeUserDefinedPlantLoad(EnergyPlusData &state,
+                                        int const LoopNum,
                                         int const LoopSideNum,
                                         int const BranchNum,
                                         int const CompNum,
@@ -183,48 +156,56 @@ namespace PlantCondLoopOperation {
                                         Real64 const LoopDemand,
                                         Real64 &RemLoopDemand);
 
-    // End Load Calculation/Distribution Section of the Plant Loop Module
-    //******************************************************************************
-
-    //********************************
-
-    Real64 FindRangeVariable(int const LoopNum,      // PlantLoop data structure loop counter
+    Real64 FindRangeVariable(EnergyPlusData &state,
+                             int const LoopNum,      // PlantLoop data structure loop counter
                              int const CurSchemePtr, // set by PL()%LoopSide()%Branch()%Comp()%OpScheme()%OpSchemePtr
                              int const CurSchemeType // identifier set in PlantData
     );
 
-    //********************************
+    void TurnOnPlantLoopPipes(EnergyPlusData &state, int const LoopNum, int const LoopSideNum);
 
-    // Begin Plant Loop ON/OFF Utility Subroutines
-    //******************************************************************************
+    void TurnOffLoopEquipment(EnergyPlusData &state, int const LoopNum);
 
-    void TurnOnPlantLoopPipes(int const LoopNum, int const LoopSideNum);
+    void TurnOffLoopSideEquipment(EnergyPlusData &state, int const LoopNum, int const LoopSideNum);
 
-    void TurnOffLoopEquipment(int const LoopNum);
+    void SetupPlantEMSActuators(EnergyPlusData &state);
 
-    void TurnOffLoopSideEquipment(int const LoopNum, int const LoopSideNum);
+    void ActivateEMSControls(
+        EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag);
 
-    // End Plant Loop ON/OFF Utility Subroutines
-    //******************************************************************************
-
-    // Begin Plant EMS Control Routines
-    //******************************************************************************
-
-    void SetupPlantEMSActuators();
-
-    void ActivateEMSControls(int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag);
-
-    void AdjustChangeInLoadByEMSControls(int const LoopNum,
+    void AdjustChangeInLoadByEMSControls(EnergyPlusData &state,
+                                         int const LoopNum,
                                          int const LoopSideNum,
                                          int const BranchNum,
                                          int const CompNum,
                                          Real64 &ChangeInLoad // positive magnitude of load change
     );
 
-    //*END PLANT EMS CONTROL ROUTINES!
-    //******************************************************************************
-
 } // namespace PlantCondLoopOperation
+
+struct PlantCondLoopOperationData : BaseGlobalStruct
+{
+
+    bool GetPlantOpInput = true;
+    bool InitLoadDistributionOneTimeFlag = true;
+    bool LoadEquipListOneTimeFlag = true;
+    int TotNumLists = 0;
+    Array1D_string EquipListsNameList;
+    Array1D<DataPlant::LoopType> EquipListsTypeList;
+    Array1D_int EquipListsIndexList;
+    bool lDummy = false; // for User-defined component load dispatch
+    void clear_state() override
+    {
+        this->GetPlantOpInput = true;
+        this->InitLoadDistributionOneTimeFlag = true;
+        this->LoadEquipListOneTimeFlag = true;
+        this->TotNumLists = 0;
+        this->EquipListsNameList.clear();
+        this->EquipListsTypeList.clear();
+        this->EquipListsIndexList.clear();
+        this->lDummy = false;
+    }
+};
 
 } // namespace EnergyPlus
 

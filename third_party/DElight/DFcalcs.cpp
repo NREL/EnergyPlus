@@ -19,24 +19,24 @@
  * under contract with Lawrence Berkeley National Laboratory.
  **************************************************************/
 
-// This work was supported by the Assistant Secretary for Energy Efficiency 
-// and Renewable Energy, Office of Building Technologies, 
-// Building Systems and Materials Division of the 
+// This work was supported by the Assistant Secretary for Energy Efficiency
+// and Renewable Energy, Office of Building Technologies,
+// Building Systems and Materials Division of the
 // U.S. Department of Energy under Contract No. DE-AC03-76SF00098.
 
 /*
-NOTICE: The Government is granted for itself and others acting on its behalf 
-a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce, 
-prepare derivative works, and perform publicly and display publicly. 
+NOTICE: The Government is granted for itself and others acting on its behalf
+a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce,
+prepare derivative works, and perform publicly and display publicly.
 Beginning five (5) years after (date permission to assert copyright was obtained),
-subject to two possible five year renewals, the Government is granted for itself 
+subject to two possible five year renewals, the Government is granted for itself
 and others acting on its behalf a paid-up, nonexclusive, irrevocable worldwide
-license in this data to reproduce, prepare derivative works, distribute copies to 
-the public, perform publicly and display publicly, and to permit others to do so. 
+license in this data to reproduce, prepare derivative works, distribute copies to
+the public, perform publicly and display publicly, and to permit others to do so.
 NEITHER THE UNITED STATES NOR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL 
-LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY 
-INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE 
+THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL
+LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY
+INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE
 WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 #pragma warning(disable:4786)
@@ -198,7 +198,7 @@ int	CalcDFs(
 		thsun = 0.;
 
 // rjh debug
-//*pofdmpfile << "Sun Altitude: iphs = " << iphs << " phsun = " << phsun << " phsun_deg = " << phsun_deg << "\n"; 
+//*pofdmpfile << "Sun Altitude: iphs = " << iphs << " phsun = " << phsun << " phsun_deg = " << phsun_deg << "\n";
 
 		/* Get clear sky zenith luminance, moisture, */
 		/* and turbidity coef for reference month. */
@@ -218,7 +218,7 @@ int	CalcDFs(
 			thsun = ((thsmin + (double)iths * thsdel - 90.0) * DTOR + bldg_ptr->azm * DTOR);
 
 // rjh debug
-//if (iphs == 0) *pofdmpfile << "Sun Azimuth: iths = " << iths << " thsun = " << thsun << " thsun deg = " << thsun/DTOR << "\n"; 
+//if (iphs == 0) *pofdmpfile << "Sun Azimuth: iths = " << iths << " thsun = " << thsun << " thsun deg = " << thsun/DTOR << "\n";
 
 			/* Calculate building shade luminances. */
 			if (dshdlu(bldg_ptr,phsun,thsun,iphs,iths,solic,tfac,zenl,bldg_ptr->hillumskyc[iphs],bldg_ptr->hillumskyo[iphs],bldg_ptr->hillumsunc[iphs],pofdmpfile) < 0) {
@@ -228,7 +228,7 @@ int	CalcDFs(
 
 			/* Calculate diffusing glazing window luminances. */
 			// HERE foreach diffusing glazing window
-			
+
 		}
 	}
 
@@ -372,7 +372,7 @@ int	CalcDFs(
 
 // rjh debug
 //if (irp == 0) {
-//	*pofdmpfile << "Window Element ix = " << ix << " iy = " << iy << " icoords = " << rwin[0] << " " << rwin[1] << " " << rwin[2] << "\n"; 
+//	*pofdmpfile << "Window Element ix = " << ix << " iy = " << iy << " icoords = " << rwin[0] << " " << rwin[1] << " " << rwin[2] << "\n";
 //	*pofdmpfile << " phray = " << phray << " thray = " << thray << "\n";
 //}
 
@@ -463,7 +463,7 @@ int	CalcDFs(
                                     if (iWndoContribRetVal < 0) {
                                         // If errors were detected then return now, else register warnings and continue processing
                                         if (iWndoContribRetVal != -10) {
-					                        *pofdmpfile << "ERROR: DElight Bad return from wndo_element_refpt_illum_contrib()\n"; 
+					                        *pofdmpfile << "ERROR: DElight Bad return from wndo_element_refpt_illum_contrib()\n";
 					                        return(-1);
                                         }
                                         else {
@@ -721,8 +721,8 @@ int	CalcDFs(
 					for (inode=0; inode<bldg_ptr->zone[izone]->surf[iIntSurf]->nnodes; inode++) {
 
 						// Get nodal patch coords and transfer to Point3d.
-						BGL::point3 p3Node(bldg_ptr->zone[izone]->surf[iIntSurf]->node[inode][0], 
-							bldg_ptr->zone[izone]->surf[iIntSurf]->node[inode][1], 
+						BGL::point3 p3Node(bldg_ptr->zone[izone]->surf[iIntSurf]->node[inode][0],
+							bldg_ptr->zone[izone]->surf[iIntSurf]->node[inode][1],
 							bldg_ptr->zone[izone]->surf[iIntSurf]->node[inode][2]);
 
 						// Get surface nodal patch area.
@@ -751,8 +751,8 @@ int	CalcDFs(
 				for (irp=0; irp<bldg_ptr->zone[izone]->nrefpts; irp++) {
 
 					// Get refpt coords and transfer to Point3d.
-					BGL::point3 p3RefPt(bldg_ptr->zone[izone]->ref_pt[irp]->bs[0], 
-						bldg_ptr->zone[izone]->ref_pt[irp]->bs[1], 
+					BGL::point3 p3RefPt(bldg_ptr->zone[izone]->ref_pt[irp]->bs[0],
+						bldg_ptr->zone[izone]->ref_pt[irp]->bs[1],
 						bldg_ptr->zone[izone]->ref_pt[irp]->bs[2]);
 
 					// Get the Overcast Sky illuminance at this refpt from the current CFS.
@@ -855,8 +855,8 @@ int	CalcDFs(
 							for (inode=0; inode<bldg_ptr->zone[izone]->surf[iIntSurf]->nnodes; inode++) {
 
 								// Get nodal patch coords and transfer to Point3d.
-								BGL::point3 p3Node(bldg_ptr->zone[izone]->surf[iIntSurf]->node[inode][0], 
-									bldg_ptr->zone[izone]->surf[iIntSurf]->node[inode][1], 
+								BGL::point3 p3Node(bldg_ptr->zone[izone]->surf[iIntSurf]->node[inode][0],
+									bldg_ptr->zone[izone]->surf[iIntSurf]->node[inode][1],
 									bldg_ptr->zone[izone]->surf[iIntSurf]->node[inode][2]);
 
 							    // Get surface nodal patch area.
@@ -887,8 +887,8 @@ int	CalcDFs(
 						for (irp=0; irp<bldg_ptr->zone[izone]->nrefpts; irp++) {
 
 							// Get refpt coords and transfer to Point3d.
-							BGL::point3 p3RefPt(bldg_ptr->zone[izone]->ref_pt[irp]->bs[0], 
-								bldg_ptr->zone[izone]->ref_pt[irp]->bs[1], 
+							BGL::point3 p3RefPt(bldg_ptr->zone[izone]->ref_pt[irp]->bs[0],
+								bldg_ptr->zone[izone]->ref_pt[irp]->bs[1],
 								bldg_ptr->zone[izone]->ref_pt[irp]->bs[2]);
 
 							// Get the illuminance at this refpt from the current CFS.
@@ -988,8 +988,8 @@ int	CalcDFs(
 							for (inode=0; inode<bldg_ptr->zone[izone]->surf[iIntSurf]->nnodes; inode++) {
 
 								// Get nodal patch coords and transfer to Point3d.
-								BGL::point3 p3Node(bldg_ptr->zone[izone]->surf[iIntSurf]->node[inode][0], 
-									bldg_ptr->zone[izone]->surf[iIntSurf]->node[inode][1], 
+								BGL::point3 p3Node(bldg_ptr->zone[izone]->surf[iIntSurf]->node[inode][0],
+									bldg_ptr->zone[izone]->surf[iIntSurf]->node[inode][1],
 									bldg_ptr->zone[izone]->surf[iIntSurf]->node[inode][2]);
 
 							    // Get surface nodal patch area.
@@ -1020,8 +1020,8 @@ int	CalcDFs(
 						for (irp=0; irp<bldg_ptr->zone[izone]->nrefpts; irp++) {
 
 							// Get refpt coords and transfer to Point3d.
-							BGL::point3 p3RefPt(bldg_ptr->zone[izone]->ref_pt[irp]->bs[0], 
-								bldg_ptr->zone[izone]->ref_pt[irp]->bs[1], 
+							BGL::point3 p3RefPt(bldg_ptr->zone[izone]->ref_pt[irp]->bs[0],
+								bldg_ptr->zone[izone]->ref_pt[irp]->bs[1],
 								bldg_ptr->zone[izone]->ref_pt[irp]->bs[2]);
 
 							// Get the illuminance at this refpt from the current CFS.
@@ -1047,7 +1047,7 @@ int	CalcDFs(
 		if ((iSliteInterRflRetVal = slite_interreflect(bldg_ptr, lib_ptr, sun_ptr, iIterations, pofdmpfile)) < 0) {
             // If errors were detected then return now, else register warnings and continue processing
             if (iSliteInterRflRetVal != -10) {
-				*pofdmpfile << "ERROR: DElight Bad return from slite_interreflect()\n"; 
+				*pofdmpfile << "ERROR: DElight Bad return from slite_interreflect()\n";
 				return(-1);
             }
             else {
@@ -1063,7 +1063,7 @@ int	CalcDFs(
 				bldg_ptr->zone[izone]->ref_pt[irp]->dfskyo = bldg_ptr->zone[izone]->ref_pt[irp]->skyoillum / bldg_ptr->hillumskyo[0];
 			// for each Sun Position Altitude
 			for (iphs=0; iphs<sun_ptr->nphs; iphs++) {
-				// for each Sun Position Azimuth 
+				// for each Sun Position Azimuth
 				for (iths=0; iths<sun_ptr->nths; iths++) {
 					// Calc component daylight factors for each clear sky sun position
 					if (bldg_ptr->hillumskyc[iphs])
@@ -1085,7 +1085,7 @@ int	CalcDFs(
 /* Modified from earlier version of wndo_element_contrib() */
 /*   Key modifications are: */
 /*       - remove glare related calculations */
-/*       - replace references to ray[2] (i.e., cos(angle of incidence) for horiz surf) by cosSurfIncidence
+/*       - replace references to ray[2] (i.e., cos(angle of incidence) for horiz surf) by cosSurfIncidence */
 /*   8/2000 modifications: */
 /*       - separate reference point illuminance calc from surface node luminance calculation */
 /************************************************************************************************/
@@ -1177,10 +1177,10 @@ int	wndo_element_refpt_illum_contrib(
 					dedir = elum * domega * tvisincidence * cosPtSurfIncidence;
 
 // rjh 8/00
-//	*pofdmpfile << "Overcast sky vars for iWndoSurf " << iWndoSurf << " iNodeSurf " << iNodeSurf << " iWndoElement(" << ix << ", " << iy << ") Node(" << node[0] << ", " << node[1] << ", " << node[2] << ")\n"; 
-//	*pofdmpfile << "   elum = " << elum << " domega = " << domega << " tvisincidence = " << tvisincidence << " cosPtSurfIncidence = " << cosPtSurfIncidence << "\n"; 
+//	*pofdmpfile << "Overcast sky vars for iWndoSurf " << iWndoSurf << " iNodeSurf " << iNodeSurf << " iWndoElement(" << ix << ", " << iy << ") Node(" << node[0] << ", " << node[1] << ", " << node[2] << ")\n";
+//	*pofdmpfile << "   elum = " << elum << " domega = " << domega << " tvisincidence = " << tvisincidence << " cosPtSurfIncidence = " << cosPtSurfIncidence << "\n";
 
-					
+
 					(*pdirect_skyoillum) += dedir;
 				}
 			}
@@ -1313,7 +1313,7 @@ int	wndo_element_refpt_illum_contrib(
 /* Modified from earlier version of wndo_element_contrib() */
 /*   Key modifications are: */
 /*       - remove glare related calculations */
-/*       - replace references to ray[2] (i.e., cos(angle of incidence) for horiz surf) by cosSurfIncidence
+/*       - replace references to ray[2] (i.e., cos(angle of incidence) for horiz surf) by cosSurfIncidence */
 /*   8/2000 modifications: */
 /*       - include visible reflectance of node surface in node luminance calculation */
 /*************************************************************************************************/
@@ -1399,7 +1399,7 @@ int	wndo_element_surfnode_lum_contrib(
 			// If ray points downward below the horizontal plane, then add contribution from ground
 			else {
 				// Add luminance from ground modified by wndo vis trans and angle of incidence on node surface
-				// Luminance of ground (cd/ft2) is 
+				// Luminance of ground (cd/ft2) is
 				// illuminance on ground (lum/ft2) * gnd_refl (which gives ft-lamberts) / PI
 				dGroundLumSkyC = bldg_ptr->hillumskyc[iphs] * bldg_ptr->zone[izone]->surf[iWndoSurf]->gnd_refl / PI;
 				dGroundLumSunC = bldg_ptr->hillumsunc[iphs] * bldg_ptr->zone[izone]->surf[iWndoSurf]->gnd_refl / PI;
@@ -1419,7 +1419,7 @@ int	wndo_element_surfnode_lum_contrib(
 				// If ray points downward below the horizontal plane, then add contribution from ground
 				else {
 					// Add luminance from ground modified by wndo vis trans and angle of incidence on node surface
-					// Luminance of ground (cd/ft2) is 
+					// Luminance of ground (cd/ft2) is
 					// illuminance on ground (lum/ft2) * gnd_refl (which gives ft-lamberts) / PI
 					dGroundLumSkyO = bldg_ptr->hillumskyo[iphs] * bldg_ptr->zone[izone]->surf[iWndoSurf]->gnd_refl / PI;
 					(*pdirect_skyolum) += dGroundLumSkyO * domega * tvisincidence * cosPtSurfIncidence * dNodeSurfaceReflectance;
@@ -1435,7 +1435,7 @@ int	wndo_element_surfnode_lum_contrib(
 			raycos[0] = cos(phsun) * cos(thsun);
 			raycos[1] = cos(phsun) * sin(thsun);
 			raycos[2] = sin(phsun);
-			
+
 			/* is sun on front side of current window? */
 			cosi = ddot(wnorm,raycos);
 			if (cosi > 0.0) {

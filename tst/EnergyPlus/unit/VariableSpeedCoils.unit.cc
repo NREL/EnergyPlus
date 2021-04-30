@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,10 +48,16 @@
 // EnergyPlus::VariableSpeedCoils Unit Tests
 
 // Google Test Headers
+#include <gtest/gtest.h>
+
+// EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
-#include <gtest/gtest.h>
 
 namespace EnergyPlus {
 
@@ -2485,11 +2491,11 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    VariableSpeedCoils::GetVarSpeedCoilInput();
+    VariableSpeedCoils::GetVarSpeedCoilInput(*state);
 
-    EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).Name, "LOBBY_ZN_1_FLR_2 WSHP COOLING MODE");
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "LOBBY_ZN_1_FLR_2 WSHP COOLING MODE");
 
-    EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(2).Name, "PSZ-AC_1:5_COOLC STANDARD 4-COMPRESSOR IPAK");
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(2).Name, "PSZ-AC_1:5_COOLC STANDARD 4-COMPRESSOR IPAK");
 }
 
 TEST_F(EnergyPlusFixture, CoilHeatingDXVariableSpeed_MinOADBTempCompOperLimit)
@@ -2498,8 +2504,6 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXVariableSpeed_MinOADBTempCompOperLimit)
     // tests minimum limits of Minimum Outdoor Drybulb Temperature for Compressor Operation
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.3;",
 
         "  Curve:Biquadratic,",
         "    HPACHeatCapFT,           !- Name",
@@ -2656,10 +2660,10 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXVariableSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    VariableSpeedCoils::GetVarSpeedCoilInput();
+    VariableSpeedCoils::GetVarSpeedCoilInput(*state);
 
-    ASSERT_EQ("HEATING COIL VARIABLESPEED", VariableSpeedCoils::VarSpeedCoil(1).Name); // Heating Coil Variable Speed
-    ASSERT_EQ(-60.0, VariableSpeedCoils::VarSpeedCoil(1).MinOATCompressor);            // removed the minimum limit of -50.0C
+    ASSERT_EQ("HEATING COIL VARIABLESPEED", state->dataVariableSpeedCoils->VarSpeedCoil(1).Name); // Heating Coil Variable Speed
+    ASSERT_EQ(-60.0, state->dataVariableSpeedCoils->VarSpeedCoil(1).MinOATCompressor);            // removed the minimum limit of -50.0C
 }
 
 TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
@@ -2753,39 +2757,61 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    VariableSpeedCoils::GetVarSpeedCoilInput();
+    VariableSpeedCoils::GetVarSpeedCoilInput(*state);
 
     Real64 LSInletDBTemp = 24.0; // conditions at 24 DB / 20 Wb found at http://www.sugartech.co.za/psychro/index.php
     Real64 LSInletHumRat = 0.013019367;
     Real64 LSInletEnth = 57256.90248;
     Real64 LSInletWBTemp = 20.0;
-    Real64 AirMassFlowRatio = VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(1);
+    Real64 AirMassFlowRatio = state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(1);
     Real64 WaterMassFlowRatio = 0.0;
     Real64 LSMassFlowRate = 1.45;
     Real64 CBFSpeed = 0.000001;
-    Real64 MSRatedTotCap = VariableSpeedCoils::VarSpeedCoil(1).MSRatedTotCap(1);
-    int MSCapFTemp = VariableSpeedCoils::VarSpeedCoil(1).MSCCapFTemp(1);
-    int MSCapAirFFlow = VariableSpeedCoils::VarSpeedCoil(1).MSCCapAirFFlow(1);
-    int MSCapWaterFFlow = VariableSpeedCoils::VarSpeedCoil(1).MSCCapWaterFFlow(1);
+    Real64 MSRatedTotCap = state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedTotCap(1);
+    int MSCapFTemp = state->dataVariableSpeedCoils->VarSpeedCoil(1).MSCCapFTemp(1);
+    int MSCapAirFFlow = state->dataVariableSpeedCoils->VarSpeedCoil(1).MSCCapAirFFlow(1);
+    int MSCapWaterFFlow = state->dataVariableSpeedCoils->VarSpeedCoil(1).MSCCapWaterFFlow(1);
     Real64 QLoadTotal = 0.0;
     Real64 QLoadTotal1 = 0.0;
     Real64 QLoadTotal2 = 0.0;
-    Real64 SHR = VariableSpeedCoils::VarSpeedCoil(1).MSRatedSHR(1);
+    Real64 SHR = state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedSHR(1);
     Real64 SSInletTemp = 24.0;
     Real64 InletAirPressure = 101320.0;
 
-    VariableSpeedCoils::CalcTotCapSHR_VSWSHP(LSInletDBTemp, LSInletHumRat, LSInletEnth, LSInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio,
-                                             LSMassFlowRate, CBFSpeed, MSRatedTotCap, MSCapFTemp, MSCapAirFFlow, MSCapWaterFFlow, 0.0, 0, 0, 0,
-                                             QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SSInletTemp, InletAirPressure, 0.0, 1,
-                                             VariableSpeedCoils::VarSpeedCoil(1).capModFacTotal);
+    VariableSpeedCoils::CalcTotCapSHR_VSWSHP(*state,
+                                             LSInletDBTemp,
+                                             LSInletHumRat,
+                                             LSInletEnth,
+                                             LSInletWBTemp,
+                                             AirMassFlowRatio,
+                                             WaterMassFlowRatio,
+                                             LSMassFlowRate,
+                                             CBFSpeed,
+                                             MSRatedTotCap,
+                                             MSCapFTemp,
+                                             MSCapAirFFlow,
+                                             MSCapWaterFFlow,
+                                             0.0,
+                                             0,
+                                             0,
+                                             0,
+                                             QLoadTotal1,
+                                             QLoadTotal2,
+                                             QLoadTotal,
+                                             SHR,
+                                             SSInletTemp,
+                                             InletAirPressure,
+                                             0.0,
+                                             1,
+                                             state->dataVariableSpeedCoils->VarSpeedCoil(1).capModFacTotal);
 
     // same calculations as in CalcTotCapSHR_VSWSHP (except CapFTemp term is 1 so no need to add that calc here)
-    Real64 hDelta = MSRatedTotCap / LSMassFlowRate;                      // Change in air enthalpy across the cooling coil [J/kg]
-    Real64 hADP = LSInletEnth - hDelta / (1.0 - CBFSpeed);               // Apparatus dew point enthalpy [J/kg]
-    Real64 tADP = Psychrometrics::PsyTsatFnHPb(hADP, InletAirPressure);  // Apparatus dew point temperature [C]
-    Real64 wADP = Psychrometrics::PsyWFnTdbH(tADP, hADP);                // Apparatus dew point humidity ratio [kg/kg]
-    Real64 hTinwADP = Psychrometrics::PsyHFnTdbW(LSInletDBTemp, wADP);   // Enthalpy at inlet dry-bulb and wADP [J/kg]
-    Real64 SHRCalc = min((hTinwADP - hADP) / (LSInletEnth - hADP), 1.0); // temporary calculated value of SHR
+    Real64 hDelta = MSRatedTotCap / LSMassFlowRate;                             // Change in air enthalpy across the cooling coil [J/kg]
+    Real64 hADP = LSInletEnth - hDelta / (1.0 - CBFSpeed);                      // Apparatus dew point enthalpy [J/kg]
+    Real64 tADP = Psychrometrics::PsyTsatFnHPb(*state, hADP, InletAirPressure); // Apparatus dew point temperature [C]
+    Real64 wADP = Psychrometrics::PsyWFnTdbH(*state, tADP, hADP);               // Apparatus dew point humidity ratio [kg/kg]
+    Real64 hTinwADP = Psychrometrics::PsyHFnTdbW(LSInletDBTemp, wADP);          // Enthalpy at inlet dry-bulb and wADP [J/kg]
+    Real64 SHRCalc = min((hTinwADP - hADP) / (LSInletEnth - hADP), 1.0);        // temporary calculated value of SHR
 
     // expect SHR to be < 1
     EXPECT_NEAR(SHR, 0.5275102, 0.000001);
@@ -2797,7 +2823,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
     Real64 OutletTemp = LSInletDBTemp - (1.0 - CBFSpeed) * (LSInletDBTemp - tADP);
     Real64 OutletHumRat = LSInletHumRat - (1.0 - CBFSpeed) * (LSInletHumRat - wADP);
     Real64 OutletEnthalpy = LSInletEnth - hDelta;
-    Real64 OutletAirRH = Psychrometrics::PsyRhFnTdbWPb(OutletTemp, OutletHumRat, InletAirPressure);
+    Real64 OutletAirRH = Psychrometrics::PsyRhFnTdbWPb(*state, OutletTemp, OutletHumRat, InletAirPressure);
 
     // outlet conditions should be very near the saturation curve
     EXPECT_NEAR(OutletTemp, tADP, 0.0001);
@@ -2805,5 +2831,178 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
     EXPECT_NEAR(OutletEnthalpy, hADP, 0.1);
     EXPECT_NEAR(OutletAirRH, 0.999, 0.001);
     EXPECT_LT(OutletAirRH, 1.0);
+}
+
+TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
+{
+    std::string const idf_objects = delimited_string({
+        "  Coil:Cooling:DX:VariableSpeed,",
+        "    VS DXCOIL,               !- Name",
+        "    VS DXCOIL_CoolCNode,     !- Air Inlet Node Name",
+        "    VS DXCOIL_HeatCNode,     !- Air Outlet Node Name",
+        "    5,                       !- Number of Speeds {dimensionless}",
+        "    5,                       !- Nominal Speed Level {dimensionless}",
+        "    135000.0,                !- Rated Total Cooling Capacity At Selected Nominal Speed Level {w}",
+        "    5.00,                    !- Rated Volumetric Air Flow Rate At Selected Nominal Speed Level {m3/s}",
+        "    0,                       !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
+        "    0,                       !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    PLF Curve,               !- Energy Part Load Fraction Curve Name",
+        "    ,                        !- Condenser Air Inlet Node Name",
+        "    AirCooled,               !- Condenser Type",
+        "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    ,                        !- Crankcase Heater Capacity {W}",
+        "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "    ,                        !- Supply Water Storage Tank Name",
+        "    ,                        !- Condensate Collection Water Storage Tank Name",
+        "    ,                        !- Basin Heater Capacity {W/K}",
+        "    2,                       !- Basin Heater Setpoint Temperature {C}",
+        "    ,                        !- Basin Heater Operating Schedule Name",
+        "    33000.0,                 !- Speed 1 Reference Unit Total Cooling Capacity At Rated Conditions {w}",
+        "    0.70,                    !- Speed 1 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
+        "    4.34,                    !- Speed 1 Reference Unit COP At Rated Conditions {dimensionless}",
+        "    1.40,                    !- Speed 1 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    4.03,                    !- Speed 1 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
+        "    ,                        !- Speed 1 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
+        "    CapacityCurve,           !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+        "    CAPFF Curve,             !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+        "    PowerCurve,              !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+        "    EIRFF Curve,             !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    35000.0,                 !- Speed 2 Reference Unit Total Cooling Capacity At Rated Conditions {w}",
+        "    0.78,                    !- Speed 2 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
+        "    4.54,                    !- Speed 2 Reference Unit COP At Rated Conditions {dimensionless}",
+        "    1.90,                    !- Speed 2 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    5.47,                    !- Speed 2 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
+        "    ,                        !- Speed 2 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
+        "    CapacityCurve,           !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
+        "    CAPFF Curve,             !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+        "    PowerCurve,              !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+        "    EIRFF Curve,             !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    70000.0,                 !- Speed 3 Reference Unit Total Cooling Capacity At Rated Conditions {w}",
+        "    0.70,                    !- Speed 3 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
+        "    4.20,                    !- Speed 3 Reference Unit COP At Rated Conditions {dimensionless}",
+        "    2.89,                    !- Speed 3 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    8.26,                    !- Speed 3 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
+        "    ,                        !- Speed 3 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
+        "    CapacityCurve,           !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
+        "    CAPFF Curve,             !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+        "    PowerCurve,              !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+        "    EIRFF Curve,             !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    120000.0,                !- Speed 4 Reference Unit Total Cooling Capacity At Rated Conditions {w}",
+        "    0.62,                    !- Speed 4 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
+        "    3.47,                    !- Speed 4 Reference Unit COP At Rated Conditions {dimensionless}",
+        "    3.56,                    !- Speed 4 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    10.25,                   !- Speed 4 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
+        "    ,                        !- Speed 4 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
+        "    CapacityCurve,           !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
+        "    CAPFF Curve,             !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+        "    PowerCurve,              !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+        "    EIRFF Curve,             !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    140000.0,                !- Speed 5 Reference Unit Total Cooling Capacity At Rated Conditions {w}",
+        "    0.69,                    !- Speed 5 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
+        "    3.84,                    !- Speed 5 Reference Unit COP At Rated Conditions {dimensionless}",
+        "    5.68,                    !- Speed 5 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    16.36,                   !- Speed 5 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
+        "    ,                        !- Speed 5 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
+        "    CapacityCurve,           !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name",
+        "    CAPFF Curve,             !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+        "    PowerCurve,              !- Speed 5 Energy Input Ratio Function of Temperature Curve Name",
+        "    EIRFF Curve;             !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+
+        "Curve:Biquadratic,",
+        "    CapacityCurve, 1, 0, 0, 0, 0, 0, 10, 25.5, 7.2, 48.8, , , Temperature, Temperature, Dimensionless;",
+        "Curve:Biquadratic,",
+        "    PowerCurve, 1, 0, 0, 0, 0, 0, 10, 25.5, 7.2, 48.8, , , Temperature, Temperature, Dimensionless;",
+        "Curve:Cubic,",
+        "    CAPFF Curve, 1, 0, 0, 0, 0, 1, , , Dimensionless, Dimensionless;",
+        "Curve:Cubic,",
+        "    EIRFF Curve, 1, 0, 0, 0, 0, 1, , , Dimensionless, Dimensionless;",
+        "Curve:Quadratic,",
+        "    PLF Curve, 0.85, 0.8333, 0.0, 0.0, 0.3, 0.85, 1.0, Dimensionless, Dimensionless;",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    // get coil inputs
+    VariableSpeedCoils::GetVarSpeedCoilInput(*state);
+    // Setting predefined tables is needed though
+    OutputReportPredefined::SetPredefinedTables(*state);
+    // Set up some environmental parameters
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
+    state->dataEnvrn->OutHumRat = 0.0009;
+    state->dataEnvrn->OutBaroPress = 99000.0;
+    state->dataEnvrn->WindSpeed = 5.0;
+    state->dataEnvrn->WindDir = 270.0;
+    // set coil parameters
+    int const CyclingScheme = DataHVACGlobals::ContFanCycCoil;
+    int DXCoilNum = 1;
+    int CompOp = 0;
+    int const SpeedCal = 1;
+    Real64 RuntimeFrac = 1.0;
+    Real64 SensLoad = 0.0;
+    Real64 LatentLoad = 0.0;
+    Real64 PartLoadFrac = 0.0;
+    Real64 OnOffAirFlowRatio = 1.0;
+    Real64 SpeedRatio = 0.0;
+    Real64 MaxONOFFCyclesperHour(0.0);
+    Real64 HPTimeConstant(0.0);
+    Real64 FanDelayTime(0.0);
+
+    // run coil init
+    VariableSpeedCoils::InitVarSpeedCoil(*state,
+                                         DXCoilNum,
+                                         MaxONOFFCyclesperHour,
+                                         HPTimeConstant,
+                                         FanDelayTime,
+                                         SensLoad,
+                                         LatentLoad,
+                                         CyclingScheme,
+                                         OnOffAirFlowRatio,
+                                         SpeedRatio,
+                                         SpeedCal);
+    // set coil inlet condition
+    state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp = 24.0;
+    state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat = 0.009;
+    state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(24.0, 0.009);
+    // test 1: compressor is On but PLR = 0
+    CompOp = 1;
+    PartLoadFrac = 0.0;
+    // set coil inlet air flow rate to speed 1
+    state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate =
+        state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(1) * 0.1;
+    state->dataVariableSpeedCoils->LoadSideMassFlowRate = state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
+    state->dataLoopNodes->Node(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum).MassFlowRate =
+        state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
+    VariableSpeedCoils::CalcVarSpeedCoilCooling(
+        *state, DXCoilNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+    ;
+    // check coil outlet and inlet air conditions match
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp,
+              state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat,
+              state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirEnthalpy,
+              state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy);
+    ;
+    // test 2: compressor is On and PLR > 0
+    CompOp = 1;
+    PartLoadFrac = 0.1;
+    // set coil inlet condition
+    state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp = 24.0;
+    state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat = 0.009;
+    state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(24.0, 0.009);
+    // set coil inlet air flow rate to speed 1 times PLR
+    state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate =
+        state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(1) * PartLoadFrac;
+    state->dataVariableSpeedCoils->LoadSideMassFlowRate = state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
+    state->dataLoopNodes->Node(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum).MassFlowRate =
+        state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
+    // run the coil
+    VariableSpeedCoils::CalcVarSpeedCoilCooling(
+        *state, DXCoilNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+    // check coil air outlet conditions
+    EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp, 5.79484, 0.00001);
+    EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat, 0.00810, 0.00001);
+    EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirEnthalpy, 26170.26, 0.01);
 }
 } // namespace EnergyPlus

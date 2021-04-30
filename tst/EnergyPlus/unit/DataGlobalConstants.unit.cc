@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -61,103 +62,102 @@ using namespace ObjexxFCL;
 TEST_F(EnergyPlusFixture, DataGlobalConstants_AssignResourceTypeNum)
 {
 
-    EXPECT_EQ(DataGlobalConstants::iRT_Electricity, DataGlobalConstants::AssignResourceTypeNum("Electricity"));
-    EXPECT_EQ(DataGlobalConstants::iRT_Gas, DataGlobalConstants::AssignResourceTypeNum("NaturalGas"));
-    EXPECT_EQ(DataGlobalConstants::iRT_Gas, DataGlobalConstants::AssignResourceTypeNum("Gas"));
-    EXPECT_EQ(DataGlobalConstants::iRT_Gasoline, DataGlobalConstants::AssignResourceTypeNum("Gasoline"));
-    EXPECT_EQ(DataGlobalConstants::iRT_Diesel, DataGlobalConstants::AssignResourceTypeNum("Diesel"));
-    EXPECT_EQ(DataGlobalConstants::iRT_Coal, DataGlobalConstants::AssignResourceTypeNum("Coal"));
-    EXPECT_EQ(DataGlobalConstants::iRT_FuelOil_1, DataGlobalConstants::AssignResourceTypeNum("FuelOilNo1"));
-    EXPECT_EQ(DataGlobalConstants::iRT_FuelOil_2, DataGlobalConstants::AssignResourceTypeNum("FuelOilNo2"));
-    EXPECT_EQ(DataGlobalConstants::iRT_Propane, DataGlobalConstants::AssignResourceTypeNum("Propane"));
-    EXPECT_EQ(DataGlobalConstants::iRT_OtherFuel1, DataGlobalConstants::AssignResourceTypeNum("OtherFuel1"));
-    EXPECT_EQ(DataGlobalConstants::iRT_OtherFuel2, DataGlobalConstants::AssignResourceTypeNum("OtherFuel2"));
-    EXPECT_EQ(DataGlobalConstants::iRT_Water, DataGlobalConstants::AssignResourceTypeNum("Water"));
-    EXPECT_EQ(DataGlobalConstants::iRT_OnSiteWater, DataGlobalConstants::AssignResourceTypeNum("OnSiteWater"));
-    EXPECT_EQ(DataGlobalConstants::iRT_MainsWater, DataGlobalConstants::AssignResourceTypeNum("MainsWater"));
-    EXPECT_EQ(DataGlobalConstants::iRT_RainWater, DataGlobalConstants::AssignResourceTypeNum("RainWater"));
-    EXPECT_EQ(DataGlobalConstants::iRT_WellWater, DataGlobalConstants::AssignResourceTypeNum("WellWater"));
-    EXPECT_EQ(DataGlobalConstants::iRT_Condensate, DataGlobalConstants::AssignResourceTypeNum("Condensate"));
-    EXPECT_EQ(DataGlobalConstants::iRT_EnergyTransfer, DataGlobalConstants::AssignResourceTypeNum("EnergyTransfer"));
-    EXPECT_EQ(DataGlobalConstants::iRT_Steam, DataGlobalConstants::AssignResourceTypeNum("Steam"));
-    EXPECT_EQ(DataGlobalConstants::iRT_DistrictCooling, DataGlobalConstants::AssignResourceTypeNum("DistrictCooling"));
-    EXPECT_EQ(DataGlobalConstants::iRT_DistrictHeating, DataGlobalConstants::AssignResourceTypeNum("DistrictHeating"));
-    EXPECT_EQ(DataGlobalConstants::iRT_ElectricityProduced, DataGlobalConstants::AssignResourceTypeNum("ElectricityProduced"));
-    EXPECT_EQ(DataGlobalConstants::iRT_ElectricityPurchased, DataGlobalConstants::AssignResourceTypeNum("ElectricityPurchased"));
-    EXPECT_EQ(DataGlobalConstants::iRT_ElectricitySurplusSold, DataGlobalConstants::AssignResourceTypeNum("ElectricitySurplusSold"));
-    EXPECT_EQ(DataGlobalConstants::iRT_ElectricityNet, DataGlobalConstants::AssignResourceTypeNum("ElectricityNet"));
-    EXPECT_EQ(DataGlobalConstants::iRT_SolarWater, DataGlobalConstants::AssignResourceTypeNum("SolarWater"));
-    EXPECT_EQ(DataGlobalConstants::iRT_SolarAir, DataGlobalConstants::AssignResourceTypeNum("SolarAir"));
-    EXPECT_EQ(DataGlobalConstants::iRT_SO2, DataGlobalConstants::AssignResourceTypeNum("SO2"));
-    EXPECT_EQ(DataGlobalConstants::iRT_NOx, DataGlobalConstants::AssignResourceTypeNum("NOx"));
-    EXPECT_EQ(DataGlobalConstants::iRT_N2O, DataGlobalConstants::AssignResourceTypeNum("N2O"));
-    EXPECT_EQ(DataGlobalConstants::iRT_PM, DataGlobalConstants::AssignResourceTypeNum("PM"));
-    EXPECT_EQ(DataGlobalConstants::iRT_PM2_5, DataGlobalConstants::AssignResourceTypeNum("PM2.5"));
-    EXPECT_EQ(DataGlobalConstants::iRT_PM10, DataGlobalConstants::AssignResourceTypeNum("PM10"));
-    EXPECT_EQ(DataGlobalConstants::iRT_CO, DataGlobalConstants::AssignResourceTypeNum("CO"));
-    EXPECT_EQ(DataGlobalConstants::iRT_CO2, DataGlobalConstants::AssignResourceTypeNum("CO2"));
-    EXPECT_EQ(DataGlobalConstants::iRT_CH4, DataGlobalConstants::AssignResourceTypeNum("CH4"));
-    EXPECT_EQ(DataGlobalConstants::iRT_NH3, DataGlobalConstants::AssignResourceTypeNum("NH3"));
-    EXPECT_EQ(DataGlobalConstants::iRT_NMVOC, DataGlobalConstants::AssignResourceTypeNum("NMVOC"));
-    EXPECT_EQ(DataGlobalConstants::iRT_Hg, DataGlobalConstants::AssignResourceTypeNum("Hg"));
-    EXPECT_EQ(DataGlobalConstants::iRT_Pb, DataGlobalConstants::AssignResourceTypeNum("Pb"));
-    EXPECT_EQ(DataGlobalConstants::iRT_NuclearHigh, DataGlobalConstants::AssignResourceTypeNum("Nuclear High"));
-    EXPECT_EQ(DataGlobalConstants::iRT_NuclearLow, DataGlobalConstants::AssignResourceTypeNum("Nuclear Low"));
-    EXPECT_EQ(DataGlobalConstants::iRT_WaterEnvironmentalFactors, DataGlobalConstants::AssignResourceTypeNum("WaterEnvironmentalFactors"));
-    EXPECT_EQ(DataGlobalConstants::iRT_CarbonEquivalent, DataGlobalConstants::AssignResourceTypeNum("Carbon Equivalent"));
-    EXPECT_EQ(DataGlobalConstants::iRT_PlantLoopHeatingDemand, DataGlobalConstants::AssignResourceTypeNum("PlantLoopHeatingDemand"));
-    EXPECT_EQ(DataGlobalConstants::iRT_PlantLoopCoolingDemand, DataGlobalConstants::AssignResourceTypeNum("PlantLoopCoolingDemand"));
-    EXPECT_EQ(0, DataGlobalConstants::AssignResourceTypeNum("XYZ"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::Electricity, DataGlobalConstants::AssignResourceTypeNum("Electricity"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::Natural_Gas, DataGlobalConstants::AssignResourceTypeNum("NaturalGas"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::Gasoline, DataGlobalConstants::AssignResourceTypeNum("Gasoline"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::Diesel, DataGlobalConstants::AssignResourceTypeNum("Diesel"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::Coal, DataGlobalConstants::AssignResourceTypeNum("Coal"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::FuelOil_1, DataGlobalConstants::AssignResourceTypeNum("FuelOilNo1"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::FuelOil_2, DataGlobalConstants::AssignResourceTypeNum("FuelOilNo2"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::Propane, DataGlobalConstants::AssignResourceTypeNum("Propane"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::OtherFuel1, DataGlobalConstants::AssignResourceTypeNum("OtherFuel1"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::OtherFuel2, DataGlobalConstants::AssignResourceTypeNum("OtherFuel2"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::Water, DataGlobalConstants::AssignResourceTypeNum("Water"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::OnSiteWater, DataGlobalConstants::AssignResourceTypeNum("OnSiteWater"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::MainsWater, DataGlobalConstants::AssignResourceTypeNum("MainsWater"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::RainWater, DataGlobalConstants::AssignResourceTypeNum("RainWater"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::WellWater, DataGlobalConstants::AssignResourceTypeNum("WellWater"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::Condensate, DataGlobalConstants::AssignResourceTypeNum("Condensate"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::EnergyTransfer, DataGlobalConstants::AssignResourceTypeNum("EnergyTransfer"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::Steam, DataGlobalConstants::AssignResourceTypeNum("Steam"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::DistrictCooling, DataGlobalConstants::AssignResourceTypeNum("DistrictCooling"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::DistrictHeating, DataGlobalConstants::AssignResourceTypeNum("DistrictHeating"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::ElectricityProduced, DataGlobalConstants::AssignResourceTypeNum("ElectricityProduced"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::ElectricityPurchased, DataGlobalConstants::AssignResourceTypeNum("ElectricityPurchased"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::ElectricitySurplusSold, DataGlobalConstants::AssignResourceTypeNum("ElectricitySurplusSold"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::ElectricityNet, DataGlobalConstants::AssignResourceTypeNum("ElectricityNet"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::SolarWater, DataGlobalConstants::AssignResourceTypeNum("SolarWater"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::SolarAir, DataGlobalConstants::AssignResourceTypeNum("SolarAir"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::SO2, DataGlobalConstants::AssignResourceTypeNum("SO2"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::NOx, DataGlobalConstants::AssignResourceTypeNum("NOx"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::N2O, DataGlobalConstants::AssignResourceTypeNum("N2O"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::PM, DataGlobalConstants::AssignResourceTypeNum("PM"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::PM2_5, DataGlobalConstants::AssignResourceTypeNum("PM2.5"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::PM10, DataGlobalConstants::AssignResourceTypeNum("PM10"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::CO, DataGlobalConstants::AssignResourceTypeNum("CO"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::CO2, DataGlobalConstants::AssignResourceTypeNum("CO2"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::CH4, DataGlobalConstants::AssignResourceTypeNum("CH4"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::NH3, DataGlobalConstants::AssignResourceTypeNum("NH3"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::NMVOC, DataGlobalConstants::AssignResourceTypeNum("NMVOC"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::Hg, DataGlobalConstants::AssignResourceTypeNum("Hg"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::Pb, DataGlobalConstants::AssignResourceTypeNum("Pb"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::NuclearHigh, DataGlobalConstants::AssignResourceTypeNum("Nuclear High"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::NuclearLow, DataGlobalConstants::AssignResourceTypeNum("Nuclear Low"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::WaterEnvironmentalFactors, DataGlobalConstants::AssignResourceTypeNum("WaterEnvironmentalFactors"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::CarbonEquivalent, DataGlobalConstants::AssignResourceTypeNum("Carbon Equivalent"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::PlantLoopHeatingDemand, DataGlobalConstants::AssignResourceTypeNum("PlantLoopHeatingDemand"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::PlantLoopCoolingDemand, DataGlobalConstants::AssignResourceTypeNum("PlantLoopCoolingDemand"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::None, DataGlobalConstants::AssignResourceTypeNum("XYZ"));
 }
 
 TEST_F(EnergyPlusFixture, DataGlobalConstants_GetResourceTypeChar)
 {
 
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Electricity), "Electricity");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Gas), "Gas");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Gasoline), "Gasoline");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Diesel), "Diesel");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Coal), "Coal");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_FuelOil_1), "FuelOil#1");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_FuelOil_2), "FuelOil#2");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Propane), "Propane");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_OtherFuel1), "OtherFuel1");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_OtherFuel2), "OtherFuel2");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Water), "Water");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_OnSiteWater), "OnSiteWater");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_MainsWater), "MainsWater");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_RainWater), "RainWater");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_WellWater), "WellWater");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Condensate), "Condensate");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_EnergyTransfer), "EnergyTransfer");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Steam), "Steam");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_DistrictCooling), "DistrictCooling");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_DistrictHeating), "DistrictHeating");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_ElectricityProduced), "ElectricityProduced");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_ElectricityPurchased), "ElectricityPurchased");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_ElectricitySurplusSold), "ElectricitySurplusSold");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_ElectricityNet), "ElectricityNet");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_SolarWater), "SolarWater");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_SolarAir), "SolarAir");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_SO2), "SO2");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_NOx), "NOx");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_N2O), "N2O");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_PM), "PM");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_PM2_5), "PM2.5");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_PM10), "PM10");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_CO), "CO");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_CO2), "CO2");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_CH4), "CH4");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_NH3), "NH3");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_NMVOC), "NMVOC");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Hg), "Hg");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Pb), "Pb");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_NuclearHigh), "Nuclear High");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_NuclearLow), "Nuclear Low");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_WaterEnvironmentalFactors), "WaterEnvironmentalFactors");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_CarbonEquivalent), "Carbon Equivalent");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_PlantLoopHeatingDemand), "PlantLoopHeatingDemand");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_PlantLoopCoolingDemand), "PlantLoopCoolingDemand");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(0), "Unknown");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Electricity), "Electricity");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Natural_Gas), "NaturalGas");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Gasoline), "Gasoline");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Diesel), "Diesel");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Coal), "Coal");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::FuelOil_1), "FuelOilNo1");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::FuelOil_2), "FuelOilNo2");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Propane), "Propane");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::OtherFuel1), "OtherFuel1");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::OtherFuel2), "OtherFuel2");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Water), "Water");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::OnSiteWater), "OnSiteWater");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::MainsWater), "MainsWater");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::RainWater), "RainWater");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::WellWater), "WellWater");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Condensate), "Condensate");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::EnergyTransfer), "EnergyTransfer");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Steam), "Steam");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::DistrictCooling), "DistrictCooling");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::DistrictHeating), "DistrictHeating");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::ElectricityProduced), "ElectricityProduced");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::ElectricityPurchased), "ElectricityPurchased");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::ElectricitySurplusSold), "ElectricitySurplusSold");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::ElectricityNet), "ElectricityNet");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::SolarWater), "SolarWater");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::SolarAir), "SolarAir");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::SO2), "SO2");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::NOx), "NOx");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::N2O), "N2O");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::PM), "PM");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::PM2_5), "PM2.5");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::PM10), "PM10");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::CO), "CO");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::CO2), "CO2");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::CH4), "CH4");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::NH3), "NH3");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::NMVOC), "NMVOC");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Hg), "Hg");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Pb), "Pb");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::NuclearHigh), "Nuclear High");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::NuclearLow), "Nuclear Low");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::WaterEnvironmentalFactors), "WaterEnvironmentalFactors");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::CarbonEquivalent), "Carbon Equivalent");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::PlantLoopHeatingDemand), "PlantLoopHeatingDemand");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::PlantLoopCoolingDemand), "PlantLoopCoolingDemand");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::None), "Unknown");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::None), "Unknown");
 }
-

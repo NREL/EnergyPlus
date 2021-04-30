@@ -10,9 +10,9 @@ Many output variable names are common across all chiller types. These generic ch
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Electric Power {[}W{]}
+  HVAC,Average,Chiller Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller Electric Energy {[}J{]}
+  HVAC,Sum,Chiller Electricity Energy {[}J{]}
 \item
   Zone,Meter,Electricity:Plant {[}J{]}
 \item
@@ -53,9 +53,9 @@ The following outputs are applicable only for evap-cooled chillers
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Chiller Basin Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Energy {[}J{]}
+  HVAC,Average,Chiller Basin Heater Electricity Energy {[}J{]}
 \end{itemize}
 
 The following three outputs are only available for water-cooled chillers
@@ -164,17 +164,17 @@ The following output is applicable only for indirect absorption chillersHVAC,Ave
 \item
   HVAC,Average,Chiller Gasoline Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Chiller FuelOil\#1 Rate {[}W{]}
+  HVAC,Average,Chiller FuelOilNo1 Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller FuelOil\#1 Energy {[}J{]}
+  HVAC,Sum,Chiller FuelOilNo1 Energy {[}J{]}
 \item
-  HVAC,Average,Chiller FuelOil\#1 Mass Flow Rate {[}kg/s{]}
+  HVAC,Average,Chiller FuelOilNo1 Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Chiller FuelOil\#2 Rate {[}W{]}
+  HVAC,Average,Chiller FuelOilNo2 Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller FuelOil\#2 Energy {[}J{]}
+  HVAC,Sum,Chiller FuelOilNo2 Energy {[}J{]}
 \item
-  HVAC,Average,Chiller FuelOil\#2 Mass Flow Rate {[}kg/s{]}
+  HVAC,Average,Chiller FuelOilNo2 Mass Flow Rate {[}kg/s{]}
 \item
   HVAC,Average,Chiller OtherFuel1 Rate {[}W{]}
 \item
@@ -189,9 +189,9 @@ The following output is applicable only for indirect absorption chillersHVAC,Ave
   HVAC,Average,Chiller OtherFuel2 Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\subsubsection{Chiller Electric Power {[}W{]}}\label{chiller-electric-power-w}
+\subsubsection{Chiller Electricity Rate {[}W{]}}\label{chiller-electric-power-w}
 
-\subsubsection{Chiller Electric Energy {[}J{]}}\label{chiller-electric-energy-j}
+\subsubsection{Chiller Electricity Energy {[}J{]}}\label{chiller-electric-energy-j}
 
 These outputs are the electric power input to the chiller. In the case of steam or fuel-powered chillers, this repesents the internal chiller pumps and other electric power consumption. Consumption is metered on Cooling:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -211,7 +211,7 @@ These outputs are the evaporator (chilled water) inlet and outlet temperatures a
 
 \subsubsection{Chiller COP {[}W/W{]}}\label{chiller-cop-ww}
 
-This output is the coefficient of performance for the chiller during cooling operation. It is calculated as the evaporator heat transfer rate (Chiller Evaporator Cooling Rate) divided by the ``fuel'' consumption rate by the chiller. For the constant COP and electric chillers, the ``fuel'' is electricity so the divisor is Chiller Electric Power {[}W{]}. For the absorption chiller, the ``fuel'' is steam so the divisor is Steam Consumption Rate {[}W{]}.
+This output is the coefficient of performance for the chiller during cooling operation. It is calculated as the evaporator heat transfer rate (Chiller Evaporator Cooling Rate) divided by the ``fuel'' consumption rate by the chiller. For the constant COP and electric chillers, the ``fuel'' is electricity so the divisor is Chiller Electricity Rate {[}W{]}. For the absorption chiller, the ``fuel'' is steam so the divisor is Steam Consumption Rate {[}W{]}.
 
 \emph{Note that this variable is reported as zero when the chiller is not operating. When reported for frequencies longer than ``detailed'' (such as timestep, hourly, daily, monthly or environment), this output will only be meaningful when the chiller is operating for the entire reporting period. To determine an average COP for a longer time period, compute the COP based on total evaporator heat transfer divided by total electric or fuel input over the desired period.}
 
@@ -233,9 +233,9 @@ These outputs are the condenser heat transfer which is the heat rejected from th
 
 This output is the condenser (heat rejection) inlet temperature for air-cooled or evap-cooled chillers. For an air-cooled chiller, this output would be the dry-bulb temperature of the air entering the condenser coil. For an evap-cooled chiller, this output would be the wet-bulb temperature of the air entering the evaporatively-cooled condenser coil.
 
-\subsubsection{Chiller Basin Heater Electric Power {[}W{]}}\label{chiller-basin-heater-electric-power-w}
+\subsubsection{Chiller Basin Heater Electricity Rate {[}W{]}}\label{chiller-basin-heater-electric-power-w}
 
-\subsubsection{Chiller Basin Heater Electric Energy {[}J{]}}\label{chiller-basin-heater-electric-energy-j}
+\subsubsection{Chiller Basin Heater Electricity Energy {[}J{]}}\label{chiller-basin-heater-electric-energy-j}
 
 These outputs are the electric power input to the chiller's basin heater (for evaporatively-cooled condenser type). Consumption is metered on Chillers:Electricity, Electricity:Plant, and Electricity:Facility
 
@@ -295,7 +295,7 @@ This output variable is available for heat recovery chillers that model split bu
 
 \subsubsection{Chiller Gas~ Mass {[}kg{]} (Gas Turbine Chiller only)}\label{chiller-gas-mass-kg-gas-turbine-chiller-only}
 
-These outputs are the steam or fuel input for steam or fuel-fired chillers. Valid fuel types depend on the type of chiller. \textless{}Fuel Type\textgreater{} may be one of:~ Gas (natural gas), Steam, Propane, Diesel, Gasoline, FuelOil\#1, FuelOil\#2, OtherFuel1 and OtherFuel2. Consumption is metered on Cooling:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
+These outputs are the steam or fuel input for steam or fuel-fired chillers. Valid fuel types depend on the type of chiller. \textless{}Fuel Type\textgreater{} may be one of:~ Gas (natural gas), Steam, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 and OtherFuel2. Consumption is metered on Cooling:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
 
 \subsubsection{Chiller Source Hot Water Rate {[}W{]}}\label{chiller-source-hot-water-rate-w}
 
@@ -472,9 +472,9 @@ Chiller:Absorption,
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Electric Power {[}W{]}
+  HVAC,Average,Chiller Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller Electric Energy {[}J{]}
+  HVAC,Sum,Chiller Electricity Energy {[}J{]}
 \item
   Zone,Meter,Electricity:Plant {[}J{]}
 \item
@@ -704,9 +704,9 @@ Chiller:Absorption:Indirect,
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Electric Power {[}W{]}
+  HVAC,Average,Chiller Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller Electric Energy {[}J{]}
+  HVAC,Sum,Chiller Electricity Energy {[}J{]}
 \item
   Zone,Meter,Electricity:Plant {[}J{]}
 \item
@@ -882,9 +882,9 @@ Chiller:ConstantCOP, Little Chiller,
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Electric Power {[}W{]}
+  HVAC,Average,Chiller Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller Electric Energy {[}J{]}
+  HVAC,Sum,Chiller Electricity Energy {[}J{]}
 \item
   Zone,Meter,Electricity:Plant {[}J{]}
 \item
@@ -923,9 +923,9 @@ Evap-cooled:
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Chiller Basin Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Energy {[}J{]}
+  HVAC,Average,Chiller Basin Heater Electricity Energy {[}J{]}
 \end{itemize}
 
 Water-cooled:
@@ -1330,9 +1330,9 @@ Chiller:Electric,
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Electric Power {[}W{]}
+  HVAC,Average,Chiller Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller Electric Energy {[}J{]}
+  HVAC,Sum,Chiller Electricity Energy {[}J{]}
 \item
   Zone,Meter,Electricity:Plant {[}J{]}
 \item
@@ -1373,9 +1373,9 @@ Evap-cooled:
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Chiller Basin Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Energy {[}J{]}
+  HVAC,Average,Chiller Basin Heater Electricity Energy {[}J{]}
 \end{itemize}
 
 Water-cooled:
@@ -1550,7 +1550,7 @@ This field is optional.~ It can be used to control heat recovery operation of th
 
 This field is optional.~ It can be used to refine the model and controls for heat recovery operation of the chiller.~ The node named here should have a setpoint placed on it by a setpoint manager.~ If the plant loop's demand calculation scheme is set to SingleSetpoint, then a single setpoint manager should be used.~ If the plant loop's demand calculation is set to DualSetpointDeadband then a dual setpoint manager should be used and the upper setpoint is used for control.~ When this field is used, a different model is used for determining the distribution of rejected heat between the two bundles that is more appropriate for series bundle arrangements and for chiller's that are able to produce relatively higher temperature heated fluilds.
 
-\paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-11}
+\paragraph{Field: End-Use Subcategory}
 
 This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the chiller will be assigned to the ``General'' end-use subcategory.
 
@@ -1643,9 +1643,9 @@ An example of this statement in an IDF is:
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Electric Power {[}W{]}
+  HVAC,Average,Chiller Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller Electric Energy {[}J{]}
+  HVAC,Sum,Chiller Electricity Energy {[}J{]}
 \item
   Zone,Meter,Electricity:Plant {[}J{]}
 \item
@@ -1705,7 +1705,7 @@ Air-cooled or Evap-cooled reported only when the condenser fan power ratio input
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Condenser Fan Electric Power {[}W{]}
+  HVAC,Average,Chiller Condenser Fan Electricity Rate {[}W{]}
 \item
   HVAC,Average,Chiller Condenser Fan Electric Consumption {[}J{]}
 \end{itemize}
@@ -1714,9 +1714,9 @@ Evap-cooled:
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Chiller Basin Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Energy {[}J{]}
+  HVAC,Average,Chiller Basin Heater Electricity Energy {[}J{]}
 \item
   HVAC,Sum,Chiller Evaporative Condenser Water Volume {[}m3{]}
 \item
@@ -1755,9 +1755,9 @@ HeatRecovery:
 
 Most of these chiller output variables are defined above under ``Generic Chiller Outputs.''~ Output variables not described above are discussed here.
 
-\paragraph{Chiller Condenser Fan Electric Power ~{[}W{]}}\label{chiller-condenser-fan-electric-power-w}
+\paragraph{Chiller Condenser Fan Electricity Rate ~{[}W{]}}\label{chiller-condenser-fan-electric-power-w}
 
-\paragraph{Chiller Condenser Fan Electric Energy ~{[}J{]}}\label{chiller-condenser-fan-electric-energy-j}
+\paragraph{Chiller Condenser Fan Electricity Energy ~{[}J{]}}\label{chiller-condenser-fan-electric-energy-j}
 
 These outputs are for the electric power consumption of the chiller condenser fan and are applicable to air- or evaporatively-cooled chillers. These reports are available only for the Chiller:Electric:EIR and only when the Condenser Fan Power Ratio input field is greater than 0. This output is also added to a meter object with Resource Type = Electricity, End Use Key = Chillers, Group Key = Plant (Ref. Output:Meter objects).
 
@@ -2026,7 +2026,7 @@ Chiller:Electric:ReformulatedEIR,
 
 \subsubsection{Outputs}\label{outputs-5-006}
 
-The output variables for Chiller:Electric:ReformulatedEIR are the same as the output variables for Chiller:Electric:EIR (ref. Electric EIR Chiller Outputs). except for the Chiller Condenser Fan Electric Power and Energy reports
+The output variables for Chiller:Electric:ReformulatedEIR are the same as the output variables for Chiller:Electric:EIR (ref. Electric EIR Chiller Outputs). except for the Chiller Condenser Fan Electricity Rate and Energy reports
 
 \subsection{Chiller:EngineDriven}\label{chillerenginedriven}
 
@@ -2380,8 +2380,8 @@ Chiller:EngineDriven,
 
 \begin{lstlisting}
 
-HVAC,Average,Chiller Electric Power [W]
-  HVAC,Sum,Chiller Electric Energy [J]
+HVAC,Average,Chiller Electricity Rate [W]
+  HVAC,Sum,Chiller Electricity Energy [J]
   Zone,Meter,Electricity:Plant [J]
   Zone,Meter,Cooling:Electricity [J]
   HVAC,Average,Chiller Evaporator Cooling Rate [W]
@@ -2409,9 +2409,9 @@ Evap-cooled:
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Chiller Basin Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Energy {[}J{]}
+  HVAC,Average,Chiller Basin Heater Electricity Energy {[}J{]}
 \end{itemize}
 
 Water-cooled:
@@ -2483,17 +2483,17 @@ One of the following blocks will be applicable based on fuel type:
 \item
   HVAC,Average,Chiller Gasoline Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Chiller FuelOil\#1 Rate {[}W{]}
+  HVAC,Average,Chiller FuelOilNo1 Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller FuelOil\#1 Energy {[}J{]}
+  HVAC,Sum,Chiller FuelOilNo1 Energy {[}J{]}
 \item
-  HVAC,Average,Chiller FuelOil\#1 Mass Flow Rate {[}kg/s{]}
+  HVAC,Average,Chiller FuelOilNo1 Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Chiller FuelOil\#2 Rate {[}W{]}
+  HVAC,Average,Chiller FuelOilNo2 Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller FuelOil\#2 Energy {[}J{]}
+  HVAC,Sum,Chiller FuelOilNo2 Energy {[}J{]}
 \item
-  HVAC,Average,Chiller FuelOil\#2 Mass Flow Rate {[}kg/s
+  HVAC,Average,Chiller FuelOilNo2 Mass Flow Rate {[}kg/s
 \item
   HVAC,Average,Chiller OtherFuel1 Rate {[}W{]}
 \item
@@ -2947,9 +2947,9 @@ Chiller:CombustionTurbine,
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Electric Power {[}W{]}
+  HVAC,Average,Chiller Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller Electric Energy {[}J{]}
+  HVAC,Sum,Chiller Electricity Energy {[}J{]}
 \item
   Zone,Meter,Electricity:Plant {[}J{]}
 \item
@@ -2990,9 +2990,9 @@ Evap-cooled:
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Chiller Basin Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Energy {[}J{]}
+  HVAC,Average,Chiller Basin Heater Electricity Energy {[}J{]}
 \end{itemize}
 
 Water-cooled:
@@ -3247,9 +3247,9 @@ ChillerHeater:Absorption:DirectFired,
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Heater Electric Power {[}W{]}
+  HVAC,Average,Chiller Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller Heater Electric Energy {[}J{]}
+  HVAC,Sum,Chiller Heater Electricity Energy {[}J{]}
 \item
   Zone,Meter,Electricity:Plant {[}J{]}
 \item
@@ -3319,9 +3319,9 @@ Outputs specific to Direct Fired Absorption Chiller during cooling operation
 \item
   HVAC,Sum,Chiller Heater Cooling \textless{}Fuel Type\textgreater{} Consumption {[}J{]}
 \item
-  HVAC,Average,Chiller Heater Cooling Electric Power {[}W{]}
+  HVAC,Average,Chiller Heater Cooling Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller Heater Cooling Electric Energy {[}J{]}
+  HVAC,Sum,Chiller Heater Cooling Electricity Energy {[}J{]}
 \item
   HVAC,Average,Chiller Heater Cooling Part Load Ratio
 \item
@@ -3342,9 +3342,9 @@ Outputs specific to Direct Fired Absorption Chiller during heating operation
 \item
   HVAC,Sum,Chiller Heater Heating \textless{}Fuel Type\textgreater{} Energy {[}J{]}
 \item
-  HVAC,Average,Chiller Heater Heating Electric Power {[}W{]}
+  HVAC,Average,Chiller Heater Heating Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller Heater Heating Electric Energy {[}J{]}
+  HVAC,Sum,Chiller Heater Heating Electricity Energy {[}J{]}
 \item
   HVAC,Average,Chiller Heater Heating Part Load Ratio {[]}
 \item
@@ -3359,9 +3359,9 @@ Outputs specific to Direct Fired Absorption Chiller during heating operation
 
 The ``Chiller'' output variables are defined above under ``Generic Chiller Outputs.''~ The specific ``Direct Fired Absorption Chiller'' output variables and exceptions to the generic outputs are defined below.
 
-\paragraph{Chiller Heater Electric Power {[}W{]}}\label{chiller-heater-electric-power-w}
+\paragraph{Chiller Heater Electricity Rate {[}W{]}}\label{chiller-heater-electric-power-w}
 
-\paragraph{Chiller Heater Electric Energy {[}J{]}}\label{chiller-heater-electric-energy-j}
+\paragraph{Chiller Heater Electricity Energy {[}J{]}}\label{chiller-heater-electric-energy-j}
 
 These outputs are the electric power input to the chiller when operating in cooling mode, heating mode, or both. This value is not metered, but the separate cooling and heating electric consumption are metered (see below).
 
@@ -3381,9 +3381,9 @@ This is the average fraction of the time period during which the direct fired ab
 
 These outputs are the fuel input to the direct fired absorption chiller to serve cooling operation. Consumption is metered on Cooling:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
 
-\paragraph{Chiller Heater Cooling Electric Power {[}W{]}}\label{chiller-heater-cooling-electric-power-w}
+\paragraph{Chiller Heater Cooling Electricity Rate {[}W{]}}\label{chiller-heater-cooling-electric-power-w}
 
-\paragraph{Chiller Heater Cooling Electric Energy {[}J{]}}\label{chiller-heater-cooling-electric-energy-j}
+\paragraph{Chiller Heater Cooling Electricity Energy {[}J{]}}\label{chiller-heater-cooling-electric-energy-j}
 
 These outputs are the electricity input to the direct fired absorption chiller to serve cooling operation. Consumption is metered on Cooling:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -3411,9 +3411,9 @@ These outputs are the heating delivered by the direct fired absorption chiller-h
 
 These outputs are the fuel input to the direct fired absorption chiller-heater to serve heating operation. Consumption is metered on Heating:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
 
-\paragraph{Chiller Heater Heating Electric Power {[}W{]}}\label{chiller-heater-heating-electric-power-w}
+\paragraph{Chiller Heater Heating Electricity Rate {[}W{]}}\label{chiller-heater-heating-electric-power-w}
 
-\paragraph{Chiller Heating Heating Electric Energy {[}J{]}}\label{chiller-heating-heating-electric-energy-j}
+\paragraph{Chiller Heating Heating Electricity Energy {[}J{]}}\label{chiller-heating-heating-electric-energy-j}
 
 These outputs are the electric power input to the direct fired absorption chiller to serve heating operation. Consumption is metered on Heating:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -3651,9 +3651,9 @@ ChillerHeater:Absorption:DoubleEffect,
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Heater Electric Power {[}W{]}
+  HVAC,Average,Chiller Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller Heater Electric Energy {[}J{]}
+  HVAC,Sum,Chiller Heater Electricity Energy {[}J{]}
 \item
   HVAC,Average,Chiller Heater Evaporator Cooling Rate {[}W{]}
 \item
@@ -3701,9 +3701,9 @@ Outputs specific to Exhaust Fired Absorption Chiller during cooling operation
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Heater Cooling Electric Power {[}W{]}
+  HVAC,Average,Chiller Heater Cooling Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller Heater Cooling Electric Energy {[}J{]}
+  HVAC,Sum,Chiller Heater Cooling Electricity Energy {[}J{]}
 \item
   HVAC,Average,Chiller Heater Cooling Part Load Ratio
 \item
@@ -3724,9 +3724,9 @@ Outputs specific to Exhaust Fired Absorption Chiller during heating operation
 \item
   HVAC,Sum,Chiller Heater Heating Energy {[}J{]}
 \item
-  HVAC,Average,Chiller Heater Heating Electric Power {[}W{]}
+  HVAC,Average,Chiller Heater Heating Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller Heater Heating Electric Energy {[}J{]}
+  HVAC,Sum,Chiller Heater Heating Electricity Energy {[}J{]}
 \item
   Zone,Meter,Heating:Electricity {[}J{]}
 \item
@@ -3745,9 +3745,9 @@ Outputs specific to Exhaust Fired Absorption Chiller during heating operation
 
 The ``Chiller'' output variables are defined above under ``Generic Chiller Outputs.''~ The specific ``Exhaust Fired Absorption Chiller'' output variables and exceptions to the generic outputs are defined below.
 
-\paragraph{Chiller Heater Electric Power {[}W{]}}\label{chiller-heater-electric-power-w-1}
+\paragraph{Chiller Heater Electricity Rate {[}W{]}}\label{chiller-heater-electric-power-w-1}
 
-\paragraph{Chiller Heater Electric Energy {[}J{]}}\label{chiller-heater-electric-energy-j-1}
+\paragraph{Chiller Heater Electricity Energy {[}J{]}}\label{chiller-heater-electric-energy-j-1}
 
 These outputs are the electric power input to the chiller when operating in cooling mode, heating mode, or both. This value is not metered, but the separate cooling and heating electric consumption are metered (see below).
 
@@ -3773,9 +3773,9 @@ This is the average coefficient of performance for the chiller in cooling operat
 
 \paragraph{Chiller Heater Heating Energy {[}J{]}}\label{chiller-heater-heating-energy-j-1}
 
-\paragraph{Chiller Heater Heating Electric Power {[}W{]}}\label{chiller-heater-heating-electric-power-w-1}
+\paragraph{Chiller Heater Heating Electricity Rate {[}W{]}}\label{chiller-heater-heating-electric-power-w-1}
 
-\paragraph{Chiller Heater Heating Electric Energy {[}J{]}}\label{chiller-heater-heating-electric-energy-j}
+\paragraph{Chiller Heater Heating Electricity Energy {[}J{]}}\label{chiller-heater-heating-electric-energy-j}
 
 These outputs are the electric power input to the Exhaust Fired absorption chiller to serve heating operation. Consumption is metered on Heating:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -3851,11 +3851,11 @@ The evaporator (chilled water) average mass flow rate over the time step being r
 
 The evaporator (chilled water) outlet temperature over the time step being reported
 
-\paragraph{Chiller Heater Cooling Electric Energy {[}J{]}}\label{chiller-heater-cooling-electric-energy-j-1}
+\paragraph{Chiller Heater Cooling Electricity Energy {[}J{]}}\label{chiller-heater-cooling-electric-energy-j-1}
 
 The electric power input to the exhaust fired absorption chiller to serve cooling operation. The values are calculated for each HVAC system time step being simulated, and the results are summed across the reporting period. Consumption is metered on Heating:Electricity, Electricity:Plant, and Electricity:Facility.
 
-\paragraph{Chiller Heater Cooling Electric Power {[}W{]}}\label{chiller-heater-cooling-electric-power-w-1}
+\paragraph{Chiller Heater Cooling Electricity Rate {[}W{]}}\label{chiller-heater-cooling-electric-power-w-1}
 
 The electric power input to the Exhaust Fired absorption chiller to serve cooling operation. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
@@ -4042,11 +4042,13 @@ Outputs available from the boiler:
 \item
   HVAC,Average,Boiler Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Boiler Parasitic Electric Power {[}W{]}
+  HVAC,Average,Boiler Parasitic Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Boiler Ancillary Electric Energy {[}J{]}
+  HVAC,Sum,Boiler Ancillary Electricity Energy {[}J{]}
 \item
   HVAC,Average,Boiler Part Load Ratio
+\item
+  HVAC,Average,Boiler Efficiency
 \end{itemize}
 
 ~ One of the following blocks will be applicable based on fuel type:
@@ -4055,9 +4057,9 @@ Electric:
 
 \begin{itemize}
 \item
-  HVAC,Average,Boiler Electric Power {[}W{]}
+  HVAC,Average,Boiler Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Boiler Electric Energy {[}J{]}
+  HVAC,Sum,Boiler Electricity Energy {[}J{]}
 \end{itemize}
 
 Gas:
@@ -4078,22 +4080,22 @@ Propane:
   HVAC,Sum,Boiler Propane Energy {[}J{]}
 \end{itemize}
 
-FuelOil\#1:
+FuelOilNo1:
 
 \begin{itemize}
 \item
-  HVAC,Average,Boiler FuelOil\#1 Rate {[}W{]}
+  HVAC,Average,Boiler FuelOilNo1 Rate {[}W{]}
 \item
-  HVAC,Sum,Boiler FuelOil\#1 Energy {[}J{]}
+  HVAC,Sum,Boiler FuelOilNo1 Energy {[}J{]}
 \end{itemize}
 
-FuelOil\#2:
+FuelOilNo2:
 
 \begin{itemize}
 \item
-  HVAC,Average,Boiler FuelOil\#2 Rate {[}W{]}
+  HVAC,Average,Boiler FuelOilNo2 Rate {[}W{]}
 \item
-  HVAC,Sum,Boiler FuelOil\#2 Energy {[}J{]}
+  HVAC,Sum,Boiler FuelOilNo2 Energy {[}J{]}
 \end{itemize}
 
 Coal:
@@ -4159,17 +4161,23 @@ These outputs are the hot water inlet and outlet temperatures and flow rate for 
 
 This output is the operating part-load ratio of the boiler. The part-load ratio is calculated as the boiler load divided by the boiler nominal capacity. The part-load ratio is limited by the minimum and maximum part-load ratio inputs specified by the user.
 
+\paragraph{Boiler Efficiency {[]}}\label{boiler-efficiency}
+
+This output is the thermal efficiency for the boiler during heating operation. It is calculated by multiplying the normalized output of the boiler efficiency curve and the nominal thermal efficiency.
+
+\emph{Note that this variable is reported as zero when the boiler is not operating. When reported for frequencies longer than ``detailed'' (such as timestep, hourly, daily, monthly or environment), this output will only be meaningful when the boiler is operating for the entire reporting period. To determine an efficiency for a longer time period, compute the efficiency based on boiler heating rate divided by boiler gas rate over the desired period.}
+
 \paragraph{Boiler \textless{}Fuel Type\textgreater{} Rate {[}W{]}}\label{boiler-fuel-type-rate-w}
 
 \paragraph{Boiler \textless{}Fuel Type\textgreater{} Energy {[}J{]} \textbackslash{}}\label{boiler-fuel-type-energy-j}
 
-\paragraph{Boiler Electric Power {[}W{]}}\label{boiler-electric-power-w}
+\paragraph{Boiler Electricity Rate {[}W{]}}\label{boiler-electric-power-w}
 
-These outputs are the energy input to the boiler. Valid fuel types are:~ Electric, Gas (natural gas), Propane, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, OtherFuel1, OtherFuel2. Consumption is metered on Heating:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
+These outputs are the energy input to the boiler. Valid fuel types are:~ Electric, Gas (natural gas), Propane, FuelOilNo1, FuelOilNo2, Coal, Diesel, Gasoline, OtherFuel1, OtherFuel2. Consumption is metered on Heating:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
 
-\paragraph{Boiler Ancillary Electric Power {[}W{]}}\label{boiler-ancillary-electric-power-w}
+\paragraph{Boiler Ancillary Electricity Rate {[}W{]}}\label{boiler-ancillary-electric-power-w}
 
-\paragraph{Boiler Ancillary Electric Energy {[}J{]}}\label{boiler-ancillary-electric-energy-j}
+\paragraph{Boiler Ancillary Electricity Energy {[}J{]}}\label{boiler-ancillary-electric-energy-j}
 
 These outputs are the parasitic electric power and parasitic electric consumption associated with the boiler. Used when simulating a forced draft fan or other electric component. Consumption is metered on Heating:Electricity and Electricity:Plant.
 
@@ -4294,6 +4302,8 @@ Outputs available from the steam boiler:
 \item
   HVAC,Sum,Boiler Heating Energy {[}J{]}
 \item
+  HVAC,Average,Boiler Steam Efficiency
+\item
   Zone,Meter,Boilers:EnergyTransfer {[}J{]}
 \item
   HVAC,Average,Boiler Steam Inlet Temperature {[}C{]}
@@ -4309,9 +4319,9 @@ Electric:
 
 \begin{itemize}
 \item
-  HVAC,Average,Boiler Electric Power {[}W{]}
+  HVAC,Average,Boiler Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Boiler Electric Energy {[}J{]}
+  HVAC,Sum,Boiler Electricity Energy {[}J{]}
 \end{itemize}
 
 Gas:
@@ -4332,22 +4342,22 @@ Propane:
   HVAC,Sum,Boiler Propane Energy {[}J{]}
 \end{itemize}
 
-FuelOil\#1:
+FuelOilNo1:
 
 \begin{itemize}
 \item
-  HVAC,Average,Boiler FuelOil\#1 Rate {[}W{]}
+  HVAC,Average,Boiler FuelOilNo1 Rate {[}W{]}
 \item
-  HVAC,Sum,Boiler FuelOil\#1 Energy {[}J{]}
+  HVAC,Sum,Boiler FuelOilNo1 Energy {[}J{]}
 \end{itemize}
 
-FuelOil\#2:
+FuelOilNo2:
 
 \begin{itemize}
 \item
-  HVAC,Average,Boiler FuelOil\#2 Rate {[}W{]}
+  HVAC,Average,Boiler FuelOilNo2 Rate {[}W{]}
 \item
-  HVAC,Sum,Boiler FuelOil\#2 Energy {[}J{]}
+  HVAC,Sum,Boiler FuelOilNo2 Energy {[}J{]}
 \end{itemize}
 
 Coal:
@@ -4401,6 +4411,12 @@ OtherFuel2:
 
 These outputs are the heating output (load) of the boiler. Energy is metered on Boilers:EnergyTransfer, EnergyTransfer:Plant, and EnergyTransfer:Facility.
 
+\paragraph{Boiler Steam Efficiency {[]}}\label{boiler-steam-efficiency}
+
+This output is the thermal efficiency for the boiler during heating operation. It is calculated as the boiler heat transfer rate (Boiler Heating Rate) divided by the ``fuel'' consumption rate by the boiler.
+
+\emph{Note that this variable is reported as zero when the boiler is not operating. When reported for frequencies longer than ``detailed'' (such as timestep, hourly, daily, monthly or environment), this output will only be meaningful when the boiler is operating for the entire reporting period. To determine an efficiency for a longer time period, compute the efficiency based on boiler heating rate divided by boiler \textless{}Fuel Type\textgreater{} rate over the desired period.}
+
 \paragraph{Boiler Steam Inlet Temperature {[}C{]}}\label{boiler-steam-inlet-temperature-c}
 
 \paragraph{Boiler Steam Outlet Temperature {[}C{]}}\label{boiler-steam-outlet-temperature-c}
@@ -4413,11 +4429,11 @@ These outputs are the steam inlet and outlet temperatures and steam flow rate fo
 
 \paragraph{Boiler \textless{}Fuel Type\textgreater{} Energy {[}J{]}}\label{boiler-fuel-type-energy-j-1}
 
-\paragraph{Boiler Electric Power {[}W{]}}\label{boiler-electric-power-w-1}
+\paragraph{Boiler Electricity Rate {[}W{]}}\label{boiler-electric-power-w-1}
 
-\paragraph{Boiler Electric Energy {[}J{]}}\label{boiler-electric-energy-j}
+\paragraph{Boiler Electricity Energy {[}J{]}}\label{boiler-electric-energy-j}
 
-These outputs are the energy input to the boiler. Valid fuel types are:~ Electric, Gas (natural gas), Propane, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, OtherFuel1, and OtherFuel2. Consumption is metered on Heating:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
+These outputs are the energy input to the boiler. Valid fuel types are:~ Electric, Gas (natural gas), Propane, FuelOilNo1, FuelOilNo2, Coal, Diesel, Gasoline, OtherFuel1, and OtherFuel2. Consumption is metered on Heating:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
 
 \subsection{Water to Water Heat Pumps}\label{water-to-water-heat-pumps}
 
@@ -4499,13 +4515,13 @@ This numeric field contains the design cooling capacity of the heat pump in W. T
 
 This numeric field is the design electric power consumption for cooling, in W.  This corresponds to the electic power use at the Reference Cooling Capacity. This field is autosizable.  When autosized, the field called Reference Coefficient of Performance must be used.
 
-\paragraph{Fields: Cooling Capacity Coefficients 1-5}\label{fields-cooling-capacity-coefficients-1-5}
+\paragraph{Fields: Cooling Capacity Curve Name}\label{fields-cooling-capacity-curve-name}
 
-Five fields are used to describe the coefficients for the Cooling Capacity curve. More details on how these coefficients are used are described in the Engineering Reference.
+This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the Cooling Capacity curve. More details on how these coefficients in the curve are used are described in the Engineering Reference.
 
-\paragraph{Field: Cooling Compressor Power Coefficients 1-5}\label{field-cooling-compressor-power-coefficients-1-5}
+\paragraph{Field: Cooling Compressor Power Curve Name}\label{field-cooling-compressor-power-curve-name}
 
-Five fields are used to decribe the coefficients for the Cooling Compressor Power curve.
+This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the Cooling Compressor Power curve. More details on how these coefficients in the curve are used are described in the Engineering Reference.
 
 \paragraph{Field: Reference Coefficient of Performance}\label{field-cooling-nom-COP}
 
@@ -4537,19 +4553,47 @@ HeatPump:WaterToWater:EquationFit:Cooling,
   1.89E-03,                !- Reference Source Side Flow Rate {m3/s}
   39890.91,                !- Reference Cooling Capacity {W}
   4790.00,                 !- Reference Cooling Power Consumption {W}
-  -1.52030596,             !- Cooling Capacity Coefficient 1
-  3.46625667,              !- Cooling Capacity Coefficient 2
-  -1.32267797,             !- Cooling Capacity Coefficient 3
-  0.09395678,              !- Cooling Capacity Coefficient 4
-  0.038975504,             !- Cooling Capacity Coefficient 5
-  -8.59564386,             !- Cooling Compressor Power Coefficient 1
-  0.96265085,              !- Cooling Compressor Power Coefficient 2
-  8.69489229,              !- Cooling Compressor Power Coefficient 3
-  0.02501669,              !- Cooling Compressor Power Coefficient 4
-  -0.20132665,             !- Cooling Compressor Power Coefficient 5
+  CoolCapCurve,            !- Cooling Capacity Curve Name
+  CoolPowCurve,            !- Cooling Compressor Power Curve Name
   8.32,                    !- Reference Coefficient of Performance
   1.0,                     !- Sizing Factor
   GshpHeating;             !- Companion Heating Heat Pump Name
+
+  Curve:QuadLinear,
+  CoolCapCurve,            !- Curve Name
+  -1.52030596,             !- CoefficientC1
+  3.46625667,              !- CoefficientC2
+  -1.32267797,             !- CoefficientC3
+  0.09395678,              !- CoefficientC4
+  0.038975504,             !- CoefficientC5
+  -100,                    !- Minimum Value of w
+  100,                     !- Maximum Value of w
+  -100,                    !- Minimum Value of x
+  100,                     !- Maximum Value of x
+  0,                       !- Minimum Value of y
+  100,                     !- Maximum Value of y
+  0,                       !- Minimum Value of z
+  100,                     !- Maximum Value of z
+  0,                       !- Minimum Curve Output
+  38;                      !- Maximum Curve Output
+
+  Curve:QuadLinear,
+  CoolPowCurve,            !- Curve Name
+  -8.59564386,             !- CoefficientC1
+  0.96265085,              !- CoefficientC2
+  8.69489229,              !- CoefficientC3
+  0.02501669,              !- CoefficientC4
+  -0.20132665,             !- CoefficientC5
+  -100,                    !- Minimum Value of w
+  100,                     !- Maximum Value of w
+  -100,                    !- Minimum Value of x
+  100,                     !- Maximum Value of x
+  0,                       !- Minimum Value of y
+  100,                     !- Maximum Value of y
+  0,                       !- Minimum Value of z
+  100,                     !- Maximum Value of z
+  0,                       !- Minimum Curve Output
+  38;                      !- Maximum Curve Output
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-12-004}
@@ -4558,13 +4602,13 @@ This section describes the outputs available for the water to water heat pump, e
 
 \begin{itemize}
 \item
-  HVAC,Sum,Heat Pump Electric Energy {[}J{]}
+  HVAC,Sum,Heat Pump Electricity Energy {[}J{]}
 \item
   HVAC,Sum,Heat Pump Load Side Heat Transfer Energy {[}J{]}
 \item
   HVAC,Sum,Heat Pump Source Side Heat Transfer Energy {[}J{]}
 \item
-  HVAC,Average,Heat Pump Electric Power {[}W{]}
+  HVAC,Average,Heat Pump Electricity Rate {[}W{]}
 \item
   HVAC,Average,Heat Pump Load Side Heat Transfer Rate {[}W{]}
 \item
@@ -4583,7 +4627,7 @@ This section describes the outputs available for the water to water heat pump, e
   HVAC,Average,Heat Pump Source Side Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{Heat Pump Electric Energy {[}J{]}}\label{water-to-water-heat-pump-electric-energy-j}
+\paragraph{Heat Pump Electricity Energy {[}J{]}}\label{water-to-water-heat-pump-electric-energy-j}
 
 This output variable represents the cumulative energy used by the compressor. The values are calculated for each HVAC system time step being simulated, and the results are summed across the reporting period.
 
@@ -4595,7 +4639,7 @@ This output variable represents the cumulative heat transfer across the load sid
 
 This output variable represents the cumulative heat transfer across the source side coil. The values are calculated for each HVAC system time step being simulated, and the results are summed across the reporting period.
 
-\paragraph{Heat Pump Electric Power {[}W{]}}\label{water-to-water-heat-pump-electric-power-w}
+\paragraph{Heat Pump Electricity Rate {[}W{]}}\label{water-to-water-heat-pump-electric-power-w}
 
 This output variable represents the compressor power required to run the heat pump. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
@@ -4671,13 +4715,13 @@ This numeric field contains the design heating capacity of the heat pump in W. T
 
 This numeric field contains the design electric power consumption for heating, in W. This corresponds to the electic power use at the Reference Heating Capacity. This field is autosizable.  When autosized, the field called Reference Coefficient of Performance must be used.
 
-\paragraph{Fields: Heating Capacity Coefficients 1-5}\label{fields-heating-capacity-coefficients-1-5}
+\paragraph{Fields: Heating Capacity Curve Name}\label{fields-heating-capacity-curve-name}
 
-Five fields are used to describe the coefficients for the Heating Capacity curve. More details on how these coefficients are used are described in the Engineering Reference.
+This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the Heating Capacity curve. More details on how these coefficients in the curve are used are described in the Engineering Reference.
 
-\paragraph{Field: Heating Compressor Power Coefficients 1-5}\label{field-heating-compressor-power-coefficients-1-5}
+\paragraph{Field: Heating Compressor Power Curve Name}\label{field-heating-compressor-power-curve-name}
 
-Five fields are used to describe the coefficients for the Heating Compressor Power curve.
+This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the Heating Compressor Power curve. More details on how these coefficients in the curve are used are described in the Engineering Reference.
 
 \paragraph{Field: Reference Coefficient of Performance}\label{field-heating-nom-COP}
 
@@ -4710,19 +4754,47 @@ HeatPump:WaterToWater:EquationFit:Heating,
   1.89E-03,                !- Reference Source Side Flow Rate {m3/s}
   39040.92,                !- Reference Heating Capacity {W}
   5130.00,                 !- Reference Heating Power Consumption {W}
-  -3.33491153,             !- Heating Capacity Coefficient 1
-  -0.51451946,             !- Heating Capacity Coefficient 2
-  4.51592706,              !- Heating Capacity Coefficient 3
-  0.01797107,              !- Heating Capacity Coefficient 4
-  0.155797661,             !- Heating Capacity Coefficient 5
-  -8.93121751,             !- Heating Compressor Power Coefficient 1
-  8.57035762,              !- Heating Compressor Power Coefficient 2
-  1.29660976,              !- Heating Compressor Power Coefficient 3
-  -0.21629222,             !- Heating Compressor Power Coefficient 4
-  0.033862378,             !- Heating Compressor Power Coefficient 5
+  HeatCapCurve,            !- Heating Capacity Curve Name
+  HeatPowCurve,            !- Heating Compressor Power Curve Name
   7.61,                    !- Reference Coefficient of Performance
   1.0,                     !- Sizing Factor
   GshpCLG;                 !- Companion Cooling Heat Pump Name
+
+  Curve:QuadLinear,
+  HeatCapCurve,            !- Curve Name
+  -3.33491153,             !- CoefficientC1
+  -0.51451946,             !- CoefficientC2
+  4.51592706,              !- CoefficientC3
+  0.01797107,              !- CoefficientC4
+  0.155797661,             !- CoefficientC5
+  -100,                    !- Minimum Value of w
+  100,                     !- Maximum Value of w
+  -100,                    !- Minimum Value of x
+  100,                     !- Maximum Value of x
+  0,                       !- Minimum Value of y
+  100,                     !- Maximum Value of y
+  0,                       !- Minimum Value of z
+  100,                     !- Maximum Value of z
+  0,                       !- Minimum Curve Output
+  38;                      !- Maximum Curve Output
+
+  Curve:QuadLinear,
+  HeatPowCurve,            !- Curve Name
+  -8.93121751,             !- CoefficientC1
+  8.57035762,              !- CoefficientC2
+  1.29660976,              !- CoefficientC3
+  -0.21629222,             !- CoefficientC4
+  0.033862378,             !- CoefficientC5
+  -100,                    !- Minimum Value of w
+  100,                     !- Maximum Value of w
+  -100,                    !- Minimum Value of x
+  100,                     !- Maximum Value of x
+  0,                       !- Minimum Value of y
+  100,                     !- Maximum Value of y
+  0,                       !- Minimum Value of z
+  100,                     !- Maximum Value of z
+  0,                       !- Minimum Curve Output
+  38;                      !- Maximum Curve Output
 \end{lstlisting}
 
 Next, the parameter estimation model objects are described. This model has two sets of parameters, one for the heating mode and other for the cooling mode.
@@ -4975,9 +5047,9 @@ This section describes the outputs available for the water to water heat pump, p
 
 \begin{itemize}
 \item
-  HVAC,Average,Heat Pump Electric Power {[}W{]}
+  HVAC,Average,Heat Pump Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Heat Pump Electric Energy {[}J{]}
+  HVAC,Sum,Heat Pump Electricity Energy {[}J{]}
 \item
   HVAC,Average,Heat Pump Load Side Heat Transfer Rate {[}W{]}
 \item
@@ -5000,11 +5072,11 @@ This section describes the outputs available for the water to water heat pump, p
   HVAC,Average,Heat Pump Source Side Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{Heat Pump Electric Power {[}W{]}}\label{water-to-water-heat-pump-electric-power-w-1}
+\paragraph{Heat Pump Electricity Rate {[}W{]}}\label{water-to-water-heat-pump-electric-power-w-1}
 
 This output variable represents the compressor power required to run the heat pump. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-\paragraph{Heat Pump Electric Energy {[}J{]}}\label{water-to-water-heat-pump-electric-energy-j-1}
+\paragraph{Heat Pump Electricity Energy {[}J{]}}\label{water-to-water-heat-pump-electric-energy-j-1}
 
 This output variable represents the cumulative energy used by the compressor. The values are calculated for each HVAC system time step being simulated, and the results are summed across the reporting period.
 
@@ -5194,9 +5266,9 @@ This section describes the outputs available for the water to water heat pump, e
 
 \begin{itemize}
 \item
-  HVAC,Average,Heat Pump Electric Power {[}W{]}
+  HVAC,Average,Heat Pump Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Heat Pump Electric Energy {[}J{]}
+  HVAC,Sum,Heat Pump Electricity Energy {[}J{]}
 \item
   HVAC,Average,Heat Pump Load Side Heat Transfer Rate {[}W{]}
 \item
@@ -5219,11 +5291,11 @@ This section describes the outputs available for the water to water heat pump, e
   HVAC,Average,Heat Pump Source Side Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{Heat Pump Electric Power {[}W{]}}\label{plhp_eir_outputs_power_usage}
+\paragraph{Heat Pump Electricity Rate {[}W{]}}\label{plhp_eir_outputs_power_usage}
 
 This output variable represents the average power usage of this coil during the specified reporting window.
 
-\paragraph{Heat Pump Electric Energy {[}J{]}}\label{plhp_eir_outputs_energy_usage}
+\paragraph{Heat Pump Electricity Energy {[}J{]}}\label{plhp_eir_outputs_energy_usage}
 
 This output variable represents the summed energy usage of the heat pump over a specified reporting window.
 
@@ -5634,7 +5706,7 @@ This alpha field contains the identifying name of the central heat pump system.
 
 \paragraph{Field: Control Method}\label{field-control-method}
 
-\paragraph{This field must contain a keyword defines how the central heat pump system controls the interaction between the chiller-heater modules and the water loops to meet the cooling and heating demands. Currently, the only available option isSmartMixing.}\label{this-field-must-contain-a-keyword-defines-how-the-central-heat-pump-system-controls-the-interaction-between-the-chiller-heater-modules-and-the-water-loops-to-meet-the-cooling-and-heating-demands.-currently-the-only-available-option-issmartmixing.}
+This field must contain a keyword defines how the central heat pump system controls the interaction between the chiller-heater modules and the water loops to meet the cooling and heating demands. Currently, the only available option is SmartMixing.
 
 \paragraph{Field: Cooling Loop Inlet Node Name}\label{field-cooling-loop-inlet-node-name}
 
@@ -5717,13 +5789,13 @@ CentralHeatPumpSystem,
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Heater System Cooling Electric Power {[}W{]}
+  HVAC,Average,Chiller Heater System Cooling Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller Heater System Cooling Electric Energy{[}J{]}
+  HVAC,Sum,Chiller Heater System Cooling Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Chiller Heater System Heating Electric Power {[}W{]}
+  HVAC,Average,Chiller Heater System Heating Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller Heater System Heating Electric Energy{[}J{]}
+  HVAC,Sum,Chiller Heater System Heating Electricity Energy {[}J{]}
 \item
   HVAC,Average,Chiller Heater System Cooling Rate {[}W{]}
 \item
@@ -5756,15 +5828,15 @@ CentralHeatPumpSystem,
   HVAC,Average,Chiller Heater System Source Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{Chiller Heater System Cooling Electric Power {[}W{]}}\label{chiller-heater-system-cooling-electric-power-w}
+\paragraph{Chiller Heater System Cooling Electricity Rate {[}W{]}}\label{chiller-heater-system-cooling-electric-power-w}
 
-\paragraph{Chiller Heater System Cooling Electric Energy {[}J{]}}\label{chiller-heater-system-cooling-electric-energy-j}
+\paragraph{Chiller Heater System Cooling Electricity Energy {[}J{]}}\label{chiller-heater-system-cooling-electric-energy-j}
 
 These outputs are the sums of the cooling electric power consumption of the central heat pump system containing one or more child objects. Cooling Energy is metered on Cooling:Electricity, Electricity:Plant, and Electricity:Facility.
 
-\paragraph{Chiller Heater System Heating Electric Power {[}W{]}}\label{chiller-heater-system-heating-electric-power-w}
+\paragraph{Chiller Heater System Heating Electricity Rate {[}W{]}}\label{chiller-heater-system-heating-electric-power-w}
 
-\paragraph{Chiller Heater System Heating Electric Energy {[}J{]}}\label{chiller-heater-system-heating-electric-energy-j}
+\paragraph{Chiller Heater System Heating Electricity Energy {[}J{]}}\label{chiller-heater-system-heating-electric-energy-j}
 
 These outputs are the sums of the heating electric power consumption of the central heat pump system. Heating Energy is metered on Heating:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -5994,13 +6066,13 @@ ChillerHeaterPerformance:Electric:EIR,
 \item
   HVAC,Average,Chiller Heater Cycling Ratio Unit \textless{}x\textgreater{} {[]}
 \item
-  HVAC,Average,Chiller Heater Cooling Electric Power Unit \textless{}x\textgreater{} {[}W{]}
+  HVAC,Average,Chiller Heater Cooling Electricity Rate Unit \textless{}x\textgreater{} {[}W{]}
 \item
-  HVAC,Sum,Chiller Heater Cooling Electric Energy Unit \textless{}x\textgreater{} {[}J{]}
+  HVAC,Sum,Chiller Heater Cooling Electricity Energy Unit \textless{}x\textgreater{} {[}J{]}
 \item
-  HVAC,Average,Chiller Heater Heating Electric Power Unit \textless{}x\textgreater{} {[}W{]}
+  HVAC,Average,Chiller Heater Heating Electricity Rate Unit \textless{}x\textgreater{} {[}W{]}
 \item
-  HVAC,Sum,Chiller Heater Heating Electric Energy Unit \textless{}x\textgreater{} {[}J{]}
+  HVAC,Sum,Chiller Heater Heating Electricity Energy Unit \textless{}x\textgreater{} {[}J{]}
 \item
   HVAC,Average,Chiller Heater Cooling Rate Unit \textless{}x\textgreater{} {[}W{]}
 \item
@@ -6070,15 +6142,15 @@ This output is the ratio of the evaporator heat transfer rate plus the false loa
 
 The cycling ratio is the amount of time the chiller-heater operates during each simulation time step. If the chiller-heater part-load ratio falls below the minimum part-load ratio, the chiller-heater cycles on and off to meet the loads.
 
-\subsubsection{Chiller Heater Cooling Electric Power Unit \textless{}x\textgreater{} {[}W{]}}\label{chiller-heater-cooling-electric-power-unit-x-w}
+\subsubsection{Chiller Heater Cooling Electricity Rate Unit \textless{}x\textgreater{} {[}W{]}}\label{chiller-heater-cooling-electric-power-unit-x-w}
 
-\subsubsection{Chiller Heater Cooling Electric Energy Unit \textless{}x\textgreater{} {[}J{]}}\label{chiller-heater-cooling-electric-energy-unit-x-j}
+\subsubsection{Chiller Heater Cooling Electricity Energy Unit \textless{}x\textgreater{} {[}J{]}}\label{chiller-heater-cooling-electric-energy-unit-x-j}
 
 These outputs are the cooling electric power consumption of the chiller-heater.
 
-\subsubsection{Chiller Heater Heating Electric Power Unit \textless{}x\textgreater{} {[}W{]}}\label{chiller-heater-heating-electric-power-unit-x-w}
+\subsubsection{Chiller Heater Heating Electricity Rate Unit \textless{}x\textgreater{} {[}W{]}}\label{chiller-heater-heating-electric-power-unit-x-w}
 
-\subsubsection{Chiller Heater Heating Electric Energy Unit \textless{}x\textgreater{} {[}J{]}}\label{chiller-heater-heating-electric-energy-unit-x-j}
+\subsubsection{Chiller Heater Heating Electricity Energy Unit \textless{}x\textgreater{} {[}J{]}}\label{chiller-heater-heating-electric-energy-unit-x-j}
 
 These outputs are the heating electric power consumption of the chiller-heater.
 
@@ -6132,893 +6204,3 @@ This is the output of the curve object Electric Input to Cooling Output Ratio Fu
 
 This is the output of the curve object Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve.
 
-\subsection{Cold Thermal Storage Objects}\label{thermal-storage-objects}
-
-There are four types of cold thermal storage objects that can be added to plant loops. (To model cold thermal storage integrated with packaged air-conditioning units, see the thermal storage cooling coil in section \ref{coilcoolingdxsinglespeedthermalstorage}.  The four cold thermal storage objects for plant loops are:
-
-\begin{itemize}
-\item
-  \hyperref[thermalstorageicesimple]{ThermalStorage:Ice:Simple}
-\item
-  \hyperref[thermalstorageicedetailed]{ThermalStorage:Ice:Detailed}
-\item
-  \hyperref[thermalstoragechilledwatermixed]{ThermalStorage:ChilledWater:Mixed}
-\item
-  \hyperref[thermalstoragechilledwaterstratified]{ThermalStorage:ChilledWater:Stratified}
-\end{itemize}
-
-These objects are typically placed on the supply side of a primary chilled water loop in series or in parallel with one or more chillers.~ Using the the component set point (\hyperref[plantequipmentoperationcomponentsetpoint]{PlantEquipmentOperation:ComponentSetpoint}) plant operation scheme type, the chiller and storage tank setpoints are used to control operation. Using a \hyperref[setpointmanagerscheduled]{SetpointManager:Scheduled} object (or other appropriate type of set point manager), the setpoints on the chiller outlet node and the ice storage outlet node can be used to control how the cooling load is shared and when charging of storage occurs.~ Example setpoints to use for various modes of operation are shown in the table below:
-
-\begin{longtable}[c]{p{3.0in}p{1.5in}p{1.5in}}
-\toprule
-Mode & Chiller Setpoint & Storage Setpoint \tabularnewline
-\midrule
-\endfirsthead
-
-\toprule
-Mode & Chiller Setpoint & Storage Setpoint \tabularnewline
-\midrule
-\endhead
-
-Charging ice storage tank & -5C & 7C \tabularnewline
-Cooling with chiller only & 7C & 99C \tabularnewline
-Cooling with chiller and storage (fully load chiller before using storage)) & 7C & 7C \tabularnewline
-Cooling with chiller and storage (chiller carries portion of load, valid if chiller is upstream of storage) & 10C & 7C \tabularnewline
-\bottomrule
-\end{longtable}
-
-Example files have been developed for three common storage configurations:
-
-1.~Series -- Chiller Upstream:~ In this configuration, a chiller is placed first on the same branch as the storage unit.
-
-2.~Series -- Chiller Downstream:~ In this configuration, a chiller is placed second on the same branch as the storage unit.
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{2}
-\tightlist
-\item
-  Parallel:~ In this configuration, the chiller is on a branch parallel to the storage unit branch when it is not charging.~ During charging mode, valves will be changed so that the chiller is in series upstream of the storage.~ To accomplish this in EnergyPlus, the chiller must be modeled using two different chiller objects to represent the same chiller.~ One chiller object on a parallel branch operates only when storage is not being charged.~ The other chiller object, in series upstream of the storage unit operates only during charging mode.
-\end{enumerate}
-
-Other considerations for applying cold thermal storage objects include:
-
-\begin{itemize}
-\item
-  In the \hyperref[plantloop]{PlantLoop} object, the ``Minimum Loop Temperature'' must be set equal to or less than the lowest setpoint to be used anywhere in the loop.
-\item
-  To end the storage charging cycle, use a \hyperref[availabilitymanagerlowtemperatureturnoff]{AvailabilityManager:LowTemperatureTurnOff} to shut off the primary chilled water loop when the temperature leaving the storage tank nears the charging mode chiller setpoint indicating that the tank is fully charged.~ For example, if the chiller is set to provide --5C chilled water during charging, then charging can be shut down when the water temperature leaving the storage unit reaches --4C.~ When using a primary-secondary loop arrangement, it may be necessary to schedule this availability manager to be active only when the HVAC systems are off to avoid fighting between the demand controls and the availability manager.
-\end{itemize}
-
-\subsection{ThermalStorage:Ice:Simple}\label{thermalstorageicesimple}
-
-This thermal storage model is based on a simple simulation of an ice storage tank with a fixed capacity.~ The tank is charged, or frozen, in an ice-on-coil configuration where ice builds up on the outside of the tubes carrying the brine or glycol solution from the chiller.~ There are two discharge (melt) options, internal or external.~ Internal melt uses the same fluid tubes for charging and discharging.~ External melt uses a separate fluid path for discharge such that the outer layers of ice melt first.~ The ice storage model includes an implied 3-way valve to control the amount of charge/discharge based on the incoming water temperature and the outlet node setpoint temperature.~ The storage tank is assumed to be fully charged (full of ice) at the beginning of each environment.~ The tank is then allowed to charge and discharge during the warmup days of the environment.~ The tank is best controlled using the \hyperref[plantequipmentoperationcomponentsetpoint]{PlantEquipmentOperation:ComponentSetpoint} plant operation scheme, and requires that a setpoint be placed by a set point manager on the ice storage Plant Outlet Node.
-
-The input fields for the object are described in detail below:
-
-\subsubsection{Inputs}\label{inputs-20-004}
-
-\paragraph{Field: Name}\label{field-name-20-001}
-
-This alpha field contains the identifying name for the ice storage tank.
-
-\paragraph{Field: Ice Storage Type}\label{field-ice-storage-type}
-
-This alpha field specifies the type of ice storage tank to be modeled. There are two options:~ ``\textbf{IceOnCoilInternal}'' models ice-on-coil, internal melt.``IceOnCoilExternal'' models ice-on-coil, external melt.
-
-\paragraph{Field: Capacity}\label{field-capacity-000}
-
-This numeric field contains the nominal capacity of the ice storage in GJ (Giga is 10\(^{9}\)).
-
-\paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-004}
-
-This alpha field specifies the name of the chilled water inlet node.
-
-\paragraph{Field: Outlet Node Name}\label{field-outlet-node-name-005}
-
-This alpha field specifies the name of the chilled water outlet node.
-
-Following is an example input for the THERMAL STORAGE:ICE:SIMPLE object.
-
-\begin{lstlisting}
-
-ThermalStorage:Ice:Simple,
-      ITS,                     !- Ice Storage Name
-      IceOnCoilInternal,       !- Ice Storage Type
-      1.5,                     !- Ice Storage Capacity {GJ}
-      ITS Inlet Node,          !- Plant Loop Inlet Node
-      ITS Outlet Node;         !- Plant Loop Outlet Node
-\end{lstlisting}
-
-\subsubsection{Outputs}\label{outputs-18-000}
-
-The following outputs are available for simple Ice Storage model:
-
-\begin{itemize}
-\item
-  HVAC,Average,Ice Thermal Storage Requested Load {[}W{]}
-\item
-  Zone,Average,Ice Thermal Storage End Fraction{[]}
-\item
-  HVAC,Average,Ice Thermal Storage Mass Flow Rate {[}kg/s{]}
-\item
-  HVAC,Average,Ice Thermal Storage Inlet Temperature {[}C{]}
-\item
-  HVAC,Average,Ice Thermal Storage Outlet Temperature {[}C{]}
-\item
-  HVAC,Average,Ice Thermal Storage Cooling Discharge Rate {[}W{]}
-\item
-  HVAC,Sum,Ice Thermal Storage Cooling Discharge Energy {[}J{]}
-\item
-  HVAC,Average,Ice Thermal Storage Cooling Charge Rate {[}W{]}
-\item
-  HVAC,Sum,Ice Thermal Storage Cooling Charge Energy {[}J{]}
-\end{itemize}
-
-\paragraph{Ice Thermal Storage Requested Load {[}W{]}}\label{ice-thermal-storage-requested-load-w}
-
-The load requested by the plant control scheme. A positive value indicates a cooling load or a request to discharge (melt) the tank. A negative value indicates a request to charge (freeze) the tank.
-
-\paragraph{Ice Thermal Storage End Fraction {[]}}\label{ice-thermal-storage-end-fraction}
-
-The fraction of full ice storage which is present at the end of the current HVAC timestep. When reported at a frequency less than detailed, this value is averaged over the reporting period.
-
-\paragraph{Ice Thermal Storage Mass Flow Rate {[}kg/s{]}}\label{ice-thermal-storage-mass-flow-rate-kgs}
-
-The total water mass flow rate through the ice storage component. Because the component includes an implied 3-way valve, this flow may be all through the tank, all bypassed through the valve, or a mixture of both.
-
-\paragraph{Ice Thermal Storage Inlet Temperature {[}C{]}}\label{ice-thermal-storage-inlet-temperature-c}
-
-The water temperature entering the ice storage component.
-
-\paragraph{Ice Thermal Storage Outlet Temperature {[}C{]}}\label{ice-thermal-storage-outlet-temperature-c}
-
-The water temperature leaving the ice storage component.
-
-\paragraph{Ice Thermal Storage Cooling Discharge Rate {[}W{]}}\label{ice-thermal-storage-cooling-discharge-rate-w}
-
-The rate of cooling delivered by the ice storage component. A positive value indicates the ice tank is discharging (melting). A zero value indicates the tank is charging or dormant.
-
-\paragraph{Ice Thermal Storage Cooling Discharge Energy {[}J{]}}\label{ice-thermal-storage-cooling-discharge-energy-j}
-
-The cooling energy delivered by the ice storage component. A positive value indicates the ice tank is discharging (melting). A zero value indicates the tank is charging or dormant.
-
-\paragraph{Ice Thermal Storage Cooling Charge Rate {[}W{]}}\label{ice-thermal-storage-cooling-charge-rate-w}
-
-The rate of charging delivered to the ice storage component. A positive value indicates the ice tank is charging (freezing). A zero value indicates the tank is discharging or dormant.
-
-\paragraph{Ice Thermal Storage Cooling Charge Energy {[}J{]}}\label{ice-thermal-storage-cooling-charge-energy-j}
-
-The charging energy delivered to the ice storage component. A positive value indicates the ice tank is charging (freezing). A zero value indicates the tank is discharging or dormant.
-
-\subsection{ThermalStorage:Ice:Detailed}\label{thermalstorageicedetailed}
-
-The detailed ice storage model allows the users of EnergyPlus to model more closely specific manufacturers' ice storage units. This is possible due to the use of curve fits to simulate the performance of the ice storage unit during charging and discharging. In this implementation, both charging and discharging are a function of the fraction charged/discharged as well as the log mean temperature difference across the storage unit. More information on the model is provided in the Engineering Reference for EnergyPlus. The remainder of this section describes the input required for the detailed ice storage model and the output that it can produce.
-
-\subsubsection{Inputs}\label{inputs-21-004}
-
-\paragraph{Field: Name}\label{field-name-21-001}
-
-This field is the name of the detailed ice storage system given to it by the user.
-
-\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-012}
-
-This field is the name of the schedule (ref: Schedule) that determines whether or not the ice storage system is available during a particular time period. This allows the system to be turned off during a particular season. A value of less than or equal to zero indicates that the ice storage system is not available. Any value greater than zero indicates that the system is available. If this field is blank, the schedule has values of 1 for all time periods.
-
-\paragraph{Field: Capacity}\label{field-capacity-1-000}
-
-This number is the maximum amount of latent thermal storage available in the ice storage system. This model does not allow the removal or addition of sensible energy from the tank. Thus, it is always assumed to be at the freezing temperature of the storage material. The capacity is expressed in units of GJ.
-
-\paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-1-001}
-
-This is the name of the node that connects the ice storage system to the plant loop. It is the inlet node to the ice storage component. The next field defines the outlet node. Due to presence of an internal bypass in this model, there are other ``nodes'' that are handled internally within the program. Users do not need to define any nodes other than the inlet and outlet nodes.
-
-\paragraph{Field: Outlet Node Name}\label{field-outlet-node-name-1-002}
-
-This is the name of the other node that connects the ice storage system to the plant loop. It is the outlet node to the ice storage component.
-
-\paragraph{Field: Discharging Curve Variable Specifications}\label{field-discharging-curve-variable-specifications}
-
-The detailed ice storage model in EnergyPlus takes advantage of the Curve feature of the program.  The discharging curve can use any curve that has two independent variables.  This field controls which two parameters are the independent variables in modeling the performance of the detailed ice storage model during discharging. There are four different independent variable specifications:
-
-\begin{itemize}
-\item
-FractionChargedLMTD (where Fraction Charged is the first independent variable and LMTD is the second independent variable)
-\item 
-FractionDischargedLMTD (where Fraction Discharged is the first independent variable and LMTD is the second independent variable)
-\item
-LMTDMassFlow (where LMTD is the first independent variable and Mass Flow rate is the second independent variable)
-\item
-LMTDFractionCharged (where LMTD is the first independent variable and Fraction Charged is the second independent variable)
-\end{itemize}
-
-More information on curve types can be found in the section on Curves.  For additional information on how these curves are used in the Detailed Ice Storage model, please consult the Engineering Reference.
-
-\paragraph{Field: Discharging Curve Name}\label{field-discharging-curve-name}
-
-This field specifies the name of the actual curve fit to be used to model the discharging process of the detailed ice storage system. Note that this must be a curve that has two independent variables.
-
-\paragraph{Field: Charging Curve Variable Specifications}\label{field-charging-curve-variable-specifications}
-
-The detailed ice storage model in EnergyPlus takes advantage of the Curve feature of the program.  The charging curve can use any curve that has two independent variables.  This field controls which two parameters are the independent variables in modeling the performance of the detailed ice storage model during charging. There are four different independent variable specifications:
-
-
-\begin{itemize}
-\item
-FractionChargedLMTD (where Fraction Charged is the first independent variable and LMTD is the second independent variable)
-\item 
-FractionDischargedLMTD (where Fraction Discharged is the first independent variable and LMTD is the second independent variable)
-\item
-LMTDMassFlow (where LMTD is the first independent variable and Mass Flow rate is the second independent variable)
-\item
-LMTDFractionCharged (where LMTD is the first independent variable and Fraction Charged is the second independent variable)
-\end{itemize}
-
-More information on curve types can be found in the section on Curves.  For additional information on how these curves are used in the Detailed Ice Storage model, please consult the Engineering Reference.
-
-\paragraph{Field: Charging Curve Name}\label{field-charging-curve-name}
-
-This field specifies the name of the actual curve fit to be used to model the charging process of the detailed ice storage system. Note that this must be a curve that has two independent variables.
-
-\paragraph{Field: Timestep of the Curve Data}\label{field-timestep-of-the-curve-data}
-
-This field defines what timestep was used to produce the curve fits named in the previous inputs. This parameter is important because the curve fit is non-dimensional. Thus, the data used to develop the curve fits were based on a specific length of time. In many cases, this is probably one hour or 1.0. The units for this parameter are hours.
-
-\paragraph{Field: Parasitic Electric Load During Discharging}\label{field-parasitic-electric-load-during-discharging}
-
-This field defines the amount of parasitic electric consumption (for controls or other miscellaneous electric consumption associate with the ice storage unit itself) during the discharge phase. This parameter is dimensionless and gets multiplied by the current load on the tank.
-
-\paragraph{Field: Parasitic Electric Load During Charging}\label{field-parasitic-electric-load-during-charging}
-
-This field defines the amount of parasitic electric consumption (for controls or other miscellaneous electric consumption associate with the ice storage unit itself) during the charge phase. This parameter is dimensionless and gets multiplied by the current load on the tank.
-
-\paragraph{Field: Tank Loss Coefficient}\label{field-tank-loss-coefficient}
-
-This field defines the loss of ice stored during a particular hour. This field is dimensionless (per hour). It is not multiplied by any temperature difference between the tank and the environment in which it might be located.
-
-\paragraph{Field: Freezing Temperature of Storage Medium}\label{field-freezing-temperature-of-storage-medium}
-
-This parameter defines the freezing/melting temperature of the ice storage medium in degrees Celsius. For most tanks, this is simply 0.0°C (the default value). However, some tanks may use other materials or salts which would change the freezing temperature. This can be changed using this parameter.
-
-\paragraph{Field: Thaw Process Indicator}\label{field-thaw-process-indicator}
-
-This input field assists in more accurate modeling of the charging process by defining how the thawing of ice takes place. There are two options for this input: \textbf{InsideMelt} and \textbf{OutsideMelt}. Some ice storage systems, by their nature, start the charging process with a bare coil or no ice left on the charging surface even though there is still ice stored in the tank.~ An example of such a system is sometimes referred to as an ice-on-coil inside melt system, and these systems would define this parameter using the ``InsideMelt'' option for this field.~ Other systems melt the ice from the outside, leaving ice still on the charging surface when charging begins. These systems are modeled using the ``OutsideMelt'' option.~ For systems that have a charging process that does not vary significantly with fraction charged can ignore this input by accepting the default value.~ The default value for this field is ``OutsideMelt''.
-
-An IDF example:
-
-\begin{lstlisting}
-
-ThermalStorage:Ice:Detailed,
-      Ice Tank,                !- Ice Storage Name
-      ON,                      !- Ice Storage availability schedule
-      0.5,                     !- Ice Storage Capacity {GJ}
-      Ice Tank Inlet Node,     !- Plant Loop Inlet Node
-      Ice Tank Outlet Node,    !- Plant Loop Outlet Node
-      FractionDischargedLMTD,   !- Discharging Curve Fit Type
-      DischargeCurve,          !- Discharging Curve Name
-      FractionChargedLMTD,      !- Charging Curve Fit Type
-      ChargeCurve,             !- Charging Curve Name
-      1.0,                     !- Timestep of Curve Fit Data
-      0.0001,                  !- Parasitic electric load during discharging
-      0.0002,                  !- Parasitic electric load during charging
-      0.0003,                  !- Tank loss coefficient
-      0.0;                     !- Freezing temperature [C]
-\end{lstlisting}
-
-\subsubsection{Outputs}\label{outputs-19-000}
-
-Current detailed ice storage output variables are:
-
-\begin{itemize}
-\item
-  System, Average, Ice Thermal Storage Cooling Rate {[}W{]}
-\item
-  System, Average, Ice Thermal Storage Change Fraction {[]}
-\item
-  System, Average, Ice Thermal Storage End Fraction {[]}
-\item
-  System, Average, Ice Thermal Storage Mass Flow Rate {[}kg/s{]}
-\item
-  System, Average, Ice Thermal Storage Bypass Mass Flow Rate {[}kg/s{]}
-\item
-  System, Average, Ice Thermal Storage Tank Mass Flow Rate {[}kg/s{]}
-\item
-  System, Average, Ice Thermal Storage Fluid Inlet Temperature {[}C{]}
-\item
-  System, Average, Ice Thermal Storage Blended Outlet Temperature {[}C{]}
-\item
-  System, Average, Ice Thermal Storage Tank Outlet Temperature {[}C{]}
-\item
-  System, Average, Ice Thermal Storage Cooling Discharge Rate {[}W{]}
-\item
-  System, Sum, Ice Thermal Storage Cooling Discharge Energy {[}J{]}
-\item
-  System, Average, Ice Thermal Storage Cooling Charge Rate {[}W{]}
-\item
-  System, Sum, Ice Thermal Storage Cooling Charge Energy {[}J{]}
-\item
-  System, Average, Ice Thermal Storage Ancillary Electric Power {[}W{]}
-\item
-  System, Sum, Ice Thermal Storage Ancillary Electric Energy {[}J{]}
-\item
-  System, Average, Ice Thermal Storage On Coil Fraction {[]}
-\end{itemize}
-
-\paragraph{~Ice Thermal Storage Cooling Rate {[}W{]}}\label{ice-thermal-storage-cooling-rate-w}
-
-The actual load (absolute value) provided by the ice storage system during the current timestep
-
-\paragraph{Ice Thermal Storage Change Fraction {[]}}\label{ice-thermal-storage-change-fraction}
-
-The change in the ice tank's charge fraction charged during the current timestep (positive for charging, negative for discharging).
-
-\paragraph{Ice Thermal Storage End Fraction {[]}}\label{ice-thermal-storage-end-fraction-1}
-
-The fraction charge of the ice storage system at the end of the timestep
-
-\paragraph{Ice Thermal Storage On Coil Fraction {[]}}\label{ice-thermal-storage-on-coil-fraction}
-
-The fraction of ice that is actually on the freezing surface at the end of the timestep.~ This can be different for an ``inside melt'' system than the end fraction (see previous output parameter).
-
-\paragraph{Ice Thermal Storage Mass Flow Rate {[}kg/s{]}}\label{ice-thermal-storage-mass-flow-rate-kgs-1}
-
-The mass flow through the ice storage component
-
-\paragraph{Ice Thermal Storage Bypass Mass Flow Rate {[}kg/s{]}}\label{ice-thermal-storage-bypass-mass-flow-rate-kgs}
-
-The mass flow through the ice storage component bypass (bypasses the actual unit)
-
-\paragraph{Ice Thermal Storage Tank Mass Flow Rate {[}kg/s{]}}\label{ice-thermal-storage-tank-mass-flow-rate-kgs}
-
-The mass flow through the ice storage unit itself
-
-\paragraph{Ice Thermal Storage Fluid Inlet Temperature {[}C{]}}\label{ice-thermal-storage-fluid-inlet-temperature-c}
-
-The inlet temperature to the ice storage component
-
-\paragraph{Ice Thermal Storage Blended Outlet Temperature {[}C{]}}\label{ice-thermal-storage-blended-outlet-temperature-c}
-
-The outlet temperature of the component after mixing any bypass flow with flow through the ice storage unit
-
-\paragraph{Ice Thermal Storage Tank Outlet Temperature {[}C{]}}\label{ice-thermal-storage-tank-outlet-temperature-c}
-
-The outlet temperature of the ice storage unit itself below mixing with any bypass flow
-
-\paragraph{Ice Thermal Storage Cooling Discharge Rate {[}W{]}}\label{ice-thermal-storage-cooling-discharge-rate-w-1}
-
-The cooling done (as a rate) by the ice storage unit or its discharge rate
-
-\paragraph{Ice Thermal Storage Cooling Discharge Energy {[}J{]}}\label{ice-thermal-storage-cooling-discharge-energy-j-1}
-
-The total cooling done by the ice storage unit or its discharge rate
-
-\paragraph{Ice Thermal Storage Cooling Charge Rate {[}W{]}}\label{ice-thermal-storage-cooling-charge-rate-w-1}
-
-The charging done (as a rate) to the ice storage unit
-
-\paragraph{Ice Thermal Storage Cooling Charge Energy {[}J{]}}\label{ice-thermal-storage-cooling-charge-energy-j-1}
-
-The total charging done to the ice storage unit
-
-\paragraph{Ice Thermal Storage Ancillary Electric Power {[}W{]}}\label{ice-thermal-storage-ancillary-electric-power-w}
-
-The electric power as a result of parasitic loads on the ice storage unit for things like controls or other miscellaneous parts of the ice storage unit itself
-
-\paragraph{Ice Thermal Storage Ancillary Electric Energy {[}J{]}}\label{ice-thermal-storage-ancillary-electric-energy-j}
-
-The electric consumption as a result of parasitic loads on the ice storage unit for things like controls or other miscellaneous parts of the ice storage unit itself
-
-\subsection{ThermalStorage:ChilledWater:Mixed}\label{thermalstoragechilledwatermixed}
-
-The ThermalStorage:ChilledWater:Mixed object analytically solves the differential equation governing the energy balance of the water tank.~ The chilled water is ``used'' by drawing from the ``Use Side'' of the water tank.~ The tank is indirectly charged by circulating cold water through the ``Source Side'' of the water tank.
-
-Control is based on cycling flow through the source side.~ When the tank temperature rises above a ``cut-in'' temperature, source side flow is requested.~ Source side flow will continue until the tank is cooled to below the tank set point or ``cut-out'' temperature.
-
-For heat gains from the ambient environment, the ambient air temperature can be taken from a schedule, a zone, or the exterior. When used with a zone, the skin gains are removed from the zone heat balance as negative internal heat gains.
-
-\subsubsection{Inputs}\label{inputs-22-003}
-
-\paragraph{Field: Name}\label{field-name-22-001}
-
-The unique name of the ThermalStorage:ChilledWater:Mixed object.
-
-\paragraph{Field: Tank Volume}\label{field-tank-volume}
-
-The volume of the thermal storage tank {[}m\(^{3}\){]}.
-
-\paragraph{Field: Setpoint Temperature Schedule Name}\label{field-setpoint-temperature-schedule-name-000}
-
-The reference to the schedule object specifying the chilled water temperature setpoint {[}°C{]}. Also known as the ``cut-out'' temperature.
-
-\paragraph{Field: Deadband Temperature Difference}\label{field-deadband-temperature-difference}
-
-The delta temperature difference {[}Δ°C{]} between the setpoint and the ``cut-in'' temperature at which the storage tank will request cooling. In other words, the ``cut-in'' temperature is Setpoint + Deadband.
-
-\paragraph{Field: Minimum Temperature Limit}\label{field-minimum-temperature-limit}
-
-The temperature {[}°C{]} at which the tank water becomes too cold.~ No source side flow is allowed when the tank temperature is below this limit.~ The minimum temperature must be lower than the setpoint temperature at all times.
-
-\paragraph{Field: Nominal Cooling Capacity}\label{field-nominal-cooling-capacity-2}
-
-This field describes the typical cooling capacity that the chilled water tank will provide.~ Since this is a passive device, the actual cooling capacity depends on water temperatures and flow rates.~ However, this field is used to describe the chilled water tank's nominal cooling capacity for supervisory control where plant operation schemes require a cooling capacity to model how equipment is dispatched.
-
-\paragraph{Field: Ambient Temperature Indicator}\label{field-ambient-temperature-indicator}
-
-The Ambient Temperature Indicator specifies how the ambient air temperature will be indicated. The field can be ``Schedule'', ``Zone'', or ``Exterior.'' If \emph{Schedule} is used, the Ambient Temperature Schedule Name field provides the values for ambient temperature. If \emph{Zone} is used, the zone air temperature of the zone specified in the Ambient Temperature Zone field provides the ambient temperature. If \emph{Exterior} is used, the outdoor dry-bulb air temperature provides the ambient temperature.
-
-\paragraph{Field: Ambient Temperature Schedule Name}\label{field-ambient-temperature-schedule-name-000}
-
-The field contains the name of a schedule object specifying the ambient air temperature around the tank for skin gains. This field is only used if Ambient Temperature Indicator is \emph{Schedule}.
-
-\paragraph{Field: Ambient Temperature Zone Name}\label{field-ambient-temperature-zone-name-000}
-
-The reference to the zone object specifying the ambient air temperature around the tank for skin gains. This field is only used if Ambient Temperature Indicator is \emph{Zone}.
-
-\paragraph{Field: Ambient Temperature Outdoor Air Node Name}\label{field-ambient-temperature-outdoor-air-node-name}
-
-This optional alpha field specifies the outdoor air node (\hyperref[outdoorairnode]{OutdoorAir:Node}) name used to define the ambient conditions surrounding the chilled water tank. This field is applicable only when the Ambient Temperature Indicator is specified as \emph{Exterior}, otherwise this field should be left blank. The node name specified must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air conditions from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor air conditions are taken directly from the weather data.
-
-\paragraph{Field: Heat Gain Coefficient from Ambient Temperature}\label{field-heat-gain-coefficient-from-ambient-temperature}
-
-The gain coefficient {[}W/K{]} from the ambient air temperature. This coefficient is often referred to as the ``UA'' for the overall tank thermal performance with respect to heat gains from the tank's skin..
-
-\paragraph{Field: Use Side Inlet Node Name}\label{field-use-side-inlet-node-name}
-
-The inlet node connection to the plant loop for the use side of the chilled water storage tank. Typically the use side draws chilled water from the tank and returns warmer water.
-
-\paragraph{Field: Use Side Outlet Node Name}\label{field-use-side-outlet-node-name}
-
-The outlet node connection to the plant loop for the use side of the chilled water storage tank. Typically the use side chilled water from the tank and returns warmer water.
-
-\paragraph{Field: Use Side Heat Transfer Effectiveness}\label{field-use-side-heat-transfer-effectiveness}
-
-This field specifies the heat transfer effectiveness between the use side water and the tank water. If the effectiveness is set to 1 then complete heat transfer occurs, simulating perfect mixing of the use side water and the tank water. If the effectiveness is lower, then the use side outlet water temperature will not be as cold as the tank water, simulating a heat exchanger.
-
-\paragraph{Field: Use Side Availability Schedule Name}\label{field-use-side-availability-schedule-name}
-
-This field contains the name of an availability schedule for the use side of the water tank. If the schedule's value is 0.0, then the use side is not available and flow will not be requested.~ If the schedule's value is note equal to 0.0 (usually 1 is used), the use side is available. If this field is blank, the schedule has values of 1 for all time periods.
-
-\paragraph{Field: Use Side Design Flow Rate}\label{field-use-side-design-flow-rate}
-
-This field is used to specify the design flow rate through the Use Side of the chilled water tank.~ The volumetric design flow rate is specified in m\(^{3}\)/s.~ The field can be autosized.~ If autosized, then the input file should include a Plant Sizing object for the plant loop connected to the Use side.~ Sizing results are reported in the EIO file.
-
-\paragraph{Field: Source Side Inlet Node Name}\label{field-source-side-inlet-node-name-4}
-
-The inlet node connection to the plant loop for the source side of the chilled water storage tank. Typically the source side draws somewhat warm water from the tank and returns colder water.~ The source side volume flow rate is obtained from the plant loop.~ The magnitude of the flow rates through the source side can be controlled by setting the Maximum Branch Flow Rate field in the BRANCH object that connects the source inlet node.
-
-\paragraph{Field: Source Side Outlet Node Name}\label{field-source-side-outlet-node-name-4}
-
-The outlet node connection to the plant loop for the source side of the chilled water storage tank. Typically the source side draws somewhat warm water from the tank and returns colder water.
-
-\paragraph{Field: Source Side Heat Transfer Effectiveness}\label{field-source-side-heat-transfer-effectiveness}
-
-This field specifies the heat transfer effectiveness between the source side water and the tank water. If the effectiveness is set to 1 then complete heat transfer occurs, simulating perfect mixing of the source side water and the tank water. If the effectiveness is lower, then the source side outlet water temperature will not be as cold as the tank water, simulating a heat exchanger.
-
-\paragraph{Field: Source Side Availability Schedule Name}\label{field-source-side-availability-schedule-name}
-
-This field contains the name of an availability schedule for the source side of the water tank.~ If the schedule's value is 0.0, then the source side is not available and flow will not be requested.~ If the schedule's value is not equal to 0.0 (usually 1 is used), the source side is available. If this field is blank, the schedule has values of 1 for all time periods.
-
-\paragraph{Field: Source Side Design Flow Rate}\label{field-source-side-design-flow-rate}
-
-This field is used to specify the design flow rate through the Source Side of the chilled water tank.~ The volumetric design flow rate is specified in m\(^{3}\)/s.~ The field can be autosized.~ If autosized, then the input file should include a Plant Sizing object for the plant loop.~ Sizing results are reported in the EIO file.
-
-\paragraph{Field: Tank Recovery Time}\label{field-tank-recovery-time}
-
-This field is used to autosize the Source Side Design Flow Rate.~ The field is used if the previous field is set to autosize and the water tank's source side is on the demand side of a plant loop.~ This the the time, in hours, that the chilled water tank is to be indirectly cooled from 14.4ºC to 9.0ºC using the exit temperature of in the associated Plant Sizing object.
-
-An example input object follows.
-
-\begin{lstlisting}
-
-  ThermalStorage:ChilledWater:Mixed,
-      Chilled Water Storage Tank 1 ,  !- Name
-      4.0 ,                           !- Tank Volume
-      CW-Tank-Temp-Schedule,          !- Setpoint Temperature Schedule Name
-      3.5,                            !- Deadband Temperature Difference
-      1.0 ,                           !- Minimum Temperature Limit
-      25000 ,                         !- Nominal Cooling Capacity
-      Zone ,                          !- Ambient Temperature Indicator
-      ,                               !- Ambient Temperature Schedule Name
-      ZN_1_FLR_1_SEC_5 ,              !- Ambient Temperature Zone Name
-      ,                               !- Ambient Temperature Outdoor Air Node Name
-      5.0 ,                           !- Heat Gain Coefficient from Ambient Temperature
-      CW Tank Discharge Inlet node,   !- Use Side Inlet Node Name
-      CW Tank Discharge Outlet node , !- Use Side Outlet Node Name
-      1.0 ,                           !- Use Side Effectiveness
-      TES Use Schedule,               !- Use Side Availability Schedule Name
-      Autosize ,                      !- Use Side Design Flow Rate
-      CW Tank Charge Inlet Node,      !- Source Side Inlet Node Name
-      CW Tank Charge Outlet Node,     !- Source Side Outlet Node Name
-      1.0,                            !- Source Side Effectiveness
-      TES Charge Schedule,            !- Source Side Availability Schedule Name
-      Autosize ,                      !- Source Side Design Flow Rate
-      4.0;                            !- Tank Recovery Time
-\end{lstlisting}
-
-\subsubsection{Outputs}\label{outputs-20-000}
-
-The following output variables are reported for chilled water thermal storage tanks.
-
-\begin{itemize}
-\item
-  Chilled Water Thermal Storage Tank Temperature~~~~~~~~~~~~~~ !- HVAC Average {[}C{]}
-\item
-  Chilled Water Thermal Storage Final Tank Temperature~~~~~~~~ !- HVAC Average {[}C{]}
-\item
-  Chilled Water Thermal Storage Tank Heat Gain Rate~~~~~~~~~~~~~~~~ !- HVAC Average {[}W{]}
-\item
-  Chilled Water Thermal Storage Tank Heat Gain Energy~~~~~~~~~~~~~~ !- HVAC Sum {[}J{]}
-\item
-  Chilled Water Thermal Storage Use Side Mass Flow Rate~~~~~~~~~~~~ !- HVAC Average {[}kg/s{]}
-\item
-  Chilled Water Thermal Storage Use Side Inlet Temperature~~~~ !- HVAC Average {[}C{]}
-\item
-  Chilled Water Thermal Storage Use Side Outlet Temperature~~~ !- HVAC Average {[}C{]}
-\item
-  Chilled Water Thermal Storage Use Side Heat Transfer Rate~~~~~~~~~~~~~~~~~ !- HVAC Average {[}W{]}
-\item
-  Chilled Water Thermal Storage Use Side Heat Transfer Energy~~~~~~~~~~~~~~~ !- HVAC Sum {[}J{]}
-\item
-  Chilled Water Thermal Storage Source Side Mass Flow Rate~~~~~~~~~ !- HVAC Average {[}kg/s{]}
-\item
-  Chilled Water Thermal Storage Source Side Inlet Temperature~ !- HVAC Average {[}C{]}
-\item
-  Chilled Water Thermal Storage Source Side Outlet Temperature !- HVAC Average {[}C{]}
-\item
-  Chilled Water Thermal Storage Source Side Heat Transfer Rate~~~~~~~~~~~~~~ !- HVAC Average {[}W{]}
-\item
-  Chilled Water Thermal Storage Source Side Heat Transfer Energy~~~~~~~~~~~~ !- HVAC Sum {[}J{]}
-\end{itemize}
-
-\paragraph{Chilled Water Thermal Storage Tank Temperature {[}C{]}}\label{chilled-water-thermal-storage-tank-temperature-c}
-
-The average water tank temperature.
-
-\paragraph{Chilled Water Thermal Storage Final Tank Temperature {[}C{]}}\label{chilled-water-thermal-storage-final-tank-temperature-c}
-
-The final water tank temperature at the end of the system timestep. If reported at the ``Detailed'' interval, this output variable can be used to verify an exact energy balance on the water storage tank.
-
-\paragraph{Chilled Water Thermal Storage Tank Heat Gain Rate {[}W{]}}\label{chilled-water-thermal-storage-tank-heat-gain-rate-w}
-
-The average heat exchange rate to the storage tank from the surrounding ambient.~ This is usually positive with surrounding ambient heating the storage tank.
-
-\paragraph{Chilled Water Thermal Storage Tank Heat Gain Energy {[}J{]}}\label{chilled-water-thermal-storage-tank-heat-gain-energy-j}
-
-The energy exchange to the storage tank from the surrounding ambient.~ This is usually positive with surrounding ambient heating the storage tank.
-
-\paragraph{Chilled Water Thermal Storage Use Side Mass Flow Rate {[}kg/s{]}}\label{chilled-water-thermal-storage-use-side-mass-flow-rate-kgs}
-
-The use side mass flow rate.
-
-\paragraph{Chilled Water Thermal Storage Use Side Inlet Temperature {[}C{]}}\label{chilled-water-thermal-storage-use-side-inlet-temperature-c}
-
-The inlet temperature on the use side.
-
-\paragraph{Chilled Water Thermal Storage Use Side Outlet Temperature {[}C{]}}\label{chilled-water-thermal-storage-use-side-outlet-temperature-c}
-
-The outlet temperature on the use side.
-
-\paragraph{Chilled Water Thermal Storage Use Side Heat Transfer Rate {[}W{]}}\label{chilled-water-thermal-storage-use-side-heat-transfer-rate-w}
-
-The average heat transfer rate between the use side water and the tank water.
-
-\paragraph{Chilled Water Thermal Storage Use Side Heat Transfer Energy {[}J{]}}\label{chilled-water-thermal-storage-use-side-heat-transfer-energy-j}
-
-The heat transfer energy between the use side water and the tank water.
-
-\paragraph{Chilled Water Thermal Storage Source Side Mass Flow Rate {[}kg/s{]}}\label{chilled-water-thermal-storage-source-side-mass-flow-rate-kgs}
-
-The source side mass flow rate.
-
-\paragraph{Chilled Water Thermal Storage Source Side Inlet Temperature {[}C{]}}\label{chilled-water-thermal-storage-source-side-inlet-temperature-c}
-
-The inlet temperature on the source side.
-
-\paragraph{Chilled Water Thermal Storage Source Side Outlet Temperature {[}C{]}}\label{chilled-water-thermal-storage-source-side-outlet-temperature-c}
-
-The outlet temperature on the source side.
-
-\paragraph{Chilled Water Thermal Storage Source Side Heat Transfer Rate {[}W{]}}\label{chilled-water-thermal-storage-source-side-heat-transfer-rate-w}
-
-The average heat transfer rate between the source side water and the tank water.
-
-\paragraph{Chilled Water Thermal Storage Source Side Heat Transfer Energy {[}J{]}}\label{chilled-water-thermal-storage-source-side-heat-transfer-energy-j}
-
-The heat transfer energy between the source side water and the tank water.
-
-\subsection{ThermalStorage:ChilledWater:Stratified}\label{thermalstoragechilledwaterstratified}
-
-The ThermalStorage:ChilledWater:Stratified object divides the water tank into multiple nodes of equal volume. The nodes are coupled by vertical conduction effects, internode fluid flow, and temperature inversion mixing. The object simultaneously solves the differential equations governing the energy balances on the nodes using a numerical method. The system timestep is divided into many small substeps that allow the simulation to capture events that occur on a very short time scale.~ The chilled water is ``used'' by drawing from the ``Use Side'' of the water tank.~ The tank is indirectly charged by circulating cold water through the ``Source Side'' of the water tank.
-
-Control is based on cycling flow through the source side.~ When the tank temperature rises above a ``cut-in'' temperature, source side flow is requested.~ Source side flow will continue until the tank is cooled to below the tank set point or ``cut-out'' temperature.
-
-For heat gains from the ambient environment, the ambient air temperature can be taken from a schedule, a zone, or the exterior. When used with a zone, the skin gains are removed from the zone heat balance as negative internal heat gains.
-
-\subsubsection{Inputs}\label{inputs-23-003}
-
-\paragraph{Field: Name}\label{field-name-23-001}
-
-The unique name of the ThermalStorage:ChilledWater:Stratified object.
-
-\paragraph{Field: Tank Volume}\label{field-tank-volume-1}
-
-The volume of the thermal storage tank {[}m\(^{3}\){]}.
-
-\paragraph{Field: Tank Height}\label{field-tank-height}
-
-The height {[}m{]} of the tank. For the HorizontalCylinder shape (see below) the height of the tank is the measure in the axial direction, i.e., the height if you were to stand the cylinder up on its end.
-
-\paragraph{Field: Tank Shape}\label{field-tank-shape}
-
-The tank shape determines the size and skin losses of the stratified nodes. There are three options:~ ``VerticalCylinder,'' ``HorizontalCylinder,'' and ``Other.''
-
-\emph{VerticalCylinder} describes most upright cylindrical water tanks.
-
-\emph{HorizontalCylinder} describes a few specialty water tanks and some large commercial storage tanks. \emph{HorizontalCylinder} implies that the tank is divided into nodes of equal mass, but not equal height.
-
-\emph{Other} describes water storage tanks that have a uniform horizontal cross-section, but are not cylinders, e.g., a cuboid or other shape. The length of the perimeter is then specified by the Tank Perimeter field.
-
-If blank, the default shape is \emph{VerticalCylinder}.
-
-\paragraph{Field: Tank Perimeter}\label{field-tank-perimeter}
-
-The length of the tank perimeter {[}m{]}. This field is only used if Tank Shape is \emph{Other}.
-
-\paragraph{Field: Setpoint Temperature Schedule Name}\label{field-setpoint-temperature-schedule-name-1}
-
-The reference to the schedule object specifying the chilled water temperature setpoint {[}°C{]}. Also known as the ``cut-out'' temperature.
-
-\paragraph{Field: Deadband Temperature Difference}\label{field-deadband-temperature-difference-1}
-
-The delta temperature difference {[}Δ°C{]} between the setpoint and the ``cut-in'' temperature at which the storage tank will request cooling. In other words, the ``cut-in'' temperature is Setpoint + Deadband.
-
-\paragraph{Field: Temperature Sensor Height}\label{field-temperature-sensor-height}
-
-This field is used to describe the location in the tank where the temperature is sensed for control descisions.~ The program will associate one of the nodes with this height and use that node's temperature for control decisions.~ The location is described in meters from the bottom of the tank.
-
-\paragraph{Field: Minimum Temperature Limit}\label{field-minimum-temperature-limit-1}
-
-The temperature {[}°C{]} at which the tank water becomes too cold.~ No source side flow is allowed when the tank temperature is below this limit.~ The minimum temperature must be lower than the setpoint temperature at all times.
-
-\paragraph{Field: Nominal Cooling Capacity}\label{field-nominal-cooling-capacity-3}
-
-This field describes the typical cooling capacity that the chilled water tank will provide.~ Since this is a passive device, the actual cooling capacity depends on water temperatures and flow rates.~ However, this field is used to describe the chilled water tank's nominal cooling capacity for supervisory control where plant operation schemes require a cooling capacity to model how equipment is dispatched.
-
-\paragraph{Field: Ambient Temperature Indicator}\label{field-ambient-temperature-indicator-1}
-
-The Ambient Temperature Indicator specifies how the ambient air temperature will be indicated. The field can be ``Schedule'', ``Zone'', or ``Exterior.'' If \emph{Schedule} is used, the Ambient Temperature Schedule Name field provides the values for ambient temperature. If \emph{Zone} is used, the zone air temperature of the zone specified in the Ambient Temperature Zone field provides the ambient temperature. If \emph{Exterior} is used, the outdoor dry-bulb air temperature provides the ambient temperature.
-
-\paragraph{Field: Ambient Temperature Schedule Name}\label{field-ambient-temperature-schedule-name-1}
-
-The field contains the name of a schedule object specifying the ambient air temperature around the tank for skin gains. This field is only used if Ambient Temperature Indicator is \emph{Schedule}.
-
-\paragraph{Field: Ambient Temperature Zone Name}\label{field-ambient-temperature-zone-name-1}
-
-The reference to the zone object specifying the ambient air temperature around the tank for skin gains. This field is only used if Ambient Temperature Indicator is \emph{Zone}.
-
-\paragraph{Field: Ambient Temperature Outside Air Node Name}\label{field-ambient-temperature-outside-air-node-name-000}
-
-This optional alpha field specifies the outdoor air node name used to define the ambient conditions surrounding the chilled water tank. This field is applicable only when the Ambient Temperature Indicator is specified as \emph{Exterior}, otherwise this field should be left blank. The node name specified must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air conditions from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor air conditions are taken directly from the weather data.
-
-\paragraph{Field: Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature}\label{field-uniform-skin-loss-coefficient-per-unit-area-to-ambient-temperature}
-
-The uniform skin loss coefficient {[}W/m\(^{2}\)-K{]} or U-Value of the tank to the ambient air temperature. The uniform skin loss accounts for the tank insulation. The overall losses at any particular tank node can be further modified using the Additional Loss Coefficient fields to account for thermal shorting due to pipe penetrations, tank feet, and any other loss effects.
-
-\paragraph{Field: Use Side Inlet Node Name}\label{field-use-side-inlet-node-name-1}
-
-The inlet node connection to the plant loop for the use side of the chilled water storage tank. Typically the use side draws chilled water from the tank and returns warmer water.
-
-\paragraph{Field: Use Side Outlet Node Name}\label{field-use-side-outlet-node-name-1}
-
-The outlet node connection to the plant loop for the use side of the chilled water storage tank. Typically the use side chilled water from the tank and returns warmer water.
-
-\paragraph{Field: Use Side Heat Transfer Effectiveness}\label{field-use-side-heat-transfer-effectiveness-1}
-
-This field specifies the heat transfer effectiveness between the use side water and the tank water. If the effectiveness is set to 1 then complete heat transfer occurs, simulating perfect mixing of the use side water and the tank water. If the effectiveness is lower, then the use side outlet water temperature will not be as cold as the tank water, simulating a heat exchanger.
-
-\paragraph{Field: Use Side Availability Schedule Name}\label{field-use-side-availability-schedule-name-1}
-
-This field contains the name of an availability schedule for the use side of the water tank.~ If the schedule's value is 0.0, then the use side is not available and flow will not be requested.~ If the schedule's value is not equal to 0.0 (usually 1 is used), then the use side is available. If this field is blank, the schedule has values of 1 for all time periods.
-
-\paragraph{Field: Use Side Inlet Height}\label{field-use-side-inlet-height}
-
-The height of the use side inlet to the tank. If blank, the inlet defaults to the top of the tank. The inlet height cannot be higher than the tank height.
-
-\paragraph{Field: Use Side Outlet Height}\label{field-use-side-outlet-height}
-
-The height of the use side outlet from the tank. If blank or \textbf{autocalculate}, the inlet defaults to the bottom of the tank. The outlet height cannot be higher than the tank height.
-
-\paragraph{Field: Use Side Design Flow Rate}\label{field-use-side-design-flow-rate-1}
-
-This field is used to specify the design flow rate through the Use Side of the water tank.~ The volumetric design flow rate is specified in m\(^{3}\)/s.~ The field is needed when the Use Side is connected to a plant loop.~ The field can be autosized.~ If autosized, then the input file should include a Plant Sizing object for the plant loop.~ Sizing results are reported in the EIO file.
-
-\paragraph{Field: Source Side Inlet Node Name}\label{field-source-side-inlet-node-name-5}
-
-The inlet node connection to the plant loop for the source side of the chilled water storage tank. Typically the source side draws somewhat warm water from the tank and returns colder water.~ The source side volume flow rate is obtained from the plant loop.~ The magnitude of the flow rates through the source side can be controlled by setting the Maximum Branch Flow Rate field in the BRANCH object that connects the source inlet node.
-
-\paragraph{Field: Source Side Outlet Node Name}\label{field-source-side-outlet-node-name-5}
-
-The outlet node connection to the plant loop for the source side of the chilled water storage tank. Typically the source side draws somewhat warm water from the tank and returns colder water.
-
-\paragraph{Field: Source Side Heat Transfer Effectiveness}\label{field-source-side-heat-transfer-effectiveness-1}
-
-This field specifies the heat transfer effectiveness between the source side water and the tank water. If the effectiveness is set to 1 then complete heat transfer occurs, simulating perfect mixing of the source side water and the tank water. If the effectiveness is less than 1.0, then the source side outlet water temperature will be less than the tank water at the outlet node, simulating a heat exchanger.
-
-\paragraph{Field: Source Side Availability Schedule Name}\label{field-source-side-availability-schedule-name-1}
-
-This field contains the name of an availability schedule for the source side of the water tank.~ If the schedule's value is 0.0, then the source side is not available and flow will not be requested. If the schedule's value is not equal to 0.0 (usually 1 is used), then the source side is available. If this field is blank, the schedule has values of 1 for all time periods.
-
-\paragraph{Field: Source Side Inlet Height}\label{field-source-side-inlet-height}
-
-The height of the source side inlet to the tank. If blank or \textbf{autocalculate}, the inlet defaults to the bottom of the tank. The inlet height cannot be higher than the tank height.
-
-\paragraph{Field: Source Side Outlet Height}\label{field-source-side-outlet-height}
-
-The height of the source side outlet from the tank. If blank, the inlet defaults to the top of the tank. The outlet height cannot be higher than the tank height.
-
-\paragraph{Field: Source Side Design Flow Rate}\label{field-source-side-design-flow-rate-1}
-
-This field is optional and is used to specify the design flow rate through the Source Side of the water heater.~ The volumetric design flow rate is specified in m\(^{3}\)/s.~ The field is needed when the Source Side is connected to a plant loop.~ The field can be autosized.~ If autosized, then the input file should include a Plant Sizing object for the plant loop.~ Sizing results are reported in the EIO file.
-
-\paragraph{Field: Tank Recovery Time}\label{field-tank-recovery-time-1}
-
-This field is used to autosize the Source Side Design Flow Rate.~ The field is used if the previous field is set to autosize and the water tank's source side is on the demand side of a plant loop.~ This the the time, in hours, that the chilled water tank is to be indirectly cooled from 14.4C to 9.0C using the exit temperature of in the associated Plant Sizing object.
-
-\paragraph{Field: Inlet Mode}\label{field-inlet-mode}
-
-The inlet mode of entering fluid from the use and source sides. There are two options:~ ``Fixed'' or ``Seeking.'' In \emph{Fixed} mode, the fluid enters at the fixed heights specified above. In \emph{Seeking} mode, the fluid ``seeks out'' the stratified node that is closest to the inlet temperature and adds all flow to that node. The \emph{Seeking} mode provides maximum stratification.
-
-\paragraph{Field: Number of Nodes}\label{field-number-of-nodes}
-
-The number of stratified nodes in the tank. There must be at least one node. The maximum number of nodes is 10, although this limit can be increased by editing the IDD.
-
-\paragraph{Field: Additional Destratification Conductivity}\label{field-additional-destratification-conductivity}
-
-An additional destratification conductivity {[}W/m-K{]} is added to the fluid conductivity of water (0.6 W/m-K) to account for vertical conduction effects along the inside of the tank wall, and perhaps other vertical components such as a dip tube pipe or anode rod.
-
-\paragraph{Field: Node 1-10 Additional Loss Coefficient}\label{field-node-1-10-additional-loss-coefficient}
-
-An additional heat gain coefficient {[}W/K{]} added to the skin gains for a given node to account for thermal shorting due to pipe penetrations, tank feet, and any other loss effects.
-
-An example input object follows.
-
-\begin{lstlisting}
-
-  ThermalStorage:ChilledWater:Stratified,
-      Chilled Water Storage Tank 1 ,  !- Name
-      4.0  ,                          !- Tank Volume
-      2.0 ,                           !- Tank Height
-      VerticalCylinder,               !- Tank Shape
-       ,                              !- Tank Perimeter
-      CW-Tank-Temp-Schedule ,         !- Setpoint Temperature Schedule Name
-      3.5 ,                           !- Deadband Temperature Difference
-      1.4 ,                           !- Temperature Sensor Height
-      1.0 ,                           !- Minimum Temperature Limit
-      2500,                           !- Nominal Cooling Capacity
-      Zone,                           !- Ambient Temperature Indicator
-       ,                              !- Ambient Temperature Schedule Name
-      ZN_1_FLR_1_SEC_5 ,              !- Ambient Temperature Zone Name
-       ,                              !- Ambient Temperature OutdoorAir:Node Name
-      4.2,                            !- Uniform Skin Loss Coefficient Per Unit Area To Ambient Temperature
-      CW Tank Discharge Inlet node,   !- Use Side Inlet Node Name
-      CW Tank Discharge Outlet node,  !- Use Side Outlet Node Name
-      1.0,                            !- Use Side Effectiveness
-      ALWAYS_ON,                      !- Use Side Availability Schedule Name
-      1.85 ,                          !- Use Side Inlet Height
-      0.15 ,                          !- Use Side Outlet Height
-      autosize,                       !- Use Side Design Flow Rate
-      CW Tank Charge Inlet Node,      !- Source Side Inlet Node Name
-      CW Tank Charge Outlet Node,     !- Source Side Outlet Node Name
-      1.0,                            !- Source Side Effectiveness
-      TES Charge Schedule,            !- Source Side Availability Schedule Name
-      0.15,                           !- Source Side Inlet Height
-      1.85,                           !- Source Side Outlet Height
-      autosize,                       !- Source Side Design Flow Rate
-      2.0,                            !- Tank Recovery Time
-      Seeking,                        !- Inlet Mode
-      6,                              !- Number Of Nodes
-      0.0;                            !- Additional Destratification Conductivity
-\end{lstlisting}
-
-\subsubsection{Outputs}\label{outputs-21-000}
-
-The following output variables are reported for stratified chilled water thermal storage tanks.
-
-\begin{itemize}
-\item
-  Chilled Water Thermal Storage Tank Temperature~~~~~~~~~~~~~~~ !- HVAC Average {[}C{]}
-\item
-  Chilled Water Thermal Storage Final Tank Temperature~~~~~~~~~ !- HVAC Average {[}C{]}
-\item
-  Chilled Water Thermal Storage Tank Heat Gain Rate~~~~~~~~~~~~~~~~~ !- HVAC Average {[}W{]}
-\item
-  Chilled Water Thermal Storage Tank Heat Gain Energy~~~~~~~~~~~~~~~ !- HVAC Sum {[}J{]}
-\item
-  Chilled Water Thermal Storage Use Side Mass Flow Rate~~~~~~~~~~~~~ !- HVAC Average {[}kg/s{]}
-\item
-  Chilled Water Thermal Storage Use Side Inlet Temperature~~~~~ !- HVAC Average {[}C{]}
-\item
-  Chilled Water Thermal Storage Use Side Outlet Temperature~~~~ !- HVAC Average {[}C{]}
-\item
-  Chilled Water Thermal Storage Use Side Heat Transfer Rate~~~~~~~~~~~~~~~~~~ !- HVAC Average {[}W{]}
-\item
-  Chilled Water Thermal Storage Use Side Heat Transfer Energy~~~~ ~~~~~~~~~~~~!- HVAC Sum {[}J{]}
-\item
-  Chilled Water Thermal Storage Source Side Mass Flow Rate~~~~~~~~~~ !- HVAC Average {[}kg/s{]}
-\item
-  Chilled Water Thermal Storage Source Side Inlet Temperature~~ !- HVAC Average {[}C{]}
-\item
-  Chilled Water Thermal Storage Source Side Outlet Temperature~ !- HVAC Average {[}C{]}
-\item
-  Chilled Water Thermal Storage Source Side Heat Transfer Rate~~~~~~~~~~~~~~~ !- HVAC Average {[}W{]}
-\item
-  Chilled Water Thermal Storage Source Side Heat Transfer Energy~~~~~~~~~~~~~ !- HVAC Sum {[}J{]}
-\item
-  Chilled Water Thermal Storage Temperature Node \textless{}1 - 10\textgreater{}~~~~~~~ !- HVAC Average {[}C{]}
-\item
-  Chilled Water Thermal Storage Final Temperature Node \textless{}1 -- 10\textgreater{} !- HVAC Average {[}C{]}
-\end{itemize}
-
-\paragraph{Chilled Water Thermal Storage Tank Temperature {[}C{]}}\label{chilled-water-thermal-storage-tank-temperature-c-1}
-
-The average water tank temperature, i.e., the average of all of the node average temperatures.
-
-\paragraph{Chilled Water Thermal Storage Tank Final Temperature {[}C{]}}\label{chilled-water-thermal-storage-tank-final-temperature-c}
-
-The final water tank temperature at the end of the system timestep, i.e., the average of all of the final node temperatures at the end of the system timestep.~ If reported at the ``Detailed'' interval, this output variable can be used to verify an exact energy balance on the water storage tank.
-
-\paragraph{Chilled Water Thermal Storage Tank Heat Gain Rate {[}W{]}}\label{chilled-water-thermal-storage-tank-heat-gain-rate-w-1}
-
-The average heat exchange rate to the storage tank from the surrounding ambient.~ This is usually positive with surrounding ambient heating the storage tank.
-
-\paragraph{Chilled Water Thermal Storage Tank Heat Gain Energy {[}J{]}}\label{chilled-water-thermal-storage-tank-heat-gain-energy-j-1}
-
-The energy exchange to the storage tank from the surrounding ambient.~ This is usually positive with surrounding ambient heating the storage tank.
-
-\paragraph{Chilled Water Thermal Storage Use Side Mass Flow Rate {[}kg/s{]}}\label{chilled-water-thermal-storage-use-side-mass-flow-rate-kgs-1}
-
-The use side mass flow rate.
-
-\paragraph{Chilled Water Thermal Storage Use Side Inlet Temperature {[}C{]}}\label{chilled-water-thermal-storage-use-side-inlet-temperature-c-1}
-
-The inlet temperature on the use side.
-
-\paragraph{Chilled Water Thermal Storage Use Side Outlet Temperature {[}C{]}}\label{chilled-water-thermal-storage-use-side-outlet-temperature-c-1}
-
-The outlet temperature on the use side.
-
-\paragraph{Chilled Water Thermal Storage Use Side Heat Transfer Rate {[}W{]}}\label{chilled-water-thermal-storage-use-side-heat-transfer-rate-w-1}
-
-The average heat transfer rate between the use side water and the tank water.
-
-\paragraph{Chilled Water Thermal Storage Use Side Heat Transfer Energy {[}J{]}}\label{chilled-water-thermal-storage-use-side-heat-transfer-energy-j-1}
-
-The heat transfer energy between the use side water and the tank water.
-
-\paragraph{Chilled Water Thermal Storage Source Side Mass Flow Rate {[}kg/s{]}}\label{chilled-water-thermal-storage-source-side-mass-flow-rate-kgs-1}
-
-The source side mass flow rate.
-
-\paragraph{Chilled Water Thermal Storage Source Side Inlet Temperature {[}C{]}}\label{chilled-water-thermal-storage-source-side-inlet-temperature-c-1}
-
-The inlet temperature on the source side.
-
-\paragraph{Chilled Water Thermal Storage Source Side Outlet Temperature {[}C{]}}\label{chilled-water-thermal-storage-source-side-outlet-temperature-c-1}
-
-The outlet temperature on the source side.
-
-\paragraph{Chilled Water Thermal Storage Source Side Heat Transfer Rate {[}W{]}}\label{chilled-water-thermal-storage-source-side-heat-transfer-rate-w-1}
-
-The average heat transfer rate between the source side water and the tank water.
-
-\paragraph{Chilled Water Thermal Storage Source Side Heat Transfer Energy {[}J{]}}\label{chilled-water-thermal-storage-source-side-heat-transfer-energy-j-1}
-
-The heat transfer energy between the source side water and the tank water.
-
-\paragraph{Chilled Water Thermal Storage Temperature Node~ 1-10 {[}C{]}}\label{chilled-water-thermal-storage-temperature-node-1-10-c}
-
-The average node temperature.
-
-\paragraph{Chilled Water Thermal Storage Final Temperature Node 1-10~ {[}C{]}}\label{chilled-water-thermal-storage-final-temperature-node-1-10-c}
-
-The final node temperature at the end of the system timestep.

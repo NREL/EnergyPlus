@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,12 +61,14 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace SZVAVModel {
 
@@ -76,7 +78,7 @@ namespace SZVAVModel {
     // parts of the simulation.
 
     // MODULE PARAMETER DEFINITIONS
-    // na
+    extern int const HCoil_Water;
 
     // DERIVED TYPE DEFINITIONS
     // na
@@ -92,7 +94,8 @@ namespace SZVAVModel {
 
     // Functions
 
-    void calcSZVAVModel(EnergyPlusData &state, PackagedTerminalHeatPump::PTUnitData &SZVAVModel,
+    void calcSZVAVModel(EnergyPlusData &state,
+                        PackagedTerminalHeatPump::PTUnitData &SZVAVModel,
                         int const &SysIndex,
                         bool const &FirstHVACIteration,
                         bool const &CoolingLoad,
@@ -106,7 +109,8 @@ namespace SZVAVModel {
 
     );
 
-    void calcSZVAVModel(EnergyPlusData &state, FanCoilUnits::FanCoilData &SZVAVModel,
+    void calcSZVAVModel(EnergyPlusData &state,
+                        FanCoilUnits::FanCoilData &SZVAVModel,
                         int const &SysIndex,
                         bool const &FirstHVACIteration,
                         bool const &CoolingLoad,
@@ -120,7 +124,8 @@ namespace SZVAVModel {
 
     );
 
-    void calcSZVAVModel(EnergyPlusData &state, UnitarySystems::UnitarySys &SZVAVModel,
+    void calcSZVAVModel(EnergyPlusData &state,
+                        UnitarySystems::UnitarySys &SZVAVModel,
                         int const &SysIndex,
                         bool const &FirstHVACIteration,
                         bool const &CoolingLoad,

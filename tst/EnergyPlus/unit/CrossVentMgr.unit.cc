@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,11 +52,11 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
-#include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -64,120 +64,115 @@
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::CrossVentMgr;
-using namespace EnergyPlus::DataRoomAirModel;
+using namespace CrossVentMgr;
+using namespace DataRoomAirModel;
 
 TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
 {
 
     // set up all conditions entering the EvolveParaUCSDCV when using the Issue #5520 test file on hitcount 9925 (where it used to crash)
-    int NumOfZones = 2;
+    state->dataGlobal->NumOfZones = 2;
     int MaxSurf = 2;
 
-    RecInflowRatio.allocate(NumOfZones);
+    state->dataRoomAirMod->RecInflowRatio.allocate(state->dataGlobal->NumOfZones);
 
-    AirflowNetworkSurfaceUCSDCV.allocate({0, MaxSurf}, NumOfZones);
-    AirflowNetworkSurfaceUCSDCV(1, 1) = 1;
-    AirflowNetworkSurfaceUCSDCV(0, 1) = 1;
-    AirflowNetworkSurfaceUCSDCV(0, 2) = 2;
+    state->dataRoomAirMod->AirflowNetworkSurfaceUCSDCV.allocate({0, MaxSurf}, state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(1, 1) = 1;
+    state->dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, 1) = 1;
+    state->dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, 2) = 2;
 
-    EnergyPlus::AirflowNetwork::MultizoneSurfaceData.allocate(MaxSurf);
-    EnergyPlus::AirflowNetwork::MultizoneSurfaceData(1).SurfNum = 6;
-    EnergyPlus::AirflowNetwork::MultizoneSurfaceData(1).OpenFactor = 1.;
-    EnergyPlus::AirflowNetwork::MultizoneSurfaceData(2).SurfNum = 9;
-    EnergyPlus::AirflowNetwork::MultizoneSurfaceData(2).OpenFactor = 1.;
+    state->dataAirflowNetwork->MultizoneSurfaceData.allocate(MaxSurf);
+    state->dataAirflowNetwork->MultizoneSurfaceData(1).SurfNum = 6;
+    state->dataAirflowNetwork->MultizoneSurfaceData(1).OpenFactor = 1.;
+    state->dataAirflowNetwork->MultizoneSurfaceData(2).SurfNum = 9;
+    state->dataAirflowNetwork->MultizoneSurfaceData(2).OpenFactor = 1.;
 
-    EnergyPlus::DataSurfaces::Surface.allocate(10);
-    EnergyPlus::DataSurfaces::Surface(6).Zone = 1;
-    EnergyPlus::DataSurfaces::Surface(6).Azimuth = 0.0;
-    EnergyPlus::DataSurfaces::Surface(6).BaseSurf = 5;
-    EnergyPlus::DataSurfaces::Surface(5).Sides = 4;
-    EnergyPlus::DataSurfaces::Surface(5).Centroid.x = 13.143481000000001;
-    EnergyPlus::DataSurfaces::Surface(5).Centroid.y = 13.264719000000003;
-    EnergyPlus::DataSurfaces::Surface(5).Centroid.z = 1.6002000000000001;
-    EnergyPlus::DataSurfaces::Surface(7).Sides = 4;
-    EnergyPlus::DataSurfaces::Surface(7).Centroid.x = 25.415490999999996;
-    EnergyPlus::DataSurfaces::Surface(7).Centroid.y = 7.1687189999999994;
-    EnergyPlus::DataSurfaces::Surface(7).Centroid.z = 1.6763999999999999;
-    EnergyPlus::DataSurfaces::Surface(8).Sides = 4;
-    EnergyPlus::DataSurfaces::Surface(8).Centroid.x = 13.223490999999997;
-    EnergyPlus::DataSurfaces::Surface(8).Centroid.y = 1.0727189999999998;
-    EnergyPlus::DataSurfaces::Surface(8).Centroid.z = 1.6763999999999999;
-    EnergyPlus::DataSurfaces::Surface(10).Sides = 4;
-    EnergyPlus::DataSurfaces::Surface(10).Centroid.x = 1.0314909999999999;
-    EnergyPlus::DataSurfaces::Surface(10).Centroid.y = 7.1687189999999994;
-    EnergyPlus::DataSurfaces::Surface(10).Centroid.z = 1.6763999999999999;
+    state->dataSurface->Surface.allocate(10);
+    state->dataSurface->Surface(6).Zone = 1;
+    state->dataSurface->Surface(6).Azimuth = 0.0;
+    state->dataSurface->Surface(6).BaseSurf = 5;
+    state->dataSurface->Surface(5).Sides = 4;
+    state->dataSurface->Surface(5).Centroid.x = 13.143481000000001;
+    state->dataSurface->Surface(5).Centroid.y = 13.264719000000003;
+    state->dataSurface->Surface(5).Centroid.z = 1.6002000000000001;
+    state->dataSurface->Surface(7).Sides = 4;
+    state->dataSurface->Surface(7).Centroid.x = 25.415490999999996;
+    state->dataSurface->Surface(7).Centroid.y = 7.1687189999999994;
+    state->dataSurface->Surface(7).Centroid.z = 1.6763999999999999;
+    state->dataSurface->Surface(8).Sides = 4;
+    state->dataSurface->Surface(8).Centroid.x = 13.223490999999997;
+    state->dataSurface->Surface(8).Centroid.y = 1.0727189999999998;
+    state->dataSurface->Surface(8).Centroid.z = 1.6763999999999999;
+    state->dataSurface->Surface(10).Sides = 4;
+    state->dataSurface->Surface(10).Centroid.x = 1.0314909999999999;
+    state->dataSurface->Surface(10).Centroid.y = 7.1687189999999994;
+    state->dataSurface->Surface(10).Centroid.z = 1.6763999999999999;
 
-    EnergyPlus::DataHeatBalance::Zone.allocate(1);
-    EnergyPlus::DataHeatBalance::Zone(1).Volume = 996.75300003839993;
-    EnergyPlus::DataHeatBalance::Zone(1).FloorArea = 297.28972800000003;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Volume = 996.75300003839993;
+    state->dataHeatBal->Zone(1).FloorArea = 297.28972800000003;
 
-    EnergyPlus::AirflowNetwork::AirflowNetworkLinkSimu.allocate(1);
-    EnergyPlus::AirflowNetwork::AirflowNetworkLinkSimu(1).VolFLOW2 = 27.142934345451458;
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu.allocate(1);
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu(1).VolFLOW2 = 27.142934345451458;
 
-    EnergyPlus::DataEnvironment::WindDir = 271.66666666666669;
+    state->dataEnvrn->WindDir = 271.66666666666669;
 
-    EnergyPlus::DataRoomAirModel::AirModel.allocate(NumOfZones);
+    state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
 
-    EnergyPlus::AirflowNetwork::AirflowNetworkLinkageData.allocate(2);
-    EnergyPlus::AirflowNetwork::AirflowNetworkLinkageData(1).CompNum = 1;
-    EnergyPlus::AirflowNetwork::AirflowNetworkLinkageData(2).CompNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData.allocate(2);
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(1).CompNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(2).CompNum = 1;
 
-    EnergyPlus::AirflowNetwork::AirflowNetworkCompData.allocate(3);
-    EnergyPlus::AirflowNetwork::AirflowNetworkCompData(1).TypeNum = 1;
-    EnergyPlus::AirflowNetwork::AirflowNetworkCompData(1).CompTypeNum = 1;
-    EnergyPlus::AirflowNetwork::AirflowNetworkCompData(2).TypeNum = 1;
-    EnergyPlus::AirflowNetwork::AirflowNetworkCompData(2).CompTypeNum = 3;
-    EnergyPlus::AirflowNetwork::AirflowNetworkCompData(3).TypeNum = 2;
-    EnergyPlus::AirflowNetwork::AirflowNetworkCompData(3).CompTypeNum = 2;
+    state->dataAirflowNetwork->AirflowNetworkCompData.allocate(3);
+    state->dataAirflowNetwork->AirflowNetworkCompData(1).TypeNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkCompData(1).CompTypeNum = AirflowNetwork::iComponentTypeNum::DOP;
+    state->dataAirflowNetwork->AirflowNetworkCompData(2).TypeNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkCompData(2).CompTypeNum = AirflowNetwork::iComponentTypeNum::SCR;
+    state->dataAirflowNetwork->AirflowNetworkCompData(3).TypeNum = 2;
+    state->dataAirflowNetwork->AirflowNetworkCompData(3).CompTypeNum = AirflowNetwork::iComponentTypeNum::SOP;
 
-    EnergyPlus::DataRoomAirModel::SurfParametersCVDV.allocate(2);
-    EnergyPlus::DataRoomAirModel::SurfParametersCVDV(1).Width = 22.715219999999999;
-    EnergyPlus::DataRoomAirModel::SurfParametersCVDV(1).Height = 1.3715999999999999;
-    EnergyPlus::DataRoomAirModel::SurfParametersCVDV(2).Width = 22.869143999999999;
-    EnergyPlus::DataRoomAirModel::SurfParametersCVDV(2).Height = 1.3715999999999999;
+    state->dataRoomAirMod->SurfParametersCVDV.allocate(2);
+    state->dataRoomAirMod->SurfParametersCVDV(1).Width = 22.715219999999999;
+    state->dataRoomAirMod->SurfParametersCVDV(1).Height = 1.3715999999999999;
+    state->dataRoomAirMod->SurfParametersCVDV(2).Width = 22.869143999999999;
+    state->dataRoomAirMod->SurfParametersCVDV(2).Height = 1.3715999999999999;
 
-    CVJetRecFlows.allocate({0, MaxSurf}, 1);
+    state->dataRoomAirMod->CVJetRecFlows.allocate({0, MaxSurf}, 1);
 
-    EnergyPlus::DataUCSDSharedData::PosZ_Wall.allocate(2);
-    EnergyPlus::DataUCSDSharedData::PosZ_Wall(1) = 1;
-    EnergyPlus::DataUCSDSharedData::PosZ_Wall(2) = 4;
+    state->dataUCSDShared->PosZ_Wall.allocate(2);
+    state->dataUCSDShared->PosZ_Wall(1) = 1;
+    state->dataUCSDShared->PosZ_Wall(2) = 4;
 
-    EnergyPlus::DataUCSDSharedData::APos_Wall.allocate(12);
-    EnergyPlus::DataUCSDSharedData::APos_Wall(1) = 5;
-    EnergyPlus::DataUCSDSharedData::APos_Wall(2) = 7;
-    EnergyPlus::DataUCSDSharedData::APos_Wall(3) = 8;
-    EnergyPlus::DataUCSDSharedData::APos_Wall(4) = 10;
+    state->dataUCSDShared->APos_Wall.allocate(12);
+    state->dataUCSDShared->APos_Wall(1) = 5;
+    state->dataUCSDShared->APos_Wall(2) = 7;
+    state->dataUCSDShared->APos_Wall(3) = 8;
+    state->dataUCSDShared->APos_Wall(4) = 10;
 
-    EnergyPlus::DataRoomAirModel::Droom.allocate(NumOfZones);
-    EnergyPlus::DataRoomAirModel::Droom(1) = 13.631070390838719;
+    state->dataRoomAirMod->Droom.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->Droom(1) = 13.631070390838719;
+    state->dataRoomAirMod->Dstar.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->Ain.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->ZoneUCSDCV.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->ZoneUCSDCV(1).ZonePtr = 1;
+    state->dataRoomAirMod->JetRecAreaRatio.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->Ujet.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->Urec.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->Qrec.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->Qtot.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->Tin.allocate(state->dataGlobal->NumOfZones);
 
-    EnergyPlus::DataRoomAirModel::Dstar.allocate(NumOfZones);
+    EvolveParaUCSDCV(*state, 1);
 
-    EnergyPlus::DataRoomAirModel::Ain.allocate(NumOfZones);
-
-    EnergyPlus::DataRoomAirModel::ZoneUCSDCV.allocate(NumOfZones);
-    EnergyPlus::DataRoomAirModel::ZoneUCSDCV(1).ZonePtr = 1;
-
-    EnergyPlus::DataRoomAirModel::JetRecAreaRatio.allocate(NumOfZones);
-    EnergyPlus::DataRoomAirModel::Ujet.allocate(NumOfZones);
-    EnergyPlus::DataRoomAirModel::Urec.allocate(NumOfZones);
-    EnergyPlus::DataRoomAirModel::Qrec.allocate(NumOfZones);
-    EnergyPlus::DataRoomAirModel::Qtot.allocate(NumOfZones);
-    EnergyPlus::DataRoomAirModel::Tin.allocate(NumOfZones);
-
-    EvolveParaUCSDCV(1);
-
-    EXPECT_NEAR(27.14, CVJetRecFlows(1, 1).Fin, 0.01);
-    EXPECT_NEAR(0.871, CVJetRecFlows(1, 1).Uin, 0.001);
-    EXPECT_NEAR(0.000, CVJetRecFlows(1, 1).Vjet, 0.001);
-    EXPECT_NEAR(0.243, CVJetRecFlows(1, 1).Yjet, 0.001);
-    EXPECT_NEAR(0.279, CVJetRecFlows(1, 1).Ujet, 0.001);
-    EXPECT_NEAR(0.070, CVJetRecFlows(1, 1).Yrec, 0.001);
-    EXPECT_NEAR(0.080, CVJetRecFlows(1, 1).Urec, 0.001);
-    EXPECT_NEAR(0.466, CVJetRecFlows(1, 1).YQrec, 0.001);
-    EXPECT_NEAR(0.535, CVJetRecFlows(1, 1).Qrec, 0.001);
+    EXPECT_NEAR(27.14, state->dataRoomAirMod->CVJetRecFlows(1, 1).Fin, 0.01);
+    EXPECT_NEAR(0.871, state->dataRoomAirMod->CVJetRecFlows(1, 1).Uin, 0.001);
+    EXPECT_NEAR(0.000, state->dataRoomAirMod->CVJetRecFlows(1, 1).Vjet, 0.001);
+    EXPECT_NEAR(0.243, state->dataRoomAirMod->CVJetRecFlows(1, 1).Yjet, 0.001);
+    EXPECT_NEAR(0.279, state->dataRoomAirMod->CVJetRecFlows(1, 1).Ujet, 0.001);
+    EXPECT_NEAR(0.070, state->dataRoomAirMod->CVJetRecFlows(1, 1).Yrec, 0.001);
+    EXPECT_NEAR(0.080, state->dataRoomAirMod->CVJetRecFlows(1, 1).Urec, 0.001);
+    EXPECT_NEAR(0.466, state->dataRoomAirMod->CVJetRecFlows(1, 1).YQrec, 0.001);
+    EXPECT_NEAR(0.535, state->dataRoomAirMod->CVJetRecFlows(1, 1).Qrec, 0.001);
 }

@@ -8,7 +8,7 @@ Each instance of this object creates a cost line item and will contribute to the
 
 Cost estimates are not currently general in that they cannot be performed for every type of component that could be included in an EnergyPlus model. Although a ``General'' option is available where all information needed for the cost line item is input by the user, the usefulness of cost modeling within EnergyPlus is expected to be enhanced when quantities are obtained from elsewhere in the input file or computed during a simulation. The cost computations are programmed in selected ways for selected objects. The objects available and the type of cost modeling that may be performed are discussed in detail in the discussion of Reference Object Type field. A particular instance of this object will always have many blank fields. Entering values in too many fields may cause an error because the program may determine how a particular cost is to be calculated based on the presence of non-zero values in particular fields. The input object includes fields that are reserved for future use in expanded cost estimate and investment analyses planned for future versions of EnergyPlus. If you would like to request additional objects or different methods of modeling component costs, feel free to describe your needs and submit a request via email to energyplus-support@gard.com.
 
-\subsubsection{Inputs}\label{inputs}
+\subsubsection{Inputs}
 
 \paragraph{Field: Name}\label{componentcostlineitem-field-name}
 
@@ -169,7 +169,7 @@ Some examples of this object in an IDF:
 
 This object can be used to perform various modifications to the construction costs to arrive at an estimate for total project costs. This object allows extending the line item model so that the overall costs of the project will reflect various profit and fees. Only one object of this type can be included in the input file. The results are included in the Construction Cost Estimate Summary table by request using the \hyperref[outputtablesummaryreports]{Output:Table:SummaryReports} object with the Component Cost Economics Summary option selected.
 
-\subsubsection{Inputs}\label{inputs-1}
+\subsubsection{Inputs}
 
 \paragraph{Field: Miscellaneous Cost per Conditioned Area}\label{field-miscellaneous-cost-per-conditioned-area}
 
@@ -216,7 +216,7 @@ ComponentCost:Adjustments,
 
 This object can be used to allow comparing the current cost estimate to the results of a previous estimate for a reference building. This object parallels the ComponentCost:Adjustment object but adds a field for entering the cost line item model result for the reference building. All the various adjustments to the project cost estimate are available here to allow using factors that differ between the current and the reference building models. The factors entered in the field associated with this object are applied to the reference building while the factors listed in the ComponentCost:Adjustment object are applied to the current building model cost estimate. Only one object of this type can be included in the input file. The results are included in the Construction Cost Estimate Summary table by request using the \hyperref[outputtablesummaryreports]{Output:Table:SummaryReports} object with the Component Cost Economics Summary option selected.
 
-\subsubsection{Inputs}\label{inputs-2}
+\subsubsection{Inputs}
 
 \paragraph{Field: Reference Building Line Item Costs}\label{field-reference-building-line-item-costs}
 

@@ -226,13 +226,13 @@ IF THE RACK SERVES CASES AND/OR WALKINS:
 
 \begin{itemize}
 \item
-  Zone,Average, Refrigeration Compressor Rack Electric Power {[}W{]}
+  Zone,Average, Refrigeration Compressor Rack Electricity Rate {[}W{]}
 \item
-  Zone,Sum, Refrigeration Compressor Rack Electric Energy {[}J{]}
+  Zone,Sum, Refrigeration Compressor Rack Electricity Energy {[}J{]}
 \item
-  Zone,Average, Refrigeration Compressor Rack Condenser Fan Electric Power {[}W{]}
+  Zone,Average, Refrigeration Compressor Rack Condenser Fan Electricity Rate {[}W{]}
 \item
-  Zone,Sum, Refrigeration Compressor Rack Condenser Fan Electric Energy {[}J{]}
+  Zone,Sum, Refrigeration Compressor Rack Condenser Fan Electricity Energy {[}J{]}
 \item
   Zone,Average, Refrigeration Compressor Rack Total Heat Transfer Rate {[}W{]}
 \item
@@ -245,13 +245,13 @@ If Condenser Type = Evap Cooled:
 
 \begin{itemize}
 \item
-  Zone,Average, Refrigeration Compressor Rack Evaporative Condenser Pump Electric Power {[}W{]}
+  Zone,Average, Refrigeration Compressor Rack Evaporative Condenser Pump Electricity Rate {[}W{]}
 \item
-  Zone,Sum, Refrigeration Compressor Rack Evaporative Condenser Pump Electric Energy {[}J{]}
+  Zone,Sum, Refrigeration Compressor Rack Evaporative Condenser Pump Electricity Energy {[}J{]}
 \item
-  Zone,Average, Refrigeration Compressor Rack Evaporative Condenser Basin Heater Electric Power {[}W{]}
+  Zone,Average, Refrigeration Compressor Rack Evaporative Condenser Basin Heater Electricity Rate {[}W{]}
 \item
-  Zone,Sum, Refrigeration Compressor Rack Evaporative Condenser Basin Heater Electric Energy {[}J{]}
+  Zone,Sum, Refrigeration Compressor Rack Evaporative Condenser Basin Heater Electricity Energy {[}J{]}
 \item
   Zone,Average, Refrigeration Compressor Rack Evaporative Condenser Water Volume Flow Rate {[}m\(^{3}\)/s{]}
 \item
@@ -275,15 +275,15 @@ IF THE RACK SERVES REFRIGERATION CHILLERS
 
 \begin{itemize}
 \item
-  HVAC,Average, Refrigeration Air Chiller Compressor Rack Electric Power {[}W{]}
+  HVAC,Average, Refrigeration Air Chiller Compressor Rack Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Refrigeration Air Chiller Compressor Rack Electric Energy {[}J{]}
+  HVAC,Sum, Refrigeration Air Chiller Compressor Rack Electricity Energy {[}J{]}
 \item
   HVAC,Average,Refrigeration Air Chiller System Compressor Runtime Fraction {[]}
 \item
-  HVAC,Average, Refrigeration Air Chiller Compressor Rack Condenser Fan Electric Power {[}W{]}
+  HVAC,Average, Refrigeration Air Chiller Compressor Rack Condenser Fan Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Refrigeration Air Chiller Compressor Rack Condenser Fan Electric Energy {[}J{]}
+  HVAC,Sum, Refrigeration Air Chiller Compressor Rack Condenser Fan Electricity Energy {[}J{]}
 \item
   HVAC,Average, Refrigeration Air Chiller Compressor Rack Total Heat Transfer Rate {[}W{]}
 \item
@@ -296,13 +296,13 @@ If Condenser Type = Evap Cooled:
 
 \begin{itemize}
 \item
-  HVAC,Average, Refrigeration Air Chiller Compressor Rack Evaporative Condenser Pump Electric Power {[}W{]}
+  HVAC,Average, Refrigeration Air Chiller Compressor Rack Evaporative Condenser Pump Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Refrigeration Air Chiller Compressor Rack Evaporative Condenser Pump Electric Energy {[}J{]}
+  HVAC,Sum, Refrigeration Air Chiller Compressor Rack Evaporative Condenser Pump Electricity Energy {[}J{]}
 \item
-  HVAC,Average, Refrigeration Air Chiller Compressor Rack Evaporative Condenser Basin Heater Electric Power {[}W{]}
+  HVAC,Average, Refrigeration Air Chiller Compressor Rack Evaporative Condenser Basin Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Refrigeration Air Chiller Compressor Rack Electric PowerRefrigeration Air Chiller Compressor Rack Evaporative Condenser Basin Heater Electric Energy {[}J{]}
+  HVAC,Sum, Refrigeration Air Chiller Compressor Rack Electric PowerRefrigeration Air Chiller Compressor Rack Evaporative Condenser Basin Heater Electricity Energy {[}J{]}
 \item
   HVAC,Average, Refrigeration Air Chiller Compressor Rack Evaporative Condenser Water Volume Flow Rate {[}m3/s{]}
 \item
@@ -336,11 +336,11 @@ When condenser type is Water Cooled, this is the total heat energy flowing acros
 
 \paragraph{IF THE RACK SERVES CASES AND OR WALKINS:}\label{if-the-rack-serves-cases-and-or-walkins}
 
-\paragraph{Refrigeration Compressor Rack Electric Power {[}W{]}}\label{refrigeration-compressor-rack-electric-power-w}
+\paragraph{Refrigeration Compressor Rack Electricity Rate {[}W{]}}\label{refrigeration-compressor-rack-electric-power-w}
 
 This output is the electric power input to the rack compressor(s) in Watts.
 
-\paragraph{Refrigeration Compressor Rack Electric Energy {[}J{]}}\label{refrigeration-compressor-rack-electric-energy-j}
+\paragraph{Refrigeration Compressor Rack Electricity Energy {[}J{]}}\label{refrigeration-compressor-rack-electric-energy-j}
 
 This is the electricity consumption of the rack compressor(s) in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
@@ -348,11 +348,11 @@ This is the electricity consumption of the rack compressor(s) in Joules for the 
 
 This is the runtime operating ratio for the compressor.
 
-\paragraph{Refrigeration Compressor Rack Condenser Fan Electric Power {[}W{]}}\label{refrigeration-compressor-rack-condenser-fan-electric-power-w}
+\paragraph{Refrigeration Compressor Rack Condenser Fan Electricity Rate {[}W{]}}\label{refrigeration-compressor-rack-condenser-fan-electric-power-w}
 
 This output is the electric input to the rack condenser fan(s) in Watts.
 
-\paragraph{Refrigeration Compressor Rack Condenser Fan Electric Energy {[}J{]}}\label{refrigeration-compressor-rack-condenser-fan-electric-energy-j}
+\paragraph{Refrigeration Compressor Rack Condenser Fan Electricity Energy {[}J{]}}\label{refrigeration-compressor-rack-condenser-fan-electric-energy-j}
 
 This is the electricity consumption of the rack condenser fan(s) in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
@@ -368,19 +368,19 @@ This is the total heat transfer of the~ refrigeration compressor rack in Joules 
 
 This field is the~ refrigeration compressor rack coefficient of performance. It is the actual compressor rack COP for the timestep being reported, accounting for the COP variation as a function of temperature. It is calculated as the Design Compressor Rack COP times the Compressor Rack COP as a Function of Temperature Curve evaluated at the effective condenser entering air temperature for the timestep being reported.
 
-\paragraph{Refrigeration Compressor Rack Evaporative Condenser Pump Electric Power {[}W{]}}\label{refrigeration-compressor-rack-evaporative-condenser-pump-electric-power-w}
+\paragraph{Refrigeration Compressor Rack Evaporative Condenser Pump Electricity Rate {[}W{]}}\label{refrigeration-compressor-rack-evaporative-condenser-pump-electric-power-w}
 
 This is the electrical power requirement in Watts for the timestep being reported for the water pump used with evaporative cooling of the compressor rack condenser.
 
-\paragraph{Refrigeration Compressor Rack Evaporative Condenser Pump Electric Energy {[}J{]}}\label{refrigeration-compressor-rack-evaporative-condenser-pump-electric-energy-j}
+\paragraph{Refrigeration Compressor Rack Evaporative Condenser Pump Electricity Energy {[}J{]}}\label{refrigeration-compressor-rack-evaporative-condenser-pump-electric-energy-j}
 
 This is the electricity consumption in Joules of the water pump used with evaporative cooling of the compressor rack condenser for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant. Use of an optional subkey category is also available, with default to the General end-use subcategory (Ref. Output:Meter objects).
 
-\paragraph{Refrigeration Compressor Rack Evaporative Condenser Basin Heater Electric Power {[}W{]}}\label{refrigeration-compressor-rack-evaporative-condenser-basin-heater-electric-power-w}
+\paragraph{Refrigeration Compressor Rack Evaporative Condenser Basin Heater Electricity Rate {[}W{]}}\label{refrigeration-compressor-rack-evaporative-condenser-basin-heater-electric-power-w}
 
 This is the electrical power requirement in Watts for the timestep being reported for the water heater in the basin of the evaporative system used to cool the compressor rack condenser.
 
-\paragraph{Refrigeration Compressor Rack Evaporative Condenser Basin Heater Electric Energy {[}J{]}}\label{refrigeration-compressor-rack-evaporative-condenser-basin-heater-electric-energy-j}
+\paragraph{Refrigeration Compressor Rack Evaporative Condenser Basin Heater Electricity Energy {[}J{]}}\label{refrigeration-compressor-rack-evaporative-condenser-basin-heater-electric-energy-j}
 
 This is the electricity consumption in Joules of the water heater used to prevent freezing of the evaporative cooling system for the compressor rack condenser for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant. Use of an optional subkey category is also available, with default to the General end-use subcategory (Ref. Output:Meter objects).
 
@@ -410,11 +410,11 @@ This field is the sensible heating energy in Joules provided by condenser waste 
 
 \paragraph{IF THE RACK SERVES CHILLERS}\label{if-the-rack-serves-chillers}
 
-\paragraph{Refrigeration Air Chiller Compressor Rack Electric Power {[}W{]}}\label{refrigeration-air-chiller-compressor-rack-electric-power-w}
+\paragraph{Refrigeration Air Chiller Compressor Rack Electricity Rate {[}W{]}}\label{refrigeration-air-chiller-compressor-rack-electric-power-w}
 
 This output is the electric power input to the rack compressor(s) in Watts.
 
-\paragraph{Refrigeration Air Chiller Compressor Rack Electric Energy {[}J{]}}\label{refrigeration-air-chiller-compressor-rack-electric-energy-j}
+\paragraph{Refrigeration Air Chiller Compressor Rack Electricity Energy {[}J{]}}\label{refrigeration-air-chiller-compressor-rack-electric-energy-j}
 
 This is the electricity consumption of the rack compressor(s) in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
@@ -422,11 +422,11 @@ This is the electricity consumption of the rack compressor(s) in Joules for the 
 
 This is the runtime fraction for the compressor serving air chillers.
 
-\paragraph{Refrigeration Air Chiller Compressor Rack Condenser Fan Electric Power {[}W{]}}\label{refrigeration-air-chiller-compressor-rack-condenser-fan-electric-power-w}
+\paragraph{Refrigeration Air Chiller Compressor Rack Condenser Fan Electricity Rate {[}W{]}}\label{refrigeration-air-chiller-compressor-rack-condenser-fan-electric-power-w}
 
 This output is the electric input to the rack condenser fan(s) in Watts.
 
-\paragraph{Refrigeration Air Chiller Compressor Rack Condenser Fan Electric Energy {[}J{]}}\label{refrigeration-air-chiller-compressor-rack-condenser-fan-electric-energy-j}
+\paragraph{Refrigeration Air Chiller Compressor Rack Condenser Fan Electricity Energy {[}J{]}}\label{refrigeration-air-chiller-compressor-rack-condenser-fan-electric-energy-j}
 
 This is the electricity consumption of the rack condenser fan(s) in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
@@ -442,19 +442,19 @@ This is the total heat transfer of the~ refrigeration compressor rack in Joules 
 
 This field is the~ refrigeration compressor rack coefficient of performance. It is the actual compressor rack COP for the timestep being reported, accounting for the COP variation as a function of temperature. It is calculated as the Design Compressor Rack COP times the Compressor Rack COP as a Function of Temperature Curve evaluated at the effective condenser entering air temperature for the timestep being reported.
 
-\paragraph{Refrigeration Air Chiller Compressor Rack Evaporative Condenser Pump Electric Power {[}W{]}}\label{refrigeration-air-chiller-compressor-rack-evaporative-condenser-pump-electric-power-w}
+\paragraph{Refrigeration Air Chiller Compressor Rack Evaporative Condenser Pump Electricity Rate {[}W{]}}\label{refrigeration-air-chiller-compressor-rack-evaporative-condenser-pump-electric-power-w}
 
 This is the electrical power requirement in Watts for the timestep being reported for the water pump used with evaporative cooling of the compressor rack condenser.
 
-\paragraph{Refrigeration Air Chiller Compressor Rack Evaporative Condenser Pump Electric Energy {[}J{]}}\label{refrigeration-air-chiller-compressor-rack-evaporative-condenser-pump-electric-energy-j}
+\paragraph{Refrigeration Air Chiller Compressor Rack Evaporative Condenser Pump Electricity Energy {[}J{]}}\label{refrigeration-air-chiller-compressor-rack-evaporative-condenser-pump-electric-energy-j}
 
 This is the electricity consumption in Joules of the water pump used with evaporative cooling of the compressor rack condenser for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant. Use of an optional subkey category is also available, with default to the General end-use subcategory (Ref. Output:Meter objects).
 
-\paragraph{Refrigeration Air Chiller Compressor Rack Evaporative Condenser Basin Heater Electric Power {[}W{]}}\label{refrigeration-air-chiller-compressor-rack-evaporative-condenser-basin-heater-electric-power-w}
+\paragraph{Refrigeration Air Chiller Compressor Rack Evaporative Condenser Basin Heater Electricity Rate {[}W{]}}\label{refrigeration-air-chiller-compressor-rack-evaporative-condenser-basin-heater-electric-power-w}
 
 This is the electrical power requirement in Watts for the timestep being reported for the water heater in the basin of the evaporative system used to cool the compressor rack condenser.
 
-\paragraph{Refrigeration Air Chiller Compressor Rack Evaporative Condenser Basin Heater Electric Energy {[}J{]}}\label{refrigeration-air-chiller-compressor-rack-evaporative-condenser-basin-heater-electric-energy-j}
+\paragraph{Refrigeration Air Chiller Compressor Rack Evaporative Condenser Basin Heater Electricity Energy {[}J{]}}\label{refrigeration-air-chiller-compressor-rack-evaporative-condenser-basin-heater-electric-energy-j}
 
 This is the electricity consumption in Joules of the water heater used to prevent freezing of the evaporative cooling system for the compressor rack condenser for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant. Use of an optional subkey category is also available, with default to the General end-use subcategory (Ref. Output:Meter objects).
 
@@ -786,13 +786,13 @@ The following is an example input for a refrigerated case.
 \item
   Zone,Sum,Refrigeration Case Return Air Latent Energy {[}J{]}
 \item
-  Zone,Average,Refrigeration Case Evaporator Fan Electric Power {[}W{]}
+  Zone,Average,Refrigeration Case Evaporator Fan Electricity Rate {[}W{]}
 \item
-  Zone,Sum,Refrigeration Case Evaporator Fan Electric Energy {[}J{]}
+  Zone,Sum,Refrigeration Case Evaporator Fan Electricity Energy {[}J{]}
 \item
-  Zone,Average,Refrigeration Case Lighting Electric Power {[}W{]}
+  Zone,Average,Refrigeration Case Lighting Electricity Rate {[}W{]}
 \item
-  Zone,Sum,Refrigeration Case Lighting Electric Energy {[}J{]}
+  Zone,Sum,Refrigeration Case Lighting Electricity Energy {[}J{]}
 \item
   Zone,Average,Refrigeration Case Latent Credit Curve Value {[]}
 \end{itemize}
@@ -809,18 +809,18 @@ If anti-sweat heater control type is not equal to None:
 
 \begin{itemize}
 \item
-  Zone,Average,Refrigeration Case Anti Sweat Electric Power {[}W{]}
+  Zone,Average,Refrigeration Case Anti Sweat Electricity Rate {[}W{]}
 \item
-  Zone,Sum,Refrigeration Case Anti Sweat Electric Energy {[}J{]}
+  Zone,Sum,Refrigeration Case Anti Sweat Electricity Energy {[}J{]}
 \end{itemize}
 
 If case defrost type is Electric or Electric with Temperature Termination:
 
 \begin{itemize}
 \item
-  Zone,Average,Refrigeration Case Defrost Electric Power {[}W{]}
+  Zone,Average,Refrigeration Case Defrost Electricity Rate {[}W{]}
 \item
-  Zone,Sum,Refrigeration Case Defrost Electric Energy {[}J{]}
+  Zone,Sum,Refrigeration Case Defrost Electricity Energy {[}J{]}
 \end{itemize}
 
 \paragraph{Refrigeration Case Evaporator Total Cooling Rate {[}W{]}}\label{refrigeration-case-evaporator-total-cooling-rate-w}
@@ -893,19 +893,19 @@ This field is the amount of sensible heating case credit energy delivered to the
 
 These are the amount of latent cooling (dehumidification) case credit energy delivered to the return air duct (zone return air node) in Joules or Watts. If an under case return duct is simulated, only a portion of the latent case credits are applied to the HVAC (zone) return air. A negative value (or zero) will be reported since the refrigerated case provides dehumidification (thereby reducing the zone latent load). If the HVAC system is off for a simulation timestep (no return air mass flow), then this latent energy is actually provided to the zone air instead (even though a non-zero value is reported here).
 
-\paragraph{Refrigeration Case Evaporator Fan Electric Power {[}W{]}}\label{refrigeration-case-evaporator-fan-electric-power-w}
+\paragraph{Refrigeration Case Evaporator Fan Electricity Rate {[}W{]}}\label{refrigeration-case-evaporator-fan-electric-power-w}
 
 This field is the electric power input to the refrigerated case fan(s) in Watts.
 
-\paragraph{Refrigeration Case Evaporator Fan Electric Energy {[}J{]}}\label{refrigeration-case-evaporator-fan-electric-energy-j}
+\paragraph{Refrigeration Case Evaporator Fan Electricity Energy {[}J{]}}\label{refrigeration-case-evaporator-fan-electric-energy-j}
 
 This field is the electricity consumption of the refrigerated case fan(s) in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. Output:Meter objects).
 
-\paragraph{Refrigeration Case Lighting Electric Power {[}W{]}}\label{refrigeration-case-lighting-electric-power-w}
+\paragraph{Refrigeration Case Lighting Electricity Rate {[}W{]}}\label{refrigeration-case-lighting-electric-power-w}
 
 This field is the electric power input to the refrigerated case lights in Watts.
 
-\paragraph{Refrigeration Case Lighting Electric Energy {[}J{]}}\label{refrigeration-case-lighting-electric-energy-j}
+\paragraph{Refrigeration Case Lighting Electricity Energy {[}J{]}}\label{refrigeration-case-lighting-electric-energy-j}
 
 This field is the electricity consumption of the refrigerated case lights in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. Output:Meter objects).
 
@@ -917,19 +917,19 @@ This field is the output of the Defrost Energy Correction Curve which denotes th
 
 This field is the output of the Latent Case Credit Curve which denotes the variation in latent case credits at off-rated conditions. The output of the latent case credit curve directly impacts the amount of frost formation on the refrigerated case evaporator coil and the requirement for defrost.
 
-\paragraph{Refrigeration Case Anti Sweat Electric Power {[}W{]}}\label{refrigeration-case-anti-sweat-electric-power-w}
+\paragraph{Refrigeration Case Anti Sweat Electricity Rate {[}W{]}}\label{refrigeration-case-anti-sweat-electric-power-w}
 
 This field is the electric power input to the refrigerated case anti-sweat heater in Watts. This output is available unless anti-sweat heater control type is specified as NONE.
 
-\paragraph{Refrigeration Case Anti Sweat Electric Energy {[}J{]}}\label{refrigeration-case-anti-sweat-electric-energy-j}
+\paragraph{Refrigeration Case Anti Sweat Electricity Energy {[}J{]}}\label{refrigeration-case-anti-sweat-electric-energy-j}
 
 This field is the total electricity consumption of the refrigerated case anti-sweat heater in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. Output:Meter objects). This output is available unless anti-sweat heater control type is specified as NONE.
 
-\paragraph{Refrigeration Case Defrost Electric Power {[}W{]}}\label{refrigeration-case-defrost-electric-power-w}
+\paragraph{Refrigeration Case Defrost Electricity Rate {[}W{]}}\label{refrigeration-case-defrost-electric-power-w}
 
 This field is the electric power input to the refrigerated case electric defrost heater(s) in Watts. This output is available if case defrost type is Electric or Electric with Temperature Termination.
 
-\paragraph{Refrigeration Case Defrost Electric Energy {[}J{]}}\label{refrigeration-case-defrost-electric-energy-j}
+\paragraph{Refrigeration Case Defrost Electricity Energy {[}J{]}}\label{refrigeration-case-defrost-electric-energy-j}
 
 This field is the total electricity consumption of the refrigerated case electric defrost heater(s) in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. Output:Meter objects). This output is available if case defrost type is Electric or Electric with Temperature Termination.
 
@@ -1161,30 +1161,30 @@ The following is an example input for a refrigeration walkin.
 \item
   Zone,Sum,Refrigeration Walk In Evaporator Latent Cooling Energy {[}J{]}
 \item
-  Zone,Average,Refrigeration Walk In Ancillary Electric Power {[}W{]}
+  Zone,Average,Refrigeration Walk In Ancillary Electricity Rate {[}W{]}
 \item
-  Zone,Sum,Refrigeration Walk In Ancillary Electric Energy {[}J{]}
+  Zone,Sum,Refrigeration Walk In Ancillary Electricity Energy {[}J{]}
 \item
-  Zone,Average,Refrigeration Walk In Fan Electric Power {[}W{]}
+  Zone,Average,Refrigeration Walk In Fan Electricity Rate {[}W{]}
 \item
-  Zone,Sum,Refrigeration Walk In Fan Electric Energy {[}J{]}
+  Zone,Sum,Refrigeration Walk In Fan Electricity Energy {[}J{]}
 \item
-  Zone,Average,Refrigeration Walk In Lighting Electric Power {[}W{]}
+  Zone,Average,Refrigeration Walk In Lighting Electricity Rate {[}W{]}
 \item
-  Zone,Sum,Refrigeration Walk In Lighting Electric Energy {[}J{]}
+  Zone,Sum,Refrigeration Walk In Lighting Electricity Energy {[}J{]}
 \item
-  Zone,Average,Refrigeration Walk In Heater Electric Power {[}W{]}
+  Zone,Average,Refrigeration Walk In Heater Electricity Rate {[}W{]}
 \item
-  Zone,Sum,Refrigeration Walk In Heater Electric Energy {[}J{]}
+  Zone,Sum,Refrigeration Walk In Heater Electricity Energy {[}J{]}
 \end{itemize}
 
 \emph{Report only for WalkIns using electric defrost}
 
 \begin{itemize}
 \item
-  Zone,Average,Refrigeration Walk In Defrost Electric Power {[}W{]}
+  Zone,Average,Refrigeration Walk In Defrost Electricity Rate {[}W{]}
 \item
-  Zone,Sum,Refrigeration Walk In Defrost Electric Energy {[}J{]}
+  Zone,Sum,Refrigeration Walk In Defrost Electricity Energy {[}J{]}
 \end{itemize}
 
 \textbf{\emph{Report for each Zone exchanging energy with the WalkIn}}
@@ -1228,43 +1228,43 @@ This field is the latent cooling (dehumidification) rate of the WalkIn evaporato
 
 This field is the latent cooling (dehumidification) of the WalkIn evaporator coil in Joules over the timestep being reported.
 
-\subsubsection{Refrigeration Walk In Ancillary Electric Power {[}W{]}}\label{refrigeration-walk-in-ancillary-electric-power-w}
+\subsubsection{Refrigeration Walk In Ancillary Electricity Rate {[}W{]}}\label{refrigeration-walk-in-ancillary-electric-power-w}
 
 This field is the total electricity (fan, heaters, lights, and electric defrost) used by the walkin in Watts.
 
-\subsubsection{Refrigeration Walk In Ancillary Electric Energy {[}J{]}}\label{refrigeration-walk-in-ancillary-electric-energy-j}
+\subsubsection{Refrigeration Walk In Ancillary Electricity Energy {[}J{]}}\label{refrigeration-walk-in-ancillary-electric-energy-j}
 
 This field is the electricity (fan, heaters, lights, and electric defrost)used by the WalkIn in Joules over the timestep being reported.
 
-\subsubsection{Refrigeration Walk In Fan Electric Power {[}W{]}}\label{refrigeration-walk-in-fan-electric-power-w}
+\subsubsection{Refrigeration Walk In Fan Electricity Rate {[}W{]}}\label{refrigeration-walk-in-fan-electric-power-w}
 
 This field is the electric power input to the WalkIn fan(s) in Watts.
 
-\subsubsection{Refrigeration Walk In Fan Electric Energy {[}J{]}}\label{refrigeration-walk-in-fan-electric-energy-j}
+\subsubsection{Refrigeration Walk In Fan Electricity Energy {[}J{]}}\label{refrigeration-walk-in-fan-electric-energy-j}
 
 This field is the electricity consumption of the WalkIn fan(s) in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects).
 
-\subsubsection{Refrigeration Walk In Lighting Electric Power {[}W{]}}\label{refrigeration-walk-in-lighting-electric-power-w}
+\subsubsection{Refrigeration Walk In Lighting Electricity Rate {[}W{]}}\label{refrigeration-walk-in-lighting-electric-power-w}
 
 This field is the electric power input to the WalkIn lights in Watts.
 
-\subsubsection{Refrigeration Walk In Lighting Electric Energy {[}J{]}}\label{refrigeration-walk-in-lighting-electric-energy-j}
+\subsubsection{Refrigeration Walk In Lighting Electricity Energy {[}J{]}}\label{refrigeration-walk-in-lighting-electric-energy-j}
 
 This field is the electricity consumption of the WalkIn lights in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects).
 
-\subsubsection{Refrigeration Walk In Heater Electric Power {[}W{]}}\label{refrigeration-walk-in-heater-electric-power-w}
+\subsubsection{Refrigeration Walk In Heater Electricity Rate {[}W{]}}\label{refrigeration-walk-in-heater-electric-power-w}
 
 This field is the electric power input to the WalkIn heaters in Watts.
 
-\subsubsection{Refrigeration Walk In Heater Electric Energy {[}J{]}}\label{refrigeration-walk-in-heater-electric-energy-j}
+\subsubsection{Refrigeration Walk In Heater Electricity Energy {[}J{]}}\label{refrigeration-walk-in-heater-electric-energy-j}
 
 This field is the total electricity consumption of the WalkIn heaters in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects).
 
-\subsubsection{Refrigeration Walk In Defrost Electric Power {[}W{]}}\label{refrigeration-walk-in-defrost-electric-power-w}
+\subsubsection{Refrigeration Walk In Defrost Electricity Rate {[}W{]}}\label{refrigeration-walk-in-defrost-electric-power-w}
 
 This field is the electric power input to the WalkIn electric defrost heater(s) in Watts. This output is available if case defrost type is Electric.
 
-\subsubsection{Refrigeration Walk In Defrost Electric Energy {[}J{]}}\label{refrigeration-walk-in-defrost-electric-energy-j}
+\subsubsection{Refrigeration Walk In Defrost Electricity Energy {[}J{]}}\label{refrigeration-walk-in-defrost-electric-energy-j}
 
 This field is the total electricity consumption of the WalkIn electric defrost heater(s) in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). This output is available if case defrost type is Electric.
 
@@ -1430,9 +1430,9 @@ THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE CASES AND/OR WALKINS:
 
 \begin{itemize}
 \item
-  Zone,Average, Refrigeration System Total Compressor Electric Power {[}W{]}
+  Zone,Average, Refrigeration System Total Compressor Electricity Rate {[}W{]}
 \item
-  Zone,Sum, Refrigeration System Total Compressor Electric Energy {[}J{]}
+  Zone,Sum, Refrigeration System Total Compressor Electricity Energy {[}J{]}
 \item
   Zone,Average, Refrigeration System Average Compressor COP {[}W/W{]}
 \item
@@ -1476,19 +1476,19 @@ THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE CASES AND/OR WALKINS:
 \item
   Zone,Average, Refrigeration System Estimated High Stage Refrigerant Mass Flow Rate {[}kg/s{]}
 \item
-  Zone,Sum,Refrigeration System Total High Stage Compressor Electric Energy {[}J{]}
+  Zone,Sum,Refrigeration System Total High Stage Compressor Electricity Energy {[}J{]}
 \item
-  Zone,Average,Refrigeration System Total High Stage Compressor Electric Power {[}W{]}
+  Zone,Average,Refrigeration System Total High Stage Compressor Electricity Rate {[}W{]}
 \item
   Zone,Sum,Refrigeration System Total High Stage Compressor Heat Transfer Energy {[}J{]}
 \item
   Zone,Average,Refrigeration System Total High Stage Compressor Heat Transfer Rate {[}W{]}
 \item
-  Zone,Sum,Refrigeration System Total Low and High Stage Compressor Electric Energy {[}J{]}
+  Zone,Sum,Refrigeration System Total Low and High Stage Compressor Electricity Energy {[}J{]}
 \item
-  Zone,Sum,Refrigeration System Total Low Stage Compressor Electric Energy {[}J{]}
+  Zone,Sum,Refrigeration System Total Low Stage Compressor Electricity Energy {[}J{]}
 \item
-  Zone,Average,Refrigeration System Total Low Stage Compressor Electric Power {[}W{]}
+  Zone,Average,Refrigeration System Total Low Stage Compressor Electricity Rate {[}W{]}
 \item
   Zone,Sum,Refrigeration System Total Low Stage Compressor Heat Transfer Energy {[}J{]}
 \item
@@ -1501,9 +1501,9 @@ THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE AIR CHILLERS:
 
 \begin{itemize}
 \item
-  HVAC,Average, Refrigeration Air Chiller System Total Compressor Electric Power {[}W{]}
+  HVAC,Average, Refrigeration Air Chiller System Total Compressor Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Refrigeration Air Chiller System Total Compressor Electric Energy {[}J{]}
+  HVAC,Sum, Refrigeration Air Chiller System Total Compressor Electricity Energy {[}J{]}
 \item
   HVAC,Average, Refrigeration Air Chiller System Average Compressor COP {[}W/W{]}
 \item
@@ -1549,19 +1549,19 @@ THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE AIR CHILLERS:
 \item
   HVAC,Average,Refrigeration Air Chiller System Estimated High Stage Refrigerant Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Sum,Refrigeration Air Chiller System Total High Stage Compressor Electric Energy {[}J{]}
+  HVAC,Sum,Refrigeration Air Chiller System Total High Stage Compressor Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Refrigeration Air Chiller System Total High Stage Compressor Electric Power {[}W{]}
+  HVAC,Average,Refrigeration Air Chiller System Total High Stage Compressor Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Refrigeration Air Chiller System Total High Stage Compressor Heat Transfer Energy {[}J{]}
 \item
   HVAC,Average,Refrigeration Air Chiller System Total High Stage Compressor Heat Transfer Rate {[}W{]}
 \item
-  HVAC,Sum, Refrigeration Air Chiller System Total Low and High Stage Compressor Electric Energy {[}J{]}
+  HVAC,Sum, Refrigeration Air Chiller System Total Low and High Stage Compressor Electricity Energy {[}J{]}
 \item
-  HVAC,Sum,Refrigeration Air Chiller System Total Low Stage Compressor Electric Energy {[}J{]}
+  HVAC,Sum,Refrigeration Air Chiller System Total Low Stage Compressor Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Refrigeration Air Chiller System Total Low Stage Compressor Electric Power {[}W{]}
+  HVAC,Average,Refrigeration Air Chiller System Total Low Stage Compressor Electricity Rate {[}W{]}
 \item
   HVAC,Sum, Refrigeration Air Chiller System Total Low Stage Compressor Heat Transfer Energy {[}J{]}
 \item
@@ -1572,31 +1572,31 @@ THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE AIR CHILLERS:
 
 \paragraph{THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE CASES AND/OR WALKINS}\label{the-following-outputs-are-available-for-systems-that-serve-cases-andor-walkins}
 
-\paragraph{Refrigeration System Total Compressor Electric Power {[}W{]}}\label{refrigeration-system-total-compressor-electric-power-w}
+\paragraph{Refrigeration System Total Compressor Electricity Rate {[}W{]}}\label{refrigeration-system-total-compressor-electric-power-w}
 
 This output is the total electric power input to the system compressor(s) in Watts.
 
-\paragraph{Refrigeration System Total Compressor~Electric Energy {[}J{]}}\label{refrigeration-system-total-compressorelectric-energy-j}
+\paragraph{Refrigeration System Total Compressor~Electricity Energy {[}J{]}}\label{refrigeration-system-total-compressorelectric-energy-j}
 
 This is the electricity consumption of the system's compressor(s) in Joules for the timestep being reported. The individual consumption for each compressor is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
-\paragraph{Refrigeration System Total Low Stage Compressor Electric Power {[}W{]}}\label{refrigeration-system-total-low-stage-compressor-electric-power-w}
+\paragraph{Refrigeration System Total Low Stage Compressor Electricity Rate {[}W{]}}\label{refrigeration-system-total-low-stage-compressor-electric-power-w}
 
 This output is the total electric power input to the system's low-stage compressor(s) in Watts.~ This output is valid only for two-stage compression systems.
 
-\paragraph{Refrigeration System Total Low Stage Compressor Electric Energy {[}J{]}}\label{refrigeration-system-total-low-stage-compressor-electric-energy-j}
+\paragraph{Refrigeration System Total Low Stage Compressor Electricity Energy {[}J{]}}\label{refrigeration-system-total-low-stage-compressor-electric-energy-j}
 
 This is the electricity consumption of the system's low-stage compressor(s) in Joules for the timestep being reported. The individual consumption for each compressor is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).~ This output is valid only for two-stage compression systems.
 
-\paragraph{Refrigeration System Total High Stage Compressor Electric Power {[}W{]}}\label{refrigeration-system-total-high-stage-compressor-electric-power-w}
+\paragraph{Refrigeration System Total High Stage Compressor Electricity Rate {[}W{]}}\label{refrigeration-system-total-high-stage-compressor-electric-power-w}
 
 This output is the total electric power input to the system's high-stage compressor(s) in Watts.~ This output is valid only for two-stage compression systems.
 
-\paragraph{Refrigeration System Total High Stage Compressor Electric Energy {[}J{]}}\label{refrigeration-system-total-high-stage-compressor-electric-energy-j}
+\paragraph{Refrigeration System Total High Stage Compressor Electricity Energy {[}J{]}}\label{refrigeration-system-total-high-stage-compressor-electric-energy-j}
 
 This is the electricity consumption of the system's high-stage compressor(s) in Joules for the timestep being reported. The individual consumption for each compressor is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).~ This output is valid only for two-stage compression systems.
 
-\paragraph{Refrigeration System Total Low and High Stage Compressor Electric Energy~ {[}J{]}}\label{refrigeration-system-total-low-and-high-stage-compressor-electric-energy-j}
+\paragraph{Refrigeration System Total Low and High Stage Compressor Electricity Energy~ {[}J{]}}\label{refrigeration-system-total-low-and-high-stage-compressor-electric-energy-j}
 
 This is the total electricity consumption of the system's low- and high-stage compressor(s) in Joules for the timestep being reported. The individual consumption for each compressor is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).~ This output is valid only for two-stage compression systems.
 
@@ -1710,31 +1710,31 @@ This is the temperature entering the thermal expansion valve before the cases, e
 
 \paragraph{THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE AIR CHILLERS}\label{the-following-outputs-are-available-for-systems-that-serve-air-chillers}
 
-\paragraph{Refrigeration Air Chiller System Total Compressor Electric Power {[}W{]}}\label{refrigeration-air-chiller-system-total-compressor-electric-power-w}
+\paragraph{Refrigeration Air Chiller System Total Compressor Electricity Rate {[}W{]}}\label{refrigeration-air-chiller-system-total-compressor-electric-power-w}
 
 This output is the total electric power input to the system compressor(s) in Watts.
 
-\paragraph{Refrigeration Chiller System Total Compressor~Electric Energy {[}J{]}}\label{refrigeration-chiller-system-total-compressorelectric-energy-j}
+\paragraph{Refrigeration Chiller System Total Compressor~Electricity Energy {[}J{]}}\label{refrigeration-chiller-system-total-compressorelectric-energy-j}
 
 This is the electricity consumption of the system's compressor(s) in Joules for the timestep being reported. The individual consumption for each compressor is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
-\paragraph{Refrigeration Air Chiller System Total Low Stage Compressor Electric Power {[}W{]}}\label{refrigeration-air-chiller-system-total-low-stage-compressor-electric-power-w}
+\paragraph{Refrigeration Air Chiller System Total Low Stage Compressor Electricity Rate {[}W{]}}\label{refrigeration-air-chiller-system-total-low-stage-compressor-electric-power-w}
 
 This output is the total electric power input to the system's low-stage compressor(s) in Watts.~ This output is valid only for two-stage compression systems.
 
-\paragraph{Refrigeration Air Chiller System Total Low Stage Compressor Electric Energy {[}J{]}}\label{refrigeration-air-chiller-system-total-low-stage-compressor-electric-energy-j}
+\paragraph{Refrigeration Air Chiller System Total Low Stage Compressor Electricity Energy {[}J{]}}\label{refrigeration-air-chiller-system-total-low-stage-compressor-electric-energy-j}
 
 This is the electricity consumption of the system's low-stage compressor(s) in Joules for the timestep being reported. The individual consumption for each compressor is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).~ This output is valid only for two-stage compression systems.
 
-\paragraph{Refrigeration Air Chiller System Total High Stage Compressor Electric Power {[}W{]}}\label{refrigeration-air-chiller-system-total-high-stage-compressor-electric-power-w}
+\paragraph{Refrigeration Air Chiller System Total High Stage Compressor Electricity Rate {[}W{]}}\label{refrigeration-air-chiller-system-total-high-stage-compressor-electric-power-w}
 
 This output is the total electric power input to the system's high-stage compressor(s) in Watts.~ This output is valid only for two-stage compression systems.
 
-\paragraph{Refrigeration Air Chiller System Total High Stage Compressor Electric Energy {[}J{]}}\label{refrigeration-air-chiller-system-total-high-stage-compressor-electric-energy-j}
+\paragraph{Refrigeration Air Chiller System Total High Stage Compressor Electricity Energy {[}J{]}}\label{refrigeration-air-chiller-system-total-high-stage-compressor-electric-energy-j}
 
 This is the electricity consumption of the system's high-stage compressor(s) in Joules for the timestep being reported. The individual consumption for each compressor is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).~ This output is valid only for two-stage compression systems.
 
-\paragraph{Refrigeration Air Chiller System Total Low and High Stage Compressor Electric Energy {[}J{]}}\label{refrigeration-air-chiller-system-total-low-and-high-stage-compressor-electric-energy-j}
+\paragraph{Refrigeration Air Chiller System Total Low and High Stage Compressor Electricity Energy {[}J{]}}\label{refrigeration-air-chiller-system-total-low-and-high-stage-compressor-electric-energy-j}
 
 This is the total electricity consumption of the system's low- and high-stage compressor(s) in Joules for the timestep being reported. The individual consumption for each compressor is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).~ This output is valid only for two-stage compression systems.
 
@@ -1973,15 +1973,15 @@ Refrigeration:TranscriticalSystem,
 
 \begin{itemize}
 \item
-  Zone,Average, Refrigeration Transcritical System Total High Pressure Compressor Electric Power {[}W{]}
+  Zone,Average, Refrigeration Transcritical System Total High Pressure Compressor Electricity Rate {[}W{]}
 \item
-  Zone,Sum, Refrigeration Transcritical System Total High Pressure Compressor Electric Energy {[}J{]}
+  Zone,Sum, Refrigeration Transcritical System Total High Pressure Compressor Electricity Energy {[}J{]}
 \item
-  Zone,Average, Refrigeration Transcritical System Low Pressure Compressor Electric Power {[}W{]}
+  Zone,Average, Refrigeration Transcritical System Low Pressure Compressor Electricity Rate {[}W{]}
 \item
-  Zone,Sum, Refrigeration Transcritical System Low Pressure Compressor Electric Energy {[}J{]}
+  Zone,Sum, Refrigeration Transcritical System Low Pressure Compressor Electricity Energy {[}J{]}
 \item
-  Zone,Sum, Refrigeration Transcritical System Total Compressor Electric Energy {[}J{]}
+  Zone,Sum, Refrigeration Transcritical System Total Compressor Electricity Energy {[}J{]}
 \item
   Zone,Average, Refrigeration Transcritical System Average COP {[}W/W{]}
 \item
@@ -2028,23 +2028,23 @@ Refrigeration:TranscriticalSystem,
   Zone,Average, Refrigeration Transcritical System Low Temperature Suction Temperature {[}C{]}
 \end{itemize}
 
-\paragraph{Refrigeration Transcritical System Total High Pressure Compressor Electric Power {[}W{]}}\label{refrigeration-transcritical-system-total-high-pressure-compressor-electric-power-w}
+\paragraph{Refrigeration Transcritical System Total High Pressure Compressor Electricity Rate {[}W{]}}\label{refrigeration-transcritical-system-total-high-pressure-compressor-electric-power-w}
 
 This output is the total electric power input to the system's high pressure compressor(s) in Watts.
 
-\paragraph{Refrigeration Transcritical System Total High Pressure Compressor Electric Energy {[}J{]}}\label{refrigeration-transcritical-system-total-high-pressure-compressor-electric-energy-j}
+\paragraph{Refrigeration Transcritical System Total High Pressure Compressor Electricity Energy {[}J{]}}\label{refrigeration-transcritical-system-total-high-pressure-compressor-electric-energy-j}
 
 This is the electricity consumption of the system's high pressure compressor(s) in Joules for the timestep being reported.~ The individual consumption for each compressor is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
-\paragraph{Refrigeration Transcritical System Low Pressure Compressor Electric Power {[}W{]}}\label{refrigeration-transcritical-system-low-pressure-compressor-electric-power-w}
+\paragraph{Refrigeration Transcritical System Low Pressure Compressor Electricity Rate {[}W{]}}\label{refrigeration-transcritical-system-low-pressure-compressor-electric-power-w}
 
 This output is the total electric power input to the system's low pressure compressor(s) in Watts.
 
-\paragraph{Refrigeration Transcritical System Low Pressure Compressor Electric Energy {[}J{]}}\label{refrigeration-transcritical-system-low-pressure-compressor-electric-energy-j}
+\paragraph{Refrigeration Transcritical System Low Pressure Compressor Electricity Energy {[}J{]}}\label{refrigeration-transcritical-system-low-pressure-compressor-electric-energy-j}
 
 This is the electricity consumption of the system's low pressure compressor(s) in Joules for the timestep being reported.~ The individual consumption for each compressor is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
-\paragraph{Refrigeration Transcritical System Total Compressor Electric Energy {[}J{]}}\label{refrigeration-transcritical-system-total-compressor-electric-energy-j}
+\paragraph{Refrigeration Transcritical System Total Compressor Electricity Energy {[}J{]}}\label{refrigeration-transcritical-system-total-compressor-electric-energy-j}
 
 This output is the total electric power input to all of the system's compressor(s) in Watts.
 
@@ -2273,9 +2273,9 @@ THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE CASES AND/OR WALKINS:
 
 \begin{itemize}
 \item
-  Zone,Average,Refrigeration Compressor Electric Power {[}W{]}
+  Zone,Average,Refrigeration Compressor Electricity Rate {[}W{]}
 \item
-  Zone,Sum,Refrigeration Compressor Electric Energy {[}J{]}
+  Zone,Sum,Refrigeration Compressor Electricity Energy {[}J{]}
 \item
   Zone,Average,Refrigeration Compressor Heat Transfer Rate {[}W{]}
 \item
@@ -2288,9 +2288,9 @@ THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE AIR CHILLERS:
 
 \begin{itemize}
 \item
-  HVAC,Average,Refrigeration Air Chiller System Compressor Electric Power {[}W{]}
+  HVAC,Average,Refrigeration Air Chiller System Compressor Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Refrigeration Air Chiller System Compressor Electric Energy {[}J{]}
+  HVAC,Sum,Refrigeration Air Chiller System Compressor Electricity Energy {[}J{]}
 \item
   HVAC,Average,Refrigeration Air Chiller System Compressor Heat Transfer Rate {[}W{]}
 \item
@@ -2301,11 +2301,11 @@ THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE AIR CHILLERS:
 
 \paragraph{THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE CASES AND/OR WALKINS}\label{the-following-outputs-are-available-for-systems-that-serve-cases-andor-walkins-1}
 
-\paragraph{Refrigeration Compressor Electric Power {[}W{]}}\label{refrigeration-compressor-electric-power-w}
+\paragraph{Refrigeration Compressor Electricity Rate {[}W{]}}\label{refrigeration-compressor-electric-power-w}
 
 This output is the electric power input to the compressor in Watts.
 
-\paragraph{Refrigeration Compressor Electric Energy {[}J{]}}\label{refrigeration-compressor-electric-energy-j}
+\paragraph{Refrigeration Compressor Electricity Energy {[}J{]}}\label{refrigeration-compressor-electric-energy-j}
 
 This is the electric energy consumed by the compressor in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
@@ -2323,11 +2323,11 @@ This is the fraction of the time step when the compressor ran to meet the load.~
 
 \paragraph{THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE AIR CHILLERS}\label{the-following-outputs-are-available-for-systems-that-serve-air-chillers-1}
 
-\paragraph{Refrigeration Air Chiller System Compressor Electric Power {[}W{]}}\label{refrigeration-air-chiller-system-compressor-electric-power-w}
+\paragraph{Refrigeration Air Chiller System Compressor Electricity Rate {[}W{]}}\label{refrigeration-air-chiller-system-compressor-electric-power-w}
 
 This output is the electric power input to the compressor in Watts.
 
-\paragraph{Refrigeration Air Chiller System Compressor Electric Energy {[}J{]}}\label{refrigeration-air-chiller-system-compressor-electric-energy-j}
+\paragraph{Refrigeration Air Chiller System Compressor Electricity Energy {[}J{]}}\label{refrigeration-air-chiller-system-compressor-electric-energy-j}
 
 This is the electric energy consumed by the compressor in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
@@ -2541,9 +2541,9 @@ FOR CONDENSERS COOLING SYSTEMS SERVING CASES AND/OR WALKINS:
 
 \begin{itemize}
 \item
-  Zone,Average, Refrigeration System Condenser Fan Electric Power {[}W{]}
+  Zone,Average, Refrigeration System Condenser Fan Electricity Rate {[}W{]}
 \item
-  Zone, Sum, Refrigeration System Condenser Fan Electric Energy {[}J{]}
+  Zone, Sum, Refrigeration System Condenser Fan Electricity Energy {[}J{]}
 \item
   Zone,Average, Refrigeration System Condenser Heat Transfer Rate {[}W{]}
 \item
@@ -2564,7 +2564,7 @@ FOR CONDENSERS COOLING SYSTEMS SERVING AIR CHILLERS:
 
 \begin{itemize}
 \item
-  HVAC,Average, Refrigeration System Condenser Fan Electric Power {[}W{]}
+  HVAC,Average, Refrigeration System Condenser Fan Electricity Rate {[}W{]}
 \item
   HVAC, Sum, Refrigeration System Condenser Fan Electric Consumption {[}J{]}
 \item
@@ -2585,7 +2585,7 @@ FOR CONDENSERS COOLING SYSTEMS SERVING AIR CHILLERS:
 
 \paragraph{FOR CONDENSERS ON SYSTEMS SERVING CASES AND/OR WALKINS:}\label{for-condensers-on-systems-serving-cases-andor-walkins}
 
-\paragraph{Refrigeration System Condenser Fan Electric Power {[}W{]}}\label{refrigeration-system-condenser-fan-electric-power-w}
+\paragraph{Refrigeration System Condenser Fan Electricity Rate {[}W{]}}\label{refrigeration-system-condenser-fan-electric-power-w}
 
 This output is the electric input to the system's condenser fan(s) in Watts.
 
@@ -2627,11 +2627,11 @@ This is the total heat recovered from the condenser inlet flow for defrost purpo
 
 \paragraph{FOR CONDENSERS ON SYSTEMS SERVING AIR CHILLERS:}\label{for-condensers-on-systems-serving-air-chillers}
 
-\paragraph{Refrigeration Air Chiller System Condenser Fan Electric Power {[}W{]}}\label{refrigeration-air-chiller-system-condenser-fan-electric-power-w}
+\paragraph{Refrigeration Air Chiller System Condenser Fan Electricity Rate {[}W{]}}\label{refrigeration-air-chiller-system-condenser-fan-electric-power-w}
 
 This output is the electric input to the system's condenser fan(s) in Watts.
 
-\paragraph{Refrigeration Air Chiller System Condenser Fan Electric Energy {[}J{]}}\label{refrigeration-air-chiller-system-condenser-fan-electric-energy-j}
+\paragraph{Refrigeration Air Chiller System Condenser Fan Electricity Energy {[}J{]}}\label{refrigeration-air-chiller-system-condenser-fan-electric-energy-j}
 
 This is the electricity consumption of the system's condenser fan(s) in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
@@ -2817,7 +2817,7 @@ Refrigeration:Condenser:EvaporativeCooled,
 
 \begin{itemize}
 \item
-  Zone,Average, Refrigeration System Condenser Fan Electric Power {[}W{]}
+  Zone,Average, Refrigeration System Condenser Fan Electricity Rate {[}W{]}
 \item
   Zone, Sum, Refrigeration System Condenser Fan Electric Consumption {[}J{]}
 \end{itemize}
@@ -2842,13 +2842,13 @@ FOR CONDENSERS COOLING SYSTEMS SERVING CASES AND/OR WALKINS:
 \item
   Zone, Sum, Refrigeration System Condenser Defrost Recovered Heat Transfer Energy {[}J{]}
 \item
-  Zone,Average, Refrigeration System Condenser Pump Electric Power {[}W{]}
+  Zone,Average, Refrigeration System Condenser Pump Electricity Rate {[}W{]}
 \item
-  Zone, Sum, Refrigeration System Condenser Pump Electric Energy {[}J{]}
+  Zone, Sum, Refrigeration System Condenser Pump Electricity Energy {[}J{]}
 \item
-  Zone,Average, Refrigeration System Condenser Basin Heater Electric Power {[}W{]}
+  Zone,Average, Refrigeration System Condenser Basin Heater Electricity Rate {[}W{]}
 \item
-  Zone, Sum, Refrigeration System Condenser Basin Heater Electric Energy {[}J{]}
+  Zone, Sum, Refrigeration System Condenser Basin Heater Electricity Energy {[}J{]}
 \item
   Zone,Average, Refrigeration System Condenser Evaporated Water Volume Flow Rate~ {[}m3/s{]}
 \item
@@ -2875,13 +2875,13 @@ FOR CONDENSERS COOLING SYSTEMS SERVING AIR CHILLERS:
 \item
   HVAC, Sum, Refrigeration Air Chiller System Condenser Defrost Recovered Heat Transfer Energy {[}J{]}
 \item
-  HVAC,Average, Refrigeration Air Chiller System Condenser Pump Electric Power {[}W{]}
+  HVAC,Average, Refrigeration Air Chiller System Condenser Pump Electricity Rate {[}W{]}
 \item
-  HVAC, Sum, Refrigeration Air Chiller System Condenser Pump Electric Energy {[}J{]}
+  HVAC, Sum, Refrigeration Air Chiller System Condenser Pump Electricity Energy {[}J{]}
 \item
-  HVAC,Average, Refrigeration Air Chiller System Condenser Basin Heater Electric Power {[}W{]}
+  HVAC,Average, Refrigeration Air Chiller System Condenser Basin Heater Electricity Rate {[}W{]}
 \item
-  HVAC, Sum, Refrigeration Air Chiller System Condenser Basin Heater Electric Energy {[}J{]}
+  HVAC, Sum, Refrigeration Air Chiller System Condenser Basin Heater Electricity Energy {[}J{]}
 \item
   HVAC,Average, Refrigeration Air Chiller System Condenser Evaporated Water Volume Flow Rate {[}m3/s{]}
 \item
@@ -2890,11 +2890,11 @@ FOR CONDENSERS COOLING SYSTEMS SERVING AIR CHILLERS:
 
 \paragraph{FOR CONDENSERS ON SYSTEMS SERVING CASES AND/OR WALKINS:}\label{for-condensers-on-systems-serving-cases-andor-walkins-1}
 
-\paragraph{Refrigeration System Condenser Fan Electric Power {[}W{]}}\label{refrigeration-system-condenser-fan-electric-power-w-1}
+\paragraph{Refrigeration System Condenser Fan Electricity Rate {[}W{]}}\label{refrigeration-system-condenser-fan-electric-power-w-1}
 
 This output is the electric input to the system's condenser fan(s) in Watts.
 
-\paragraph{Refrigeration System Condenser Fan Electric Energy {[}J{]}}\label{refrigeration-system-condenser-fan-electric-energy-j}
+\paragraph{Refrigeration System Condenser Fan Electricity Energy {[}J{]}}\label{refrigeration-system-condenser-fan-electric-energy-j}
 
 This is the electricity consumption of the system's condenser fan(s) in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
@@ -2930,19 +2930,19 @@ This is the total heat recovered from the condenser refrigerant inlet flow for d
 
 This is the total heat recovered from the condenser refrigerant inlet flow for defrost purposes within the refrigeration system for the timestep being reported.
 
-\paragraph{Refrigeration System Condenser Pump Electric Power {[}W{]}}\label{refrigeration-system-condenser-pump-electric-power-w}
+\paragraph{Refrigeration System Condenser Pump Electricity Rate {[}W{]}}\label{refrigeration-system-condenser-pump-electric-power-w}
 
 This is the electrical power requirement in Watts for the timestep being reported for the water pump used with evaporative cooling of the condenser.
 
-\paragraph{Refrigeration System Condenser Pump Electric Energy {[}J{]}}\label{refrigeration-system-condenser-pump-electric-energy-j}
+\paragraph{Refrigeration System Condenser Pump Electricity Energy {[}J{]}}\label{refrigeration-system-condenser-pump-electric-energy-j}
 
 This is the electricity consumption in Joules of the water pump used with evaporative cooling of the condenser for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant. Use of an optional subkey category is also available, with default to the General end-use subcategory (Ref. Output:Meter objects).
 
-\paragraph{Refrigeration System Condenser Basin Heater Electric Power {[}W{]}}\label{refrigeration-system-condenser-basin-heater-electric-power-w}
+\paragraph{Refrigeration System Condenser Basin Heater Electricity Rate {[}W{]}}\label{refrigeration-system-condenser-basin-heater-electric-power-w}
 
 This is the electrical power requirement in Watts for the timestep being reported for the water heater in the basin of the evaporative system used to cool the condenser.
 
-\paragraph{Refrigeration System Condenser Basin Heater Electric Energy {[}J{]}}\label{refrigeration-system-condenser-basin-heater-electric-energy-j}
+\paragraph{Refrigeration System Condenser Basin Heater Electricity Energy {[}J{]}}\label{refrigeration-system-condenser-basin-heater-electric-energy-j}
 
 This is the electricity consumption in Joules of the water heater used to prevent freezing of the evaporative cooling system for the condenser for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant. Use of an optional subkey category is also available, with default to the General end-use subcategory (Ref. Output:Meter objects).
 
@@ -2956,11 +2956,11 @@ This is the water consumed by evaporation in m\(^{3}\) while providing evaporati
 
 \paragraph{FOR CONDENSERS ON SYSTEMS SERVING AIR CHILLERS:}\label{for-condensers-on-systems-serving-air-chillers-1}
 
-\paragraph{Refrigeration Air Chiller System Condenser Fan Electric Power {[}W{]}}\label{refrigeration-air-chiller-system-condenser-fan-electric-power-w-1}
+\paragraph{Refrigeration Air Chiller System Condenser Fan Electricity Rate {[}W{]}}\label{refrigeration-air-chiller-system-condenser-fan-electric-power-w-1}
 
 This output is the electric input to the system's condenser fan(s) in Watts.
 
-\paragraph{Refrigeration Air Chiller System Condenser Fan Electric Energy {[}J{]}}\label{refrigeration-air-chiller-system-condenser-fan-electric-energy-j-1}
+\paragraph{Refrigeration Air Chiller System Condenser Fan Electricity Energy {[}J{]}}\label{refrigeration-air-chiller-system-condenser-fan-electric-energy-j-1}
 
 This is the electricity consumption of the system's condenser fan(s) in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
@@ -2996,19 +2996,19 @@ This is the total heat recovered from the condenser refrigerant inlet flow for d
 
 This is the total heat recovered from the condenser refrigerant inlet flow for defrost purposes within the refrigeration system for the timestep being reported.
 
-\paragraph{Refrigeration Air Chiller System Condenser Pump Electric Power {[}W{]}}\label{refrigeration-air-chiller-system-condenser-pump-electric-power-w}
+\paragraph{Refrigeration Air Chiller System Condenser Pump Electricity Rate {[}W{]}}\label{refrigeration-air-chiller-system-condenser-pump-electric-power-w}
 
 This is the electrical power requirement in Watts for the timestep being reported for the water pump used with evaporative cooling of the condenser.
 
-\paragraph{Refrigeration Air Chiller System Condenser Pump Electric Energy {[}J{]}}\label{refrigeration-air-chiller-system-condenser-pump-electric-energy-j}
+\paragraph{Refrigeration Air Chiller System Condenser Pump Electricity Energy {[}J{]}}\label{refrigeration-air-chiller-system-condenser-pump-electric-energy-j}
 
 This is the electricity consumption in Joules of the water pump used with evaporative cooling of the condenser for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant. Use of an optional subkey category is also available, with default to the General end-use subcategory (Ref. Output:Meter objects).
 
-\paragraph{Refrigeration Air Chiller System Condenser Basin Heater Electric Power {[}W{]}}\label{refrigeration-air-chiller-system-condenser-basin-heater-electric-power-w}
+\paragraph{Refrigeration Air Chiller System Condenser Basin Heater Electricity Rate {[}W{]}}\label{refrigeration-air-chiller-system-condenser-basin-heater-electric-power-w}
 
 This is the electrical power requirement in Watts for the timestep being reported for the water heater in the basin of the evaporative system used to cool the condenser.
 
-\paragraph{Refrigeration Air Chiller System Condenser Basin Heater Electric Energy {[}J{]}}\label{refrigeration-air-chiller-system-condenser-basin-heater-electric-energy-j}
+\paragraph{Refrigeration Air Chiller System Condenser Basin Heater Electricity Energy {[}J{]}}\label{refrigeration-air-chiller-system-condenser-basin-heater-electric-energy-j}
 
 This is the electricity consumption in Joules of the water heater used to prevent freezing of the evaporative cooling system for the condenser for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant. Use of an optional subkey category is also available, with default to the General end-use subcategory (Ref. Output:Meter objects).
 
@@ -3423,9 +3423,9 @@ Refrigeration:GasCooler:AirCooled,
 \item
   Zone,Sum, Refrigeration Transcritical System Gas Cooler Heat Transfer Energy {[}J{]}
 \item
-  Zone,Average, Refrigeration Transcritical System Gas Cooler Fan Electric Power {[}W{]}
+  Zone,Average, Refrigeration Transcritical System Gas Cooler Fan Electricity Rate {[}W{]}
 \item
-  Zone,Sum, Refrigeration Transcritical System Gas Cooler Fan Electric Energy {[}J{]}
+  Zone,Sum, Refrigeration Transcritical System Gas Cooler Fan Electricity Energy {[}J{]}
 \item
   Zone,Average, Refrigeration Transcritical System Gas Cooler Outlet Temperature {[}C{]}
 \item
@@ -3444,11 +3444,11 @@ This output is the total heat transfer rate from the gas cooler in Watts, and in
 
 This output is the total heat transferred from the gas cooler to the surroundings, in Joules, for the timestep being reported.
 
-\paragraph{Refrigeration Transcritical System Gas Cooler Fan Electric Power {[}W{]}}\label{refrigeration-transcritical-system-gas-cooler-fan-electric-power-w}
+\paragraph{Refrigeration Transcritical System Gas Cooler Fan Electricity Rate {[}W{]}}\label{refrigeration-transcritical-system-gas-cooler-fan-electric-power-w}
 
 This output is the electric input to the system's gas cooler fan(s) in Watts.
 
-\paragraph{Refrigeration Transcritical System Gas Cooler Fan Electric Energy {[}J{]}}\label{refrigeration-transcritical-system-gas-cooler-fan-electric-energy-j}
+\paragraph{Refrigeration Transcritical System Gas Cooler Fan Electricity Energy {[}J{]}}\label{refrigeration-transcritical-system-gas-cooler-fan-electric-energy-j}
 
 This is the electricity consumption of the system's gas cooler fan(s) in Joules for the timestep being reported.~ This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
@@ -3678,9 +3678,9 @@ FOR SECONDARY SYSTEMS SERVING CASES AND/OR WALKINS:
 
 \begin{itemize}
 \item
-  Zone,Average,Refrigeration Secondary Loop Pump Electric Power {[}W{]}
+  Zone,Average,Refrigeration Secondary Loop Pump Electricity Rate {[}W{]}
 \item
-  Zone,Sum,Refrigeration Secondary Loop Pump Electric Energy {[}J{]}
+  Zone,Sum,Refrigeration Secondary Loop Pump Electricity Energy {[}J{]}
 \item
   Zone,Average,Refrigeration Secondary Loop Load Heat Transfer Rate {[}W{]}
 \item
@@ -3705,9 +3705,9 @@ FOR SECONDARY SYSTEMS SERVING AIR CHILLERS:
 
 \begin{itemize}
 \item
-  HVAC,Average,Refrigeration Air Chiller Secondary Loop Pump Electric Power {[}W{]}
+  HVAC,Average,Refrigeration Air Chiller Secondary Loop Pump Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Refrigeration Air Chiller Secondary Loop Pump Electric Energy {[}J{]}
+  HVAC,Sum,Refrigeration Air Chiller Secondary Loop Pump Electricity Energy {[}J{]}
 \item
   HVAC,Average,Refrigeration Air Chiller Secondary Loop Load Heat Transfer Rate {[}W{]}
 \item
@@ -3732,11 +3732,11 @@ FOR SECONDARY SYSTEMS SERVING AIR CHILLERS:
 
 \paragraph{FOR SECONDARY SYSTEMS SERVING CASES AND/OR WALKINS:}\label{for-secondary-systems-serving-cases-andor-walkins}
 
-\paragraph{Refrigeration Secondary Loop Pump Electric Power {[}W{]}}\label{refrigeration-secondary-loop-pump-electric-power-w}
+\paragraph{Refrigeration Secondary Loop Pump Electricity Rate {[}W{]}}\label{refrigeration-secondary-loop-pump-electric-power-w}
 
 This output is the total electric power input to the pump(s) in Watts.
 
-\paragraph{Refrigeration Secondary Loop Pump Electric Energy {[}J{]}}\label{refrigeration-secondary-loop-pump-electric-energy-j}
+\paragraph{Refrigeration Secondary Loop Pump Electricity Energy {[}J{]}}\label{refrigeration-secondary-loop-pump-electric-energy-j}
 
 This is the electricity consumption of the system's pump(s) in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
@@ -3782,11 +3782,11 @@ This is the total heat transferred to the receiver in Joules for the timestep be
 
 \paragraph{FOR SECONDARY SYSTEMS SERVING AIR CHILLERS:}\label{for-secondary-systems-serving-air-chillers}
 
-\paragraph{Refrigeration Air Chiller Secondary Loop Pump Electric Power {[}W{]}}\label{refrigeration-air-chiller-secondary-loop-pump-electric-power-w}
+\paragraph{Refrigeration Air Chiller Secondary Loop Pump Electricity Rate {[}W{]}}\label{refrigeration-air-chiller-secondary-loop-pump-electric-power-w}
 
 This output is the total electric power input to the pump(s) in Watts.
 
-\paragraph{Refrigeration Air Chiller Secondary Loop Pump Electric Energy {[}J{]}}\label{refrigeration-air-chiller-secondary-loop-pump-electric-energy-j}
+\paragraph{Refrigeration Air Chiller Secondary Loop Pump Electricity Energy {[}J{]}}\label{refrigeration-air-chiller-secondary-loop-pump-electric-energy-j}
 
 This is the electricity consumption of the system's pump(s) in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
@@ -4192,17 +4192,17 @@ The following is an example input for a refrigeration air chiller.
 \item
   HVAC,Average, Refrigeration Zone Air Chiller Water Removed Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Refrigeration Zone Air Chiller Total Electric Power {[}W{]}
+  HVAC,Average,Refrigeration Zone Air Chiller Total Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Refrigeration Zone Air Chiller Total Electric Energy {[}J{]}
+  HVAC,Sum,Refrigeration Zone Air Chiller Total Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Refrigeration Zone Air Chiller Fan Electric Power {[}W{]}
+  HVAC,Average,Refrigeration Zone Air Chiller Fan Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Refrigeration Zone Air Chiller Fan Electric Energy {[}J{]}
+  HVAC,Sum,Refrigeration Zone Air Chiller Fan Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Refrigeration Zone Air Chiller Heater Electric Power {[}W{]}
+  HVAC,Average,Refrigeration Zone Air Chiller Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Refrigeration Zone Air Chiller Heater Electric Energy {[}J{]}
+  HVAC,Sum,Refrigeration Zone Air Chiller Heater Electricity Energy {[}J{]}
 \item
   HVAC,Average,Refrigeration Zone Air Chiller Sensible Heat Ratio {[]}
 \item
@@ -4225,9 +4225,9 @@ The following is an example input for a refrigeration air chiller.
 
 \begin{itemize}
 \item
-  HVAC,Average,Refrigeration Zone Air Chiller Defrost Electric Power {[}W{]}
+  HVAC,Average,Refrigeration Zone Air Chiller Defrost Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Refrigeration Zone Air Chiller Defrost Electric Energy {[}J{]}
+  HVAC,Sum,Refrigeration Zone Air Chiller Defrost Electricity Energy {[}J{]}
 \end{itemize}
 
 \textbf{\emph{Report for each Zone exchanging energy with the Air Chiller}}
@@ -4285,19 +4285,19 @@ This field is the latent cooling (dehumidification) of the Air Chiller evaporato
 
 This field is the latent cooling (dehumidification) of the Air Chiller evaporator coil in kilograms per second over the timestep being reported.
 
-\paragraph{Refrigeration Zone Air Chiller Total Electric Power {[}W{]}}\label{refrigeration-zone-air-chiller-total-electric-power-w}
+\paragraph{Refrigeration Zone Air Chiller Total Electricity Rate {[}W{]}}\label{refrigeration-zone-air-chiller-total-electric-power-w}
 
 This field is the total electricity (fan, heaters, lights, and electric defrost) used by the Air Chiller in Watts.
 
-\paragraph{Refrigeration Zone Air Chiller Total Electric Energy {[}J{]}}\label{refrigeration-zone-air-chiller-total-electric-energy-j}
+\paragraph{Refrigeration Zone Air Chiller Total Electricity Energy {[}J{]}}\label{refrigeration-zone-air-chiller-total-electric-energy-j}
 
 This field is the electricity (fan, heaters, lights, and electric defrost)used by the Refrigeration chiller in Joules over the timestep being reported.
 
-\paragraph{Refrigeration Zone Air Chiller Fan Electric Power {[}W{]}}\label{refrigeration-zone-air-chiller-fan-electric-power-w}
+\paragraph{Refrigeration Zone Air Chiller Fan Electricity Rate {[}W{]}}\label{refrigeration-zone-air-chiller-fan-electric-power-w}
 
 This field is the electric power input to the Air Chiller fan(s) in Watts.
 
-\paragraph{Refrigeration Zone Air Chiller Fan Electric Energy ~{[}J{]}}\label{refrigeration-zone-air-chiller-fan-electric-energy-j}
+\paragraph{Refrigeration Zone Air Chiller Fan Electricity Energy ~{[}J{]}}\label{refrigeration-zone-air-chiller-fan-electric-energy-j}
 
 This field is the electricity consumption of the Air Chiller fan(s) in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. Output:Meter objects).
 
@@ -4305,15 +4305,15 @@ This field is the electricity consumption of the Air Chiller fan(s) in Joules ov
 
 This field is the electric power input to the Air Chiller heaters in Watts.
 
-\paragraph{Refrigeration Zone Air Chiller Heater Electric Energy {[}J{]}}\label{refrigeration-zone-air-chiller-heater-electric-energy-j}
+\paragraph{Refrigeration Zone Air Chiller Heater Electricity Energy {[}J{]}}\label{refrigeration-zone-air-chiller-heater-electric-energy-j}
 
 This field is the total electricity consumption of the Air Chiller heaters in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. Output:Meter objects).
 
-\paragraph{Refrigeration Zone Air Chiller Defrost Electric Power~ {[}W{]}}\label{refrigeration-zone-air-chiller-defrost-electric-power-w}
+\paragraph{Refrigeration Zone Air Chiller Defrost Electricity Rate~ {[}W{]}}\label{refrigeration-zone-air-chiller-defrost-electric-power-w}
 
 This field is the electric power input to the Air Chiller electric defrost heater(s) in Watts. This output is available if case defrost type is Electric.
 
-\paragraph{Refrigeration Zone Air Chiller Defrost Electric Energy {[}J{]}}\label{refrigeration-zone-air-chiller-defrost-electric-energy-j}
+\paragraph{Refrigeration Zone Air Chiller Defrost Electricity Energy {[}J{]}}\label{refrigeration-zone-air-chiller-defrost-electric-energy-j}
 
 This field is the total electricity consumption of the Air Chiller electric defrost heater(s) in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. Output:Meter objects). This output is available if case defrost type is Electric.
 

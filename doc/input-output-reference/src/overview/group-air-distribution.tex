@@ -8,12 +8,12 @@ The only numeric input is the design primary air flow rate. This item is input j
 
 The next series of names refer to nodes for the various inlet and outlet points of the air loop. The air loop starts where the zone equipment ends. This is a single point consisting of the return air duct once all of the zone return air streams have been collected (if the loop has a return path). While in reality, there is really only one point, for clarity within the simulation components and consistency with the other HVAC loop sections, this point in the systems is defined as two points: one that resides with the zone equipment simulation and one that is acted upon by the air loop simulation. Both node names must be entered into the input file (if the loop has a return path), and both nodes must have unique names. Similarly, the end points of the air loop that also correspond to the beginning points of the zone equipment loop must also be defined. These consist of names referencing lists of up to three pairs of node names as shown below. Up to three air loop outlets are allowed to accommodate the simulation of three deck systems.
 
-\paragraph{Schedules And Availability Manager}\label{schedules-and-availability-manager}
+\paragraph{Schedules And Availability Manager}
 Regarding component schedules, the general rule is don't schedule any components except the supply fan and the corresponding availability manager(s). Beyond that, every component should always be available and let the controls determine what runs or doesn't run. If a component other than the supply fan is scheduled off, then it will remain off even if the night cycle manager turns on the system.
 
 \subsubsection{Inputs}\label{inputs-002}
 
-\paragraph{Field: Name}\label{field-name-002}
+\paragraph{Field: Name}
 
 This field is a unique, user assigned name for a single instance of an AirLoopHVAC object. Any other object referencing this AirLoopHVAC will use this name.
 
@@ -160,6 +160,56 @@ Reports the total outdoor air volume that has been supplied to a zone over the r
 
 Reports the air changes per hour in the zone due to the outside fresh air supplied by mechanical ventilation system.
 
+\paragraph{Zone Target Voz Ventilation Flow Rate {[}m3/s{]}}\label{zone-target-voz-ventilation-flow-rate}
+The target ventilation flow rate \(V_{oz-dyn}\) at standard density at the current timestep as defined by the zone Design Specification Outdoor Air Object (\hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir}).
+
+\paragraph{Zone Ventilation Below Target Voz Time {[}hr{]}}\label{zone-ventilation-below-target-voz-time}
+The time that the zone total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% below the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Zone Ventilation At Target Voz Time {[}hr{]}}\label{zone-ventilation-at-target-voz-time}
+The time that the zone total ventilation rate (mechanical ventilation plus natural ventilation) is within 1\% of the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Zone Ventilation Above Target Voz Time {[}hr{]}}\label{zone-ventilation-above-target-voz-time}
+The time that the zone total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% above the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Zone Ventilation When Unoccupied Time {[}hr{]}}\label{zone-ventilation-when-unoccupied-time}
+The time that the zone total ventilation rate (mechanical ventilation plus natural ventilation) is greater than zero when the zone is unoccupied.
+
+\paragraph{Facility Any Zone Ventilation Below Target Voz Time {[}hr{]}}\label{facility-any-zone-ventilation-below-target-voz-time}
+The time that any zone's total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% below the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Facility All Zones Ventilation At Target Voz Time {[}hr{]}}\label{facility-all-zones-ventilation-at-target-voz-time}
+The time that every zone's total ventilation rate (mechanical ventilation plus natural ventilation) is within 1\% of the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Facility Any Zone Ventilation Above Target Voz Time {[}hr{]}}\label{facility-any-zone-ventilation-above-target-voz-time}
+The time that any zone's total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% above the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Facility Any Zone Ventilation When Unoccupied Time {[}hr{]}}\label{facility-any-zone-ventilation-when-unoccupied-time}
+The time that any zone's total ventilation rate (mechanical ventilation plus natural ventilation) is greater than zero when the zone is unoccupied.
+
+\paragraph{Air System Mechanical Ventilation Flow Rate {[}m3/s{]}}\label{air-system-mechanical-ventilation-flow-rate}
+The current airloop mechanical ventilation flow rate at standard density.
+
+\paragraph{Air System Natural Ventilation Flow Rate {[}m3/s{]}}\label{air-system-natural-ventilation-flow-rate}
+The sum of the natural ventilation flow rate at standard density at the current timestep for each zone on the airloop. If any zone terminal unit has a Design Specification Air Terminal Sizing Object  (\hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing}) then the natural ventilation rate for that zone is scaled by the Fraction of Minimum Outdoor Air Flow value.
+
+\paragraph{Air System Target Voz Ventilation Flow Rate {[}m3/s{]}}\label{air-system-target-voz-ventilation-flow-rate}
+The sum of the target ventilation flow rates \(V_{oz-dyn}\) at standard density at the current timestep for each zone on the airloop. If any zone terminal unit has a Design Specification Air Terminal Sizing Object  (\hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing}) then the target ventilation rate for that zone is scaled by the Fraction of Minimum Outdoor Air Flow value.
+
+\paragraph{Air System Ventilation Below Target Voz Time {[}hr{]}}\label{air-system-ventilation-below-target-voz-time}
+The time that the airloop total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% below the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Air System Ventilation At Target Voz Time {[}hr{]}}\label{air-system-ventilation-at-target-voz-time}
+The time that the airloop total ventilation rate (mechanical ventilation plus natural ventilation) is within 1\% of the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Air System Ventilation Above Target Voz Time {[}hr{]}}\label{air-system-ventilation-above-target-voz-time}
+The time that the airloop total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% above the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Air System Ventilation When Unoccupied Time {[}hr{]}}\label{air-system-ventilation-when-unoccupied-time}
+The time that the airloop total ventilation rate (mechanical ventilation plus natural ventilation) is greater than zero when all of the zones on the airloop are unoccupied.
+
+
+
 The example syntax below shows the basic ventilation flow variables reported on an hourly basis.
 
 \begin{itemize}
@@ -177,6 +227,38 @@ The example syntax below shows the basic ventilation flow variables reported on 
   Output:Variable,*,Zone Mechanical Ventilation Current Density Volume,Hourly;
 \item
   Output:Variable,*, Zone Mechanical Ventilation Air Changes per Hour,Hourly;
+\item
+  Output:Variable,*, Zone Target Voz Ventilation Flow Rate,Hourly;
+\item
+  Output:Variable,*, Zone Ventilation Below Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Zone Ventilation At Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Zone Ventilation Above Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Zone Ventilation When Unoccupied Time,Hourly;
+\item
+  Output:Variable,*, Facility Any Zone Ventilation Below Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Facility All Zones Ventilation At Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Facility Any Zone Ventilation Above Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Facility Any Zone Ventilation When Unoccupied Time,Hourly;
+\item
+  Output:Variable,*, Air System Mechanical Ventilation Flow Rate,Hourly;
+\item
+  Output:Variable,*, Air System Natural Ventilation Flow Rate,Hourly;
+\item
+  Output:Variable,*, Air System Target Voz Ventilation Flow Rate,Hourly;
+\item
+  Output:Variable,*, Air System Ventilation Below Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Air System Ventilation At Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Air System Ventilation Above Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Air System Ventilation When Unoccupied Time,Hourly;
 \end{itemize}
 
 \paragraph{Ventilation Load Reports}\label{ventilation-load-reports}
@@ -374,13 +456,17 @@ Steam Consumption for the system (Joules).
 
 Chilled Water Consumption for the system (Joules).
 
-\subsubsection{Air System Electric Energy}\label{air-system-electric-energy}
+\subsubsection{Air System Electricity Energy}\label{air-system-electric-energy}
 
 Electric Consumption for the system (Joules).
 
-\subsubsection{Air System Gas Energy}\label{air-system-gas-energy}
+\subsubsection{Air System NaturalGas Energy}\label{air-system-gas-energy}
 
-Gas (Natural Gas and Propane) Consumption for the system (Joules).
+Natural Gas Consumption for the system (Joules).
+
+\subsubsection{Air System Propane Energy}
+
+Propane Consumption for the system (Joules).
 
 \subsubsection{Air System Water Volume}\label{air-system-water-volume}
 
@@ -398,8 +484,8 @@ The Standard reports file includes these variables reporting in the Tabular repo
       Air System Hot Water Energy ,  SumOrAverage,
       Air System Steam Energy ,  SumOrAverage,
       Air System Chilled Water Energy,  SumOrAverage,
-      Air System Electric Energy,  SumOrAverage,
-      Air System Gas Energy,  SumOrAverage,
+      Air System Electricity Energy,  SumOrAverage,
+      Air System NaturalGas Energy,  SumOrAverage,
       Air System Water Volume,  SumOrAverage;
 \end{lstlisting}
 
@@ -479,7 +565,7 @@ Energy removed from air loop by user defined air terminal units (Joules)
 
 Reporting System Component Energy Use consists of eleven output variables that report the total energy consumption (in Joules) of system components by energy type and coil type. Electric energy consumption is reported for fans, heating and cooling coils in packaged (DX) systems, electric resistance heating coils, humidifiers, evaporative coolers and desiccant dehumidifiers.
 
-\subsubsection{Air System Fan Electric Energy}\label{air-system-fan-electric-energy}
+\subsubsection{Air System Fan Electricity Energy}\label{air-system-fan-electric-energy}
 
 Electric consumption for fans. (Joules)
 
@@ -491,35 +577,39 @@ Consumption for heating coil hot water (both purchased and plant supplied) (Joul
 
 Consumption for cooling coil chilled water (both purchased and plant supplied) (Joules)
 
-\subsubsection{Air System DX Heating Coil Electric Energy}\label{air-system-dx-heating-coil-electric-energy}
+\subsubsection{Air System DX Heating Coil Electricity Energy}\label{air-system-dx-heating-coil-electric-energy}
 
 Compressor plus condenser fan electricity use. (Joules)
 
-\subsubsection{Air System DX Cooling Coil Electric Energy}\label{air-system-dx-cooling-coil-electric-energy}
+\subsubsection{Air System DX Cooling Coil Electricity Energy}\label{air-system-dx-cooling-coil-electric-energy}
 
 Compressor plus condenser fan electricity use. (Joules)
 
-\subsubsection{Air System Heating Coil Electric Energy}\label{air-system-heating-coil-electric-energy}
+\subsubsection{Air System Heating Coil Electricity Energy}\label{air-system-heating-coil-electric-energy}
 
 Electricity consumption for the heating coil. (Joules)
 
-\subsubsection{Air System Heating Coil Gas Energy}\label{air-system-heating-coil-gas-energy}
+\subsubsection{Air System Heating Coil NaturalGas Energy}\label{air-system-heating-coil-gas-energy}
 
-Gas (Propane and Natural Gas) consumption for the heating coil. (Joules)
+Natural Gas consumption for the heating coil. (Joules)
+
+\subsubsection{Air System Heating Coil Propane Energy}\label{air-system-heating-coil-propane-energy}
+
+Propane consumption for the heating coil. (Joules)
 
 \subsubsection{Air System Heating Coil Steam Energy}\label{air-system-heating-coil-steam-energy}
 
 Steam consumption for the heating coil (steam coils). (Joules)
 
-\subsubsection{Air System Humidifier Electric Energy}\label{air-system-humidifier-electric-energy}
+\subsubsection{Air System Humidifier Electricity Energy}\label{air-system-humidifier-electric-energy}
 
 Electricity consumption for the humidifiers. (Joules)
 
-\subsubsection{Air System Evaporative Cooler Electric Energy}\label{air-system-evaporative-cooler-electric-energy}
+\subsubsection{Air System Evaporative Cooler Electricity Energy}\label{air-system-evaporative-cooler-electric-energy}
 
 Electricity consumption for the evaporative coolers. (Joules)
 
-\subsubsection{Air System Desiccant Dehumidifier Electric Energy}\label{air-system-desiccant-dehumidifier-electric-energy}
+\subsubsection{Air System Desiccant Dehumidifier Electricity Energy}\label{air-system-desiccant-dehumidifier-electric-energy}
 
 Electricity consumption for the desiccant dehumidifiers. (Joules)
 
@@ -533,17 +623,17 @@ The Standard reports file includes these variables reporting in the Tabular repo
     Output:Table:Monthly,
       Air Loop System Component Energy Use,       !- Name
       ,                        !- DigitsAfterDecimal
-      Air System Fan Electric Energy,  SumOrAverage,
+      Air System Fan Electricity Energy,  SumOrAverage,
       Air System Heating Coil Hot Water Energy,  SumOrAverage,
       Air System Cooling Coil Chilled Water Energy,  SumOrAverage,
-      Air System DX Heating Coil Electric Energy,  SumOrAverage,
-      Air System DX Cooling Coil Electric Energy,  SumOrAverage,
-      Air System Heating Coil Electric Energy,  SumOrAverage,
+      Air System DX Heating Coil Electricity Energy,  SumOrAverage,
+      Air System DX Cooling Coil Electricity Energy,  SumOrAverage,
+      Air System Heating Coil Electricity Energy,  SumOrAverage,
       Air System Heating Coil Gas Energy,  SumOrAverage,
       Air System Heating Coil Steam Energy,  SumOrAverage,
-      Air System Humidifier Electric Energy,  SumOrAverage,
-      Air System Evaporative Cooler Electric Energy,  SumOrAverage,
-      Air System Desiccant Dehumidifier Electric Energy,  SumOrAverage;
+      Air System Humidifier Electricity Energy,  SumOrAverage,
+      Air System Evaporative Cooler Electricity Energy,  SumOrAverage,
+      Air System Desiccant Dehumidifier Electricity Energy,  SumOrAverage;
 \end{lstlisting}
 
 \subsection{Overall Air Loop Syntax}\label{overall-air-loop-syntax}
@@ -813,7 +903,7 @@ The name of a specific \textbf{\hyperref[airflownetworkmultizonewindpressurecoef
 
 This field is used to specify whether the pressure curve is symmetric or not. \textbf{Yes} for curves that should be evaluated from 0 to 180 degrees. \textbf{No} for curves that should be evaluated from 0 to 360 degrees.
 
-\paragraph{Field: Wind Angle Type}\label{field-wind-angle-type}
+\paragraph{Field: Wind Angle Type}
 
 This field is used to specify whether the angle used to compute the wind pressure coefficient is absolute or relative. \textbf{Relative} for computing the angle between the wind direction and the surface azimuth. \textbf{Absolute} for using the wind direction angle directly.
 

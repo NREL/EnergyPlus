@@ -1111,7 +1111,7 @@ public: // Subscript
 	T const &
 	operator []( size_type const i ) const
 	{
-		assert( i < std::numeric_limits< int >::max() );
+		assert( i < std::numeric_limits< size_type >::max() );
 		assert( contains( static_cast< int >( i + 1 ) ) );
 		return data_[ k_ + ( m_ * ( i + 1 ) ) ];
 	}

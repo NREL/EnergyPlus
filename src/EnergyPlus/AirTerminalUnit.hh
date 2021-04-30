@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,9 +52,13 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 // types of air terminal units, refactored from old DataDefineEquip
 enum AirTerminalUnitType
@@ -115,8 +119,9 @@ protected: // Assignment
     AirTerminalUnit &operator=(AirTerminalUnit &&) = default;
 #endif
 
-public:                                                  // Methods
-    virtual void simulate(bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
+public: // Methods
+    virtual void simulate(EnergyPlusData &state,
+                          bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                           Real64 &NonAirSysOutput        // convective cooling by the beam system [W]
                           ) = 0;
 

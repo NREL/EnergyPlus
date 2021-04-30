@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,50 +55,41 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+
+// Forward declarations
+struct EnergyPlusData;
 
 #define EP_HBIRE_SEQ
 
 namespace HeatBalanceIntRadExchange {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int MaxNumOfRadEnclosureSurfs; // Max saved to get large enough space for SurfaceTempInKto4th
-
-    extern bool CarrollMethod;  // Use Carroll MRT method
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceIntRadExchange
-
-    // Functions
-    void clear_state();
-
-    void CalcInteriorRadExchange(Array1S<Real64> const SurfaceTemp,       // Current surface temperatures
+    void CalcInteriorRadExchange(EnergyPlusData &state,
+                                 Array1S<Real64> const SurfaceTemp,       // Current surface temperatures
                                  int const SurfIterations,                // Number of iterations in calling subroutine
-                                 Array1D<Real64> &NetLWRadToSurf,          // Net long wavelength radiant exchange from other surfaces
+                                 Array1D<Real64> &NetLWRadToSurf,         // Net long wavelength radiant exchange from other surfaces
                                  Optional_int_const ZoneToResimulate = _, // if passed in, then only calculate for this zone
                                  std::string const &CalledFrom = "");
 
-    void UpdateMovableInsulationFlag(bool &MovableInsulationChange, // set to true if there is a change in the movable insulation state
+    void UpdateMovableInsulationFlag(EnergyPlusData &state,
+                                     bool &MovableInsulationChange, // set to true if there is a change in the movable insulation state
                                      int const SurfNum              // surface number of surface being investigated
     );
 
-    void InitInteriorRadExchange(OutputFiles &outputFiles);
+    void InitInteriorRadExchange(EnergyPlusData &state);
 
-    void InitSolarViewFactors(OutputFiles &outputFiles);
+    void InitSolarViewFactors(EnergyPlusData &state);
 
-    void AlignInputViewFactors(std::string const &cCurrentModuleObject, // Object type
+    void AlignInputViewFactors(EnergyPlusData &state,
+                               std::string const &cCurrentModuleObject, // Object type
                                bool &ErrorsFound                        // True when errors are found
     );
 
-    void GetInputViewFactors(std::string const &EnclosureName, // Needed to check for user input view factors.
+    void GetInputViewFactors(EnergyPlusData &state,
+                             std::string const &EnclosureName, // Needed to check for user input view factors.
                              int const N,                      // NUMBER OF SURFACES
                              Array2A<Real64> F,                // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
                              const Array1D_int &SPtr,          // pointer to actual surface number
@@ -106,7 +97,8 @@ namespace HeatBalanceIntRadExchange {
                              bool &ErrorsFound                 // True when errors are found in number of fields vs max args
     );
 
-    void GetInputViewFactorsbyName(std::string const &ZoneName, // Needed to check for user input view factors.
+    void GetInputViewFactorsbyName(EnergyPlusData &state,
+                                   std::string const &ZoneName, // Needed to check for user input view factors.
                                    int const N,                 // NUMBER OF SURFACES
                                    Array2A<Real64> F,           // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
                                    const Array1D_int &SPtr,     // pointer to actual surface number
@@ -114,7 +106,8 @@ namespace HeatBalanceIntRadExchange {
                                    bool &ErrorsFound            // True when errors are found in number of fields vs max args
     );
 
-    void CalcApproximateViewFactors(int const N,                    // NUMBER OF SURFACES
+    void CalcApproximateViewFactors(EnergyPlusData &state,
+                                    int const N,                    // NUMBER OF SURFACES
                                     const Array1D<Real64> &A,       // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
                                     const Array1D<Real64> &Azimuth, // Facing angle of the surface (in degrees)
                                     const Array1D<Real64> &Tilt,    // Tilt angle of the surface (in degrees)
@@ -122,7 +115,8 @@ namespace HeatBalanceIntRadExchange {
                                     const Array1D_int &SPtr         // pointer to REAL(r64) surface number (for error message)
     );
 
-    void FixViewFactors(int const N,                     // NUMBER OF SURFACES
+    void FixViewFactors(EnergyPlusData &state,
+                        int const N,                     // NUMBER OF SURFACES
                         const Array1D<Real64> &A,        // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
                         Array2A<Real64> F,               // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
                         std::string &enclName,           // Name of Enclosure being fixed
@@ -134,29 +128,32 @@ namespace HeatBalanceIntRadExchange {
                         Real64 &RowSum                   // RowSum of Fixed
     );
 
-    void CalcScriptF(int const N,             // Number of surfaces
+    void CalcScriptF(EnergyPlusData &state,
+                     int const N,              // Number of surfaces
                      Array1D<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-                     Array2<Real64> const &F, // DIRECT VIEW FACTOR MATRIX (N X N)
+                     Array2<Real64> const &F,  // DIRECT VIEW FACTOR MATRIX (N X N)
                      Array1D<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
-                     Array2<Real64> &ScriptF  // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
+                     Array2<Real64> &ScriptF   // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
     );
 
-    void CalcFMRT(int const N,             // Number of surfaces
+    void CalcFMRT(EnergyPlusData &state,
+                  int const N,              // Number of surfaces
                   Array1D<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
                   Array1D<Real64> &FMRT     // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
     );
 
-    void CalcFp(int const N,             // Number of surfaces
-                Array1D<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
-                Array1D<Real64> &FMRT,    // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
-                Array1D<Real64> &Fp       // VECTOR OF OPPENHEIM RESISTNACE VALUES
+    void CalcFp(int const N,            // Number of surfaces
+                Array1D<Real64> &EMISS, // VECTOR OF SURFACE EMISSIVITIES
+                Array1D<Real64> &FMRT,  // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
+                Array1D<Real64> &Fp     // VECTOR OF OPPENHEIM RESISTNACE VALUES
     );
 
     void CalcMatrixInverse(Array2<Real64> &A, // Matrix: Gets reduced to L\U form
                            Array2<Real64> &I  // Returned as inverse matrix
     );
 
-    int GetRadiantSystemSurface(std::string const &cCurrentModuleObject, // Calling Object type
+    int GetRadiantSystemSurface(EnergyPlusData &state,
+                                std::string const &cCurrentModuleObject, // Calling Object type
                                 std::string const &RadSysName,           // Calling Object name
                                 int const RadSysZoneNum,                 // Radiant system zone number
                                 std::string const &SurfaceName,          // Referenced surface name
@@ -164,6 +161,33 @@ namespace HeatBalanceIntRadExchange {
     );
 
 } // namespace HeatBalanceIntRadExchange
+
+struct HeatBalanceIntRadExchgData : BaseGlobalStruct
+{
+
+    int MaxNumOfRadEnclosureSurfs = 0;            // Max saved to get large enough space for SurfaceTempInKto4th
+    bool CarrollMethod = false;                   // Use Carroll MRT method
+    bool CalcInteriorRadExchangefirstTime = true; // Logical flag for one-time initializations
+
+    // variables added as part of strategy to reduce calculation time - Glazer 2011-04-22
+    Array1D<Real64> SurfaceTempRad;
+    Array1D<Real64> SurfaceTempInKto4th;
+    Array1D<Real64> SurfaceEmiss;
+    bool ViewFactorReport = false; // Flag to output view factor report in eio file
+    int LargestSurf = 0;
+
+    void clear_state() override
+    {
+        this->MaxNumOfRadEnclosureSurfs = 0;
+        this->CarrollMethod = false;
+        this->CalcInteriorRadExchangefirstTime = true;
+        this->SurfaceTempRad.deallocate();
+        this->SurfaceTempInKto4th.deallocate();
+        this->SurfaceEmiss.deallocate();
+        this->ViewFactorReport = false;
+        this->LargestSurf = 0;
+    }
+};
 
 } // namespace EnergyPlus
 

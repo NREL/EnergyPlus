@@ -1,0 +1,32 @@
+\documentclass{report}
+
+\usepackage{amssymb,amsmath}
+\usepackage[math]{mathspec}
+\usepackage[margin=0.75in, top=1in]{geometry}
+\usepackage{graphicx,grffile}
+\usepackage[table,svgnames]{xcolor}
+\usepackage{framed}
+\usepackage{longtable,booktabs}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage[per-mode=symbol]{siunitx}
+
+\title{Test Build with Dependencies}
+\author{Probably CI}
+\date{\today}
+
+\begin{document}
+
+    This document is a test to make sure the build system can build the rest of the documentation.
+    It should be built with XeTeX, which is the core dependency for building the E+ docs.
+
+    The package listing above should really be kept up to date with the main header.tex, maybe we could split out
+    these dependencies into a standalone file so we can import them from both header.tex and here.
+    One less manual step.
+
+    In any case, when a developer attempts to build this on a machine, it will have a nice benefit of installing the missing packages (if the install is set up to do that).
+    This is especially nice for CI package builds because miktex is acting weird while trying to build all the documents in multiple threads.
+    I think the package update manager is getting confused occasionally with everything going on.
+
+\end{document}

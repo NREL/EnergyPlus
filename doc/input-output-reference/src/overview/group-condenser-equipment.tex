@@ -53,7 +53,7 @@ Design\;Air\;Flow\;Rate = \frac{{0.5{\rho_{air}}(Fan\;power\;at\;Design\;Air\;Fl
 
 where a fan pressure rise of 190 Pascals and total fan efficiency of 0.5 are assumed.
 
-\paragraph{Field: Design Fan Power}\label{field-design-fan-power}
+\paragraph{Field: Design Fan Power}
 
 This numeric field contains the fan power (in watts) at the design air flow rate specified in the previous field. A value greater than zero must be specified regardless of the tower performance input method, or this field can be autosized. If autosized, the fan power is calculated as follows:
 
@@ -121,7 +121,7 @@ This numeric field specifies the design inlet air dry-bulb temperature of the to
 
 This numeric field specifies the design inlet air wet-bulb temperature of the tower. The default is \SI{25.6}{\celsius}.
 
-\paragraph{Field: Design Approach Temperature}\label{field-design-approach-temperature}
+\paragraph{Field: Design Approach Temperature}
 
 This numeric field specifies the design approach temperature of the tower corresponding to the design inlet air wet-bulb temperature and the design temperature range.
 The approach temperature should be the outlet water temperature minus the inlet air wet-bulb temperature at design conditions.
@@ -332,9 +332,9 @@ Three examples of an IDF specification for this object are shown below:
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Fan Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Fan Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Cooling Tower Fan Electric Energy {[}J{]}
+  HVAC,Sum,Cooling Tower Fan Electricity Energy {[}J{]}
 \item
   HVAC,Average,Cooling Tower Heat Transfer Rate {[}W{]}
 \item
@@ -399,14 +399,14 @@ IF specified:
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Basin Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Cooling Tower Basin Heater Electric Energy {[}J{]}
+  HVAC,Sum,Cooling Tower Basin Heater Electricity Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Cooling Tower Fan Electric Power {[}W{]}}\label{cooling-tower-fan-electric-power-w}
+\paragraph{Cooling Tower Fan Electricity Rate {[}W{]}}\label{cooling-tower-fan-electric-power-w}
 
-\paragraph{Cooling Tower Fan Electric Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j}
+\paragraph{Cooling Tower Fan Electricity Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j}
 
 These outputs are the electric power input to the tower fans. Consumption is metered on HeatRejection:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -422,9 +422,9 @@ This is the rate at which heat is removed from the condenser water loop by the t
 
 These outputs are the tower water inlet and outlet temperatures, and mass flow rate of the circulating condenser water loop.
 
-\paragraph{Cooling Tower Basin Heater Electric Power {[}W{]}}\label{cooling-tower-basin-heater-electric-power-w}
+\paragraph{Cooling Tower Basin Heater Electricity Rate {[}W{]}}\label{cooling-tower-basin-heater-electric-power-w}
 
-\paragraph{Cooling Tower Basin Heater Electric Energy {[}J{]}}\label{cooling-tower-basin-heater-electric-energy-j}
+\paragraph{Cooling Tower Basin Heater Electricity Energy {[}J{]}}\label{cooling-tower-basin-heater-electric-energy-j}
 
 These outputs are the electric power input to the tower basin heater. Consumption is metered on HeatRejection:Electricity, Electricity:Plant, and Electricity:Facility
 
@@ -878,9 +878,9 @@ Four examples of an IDF specification for this object are shown below:
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Fan Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Fan Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Cooling Tower Fan Electric Energy {[}J{]}
+  HVAC,Sum,Cooling Tower Fan Electricity Energy {[}J{]}
 \item
   HVAC,Average,Cooling Tower Heat Transfer Rate {[}W{]}
 \item
@@ -947,14 +947,14 @@ IF specified:
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Basin Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Cooling Tower Basin Heater Electric Energy {[}J{]}
+  HVAC,Sum,Cooling Tower Basin Heater Electricity Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Cooling Tower Fan Electric Power {[}W{]}}\label{cooling-tower-fan-electric-power-w-1}
+\paragraph{Cooling Tower Fan Electricity Rate {[}W{]}}\label{cooling-tower-fan-electric-power-w-1}
 
-\paragraph{Cooling Tower Fan Electric Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j-1}
+\paragraph{Cooling Tower Fan Electricity Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j-1}
 
 These outputs are the electric power input to the tower fans. Consumption is metered on HeatRejection:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -970,9 +970,9 @@ This is the rate at which heat is removed from the condenser water loop by the t
 
 These outputs are the tower water inlet and outlet temperatures, and mass flow rate.
 
-\paragraph{Cooling Tower Basin Heater Electric Power {[}W{]}}\label{cooling-tower-basin-heater-electric-power-w-1}
+\paragraph{Cooling Tower Basin Heater Electricity Rate {[}W{]}}\label{cooling-tower-basin-heater-electric-power-w-1}
 
-\paragraph{Cooling Tower Basin Heater Electric Energy {[}J{]}}\label{cooling-tower-basin-heater-electric-energy-j-1}
+\paragraph{Cooling Tower Basin Heater Electricity Energy {[}J{]}}\label{cooling-tower-basin-heater-electric-energy-j-1}
 
 These outputs are the electric power input to the tower basin heater. Consumption is metered on HeatRejection:Electricity, Electricity:Plant, and Electricity:Facility
 
@@ -1340,9 +1340,9 @@ An example IDF specification follows.
 \item
   HVAC,Average,Cooling Tower Heat Transfer Rate {[}W{]}
 \item
-  HVAC,Average,Cooling Tower Fan Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Fan Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Cooling Tower Fan Electric Energy {[}J{]}
+  HVAC,Sum,Cooling Tower Fan Electricity Energy {[}J{]}
 \item
   HVAC,Average,Cooling Tower Operating Cells Count {[]}
 \item
@@ -1397,14 +1397,14 @@ IF specified:
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Basin Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Cooling Tower Basin Heater Electric Energy {[}J{]}
+  HVAC,Sum,Cooling Tower Basin Heater Electricity Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Cooling Tower Fan Electric Power {[}W{]}}\label{cooling-tower-fan-electric-power-w-2}
+\paragraph{Cooling Tower Fan Electricity Rate {[}W{]}}\label{cooling-tower-fan-electric-power-w-2}
 
-\paragraph{Cooling Tower Fan Electric Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j-2}
+\paragraph{Cooling Tower Fan Electricity Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j-2}
 
 These outputs are the electric power input to the tower fans. Consumption is metered on HeatRejection:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -1428,9 +1428,9 @@ This output is the air flow ratio.~ The current air flow rate divided by the des
 
 This represents the number of cells operating at each time step.
 
-\paragraph{Cooling Tower Basin Heater Electric Power {[}W{]}}\label{cooling-tower-basin-heater-electric-power-w-2}
+\paragraph{Cooling Tower Basin Heater Electricity Rate {[}W{]}}\label{cooling-tower-basin-heater-electric-power-w-2}
 
-\paragraph{Cooling Tower Basin Heater Electric Energy {[}J{]}}\label{cooling-tower-basin-heater-electric-energy-j-2}
+\paragraph{Cooling Tower Basin Heater Electricity Energy {[}J{]}}\label{cooling-tower-basin-heater-electric-energy-j-2}
 
 These outputs are the electric power input to the tower basin heater. Consumption is metered on HeatRejection:Electricity, Electricity:Plant, and Electricity:Facility
 
@@ -1677,9 +1677,9 @@ CoolingTower:VariableSpeed,
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Fan Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Fan Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Cooling Tower Fan Electric Energy {[}J{]}
+  HVAC,Sum,Cooling Tower Fan Electricity Energy {[}J{]}
 \item
   HVAC,Average,Cooling Tower Heat Transfer Rate {[}W{]}
 \item
@@ -1744,14 +1744,14 @@ IF specified:
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Basin Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Cooling Tower Basin Heater Electric Energy {[}J{]}
+  HVAC,Sum,Cooling Tower Basin Heater Electricity Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Cooling Tower Fan Electric Power {[}W{]}}\label{cooling-tower-fan-electric-power-w-3}
+\paragraph{Cooling Tower Fan Electricity Rate {[}W{]}}\label{cooling-tower-fan-electric-power-w-3}
 
-\paragraph{Cooling Tower Fan Electric Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j-3}
+\paragraph{Cooling Tower Fan Electricity Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j-3}
 
 These outputs are the electric power input to the tower fan. Consumption is metered on HeatRejection:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -1775,9 +1775,9 @@ These outputs are the tower water inlet and outlet temperatures, and mass flow r
 
 This is the ratio of air flow through the tower to the design air flow rate. During times when the tower can maintain the condenser loop set point temperature using free convection (when the fan in not operating), the air flow rate ratio is assumed to be equal to the field Fraction of Tower Capacity in Free Convection Regime. During times when the fan cycles on/off to maintain the outlet water set point temperature, the air flow rate ratio is calculated as the summation of Fan Part-Load Ratio multiplied by the Minimum Air Flow Rate Ratio and (1.0 - Fan Part-Load Ratio) multiplied by the fraction of Tower Capacity in Free Convection Regime.
 
-\paragraph{Cooling Tower Basin Heater Electric Power {[}W{]}}\label{cooling-tower-basin-heater-electric-power-w-3}
+\paragraph{Cooling Tower Basin Heater Electricity Rate {[}W{]}}\label{cooling-tower-basin-heater-electric-power-w-3}
 
-\paragraph{Cooling Tower Basin Heater Electric Energy {[}J{]}}\label{cooling-tower-basin-heater-electric-energy-j-3}
+\paragraph{Cooling Tower Basin Heater Electricity Energy {[}J{]}}\label{cooling-tower-basin-heater-electric-energy-j-3}
 
 These outputs are the electric power input to the tower basin heater. Consumption is metered on HeatRejection:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -2260,9 +2260,9 @@ EvaporativeFluidCooler:SingleSpeed,
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Fan Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Fan Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Cooling Tower Fan Electric Energy {[}J{]}
+  HVAC,Sum,Cooling Tower Fan Electricity Energy {[}J{]}
 \item
   HVAC,Average,Cooling Tower Heat Transfer Rate {[}W{]}
 \item
@@ -2306,11 +2306,11 @@ If Supply Water Storage Tank Name is specified:
   HVAC,Sum,Cooling Tower Starved Storage Tank Water Volume {[}m3{]}
 \end{itemize}
 
-\paragraph{Cooling Tower Fan Electric Power {[}W{]}}\label{cooling-tower-fan-electric-power-w-4}
+\paragraph{Cooling Tower Fan Electricity Rate {[}W{]}}\label{cooling-tower-fan-electric-power-w-4}
 
 The average electric power consumption of the fluid cooler fan in Watts for the timestep being reported.
 
-\paragraph{Cooling Tower Fan Electric Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j-4}
+\paragraph{Cooling Tower Fan Electricity Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j-4}
 
 Fan energy use in Joules.~ Consumption is metered on HeatRejection:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -2571,9 +2571,9 @@ EvaporativeFluidCooler:TwoSpeed,
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Fan Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Fan Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Cooling Tower Fan Electric Energy {[}J{]}
+  HVAC,Sum,Cooling Tower Fan Electricity Energy {[}J{]}
 \item
   HVAC,Average,Cooling Tower Heat Transfer Rate {[}W{]}
 \item
@@ -2615,11 +2615,11 @@ If Supply Water Storage Tank Name is specified:
   HVAC,Sum,Cooling Tower Starved Storage Tank Water Volume {[}m3{]}
 \end{itemize}
 
-\paragraph{Cooling Tower Fan Electric Power {[}W{]}}\label{cooling-tower-fan-electric-power-w-5}
+\paragraph{Cooling Tower Fan Electricity Rate {[}W{]}}\label{cooling-tower-fan-electric-power-w-5}
 
 The average electric power consumption of the fluid cooler fan in Watts for the timestep being reported.
 
-\paragraph{Cooling Tower Fan Electric Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j-5}
+\paragraph{Cooling Tower Fan Electricity Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j-5}
 
 Fan energy use in Joules.~ Consumption is metered on HeatRejection:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -2758,9 +2758,9 @@ FluidCooler:SingleSpeed,
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Fan Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Fan Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Cooling Tower Fan Electric Energy {[}J{]}
+  HVAC,Sum,Cooling Tower Fan Electricity Energy {[}J{]}
 \item
   Zone,Meter,HeatRejection:Electricity {[}J{]}
 \item
@@ -2773,11 +2773,11 @@ FluidCooler:SingleSpeed,
   HVAC,Average,Cooling Tower Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{Cooling Tower Fan Electric Power {[}W{]}}\label{cooling-tower-fan-electric-power-w-6}
+\paragraph{Cooling Tower Fan Electricity Rate {[}W{]}}\label{cooling-tower-fan-electric-power-w-6}
 
 The electric power consumption of the fluid cooler fans.
 
-\paragraph{Cooling Tower Fan Electric Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j-6}
+\paragraph{Cooling Tower Fan Electricity Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j-6}
 
 Fan energy use.~ Consumption is metered on HeatRejection:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -2920,9 +2920,9 @@ FluidCooler:TwoSpeed,
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Fan Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Fan Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Cooling Tower Fan Electric Energy {[}J{]}
+  HVAC,Sum,Cooling Tower Fan Electricity Energy {[}J{]}
 \item
   HVAC,Average,Cooling Tower Heat Transfer Rate {[}W{]}
 \item
@@ -2933,11 +2933,11 @@ FluidCooler:TwoSpeed,
   HVAC,Average,Cooling Tower Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{Cooling Tower Fan Electric Power {[}W{]}}\label{cooling-tower-fan-electric-power-w-7}
+\paragraph{Cooling Tower Fan Electricity Rate {[}W{]}}\label{cooling-tower-fan-electric-power-w-7}
 
 Average fan electric power consumed.
 
-\paragraph{Cooling Tower Fan Electric Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j-7}
+\paragraph{Cooling Tower Fan Electricity Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j-7}
 
 Total energy used by the fan. Consumption is metered on HeatRejection:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -3241,6 +3241,10 @@ This numeric field indicates the depth of the top of the borehole below the grou
 
 This numeric field indicates the active length of the borehole, referenced from the starting location (potentially below the ground surface), to the end of the borehole, in meters.
 
+\paragraph{Field: Borehole Diameter}
+
+This numeric field indicates the diameter of the borehole, in meters.
+
 \paragraph{Field: Grout Thermal Conductivity}\label{field-grout-thermal-conductivity}
 
 This numeric field contains the thermal conductivity of the filler material in W/m-K.
@@ -3540,11 +3544,11 @@ This numeric field is the number of parallel trenches. Design flow rate will be 
 
 This numeric field is the center-to-center distance in between parallel trenches, in meters.
 
-\paragraph{Field: Type of Undisturbed Ground Temperature Object}\label{field-type-of-undisturbed-ground-temperature-object}
+\paragraph{Field: Type of Undisturbed Ground Temperature Object}
 
 The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
-\paragraph{Field: Name of Undisturbed Ground Temperature Object}\label{field-name-of-undisturbed-ground-temperature-object}
+\paragraph{Field: Name of Undisturbed Ground Temperature Object}
 
 The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 

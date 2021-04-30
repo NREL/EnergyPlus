@@ -756,7 +756,7 @@ This numerical field specifies the ratio of the low speed flow rate to the maxim
 
 This numerical field specifies the ratio of the medium speed flow rate to the maximum supply air flow rate. Its value should be greater than the \emph{Low Speed Supply Air Flow Ratio} but less than 1.If left blank, the default value is 0.66. This field is ignored if the capacity control method selected is not \emph{CyclingFan}.
 
-\paragraph{Field: Outdoor Air Schedule Name}\label{field-outdoor-air-schedule-name}
+\paragraph{Field: Outdoor Air Schedule Name}
 
 \paragraph{The name of a schedule whose values (0.0 to 1.0) are used as multipliers to alter the outdoor air flow rate. If this field is left blank, the values will default to 1.0. This schedule is ignored if the zone is served by an HVACTemplate dedicated outdoor air system.}\label{the-name-of-a-schedule-whose-values-0.0-to-1.0-are-used-as-multipliers-to-alter-the-outdoor-air-flow-rate.-if-this-field-is-left-blank-the-values-will-default-to-1.0.-this-schedule-is-ignored-if-the-zone-is-served-by-an-hvactemplate-dedicated-outdoor-air-system.}
 
@@ -1018,7 +1018,7 @@ Leave this field blank if you want the baseboard heating to be available for the
 
 Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts. Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the PTAC system. The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the PTAC system.
 
-\paragraph{Field: Capacity Control Method}\label{field-capacity-control-method-2}
+\paragraph{Field: Capacity Control Method}
 
 This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{None}} or \textbf{\emph{SingleZoneVAV}}. For \emph{None}, the unit varies the fan and/or coil speed to meet the load. If constant fan operating mode is selected the fan operates at the design cooling or heating air flow rate while the coil modulates to meet the load. If cycling fan operating mode is selected the fan and coil modulate in unison to meet the load. For \emph{SingleZoneVAV}, the fan air flow rate is reduced to the no load supply air flow rate when the zone sensible load is low such that the maximum supply air temperature limit is not exceeded. If the unit cannot meet the load at this lower air flow rate, the fan speed increases while maintaining the maximum supply air temperature. If the unit still cannot meet the load the unit will operate at the maximum supply air flow rate and the maximum supply air temperature limit can be exceeded. Supply air temperature limits are identified in the \hyperref[zonehvacpackagedterminalairconditioner]{ZoneHVAC:PackagedTerminalAirConditioner} input fields for Minimum Supply Air Temperature in Cooling Mode and Maximum Supply Air Temperature in Heating Mode. Additionally, specific coil types are required for the SingleZoneVAV capacity control method. The cooling coil type is \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} while the heating coil types are \hyperref[coilheatingwater]{Coil:Heating:Water}, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel} and \hyperref[coilheatingelectric]{Coil:Heating:Electric}. If alternate coil types are used they are modeled using the load based control method.
 
@@ -1304,7 +1304,7 @@ Leave this field blank if you want the baseboard heating to be available for the
 
 Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts. Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the PTHP system. The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the PTHP system.
 
-\paragraph{Field: Capacity Control Method}\label{field-capacity-control-method-3}
+\paragraph{Field: Capacity Control Method}
 
 This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{None}} or \textbf{\emph{SingleZoneVAV}}. For \emph{None}, the unit varies the fan and/or coil speed to meet the load. If constant fan operating mode is selected the fan operates at the design cooling or heating air flow rate while the coil modulates to meet the load. If cycling fan operating mode is selected the fan and coil modulate in unison to meet the load. For \emph{SingleZoneVAV}, the fan air flow rate is reduced to the no load supply air flow rate when the zone sensible load is low such that the maximum supply air temperature limit is not exceeded. If the unit cannot meet the load at this lower air flow rate, the fan speed increases while maintaining the maximum supply air temperature. If the unit still cannot meet the load the unit will operate at the maximum supply air flow rate and the maximum supply air temperature limit can be exceeded. Supply air temperature limits are identified in the \hyperref[zonehvacpackagedterminalheatpump]{ZoneHVAC:PackagedTerminalHeatPump} input fields for Minimum Supply Air Temperature in Cooling Mode and Maximum Supply Air Temperature in Heating Mode. Additionally, specific coil types are required for the SingleZoneVAV capacity control method. The cooling coil type is \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} while the heating coil type is \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed}.
 
@@ -1785,11 +1785,11 @@ Usually set to blank, which allows the heat pump heating coil to be available an
 
 Enter autosize to let the automatic sizing algorithm determine the heat pump heating coil gorss rated capacity based on the maximum heating loads during the heating design day. If a value is entered, it represents the full load gross heating capacity, in watts of the DX heat pump unit at rated conditions. Rated conditions are air entering the heat pump heating coil at the heating supply air flow rate at 21.11°C drybulb/15.55°C wetbulb with air entering the outdoor coil at 8.33°C drybulb/6.11C wetbulb. Capacity should be the ``gross'', i.e., the effect of supply air fan heat is not accounted for. The units are in W. The default is autosize.
 
-\paragraph{Field: Zone Terminal Unit On Parasitic Electric Energy Use}\label{field-zone-terminal-unit-on-parasitic-electric-energy-use}
+\paragraph{Field: Zone Terminal Unit On Parasitic Electricity Energy Use}\label{field-zone-terminal-unit-on-parasitic-electric-energy-use}
 
 This numeric field defines the parasitic electrical energy use of the zone terminal unit when either terminal unit coil is operating. When in cooling mode, this electric energy use is reported in a zone terminal unit cooling electric consumption output variable. When in heating mode, this electric energy use is reported in a zone terminal unit heating electric consumption output variable.
 
-\paragraph{Field: Zone Terminal Unit Off Parasitic Electric Energy Use}\label{field-zone-terminal-unit-off-parasitic-electric-energy-use}
+\paragraph{Field: Zone Terminal Unit Off Parasitic Electricity Energy Use}\label{field-zone-terminal-unit-off-parasitic-electric-energy-use}
 
 This numeric field defines the parasitic electrical energy use of the zone terminal unit when the terminal unit coil(s) is not operating. When the previous mode was cooling, this electric energy use is reported in a zone terminal unit cooling electric consumption output variable. When the previous mode was heating, this electric energy use is reported in a zone terminal unit heating electric consumption output variable.
 
@@ -2682,7 +2682,7 @@ HVACTemplate:Zone:VAV:HeatAndCool,
 
 \subsection{HVACTemplate:Zone:ConstantVolume}\label{hvactemplatezoneconstantvolume}
 
-This object simulates the zone portion of a constant volume HVAC configuration with or without reheat. One or more HVACTemplate:Zone:ConstantVolume objects will be used with a single \hyperref[hvactemplatesystemconstantvolume]{HVACTemplate:System:ConstantVolume} which has optional chilled water cooling and several types of heating. Reference \hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:ConstantVolume:NoReheat} and \hyperref[airterminalsingleductconstantvolumereheat]{AirTerminal:SingleDuct:ConstantVolume:Reheat} for more details about the terminal units.
+This object simulates the zone portion of a constant volume HVAC configuration with or without reheat. One or more HVACTemplate:Zone:ConstantVolume objects will be used with a single \hyperref[hvactemplatesystemconstantvolume]{HVACTemplate:System:ConstantVolume} which has optional chilled water cooling and several types of heating. Reference \hyperref[airterminalsingleductconstantvolumenoreheat]{AirTerminal:SingleDuct:ConstantVolume:NoReheat} and \hyperref[airterminalsingleductconstantvolumereheat]{AirTerminal:SingleDuct:ConstantVolume:Reheat} for more details about the terminal units.
 
 \subsubsection{Inputs}\label{inputs-12-006}
 
@@ -7557,7 +7557,7 @@ This object references a detailed chiller object and adds it to an \hyperref[hva
 
 The name of this object.
 
-\paragraph{Field: Chiller Object Type}\label{field-chiller-object-type}
+\paragraph{Field: Chiller Object Type}
 
 The object type of the referenced chiller. Select from one of the following supported chiller object types:
 
@@ -8071,7 +8071,7 @@ This object references a detailed boiler object and adds it to an \hyperref[hvac
 
 The name of this object.
 
-\paragraph{Field: Boiler Object Type}\label{field-boiler-object-type}
+\paragraph{Field: Boiler Object Type}
 
 The object type of the referenced boiler. Select from one of the following supported boiler object types:
 

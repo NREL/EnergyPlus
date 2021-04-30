@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,28 +48,28 @@
 #ifndef EnergyPlusPgm_hh_INCLUDED
 #define EnergyPlusPgm_hh_INCLUDED
 
-#include <EnergyPlus/api/EnergyPlusAPI.h>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/api/EnergyPlusAPI.h>
 
 // C++ Headers
 #include <string>
 
 // Functions
 
-void CreateCurrentDateTimeString(std::string &CurrentDateTimeString);
+std::string CreateCurrentDateTimeString();
 
-int initializeEnergyPlus(EnergyPlusData &state, std::string const & filepath);
+int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath);
 
-int wrapUpEnergyPlus(EnergyPlusData &state);
+int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state);
 
-void ENERGYPLUSLIB_API EnergyPlusPgm(EnergyPlusData &state, std::string const &filepath = std::string());
+int ENERGYPLUSLIB_API EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath = std::string());
 
-int ENERGYPLUSLIB_API RunEnergyPlus(EnergyPlusData &state, std::string const & filepath = std::string());
+int ENERGYPLUSLIB_API RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath = std::string());
 
-int runEnergyPlusAsLibrary(EnergyPlusData &state, int argc, const char *argv[]);
+int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const char *argv[]);
 
-void ENERGYPLUSLIB_API StoreProgressCallback(void (*f)(int const));
+void ENERGYPLUSLIB_API StoreProgressCallback(EnergyPlus::EnergyPlusData &state, void (*f)(int const));
 
-void ENERGYPLUSLIB_API StoreMessageCallback(void (*f)(std::string const &));
+void ENERGYPLUSLIB_API StoreMessageCallback(EnergyPlus::EnergyPlusData &state, void (*f)(std::string const &));
 
 #endif

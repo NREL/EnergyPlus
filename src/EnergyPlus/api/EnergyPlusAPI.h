@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,7 +51,7 @@
 /// \file EnergyPlusAPI.h
 /// \brief This file provides a define that enables exposing methods on the API.  No client needs to directly import this file.
 
-#if _WIN32 || _MSC_VER
+#if (_WIN32 || _MSC_VER) && !ENERGYPLUS_STATIC_API
 #if defined(energypluslib_EXPORTS) || defined(energyplusapi_EXPORTS) || defined(energypluslib2_EXPORTS)
 #define ENERGYPLUSLIB_API __declspec(dllexport)
 #else

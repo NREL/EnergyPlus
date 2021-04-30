@@ -84,7 +84,7 @@ The control is actuated by setting values for the availability status. The setti
 
 An actuator called ``Ideal Loads Air System'' is available with control types called ``Air Mass Flow Rate'' (supply air), ``Outdoor Air Mass Flow Rate,'' ``Air Temperature,'' and ``Air Humidity Ratio.'' ~These are available in models that use the ideal loads air system, formerly known as purchased air. The units are kg/s for mass flow rate, C for temperature and kgWater/kgDryAir for humidity ratio. The unique identifier is the user-defined name of the ZoneHVAC:IdealLoadsAirSystem input object.
 
-For Air Temperature and Air Humidity Ratio, the overrides are absolute. They are applied after all other limits have been checked. For mass flow rate, the overrides are not absolute, in that the model has additional internal controls that may not always be overridden. The internal controls will still apply the capacity and flow rate limits if defined in the input object. The EMS override affects the flow rate only if the air system is on. If the air system is ``off,'' the mass flow is zero regardless of the actuator setting. The internal model controls will turn off the air system if the zone is in the dead band or if it is scheduled ``off'' by availability managers. This behavior allows you to use the internal controls to determine when the air should cycle on, as for a constant volume system that cycles to achieve control. If both the Air Mass Flow Rate and Outdoor Air Mass Flow Rate are overridden, the Outdoor Air Mass Flow Rate will not be allowed to be greater than the override value for Air Mass Flow Rate.
+For Air Temperature and Air Humidity Ratio, the overrides are absolute. They are applied after all other limits have been checked. For mass flow rate, the overrides are not absolute,the internal controls will still apply the capacity and flow rate limits if defined in the input object. The EMS override will be ignored if the ideal loads system is off (the availability schedule value is zero or it has  been forced ``off'' by an availability manager). If both the Air Mass Flow Rate and Outdoor Air Mass Flow Rate are overridden, the Outdoor Air Mass Flow Rate will not be allowed to be greater than the override value for Air Mass Flow Rate.
 
 \subsection{Fan}\label{fan}
 
@@ -94,7 +94,7 @@ An actuator is also available for overriding the autosize value for the fan's de
 
 \subsection{DX Cooling Coils}\label{dx-cooling-coils}
 
-Actuators are available for overriding the autosize values related to the size of single speed DX coils.~ Actuators called ``Coil:Cooling:DX:SingleSpeed'' are available with control types ``Autosized Rated Air Flow Rate'' (in m3/s), ``Autosized Rated Sensible Heat Ratio'' (in W/W), and ``Autosized Rated Total Cooling Capacity'' (in W).~ These are only useful from the calling point named AfterComponentInputReadIn.
+Actuators are available for overriding the autosize rated airflow rate and total cooling capacity of the Coil:Cooling:DX object.~ Actuators called ``Coil:Cooling:DX:CurveFit:SingleSpeed'' are available with control types ``Autosized Rated Air Flow Rate'' (in m3/s) and ``Autosized Rated Total Cooling Capacity'' (in W).~ These are only useful from the calling point named AfterComponentInputReadIn.
 
 \subsection{Unitary Equipment}\label{unitary-equipment}
 

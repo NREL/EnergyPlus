@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,8 +51,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Vectors.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 // C++ Headers
 #include <cmath>
@@ -61,9 +63,8 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::Vectors;
 using namespace ObjexxFCL;
 
-TEST(VectorsTest, AreaPolygon)
+TEST_F(EnergyPlusFixture, VectorsTest_AreaPolygon)
 {
-    ShowMessage("Begin Test: VectorsTest, AreaPolygon");
     Array1D<Vector> a(4); // 3 x 7 rectangle
     a(1).x = a(1).y = a(1).z = 0.0;
     a(2).x = 3.0;
@@ -77,9 +78,8 @@ TEST(VectorsTest, AreaPolygon)
     EXPECT_EQ(21.0, AreaPolygon(4, a));
 }
 
-TEST(VectorsTest, VecNormalize)
+TEST_F(EnergyPlusFixture, VectorsTest_VecNormalize)
 {
-    ShowMessage("Begin Test: VectorsTest, VecNormalize");
     {
         Vector const v(3.0, 3.0, 3.0);
         Vector const n(VecNormalize(v));
@@ -98,9 +98,8 @@ TEST(VectorsTest, VecNormalize)
     }
 }
 
-TEST(VectorsTest, VecRound)
+TEST_F(EnergyPlusFixture, VectorsTest_VecRound)
 {
-    ShowMessage("Begin Test: VectorsTest, VecRound");
     Vector v(11.567, -33.602, 55.981);
     VecRound(v, 2.0);
     EXPECT_DOUBLE_EQ(11.5, v.x);
@@ -108,7 +107,8 @@ TEST(VectorsTest, VecRound)
     EXPECT_DOUBLE_EQ(56.0, v.z);
 }
 
-TEST(VectorTest, CoplnarPoints) {
+TEST_F(EnergyPlusFixture, VectorsTest_CoplnarPoints)
+{
     {
         Array1D<Vector> base = {Vector(0, 0, 0), Vector(1, 0, 0), Vector(1, 1, 0), Vector(0, 1, 0)};
         std::vector<int> coplanarPoints;
@@ -117,9 +117,8 @@ TEST(VectorTest, CoplnarPoints) {
         Array1D<Vector> query = {Vector(0, 0, 0), Vector(1, 1, 1), Vector(2, 0, 0), Vector(0, 0, -1)};
         coplanarPoints = PointsInPlane(base, base.size(), query, query.size(), ErrorsFound);
 
-        EXPECT_EQ(coplanarPoints[0],1); // 1st point in query is coplanar with base
-        EXPECT_EQ(coplanarPoints[1],3); // 3rd point in query is coplanar with base
-        EXPECT_EQ(coplanarPoints.size(),2u); // Only 2 points in query are coplanar with base
-
+        EXPECT_EQ(coplanarPoints[0], 1);      // 1st point in query is coplanar with base
+        EXPECT_EQ(coplanarPoints[1], 3);      // 3rd point in query is coplanar with base
+        EXPECT_EQ(coplanarPoints.size(), 2u); // Only 2 points in query are coplanar with base
     }
 }

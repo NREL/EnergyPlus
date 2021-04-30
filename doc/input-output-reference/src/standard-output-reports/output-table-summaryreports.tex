@@ -20,11 +20,11 @@ The Annual Building Utility Performance Summary report often called ABUPS -- (ke
 \item
   Building Area -- Shows the total floorspace of the building and the conditioned floorspace.
 \item
-  End Uses -- This shows the total use of electricity, natural gas, other fuels, purchased cooling, purchased heating and water for each major end-use category. The end-use categories are Heating, Cooling, Interior Lighting, Exterior Lighting, Interior Equipment, Exterior Equipment, Fans, Pumps, Heat Rejection, Humidification, Heat Recovery, Hot Water, Refrigeration, and Generators. Not all fuels have corresponding end uses. The values in this sub-table are from output meters. To determine which components are attached to each end-use meter, consult the meter details output file (*.mtd). The source of the resource does not affect this table -- the amount of electricity used for lights does not change if the electricity is from the utility or from an on-site generator. The Other Fuel column includes fuel oil\#1, fuel oil\#2, gasoline, coal, propane, diesel, otherfuel1 and otherfuel2. The district heating column also~ includes steam.
+  End Uses -- This shows the total use of electricity, natural gas, other fuels, purchased cooling, purchased heating and water for each major end-use category. The end-use categories are Heating, Cooling, Interior Lighting, Exterior Lighting, Interior Equipment, Exterior Equipment, Fans, Pumps, Heat Rejection, Humidification, Heat Recovery, Hot Water, Refrigeration, and Generators. Not all fuels have corresponding end uses. The values in this sub-table are from output meters. To determine which components are attached to each end-use meter, consult the meter details output file (*.mtd). The source of the resource does not affect this table -- the amount of electricity used for lights does not change if the electricity is from the utility or from an on-site generator. The district heating column also includes steam.
 \item
   End Uses By Subcategory -- Shows a breakdown of the major end uses by user-defined category. If an end-use subcategory was not input for an object, it is automatically added to the General subcategory for that major end-use category.
 \item
-  Utility Use Per Floor Area -- These two sub-tables show the results from the end-uses table divided by the total floor area defined for the building and for the total conditioned floor area. Only three categories for end-uses are used for these sub-tables, lighting, HVAC and other. HVAC includes fans, pumps, heating, cooling, heat rejection, humidification, and domestic hot water heating. The Other Fuel column includes fuel oil\#1, fuel oil\#2, gasoline, coal, propane, diesel, otherfuel1 and otherfuel2. The district heating column also~ includes steam.
+  Utility Use Per Floor Area -- These two sub-tables show the results from the end-uses table divided by the total floor area defined for the building and for the total conditioned floor area. Only three categories for end-uses are used for these sub-tables, lighting, HVAC and other. HVAC includes fans, pumps, heating, cooling, heat rejection, humidification, and domestic hot water heating. The district heating column also includes steam.
 \item
   Electric Loads Satisfied -- Shows the different methods that electric loads are satisfied in the building. The values shown for on site power generation are: Fuel-Fired Power Generation, High Temperature Geothermal, Photovoltaic Power, and Wind Power. The flows to and from the electric utility are shown next and finally the total electricity used at the site is compared to the total generated on site plus the net amount from the electric utility. The percentages shown are based on the total electricity used by the end-uses. Note that High Temperature Geothermal and Wind Power are not yet implemented in EnergyPlus.
 \item
@@ -56,7 +56,7 @@ The Source Energy End Use Components Summary report produces a report (key: Sour
 
 \begin{itemize}
 \item
-  Source Energy End Use Components -- This shows the total use of source electricity, source natural gas, source values of other fuels, source purchased cooling~~ and purchased heating for each major end-use category. The end-use categories are Heating, Cooling, Interior Lighting, Exterior Lighting, Interior Equipment, Exterior Equipment, Fans, Pumps, Heat Rejection, Humidification, Heat Recovery, Hot Water, Refrigeration, and Generators. Not all fuels have corresponding end uses. The values in this sub-table are from output meters. To determine which components are attached to each end-use meter, consult the meter details output file (*.mtd). The source of the resource will affect this table -- the amount of electricity used for lights will change if the electricity is from the utility or from an on-site generator. The Other Fuel column includes FuelOil\#1, FuelOil\#2, Gasoline, Coal, Propane, Diesel, OtherFuel1 and OtherFuel2. The district heating column also~ includes steam.
+  Source Energy End Use Components -- This shows the total use of source electricity, source natural gas, source values of other fuels, source purchased cooling~~ and purchased heating for each major end-use category. The end-use categories are Heating, Cooling, Interior Lighting, Exterior Lighting, Interior Equipment, Exterior Equipment, Fans, Pumps, Heat Rejection, Humidification, Heat Recovery, Hot Water, Refrigeration, and Generators. Not all fuels have corresponding end uses. The values in this sub-table are from output meters. To determine which components are attached to each end-use meter, consult the meter details output file (*.mtd). The source of the resource will affect this table -- the amount of electricity used for lights will change if the electricity is from the utility or from an on-site generator. The district heating column also includes steam.
 \item
   Source Energy End Use Components normalized by Conditioned Floor Area -- This table shows the total end uses in source energy normalized by conditioned floor area.
 \item
@@ -123,8 +123,8 @@ The Equipment Summary report (key: EquipmentSummary) produces a report that incl
 \item
   Cooling Coils includes the nominal total, sensible and latent capacities, the nominal sensible heat ratio, the nominal efficiency, nominal UA value, and nominal~ surface area for each cooling coil. These values are calculated by calling the cooling coil simulation routine with the rated inlet conditions: inlet air dry bulb temperature = 26.67C, inlet air wet bulb temperature = 19.44C, inlet chilled water temperature = 6.67C.
 \item
-  DX Cooling Coils summarizes the Standard Rating (Net) Cooling Capacity, SEER, EER and IEER values at AHRI standard test. Currently, these values are only reported for coil type = \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} with condenser type = AirCooled.
-\item
+  DX Cooling Coils summarizes the Standard Rating (Net) Cooling Capacity, SEER, EER and IEER values at AHRI standard test. Currently, these values are only reported for coil type = \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} and \hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:MultiSpeeed} with condenser type = AirCooled. However, the EER value is not reported for the mulit-speed DX cooling coil. There are two SEER values reported: \textit{SEER} and \textit{SEER Default}. The \textit{SEER} value is calculated using user specified Part Load Factor (PLF) curve used for energy performance calculation and the \textit{SEER Default} value is calculated using the AHRI Standard 210/240-2008 default PLF curve and cooling coefficent of degradation value of 0.25. 
+  \item
   DX Heating Coils summarizes the High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity and Heating Seasonal Performance Factor (HSPF) values at AHRI standard test. Currently, these values are only reported for coil type = \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed}.
 \item
   Heating Coils includes the nominal capacity and efficiency for each heating coil. The capacity is calculated by calling the heating coil simulation routine at the rated inlet conditions: inlet air dry bulb temperature = 16.6C, inlet relative humidity = 50\%, inlet hot water temperature = 82.2C.
@@ -170,6 +170,27 @@ The Outdoor Air Summary report (key: OutdoorAirSummary) produces a report that i
   Average Outside Air During Occupied Hours table shows for each zone the average and nominal number of occupants, the zone volume, the average air change rate based on mechanical ventilation, infiltration and simple ventilation during occupied hours.
 \item
   Minimum Outside Air During Occupied Hours table shows for each zone the average and nominal number of occupants, the zone volume, the minimum air change rate based on mechanical ventilation, infiltration and simple ventilation during occupied hours.
+\end{itemize}
+
+\paragraph{Outdoor Air Details}\label{outdoor-air-details}
+
+The Outdoor Air Details report (key: OutdoorAirDetails) produces a report that includes the following tables. For descriptions of each column, see the Output Details and Examples document.
+
+\begin{itemize}
+\item
+  Mechanical Ventilation Parameters by Zone table shows for each zone the average and nominal number of occupants, the zone volume and area, the design outdoor air flow rate \(V_{oz}\) and the minimum dynamic target ventilation flow rate \(V_{oz-dyn-min}\).
+\item
+  Total Outdoor Air by Zone table shows for each zone the total mechanical ventilation, natural ventilation, total ventilation (mechanical plus natural), infiltration, total ventilation plus infiltration, dynamic target ventilation \(V_{oz-dyn}\), the time when total ventilation is below, at, or above \(V_{oz-dyn}\), and the time ventilation is provided when the zone is unoccupied.
+\item
+  Average Outdoor Air During Occupancy by Zone - Flow Rates table shows for each zone the average flow rates when the zone is occupied for mechanical ventilation, natural ventilation, total ventilation (mechanical plus natural), infiltration, total ventilation plus infiltration, dynamic target ventilation \(V_{oz-dyn}\) and the time when total ventilation is below, at, or above \(V_{oz-dyn}\).
+\item
+  Total Outdoor Air by AirLoop table shows for each airloop the total mechanical ventilation, natural ventilation, total ventilation (mechanical plus natural), sum of the zone dynamic target ventilation \(V_{oz-dyn}\), the time when total ventilation is below, at, or above \(V_{oz-dyn}\), and the time ventilation is provided when all zones are unoccupied.
+\item
+  Average Outdoor Air During Occupancy by AirLoop table shows for each airloop the average flow rates when any zone on the airloop is occupied for mechanical ventilation, natural ventilation, total ventilation (mechanical plus natural), sum of the zone dynamic target ventilation \(V_{oz-dyn}\), and the time when total ventilation is below, at, or above \(V_{oz-dyn}\).
+\item
+  Outdoor Air Controller Limiting Factors by AirLoop table shows for each airloop the time when any zone on the airloop is occupied and various limiting factors control the mechanical ventilation flow rate: no limiting factor, economizer operation, demand controlled ventilation, exhaust flow, high humidity economizer control, night ventilation, limits and scheduled limits, demand limiting, and energy management system override.
+\item
+  Average Outdoor Air for Limiting Factors During Occupancy table shows for each airloop the average mechanical ventilation flow rates when any zone on the airloop is occupied and various limiting factors control the mechanical ventilation flow rate: no limiting factor, economizer operation, demand controlled ventilation, exhaust flow, high humidity economizer control, night ventilation, limits and scheduled limits, demand limiting, and energy management system override.
 \end{itemize}
 
 \paragraph{System Summary}\label{system-summary}
@@ -429,6 +450,17 @@ The Life Cycle Cost Report provides a summary of the information from the Life C
 
 The Heat Emissions Report provides a summary of the building heat emission to the ambient air. This report shows the heat emissions from buildings by surface heat transfer, zone exhaust, zone relief, HVAC relief, HVAC heat rejection, as well as the total emissions. The key used to obtain this report is HeatEmissionsSummary.
 
+\paragraph{Thermal Resilience Summary}\label{ThermalResilienceSummary}
+
+The Thermal Resilience Summary provides the indoor thermal resilience metrics unmet hours and occupant$·$hours summary report. This includes the Heat Index Hours and OccupantHours, Humidex Hours and OccupantHours, Heating SET Hours and Cooling SET Hours reports. The Heating SET Hours and Cooling SET Hours are reported only when the Pierce model are chosen for thermal comfort calculations. To activate the Pierce SET calculation in EnergyPlus, users need to define the \textbf{People} and chose \textbf{Pierce} as the thermal comfort method.
+
+\paragraph{CO2 Resilience Summary}\label{CO2ResilienceSummary}
+
+The CO2 Resilience Summary provides the indoor CO2 level unmet hours and occupant$·$hours summary report for resilience. This includes the CO2 Level Hours and OccupantHours reports. To activate the $CO_2$ concentration calculation in EnergyPlus, the \textbf{ZoneAirContaminantBalance} object needs to be specified and with the field \textbf{Carbon Dioxide Concentration} set to Yes. Users can define a schedule of outdoor air $CO_2$ concentration in the field \textbf{Outdoor Carbon Dioxide Schedule Name}. $CO_2$ generation rate at the zone level can be specified using the \textbf{ZoneContaminantSourceAndSink:CarbonDioxide} object.
+
+\paragraph{Visual Resilience Summary}\label{VisualResilienceSummary}
+
+The Visual Resilience Summary provides the indoor illuminance level unmet hours and occupant$·$hours summary report for resilience. This includes the Illuminance Level Hours and OccupantHours reports. To activate the indoor illuminance calculation in EnergyPlus, users need to define the \textbf{Daylighting:Controls} and the \textbf{Daylighting:ReferencePoint} objects, even if no daylighting controls are actually implemented in the building simulation model.
 
 \subsubsection{Predefined Monthly Summary Reports}\label{predefined-monthly-summary-reports}
 
@@ -558,9 +590,9 @@ The predefined monthly report options are shown below. The key name of the prede
 \item
   Electricity:Facility (Maximum)
 \item
-  Gas:Facility (SumOrAverage)
+  NaturalGas:Facility (SumOrAverage)
 \item
-  Gas:Facility (Maximum)
+  NaturalGas:Facility (Maximum)
 \end{itemize}
 
 \paragraph{EnergyConsumptionElectricityGeneratedPropaneMonthly}\label{energyconsumptionelectricitygeneratedpropanemonthly}
@@ -576,7 +608,7 @@ The predefined monthly report options are shown below. The key name of the prede
   Propane:Facility (Maximum)
 \end{itemize}
 
-\paragraph{EnergyConsumptionDieselFuel OilMonthly}\label{energyconsumptiondieselfuel-oilmonthly}
+\paragraph{EnergyConsumptionDieselFuelOilMonthly}\label{energyconsumptiondieselfuel-oilmonthly}
 
 \begin{itemize}
 \item
@@ -584,13 +616,13 @@ The predefined monthly report options are shown below. The key name of the prede
 \item
   Diesel:Facility (Maximum)
 \item
-  FuelOil\#1:Facility (SumOrAverage)
+  FuelOilNo1:Facility (SumOrAverage)
 \item
-  FuelOil\#1:Facility (Maximum)
+  FuelOilNo1:Facility (Maximum)
 \item
-  FuelOil\#2:Facility (SumOrAverage)
+  FuelOilNo2:Facility (SumOrAverage)
 \item
-  FuelOil\#2:Facility (Maximum)
+  FuelOilNo2:Facility (Maximum)
 \end{itemize}
 
 \paragraph{EnergyConsumptionDisctrictHeatingCoolingMonthly}\label{energyconsumptiondisctrictheatingcoolingmonthly}
@@ -667,17 +699,17 @@ The predefined monthly report options are shown below. The key name of the prede
 
 \begin{itemize}
 \item
-  InteriorEquipment:Gas (SumOrAverage)
+  InteriorEquipment:NaturalGas (SumOrAverage)
 \item
-  ExteriorEquipment:Gas (SumOrAverage)
+  ExteriorEquipment:NaturalGas (SumOrAverage)
 \item
-  Heating:Gas (SumOrAverage)
+  Heating:NaturalGas (SumOrAverage)
 \item
-  Cooling:Gas (SumOrAverage)
+  Cooling:NaturalGas (SumOrAverage)
 \item
-  WaterSystems:Gas (SumOrAverage)
+  WaterSystems:NaturalGas (SumOrAverage)
 \item
-  Cogeneration:Gas (SumOrAverage)
+  Cogeneration:NaturalGas (SumOrAverage)
 \end{itemize}
 
 \paragraph{EndUseEnergyConsumptionDieselMonthly}\label{enduseenergyconsumptiondieselmonthly}
@@ -699,25 +731,25 @@ The predefined monthly report options are shown below. The key name of the prede
 
 \begin{itemize}
 \item
-  ExteriorEquipment:FuelOil\#1 (SumOrAverage)
+  ExteriorEquipment:FuelOilNo1 (SumOrAverage)
 \item
-  Cooling:FuelOil\#1 (SumOrAverage)
+  Cooling:FuelOilNo1 (SumOrAverage)
 \item
-  Heating:FuelOil\#1 (SumOrAverage)
+  Heating:FuelOilNo1 (SumOrAverage)
 \item
-  WaterSystems:FuelOil\#1 (SumOrAverage)
+  WaterSystems:FuelOilNo1 (SumOrAverage)
 \item
-  Cogeneration:FuelOil\#1 (SumOrAverage)
+  Cogeneration:FuelOilNo1 (SumOrAverage)
 \item
-  ExteriorEquipment:FuelOil\#2 (SumOrAverage)
+  ExteriorEquipment:FuelOilNo2 (SumOrAverage)
 \item
-  Cooling:FuelOil\#2 (SumOrAverage)
+  Cooling:FuelOilNo2 (SumOrAverage)
 \item
-  Heating:FuelOil\#2 (SumOrAverage)
+  Heating:FuelOilNo2 (SumOrAverage)
 \item
-  WaterSystems:FuelOil\#2 (SumOrAverage)
+  WaterSystems:FuelOilNo2 (SumOrAverage)
 \item
-  Cogeneration:FuelOil\#2 (SumOrAverage)
+  Cogeneration:FuelOilNo2 (SumOrAverage)
 \end{itemize}
 
 \paragraph{EndUseEnergyConsumptionCoalMonthly}\label{enduseenergyconsumptioncoalmonthly}
@@ -851,17 +883,17 @@ The predefined monthly report options are shown below. The key name of the prede
 
 \begin{itemize}
 \item
-  InteriorEquipment:Gas (Maximum)
+  InteriorEquipment:NaturalGas (Maximum)
 \item
-  ExteriorEquipment:Gas (Maximum)
+  ExteriorEquipment:NaturalGas (Maximum)
 \item
-  Heating:Gas (Maximum)
+  Heating:NaturalGas (Maximum)
 \item
-  Cooling:Gas (Maximum)
+  Cooling:NaturalGas (Maximum)
 \item
-  WaterSystems:Gas (Maximum)
+  WaterSystems:NaturalGas (Maximum)
 \item
-  Cogeneration:Gas (Maximum)
+  Cogeneration:NaturalGas (Maximum)
 \end{itemize}
 
 \paragraph{PeakEnergyEndUseDieselMonthly}\label{peakenergyendusedieselmonthly}
@@ -883,25 +915,25 @@ The predefined monthly report options are shown below. The key name of the prede
 
 \begin{itemize}
 \item
-  ExteriorEquipment:FuelOil\#1 (Maximum)
+  ExteriorEquipment:FuelOilNo1 (Maximum)
 \item
-  Cooling:FuelOil\#1 (Maximum)
+  Cooling:FuelOilNo1 (Maximum)
 \item
-  Heating:FuelOil\#1 (Maximum)
+  Heating:FuelOilNo1 (Maximum)
 \item
-  WaterSystems:FuelOil\#1 (Maximum)
+  WaterSystems:FuelOilNo1 (Maximum)
 \item
-  Cogeneration:FuelOil\#1 (Maximum)
+  Cogeneration:FuelOilNo1 (Maximum)
 \item
-  ExteriorEquipment:FuelOil\#2 (Maximum)
+  ExteriorEquipment:FuelOilNo2 (Maximum)
 \item
-  Cooling:FuelOil\#2 (Maximum)
+  Cooling:FuelOilNo2 (Maximum)
 \item
-  Heating:FuelOil\#2 (Maximum)
+  Heating:FuelOilNo2 (Maximum)
 \item
-  WaterSystems:FuelOil\#2 (Maximum)
+  WaterSystems:FuelOilNo2 (Maximum)
 \item
-  Cogeneration:FuelOil\#2 (Maximum)
+  Cogeneration:FuelOilNo2 (Maximum)
 \end{itemize}
 
 \paragraph{PeakEnergyEndUseCoalMonthly}\label{peakenergyendusecoalmonthly}
@@ -1040,11 +1072,11 @@ The predefined monthly report options are shown below. The key name of the prede
 
 \begin{itemize}
 \item
-  Chiller Electric Energy (SumOrAverage)
+  Chiller Electricity Energy (SumOrAverage)
 \item
-  Chiller Electric Power (Maximum)
+  Chiller Electricity Rate (Maximum)
 \item
-  Chiller Electric Energy (HoursNonZero)
+  Chiller Electricity Energy (HoursNonZero)
 \item
   Chiller Evaporator Cooling Energy (SumOrAverage)
 \item
@@ -1063,7 +1095,7 @@ The predefined monthly report options are shown below. The key name of the prede
 \item
   Tower Fan Electric Consumption (HoursNonZero)
 \item
-  Cooling Tower Fan Electric Power (Maximum)
+  Cooling Tower Fan Electricity Rate (Maximum)
 \item
   Cooling Tower Heat Transfer Rate (Maximum)
 \item
@@ -1094,7 +1126,7 @@ The predefined monthly report options are shown below. The key name of the prede
 \item
   Boiler Mass Flow Rate (SumOrAverage)
 \item
-  Boiler Ancillary Electric Power (SumOrAverage)
+  Boiler Ancillary Electricity Rate (SumOrAverage)
 \end{itemize}
 
 \paragraph{DXReportMonthly}\label{dxreportmonthly}
@@ -1123,9 +1155,9 @@ The predefined monthly report options are shown below. The key name of the prede
 \item
   Cooling Coil Latent Cooling Rate (Maximum)
 \item
-  Cooling Coil Electric Power (Maximum)
+  Cooling Coil Electricity Rate (Maximum)
 \item
-  Cooling Coil Crankcase Heater Electric Power (Maximum)
+  Cooling Coil Crankcase Heater Electricity Rate (Maximum)
 \end{itemize}
 
 \paragraph{WindowReportMonthly}\label{windowreportmonthly}
@@ -1334,7 +1366,7 @@ The predefined monthly report options are shown below. The key name of the prede
 \item
   Zone Window Air Conditioner Latent Cooling Rate (ValueWhenMaxMin)
 \item
-  Zone Window Air Conditioner Electric Power (ValueWhenMaxMin)
+  Zone Window Air Conditioner Electricity Rate (ValueWhenMaxMin)
 \end{itemize}
 
 \paragraph{WaterHeaterReportMonthly}\label{waterheaterreportmonthly}
@@ -1452,7 +1484,7 @@ The predefined monthly report options are shown below. The key name of the prede
 \item
   Fan Rise in Air Temperature (SumOrAverage)
 \item
-  Fan Electric Power (Maximum)
+  Fan Electricity Rate (Maximum)
 \item
   Fan Rise in Air Temperature (ValueWhenMaxMin)
 \end{itemize}
@@ -1465,7 +1497,7 @@ The predefined monthly report options are shown below. The key name of the prede
 \item
   Pump Fluid Heat Gain Energy (SumOrAverage)
 \item
-  Pump Electric Power (Maximum)
+  Pump Electricity Rate (Maximum)
 \item
   Pump Shaft Power (ValueWhenMaxMin)
 \item

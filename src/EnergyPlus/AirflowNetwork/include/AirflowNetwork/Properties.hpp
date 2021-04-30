@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,7 +50,7 @@
 
 #ifndef AIRDENSITY
 #include "../../../Psychrometrics.hh"
-#define AIRDENSITY(P, T, W) Psychrometrics::PsyRhoAirFnPbTdbW(P, T, W)
+#define AIRDENSITY(state, P, T, W) Psychrometrics::PsyRhoAirFnPbTdbW(state, P, T, W)
 #define AIRCP(W) Psychrometrics::PsyCpAirFnW(W)
 #else
 // Need a fallback
@@ -64,40 +64,58 @@
 
 #ifndef TOKELVIN
 #include "../../../DataGlobals.hh"
-#define TOKELVIN(T) (T + DataGlobals::KelvinConv)
+#define TOKELVIN(T) (T + DataGlobalConstants::KelvinConv)
 #else
 // Need a fallback
 #endif
 
+// EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace AirflowNetwork {
 
-    extern int lowerLimitErrIdx;
-    extern int upperLimitErrIdx;
-
-    Real64 airThermConductivity(Real64 T // Temperature in Celsius
+    Real64 airThermConductivity(EnergyPlusData &state, Real64 T // Temperature in Celsius
     );
 
     Real64 airDynamicVisc(Real64 T // Temperature in Celsius
     );
 
-    Real64 airKinematicVisc(Real64 T, // Temperature in Celsius
+    Real64 airKinematicVisc(EnergyPlusData &state,
+                            Real64 T, // Temperature in Celsius
                             Real64 W, // Humidity ratio
                             Real64 P  // Barometric pressure
     );
 
-    Real64 airThermalDiffusivity(Real64 T, // Temperature in Celsius
+    Real64 airThermalDiffusivity(EnergyPlusData &state,
+                                 Real64 T, // Temperature in Celsius
                                  Real64 W, // Humidity ratio
                                  Real64 P  // Barometric pressure
     );
 
-    Real64 airPrandtl(Real64 T, // Temperature in Celsius
+    Real64 airPrandtl(EnergyPlusData &state,
+                      Real64 T, // Temperature in Celsius
                       Real64 W, // Humidity ratio
                       Real64 P  // Barometric pressure
     );
 
 } // namespace AirflowNetwork
+
+struct DataAFNProps : BaseGlobalStruct
+{
+    int lowerLimitErrIdx = 0;
+    int upperLimitErrIdx = 0;
+    void clear_state() override
+    {
+        lowerLimitErrIdx = 0;
+        upperLimitErrIdx = 0;
+    }
+};
 
 } // namespace EnergyPlus
 

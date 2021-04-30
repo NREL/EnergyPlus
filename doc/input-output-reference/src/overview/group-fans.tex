@@ -72,9 +72,9 @@ This numeric field is the fraction of the motor heat that is added to the air st
 
 \paragraph{Field: Design Electric Power Consumption}\label{field-design-elec-power-fansysmodel}
 
-This numeric field is the electric power consumption at the full Design Maximum Air Flow Rate and Design Pressure Rise, in Watts.  The value entered in this field is used to determine the fan efficiency. This field is autosizable.  When autosized there are three different options available for the method used to size the design power and can be selected in the following field.
+This numeric field is the electric power consumption at the full Design Maximum Air Flow Rate and Design Pressure Rise, in Watts.  The value entered in this field is used to determine the fan efficiency. This field is autosizable and defaults to autosize.  When autosized there are three different options available for the method used to size the design power and can be selected in the following field.
 
-\paragraph{Field: Design Power Sizing Method}\label{field-design-power-sizing-method}
+\paragraph{Field: Design Power Sizing Method}
 
 This field is used to select how the fan's Design Electric Power Consumption is sized when the previous field is set to autosize.  There are three choices: PowerPerFlow, PowerPerFlowPerPressure, or TotalEfficiencyAndPressure.  The default is PowerPerFlowPerPressure.
 When PowerPerFlow is selected, the value entered in the input field called Electric Power Per Unit Flow Rate is used to size the Design Electric Power Consumption. This method is useful during early-phase design modeling when little information is available for determining the Design Pressure Rise.  Although the pressure rise is not used to size the Design Electric Power Consumption it is still used to determine the heat added to the air stream as a result of the work done by the fan.
@@ -226,20 +226,20 @@ Fan:SystemModel,
 
 \begin{itemize}
 \item
-HVAC,Average,Fan Electric Power{[}W{]}
+HVAC,Average,Fan Electricity Rate {[}W{]}
 \item
-HVAC,Sum,Fan Electric Energy{[}J{]}
+HVAC,Sum,Fan Electricity Energy {[}J{]}
 \item
 HVAC,Average,Fan Rise in Air Temperature{[}deltaC{]}
 \item
 HVAC,Average,Fan Air Mass Flow Rate{[}kg/s{]}
 \end{itemize}
 
-\paragraph{Fan Electric Power {[}W{]}}\label{fan-electric-power-fansysmodel}
+\paragraph{Fan Electricity Rate {[}W{]}}\label{fan-electric-power-fansysmodel}
 
 This output field contains the average electricity consumption rate for the fan in Watts for the time interval being reported.
 
-\paragraph{Fan Electric Energy {[}J{]}}\label{fan-electric-energy-fansysmodel}
+\paragraph{Fan Electricity Energy {[}J{]}}\label{fan-electric-energy-fansysmodel}
 
 This output contains the electricity consumption of the fan in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Fans, Group Key = System (ref. Output:Meter objects).
 
@@ -305,14 +305,14 @@ Allows you to specify a user-defined end-use subcategory, e.g., ``Central System
 
 \begin{itemize}
 \item
-  HVAC,Average,Fan Electric Power{[}W{]}
+  HVAC,Average,Fan Electricity Rate {[}W{]}
 \item
   HVAC,Average,Fan Rise in Air Temperature {[}deltaC{]}
 \item
-  HVAC,Sum,Fan Electric Energy {[}J{]}
+  HVAC,Sum,Fan Electricity Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Fan Electric Power {[}W{]}}\label{fan-electric-power-w}
+\paragraph{Fan Electricity Rate {[}W{]}}\label{fan-electric-power-w}
 
 This output field contains the average electricity consumption rate for the fan in Watts for the timestep being reported.
 
@@ -320,7 +320,7 @@ This output field contains the average electricity consumption rate for the fan 
 
 This output field contains the average rise in air temperature across the fan (outlet air temperature minus inlet air temperature) in degrees Celsius for the timestep being reported.
 
-\paragraph{Fan Electric Energy {[}J{]}}\label{fan-electric-energy-j}
+\paragraph{Fan Electricity Energy {[}J{]}}\label{fan-electric-energy-j}
 
 This output field contains the electricity consumption of the fan in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Fans, Group Key = System (ref. Output:Meter objects).
 
@@ -378,7 +378,7 @@ Enter the name of an exponent performance curve. This optional alpha field must 
 
 Enter the name of a quadratic or cubic performance curve. This optional alpha field is used to simulate multi-speed fan motors. This curve represents the ratio of actual fan total efficiency to rated fan total efficiency when a change in fan speed occurs. Leave this field blank when simulating constant-speed fan motors.
 
-\paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-1-000}
+\paragraph{Field: End-Use Subcategory}
 
 Allows you to specify a user-defined end-use subcategory, e.g., ``Main Fans'', etc. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the fan will be assigned to the ``General'' end-use subcategory.
 
@@ -399,15 +399,15 @@ Fan:OnOff,
 
 \subsubsection{Outputs}\label{outputs-1-011}
 
-HVAC,Average,Fan Electric Power{[}W{]}
+HVAC,Average,Fan Electricity Rate {[}W{]}
 
 HVAC,Average,Fan Rise in Air Temperature {[}deltaC{]}
 
-HVAC,Sum,Fan Electric Energy {[}J{]}
+HVAC,Sum,Fan Electricity Energy {[}J{]}
 
 HVAC,Average,Fan Runtime Fraction {[]}
 
-\paragraph{Fan Electric Power {[}W{]}}\label{fan-electric-power-w-1}
+\paragraph{Fan Electricity Rate {[}W{]}}\label{fan-electric-power-w-1}
 
 This output field contains the average electricity consumption rate for the fan in Watts for the timestep being reported.
 
@@ -415,7 +415,7 @@ This output field contains the average electricity consumption rate for the fan 
 
 This output field contains the average rise in air temperature across the fan (outlet air temperature minus inlet air temperature) in degrees Celsius for the timestep being reported.
 
-\paragraph{Fan Electric Energy {[}J{]}}\label{fan-electric-energy-j-1}
+\paragraph{Fan Electricity Energy {[}J{]}}\label{fan-electric-energy-j-1}
 
 This output field contains the electricity consumption of the fan in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Fans, Group Key = System (ref. Output:Meter objects).
 
@@ -531,7 +531,7 @@ The name of the HVAC system node which supplies the inlet air conditions to the 
 
 The name of the HVAC system node to which the fan sends its outlet air.
 
-\paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-2-000}
+\paragraph{Field: End-Use Subcategory}
 
 Allows you to specify a user-defined end-use subcategory, e.g., ``Central System'', etc. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the fan will be assigned to the ``General'' end-use subcategory.
 
@@ -539,14 +539,14 @@ Allows you to specify a user-defined end-use subcategory, e.g., ``Central System
 
 \begin{itemize}
 \item
-  HVAC,Average,Fan Electric Power{[}W{]}
+  HVAC,Average,Fan Electricity Rate {[}W{]}
 \item
   HVAC,Average,Fan Rise in Air Temperature {[}deltaC{]}
 \item
-  HVAC,Sum,Fan Electric Energy {[}J{]}
+  HVAC,Sum,Fan Electricity Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Fan Electric Power {[}W{]}}\label{fan-electric-power-w-2}
+\paragraph{Fan Electricity Rate {[}W{]}}\label{fan-electric-power-w-2}
 
 This output field contains the average electricity consumption rate for the fan in Watts for the timestep being reported.
 
@@ -554,7 +554,7 @@ This output field contains the average electricity consumption rate for the fan 
 
 This output field contains the average rise in air temperature across the fan (outlet air temperature minus inlet air temperature) in degrees Celsius for the timestep being reported.
 
-\paragraph{Fan Electric Energy {[}J{]}}\label{fan-electric-energy-j-2}
+\paragraph{Fan Electricity Energy {[}J{]}}\label{fan-electric-energy-j-2}
 
 This output field contains the electricity consumption of the fan in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Fans, Group Key = System (ref. Output:Meter objects).
 
@@ -564,7 +564,7 @@ This fan object differs from the other fans in that it stands on its own in a zo
 
 There are several control options available for the exhaust fan including: an on/off availability schedule, interaction with system availability managers, minimum zone air temperature control limits and a variable flow fraction schedule.
 
-The way in which the exhaust fan impacts central air system can be controlled by declaring what portion of the flow has been balanced by simple airflow from infiltration, ventilation, or mixing. However, it is important to note that presence of an exhaust fan does not by itself drive any simple airflow such as infiltration, ventilation, or zone mixing. There is no comprehensive automatic mass balancing between air system flows, exhaust flows, and the separate simple airflows. For balancing, the simple airflows need to have their own input objects that need to be coordinated with the exhaust fan.
+The way in which the exhaust fan impacts central air system can be controlled by declaring what portion of the flow has been balanced by simple airflow from infiltration, ventilation, or mixing. However, it is important to note that presence of an exhaust fan does not by itself drive any simple airflow such as infiltration, ventilation, or zone mixing. For balancing, the simple airflows need to have their own input objects that need to be coordinated with the exhaust fan. The ZoneAirMassFlowConservation object could be a possible solution that can help with balancing unbalanced airflows by triggering the zone air mass flow conservation when desired. 
 
 \subsubsection{Inputs}\label{inputs-3-014}
 
@@ -618,24 +618,24 @@ This field is optional. If it is not used then there will be no temperature-rela
 
 \paragraph{Field: Balanced Exhaust Fraction Schedule Name}\label{field-balanced-exhaust-fraction-schedule-name}
 
-This field is optional. If it is not used, then all the exhaust air flow is assumed to be unbalanced by any simple airflows, such as infiltration, ventilation, or zone mixing. Unbalanced exhaust is then modeled as being provided by the outdoor air system in the central air system. The modeling of unbalanced will reduce the flow rates at the zone's return air node by the flow rate that is being exhausted and will ensure that the outdoor air flow rate is sufficient to serve the exhaust. If this field is used, then enter the name of a schedule with fractional values between 0.0 and 1.0, inclusive. This fraction is applied to the exhaust fan flow rate and the model tracks the portion of the exhaust that is balanced. Balanced exhaust is then modeled as being provided by simple airflows and does not impact the central air system return air or outdoor air flow rates. For example, if a kitchen zone with an exhaust fan is designed to draw half of its make up air from a neighboring dining room and the other half from the outdoor air system, then a schedule value of 0.5 could be used here.
+This field is optional. If it is not used, then all the exhaust air flow is assumed to be unbalanced by any simple airflows, such as infiltration, ventilation, or zone mixing. Unbalanced exhaust is then modeled as being provided by the outdoor air system in the central air system. The modeling of unbalanced will reduce the flow rates at the zone's return air node by the flow rate that is being exhausted and will ensure that the outdoor air flow rate is sufficient to serve the exhaust. If this field is used, then enter the name of a schedule with fractional values between 0.0 and 1.0, inclusive. This fraction is applied to the exhaust fan flow rate and the model tracks the portion of the exhaust that is balanced. Balanced exhaust is then modeled as being provided by simple airflows and does not impact the central air system return air or outdoor air flow rates. For example, if a kitchen zone with an exhaust fan is designed to draw half of its make up air from a neighboring dining room and the other half from the outdoor air system, then a schedule value of 0.5 could be used here. This input field must be blank when the zone air flow balance is enforced. If user specifies a schedule and zone air flow balance is enforced, then EnergyPlus throws a warning error message, ignores the schedule and simulation continues.   
 
 \subsubsection{Outputs}\label{outputs-3-007}
 
 \begin{itemize}
 \item
-  HVAC,Average,Fan Electric Power {[}W{]}
+  HVAC,Average,Fan Electricity Rate {[}W{]}
 \item
   HVAC,Average,Fan Rise in Air Temperature{[}deltaC{]}
 \item
-  HVAC,Sum,Fan Electric Energy {[}J{]}
+  HVAC,Sum,Fan Electricity Energy {[}J{]}
 \item
   HVAC,Average,Fan Unbalanced Air Mass Flow Rate {[}kg/s{]}
 \item
   HVAC,Average,Fan Balanced Air Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{Fan Electric Power {[}W{]}}\label{fan-electric-power-w-3}
+\paragraph{Fan Electricity Rate {[}W{]}}\label{fan-electric-power-w-3}
 
 This output field contains the average electricity consumption rate for the fan in Watts for the timestep being reported.
 
@@ -643,7 +643,7 @@ This output field contains the average electricity consumption rate for the fan 
 
 This output field contains the average rise in air temperature across the fan (outlet air temperature minus inlet air temperature) in degrees Celsius for the timestep being reported.
 
-\paragraph{Fan Electric Energy {[}J{]}}\label{fan-electric-energy-j-3}
+\paragraph{Fan Electricity Energy {[}J{]}}\label{fan-electric-energy-j-3}
 
 This output field contains the electricity consumption of the fan in Joules for the timestep being reported. This output is also added to an output meter with Resource Type = Electricity, End Use Key = Fans, Group Key = System (ref. Output:Meter objects).
 
@@ -1102,14 +1102,14 @@ Fan:ComponentModel,
 
 \begin{itemize}
 \item
-  HVAC,Average,Fan Electric Power{[}W{]}
+  HVAC,Average,Fan Electricity Rate {[}W{]}
 \item
   HVAC,Average,Fan Rise in Air Temperature {[}deltaC{]}
 \item
-  HVAC,Sum,Fan Electric Energy {[}J{]}
+  HVAC,Sum,Fan Electricity Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Fan Electric Power {[}W{]}}\label{fan-electric-power-w-4}
+\paragraph{Fan Electricity Rate {[}W{]}}\label{fan-electric-power-w-4}
 
 This output field contains the average electricity consumption rate for the fan in Watts for the timestep being reported.
 
@@ -1117,7 +1117,7 @@ This output field contains the average electricity consumption rate for the fan 
 
 This output field contains the average rise in air temperature across the fan (outlet air temperature minus inlet air temperature) in degrees Celsius for the timestep being reported.
 
-\paragraph{Fan Electric Energy {[}J{]}}\label{fan-electric-energy-j-4}
+\paragraph{Fan Electricity Energy {[}J{]}}\label{fan-electric-energy-j-4}
 
 This output field contains the electricity consumption of the fan in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Fans, Group Key = System (ref. Output:Meter objects).
 

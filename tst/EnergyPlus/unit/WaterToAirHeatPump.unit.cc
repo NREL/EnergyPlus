@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,13 +53,14 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/WaterToAirHeatPump.hh>
 
@@ -71,7 +72,6 @@ using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::WaterToAirHeatPump;
-using General::RoundSigDigits;
 
 TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 {
@@ -134,100 +134,103 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    FluidProperties::RefrigData.allocate(1);
-    FluidProperties::RefrigData(1).Name = "R22";
-    FluidProperties::RefrigData(1).PsLowTempIndex = 1;
-    FluidProperties::RefrigData(1).PsHighTempIndex = 2;
-    FluidProperties::RefrigData(1).PsTemps.allocate(2);
-    FluidProperties::RefrigData(1).PsTemps(1) = -157.42;
-    FluidProperties::RefrigData(1).PsTemps(2) = 96.145;
-    FluidProperties::RefrigData(1).PsValues.allocate(2);
-    FluidProperties::RefrigData(1).PsValues(1) = 0.3795;
-    FluidProperties::RefrigData(1).PsValues(2) = 4990000.0;
+    state->dataFluidProps->RefrigData.allocate(1);
+    state->dataFluidProps->RefrigData(1).Name = "R22";
+    state->dataFluidProps->RefrigData(1).PsLowTempIndex = 1;
+    state->dataFluidProps->RefrigData(1).PsHighTempIndex = 2;
+    state->dataFluidProps->RefrigData(1).PsTemps.allocate(2);
+    state->dataFluidProps->RefrigData(1).PsTemps(1) = -157.42;
+    state->dataFluidProps->RefrigData(1).PsTemps(2) = 96.145;
+    state->dataFluidProps->RefrigData(1).PsValues.allocate(2);
+    state->dataFluidProps->RefrigData(1).PsValues(1) = 0.3795;
+    state->dataFluidProps->RefrigData(1).PsValues(2) = 4990000.0;
 
-    FluidProperties::RefrigData(1).HfLowTempIndex = 1;
-    FluidProperties::RefrigData(1).HfHighTempIndex = 2;
-    FluidProperties::RefrigData(1).PsLowPresIndex = 1;
-    FluidProperties::RefrigData(1).PsHighPresIndex = 2;
-    FluidProperties::RefrigData(1).HTemps.allocate(2);
-    FluidProperties::RefrigData(1).HfValues.allocate(2);
-    FluidProperties::RefrigData(1).HfgValues.allocate(2);
+    state->dataFluidProps->RefrigData(1).HfLowTempIndex = 1;
+    state->dataFluidProps->RefrigData(1).HfHighTempIndex = 2;
+    state->dataFluidProps->RefrigData(1).PsLowPresIndex = 1;
+    state->dataFluidProps->RefrigData(1).PsHighPresIndex = 2;
+    state->dataFluidProps->RefrigData(1).HTemps.allocate(2);
+    state->dataFluidProps->RefrigData(1).HfValues.allocate(2);
+    state->dataFluidProps->RefrigData(1).HfgValues.allocate(2);
 
-    FluidProperties::RefrigData(1).HTemps(1) = -157.42;
-    FluidProperties::RefrigData(1).HTemps(2) = 96.145;
-    FluidProperties::RefrigData(1).HfValues(1) = 29600.0;
-    FluidProperties::RefrigData(1).HfValues(2) = 366900.0;
-    FluidProperties::RefrigData(1).HfgValues(1) = 332700.0;
-    FluidProperties::RefrigData(1).HfgValues(2) = 366900.0;
-    FluidProperties::RefrigData(1).NumSuperTempPts = 2;
-    FluidProperties::RefrigData(1).NumSuperPressPts = 2;
-    FluidProperties::RefrigData(1).SHTemps.allocate(2);
-    FluidProperties::RefrigData(1).SHPress.allocate(2);
-    FluidProperties::RefrigData(1).SHTemps(1) = -157.15;
-    FluidProperties::RefrigData(1).SHTemps(2) = 152.85;
-    FluidProperties::RefrigData(1).SHPress(1) = 0.4043;
-    FluidProperties::RefrigData(1).SHPress(2) = 16500000.0;
-    FluidProperties::RefrigData(1).HshValues.allocate(2, 2);
-    FluidProperties::RefrigData(1).HshValues(1, 1) = 332800.0;
-    FluidProperties::RefrigData(1).HshValues(1, 2) = 537000.0;
-    FluidProperties::RefrigData(1).HshValues(2, 1) = 332800.0;
-    FluidProperties::RefrigData(1).HshValues(2, 2) = 537000.0;
-    FluidProperties::RefrigData(1).RhoshValues.allocate(2, 2);
-    FluidProperties::RefrigData(1).RhoshValues(1, 1) = 0.00003625;
-    FluidProperties::RefrigData(1).RhoshValues(1, 2) = 0.0;
-    FluidProperties::RefrigData(1).RhoshValues(2, 1) = 0.00003625;
-    FluidProperties::RefrigData(1).RhoshValues(2, 2) = 0.0;
+    state->dataFluidProps->RefrigData(1).HTemps(1) = -157.42;
+    state->dataFluidProps->RefrigData(1).HTemps(2) = 96.145;
+    state->dataFluidProps->RefrigData(1).HfValues(1) = 29600.0;
+    state->dataFluidProps->RefrigData(1).HfValues(2) = 366900.0;
+    state->dataFluidProps->RefrigData(1).HfgValues(1) = 332700.0;
+    state->dataFluidProps->RefrigData(1).HfgValues(2) = 366900.0;
+    state->dataFluidProps->RefrigData(1).NumSuperTempPts = 2;
+    state->dataFluidProps->RefrigData(1).NumSuperPressPts = 2;
+    state->dataFluidProps->RefrigData(1).SHTemps.allocate(2);
+    state->dataFluidProps->RefrigData(1).SHPress.allocate(2);
+    state->dataFluidProps->RefrigData(1).SHTemps(1) = -157.15;
+    state->dataFluidProps->RefrigData(1).SHTemps(2) = 152.85;
+    state->dataFluidProps->RefrigData(1).SHPress(1) = 0.4043;
+    state->dataFluidProps->RefrigData(1).SHPress(2) = 16500000.0;
+    state->dataFluidProps->RefrigData(1).HshValues.allocate(2, 2);
+    state->dataFluidProps->RefrigData(1).HshValues(1, 1) = 332800.0;
+    state->dataFluidProps->RefrigData(1).HshValues(1, 2) = 537000.0;
+    state->dataFluidProps->RefrigData(1).HshValues(2, 1) = 332800.0;
+    state->dataFluidProps->RefrigData(1).HshValues(2, 2) = 537000.0;
+    state->dataFluidProps->RefrigData(1).RhoshValues.allocate(2, 2);
+    state->dataFluidProps->RefrigData(1).RhoshValues(1, 1) = 0.00003625;
+    state->dataFluidProps->RefrigData(1).RhoshValues(1, 2) = 0.0;
+    state->dataFluidProps->RefrigData(1).RhoshValues(2, 1) = 0.00003625;
+    state->dataFluidProps->RefrigData(1).RhoshValues(2, 2) = 0.0;
 
-    FluidProperties::RefrigData(1).RhofLowTempIndex = 1;
-    FluidProperties::RefrigData(1).RhofHighTempIndex = 2;
-    FluidProperties::RefrigData(1).RhoTemps.allocate(2);
-    FluidProperties::RefrigData(1).RhoTemps(1) = -157.42;
-    FluidProperties::RefrigData(1).RhoTemps(2) = 96.145;
-    FluidProperties::RefrigData(1).RhofValues.allocate(2);
-    FluidProperties::RefrigData(1).RhofValues(1) = 1721.0;
-    FluidProperties::RefrigData(1).RhofValues(2) = 523.8;
-    FluidProperties::RefrigData(1).RhofgValues.allocate(2);
-    FluidProperties::RefrigData(1).RhofgValues(1) = 0.341;
-    FluidProperties::RefrigData(1).RhofgValues(2) = 523.8;
+    state->dataFluidProps->RefrigData(1).RhofLowTempIndex = 1;
+    state->dataFluidProps->RefrigData(1).RhofHighTempIndex = 2;
+    state->dataFluidProps->RefrigData(1).RhoTemps.allocate(2);
+    state->dataFluidProps->RefrigData(1).RhoTemps(1) = -157.42;
+    state->dataFluidProps->RefrigData(1).RhoTemps(2) = 96.145;
+    state->dataFluidProps->RefrigData(1).RhofValues.allocate(2);
+    state->dataFluidProps->RefrigData(1).RhofValues(1) = 1721.0;
+    state->dataFluidProps->RefrigData(1).RhofValues(2) = 523.8;
+    state->dataFluidProps->RefrigData(1).RhofgValues.allocate(2);
+    state->dataFluidProps->RefrigData(1).RhofgValues(1) = 0.341;
+    state->dataFluidProps->RefrigData(1).RhofgValues(2) = 523.8;
 
-    GetWatertoAirHPInput();
+    GetWatertoAirHPInput(*state);
 
     int HPNum(1);
     Real64 DesignAirflow(2.0);
-    DataLoopNode::Node(WatertoAirHP(HPNum).WaterInletNodeNum).Temp = 5.0;
-    DataLoopNode::Node(WatertoAirHP(HPNum).WaterInletNodeNum).Enthalpy = 44650.0;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).Temp = 5.0;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).Enthalpy = 44650.0;
 
-    WatertoAirHP(HPNum).DesignWaterMassFlowRate = 15.0;
-    DataLoopNode::Node(WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRate = WatertoAirHP(HPNum).DesignWaterMassFlowRate;
-    DataLoopNode::Node(WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRateMax = WatertoAirHP(HPNum).DesignWaterMassFlowRate;
-    DataLoopNode::Node(WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRateMaxAvail = WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate = 15.0;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRate =
+        state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRateMax =
+        state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRateMaxAvail =
+        state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
 
-    DataLoopNode::Node(WatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate = DesignAirflow;
-    DataLoopNode::Node(WatertoAirHP(HPNum).AirInletNodeNum).Temp = 26.0;
-    DataLoopNode::Node(WatertoAirHP(HPNum).AirInletNodeNum).HumRat = 0.007;
-    DataLoopNode::Node(WatertoAirHP(HPNum).AirInletNodeNum).Enthalpy = 43970.75;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate = DesignAirflow;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).Temp = 26.0;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).HumRat = 0.007;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).Enthalpy = 43970.75;
 
-    TotNumLoops = 2;
-    PlantLoop.allocate(TotNumLoops);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
-    for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
 
-    PlantLoop(1).Name = "ChilledWaterLoop";
-    PlantLoop(1).FluidName = "ChilledWater";
-    PlantLoop(1).FluidIndex = 1;
-    PlantLoop(1).FluidName = "WATER";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = WatertoAirHP(HPNum).Name;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = WatertoAirHP(HPNum).WAHPPlantTypeOfNum;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = WatertoAirHP(HPNum).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "ChilledWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum;
 
     bool InitFlag(true);
     Real64 MaxONOFFCyclesperHour(4.0);
@@ -240,58 +243,67 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
     bool FirstHVACIteration(true);
     Real64 RuntimeFrac(1.0);
     int CompOp(1);
-    WatertoAirHP(HPNum).LoopNum = 1;
+    state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum = 1;
 
-    InitWatertoAirHP(HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
+    InitWatertoAirHP(
+        *state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
 
-    CalcWatertoAirHPCooling(HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
+    CalcWatertoAirHPCooling(*state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
 
     // make sure the coil is active
-    EXPECT_NE(WatertoAirHP(HPNum).QSource, 0.0);
-    EXPECT_NE(WatertoAirHP(HPNum).Power, 0.0);
+    EXPECT_NE(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSource, 0.0);
+    EXPECT_NE(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).Power, 0.0);
     // check the source side energy balance
-    EXPECT_NEAR(WatertoAirHP(HPNum).QSource,
-                WatertoAirHP(HPNum).InletWaterMassFlowRate * (WatertoAirHP(HPNum).OutletWaterEnthalpy - WatertoAirHP(HPNum).InletWaterEnthalpy),
+    EXPECT_NEAR(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSource,
+                state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterMassFlowRate *
+                    (state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletWaterEnthalpy -
+                     state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterEnthalpy),
                 0.000000001);
 
     HPNum = 2;
-    WatertoAirHP(HPNum).LoopNum = 2;
-    PlantLoop(2).Name = "HotWaterLoop";
-    PlantLoop(2).FluidName = "HotWater";
-    PlantLoop(2).FluidIndex = 1;
-    PlantLoop(2).FluidName = "WATER";
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = WatertoAirHP(HPNum).Name;
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = WatertoAirHP(HPNum).WAHPPlantTypeOfNum;
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = WatertoAirHP(HPNum).WaterInletNodeNum;
+    state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum = 2;
+    state->dataPlnt->PlantLoop(2).Name = "HotWaterLoop";
+    state->dataPlnt->PlantLoop(2).FluidName = "HotWater";
+    state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum;
 
-    DataLoopNode::Node(WatertoAirHP(HPNum).WaterInletNodeNum).Temp = 35.0;
-    DataLoopNode::Node(WatertoAirHP(HPNum).WaterInletNodeNum).Enthalpy = 43950.0;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).Temp = 35.0;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).Enthalpy = 43950.0;
 
-    WatertoAirHP(HPNum).DesignWaterMassFlowRate = 15.0;
-    DataLoopNode::Node(WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRate = WatertoAirHP(HPNum).DesignWaterMassFlowRate;
-    DataLoopNode::Node(WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRateMax = WatertoAirHP(HPNum).DesignWaterMassFlowRate;
-    DataLoopNode::Node(WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRateMaxAvail = WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate = 15.0;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRate =
+        state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRateMax =
+        state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRateMaxAvail =
+        state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
 
-    DataLoopNode::Node(WatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate = DesignAirflow;
-    DataLoopNode::Node(WatertoAirHP(HPNum).AirInletNodeNum).Temp = 15.0;
-    DataLoopNode::Node(WatertoAirHP(HPNum).AirInletNodeNum).HumRat = 0.004;
-    DataLoopNode::Node(WatertoAirHP(HPNum).AirInletNodeNum).Enthalpy = PsyHFnTdbW(15.0, 0.004);
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate = DesignAirflow;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).Temp = 15.0;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).Enthalpy = PsyHFnTdbW(15.0, 0.004);
 
-    WatertoAirHP(HPNum).DesignWaterMassFlowRate = 15.0;
+    state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate = 15.0;
 
-    InitWatertoAirHP(HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
+    InitWatertoAirHP(
+        *state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
 
-    CalcWatertoAirHPHeating(HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
+    CalcWatertoAirHPHeating(*state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
 
     // make sure the coil is active
-    EXPECT_NE(WatertoAirHP(HPNum).QSource, 0.0);
-    EXPECT_NE(WatertoAirHP(HPNum).Power, 0.0);
+    EXPECT_NE(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSource, 0.0);
+    EXPECT_NE(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).Power, 0.0);
     // check the source side energy balance
-    EXPECT_NEAR(WatertoAirHP(HPNum).QSource,
-                WatertoAirHP(HPNum).InletWaterMassFlowRate * (WatertoAirHP(HPNum).InletWaterEnthalpy - WatertoAirHP(HPNum).OutletWaterEnthalpy),
+    EXPECT_NEAR(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSource,
+                state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterMassFlowRate *
+                    (state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterEnthalpy -
+                     state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletWaterEnthalpy),
                 0.000000001);
 
     // clean up
-    WatertoAirHP.deallocate();
-    FluidProperties::RefrigData.deallocate();
+    state->dataWaterToAirHeatPump->WatertoAirHP.deallocate();
+    state->dataFluidProps->RefrigData.deallocate();
 }

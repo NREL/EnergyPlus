@@ -114,6 +114,8 @@ This field describes when the Erl programs managed under this object are called 
 \item
   BeginNewEnvironment. This calling point occurs near the beginning of each environment period. Environment periods include sizing periods such as design days and run periods. This calling point will not be useful for control actions but is useful for initialization of Erl program variables and other one-time set up actions for EMS.
 \item
+  BeginZoneTimestepBeforeSetCurrentWeather. This calling point occurs near the beginning of each timestep during weather data setup. It is called from ``ManageWeather'' before ``SetCurrentWeather'' which sets the environment variables for a given timstep. ``SetCurrentWeather'' is where the Weather Data actuators may override certain environment variables. Note that this calling point is not active during sizing.
+\item
   AfterNewEnvironmentWarmUpIsComplete. This calling point occurs at the beginning of each environment period but after warm up days are complete. Warm up days are used to condition the transient aspects of the model with the first day before proceeding. This calling point will not be useful for control actions but is useful for re-initializing Erl programs with fresh values after warm up is complete. Programs called from this point might be used to reset counters or summed variables that would change during warmup.
 \item
   BeginZoneTimestepBeforeInitHeatBalance. This calling point occurs at the beginning of each timestep before ``InitHeatBalance'' executes but after the weather manager and exterior energy use manager. ``InitHeatBalance'' refers to the step in EnergyPlus modeling when the solar shading and daylighting coefficients are calculated. This calling point is useful for controlling components that affect the building envelope including surface constructions, window shades, and shading surfaces. Programs called from this point might actuate the building envelope or internal gains based on current weather or on the results from the previous timestep. Demand management routines might use this calling point to operate window shades, change active window constructions, activate exterior shades, etc.
@@ -405,9 +407,9 @@ This field is used to specify the type of resource that the output variable cons
 \item
   \textbf{Coal}, this selects the meter for coal consumption, in units of Joules {[}J{]},
 \item
-  \textbf{FuelOilNo1}, this selects the meter for \#1 Fuel Oil consumption, in units of Joules {[}J{]},
+  \textbf{FuelOilNo1}, this selects the meter for No 1 Fuel Oil consumption, in units of Joules {[}J{]},
 \item
-  \textbf{FuelOilNo2}, this selects the meter for \#2 Fuel Oil consumption, in units of Joules {[}J{]},
+  \textbf{FuelOilNo2}, this selects the meter for No 2 Fuel Oil consumption, in units of Joules {[}J{]},
 \item
   \textbf{Propane}, this selects the meter for propane consumption, in units of Joules {[}J{]},
 \item

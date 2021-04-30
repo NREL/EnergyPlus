@@ -30,7 +30,7 @@
 
 #include <cctype>
 #include <iostream>
-#include <strstream>
+#include <sstream>
 #include <iomanip>
 using namespace std;
 
@@ -68,11 +68,11 @@ istream &operator >> (istream &s, vector3 &v)	//	WLC 06/06/2003 major rewrite
 {
     vector3	result;
     Char	c;
-	ostrstream osstream;
+	std::ostringstream osstream;
 	
 	// Expected format: [1 2 3]
 	
-    while (s >> c && isspace(c));
+    while (s >> c && isspace(c)) {;} // skip through spaces
 	if (s.eof()) return(s);
 	if (s.fail()) {
 //		cerr << "vector3:ReadError1: unrecoverable failbit\n";

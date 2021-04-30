@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,178 +52,279 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace DataEnvironment {
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
+    Real64 constexpr EarthRadius(6356000.0);          // Radius of the Earth (m)
+    Real64 constexpr AtmosphericTempGradient(0.0065); // Standard atmospheric air temperature gradient (K/m)
+    Real64 constexpr SunIsUpValue(0.00001);           // if Cos Zenith Angle of the sun is >= this value, the sun is "up"
+    Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
-    // MODULE PARAMETER DEFINITIONS:
-    extern Real64 const EarthRadius;             // Radius of the Earth (m)
-    extern Real64 const AtmosphericTempGradient; // Standard atmospheric air temperature gradient (K/m)
-    extern Real64 const SunIsUpValue;            // if Cos Zenith Angle of the sun is >= this value, the sun is "up"
-    extern Real64 const StdPressureSeaLevel;     // Standard barometric pressure at sea level (Pa)
+    Real64 OutDryBulbTempAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
+    Real64 OutWetBulbTempAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
+    Real64 OutDewPointTempAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
-    // MODULE VARIABLE DECLARATIONS:
-    extern Real64 BeamSolarRad;                 // Current beam normal solar irradiance
-    extern bool EMSBeamSolarRadOverrideOn;      // EMS flag for beam normal solar irradiance
-    extern Real64 EMSBeamSolarRadOverrideValue; // EMS override value for beam normal solar irradiance
-    extern int DayOfMonth;                      // Current day of the month
-    extern int DayOfMonthTomorrow;              // Tomorrow's day of the month
-    extern int DayOfWeek;                       // Current day of the week (Sunday=1, Monday=2, ...)
-    extern int DayOfWeekTomorrow;               // Tomorrow's day of the week (Sunday=1, Monday=2, ...)
-    extern int DayOfYear;                       // Current day of the year (01JAN=1, 02JAN=2, ...)
-    extern int DayOfYear_Schedule;              // Schedule manager always assumes leap years...
-    extern Real64 DifSolarRad;                  // Current sky diffuse solar horizontal irradiance
-    extern bool EMSDifSolarRadOverrideOn;       // EMS flag for sky diffuse solar horizontal irradiance
-    extern Real64 EMSDifSolarRadOverrideValue;  // EMS override value for sky diffuse solar horizontal irradiance
-    extern int DSTIndicator;                    // Daylight Saving Time Indicator (1=yes, 0=no) for Today
-    extern Real64 Elevation;                    // Elevation of this building site
-    extern bool EndMonthFlag;                   // Set to true on last day of month
-    extern bool EndYearFlag;                    // Set to true on last day of year
-    extern Real64 GndReflectanceForDayltg;      // Ground visible reflectance for use in daylighting calc
-    extern Real64 GndReflectance;               // Ground visible reflectance from input
-    extern Real64 GndSolarRad;                  // Current ground reflected radiation
-    extern Real64 GroundTemp;                   // Current ground temperature {C}
-    extern Real64 GroundTempKelvin;             // Current ground temperature {K}
-    extern Real64 GroundTempFC;                 // Current ground temperature defined for F or C factor method {C}
-    extern Real64 GroundTemp_Surface;           // Current surface ground temperature {C}
-    extern Real64 GroundTemp_Deep;              // Current deep ground temperature
-    extern int HolidayIndex;                    // Indicates whether current day is a holiday and if so what type
-    // HolidayIndex=(0-no holiday, 1-holiday type 1, ...)
-    extern int HolidayIndexTomorrow;               // Tomorrow's Holiday Index
-    extern bool IsRain;                            // Surfaces are wet for this time interval
-    extern bool IsSnow;                            // Snow on the ground for this time interval
-    extern Real64 Latitude;                        // Latitude of building location
-    extern Real64 Longitude;                       // Longitude of building location
-    extern int Month;                              // Current calendar month
-    extern int MonthTomorrow;                      // Tomorrow's calendar month
-    extern Real64 OutBaroPress;                    // Current outdoor air barometric pressure
-    extern Real64 OutDryBulbTemp;                  // Current outdoor air dry bulb temperature
-    extern bool EMSOutDryBulbOverrideOn;           // EMS flag for outdoor air dry bulb temperature
-    extern Real64 EMSOutDryBulbOverrideValue;      // EMS override value for outdoor air dry bulb temperature
-    extern Real64 OutHumRat;                       // Current outdoor air humidity ratio
-    extern Real64 OutRelHum;                       // Current outdoor relative humidity [%]
-    extern Real64 OutRelHumValue;                  // Current outdoor relative humidity value [0.0-1.0]
-    extern bool EMSOutRelHumOverrideOn;            // EMS flag for outdoor relative humidity value
-    extern Real64 EMSOutRelHumOverrideValue;       // EMS override value for outdoor relative humidity value
-    extern Real64 OutEnthalpy;                     // Current outdoor enthalpy
-    extern Real64 OutAirDensity;                   // Current outdoor air density
-    extern Real64 OutWetBulbTemp;                  // Current outdoor air wet bulb temperature
-    extern Real64 OutDewPointTemp;                 // Current outdoor dewpoint temperature
-    extern bool EMSOutDewPointTempOverrideOn;      // EMS flag for outdoor dewpoint temperature
-    extern Real64 EMSOutDewPointTempOverrideValue; // EMS override value for outdoor dewpoint temperature
-    extern Real64 SkyTemp;                         // Current sky temperature {C}
-    extern Real64 SkyTempKelvin;                   // Current sky temperature {K}
-    extern Real64 LiquidPrecipitation;             // Current liquid precipitation amount (rain) {m}
-    extern bool SunIsUp;                           // True when Sun is over horizon, False when not
-    extern Real64 WindDir;                         // Current outdoor air wind direction
-    extern bool EMSWindDirOverrideOn;              // EMS flag for outdoor air wind direction
-    extern Real64 EMSWindDirOverrideValue;         // EMS override value for outdoor air wind direction
-    extern Real64 WindSpeed;                       // Current outdoor air wind speed
-    extern bool EMSWindSpeedOverrideOn;            // EMS flag for outdoor air wind speed
-    extern Real64 EMSWindSpeedOverrideValue;       // EMS override value for outdoor air wind speed
-    extern Real64 WaterMainsTemp;                  // Current water mains temperature
-    extern int Year;                               // Current calendar year of the simulation from the weather file
-    extern int YearTomorrow;                       // Tomorrow's calendar year of the simulation
-    extern Array1D<Real64> SOLCOS;                 // Solar direction cosines at current time step
-    extern Real64 CloudFraction;                   // Fraction of sky covered by clouds
-    extern Real64 HISKF;                           // Exterior horizontal illuminance from sky (lux).
-    extern Real64 HISUNF;                          // Exterior horizontal beam illuminance (lux)
-    extern Real64 HISUNFnorm;                      // Exterior beam normal illuminance (lux)
-    extern Real64 PDIRLW;                          // Luminous efficacy (lum/W) of beam solar radiation
-    extern Real64 PDIFLW;                          // Luminous efficacy (lum/W) of sky diffuse solar radiation
-    extern Real64 SkyClearness;                    // Sky clearness (see subr. DayltgLuminousEfficacy)
-    extern Real64 SkyBrightness;                   // Sky brightness (see subr. DayltgLuminousEfficacy)
-    extern Real64 StdBaroPress;                    // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
-    extern Real64 StdRhoAir;                       // Standard "rho air" set in WeatherManager - based on StdBaroPress at elevation
-    extern Real64 rhoAirSTP;                       // Standard density of dry air at 101325 Pa, 20.0C temperaure
-    extern Real64 TimeZoneNumber;                  // Time Zone Number of building location
-    extern Real64 TimeZoneMeridian;                // Standard Meridian of TimeZone
-    extern std::string EnvironmentName;            // Current environment name (longer for weather file names)
-    extern std::string WeatherFileLocationTitle;   // Location Title from Weather File
-    extern std::string CurMnDyHr;                  // Current Month/Day/Hour timestamp info
-    extern std::string CurMnDy;                    // Current Month/Day timestamp info
-    extern std::string CurMnDyYr;                  // Current Month/Day/Year timestamp info
-    extern int CurEnvirNum;                        // current environment number
-    extern int TotDesDays;                         // Total number of Design days to Setup
-    extern int TotRunDesPersDays;                  // Total number of Run Design Periods [Days] (Weather data) to Setup
-    extern int CurrentOverallSimDay;               // Count of current simulation day in total of all sim days
-    extern int TotalOverallSimDays;                // Count of all possible simulation days in all environments
-    extern int MaxNumberSimYears;                  // Maximum number of simulation years requested in all RunPeriod statements
-    extern int RunPeriodStartDayOfWeek;            // Day of week of the first day of the run period. (or design day - day of week)
+    Real64 WindSpeedAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
-    extern Real64 CosSolarDeclinAngle; // Cosine of the solar declination angle
-    extern Real64 EquationOfTime;      // Value of the equation of time formula
-    extern Real64 SinLatitude;         // Sine of Latitude
-    extern Real64 CosLatitude;         // Cosine of Latitude
-    extern Real64 SinSolarDeclinAngle; // Sine of the solar declination angle
-    extern Real64 TS1TimeOffset;       // offset when TS=1 for solar calculations
+    Real64 OutBaroPressAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
-    extern Real64 WeatherFileWindModCoeff; // =(WindBLHeight/WindSensorHeight)**WindExp for conditions at the weather station
-    extern Real64 WeatherFileTempModCoeff; // =AtmosphericTempGradient*EarthRadius*SensorHeight/(EarthRadius+SensorHeight)
-
-    extern Real64 SiteWindExp;      // Exponent for the wind velocity profile at the site
-    extern Real64 SiteWindBLHeight; // Boundary layer height for the wind velocity profile at the site (m)
-    extern Real64 SiteTempGradient; // Air temperature gradient coefficient (K/m)
-
-    extern bool GroundTempObjInput;         // Ground temperature object input
-    extern bool GroundTemp_SurfaceObjInput; // Surface ground temperature object input
-    extern bool GroundTemp_DeepObjInput;    // Deep ground temperature object input
-    extern bool FCGroundTemps;
-    extern bool DisplayWeatherMissingDataWarnings; // Display missing/out of range weather warnings
-    extern bool IgnoreSolarRadiation;              // TRUE if all solar radiation is to be ignored
-    extern bool IgnoreBeamRadiation;               // TRUE if beam (aka direct normal) radiation is to be ignored
-    extern bool IgnoreDiffuseRadiation;            // TRUE if diffuse horizontal radiation is to be ignored
-
-    extern bool PrintEnvrnStampWarmup;
-    extern bool PrintEnvrnStampWarmupPrinted;
-
-    extern bool RunPeriodEnvironment;       // True if Run Period, False if DesignDay
-    extern std::string EnvironmentStartEnd; // Start/End dates for Environment
-    extern bool CurrentYearIsLeapYear;      // true when current year is leap year (convoluted logic dealing with
-    // whether weather file allows leap years, runperiod inputs.
-
-    extern int varyingLocationSchedIndexLat;
-    extern int varyingLocationSchedIndexLong;
-    extern int varyingOrientationSchedIndex;
-
-    // for PerformancePrecisionTradeoffs
-    extern bool forceBeginEnvResetSuppress;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataEnvironment:
-    // PUBLIC OutBaroPressAt
-    // PUBLIC OutAirDensityAt
-
-    // Functions
-
-    // Clears the global data in DataEnvironment.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
-    Real64 OutDryBulbTempAt(Real64 const Z); // Height above ground (m)
-
-    Real64 OutWetBulbTempAt(Real64 const Z); // Height above ground (m)
-
-    Real64 OutDewPointTempAt(Real64 const Z); // Height above ground (m)
-
-    Real64 WindSpeedAt(Real64 const Z); // Height above ground (m)
-
-    Real64 OutBaroPressAt(Real64 const Z); // Height above ground (m)
-
-    void SetOutBulbTempAt_error(std::string const &Settings, Real64 const max_height, std::string const &SettingsName);
+    void SetOutBulbTempAt_error(EnergyPlusData &state, std::string const &Settings, Real64 max_height, std::string const &SettingsName);
 
 } // namespace DataEnvironment
+
+struct EnvironmentData : BaseGlobalStruct
+{
+
+    Real64 BeamSolarRad = 0.0;                 // Current beam normal solar irradiance
+    bool EMSBeamSolarRadOverrideOn = false;    // EMS flag for beam normal solar irradiance
+    Real64 EMSBeamSolarRadOverrideValue = 0.0; // EMS override value for beam normal solar irradiance
+    int DayOfMonth = 0;                        // Current day of the month
+    int DayOfMonthTomorrow = 0;                // Tomorrow's day of the month
+    int DayOfWeek = 0;                         // Current day of the week (Sunday=1, Monday=2, ...)
+    int DayOfWeekTomorrow = 0;                 // Tomorrow's day of the week (Sunday=1, Monday=2, ...)
+    int DayOfYear = 0;                         // Current day of the year (01JAN=1, 02JAN=2, ...)
+    int DayOfYear_Schedule = 0;                // Schedule manager always assumes leap years...
+    Real64 DifSolarRad = 0.0;                  // Current sky diffuse solar horizontal irradiance
+    bool EMSDifSolarRadOverrideOn = false;     // EMS flag for sky diffuse solar horizontal irradiance
+    Real64 EMSDifSolarRadOverrideValue = 0.0;  // EMS override value for sky diffuse solar horizontal irradiance
+    int DSTIndicator = 0;                      // Daylight Saving Time Indicator (1=yes, 0=no) for Today
+    Real64 Elevation = 0.0;                    // Elevation of this building site
+    bool EndMonthFlag = false;                 // Set to true on last day of month
+    bool EndYearFlag = false;                  // Set to true on the last day of year
+    Real64 GndReflectanceForDayltg = 0.0;      // Ground visible reflectance for use in daylighting calc
+    Real64 GndReflectance = 0.0;               // Ground visible reflectance from input
+    Real64 GndSolarRad = 0.0;                  // Current ground reflected radiation
+    Real64 GroundTemp = 0.0;                   // Current ground temperature {C}
+    Real64 GroundTempKelvin = 0.0;             // Current ground temperature {K}
+    Real64 GroundTempFC = 0.0;                 // Current ground temperature defined for F or C factor method {C}
+    Real64 GroundTemp_Surface = 0.0;           // Current surface ground temperature {C}
+    Real64 GroundTemp_Deep = 0.0;              // Current deep ground temperature
+    int HolidayIndex = 0; // Indicates whether current day is a holiday and if so what type - HolidayIndex=(0-no holiday, 1-holiday type 1, ...)
+    int HolidayIndexTomorrow = 0;                 // Tomorrow's Holiday Index
+    bool IsRain = false;                          // Surfaces are wet for this time interval
+    bool IsSnow = false;                          // Snow on the ground for this time interval
+    Real64 Latitude = 0.0;                        // Latitude of building location
+    Real64 Longitude = 0.0;                       // Longitude of building location
+    int Month = 0;                                // Current calendar month
+    int MonthTomorrow = 0;                        // Tomorrow's calendar month
+    Real64 OutBaroPress = 0.0;                    // Current outdoor air barometric pressure
+    Real64 OutDryBulbTemp = 0.0;                  // Current outdoor air dry bulb temperature
+    bool EMSOutDryBulbOverrideOn = false;         // EMS flag for outdoor air dry bulb temperature
+    Real64 EMSOutDryBulbOverrideValue = 0.0;      // EMS override value for outdoor air dry bulb temperature
+    Real64 OutHumRat = 0.0;                       // Current outdoor air humidity ratio
+    Real64 OutRelHum = 0.0;                       // Current outdoor relative humidity [%]
+    Real64 OutRelHumValue = 0.0;                  // Current outdoor relative humidity value [0.0-1.0]
+    bool EMSOutRelHumOverrideOn = false;          // EMS flag for outdoor relative humidity value
+    Real64 EMSOutRelHumOverrideValue = 0.0;       // EMS override value for outdoor relative humidity value
+    Real64 OutEnthalpy = 0.0;                     // Current outdoor enthalpy
+    Real64 OutAirDensity = 0.0;                   // Current outdoor air density
+    Real64 OutWetBulbTemp = 0.0;                  // Current outdoor air wet bulb temperature
+    Real64 OutDewPointTemp = 0.0;                 // Current outdoor dewpoint temperature
+    bool EMSOutDewPointTempOverrideOn = false;    // EMS flag for outdoor dewpoint temperature
+    Real64 EMSOutDewPointTempOverrideValue = 0.0; // EMS override value for outdoor dewpoint temperature
+    Real64 SkyTemp = 0.0;                         // Current sky temperature {C}
+    Real64 SkyTempKelvin = 0.0;                   // Current sky temperature {K}
+    Real64 LiquidPrecipitation = 0.0;             // Current liquid precipitation amount (rain) {m}
+    bool SunIsUp = false;                         // True when Sun is over horizon, False when not
+    bool PreviousSolRadPositive = false; // True when Sun is over horizon at the previous timestep, and BeamSolarRad + GndSolarRad + DifSolarRad > 0.0
+    Real64 WindDir = 0.0;                // Current outdoor air wind direction
+    bool EMSWindDirOverrideOn = false;   // EMS flag for outdoor air wind direction
+    Real64 EMSWindDirOverrideValue = 0.0;                       // EMS override value for outdoor air wind direction
+    Real64 WindSpeed = 0.0;                                     // Current outdoor air wind speed
+    bool EMSWindSpeedOverrideOn = false;                        // EMS flag for outdoor air wind speed
+    Real64 EMSWindSpeedOverrideValue = false;                   // EMS override value for outdoor air wind speed
+    Real64 WaterMainsTemp = 0.0;                                // Current water mains temperature
+    int Year = 0;                                               // Current calendar year of the simulation from the weather file
+    int YearTomorrow = 0;                                       // Tomorrow's calendar year of the simulation
+    Array1D<Real64> SOLCOS = Array1D<Real64>(3);                // Solar direction cosines at current time step
+    Real64 CloudFraction = 0.0;                                 // Fraction of sky covered by clouds
+    Real64 HISKF = 0.0;                                         // Exterior horizontal illuminance from sky (lux).
+    Real64 HISUNF = 0.0;                                        // Exterior horizontal beam illuminance (lux)
+    Real64 HISUNFnorm = 0.0;                                    // Exterior beam normal illuminance (lux)
+    Real64 PDIRLW = 0.0;                                        // Luminous efficacy (lum/W) of beam solar radiation
+    Real64 PDIFLW = 0.0;                                        // Luminous efficacy (lum/W) of sky diffuse solar radiation
+    Real64 SkyClearness = 0.0;                                  // Sky clearness (see subr. DayltgLuminousEfficacy)
+    Real64 SkyBrightness = 0.0;                                 // Sky brightness (see subr. DayltgLuminousEfficacy)
+    Real64 TotalCloudCover = 5.0;                               // Total Sky Cover (tenth of sky)
+    Real64 OpaqueCloudCover = 5.0;                              // Opaque Sky Cover (tenth of sky)
+    Real64 StdBaroPress = DataEnvironment::StdPressureSeaLevel; // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
+    Real64 StdRhoAir = 0.0;                                     // Standard "rho air" set in WeatherManager - based on StdBaroPress
+    Real64 rhoAirSTP = 0.0;                                     // Standard density of dry air at 101325 Pa, 20.0C temperature
+    Real64 TimeZoneNumber = 0.0;                                // Time Zone Number of building location
+    Real64 TimeZoneMeridian = 0.0;                              // Standard Meridian of TimeZone
+    std::string EnvironmentName;                                // Current environment name (longer for weather file names)
+    std::string WeatherFileLocationTitle;                       // Location Title from Weather File
+    std::string CurMnDyHr;                                      // Current Month/Day/Hour timestamp info
+    std::string CurMnDy;                                        // Current Month/Day timestamp info
+    std::string CurMnDyYr;                                      // Current Month/Day/Year timestamp info
+    int CurEnvirNum = 0;                                        // current environment number
+    int TotDesDays = 0;                                         // Total number of Design days to Setup
+    int TotRunDesPersDays = 0;                                  // Total number of Run Design Periods [Days] (Weather data) to Setup
+    int CurrentOverallSimDay = 0;                               // Count of current simulation day in total of all sim days
+    int TotalOverallSimDays = 0;                                // Count of all possible simulation days in all environments
+    int MaxNumberSimYears = 0;                                  // Maximum number of simulation years requested in all RunPeriod statements
+    int RunPeriodStartDayOfWeek = 0;                            // Day of week of the first day of the run period. (or design day - day of week)
+    Real64 CosSolarDeclinAngle = 0.0;                           // Cosine of the solar declination angle
+    Real64 EquationOfTime = 0.0;                                // Value of the equation of time formula
+    Real64 SinLatitude = 0.0;                                   // Sine of Latitude
+    Real64 CosLatitude = 0.0;                                   // Cosine of Latitude
+    Real64 SinSolarDeclinAngle = 0.0;                           // Sine of the solar declination angle
+    Real64 TS1TimeOffset = -0.5;                                // offset when TS=1 for solar calculations
+    Real64 WeatherFileWindModCoeff = 1.5863;                    // =(WindBLHeight/WindSensorHeight)**WindExp for conditions at the weather station
+    Real64 WeatherFileTempModCoeff = 0.0;                       // =AtmosphericTempGradient*EarthRadius*SensorHeight/(EarthRadius+SensorHeight)
+    Real64 SiteWindExp = 0.22;                                  // Exponent for the wind velocity profile at the site
+    Real64 SiteWindBLHeight = 370.0;                            // Boundary layer height for the wind velocity profile at the site (m)
+    Real64 SiteTempGradient = 0.0065;                           // Air temperature gradient coefficient (K/m)
+    bool GroundTempObjInput = false;                            // Ground temperature object input
+    bool GroundTemp_SurfaceObjInput = false;                    // Surface ground temperature object input
+    bool GroundTemp_DeepObjInput = false;                       // Deep ground temperature object input
+    bool FCGroundTemps = false;
+    bool DisplayWeatherMissingDataWarnings = false; // Display missing/out of range weather warnings
+    bool IgnoreSolarRadiation = false;              // TRUE if all solar radiation is to be ignored
+    bool IgnoreBeamRadiation = false;               // TRUE if beam (aka direct normal) radiation is to be ignored
+    bool IgnoreDiffuseRadiation = false;            // TRUE if diffuse horizontal radiation is to be ignored
+    bool PrintEnvrnStampWarmup = false;
+    bool PrintEnvrnStampWarmupPrinted = false;
+    bool RunPeriodEnvironment = false; // True if Run Period, False if DesignDay
+    std::string EnvironmentStartEnd;   // Start/End dates for Environment
+    bool CurrentYearIsLeapYear =
+        false; // true when current year is leap year (convoluted logic dealing with whether weather file allows leap years, runperiod inputs.
+    int varyingLocationSchedIndexLat = 0;
+    int varyingLocationSchedIndexLong = 0;
+    int varyingOrientationSchedIndex = 0;
+    bool forceBeginEnvResetSuppress = false; // for PerformancePrecisionTradeoffs
+    bool oneTimeCompRptHeaderFlag = true;
+
+    void clear_state() override
+    {
+        this->BeamSolarRad = 0.0;
+        this->EMSBeamSolarRadOverrideOn = false;
+        this->EMSBeamSolarRadOverrideValue = 0.0;
+        this->DayOfMonth = 0;
+        this->DayOfMonthTomorrow = 0;
+        this->DayOfWeek = 0;
+        this->DayOfWeekTomorrow = 0;
+        this->DayOfYear = 0;
+        this->DayOfYear_Schedule = 0;
+        this->DifSolarRad = 0.0;
+        this->EMSBeamSolarRadOverrideOn = false;
+        this->EMSBeamSolarRadOverrideValue = 0.0;
+        this->DSTIndicator = 0;
+        this->Elevation = 0.0;
+        this->EndMonthFlag = false;
+        this->EndYearFlag = false;
+        this->GndReflectanceForDayltg = 0.0;
+        this->GndReflectance = 0.0;
+        this->GndSolarRad = 0.0;
+        this->GroundTemp = 0.0;
+        this->GroundTempKelvin = 0.0;
+        this->GroundTempFC = 0.0;
+        this->GroundTemp_Surface = 0.0;
+        this->GroundTemp_Deep = 0.0;
+        this->HolidayIndex = 0;
+        this->HolidayIndexTomorrow = 0;
+        this->IsRain = false;
+        this->IsSnow = false;
+        this->Latitude = 0.0;
+        this->Longitude = 0.0;
+        this->Month = 0;
+        this->MonthTomorrow = 0;
+        this->OutBaroPress = 0.0;
+        this->OutDryBulbTemp = 0.0;
+        this->EMSOutDryBulbOverrideOn = false;
+        this->EMSOutDryBulbOverrideValue = 0.0;
+        this->OutHumRat = 0.0;
+        this->OutRelHum = 0.0;
+        this->OutRelHumValue = 0.0;
+        this->EMSOutRelHumOverrideOn = false;
+        this->EMSOutRelHumOverrideValue = 0.0;
+        this->OutEnthalpy = 0.0;
+        this->OutAirDensity = 0.0;
+        this->OutWetBulbTemp = 0.0;
+        this->OutDewPointTemp = 0.0;
+        this->EMSOutDewPointTempOverrideOn = false;
+        this->EMSOutDewPointTempOverrideValue = 0.0;
+        this->SkyTemp = 0.0;
+        this->SkyTempKelvin = 0.0;
+        this->LiquidPrecipitation = 0.0;
+        this->SunIsUp = false;
+        this->WindDir = 0.0;
+        this->EMSWindDirOverrideOn = false;
+        this->EMSWindDirOverrideValue = 0.0;
+        this->WindSpeed = 0.0;
+        this->EMSWindSpeedOverrideOn = false;
+        this->EMSWindSpeedOverrideValue = false;
+        this->WaterMainsTemp = 0.0;
+        this->Year = 0;
+        this->YearTomorrow = 0;
+        this->SOLCOS = Array1D<Real64>(3);
+        this->CloudFraction = 0.0;
+        this->HISKF = 0.0;
+        this->HISUNF = 0.0;
+        this->HISUNFnorm = 0.0;
+        this->PDIRLW = 0.0;
+        this->PDIFLW = 0.0;
+        this->SkyClearness = 0.0;
+        this->SkyBrightness = 0.0;
+        this->TotalCloudCover = 5.0;
+        this->OpaqueCloudCover = 5.0;
+        this->StdBaroPress = DataEnvironment::StdPressureSeaLevel;
+        this->StdRhoAir = 0.0;
+        this->rhoAirSTP = 0.0;
+        this->TimeZoneNumber = 0.0;
+        this->TimeZoneMeridian = 0.0;
+        this->EnvironmentName.clear();
+        this->WeatherFileLocationTitle.clear();
+        this->CurMnDyHr.clear();
+        this->CurMnDy.clear();
+        this->CurMnDyYr.clear();
+        this->CurEnvirNum = 0;
+        this->TotDesDays = 0;
+        this->TotRunDesPersDays = 0;
+        this->CurrentOverallSimDay = 0;
+        this->TotalOverallSimDays = 0;
+        this->MaxNumberSimYears = 0;
+        this->RunPeriodStartDayOfWeek = 0;
+        this->CosSolarDeclinAngle = 0.0;
+        this->EquationOfTime = 0.0;
+        this->SinLatitude = 0.0;
+        this->CosLatitude = 0.0;
+        this->SinSolarDeclinAngle = 0.0;
+        this->TS1TimeOffset = -0.5;
+        this->WeatherFileWindModCoeff = 1.5863;
+        this->WeatherFileTempModCoeff = 0.0;
+        this->SiteWindExp = 0.22;
+        this->SiteWindBLHeight = 370.0;
+        this->SiteTempGradient = 0.0065;
+        this->GroundTempObjInput = false;
+        this->GroundTemp_SurfaceObjInput = false;
+        this->GroundTemp_DeepObjInput = false;
+        this->FCGroundTemps = false;
+        this->DisplayWeatherMissingDataWarnings = false;
+        this->IgnoreSolarRadiation = false;
+        this->IgnoreBeamRadiation = false;
+        this->IgnoreDiffuseRadiation = false;
+        this->PrintEnvrnStampWarmup = false;
+        this->PrintEnvrnStampWarmupPrinted = false;
+        this->RunPeriodEnvironment = false;
+        this->EnvironmentStartEnd.clear();
+        this->CurrentYearIsLeapYear = false;
+        this->varyingLocationSchedIndexLat = 0;
+        this->varyingLocationSchedIndexLong = 0;
+        this->varyingOrientationSchedIndex = 0;
+        this->forceBeginEnvResetSuppress = false;
+        this->oneTimeCompRptHeaderFlag = true;
+    }
+};
 
 } // namespace EnergyPlus
 

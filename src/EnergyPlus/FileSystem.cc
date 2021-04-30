@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -47,6 +47,7 @@
 
 // Standard C++ library
 #include <errno.h>
+#include <fstream>
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -99,13 +100,20 @@ namespace FileSystem {
         tempPath = tempPath.substr(0, pathCharPosition + 1);
 
         // If empty, then current dir, but with trailing separator too: eg `./`
-        if (tempPath == "") tempPath = {'.',DataStringGlobals:: pathChar};
+        if (tempPath == "") tempPath = {'.', DataStringGlobals::pathChar};
 
         return tempPath;
     }
 
     std::string getAbsolutePath(std::string const &path)
     {
+        /*
+         * Returns the absolute path for a given relative path.
+         *
+         * If the relative path points to a symlink, the symlink will
+         * be resolved, and this function will return the absolute path
+         * of the link.
+         */
 
 #ifdef _WIN32
         char absolutePath[1024];
@@ -119,9 +127,14 @@ namespace FileSystem {
         }
 
         std::string pathTail;
-        if (parentPath == ".")
+        std::string currentDir = ".";
+        std::string currentDirWithSep = currentDir + DataStringGlobals::pathChar;
+        if ((parentPath == currentDir || parentPath == currentDirWithSep) && path.find(currentDirWithSep) == std::string::npos)
+            // If parent path is the current directory and the original path does not already contain
+            // the current directory in the string, then leave the path tail as-is.
             pathTail = path;
         else
+            // otherwise strip off any preceding content from the path tail
             pathTail = path.substr(parentPath.size(), path.size() - parentPath.size());
 
         char *absolutePathTemp = realpath(parentPath.c_str(), NULL);
@@ -142,6 +155,11 @@ namespace FileSystem {
 
     std::string getProgramPath()
     {
+        /*
+         * Returns the relative path to the executable file (including symlinks).
+         *
+         * To resolve symlinks, wrap this call in getAbsolutePath().
+         */
         char executableRelativePath[1024];
 
 #ifdef __APPLE__
@@ -240,7 +258,32 @@ namespace FileSystem {
 
     void moveFile(std::string const &filePath, std::string const &destination)
     {
-        rename(filePath.c_str(), destination.c_str());
+        if (!fileExists(filePath)) {
+            return;
+        }
+#ifdef _WIN32
+        // Note: on Windows, rename function doesn't always replace the existing file so MoveFileExA is used
+        MoveFileExA(filePath.c_str(), destination.c_str(), MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING);
+#else
+        // Start by removing the destination file. rename fails silently, so you don't want to silently use a potentially outdated file...
+        removeFile(destination);
+        int result = rename(filePath.c_str(), destination.c_str());
+        if ((result != 0) || !fileExists(destination)) {
+            // rename won't work for cross-device (eg: copying from one disk to another)
+
+            // Do a copy of the content
+            {
+                std::ifstream src(filePath, std::ios::binary);
+                std::ofstream dst(destination, std::ios::binary);
+                dst << src.rdbuf();
+            }
+
+            //  Then remove original
+            if (fileExists(destination)) {
+                removeFile(filePath);
+            }
+        }
+#endif
     }
 
     int systemCall(std::string const &command)

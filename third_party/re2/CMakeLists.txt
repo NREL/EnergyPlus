@@ -10,7 +10,7 @@ if(POLICY CMP0048)
 endif()
 
 project(RE2 CXX)
-include(CTest)
+#include(CTest)
 include(GNUInstallDirs)
 
 option(BUILD_SHARED_LIBS "build shared libraries" OFF)

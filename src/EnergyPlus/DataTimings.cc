@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,17 +46,13 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
-#include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataTimings.hh>
-#include <EnergyPlus/General.hh>
-#include <EnergyPlus/Timer.h>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -76,76 +72,11 @@ namespace DataTimings {
     // PURPOSE OF THIS MODULE:
     // This data-only module is a repository for data and routines for timing within EnergyPlus.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using DataSystemVariables::DeveloperFlag;
-    using DataSystemVariables::tabchar;
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-    int const MaxTimingStringLength(250); // string length for timing string array
-
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    int NumTimingElements(0);
-    int MaxTimingElements(0);
-    Real64 dailyWeatherTime;
-    Real64 dailyExteriorEnergyUseTime;
-    Real64 dailyHeatBalanceTime;
-    Real64 hbdailyInit;
-    Real64 hbdailyOutSurf;
-    Real64 hbdailyInSurf;
-    Real64 hbdailyHVAC;
-    Real64 hbdailyRep;
-    Real64 clockrate;
-    bool lprocessingInputTiming(false);
-    bool lmanageSimulationTiming(false);
-    bool lcloseoutReportingTiming(false);
-
-    // Following for calls to routines
-#ifdef EP_Count_Calls
-    int NumShadow_Calls(0);
-    int NumShadowAtTS_Calls(0);
-    int NumClipPoly_Calls(0);
-    int NumInitSolar_Calls(0);
-    int NumAnisoSky_Calls(0);
-    int NumDetPolyOverlap_Calls(0);
-    int NumCalcPerSolBeam_Calls(0);
-    int NumDetShadowCombs_Calls(0);
-    int NumIntSolarDist_Calls(0);
-    int NumIntRadExchange_Calls(0);
-    int NumIntRadExchangeZ_Calls(0);
-    int NumIntRadExchangeMain_Calls(0);
-    int NumIntRadExchangeOSurf_Calls(0);
-    int NumIntRadExchangeISurf_Calls(0);
-    int NumMaxInsideSurfIterations(0);
-    int NumCalcScriptF_Calls(0);
-#endif
-
-    // Object Data
-    Array1D<timings> Timing;
-
     // Functions
 
     void epStartTime(
 #ifdef EP_NO_Timings
-        std::string const &EP_UNUSED(ctimingElementstring)
+        [[maybe_unused]] std::string const &ctimingElementstring
 #endif
 #ifdef EP_Timings
             std::string const &ctimingElementstring
@@ -166,25 +97,6 @@ namespace DataTimings {
         // METHODOLOGY EMPLOYED:
         // structure similar to recurring error structure.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         // Object Data
         Array1D<timings> tempTiming; // used for reallocate.
 
@@ -194,29 +106,29 @@ namespace DataTimings {
 #ifdef EP_Timings
         int loop;  // testing if already in structure
         int found; // indicator for element
-        if (NumTimingElements == 0) {
-            MaxTimingElements = 250;
-            Timing.allocate(MaxTimingElements);
-        } else if (NumTimingElements == MaxTimingElements) {
-            tempTiming.allocate(MaxTimingElements + 250);
-            tempTiming({1, MaxTimingElements}) = Timing({1, MaxTimingElements});
+        if (state.dataTimingsData->NumTimingElements == 0) {
+            state.dataTimingsData->MaxTimingElements = 250;
+            Timing.allocate(state.dataTimingsData->MaxTimingElements);
+        } else if (state.dataTimingsData->NumTimingElements == state.dataTimingsData->MaxTimingElements) {
+            tempTiming.allocate(state.dataTimingsData->MaxTimingElements + 250);
+            tempTiming({1, state.dataTimingsData->MaxTimingElements}) = Timing({1, state.dataTimingsData->MaxTimingElements});
             Timing.deallocate();
-            MaxTimingElements += 250;
-            Timing.allocate(MaxTimingElements);
-            Timing({1, MaxTimingElements}) = tempTiming({1, MaxTimingElements});
+            state.dataTimingsData->MaxTimingElements += 250;
+            Timing.allocate(state.dataTimingsData->MaxTimingElements);
+            Timing({1, state.dataTimingsData->MaxTimingElements}) = tempTiming({1, state.dataTimingsData->MaxTimingElements});
             tempTiming.deallocate();
         }
 
         found = 0;
-        for (loop = 1; loop <= NumTimingElements; ++loop) {
+        for (loop = 1; loop <= state.dataTimingsData->NumTimingElements; ++loop) {
             if (Timing(loop).Element != ctimingElementstring) continue;
             found = loop;
         }
 
         if (found == 0) {
-            ++NumTimingElements;
-            Timing(NumTimingElements).Element = ctimingElementstring;
-            found = NumTimingElements;
+            ++state.dataTimingsData->NumTimingElements;
+            Timing(state.dataTimingsData->NumTimingElements).Element = ctimingElementstring;
+            found = state.dataTimingsData->NumTimingElements;
         }
 
         TSTART(Timing(found).rstartTime);
@@ -226,12 +138,12 @@ namespace DataTimings {
 
     void epStopTime(
 #ifdef EP_NO_Timings
-        std::string const &EP_UNUSED(ctimingElementstring),
-        Optional_bool_const EP_UNUSED(printit), // true if it should be printed here.
-        Optional_string_const EP_UNUSED(wprint) // only needed (and assumed, if printit is true)
+        [[maybe_unused]] std::string const &ctimingElementstring,
+        [[maybe_unused]] Optional_bool_const printit, // true if it should be printed here.
+        [[maybe_unused]] Optional_string_const wprint // only needed (and assumed, if printit is true)
 #endif
 #ifdef EP_Timings
-        std::string const &ctimingElementstring,
+            std::string const &ctimingElementstring,
         Optional_bool_const printit, // true if it should be printed here.
         Optional_string_const wprint // only needed (and assumed, if printit is true)
 #endif
@@ -251,25 +163,6 @@ namespace DataTimings {
         // METHODOLOGY EMPLOYED:
         // structure similar to recurring error structure.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 #ifdef EP_NO_Timings
         return;
 #endif
@@ -278,13 +171,13 @@ namespace DataTimings {
         int found; // indicator for element
         Real64 stoptime;
         found = 0;
-        for (loop = 1; loop <= NumTimingElements; ++loop) {
+        for (loop = 1; loop <= state.dataTimingsData->NumTimingElements; ++loop) {
             if (Timing(loop).Element != ctimingElementstring) continue;
             found = loop;
         }
 
         if (found == 0) {
-            ShowFatalError("epStopTime: No element=" + ctimingElementstring);
+            ShowFatalError(state, "epStopTime: No element=" + ctimingElementstring);
         }
 
         TSTOP(stoptime);
@@ -295,29 +188,29 @@ namespace DataTimings {
                 {
                     auto const SELECT_CASE_var(wprint);
                     if (SELECT_CASE_var == "PRINT_TIME0") {
-                        ObjexxFCL::gio::write("(a80,f16.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
+                        fmt::print("{:80}{16.4F}\n", ctimingElementstring, stoptime - Timing(found).rstartTime);
                     } else if (SELECT_CASE_var == "PRINT_TIME1") {
-                        ObjexxFCL::gio::write("(a70,f16.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
+                        fmt::print("{:70}{16.4F}\n", ctimingElementstring, stoptime - Timing(found).rstartTime);
                     } else if (SELECT_CASE_var == "PRINT_TIME2") {
-                        ObjexxFCL::gio::write("(a60,f10.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
+                        fmt::print("{:60}{10.4F}\n", ctimingElementstring, stoptime - Timing(found).rstartTime);
                     } else if (SELECT_CASE_var == "PRINT_TIME2i") {
-                        ObjexxFCL::gio::write("(a56,i4,f10.4)") << ctimingElementstring << Timing(found).calls << Timing(found).currentTimeSum;
+                        fmt::print("{:56}{:4}{10.4F}\n", ctimingElementstring, Timing(found).calls, Timing(found).currentTimeSum);
                     } else if (SELECT_CASE_var == "PRINT_TIME3") {
-                        ObjexxFCL::gio::write("(a50,f10.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
+                        fmt::print("{:50}{:10.4F}\n", ctimingElementstring, stoptime - Timing(found).rstartTime);
                     } else if (SELECT_CASE_var == "PRINT_TIME3i") {
-                        ObjexxFCL::gio::write("(a46,i4,f10.4)") << ctimingElementstring << Timing(found).calls << Timing(found).currentTimeSum;
+                        fmt::print("{:46}{:4}{:10.4F}\n", ctimingElementstring, Timing(found).calls, Timing(found).currentTimeSum);
                     } else if (SELECT_CASE_var == "PRINT_TIME4") {
-                        ObjexxFCL::gio::write("(a40,f10.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
+                        fmt::print("{:40}{:10.4F}\n", ctimingElementstring, stoptime - Timing(found).rstartTime);
                     } else if (SELECT_CASE_var == "PRINT_TIMEX") {
-                        ObjexxFCL::gio::write("(a100,f16.6)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
+                        fmt::print("{:100}{:16.6F}\n", ctimingElementstring, stoptime - Timing(found).rstartTime);
                     } else if (SELECT_CASE_var == "PRINTES") {
-                        ObjexxFCL::gio::write("(a80,es22.15)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
+                        fmt::print("{:80}{:22.15}\n", ctimingElementstring, stoptime - Timing(found).rstartTime);
                     } else if (SELECT_CASE_var == "PRINT_TIME_AF") {
-                        ObjexxFCL::gio::write("(a55,10x,f16.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
+                        fmt::print("{:55}          {:16.4F}\n", ctimingElementstring, stoptime - Timing(found).rstartTime);
                     } else if (SELECT_CASE_var == "PRINT_TIME_AIF") {
-                        ObjexxFCL::gio::write("(a55,i10,f16.4)") << ctimingElementstring << Timing(found).calls << Timing(found).currentTimeSum;
+                        fmt::print("{:55}{:10}{:16.4F}\n", ctimingElementstring, Timing(found).calls, Timing(found).currentTimeSum);
                     } else {
-                        ObjexxFCL::gio::write("*") << ctimingElementstring << Timing(found).currentTimeSum;
+                        fmt::print("{}{}", ctimingElementstring, Timing(found).currentTimeSum);
                     }
                 }
             }
@@ -330,10 +223,12 @@ namespace DataTimings {
 
     void epSummaryTimes(
 #ifdef EP_NO_Timings
-        Real64 &EP_UNUSED(TimeUsed_CPUTime)
+        InputOutputFile &,
+        [[maybe_unused]] Real64 &TimeUsed_CPUTime
 #endif
 #ifdef EP_Timings
-            Real64 &TimeUsed_CPUTime
+            InputOutputFile &auditFile,
+        Real64 &TimeUsed_CPUTime
 #endif
     )
     {
@@ -355,13 +250,11 @@ namespace DataTimings {
         // na
 
         // Using/Aliasing
-        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -374,27 +267,40 @@ namespace DataTimings {
 #ifdef EP_NO_Timings
         return;
 #endif
+
 #ifdef EP_Timings
         int loop;
-        int EchoInputFile;
-        EchoInputFile = FindUnitNumber(outputAuditFile);
-        ObjexxFCL::gio::write(EchoInputFile, fmtA) << "Timing Element" + tabchar + "# calls" + tabchar + "Time {s}" + tabchar + "Time {s} (per call)";
 
-        for (loop = 1; loop <= NumTimingElements; ++loop) {
+        print(auditFile, "Timing Element{}# calls{}Time {{s}}{}Time {{s}} (per call)\n", tabchar, tabchar, tabchar);
+
+        for (loop = 1; loop <= state.dataTimingsData->NumTimingElements; ++loop) {
             if (Timing(loop).calls > 0) {
-                ObjexxFCL::gio::write(EchoInputFile, fmtA) << Timing(loop).Element + tabchar + RoundSigDigits(Timing(loop).calls) + tabchar +
-                                                       RoundSigDigits(Timing(loop).currentTimeSum, 3) + tabchar +
-                                                       RoundSigDigits(Timing(loop).currentTimeSum / double(Timing(loop).calls), 3);
+                print(auditFile,
+                      "{}{}{}{}{:.3R}{}{:.3R}\n",
+                      Timing(loop).Element,
+                      tabchar,
+                      Timing(loop).calls,
+                      tabchar,
+                      Timing(loop).currentTimeSum,
+                      tabchar,
+                      Timing(loop).currentTimeSum / double(Timing(loop).calls));
             } else {
-                ObjexxFCL::gio::write(EchoInputFile, fmtA) << Timing(loop).Element + tabchar + RoundSigDigits(Timing(loop).calls) + tabchar +
-                                                       RoundSigDigits(Timing(loop).currentTimeSum, 3) + tabchar + RoundSigDigits(-999.0, 3);
+                print(auditFile,
+                      "{}{}{}{}{:.3R}{}{:.3R}\n",
+                      Timing(loop).Element,
+                      tabchar,
+                      Timing(loop).calls,
+                      tabchar,
+                      Timing(loop).currentTimeSum,
+                      tabchar,
+                      -999.0);
             }
         }
-        ObjexxFCL::gio::write(EchoInputFile, fmtA) << "Time from CPU_Time" + tabchar + RoundSigDigits(TimeUsed_CPUTime, 3);
+        print(auditFile, "Time from CPU_Time{}{:.3R}\n", tabchar, TimeUsed_CPUTime);
 #endif
     }
 
-    Real64 epGetTimeUsed(std::string const &ctimingElementstring)
+    Real64 epGetTimeUsed(EnergyPlusData &state, std::string const &ctimingElementstring)
     {
 
         // FUNCTION INFORMATION:
@@ -406,52 +312,31 @@ namespace DataTimings {
         // PURPOSE OF THIS FUNCTION:
         // Provides outside function to getting time used on a particular element
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataErrorTracking::AbortProcessing;
-
         // Return value
         Real64 totalTimeUsed;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int loop;  // testing if already in structure
         int found; // indicator for element
 
         found = 0;
-        for (loop = 1; loop <= NumTimingElements; ++loop) {
-            if (Timing(loop).Element != ctimingElementstring) continue;
+        for (loop = 1; loop <= state.dataTimingsData->NumTimingElements; ++loop) {
+            if (state.dataTimingsData->Timing(loop).Element != ctimingElementstring) continue;
             found = loop;
         }
 
-        if (found == 0 && !AbortProcessing) {
-            ShowFatalError("epGetTimeUsed: No element=" + ctimingElementstring);
+        if (found == 0 && !state.dataErrTracking->AbortProcessing) {
+            ShowFatalError(state, "epGetTimeUsed: No element=" + ctimingElementstring);
         } else {
-            ShowSevereError("epGetTimeUsed: No element=" + ctimingElementstring);
+            ShowSevereError(state, "epGetTimeUsed: No element=" + ctimingElementstring);
         }
 
-        totalTimeUsed = Timing(found).currentTimeSum;
+        totalTimeUsed = state.dataTimingsData->Timing(found).currentTimeSum;
 
         return totalTimeUsed;
     }
 
-    Real64 epGetTimeUsedperCall(std::string const &ctimingElementstring)
+    Real64 epGetTimeUsedperCall(EnergyPlusData &state, std::string const &ctimingElementstring)
     {
 
         // FUNCTION INFORMATION:
@@ -464,48 +349,27 @@ namespace DataTimings {
         // Provides outside function to getting time used on a particular element
         // per Call.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataErrorTracking::AbortProcessing;
-
         // Return value
         Real64 averageTimeUsed;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int loop;  // testing if already in structure
         int found; // indicator for element
 
         found = 0;
-        for (loop = 1; loop <= NumTimingElements; ++loop) {
-            if (Timing(loop).Element != ctimingElementstring) continue;
+        for (loop = 1; loop <= state.dataTimingsData->NumTimingElements; ++loop) {
+            if (state.dataTimingsData->Timing(loop).Element != ctimingElementstring) continue;
             found = loop;
         }
 
         if (found == 0) {
-            ShowFatalError("epGetTimeUsedperCall: No element=" + ctimingElementstring);
+            ShowFatalError(state, "epGetTimeUsedperCall: No element=" + ctimingElementstring);
         } else {
-            ShowSevereError("epGetTimeUsedperCall: No element=" + ctimingElementstring);
+            ShowSevereError(state, "epGetTimeUsedperCall: No element=" + ctimingElementstring);
         }
 
-        if (Timing(found).calls > 0) {
-            averageTimeUsed = Timing(found).currentTimeSum / double(Timing(found).calls);
+        if (state.dataTimingsData->Timing(found).calls > 0) {
+            averageTimeUsed = state.dataTimingsData->Timing(found).currentTimeSum / double(state.dataTimingsData->Timing(found).calls);
         } else {
             averageTimeUsed = -999.0;
         }
@@ -513,7 +377,7 @@ namespace DataTimings {
         return averageTimeUsed;
     }
 
-    Real64 eptime()
+    Real64 eptime(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -528,36 +392,15 @@ namespace DataTimings {
         // According to Intel documentation, the "count_rate" may differ depending on
         // the size of the integer to receive the output.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 calctime; // calculated time based on "count" and "count_rate"
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Int32 icount;
 
         SYSTEM_CLOCK(icount);
 
-        calctime = double(icount) / clockrate; // clockrate is set by main program.
+        calctime = double(icount) / state.dataTimingsData->clockrate; // clockrate is set by main program.
 
         return calctime;
     }
@@ -575,29 +418,8 @@ namespace DataTimings {
         // An alternative method for timing elapsed times is to call the standard
         // Date_And_Time routine and set the "time".
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 calctime; // calculated time based on hrs, minutes, seconds, milliseconds
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Array1D<Int32> clockvalues(8);

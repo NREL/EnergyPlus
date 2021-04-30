@@ -147,13 +147,13 @@ ElectricLoadCenter:Transformer,
 \item
   HVAC,Average,Transformer Efficiency{[]}
 \item
-  HVAC,Average,Transformer Output Electric Power{[}W{]}
+  HVAC,Average,Transformer Output Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Transformer Output Elecric Energy {[}J{]}
 \item
-  HVAC,Average,Transformer Input Electric Power{[}W{]}
+  HVAC,Average,Transformer Input Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Transformer Input Electric Energy {[}J{]}
+  HVAC,Sum,Transformer Input Electricity Energy {[}J{]}
 \item
   HVAC,Average,Transformer No Load Loss Rate {[}W{]}
 \item
@@ -176,15 +176,15 @@ ElectricLoadCenter:Transformer,
 
 This output field is the efficiency at which the distribution transformer changes alternating current from the higher primary voltage to a lower secondary voltage. The efficiency is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 
-\paragraph{Transformer Output Electric Power {[}W{]}}\label{transformer-output-electric-power-w}
+\paragraph{Transformer Output Electricity Rate {[}W{]}}\label{transformer-output-electric-power-w}
 
 \paragraph{Transformer Output Elecric Energy {[}J{]}}\label{transformer-output-elecric-energy-j}
 
 These outputs are the total electricity power or energy provided by the transformer. They are equal to the metered loads which are wired to the transformer. These values are calculated for each HVAC system timestep being simulated, and the results are averaged (for power) or summed (for energy) for the timestep being reported.
 
-\paragraph{Transformer Input Electric Power {[}W{]}}\label{transformer-input-electric-power-w}
+\paragraph{Transformer Input Electricity Rate {[}W{]}}\label{transformer-input-electric-power-w}
 
-\paragraph{Transformer Input Electric Energy {[}J{]}}\label{transformer-input-electric-energy-j}
+\paragraph{Transformer Input Electricity Energy {[}J{]}}\label{transformer-input-electric-energy-j}
 
 These outputs are the total electricity power or energy fed into the transformer. These values are calculated for each HVAC system timestep being simulated, and the results are averaged (for power) or summed (for energy) for the timestep being reported.
 
@@ -417,17 +417,17 @@ Even if no ElectricLoadCenter:Distribution object is included, the following who
 \begin{itemize}
 \tightlist
 \item
-  HVAC,Average,Facility Total Purchased Electric Power {[}W{]}
+  HVAC,Average,Facility Total Purchased Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Facility Total Purchased Electric Energy {[}J{]}
+  HVAC,Sum,Facility Total Purchased Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Facility Total Surplus Electric Power {[}W{]}
+  HVAC,Average,Facility Total Surplus Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Facility Total Surplus Electric Energy {[}J{]}
+  HVAC,Sum,Facility Total Surplus Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Facility Net Purchased Electric Power {[}W{]}
+  HVAC,Average,Facility Net Purchased Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Facility Net Purchased Electric Energy {[}J{]}
+  HVAC,Sum,Facility Net Purchased Electricity Energy {[}J{]}
 \item
   HVAC,Average,Facility Total Building Electric Demand Power {[}W{]}
 \item
@@ -435,28 +435,28 @@ Even if no ElectricLoadCenter:Distribution object is included, the following who
 \item
   HVAC,Average,Facility Total Electric Demand Power {[}W{]}
 \item
-  HVAC,Average,Facility Total Produced Electric Power {[}W{]}
+  HVAC,Average,Facility Total Produced Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Facility Total Produced Electric Energy {[}J{]}
+  HVAC,Sum,Facility Total Produced Electricity Energy {[}J{]}
 \end{itemize}
 
 These output variables all use a default keyword Whole Building.
 
-\paragraph{Facility Total Purchased Electric Power {[}W{]}}\label{facility-total-purchased-electric-power-w}
+\paragraph{Facility Total Purchased Electricity Rate {[}W{]}}\label{facility-total-purchased-electric-power-w}
 
-\paragraph{Facility Total Purchased Electric Energy {[}J{]}}\label{facility-total-purchased-electric-energy-j}
+\paragraph{Facility Total Purchased Electricity Energy {[}J{]}}\label{facility-total-purchased-electric-energy-j}
 
 These outputs are the total of electricity purchased for the entire facility in both power and energy units. This value is always positive and indicates the amount of energy that is purchased from the utility.
 
-\paragraph{Facility Total Surplus Electric Power {[}W{]}}\label{facility-total-surplus-electric-power-w}
+\paragraph{Facility Total Surplus Electricity Rate {[}W{]}}\label{facility-total-surplus-electric-power-w}
 
-\paragraph{Facility Total Surplus Electric Energy {[}J{]}}\label{facility-total-surplus-electric-energy-j}
+\paragraph{Facility Total Surplus Electricity Energy {[}J{]}}\label{facility-total-surplus-electric-energy-j}
 
 These outputs are the total excess electricity exported and sent out to the electrical grid in both power and energy units. This value is always positive and indicates the surplus electric power (from generation and/or storage discharge) exceeds the whole-building demand and electricity is being fed from the facility into the grid.
 
-\paragraph{Facility Net Purchased Electric Power {[}W{]}}\label{facility-net-purchased-electric-power-w}
+\paragraph{Facility Net Purchased Electricity Rate {[}W{]}}\label{facility-net-purchased-electric-power-w}
 
-\paragraph{Facility Net Purchased Electric Energy {[}J{]}}\label{facility-net-purchased-electric-energy-j}
+\paragraph{Facility Net Purchased Electricity Energy {[}J{]}}\label{facility-net-purchased-electric-energy-j}
 
 These outputs are the net electricity purchased in both Power and Energy units. This value can be either positive or negative. Positive values are defined as electricity purchased from the utility. Negative values are defined as surplus electricity fed back into the grid.
 
@@ -472,9 +472,9 @@ This output variable includes all of the electric demand from the HVAC portion o
 
 This is the total of the whole Building and HVAC electric demands.
 
-\paragraph{Facility Total Produced Electric Power {[}W{]}}\label{facility-total-produced-electric-power-w}
+\paragraph{Facility Total Produced Electricity Rate {[}W{]}}\label{facility-total-produced-electric-power-w}
 
-\paragraph{Facility Total Produced Electric Energy {[}J{]}}\label{facility-total-produced-electric-energy-j}
+\paragraph{Facility Total Produced Electricity Energy {[}J{]}}\label{facility-total-produced-electric-energy-j}
 
 These outputs are the total generator and photovoltaic electricity produced on-site for the entire model, and they are in both Power and Energy units. When the electric power production system includes power conversion devices including DC to AC inverters, AC to DC converters, or transformers, the power conversion losses are included as negative values in these reports. When electrical storage is used with on-site production, the electricity put into storage is decremented from production and the electricity removed storage is added to production. This means that losses from a round trip through electrical storage decrease on-site electricity production.
 
@@ -483,32 +483,32 @@ Each ElectricLoadCenter also collects results from the individual generators tha
 \begin{itemize}
 \tightlist
 \item
-  HVAC,Average,Electric Load Center Produced Electric Power {[}W{]}
+  HVAC,Average,Electric Load Center Produced Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Electric Load Center Produced Electric Energy {[}J{]}
+  HVAC,Sum,Electric Load Center Produced Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Electric Load Center Supplied Electric Power {[}W{]}
+  HVAC,Average,Electric Load Center Supplied Electricity Rate {[}W{]}
 \item
-  HVAC,Average,Electric Load Center Drawn Electric Power {[}W{]}
+  HVAC,Average,Electric Load Center Drawn Electricity Rate {[}W{]}
 \item
   HVAC,Average,Electric Load Center Produced Thermal Rate {[}W{]}
 \item
   HVAC,Sum,Electric Load Center Produced Thermal Energy {[}J{]}
 \item
-  HVAC,Average,Electric Load Center Requested Electric Power {[}W{]}
+  HVAC,Average,Electric Load Center Requested Electricity Rate {[}W{]}
 \end{itemize}
 
-\paragraph{Electric Load Center Produced Electric Power {[}W{]}}\label{electric-load-center-produced-electric-power-w}
+\paragraph{Electric Load Center Produced Electricity Rate {[}W{]}}\label{electric-load-center-produced-electric-power-w}
 
-\paragraph{Electric Load Center Produced Electric Energy {[}J{]}}\label{electric-load-center-produced-electric-energy-j}
+\paragraph{Electric Load Center Produced Electricity Energy {[}J{]}}\label{electric-load-center-produced-electric-energy-j}
 
 These outputs are the sum of electrical energy and power produced by the generators attached to a particular load center. This could be DC or AC depending on the type of buss. The power actually delivered by the load center may be adjusted by power conversion losses from an inverter or transformer or by interaction with the any electrical storage.
 
-\paragraph{Electric Load Center Supplied Electric Power {[}W{]}}\label{electric-load-center-supplied-electric-power-w}
+\paragraph{Electric Load Center Supplied Electricity Rate {[}W{]}}\label{electric-load-center-supplied-electric-power-w}
 
 This output is the power fed from the electric load center into the main distribution panel, in Watts. This power is generated or discharged by on site equipment and has been adjusted to account for any power conversion by an inverter and/or transformer on the load center.
 
-\paragraph{Electric Load Center Drawn Electric Power {[}W{]}}\label{electric-load-center-drawn-electric-power-w}
+\paragraph{Electric Load Center Drawn Electricity Rate {[}W{]}}\label{electric-load-center-drawn-electric-power-w}
 
 This output is the power fed from the main distribution panel into the load center, in Watts. This power draw is typically only for charging storage with power from either the grid or another load center.
 
@@ -518,7 +518,7 @@ This output is the power fed from the main distribution panel into the load cent
 
 These outputs are the sum of the thermal energy and power produced by the generators attached to a particular load center. The keywords for these reports are the unique names of ElectricLoadCenter:Distribution objects.
 
-\paragraph{Electric Load Center Requested Electric Power {[}W{]}}\label{electric-load-center-requested-electric-power-w}
+\paragraph{Electric Load Center Requested Electricity Rate {[}W{]}}\label{electric-load-center-requested-electric-power-w}
 
 This output variable is the average electric power supply (in watts) requested of the load center by the facility's main distribution panel, for the time step being reported. This is used by the load center generator and storage operation control logic when determining how to run the generators and/or storage devices. For the baseload generator operating scheme, this output variable should equal the sum of the power supply requests for the available generators associated with this load center (ref. ElectricLoadCenter:Generators). In other cases, this output could be different from the sum of the power supply requests for the generators associated with this load center. For example, a generator might be requested to provide a certain amount of power but can only provide a fraction of the requested amount. In this case the load center will detect this shortfall and include it when calculating the power request for the next available generator. Therefore, the sum of the power supply requests for the individual generators associated with this load center (ref. ElectricLoadCenter:Generators) could be greater than the Electric Load Center Requested Electric Power output variable.
 
@@ -607,10 +607,10 @@ A single output variable is available for each generator specified via this obje
 \begin{itemize}
 \tightlist
 \item
-  HVAC,Average,Generator Requested Electric Power {[}W{]}
+  HVAC,Average,Generator Requested Electricity Rate {[}W{]}
 \end{itemize}
 
-\paragraph{Generator Requested Electric Power {[}W{]}}\label{generator-requested-electric-power-w}
+\paragraph{Generator Requested Electricity Rate {[}W{]}}\label{generator-requested-electric-power-w}
 
 This output variable represents the average electric power supply in Watts that is being requested by the generator operation scheme from a specific generator for the time step being reported. In some instances the output value may be the Rated Electric Power Output specified for the generator in the ElectricLoadCenter:Generators object. If the generator is not available for a simulation time step (as indicated by its availability schedule), then the power supply request will be zero. The power supply request may be less than the rated electric power output if the overall electric power reduction target has already been met, partially or completely, by electric power produced by other generators. If an EnergyPlus Energy Management System is used to specify an electric power supply request for this generator, then that EMS request will be reflected in this output variable.
 
@@ -847,9 +847,9 @@ Default: 0.96
 
 \begin{itemize}
 \item
-  HVAC,Average,Inverter Produced AC Electric Power {[}W{]}
+  HVAC,Average,Inverter Produced AC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Inverter Produced AC Electric Energy {[}J{]}
+  HVAC,Sum,Inverter Produced AC Electricity Energy {[}J{]}
 \end{itemize}
 
 \subsubsection{Outputs}\label{outputs-3-005}
@@ -861,13 +861,13 @@ Each inverter can report the following seven output variables.
 \item
   HVAC,Average,Inverter DC to AC Efficiency {[]}
 \item
-  HVAC,Average,Inverter DC Input Electric Power {[}W{]}
+  HVAC,Average,Inverter DC Input Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Inverter DC Input Electric Energy {[}J{]}
+  HVAC,Sum,Inverter DC Input Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Inverter AC Output Electric Power {[}W{]}
+  HVAC,Average,Inverter AC Output Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Inverter AC Output Electric Energy {[}J{]}
+  HVAC,Sum,Inverter AC Output Electricity Energy {[}J{]}
 \item
   HVAC,Average,Inverter Conversion Loss Power {[}W{]}
 \item
@@ -879,9 +879,9 @@ Each inverter can report the following seven output variables.
 \item
   HVAC,Sum,Inverter Thermal Loss Energy {[}J{]}
 \item
-  HVAC,Average,Inverter Ancillary AC Electric Power {[}W{]}
+  HVAC,Average,Inverter Ancillary AC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Inverter Ancillary AC Electric Energy {[}J{]}
+  HVAC,Sum,Inverter Ancillary AC Electricity Energy {[}J{]}
 \end{itemize}
 
 \paragraph{Inverter DC to AC Efficiency {[]}}\label{inverter-dc-to-ac-efficiency}
@@ -890,13 +890,13 @@ This is the efficiency with which DC power is converted to AC power by the inver
 
 \paragraph{Inverter DC Input Elecric Power {[}W{]}}\label{inverter-dc-input-elecric-power-w}
 
-\paragraph{Inverter DC Input Electric Energy {[}J{]}}\label{inverter-dc-input-electric-energy-j}
+\paragraph{Inverter DC Input Electricity Energy {[}J{]}}\label{inverter-dc-input-electric-energy-j}
 
 These outputs are total electricity power or energy fed into the inverter. This is Direct Current from photovoltaics (or DC-based electrical storage) going into the inverter.
 
-\paragraph{Inverter AC Output Electric Power {[}W{]}}\label{inverter-ac-output-electric-power-w}
+\paragraph{Inverter AC Output Electricity Rate {[}W{]}}\label{inverter-ac-output-electric-power-w}
 
-\paragraph{Inverter AC Output Electric Energy {[}J{]}}\label{inverter-ac-output-electric-energy-j}
+\paragraph{Inverter AC Output Electricity Energy {[}J{]}}\label{inverter-ac-output-electric-energy-j}
 
 These outputs are the total electricity power or energy produced by the inverter. This is Alternating Current going out of the inverter.
 
@@ -914,9 +914,9 @@ These outputs are the thermal power or energy losses in the inverter that stem f
 
 These outputs are the thermal power or energy losses in the inverter that stem from converting from DC to AC plus any ancillary electric power.
 
-\paragraph{Inverter Ancillary AC Electric Power {[}W{]}}\label{inverter-ancillary-ac-electric-power-w}
+\paragraph{Inverter Ancillary AC Electricity Rate {[}W{]}}\label{inverter-ancillary-ac-electric-power-w}
 
-\paragraph{Inverter Ancillary AC Electric Energy {[}J{]}}\label{inverter-ancillary-ac-electric-energy-j}
+\paragraph{Inverter Ancillary AC Electricity Energy {[}J{]}}\label{inverter-ancillary-ac-electric-energy-j}
 
 These outputs are the Alternating Current electricity consumed by the inverter. These are ancillary, or night tare loss, power uses by the inverter and modeled as if powered by the building's grid connection. These ancillary power draws generally occur when the inverter is not generating power but waiting in a standby mode ready to begin generating power.
 
@@ -984,13 +984,13 @@ Each converter can report the following output variables
 \item
   HVAC,Average,Converter AC to DC Efficiency {[]}
 \item
-  HVAC,Average,Converter AC Input Electric Power {[}W{]}
+  HVAC,Average,Converter AC Input Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Converter AC Input Electric Energy {[}J{]}
+  HVAC,Sum,Converter AC Input Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Converter DC Output Electric Power {[}W{]}
+  HVAC,Average,Converter DC Output Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Converter DC Output Electric Energy {[}J{]}
+  HVAC,Sum,Converter DC Output Electricity Energy {[}J{]}
 \item
   HVAC,Average,Converter Electric Loss Power {[}W{]}
 \item
@@ -1002,24 +1002,24 @@ Each converter can report the following output variables
 \item
   HVAC,Sum,Converter Thermal Loss Energy {[}J{]}
 \item
-  HVAC,Average,Converter Ancillary AC Electric Power {[}W{]}
+  HVAC,Average,Converter Ancillary AC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Converter Ancillary AC Electric Energy {[}J{]}
+  HVAC,Sum,Converter Ancillary AC Electricity Energy {[}J{]}
 \end{itemize}
 
 \subsubsection{Converter AC to DC Efficiency {[]}}\label{converter-ac-to-dc-efficiency}
 
 This is the efficiency with which AC power is converted to DC power by the converter
 
-\subsubsection{Converter AC Input Electric Power {[}W{]}}\label{converter-ac-input-electric-power-w}
+\subsubsection{Converter AC Input Electricity Rate {[}W{]}}\label{converter-ac-input-electric-power-w}
 
-\subsubsection{Converter AC Input Electric Energy {[}J{]}}\label{converter-ac-input-electric-energy-j}
+\subsubsection{Converter AC Input Electricity Energy {[}J{]}}\label{converter-ac-input-electric-energy-j}
 
 These outputs are the total electric power or energy fed into the converter. This is Alternating Current, or AC, drawn from the main panel into the load center.
 
-\subsubsection{Converter DC Output Electric Power {[}W{]}}\label{converter-dc-output-electric-power-w}
+\subsubsection{Converter DC Output Electricity Rate {[}W{]}}\label{converter-dc-output-electric-power-w}
 
-\subsubsection{Converter DC Output Electric Energy {[}J{]}}\label{converter-dc-output-electric-energy-j}
+\subsubsection{Converter DC Output Electricity Energy {[}J{]}}\label{converter-dc-output-electric-energy-j}
 
 These outputs are the total electric power or energy leaving the converter. This is Direct Current, or DC, that will go into charging storage.
 
@@ -1037,9 +1037,9 @@ These outputs are the conversion losses that result from inefficiencies in the c
 
 These outputs are the power and energy losses that result from the inefficiencies in the conversion from AC to DC and the ancillary standby power.
 
-\subsubsection{Converter Ancillary AC Electric Power {[}W{]}}\label{converter-ancillary-ac-electric-power-w}
+\subsubsection{Converter Ancillary AC Electricity Rate {[}W{]}}\label{converter-ancillary-ac-electric-power-w}
 
-\subsubsection{Converter Ancillary AC Electric Energy {[}J{]}}\label{converter-ancillary-ac-electric-energy-j}
+\subsubsection{Converter Ancillary AC Electricity Energy {[}J{]}}\label{converter-ancillary-ac-electric-energy-j}
 
 These outputs are the power and energy consumed in standby operation when the converter is not being used but is available and ready to be used. The ancillary power consumption is metered on the ``Cogeneration'' end use for ``Electricity.''
 
@@ -1406,6 +1406,209 @@ These outputs are the thermal power or energy losses from both charging and draw
 
 This output reports the fractional battery life used up at a point of time. For example, a value of 0.4 at the end of one year simulation means that the 40\% of the battery life is used up, so the battery needs to be replaced every two and a half years.
 
+\subsection{ElectricLoadCenter:Storage:LiIonNMCBattery}\label{electricloadcenterstorage-liionbattery}
+
+This object usses the Li-ion NMC battery model from the System Advisor Model (SAM) software.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}\label{liion-name}
+
+This alpha field contains the identifying name for the battery.
+
+\paragraph{Field: Availability Schedule Name}\label{liion-avail-sched-name}
+
+This alpha field contains the schedule name (ref. Schedule objects) that describes when the battery is available. A schedule value greater than 0 (usually 1 is used) indicates that electrical energy can be stored or drawn from the battery. A value less than or equal to 0 (usually 0 is used) denotes that the battery is not available. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Zone Name}\label{liion-zone-name}
+
+This field contains the name of the thermal zone where the battery is located. Entering a valid name of zone here will direct EnergyPlus to include the energy storage losses as heat gains to the named thermal zone. If the battery is not within a thermal zone, this field can be left blank and the thermal energy associated with storage losses is removed from the building model.
+
+\paragraph{Field: Radiative Fraction}\label{liion-rad-frac}
+
+This field contains the fraction of storage losses that enter the zone as long-wave thermal radiation. This numeric filed should have a value between 0.0 and 1.0. The balance of the losses is convective. This field is not used if the previous field for zone name is left blank.
+
+\paragraph{Field: Lifetime Model}\label{liion-lifetime-model}
+
+Which lifetime model to use for the battery. Available choices are:
+
+\begin{itemize}
+  \item None: The battery doesn't degrade over time
+  \item KandlerSmith: Use the lifetime model developed by Kandler Smith. Details at \url{https://ieeexplore.ieee.org/abstract/document/7963578}
+\end{itemize}
+
+\paragraph{Field: Number of Cells in Series}\label{liion-n-series}
+
+The number of cells in series. Increasing this number increases the voltage output of the battery.
+
+\paragraph{Field: Number of Strings in Parallel}\label{liion-n-parallel}
+
+The number of strings in parallel.
+
+\paragraph{Field: Initial Fractional State of Charge}\label{liion-init-soc}
+
+This field describes the initial state of charge in terms of the fraction of maximum capacity.
+
+\paragraph{Field: DC to DC Charging Efficiency}\label{liion-dc-dc-charg-eff}
+
+The charging loss coefficient.
+
+\paragraph{Field: Battery Mass}\label{liion-mass}
+
+Battery mass (kg) used in thermal calculation.
+
+\paragraph{Field: Battery Surface Area}\label{liion-surf-area}
+
+Battery surface area (m\textsuperscript{2}) used in thermal calculations.
+
+\paragraph{Field: Battery Specific Heat Capacity}\label{liion-cp}
+
+Specific heat of the battery (J/kg-K) used in the thermal calculation.
+
+\paragraph{Field: Heat Transfer Coefficient Between Battery and Ambient}\label{liion-h}
+
+Heat transfer coefficient (W/m\textsuperscript{2}-K)between battery and ambient.
+
+\paragraph{Field: Fully Charged Cell Voltage}\label{liion-vfull}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+\paragraph{Field: Cell Voltage at End of Exponential Zone}\label{liion-vexp}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+\paragraph{Field: Cell Voltage at End of Nominal Zone}\label{liion-vnom}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+\paragraph{Field: Default Nominal Cell Voltage}\label{liion-vnom-default}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+\paragraph{Field: Fully Charged Cell Capacity}\label{liion-qfull}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+\paragraph{Field: Fraction of Cell Capacity Removed at the End of Exponential Zone}\label{liion-qexp}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+\paragraph{Field: Fraction of Cell Capacity Removed at the End of Nominal Zone}\label{liion-qnom}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+\paragraph{Field: Charge Rate at Which Voltage vs Capacity Curve Was Generated}\label{liion-crate}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+\paragraph{Field: Battery Cell Internal Electrical Resistance}\label{liion-internal-r}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+An example input of the ElectricLoadCenter:Storage:LiIonNMCBattery is:
+
+\begin{lstlisting}
+
+  ElectricLoadCenter:Storage:LiIonNMCBattery,
+    LiIonBattery,            !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    ,                        !- Zone Name
+    0,                       !- Radiative Fraction
+    KandlerSmith,            !- Lifetime Model
+    139,                     !- Number of Cells in Series
+    25,                      !- Number of Strings in Parallel
+    0.7,                     !- Initial Fractional State of Charge
+    ,                        !- DC to DC Charging Efficiency
+    342,                     !- Battery Mass
+    4.26,                    !- Battery Surface Area
+    ,                        !- Battery Specific Heat Capacity
+    ;                        !- Heat Transfer Coefficient Between Battery and Ambient
+
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{electricloadcenter-storageliionnmcbatttery-outputs}
+
+\begin{itemize}
+  \item
+    HVAC,Average, Electric Storage Operating Mode Index {[]}
+  \item
+    HVAC,Average,Electric Storage Charge State{[}Ah{]}
+  \item
+    HVAC,Average, Electric Storage Charge Fraction {[]}
+  \item
+    HVAC,Average,Electric Storage Charge Power{[}W{]}
+  \item
+    HVAC,Sum,Electric Storage Charge Energy {[}J{]}
+  \item
+    HVAC,Average,Electric Storage Discharge Power{[}W{]}
+  \item
+    HVAC,Sum,Electric Storage Discharge Energy {[}J{]}
+  \item
+    HVAC,Average,Electric Storage Total Current{[}A{]}
+  \item
+    HVAC,Average, Electric Storage Total Voltage {[}V{]}
+  \item
+    HVAC,Average,Electric Storage Thermal Loss Rate {[}W{]}
+  \item
+    HVAC,Average,Electric Storage Degradation Fraction {[]}
+  \item
+    HVAC,Sum,Electric Storage Production Decrement Energy {[}J{]}
+  \item
+    HVAC,Sum,Electric Storage Thermal Loss Energy {[}J{]}
+  \item
+    HVAC,Average,Electric Storage Battery Temperature {[}C{]}
+\end{itemize}
+
+\paragraph{Electric Storage Operating Mode Index {[]}}\label{liion-operating-mode-index}
+
+This output reports the battery mode of operation: 0 for idle; 1 for discharging; 2 for charging. It is expected that more operation modes would be added when a smart and active power dispatch controller is used in future.
+
+\paragraph{Electric Storage Charge State {[}Ah{]}}\label{liion-charge-state-ah}
+
+The state of charge is expressed as the amount of charge stored in the battery at a point of time. It has the same unit as the maximum capacity. This value is given for an individual battery module
+
+\paragraph{Electric Storage Charge Fraction {[]}}\label{liion-charge-fraction}
+
+This output is the ratio between the electrical storage state of charge and the maximum capacity.
+
+\paragraph{Electric Storage Charge Power {[}W{]}}\label{liion-charge-power-w-1}
+
+\paragraph{Electric Storage Charge Energy {[}J{]}}\label{liion-charge-energy-j-1}
+
+These outputs are total electricity power or energy fed into the battery. This is the rate of amount of charging.
+
+\paragraph{Electric Storage Production Decrement Energy {[}J{]}}\label{liion-production-decrement-energy-j-1}
+
+This output is the total electricity energy decremented from electricity production because it has fed into the battery. This output has the opposite sign of Electric Storage Charge Energy but is otherwise similar. This decrement output variable is also a meter associated with the resource type ElectricityProduced that reduces the metered electricity production to account for power that went into storage after production.
+
+\paragraph{Electric Storage Discharge Power {[}W{]}}\label{liion-discharge-power-w-1}
+
+\paragraph{Electric Storage Discharge Energy {[}J{]}}\label{liion-discharge-energy-j-1}
+
+These outputs are total electricity power or energy drawn from the battery. This is the rate or amount of discharging. The energy from storage output variable is also a meter associated with the resource type ElectricityProduced that increases the metered electricity production to account for power that has come back out of storage.
+
+\paragraph{Electric Storage Total Current {[}A{]}}\label{liion-total-current-a}
+
+This output is the current to or from the battery bank depending on whether the battery is in the state of charging or discharging. The value is positive for discharging and negative for charging.
+
+\paragraph{Electric Storage Total Voltage {[}V{]}}\label{liion-total-voltage-v}
+
+This output is the total terminal voltage of the battery bank.
+
+\paragraph{Electric Storage Thermal Loss Rate {[}W{]}}\label{liion-thermal-loss-rate-w-1}
+
+\paragraph{Electric Storage Thermal Loss Energy {[}J{]}}\label{liion-thermal-loss-energy-j-1}
+
+These outputs are the thermal power or energy losses from both charging and drawing electrical power in or out of the storage device. These losses are due to the battery internal resistance in charging and discharging.
+
+\paragraph{Electric Storage Degradation Fraction {[]}}\label{liion-degradation-fraction}
+
+This output reports the fractional battery life used up at a point of time. For example, a value of 0.4 at the end of one year simulation means that 40\% of the battery life is used up.
+
+\paragraph{HVAC,Average,Electric Storage Battery Temperature {[}C{]}}\label{liion-battery-temperature}
+
+The internal temperature of the battery.
+
 \subsection{Generator:InternalCombustionEngine}\label{generatorinternalcombustionengine}
 
 The Internal Combustion (IC) Engine generator uses a modified Otto cycle. This generator model uses the electrical load and rated engine generator size to compute part-load ratios (PLR). Fuel energy input and recoverable jacket and lube oil heat are then computed. Finally, the recoverable exhaust heat is calculated.
@@ -1619,9 +1822,9 @@ The output variables that are available for the IC engine generator are:
 
 \begin{itemize}
 \item
-  HVAC,Average,Generator Produced Electric Power {[}W{]}
+  HVAC,Average,Generator Produced Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Produced Electric Energy {[}J{]}
+  HVAC,Sum,Generator Produced Electricity Energy {[}J{]}
 \item
   HVAC,Average,Generator Lube Heat Recovery Rate {[}W{]}
 \item
@@ -1658,9 +1861,9 @@ The output variables that are available for the IC engine generator are:
   HVAC,Average,Generator \textless{}Fuel Type\textgreater{} Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{Generator Produced Electric Power {[}W{]}}\label{generator-produced-electric-power-w}
+\paragraph{Generator Produced Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w}
 
-\paragraph{Generator Produced Electric Energy {[}J{]}}\label{generator-produced-electric-energy-j}
+\paragraph{Generator Produced Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j}
 
 These outputs are the electric power output from the electric generator. Energy is metered on Cogeneration:ElectricityProduced, ElectricityProduced:Plant, and ElectricityProduced:Facility.
 
@@ -1708,15 +1911,15 @@ These outputs are the generator's fuel energy and use rate. The energy content o
 
 If the fuel type is Diesel, then Diesel is shown as the fuel type. They are the diesel fuel input to the electric generator. Consumption is metered on Cogeneration:Diesel, Diesel:Plant, and Diesel:Facility.
 
-If the fuel type is Natural Gas, then Gas is shown as the fuel type. They are the natural gas fuel input to the electric generator. Consumption is metered on Cogeneration:Gas, Gas:Plant, and Gas:Facility.
+If the fuel type is Natural Gas, then NaturalGas is shown as the fuel type. They are the natural gas fuel input to the electric generator. Consumption is metered on Cogeneration:NaturalGas, NaturalGas:Plant, and NaturalNaturalGas:Facility.
 
 If the fuel type is Propane, then Propane is shown as the fuel type. They are the propane fuel input to the electric generator. Consumption is metered on Cogeneration:Propane, Propane:Plant, and Propane:Facility.
 
 If the fuel type is Gasoline, then Gasoline is shown as the fuel type. They are the gasoline fuel input to the electric generator. Consumption is metered on Cogeneration:Gasoline, Gasoline:Plant, and Gasoline:Facility.
 
-If the fuel type is FuelOilNo1, then FuelOil\#1 is shown as the fuel type. They are the fuel oil input to the electric generator. Consumption is metered on Cogeneration:FuelOil\#1, FuelOil\#1:Plant, and FuelOil\#1:Facility.
+If the fuel type is FuelOilNo1, then FuelOilNo1 is shown as the fuel type. They are the fuel oil input to the electric generator. Consumption is metered on Cogeneration:FuelOilNo1, FuelOilNo1:Plant, and FuelOilNo1:Facility.
 
-If the fuel type is FuelOilNo2, then FuelOil\#2 is shown as the fuel type. They are the fuel oil input to the electric generator. Consumption is metered on Cogeneration:FuelOil\#2, FuelOil\#2:Plant, and FuelOil\#2:Facility.
+If the fuel type is FuelOilNo2, then FuelOilNo2 is shown as the fuel type. They are the fuel oil input to the electric generator. Consumption is metered on Cogeneration:FuelOilNo2, FuelOilNo2:Plant, and FuelOilNo2:Facility.
 
 If the fuel type is OtherFuel1, then OtherFuel1 is shown as the fuel type. They are the fuel oil input to the electric generator. Consumption is metered on Cogeneration:OtherFuel1, OtherFuel1:Plant, and OtherFuel1:Facility.
 
@@ -1840,7 +2043,7 @@ This alpha field contains the identifying name for the combustion turbine genera
 
 \paragraph{Field: Fuel Type}\label{field-fuel-type-1}
 
-This alpha field determines the type of fuel that the generator uses. Valid choices are: \textbf{NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1} and \textbf{OtherFuel2}. The default is \textbf{NaturalGas}.
+This choice field specifies the type of fuel used by the generator. The fuel type can be NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, OtherFuel1, or OtherFuel2. If the field is left blank, the fuel type will be assumed to be \textbf{NaturalGas}.
 
 \paragraph{Field: Heat Recovery Maximum Temperature}\label{field-heat-recovery-maximum-temperature-1}
 
@@ -1939,9 +2142,9 @@ The output variables that are available for the combustion turbine generator are
 
 \begin{itemize}
 \item
-  HVAC,Average,Generator Produced Electric Power {[}W{]}
+  HVAC,Average,Generator Produced Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Produced Electric Energy {[}J{]}
+  HVAC,Sum,Generator Produced Electricity Energy {[}J{]}
 \item
   Zone,Meter,ElectricityProduced:Facility {[}J{]}
 \item
@@ -2040,7 +2243,7 @@ This alpha field specifies the name of a quadratic or cubic performance curve (r
 
 \paragraph{Field: Fuel Type}\label{field-fuel-type-2}
 
-This choice field specifies the type of fuel used by the generator. Valid field types are Propane and NaturalGas. If the field is left blank, the fuel type will be assumed to be NaturalGas.
+This choice field specifies the type of fuel used by the generator. The fuel type can be NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, OtherFuel1, or OtherFuel2. If the field is left blank, the fuel type will be assumed to be \textbf{NaturalGas}.
 
 \paragraph{Field: Fuel Higher Heating Value}\label{field-fuel-higher-heating-value-2}
 
@@ -2247,9 +2450,9 @@ The output variables that are available for the microturbine generator are:
 
 \begin{itemize}
 \item
-  HVAC,Average,Generator Produced Electric Power {[}W{]}
+  HVAC,Average,Generator Produced Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Produced Electric Energy {[}J{]}
+  HVAC,Sum,Generator Produced Electricity Energy {[}J{]}
 \item
   HVAC,Average,Generator LHV Basis Electric Efficiency {[}-{]}
 \item
@@ -2268,18 +2471,18 @@ If Standby Power input field \textgreater{} 0.0:
 
 \begin{itemize}
 \item
-  HVAC,Average,Generator Standby Electric Power {[}W{]}
+  HVAC,Average,Generator Standby Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Standby Electric Energy {[}J{]}
+  HVAC,Sum,Generator Standby Electricity Energy {[}J{]}
 \end{itemize}
 
 If Ancillary Power input field \textgreater{} 0.0:
 
 \begin{itemize}
 \item
-  HVAC,Average,Generator Ancillary Electric Power {[}W{]}
+  HVAC,Average,Generator Ancillary Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Ancillary Electric Energy {[}J{]}
+  HVAC,Sum,Generator Ancillary Electricity Energy {[}J{]}
 \end{itemize}
 
 If heat recovery water inlet and outlet node names are entered (and valid):
@@ -2308,11 +2511,11 @@ If exhaust air calculations are performed:
   HVAC,Average,Generator Exhaust Air Temperature {[}C{]}
 \end{itemize}
 
-\paragraph{Generator Produced Electric Power {[}W{]}}\label{generator-produced-electric-power-w-1}
+\paragraph{Generator Produced Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-1}
 
 This output variable is the average electric power produced by the generator in Watts for the timestep being reported. This is the net electric power produced, accounting for ancillary electric power consumed during generator operation.
 
-\paragraph{Generator Produced Electric Energy {[}J{]}}\label{generator-produced-electric-energy-j-1}
+\paragraph{Generator Produced Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-1}
 
 This output variable is the electric energy produced by the generator in Joules for the timestep being reported. This output is also added to a meter with Resource Type = ElectricityProduced, End Use Key = Cogeneration, Group Key = Plant (Ref. Output:Meter objects). This is the net electric energy produced, accounting for ancillary electric consumption during generator operation.
 
@@ -2340,21 +2543,21 @@ This output variable is the fuel energy consumption of the electric generator in
 
 This output variable is the average mass flow rate of fuel being consumed by the electric generator in kg/s for the timestep being reported. \textless{}Fuel Type\textgreater{} is the name of the fuel used by this electric generator. \textless{}Fuel Type\textgreater{} can be one of the following: Natural Gas ( = \textgreater{} Gas ) or Propane Gas ( = \textgreater{} Propane ).
 
-\paragraph{Generator Standby Electric Power {[}W{]}}\label{generator-standby-electric-power-w}
+\paragraph{Generator Standby Electricity Rate {[}W{]}}\label{generator-standby-electric-power-w}
 
 This output variable is the average standby electric power consumed by the generator in Watts for the timestep being reported. Standby power is electrical power consumed by the generator (e.g., air fans and controls) when the generator is available to operate but the generator electrical power output is zero (power output is not being requested by the electric load center). This output variable is only produced when the user enters a value greater than 0.0 for the input field Standby Power.
 
-\paragraph{Generator Standby Electric Energy {[}J{]}}\label{generator-standby-electric-energy-j}
+\paragraph{Generator Standby Electricity Energy {[}J{]}}\label{generator-standby-electric-energy-j}
 
 This output variable is the standby electric energy consumption for the generator in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cogeneration, Group Key = Plant (Ref. Output:Meter objects). This output variable is only produced when the user enters a value greater than 0.0 for the input field Standby Power.
 
-\paragraph{Generator Ancillary Electric Power {[}W{]}}\label{generator-ancillary-electric-power-w}
+\paragraph{Generator Ancillary Electricity Rate {[}W{]}}\label{generator-ancillary-electric-power-w}
 
 This output variable is the average ancillary electric power consumed by the generator in Watts for the timestep being reported. Ancillary power is the electrical power consumed by other associated equipment (e.g., external fuel pressurization pumps) when the generator is operating. This output variable is only produced when the user enters a value greater than 0.0 for the input field Ancillary Power.
 
-\paragraph{Generator Ancillary Electric Energy {[}J{]}}\label{generator-ancillary-electric-energy-j}
+\paragraph{Generator Ancillary Electricity Energy {[}J{]}}\label{generator-ancillary-electric-energy-j}
 
-This output variable is the ancillary electric energy consumption for the generator in Joules for the timestep being reported. This energy consumption is already deducted from the output variable Generator Produced Electric Energy ( net electric energy produced by the generator). This output variable is only produced when the user enters a value greater than 0.0 for the input field Ancillary Power.
+This output variable is the ancillary electric energy consumption for the generator in Joules for the timestep being reported. This energy consumption is already deducted from the output variable Generator Produced Electricity Energy ( net electric energy produced by the generator). This output variable is only produced when the user enters a value greater than 0.0 for the input field Ancillary Power.
 
 \paragraph{Generator Produced Thermal Rate {[}W{]}}\label{generator-produced-thermal-rate-w-1}
 
@@ -2636,9 +2839,9 @@ Generator:MicroCHP:NonNormalizedParameters,
 \item
   HVAC,Sum,Generator Cool Down Mode Time {[}s{]}
 \item
-  HVAC,Average,Generator Produced Electric Power {[}W{]}
+  HVAC,Average,Generator Produced Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Produced Electric Energy {[}J{]}
+  HVAC,Sum,Generator Produced Electricity Energy {[}J{]}
 \item
   HVAC,Average,Generator Electric Efficiency {[]}
 \item
@@ -2670,9 +2873,9 @@ Generator:MicroCHP:NonNormalizedParameters,
 \item
   HVAC,Average,Generator Fuel LHV Basis Rate {[}W{]}
 \item
-  HVAC,Average,Generator Fuel Compressor Electric Power {[}W{]}
+  HVAC,Average,Generator Fuel Compressor Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Fuel Compressor Electric Energy {[}J{]}
+  HVAC,Sum,Generator Fuel Compressor Electricity Energy {[}J{]}
 \item
   HVAC,Average,Generator Fuel Compressor Skin Heat Loss Rate {[}W{]}
 \item
@@ -2705,11 +2908,11 @@ This report is the amount of time the generator spent in Normal Operating mode i
 
 This report is the amount of time the generator spent in Cool Down mode in seconds.
 
-\paragraph{Generator Produced Electric Power {[}W{]}}\label{generator-produced-electric-power-w-2}
+\paragraph{Generator Produced Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-2}
 
 This report is the net electrical power produced by the generator in watts.
 
-\paragraph{Generator Produced Electric Energy {[}J{]}}\label{generator-produced-electric-energy-j-2}
+\paragraph{Generator Produced Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-2}
 
 This report is the net electrical energy produced by the generator in joules. This output variable is also put on the meter for on-site production.
 
@@ -2873,9 +3076,9 @@ The following output variables are available for the fuel cell model.
 
 \begin{itemize}
 \item
-  Output:Variable,*,Generator Produced Electric Power,hourly; !- HVAC Average {[}W{]}
+  Output:Variable,*,Generator Produced Electricity Rate,hourly; !- HVAC Average {[}W{]}
 \item
-  Output:Variable,*,Generator Produced Electric Energy,hourly; !- HVAC Sum {[}J{]}
+  Output:Variable,*,Generator Produced Electricity Energy,hourly; !- HVAC Sum {[}J{]}
 \item
   Output:Variable,*,Generator Produced Thermal Rate,hourly; !- HVAC Average {[}W{]}
 \item
@@ -2898,11 +3101,11 @@ The following output variables are available for the fuel cell model.
   Output:Variable,*,FuelCell Radiation Heat Loss Rate to Zone,hourly; !- HVAC Average {[}W{]}
 \end{itemize}
 
-\paragraph{Generator Produced Electric Power {[}W{]}}\label{generator-produced-electric-power-w-3}
+\paragraph{Generator Produced Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-3}
 
 This report is the net electrical power produced by the generator in watts.
 
-\paragraph{Generator Produced Electric Energy {[}J{]}}\label{generator-produced-electric-energy-j-3}
+\paragraph{Generator Produced Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-3}
 
 This report is the net electrical energy produced by the generator in joules. This output variable is also put on the meter for on-site production.
 
@@ -2956,9 +3159,9 @@ Using the FC model with DisplayAdvancedReportVariables (see Diagnostics object o
 \item
   HVAC,Average,Generator Power Module Entering Air Enthalpy {[}W{]}
 \item
-  HVAC,Average,Generator Blower Electric Power {[}W{]}
+  HVAC,Average,Generator Blower Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Blower Electric Energy {[}J{]}
+  HVAC,Sum,Generator Blower Electricity Energy {[}J{]}
 \item
   HVAC,Average,Generator Blower Skin Heat Loss Rate {[}W{]}
 \item
@@ -2970,9 +3173,9 @@ Using the FC model with DisplayAdvancedReportVariables (see Diagnostics object o
 \item
   HVAC,Average,Generator Power Module Entering Fuel Enthalpy {[}W{]}
 \item
-  HVAC,Average,Generator Fuel Compressor Electric Power {[}W{]}
+  HVAC,Average,Generator Fuel Compressor Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Fuel Compressor Electric Energy {[}J{]}
+  HVAC,Sum,Generator Fuel Compressor Electricity Energy {[}J{]}
 \item
   HVAC,Average,Generator Fuel Compressor Skin Heat Loss Rate {[}W{]}
 \item
@@ -2982,9 +3185,9 @@ Using the FC model with DisplayAdvancedReportVariables (see Diagnostics object o
 \item
   HVAC,Average,Generator Fuel Reformer Water Molar Flow Rate {[}kmol/s{]}
 \item
-  HVAC,Average,Generator Fuel Reformer Water Pump Electric Power {[}W{]}
+  HVAC,Average,Generator Fuel Reformer Water Pump Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Fuel Reformer Water Pump Electric Energy {[}J{]}
+  HVAC,Sum,Generator Fuel Reformer Water Pump Electricity Energy {[}J{]}
 \item
   HVAC,Average,Generator Power Module Entering Reforming Water Enthalpy {[}W{]}
 \item
@@ -3006,13 +3209,13 @@ Using the FC model with DisplayAdvancedReportVariables (see Diagnostics object o
 \item
   HVAC,Average,Generator Inverter Loss Power {[}W{]}
 \item
-  HVAC,Average,Generator Produced DC Electric Power {[}W{]}
+  HVAC,Average,Generator Produced DC Electricity Rate {[}W{]}
 \item
   HVAC,Average,Generator DC Power Efficiency {[]}
 \item
   HVAC,Average,Generator Electric Storage Charge State {[}J{]}
 \item
-  HVAC,Average,Generator Produced DC Electric Power {[}W{]}
+  HVAC,Average,Generator Produced DC Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Generator DC Storage Charging Energy {[}J{]}
 \item
@@ -3020,9 +3223,9 @@ Using the FC model with DisplayAdvancedReportVariables (see Diagnostics object o
 \item
   HVAC,Sum,Generator DC Storage Discharging Energy {[}J{]}
 \item
-  HVAC,Average,Generator Ancillary AC Electric Power {[}W{]}
+  HVAC,Average,Generator Ancillary AC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Ancillary AC Electric Energy {[}J{]}
+  HVAC,Sum,Generator Ancillary AC Electricity Energy {[}J{]}
 \item
   HVAC,Average,Generator Zone Sensible Heat Transfer Rate {[}W{]}
 \item
@@ -3035,6 +3238,10 @@ Using the FC model with DisplayAdvancedReportVariables (see Diagnostics object o
   HVAC,Sum, Generator Fuel Cell Model Iteration Count {[]}
 \item
   HVAC,Sum,Generator Root Solver Iteration Count {[]}
+\item
+  HVAC,Average,Generator Number of Cycles {[]}
+\item
+  HVAC,Average,Generator Power Module Skin Heat Loss Rate {[}W{]}
 \end{itemize}
 
 \paragraph{Generator Air Inlet Temperature {[}C{]}}\label{generator-air-inlet-temperature-c}
@@ -3053,11 +3260,11 @@ This variable provides the results for \({\dot N_{air}}\) , the flow rate of air
 
 This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{air}}\) , which is the enthalpy flow in the air stream entering the power module relative to \SI{25}{\celsius}.
 
-\paragraph{Generator Blower Electric Power {[}W{]}}\label{generator-blower-electric-power-w}
+\paragraph{Generator Blower Electricity Rate {[}W{]}}\label{generator-blower-electric-power-w}
 
 This variable provides the results for \({P_{blower - el}}\) , which is the electrical power used by the air supply blower.
 
-\paragraph{Generator Blower Electric Energy {[}J{]}}\label{generator-blower-electric-energy-j}
+\paragraph{Generator Blower Electricity Energy {[}J{]}}\label{generator-blower-electric-energy-j}
 
 This variable provides the results for the energy used by the air supply blower. It is also added to the appropriate meters.
 
@@ -3081,11 +3288,11 @@ This variable provides the results for \({\dot N_{fuel}}\) , which is the flow r
 
 This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{fuel}}\) , which is the enthalpy flow in the fuel stream entering the power module relative to \SI{25}{\celsius}.
 
-\paragraph{Generator Fuel Compressor Electric Power {[}W{]}}\label{generator-fuel-compressor-electric-power-w}
+\paragraph{Generator Fuel Compressor Electricity Rate {[}W{]}}\label{generator-fuel-compressor-electric-power-w}
 
 This variable provides the results for \({P_{comp - el}}\) , which is the electrical power used by the fuel supply compressor.
 
-\paragraph{Generator Fuel Compressor Electric Energy {[}J{]}}\label{generator-fuel-compressor-electric-energy-j}
+\paragraph{Generator Fuel Compressor Electricity Energy {[}J{]}}\label{generator-fuel-compressor-electric-energy-j}
 
 This variable provides the results for the energy used by the fuel supply compressor. It is also added to the appropriate meters.
 
@@ -3105,11 +3312,11 @@ This variable provides the temperature of the water supplied to the power module
 
 This variable provides the results for \({\dot N_{water}}\) , which the flow rate of reforming water into the FC.
 
-\paragraph{Generator Fuel Reformer Water Pump Electric Power {[}W{]}}\label{generator-fuel-reformer-water-pump-electric-power-w}
+\paragraph{Generator Fuel Reformer Water Pump Electricity Rate {[}W{]}}\label{generator-fuel-reformer-water-pump-electric-power-w}
 
 This variable provides the results for \({P_{pump - el}}\) , which is the electrical power used by the water pump.
 
-\paragraph{Generator Fuel Reformer Water Pump Electric Energy {[}J{]}}\label{generator-fuel-reformer-water-pump-electric-energy-j}
+\paragraph{Generator Fuel Reformer Water Pump Electricity Energy {[}J{]}}\label{generator-fuel-reformer-water-pump-electric-energy-j}
 
 This variable provides the results for energy used by the water pump. It is also added to the appropriate meters.
 
@@ -3153,7 +3360,7 @@ This variable provides the results for the flow rate of the oxygen gas leaving t
 
 This variable provides the results for the power losses associated with inefficiencies in the inverter.
 
-\paragraph{Generator Produced DC Electric Power {[}W{]}}\label{generator-produced-dc-electric-power-w}
+\paragraph{Generator Produced DC Electricity Rate {[}W{]}}\label{generator-produced-dc-electric-power-w}
 
 This variable provides the results for \({P_{el}}\) , which is the net DC electrical power produced by the fuel cell power module.
 
@@ -3165,7 +3372,7 @@ This variable provides the results for \({\varepsilon_{el}}\) , which is the ele
 
 This variable provides the results for state of charge of the electrical storage device inside the fuel cell. Although the units are Joules, this is a state variable and is reported as an average rather than a sum.
 
-\paragraph{Generator Produced DC Electric Power {[}W{]}}\label{generator-produced-dc-electric-power-w-1}
+\paragraph{Generator Produced DC Electricity Rate {[}W{]}}\label{generator-produced-dc-electric-power-w-1}
 
 This variable provides the rate at which power was stored into the fuel cell's electrical storage subsystem.
 
@@ -3181,11 +3388,11 @@ This variable provides the rate at which power was drawn from the fuel cell's el
 
 This variable provides the energy drawn from the fuel cell's electrical storage subsystem.
 
-\paragraph{Generator Ancillary AC Electric Power {[}W{]}}\label{generator-ancillary-ac-electric-power-w}
+\paragraph{Generator Ancillary AC Electricity Rate {[}W{]}}\label{generator-ancillary-ac-electric-power-w}
 
 This variable provides the results for \({P_{el,ancillaries - AC}}\) , which is the rate at which ancillary devices within the power module use electricity supplied to the fuel cell by an external source.
 
-\paragraph{Generator Ancillary AC Electric Energy {[}J{]}}\label{generator-ancillary-ac-electric-energy-j}
+\paragraph{Generator Ancillary AC Electricity Energy {[}J{]}}\label{generator-ancillary-ac-electric-energy-j}
 
 This variable provides the results for the energy used by AC ancillaries. It is also added to the appropriate meters.
 
@@ -3208,6 +3415,16 @@ This is the water vapor fraction in the exit gas.
 \paragraph{Generator Heat Recovery Water Condensate Molar Flow Rate {[}kmol/s{]}}\label{generator-heat-recovery-water-condensate-molar-flow-rate-kmols}
 
 This is the flow of condensed water in kmol/s.
+
+\paragraph{Generator Number of Cycles {[]}}\label{generator-number-of-cycles}
+
+This is the number of start-stop cycles that the fuel cell power module has experienced so far.
+It is initialized to the value of \hyperref[field-number-of-stops-at-start-of-simulation]{Number of Stops at Start of Simulation} provided in the \hyperref[generatorfuelcellpowermodule]{Generator:FuelCell:PowerModule} object.
+
+\paragraph{Generator Power Module Skin Heat Loss Rate {[}W{]}}\label{generator-power-module-skin-heat-loss-rate-w}
+
+This is the which is the rate of energy lost to the surroundings via the skin of the fuel cell power module.
+
 
 \subsection{Generator:FuelCell:PowerModule}\label{generatorfuelcellpowermodule}
 
@@ -4143,6 +4360,8 @@ This field contains the name of a \hyperref[curvecubic]{Curve:Cubic} input objec
 
 This field describes the portion of the compressor electrical power that is lost to the surroundings. The rest of the energy is added to the fuel stream. A heat loss factor of 1.0 indicates that all the heat is lost to the surroundings and no energy is added to the fuel inlet stream.
 
+Note with \emph{LiquidGeneric} fuel type, currently this value would not taken into effect. In this case a heat loss factor of 1.0 is always used for this fuel type. 
+
 \paragraph{Field: Fuel Type}\label{field-fuel-type-3}
 
 Choose between GaseousConstituents or LiquidGeneric .
@@ -4181,17 +4400,17 @@ These fields describe the molar fraction of the fuel stream constituents. It is 
 
 In addition to the following output variables, the resulting fuel heating values are also reported to the eio file.
 
-HVAC,Average,Generator Fuel Compressor Electric Power {[}W{]}
+HVAC,Average,Generator Fuel Compressor Electricity Rate {[}W{]}
 
-HVAC,Sum,Generator Fuel Compressor Electric Energy {[}J{]}
+HVAC,Sum,Generator Fuel Compressor Electricity Energy {[}J{]}
 
 HVAC,Average,Generator Fuel Compressor Skin Heat Loss Rate {[}W{]}
 
-\paragraph{Generator Fuel Compressor Electric Power {[}W{]}}\label{generator-fuel-compressor-electric-power-w-1}
+\paragraph{Generator Fuel Compressor Electricity Rate {[}W{]}}\label{generator-fuel-compressor-electric-power-w-1}
 
 This is the rate of energy use by the gas compressor, if any, that provides fuel at a higher pressure.
 
-\paragraph{Generator Fuel Compressor Electric Energy {[}J{]}}\label{generator-fuel-compressor-electric-energy-j-1}
+\paragraph{Generator Fuel Compressor Electricity Energy {[}J{]}}\label{generator-fuel-compressor-electric-energy-j-1}
 
 This is the energy used by the gas compressor, if any, that provides fuel at a higher pressure.
 
@@ -4273,9 +4492,9 @@ Using the Generator:PV:Simple object makes a number of output variables availabl
 
 \begin{itemize}
 \item
-  HVAC,Average,Generator Produced DC Electric Power {[}W{]}
+  HVAC,Average,Generator Produced DC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Produced DC Electric Energy {[}J{]}
+  HVAC,Sum,Generator Produced DC Electricity Energy {[}J{]}
 \item
   HVAC,Average,Generator PV Cell Temperature {[}C{]}
 \item
@@ -4286,11 +4505,11 @@ Using the Generator:PV:Simple object makes a number of output variables availabl
   HVAC,Average,Generator PV Array Efficiency {[]}
 \end{itemize}
 
-\paragraph{Generator Produced DC Electric Power {[}W{]}}\label{generator-produced-dc-electric-power-w-2}
+\paragraph{Generator Produced DC Electricity Rate {[}W{]}}\label{generator-produced-dc-electric-power-w-2}
 
 This output variable is the power of DC electricity produced by the PV array in Watts..
 
-\paragraph{Generator Produced DC Electric Energy {[}J{]}}\label{generator-produced-dc-electric-energy-j}
+\paragraph{Generator Produced DC Electricity Energy {[}J{]}}\label{generator-produced-dc-electric-energy-j}
 
 This output variable is the energy in DC electricity produced by the PV array, in Joules.
 
@@ -4370,7 +4589,7 @@ The following table shows several sample PV array types with their input values.
 \midrule
 \endhead
 
-Units: & [A] & [V] & [V] & [A] & \{A/K] & [V/K] & [-] & [K] & [m2] \tabularnewline
+Units: & [A] & [V] & [V] & [A] & [A/K] & [V/K] & [-] & [K] & [m2] \tabularnewline
 ASE 300-DFG/50 & 6.2 & 60 & 50.5 & 5.6 & 0.001 & -0.0038 & 216 & 318 & 2.43 \tabularnewline
 BPsolar 275 & 4.75 & 21.4 & 17 & 4.45 & 0.00065 & -0.08 & 36 & 320 & 0.63 \tabularnewline
 BPsolar 3160 & 4.8 & 44.2 & 35.1 & 4.55 & 0.00065 & -0.16 & 72 & 320 & 1.26 \tabularnewline
@@ -4762,7 +4981,7 @@ When using EpMacro with a typical installation of EnergyPlus, the above entry ca
 
 \subsection{Generator:PVWatts}\label{generatorpvwatts}
 
-PVWatts is a web application and module in NREL's System Advisor Model (SAM) software that estimates the electricity production of a grid-connected photovoltaic system based on a few simple inputs. This object brings the same calculations from PVWatts into an EnergyPlus whole building simulation without the need to call the web application API or SAM SDK. It provides a good alternative to the \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic} object when detailed information about the PV array is not available such as in a first pass analysis or when the desire is to achieve comparable results to PVWatts outside of EnergyPlus. To get comparable results to PVWatts, it should be used with the \hyperref[electricloadcenterinverterpvwatts]{ElectricLoadCenter:Inverter:PVWatts}.
+PVWatts is a web application and module in NREL's System Advisor Model (SAM) software that estimates the electricity production of a grid-connected photovoltaic system based on a few simple inputs. This object brings the same calculations from PVWatts into an EnergyPlus whole building simulation without the need to call the web application API or SAM SDK. It provides a good alternative to the \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic} object when detailed information about the PV array is not available such as in a first pass analysis or when the desire is to achieve comparable results to PVWatts outside of EnergyPlus. To get comparable results to PVWatts, it should be used with the \hyperref[electricloadcenterinverterpvwatts]{ElectricLoadCenter:Inverter:PVWatts}. The PVWatts:Generator uses SAM 2020.11.29 Revision 0, SSC Revision 250.
 
 \subsubsection{Inputs}\label{input-description}
 
@@ -4901,13 +5120,15 @@ Default: 0.4
 
 \begin{itemize}
 \item
-  HVAC,Average,Generator Produced DC Electric Power {[}W{]}
+  HVAC,Average,Generator Produced DC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Produced DC Electric Energy {[}J{]}
+  HVAC,Sum,Generator Produced DC Electricity Energy {[}J{]}
 \item
   HVAC,Average,Plane of Array Irradiance $\left [\frac{\text{W}}{\text{m}^2} \right ]$
 \item
   HVAC,Average,Generator PV Cell Temperature {[}C{]}
+\item
+  HVAC,Average,Shaded Percent {[}\%{]}
 \end{itemize}
 
 
@@ -5103,9 +5324,9 @@ Generator:WindTurbine,
 
 \begin{itemize}
 \item
-  HVAC,Average, Generator Produced Electric Power {[}W{]}
+  HVAC,Average, Generator Produced Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Generator Produced Electric Energy {[}J{]}
+  HVAC,Sum, Generator Produced Electricity Energy {[}J{]}
 \item
   HVAC,Average, Generator Turbine Local Wind Speed {[}m/s{]}
 \item
@@ -5124,11 +5345,11 @@ Generator:WindTurbine,
   HVAC,Average, Generator Turbine Attack Angle {[}deg{]}
 \end{itemize}
 
-\paragraph{Generator Produced Electric Power {[}W{]}}\label{generator-produced-electric-power-w-4}
+\paragraph{Generator Produced Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-4}
 
 This report is the electric power that the wind turbine system produces.
 
-\paragraph{Generator Produced Electric Energy {[}J{]}}\label{generator-produced-electric-energy-j-4}
+\paragraph{Generator Produced Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-4}
 
 This report is the electric energy that the wind turbine system produces.
 
@@ -5164,7 +5385,7 @@ This report is the local relative flow velocity that represents actual direction
 
 This report is the azimuth angle between the relative flow velocity and the plane of chord. It varies as the wind speed increases, so that the lift and drag forces change.
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 \protect\hyperlink{ux5fftnref1}{{[}1{]}} Ulleberg Ø . (1997) Simulation of autonomous PV-H2 systems: analysis of the PHOEBUS plant design, operation and energy management. In \emph{Proceedings of ISES 1997 Solar World Congress}, August 24-30, Taejon, Korea.
 

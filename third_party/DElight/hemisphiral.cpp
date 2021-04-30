@@ -8,24 +8,24 @@
  *           Lawrence Berkeley National Laboratory
  */
 
-// This work was supported by the Assistant Secretary for Energy Efficiency 
-// and Renewable Energy, Office of Building Technologies, 
-// Building Systems and Materials Division of the 
+// This work was supported by the Assistant Secretary for Energy Efficiency
+// and Renewable Energy, Office of Building Technologies,
+// Building Systems and Materials Division of the
 // U.S. Department of Energy under Contract No. DE-AC03-76SF00098.
 
 /*
-NOTICE: The Government is granted for itself and others acting on its behalf 
-a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce, 
-prepare derivative works, and perform publicly and display publicly. 
+NOTICE: The Government is granted for itself and others acting on its behalf
+a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce,
+prepare derivative works, and perform publicly and display publicly.
 Beginning five (5) years after (date permission to assert copyright was obtained),
-subject to two possible five year renewals, the Government is granted for itself 
+subject to two possible five year renewals, the Government is granted for itself
 and others acting on its behalf a paid-up, nonexclusive, irrevocable worldwide
-license in this data to reproduce, prepare derivative works, distribute copies to 
-the public, perform publicly and display publicly, and to permit others to do so. 
+license in this data to reproduce, prepare derivative works, distribute copies to
+the public, perform publicly and display publicly, and to permit others to do so.
 NEITHER THE UNITED STATES NOR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL 
-LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY 
-INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE 
+THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL
+LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY
+INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE
 WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 #pragma warning(disable:4786)
@@ -33,7 +33,7 @@ WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include <strstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <algorithm> // for min/max
@@ -222,12 +222,12 @@ Double	HemiSphiral::SLcum(int ii)
 
 Double	HemiSphiral::x2D(int ii)
 {
-	return dir(ii)[0];	
+	return dir(ii)[0];
 }
 
 Double	HemiSphiral::y2D(int ii)
 {
-	return dir(ii)[1];	
+	return dir(ii)[1];
 }
 
 BGL::vector3	HemiSphiral::dir(int ii)
@@ -410,7 +410,7 @@ int	HemiSphiral::nearestc(Double admax, BGL::vector3 dirext, vector<struct neare
 	int		jj0 =      (int)(0.5 + (1 - dirext[2])/deltaz);
 //	Double	jj0Double = (1 - dirext[2])/deltaz;
 //	cout << jj0 << " " << 1. - jj0*deltaz << " " << jj0Double << "\n";
-	
+
 	//	search row 0
 	int		irow = 0;
 //	cout << "irow search: " << irow << "; jjstart: " << jj0 << "\n";
@@ -444,9 +444,9 @@ int	HemiSphiral::nearestc(Double admax, BGL::vector3 dirext, vector<struct neare
 		rowsearch(jj,admax,dirext,distminindx,distmin);
 	}
 	//	"raw" result of searches
-//	cout << "nearestc: \n"; 
+//	cout << "nearestc: \n";
 //	for (int kk=0; kk<distminindx.size(); kk++) {
-//		cout << distminindx[kk] << " "; 
+//		cout << distminindx[kk] << " ";
 //	}
 //	cout << "\n";
 
@@ -466,9 +466,9 @@ int	HemiSphiral::nearestc(Double admax, BGL::vector3 dirext, vector<struct neare
 		IIEND:;
 	}
 	//	"finished" result of searches
-//	cout << "nearestc: \n"; 
+//	cout << "nearestc: \n";
 //	for (int kk=0; kk<tdminindx.size(); kk++) {
-//		cout << tdminindx[kk] << " "; 
+//		cout << tdminindx[kk] << " ";
 //	}
 //	cout << "\n";
 //	return tdminindx;
@@ -566,7 +566,7 @@ Double	HemiSphiral::interp(BGL::vector3 dirext)
 	int	nnsize = nearestc(2.0*DA,dirext, nd);
 	if (nnsize == 0) return 0;
 
-	vector<Double> weights = ::interpwgts(dirext,nd);
+	vector<Double> weights = ::interpwgts(nd);
 
 	Double interpval = 0;
 	for (int ii=0; ii<(int)weights.size(); ii++) {
@@ -577,7 +577,7 @@ Double	HemiSphiral::interp(BGL::vector3 dirext)
 }
 
 //vector<Double>	HemiSphiral::interpwgts(BGL::vector3 dirext, vector<struct nearestdata>& nd)
-vector<Double>	interpwgts(BGL::vector3 dirext, vector<struct nearestdata>& nd)
+vector<Double>	interpwgts(vector<struct nearestdata>& nd)
 {
 	//	avoids singularity if dirext == dir(ii)
 	Double epsilon = MAXPointTol;	//	tunable parameter
@@ -604,17 +604,17 @@ vector<Double>	interpwgts(BGL::vector3 dirext, vector<struct nearestdata>& nd)
 	for (ii=0; ii<size; ii++) {
 		weights[ii] = adistinverse[ii] / sum;
 	}
-	
+
 	return weights;
 }
 
 vector<Double>	HemiSphiral::interpwgts(BGL::vector3 dirext)
 {
 	vector<struct nearestdata> nd;
-	int	nnsize = nearestc(1.5*DA,dirext, nd);
+	nearestc(1.5*DA,dirext, nd);
 
-//	return interpwgts(dirext,nearestc(1.5*DA,dirext));	
-	return ::interpwgts(dirext,nd);	
+//	return interpwgts(dirext,nearestc(1.5*DA,dirext));
+	return ::interpwgts(nd);
 }
 
 Double		HemiSphiral::TotIllum()
@@ -745,18 +745,18 @@ ifstream&	HemiSphiral::load(ifstream& infile)
 {
     HemiSphiral    result;
     Char    c;
-	ostrstream osstream;
+	std::ostringstream osstream;
 
 	// Expected format: {double0 double1 ... doubleN}
-	
-    while (infile >> c && isspace(c));
-	if (infile.eof()) return(infile);
+
+    while (infile >> c && isspace(c)) {;} // skip through spaces
+    if (infile.eof()) return(infile);
 	if (infile.fail()) {
 		osstream << "HemiSphiral:ReadError1: unrecoverable failbit\n";
 	    writewndo(osstream.str(),"e");
 		return(infile);
 	}
-		
+
     if (c != '{') {
 		infile.putback(c);
 	    infile.clear(ios::failbit);
@@ -826,14 +826,14 @@ void HemiSphiral::summary()
 void	HemiSphiral::pointdump()
 {
 	for (int ii=0; ii<N; ii++) {
-		cout << right << setw(4) << ii << " "; 
+		cout << right << setw(4) << ii << " ";
 		cout << left << setprecision(5);
 		cout << setw(8) << valList[ii] << " ";
 		cout << setw(8) << theta(ii)*180/PI << " ";
 		cout << setw(8) << phiMod2pi(ii)*180/PI << " ";
 		cout << setw(8) << phi(ii)/(2*PI) << " ";	//	= #turns
-		cout << setw(8) << SLcum(ii) << " ";	
-		cout << setw(8) << dir(ii) << " ";	
+		cout << setw(8) << SLcum(ii) << " ";
+		cout << setw(8) << dir(ii) << " ";
 		cout << "\n";
 	}
 }
@@ -843,7 +843,7 @@ ofstream&	HemiSphiral::pointdumpT21(ofstream& outfile)
 	int	ii = -1;
 	while (dir(++ii)[2] >= 0) {
 //	for (int ii=0; ii<N; ii++) {
-//		outfile << right << setw(4) << ii << "\t"; 
+//		outfile << right << setw(4) << ii << "\t";
 		outfile << left << setprecision(6);
 		Double	phiT21 = 180 - phiMod2pi(ii)*180/PI;
 		if (phiT21 < 0) phiT21 += 360;
@@ -851,7 +851,7 @@ ofstream&	HemiSphiral::pointdumpT21(ofstream& outfile)
 		Double	thetaT21 = 180 - theta(ii)*180/PI;
 		outfile << setw(8) << thetaT21 << "\t";
 		outfile << setw(8) << valList[ii] << "\t";
-//		outfile << setw(8) << dir(ii) << "\t";	
+//		outfile << setw(8) << dir(ii) << "\t";
 		outfile << "\n";
 	}
 	return outfile;

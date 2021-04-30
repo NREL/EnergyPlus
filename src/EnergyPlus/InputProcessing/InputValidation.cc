@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -81,6 +81,12 @@ std::vector<std::string> const &Validation::warnings()
 
 bool Validation::validate(json const &parsed_input)
 {
+
+    static constexpr auto nameError =
+        "Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints: ''.";
+    static constexpr auto otherError =
+        "Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints";
+
     valijson::Schema validation_schema;
     valijson::SchemaParser parser;
     valijson::adapters::NlohmannJsonAdapter schema_doc(*schema);
@@ -100,10 +106,12 @@ bool Validation::validate(json const &parsed_input)
                     context += *it;
 
                 errors_.emplace_back(context + " - " + error.description);
-                if (max_context == 2 &&
-                    error.description ==
-                        "Object contains properties that could not be validated using 'properties' or 'additionalProperties' constraints") {
-                    errors_.emplace_back(context + " - Object name is required and cannot be blank or whitespace");
+                if (max_context == 2) {
+                    if (error.description == nameError) { // C++20: should mark this [[likely]]
+                        errors_.emplace_back(context + " - Object name is required and cannot be blank or whitespace");
+                    } else if (error.description.find(otherError) != std::string::npos) {
+                        errors_.emplace_back(context + " - Object name is required and cannot be blank or whitespace, and must be UTF-8 encoded");
+                    }
                 }
             }
         }

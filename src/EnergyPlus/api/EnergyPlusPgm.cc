@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -187,64 +187,66 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/CommandLineInterface.hh>
-#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataTimings.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
-#include <EnergyPlus/api/EnergyPlusPgm.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/InputProcessing/DataStorage.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/api/EnergyPlusPgm.hh>
 
 #ifdef _WIN32
 #include <direct.h>
 #include <stdlib.h>
 #else // Mac or Linux
-#include <fmt-6.1.2/include/fmt/format.h>
 #include <unistd.h>
 #endif
 
-void EnergyPlusPgm(EnergyPlusData &state, std::string const &filepath)
+int EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath)
 {
-    std::exit(RunEnergyPlus(state, filepath));
+    return RunEnergyPlus(state, filepath);
 }
 
-int initializeEnergyPlus(EnergyPlusData &state, std::string const & filepath) {
+void commonInitialize(EnergyPlus::EnergyPlusData &state)
+{
     using namespace EnergyPlus;
-
     // Disable C++ i/o synching with C methods for speed
-    std::ios_base::sync_with_stdio(false);
-    std::cin.tie(nullptr); // Untie cin and cout: Could cause odd behavior for interactive prompts
+    // std::ios_base::sync_with_stdio(false);
+    // std::cin.tie(nullptr); // Untie cin and cout: Could cause odd behavior for interactive prompts
 
 // Enable floating point exceptions
 #ifndef NDEBUG
 #ifdef __unix__
-    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW); // These exceptions are enabled (FE_INEXACT and FE_UNDERFLOW will not throw)
 #endif
 #endif
 
+#ifdef MSVC_DEBUG
+    // the following line enables NaN detection in Visual Studio debug builds. See
+    // https://github.com/NREL/EnergyPlus/wiki/Debugging-Tips
+    int fp_control_state =
+        _controlfp(_EM_INEXACT | _EM_UNDERFLOW, _MCW_EM); // These exceptions are disabled (_EM_INEXACT and _EM_UNDERFLOW will not throw)
+#endif
+
 #ifdef _MSC_VER
-    #ifndef _DEBUG
+#ifndef _DEBUG
     // If _MSC_VER and not debug then prevent dialogs on error
     SetErrorMode(SEM_NOGPFAULTERRORBOX);
     _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
@@ -252,145 +254,114 @@ int initializeEnergyPlus(EnergyPlusData &state, std::string const & filepath) {
 #endif
 #endif
 
-    DataSystemVariables::Time_Start = DataTimings::epElapsedTime();
+    state.dataSysVars->Time_Start = DataTimings::epElapsedTime();
 #ifdef EP_Detailed_Timings
     epStartTime("EntireRun=");
 #endif
 
-    CreateCurrentDateTimeString(DataStringGlobals::CurrentDateTime);
+    state.dataStrGlobals->CurrentDateTime = CreateCurrentDateTimeString();
 
-    ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
-    ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setProgramVersion(state.dataStrGlobals->VerStringVar);
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setStartDateTimeStamp(state.dataStrGlobals->CurrentDateTime.substr(5));
 
-    DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
+    state.dataStrGlobals->VerStringVar = DataStringGlobals::VerString + "," + state.dataStrGlobals->CurrentDateTime;
 
-    DataSystemVariables::processEnvironmentVariables(state.dataGlobals);
+    DataSystemVariables::processEnvironmentVariables(state);
+}
+
+int commonRun(EnergyPlus::EnergyPlusData &state)
+{
+    using namespace EnergyPlus;
+
+    int errStatus = initErrorFile(state);
+    if (errStatus) {
+        return errStatus;
+    }
+
+    state.dataSysVars->TestAllPaths = true;
+
+    DisplayString(state, "EnergyPlus Starting");
+    DisplayString(state, state.dataStrGlobals->VerStringVar);
+
+    try {
+        state.dataInputProcessing->inputProcessor = InputProcessor::factory();
+        state.dataInputProcessing->inputProcessor->processInput(state);
+        if (state.dataGlobal->outputEpJSONConversionOnly) {
+            DisplayString(state, "Converted input file format. Exiting.");
+            return EndEnergyPlus(state);
+        }
+    } catch (const FatalError &e) {
+        return AbortEnergyPlus(state);
+    } catch (const std::exception &e) {
+        ShowSevereError(state, e.what());
+        return AbortEnergyPlus(state);
+    }
+    return 0;
+}
+
+int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath)
+{
+    using namespace EnergyPlus;
+    commonInitialize(state);
 
     if (!filepath.empty()) {
         // if filepath is not empty, then we are using E+ as a library API call
         // change the directory to the specified folder, and pass in dummy args to command line parser
         // this will initialize the paths throughout E+ to the defaults
-        DisplayString("EnergyPlus Library: Changing directory to: " + filepath);
+        DisplayString(state, "EnergyPlus Library: Changing directory to: " + filepath);
 #ifdef _WIN32
         int status = _chdir(filepath.c_str());
 #else
         int status = chdir(filepath.c_str());
 #endif
         if (status == 0) {
-            DisplayString("Directory change successful.");
+            DisplayString(state, "Directory change successful.");
         } else {
-            DisplayString("Couldn't change directory; aborting EnergyPlus");
+            DisplayString(state, "Couldn't change directory; aborting EnergyPlus");
             return EXIT_FAILURE;
         }
-        DataStringGlobals::ProgramPath = filepath + DataStringGlobals::pathChar;
+        state.dataStrGlobals->ProgramPath = filepath + DataStringGlobals::pathChar;
         int dummy_argc = 1;
         const char *dummy_argv[1] = {"energyplus"};
         CommandLineInterface::ProcessArgs(state, dummy_argc, dummy_argv);
     }
 
-    int errStatus = initErrorFile();
-    if (errStatus) {
-        return errStatus;
-    }
+    return commonRun(state);
+}
 
-    DataSystemVariables::TestAllPaths = true;
+int initializeAsLibrary(EnergyPlus::EnergyPlusData &state)
+{
+    commonInitialize(state);
+    return commonRun(state);
+}
 
-    DisplayString("EnergyPlus Starting");
-    DisplayString(DataStringGlobals::VerString);
+int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state)
+{
+    using namespace EnergyPlus;
 
     try {
-        EnergyPlus::inputProcessor = InputProcessor::factory();
-        EnergyPlus::inputProcessor->processInput();
-        if (DataGlobals::outputEpJSONConversionOnly) {
-            DisplayString("Converted input file format. Exiting.");
-            return EndEnergyPlus();
+        ShowMessage(state, "Simulation Error Summary *************");
+
+        GenOutputVariablesAuditReport(state);
+
+        Psychrometrics::ShowPsychrometricSummary(state, state.files.audit);
+
+        state.dataInputProcessing->inputProcessor->reportOrphanRecordObjects(state);
+        FluidProperties::ReportOrphanFluids(state);
+        ScheduleManager::ReportOrphanSchedules(state);
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite.reset();
         }
-        ResultsFramework::OutputSchema->setupOutputOptions();
-    } catch (const FatalError &e) {
-        return AbortEnergyPlus(state);
-    } catch (const std::exception &e) {
-        ShowSevereError(e.what());
-        return AbortEnergyPlus(state);
-    }
-    return 0;
-}
+        if (state.dataInputProcessing->inputProcessor) {
+            state.dataInputProcessing->inputProcessor.reset();
+        }
 
-int initializeAsLibrary(EnergyPlusData &state) {
-    using namespace EnergyPlus;
-
-    // Disable C++ i/o synching with C methods for speed
-    std::ios_base::sync_with_stdio(false);
-    std::cin.tie(nullptr); // Untie cin and cout: Could cause odd behavior for interactive prompts
-
-// Enable floating point exceptions
-#ifndef NDEBUG
-#ifdef __unix__
-    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
-#endif
-#endif
-
-#ifdef _MSC_VER
-    #ifndef _DEBUG
-    // If _MSC_VER and not debug then prevent dialogs on error
-    SetErrorMode(SEM_NOGPFAULTERRORBOX);
-    _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
-    _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
-#endif
-#endif
-
-    DataSystemVariables::Time_Start = DataTimings::epElapsedTime();
-#ifdef EP_Detailed_Timings
-    epStartTime("EntireRun=");
-#endif
-
-    CreateCurrentDateTimeString(DataStringGlobals::CurrentDateTime);
-
-    ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
-    ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
-
-    DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
-
-    DataSystemVariables::processEnvironmentVariables(state.dataGlobals);
-
-    int errStatus = initErrorFile();
-    if (errStatus) {
-        return errStatus;
-    }
-
-    DataSystemVariables::TestAllPaths = true;
-
-    DisplayString("EnergyPlus Starting");
-    DisplayString(DataStringGlobals::VerString);
-
-    try {
-        EnergyPlus::inputProcessor = InputProcessor::factory();
-        EnergyPlus::inputProcessor->processInput();
-        ResultsFramework::OutputSchema->setupOutputOptions();
-    } catch (const FatalError &e) {
-        return AbortEnergyPlus(state);
-    } catch (const std::exception &e) {
-        ShowSevereError(e.what());
-        return AbortEnergyPlus(state);
-    }
-    return 0;
-}
-
-int wrapUpEnergyPlus(EnergyPlusData &state) {
-    using namespace EnergyPlus;
-
-    try {
-        ShowMessage("Simulation Error Summary *************");
-
-        GenOutputVariablesAuditReport();
-
-        Psychrometrics::ShowPsychrometricSummary();
-
-        EnergyPlus::inputProcessor->reportOrphanRecordObjects();
-        FluidProperties::ReportOrphanFluids();
-        ScheduleManager::ReportOrphanSchedules();
-
-        if (DataGlobals::runReadVars) {
-            int status = CommandLineInterface::runReadVarsESO();
+        if (state.dataGlobal->runReadVars) {
+            //            state.files.outputControl.csv = true;
+            if (state.files.outputControl.csv) {
+                ShowWarningMessage(state, "Native CSV output requested in input file, but running ReadVarsESO due to command line argument.");
+            }
+            int status = CommandLineInterface::runReadVarsESO(state);
             if (status) {
                 return status;
             }
@@ -398,16 +369,15 @@ int wrapUpEnergyPlus(EnergyPlusData &state) {
     } catch (const FatalError &e) {
         return AbortEnergyPlus(state);
     } catch (const std::exception &e) {
-        ShowSevereError(e.what());
+        ShowSevereError(state, e.what());
         return AbortEnergyPlus(state);
     }
 
-    return EndEnergyPlus();
+    return EndEnergyPlus(state);
 }
 
-int RunEnergyPlus(EnergyPlusData &state, std::string const & filepath)
+int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath)
 {
-
 
     // PROGRAM INFORMATION:
     //       AUTHOR         Linda K. Lawrie, et al
@@ -424,19 +394,19 @@ int RunEnergyPlus(EnergyPlusData &state, std::string const & filepath)
     // as possible and contain all "simulation" code in other modules and files.
 
     int status = initializeEnergyPlus(state, filepath);
-    if (status) return status;
+    if (status || state.dataGlobal->outputEpJSONConversionOnly) return status;
     try {
-        EnergyPlus::SimulationManager::ManageSimulation(state,EnergyPlus::OutputFiles::getSingleton());
+        EnergyPlus::SimulationManager::ManageSimulation(state);
     } catch (const EnergyPlus::FatalError &e) {
         return EnergyPlus::AbortEnergyPlus(state);
     } catch (const std::exception &e) {
-        EnergyPlus::ShowSevereError(e.what());
+        EnergyPlus::ShowSevereError(state, e.what());
         return EnergyPlus::AbortEnergyPlus(state);
     }
     return wrapUpEnergyPlus(state);
 }
 
-int runEnergyPlusAsLibrary(EnergyPlusData &state, int argc, const char *argv[])
+int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const char *argv[])
 {
     // PROGRAM INFORMATION:
     //       AUTHOR         Linda K. Lawrie, et al
@@ -452,40 +422,44 @@ int runEnergyPlusAsLibrary(EnergyPlusData &state, int argc, const char *argv[])
     // The method used in EnergyPlus is to simplify the main program as much
     // as possible and contain all "simulation" code in other modules and files.
 
-    EnergyPlus::DataGlobals::eplusRunningViaAPI = true;
+    state.dataGlobal->eplusRunningViaAPI = true;
 
     // clean out any stdin, stderr, stdout flags from a prior call
     if (!std::cin.good()) std::cin.clear();
     if (!std::cerr.good()) std::cerr.clear();
     if (!std::cout.good()) std::cout.clear();
 
-    EnergyPlus::CommandLineInterface::ProcessArgs(state, argc, argv );
+    int return_code = EnergyPlus::CommandLineInterface::ProcessArgs(state, argc, argv);
+    if (return_code == static_cast<int>(EnergyPlus::CommandLineInterface::ReturnCodes::Failure)) {
+        return return_code;
+    } else if (return_code == static_cast<int>(EnergyPlus::CommandLineInterface::ReturnCodes::SuccessButHelper)) {
+        // If it was "--version" or "--help", you do not want to continue trying to run the simulation, but do not want to indicate failure either
+        return static_cast<int>(EnergyPlus::CommandLineInterface::ReturnCodes::Success);
+    }
 
     int status = initializeAsLibrary(state);
-    if (status) return status;
+    if (status || state.dataGlobal->outputEpJSONConversionOnly) return status;
     try {
-        EnergyPlus::SimulationManager::ManageSimulation(state, EnergyPlus::OutputFiles::getSingleton());
+        EnergyPlus::SimulationManager::ManageSimulation(state);
     } catch (const EnergyPlus::FatalError &e) {
         return EnergyPlus::AbortEnergyPlus(state);
     } catch (const std::exception &e) {
-        EnergyPlus::ShowSevereError(e.what());
+        EnergyPlus::ShowSevereError(state, e.what());
         return EnergyPlus::AbortEnergyPlus(state);
     }
     return wrapUpEnergyPlus(state);
 }
 
-void StoreProgressCallback(void (*f)(int const))
+void StoreProgressCallback(EnergyPlus::EnergyPlusData &state, void (*f)(int const))
 {
-    using namespace EnergyPlus::DataGlobals;
-    fProgressPtr = f;
+    state.dataGlobal->fProgressPtr = f;
 }
-void StoreMessageCallback(void (*f)(std::string const &))
+void StoreMessageCallback(EnergyPlus::EnergyPlusData &state, void (*f)(std::string const &))
 {
-    using namespace EnergyPlus::DataGlobals;
-    fMessagePtr = f;
+    state.dataGlobal->fMessagePtr = f;
 }
 
-void CreateCurrentDateTimeString(std::string &CurrentDateTimeString)
+std::string CreateCurrentDateTimeString()
 {
 
     // SUBROUTINE INFORMATION:
@@ -499,7 +473,6 @@ void CreateCurrentDateTimeString(std::string &CurrentDateTimeString)
     // that one is always available.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    ObjexxFCL::gio::Fmt fmtDate("(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Array1D_int value(8);
@@ -515,8 +488,8 @@ void CreateCurrentDateTimeString(std::string &CurrentDateTimeString)
 
     date_and_time(datestring, _, _, value);
     if (!datestring.empty()) {
-        ObjexxFCL::gio::write(CurrentDateTimeString, fmtDate) << value(1) << value(2) << value(3) << value(5) << value(6);
+        return EnergyPlus::format(" YMD={:4}.{:02}.{:02} {:02}:{:02}", value(1), value(2), value(3), value(5), value(6));
     } else {
-        CurrentDateTimeString = " unknown date/time";
+        return " unknown date/time";
     }
 }

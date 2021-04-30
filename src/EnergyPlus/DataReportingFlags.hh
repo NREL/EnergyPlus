@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,32 +52,37 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-namespace DataReportingFlags {
+struct ReportFlagData : BaseGlobalStruct
+{
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
+    int NumOfWarmupDays = 0; // reinitialized for each environment.
+    std::string cWarmupDay;
+    bool DisplayPerfSimulationFlag = false;  // True when "Performing Simulation" should be displayed
+    bool DoWeatherInitReporting = false;     // Init reporting -- items that go onto OutputFileInits (eio)
+    bool PrintEndDataDictionary = false;     // Flag for printing "End of Data Dictionary" on output files
+    bool MakeMirroredDetachedShading = true; // True (default) when Detached Shading Surfaces should be "mirrored"
+    bool MakeMirroredAttachedShading = true; // True (default) when Attached Shading Surfaces should be "mirrored"
+    bool DebugOutput = false;
+    bool EvenDuringWarmup = false;
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumOfWarmupDays; // reinitialized for each environment.
-    extern std::string cWarmupDay;
-    extern bool DisplayPerfSimulationFlag;        // True when "Performing Simulation" should be displayed
-    extern bool DoWeatherInitReporting;           // Init reporting -- items that go onto OutputFileInits
-    extern bool PrintEndDataDictionary;           // Flag for printing "End of Data Dictionary" on output files
-    extern bool IgnoreInteriorWindowTransmission; // True when section "IgnoreInteriorWindowTransmission" is entered
-    extern bool MakeMirroredDetachedShading;      // True (default) when Detached Shading Surfaces should be "mirrored"
-    extern bool MakeMirroredAttachedShading;      // True (default) when Attached Shading Surfaces should be "mirrored"
-    extern bool DebugOutput;
-    extern bool EvenDuringWarmup;
-
-} // namespace DataReportingFlags
+    void clear_state() override
+    {
+        this->NumOfWarmupDays = 0;
+        this->cWarmupDay.clear();
+        this->DisplayPerfSimulationFlag = false;
+        this->DoWeatherInitReporting = false;
+        this->PrintEndDataDictionary = false;
+        this->MakeMirroredDetachedShading = true;
+        this->MakeMirroredAttachedShading = true;
+        this->DebugOutput = false;
+        this->EvenDuringWarmup = false;
+    }
+};
 
 } // namespace EnergyPlus
 

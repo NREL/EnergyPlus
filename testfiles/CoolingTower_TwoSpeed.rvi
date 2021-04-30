@@ -3,7 +3,7 @@ eplusout.csv
 Zone Air Temperature
 Plant Supply Side Cooling Demand Rate
 Plant Supply Side Heating Demand Rate
-BIG CHILLER,Chiller Electric Power
+BIG CHILLER,Chiller Electricity Rate
 BIG CHILLER,Chiller Evaporator Cooling Rate
 BIG CHILLER,Chiller Condenser Heat Transfer Rate
 BIG CHILLER,Chiller Condenser Inlet Temperature
@@ -17,10 +17,10 @@ BIG TOWER1,Cooling Tower Mass Flow Rate
 BIG TOWER2,Cooling Tower Mass Flow Rate
 BIG TOWER1,Cooling Tower Heat Transfer Rate
 BIG TOWER2,Cooling Tower Heat Transfer Rate
-BIG TOWER1,Cooling Tower Fan Electric Power
-BIG TOWER2,Cooling Tower Fan Electric Power
-BIG TOWER1,Cooling Tower Fan Electric Energy
-BIG TOWER2,Cooling Tower Fan Electric Energy
+BIG TOWER1,Cooling Tower Fan Electricity Rate
+BIG TOWER2,Cooling Tower Fan Electricity Rate
+BIG TOWER1,Cooling Tower Fan Electricity Energy
+BIG TOWER2,Cooling Tower Fan Electricity Energy
 Environment,Site Outdoor Air Drybulb Temperature
 Environment,Site Outdoor Air Wetbulb Temperature
 Environment,Site Outdoor Air Barometric Pressure

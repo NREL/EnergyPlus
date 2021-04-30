@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,35 +49,32 @@
 #define GeneratorFuelSupply_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+
+// Forward declarations
+struct EnergyPlusData;
+
 namespace GeneratorFuelSupply {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
+    void GetGeneratorFuelSupplyInput(EnergyPlusData &state);
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // <name Public routines, optionally name Private routines within this module>
-
-    // Functions
-
-    void GetGeneratorFuelSupplyInput();
-
-    //******************************************************************************
-
-    void SetupFuelConstituentData(EnergyPlus::OutputFiles &outputFiles, int const FuelSupplyNum, bool &ErrorsFound);
+    void SetupFuelConstituentData(EnergyPlusData &state, int FuelSupplyNum, bool &ErrorsFound);
 
 } // namespace GeneratorFuelSupply
+
+struct GeneratorFuelSupplyData : BaseGlobalStruct
+{
+
+    bool MyOneTimeFlag = true;
+
+    void clear_state() override
+    {
+        this->MyOneTimeFlag = true;
+    }
+};
 
 } // namespace EnergyPlus
 

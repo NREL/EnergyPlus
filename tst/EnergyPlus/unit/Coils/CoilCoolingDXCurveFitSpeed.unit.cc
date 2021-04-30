@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,20 +57,19 @@
 
 using namespace EnergyPlus;
 
-
-TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedInput )
+TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedInput)
 {
     std::string idf_objects = this->getSpeedObjectString("speed1");
-    EXPECT_TRUE(process_idf( idf_objects, false ));
-    CoilCoolingDXCurveFitSpeed thisSpeed("speed1");
+    EXPECT_TRUE(process_idf(idf_objects, false));
+    CoilCoolingDXCurveFitSpeed thisSpeed(*state, "speed1");
     EXPECT_EQ("SPEED1", thisSpeed.name);
 }
 
-TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedTest )
+TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedTest)
 {
     std::string idf_objects = this->getSpeedObjectString("speed1");
-    EXPECT_TRUE(process_idf( idf_objects, false ));
-    CoilCoolingDXCurveFitSpeed thisSpeed("speed1");
+    EXPECT_TRUE(process_idf(idf_objects, false));
+    CoilCoolingDXCurveFitSpeed thisSpeed(*state, "speed1");
     EXPECT_EQ("SPEED1", thisSpeed.name);
 
     CoilCoolingDXCurveFitOperatingMode thisMode;
@@ -85,7 +84,6 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedTest )
     DataLoopNode::NodeData outletNode;
 
     thisSpeed.PLR = 1.0;
-    thisSpeed.CondInletTemp = 35.0;
     thisSpeed.ambPressure = 101325.0;
     thisSpeed.AirFF = 1.0;
     thisSpeed.rated_total_capacity = 3000.0;
@@ -96,12 +94,11 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedTest )
     thisSpeed.AirMassFlow = 1.0;
     int fanOpMode = 0;
     Real64 condInletTemp = 24;
-    thisSpeed.CalcSpeedOutput(inletNode, outletNode, thisSpeed.PLR, fanOpMode, condInletTemp);
+    thisSpeed.CalcSpeedOutput(*state, inletNode, outletNode, thisSpeed.PLR, fanOpMode, condInletTemp);
 
-    EXPECT_NEAR( outletNode.Temp, 17.791, 0.001 );
-    EXPECT_NEAR( outletNode.HumRat, 0.00754, 0.0001 );
-    EXPECT_NEAR( outletNode.Enthalpy, 37000.0, 0.1 );
-    EXPECT_NEAR( thisSpeed.fullLoadPower, 900.0, 0.1 );
-    EXPECT_NEAR( thisSpeed.RTF, 1.0, 0.01 );
-
+    EXPECT_NEAR(outletNode.Temp, 17.791, 0.001);
+    EXPECT_NEAR(outletNode.HumRat, 0.00754, 0.0001);
+    EXPECT_NEAR(outletNode.Enthalpy, 37000.0, 0.1);
+    EXPECT_NEAR(thisSpeed.fullLoadPower, 900.0, 0.1);
+    EXPECT_NEAR(thisSpeed.RTF, 1.0, 0.01);
 }

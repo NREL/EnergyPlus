@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -59,54 +60,60 @@ namespace EnergyPlus {
 
 namespace DataWater {
 
-    // Using/Aliasing
+    enum class TankThermalMode
+    {
+        Unassigned,
+        ScheduledTankTemp,     // tank water temperature is user input via schedule
+        TankZoneThermalCoupled // tank water temperature is modeled using simple UA
+    };
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLI
+    enum class RainfallMode
+    {
+        Unassigned,
+        RainSchedDesign, // mode of Rainfall determination is Scheduled Design
+        IrrSchedDesign,  // mode of Irrigation determination is Scheduled Design
+        IrrSmartSched    // mode of irrigation
+    };
 
-    // MODULE PARAMETER DEFINITION
+    enum class RainLossFactor
+    {
+        Unassigned,
+        Constant,
+        Scheduled
+    };
 
-    extern int const ScheduledTankTemp;      // tank water temperature is user input via schedule
-    extern int const TankZoneThermalCoupled; // tank water temperature is modeled using simple UA
+    enum class AmbientTempType
+    {
+        Unassigned,
+        Schedule, // ambient temperature around tank (or HPWH inlet air) is scheduled
+        Zone,     // tank is located in a zone or HPWH inlet air is zone air only
+        Exterior  // tank is located outdoors or HPWH inlet air is outdoor air only
+    };
 
-    extern int const RainSchedDesign; // mode of Rainfall determination is Scheduled Design
-    extern int const IrrSchedDesign;  // mode of Irrigation determination is Scheduled Design (DJS -PSU)
-    extern int const IrrSmartSched;   // mode of irrigation DJS - PSU
+    enum class GroundWaterTable
+    {
+        Unassigned,
+        ConstantWaterTable,
+        ScheduledWaterTable
+    };
 
-    extern int const ConstantRainLossFactor;
-    extern int const ScheduledRainLossFactor;
+    enum class ControlSupplyType
+    {
+        Unassigned,
+        NoControlLevel,
+        MainsFloatValve,
+        WellFloatValve,
+        WellFloatMainsBackup,
+        OtherTankFloatValve,
+        TankMainsBackup
+    };
 
-    extern int const AmbientTempSchedule; // ambient temperature around tank (or HPWH inlet air) is scheduled
-    extern int const AmbientTempZone;     // tank is located in a zone or HPWH inlet air is zone air only
-    extern int const AmbientTempExterior; // tank is located outdoors or HPWH inlet air is outdoor air only
-
-    extern int const ConstantWaterTable;
-    extern int const ScheduledWaterTable;
-
-    extern int const NoControlLevel;
-    extern int const MainsFloatValve;
-    extern int const WellFloatValve;
-    extern int const WellFloatMainsBackup;
-    extern int const OtherTankFloatValve;
-    extern int const TankMainsBackup;
-
-    extern int const OverflowDiscarded;
-    extern int const OverflowToTank;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumWaterStorageTanks; // number of water Storage tanks in model
-    extern int NumRainCollectors;    // number of rainfall collectors in model
-    extern int NumGroundWaterWells;  // number of
-    extern int NumSiteRainFall;
-    extern int NumIrrigation;              // DJS PSU Dec 2006 number of irrigation descriptions (1 allowed)
-    extern bool AnyWaterSystemsInModel;    // control flag set true if any water systems
-    extern bool WaterSystemGetInputCalled; // set true once input data gotten.
-    extern bool AnyIrrigationInModel;      // control flag set true if irrigation input for ecoroof DJS PSU Dec 2006
-
-    // Types
+    enum class Overflow
+    {
+        Unassigned,
+        Discarded,
+        ToTank
+    };
 
     struct StorageTankDataStruct
     {
@@ -116,14 +123,15 @@ namespace DataWater {
         std::string QualitySubCategoryName; // name of water subcategory
         //   INTEGER                      :: QualitySubCategory = 0 !
         Real64 MaxCapacity; // tank capacity Limit [m3]
-        int OverflowMode;
+        Overflow OverflowMode;
         std::string OverflowTankName;
         int OverflowTankID;
         int OverflowTankSupplyARRID;
-        Real64 ValveOnCapacity;  // tank capacity at lower control range [m3]
-        Real64 ValveOffCapacity; // tank capacity at upper control range [m3]
-        int ControlSupplyType;   // mode for tank controlled resupply
-        int GroundWellID;        // index "pointer" to well if present
+        Real64 ValveOnCapacity;   // tank capacity at lower control range [m3]
+        Real64 ValveOffCapacity;  // tank capacity at upper control range [m3]
+        bool LastTimeStepFilling; // Indicates that tank was filling up at last timestep, to determine whether to continue until ValveOffCapacity
+        ControlSupplyType ControlSupply; // mode for tank controlled resupply
+        int GroundWellID;                // index "pointer" to well if present
         std::string SupplyTankName;
         int SupplyTankID;
         int SupplyTankDemandARRID;
@@ -131,16 +139,16 @@ namespace DataWater {
         Real64 InitialVolume;  // water in tank at start of simulation period [m3]
         Real64 MaxInFlowRate;  // limit on rate of inlet [m3/s]
         Real64 MaxOutFlowRate; // limit on rate of outlet [m3/s]
-        int ThermalMode;
-        Real64 InitialTankTemp;       // initial tank temperature [C]
-        int TempSchedID;              // index "pointer" to schedule
-        int AmbientTempIndicator;     // Indicator for ambient tank losses (SCHEDULE, ZONE, EXTERIOR)
-        int AmbientTempSchedule;      // Schedule index pointer
-        int ZoneID;                   // index "pointer" to zone where tank is
-        Real64 UValue;                // U-value for tank [W/m2-k]
-        Real64 SurfArea;              // surface are of tank on Zone side... [m2]
-        int InternalMassID;           // index "pointer" to internal mass object for thermal coupling
-        std::string SurfMaterialName; // surface properties
+        TankThermalMode ThermalMode;
+        Real64 InitialTankTemp;               // initial tank temperature [C]
+        int TempSchedID;                      // index "pointer" to schedule
+        AmbientTempType AmbientTempIndicator; // Indicator for ambient tank losses (SCHEDULE, ZONE, EXTERIOR)
+        int AmbientTempSchedule;              // Schedule index pointer
+        int ZoneID;                           // index "pointer" to zone where tank is
+        Real64 UValue;                        // U-value for tank [W/m2-k]
+        Real64 SurfArea;                      // surface are of tank on Zone side... [m2]
+        int InternalMassID;                   // index "pointer" to internal mass object for thermal coupling
+        std::string SurfMaterialName;         // surface properties
         // calculated data and from elsewhere
         Real64 ThisTimeStepVolume;
         Real64 LastTimeStepVolume;
@@ -173,9 +181,10 @@ namespace DataWater {
 
         // Default Constructor
         StorageTankDataStruct()
-            : MaxCapacity(0.0), OverflowMode(0), OverflowTankID(0), OverflowTankSupplyARRID(0), ValveOnCapacity(0.0), ValveOffCapacity(0.0),
-              ControlSupplyType(0), GroundWellID(0), SupplyTankID(0), SupplyTankDemandARRID(0), BackupMainsCapacity(0.0), InitialVolume(0.0),
-              MaxInFlowRate(0.0), MaxOutFlowRate(0.0), ThermalMode(0), InitialTankTemp(20.0), TempSchedID(0), AmbientTempIndicator(0),
+            : MaxCapacity(0.0), OverflowMode(Overflow::Unassigned), OverflowTankID(0), OverflowTankSupplyARRID(0), ValveOnCapacity(0.0),
+              ValveOffCapacity(0.0), LastTimeStepFilling(false), ControlSupply(ControlSupplyType::Unassigned), GroundWellID(0), SupplyTankID(0),
+              SupplyTankDemandARRID(0), BackupMainsCapacity(0.0), InitialVolume(0.0), MaxInFlowRate(0.0), MaxOutFlowRate(0.0),
+              ThermalMode(TankThermalMode::Unassigned), InitialTankTemp(20.0), TempSchedID(0), AmbientTempIndicator(AmbientTempType::Unassigned),
               AmbientTempSchedule(0), ZoneID(0), UValue(0.0), SurfArea(0.0), InternalMassID(0), ThisTimeStepVolume(0.0), LastTimeStepVolume(0.0),
               LastTimeStepTemp(0.0), NumWaterSupplies(0), NumWaterDemands(0), VdotFromTank(0.0), VdotToTank(0.0), VdotOverflow(0.0), VolOverflow(0.0),
               NetVdot(0.0), Twater(0.0), TouterSkin(0.0), TwaterOverflow(0.0), MainsDrawVdot(0.0), MainsDrawVol(0.0), SkinLossPower(0.0),
@@ -192,9 +201,9 @@ namespace DataWater {
         std::string StorageTankName;
         int StorageTankID; // index "pointer" to storage tank array
         int StorageTankSupplyARRID;
-        int LossFactorMode;    // control how loss factor(s) are entered
-        Real64 LossFactor;     // loss factor when constant
-        int LossFactorSchedID; // index "pointer" to schedule
+        RainLossFactor LossFactorMode; // control how loss factor(s) are entered
+        Real64 LossFactor;             // loss factor when constant
+        int LossFactorSchedID;         // index "pointer" to schedule
         Real64 MaxCollectRate;
         int NumCollectSurfs; // number of surfaces used in the collector
         Array1D_string SurfName;
@@ -207,8 +216,8 @@ namespace DataWater {
 
         // Default Constructor
         RainfallCollectorDataStruct()
-            : StorageTankID(0), StorageTankSupplyARRID(0), LossFactorMode(0), LossFactor(0.0), LossFactorSchedID(0), MaxCollectRate(0.0),
-              NumCollectSurfs(0), HorizArea(0.0), VdotAvail(0.0), VolCollected(0.0), MeanHeight(0.0)
+            : StorageTankID(0), StorageTankSupplyARRID(0), LossFactorMode(RainLossFactor::Unassigned), LossFactor(0.0), LossFactorSchedID(0),
+              MaxCollectRate(0.0), NumCollectSurfs(0), HorizArea(0.0), VdotAvail(0.0), VolCollected(0.0), MeanHeight(0.0)
         {
         }
     };
@@ -226,9 +235,9 @@ namespace DataWater {
         Real64 PumpNomHead;         // design nominal capacity of pump
         Real64 PumpNomPowerUse;     // design nominal power of pump at nom capacity
         Real64 PumpEfficiency;
-        Real64 WellRecoveryRate;  // rate at which groundwater can enter well [m3/s]
-        Real64 NomWellStorageVol; // water storage in well at average water table depth [m3]
-        int GroundwaterTableMode; // method of determining water table depth
+        Real64 WellRecoveryRate;               // rate at which groundwater can enter well [m3/s]
+        Real64 NomWellStorageVol;              // water storage in well at average water table depth [m3]
+        GroundWaterTable GroundwaterTableMode; // method of determining water table depth
         Real64 WaterTableDepth;
         int WaterTableDepthSchedID;
         // calculated and from elsewhere
@@ -241,8 +250,9 @@ namespace DataWater {
         // Default Constructor
         GroundwaterWellDataStruct()
             : StorageTankID(0), StorageTankSupplyARRID(0), PumpDepth(0.0), PumpNomVolFlowRate(0.0), PumpNomHead(0.0), PumpNomPowerUse(0.0),
-              PumpEfficiency(0.0), WellRecoveryRate(0.0), NomWellStorageVol(0.0), GroundwaterTableMode(0), WaterTableDepth(0.0),
-              WaterTableDepthSchedID(0), VdotRequest(0.0), VdotDelivered(0.0), VolDelivered(0.0), PumpPower(0.0), PumpEnergy(0.0)
+              PumpEfficiency(0.0), WellRecoveryRate(0.0), NomWellStorageVol(0.0), GroundwaterTableMode(GroundWaterTable::Unassigned),
+              WaterTableDepth(0.0), WaterTableDepthSchedID(0), VdotRequest(0.0), VdotDelivered(0.0), VolDelivered(0.0), PumpPower(0.0),
+              PumpEnergy(0.0)
         {
         }
     };
@@ -250,7 +260,7 @@ namespace DataWater {
     struct SiteRainFallDataStruct
     {
         // Members
-        int ModeID; // type of rainfall modeling
+        RainfallMode ModeID; // type of rainfall modeling
         Real64 DesignAnnualRain;
         int RainSchedID;
         Real64 NomAnnualRain;
@@ -259,7 +269,8 @@ namespace DataWater {
         Real64 CurrentAmount;
 
         // Default Constructor
-        SiteRainFallDataStruct() : ModeID(0), DesignAnnualRain(0.0), RainSchedID(0), NomAnnualRain(0.0), CurrentRate(0.0), CurrentAmount(0.0)
+        SiteRainFallDataStruct()
+            : ModeID(RainfallMode::Unassigned), DesignAnnualRain(0.0), RainSchedID(0), NomAnnualRain(0.0), CurrentRate(0.0), CurrentAmount(0.0)
         {
         }
     };
@@ -267,28 +278,55 @@ namespace DataWater {
     struct IrrigationDataStruct
     {
         // Members
-        int ModeID; // type of irrigation modeling
+        RainfallMode ModeID; // type of irrigation modeling
         int IrrSchedID;
         Real64 ScheduledAmount;
         Real64 ActualAmount;
         Real64 IrrigationThreshold; // percent at which no irrigation happens (smart schedule)
 
         // Default Constructor
-        IrrigationDataStruct() : ModeID(0), IrrSchedID(0), ScheduledAmount(0.0), ActualAmount(0.0), IrrigationThreshold(0.4)
+        IrrigationDataStruct() : ModeID(RainfallMode::Unassigned), IrrSchedID(0), ScheduledAmount(0.0), ActualAmount(0.0), IrrigationThreshold(0.4)
         {
         }
     };
 
-    // Object Data
-    extern SiteRainFallDataStruct
-        RainFall; // type of rainfall modeling | design annual rain | rain sched id | nominal annual rain | current rate | current amount
-    extern IrrigationDataStruct
-        Irrigation; // type of irrigation modeling | Irrigation schedule id | scheduled amount | actual amount | irrigation threshold
-    extern Array1D<StorageTankDataStruct> WaterStorage;
-    extern Array1D<RainfallCollectorDataStruct> RainCollector;
-    extern Array1D<GroundwaterWellDataStruct> GroundwaterWell;
-
 } // namespace DataWater
+
+struct DataWaterData : BaseGlobalStruct
+{
+
+    DataWater::SiteRainFallDataStruct
+        RainFall; // type of rainfall modeling | design annual rain | rain sched id | nominal annual rain | current rate | current amount
+    DataWater::IrrigationDataStruct
+        Irrigation; // type of irrigation modeling | Irrigation schedule id | scheduled amount | actual amount | irrigation threshold
+    Array1D<DataWater::StorageTankDataStruct> WaterStorage;
+    Array1D<DataWater::RainfallCollectorDataStruct> RainCollector;
+    Array1D<DataWater::GroundwaterWellDataStruct> GroundwaterWell;
+
+    int NumWaterStorageTanks = 0; // number of water Storage tanks in model
+    int NumRainCollectors = 0;    // number of rainfall collectors in model
+    int NumGroundWaterWells = 0;  // number of
+    int NumSiteRainFall = 0;
+    bool AnyWaterSystemsInModel = false;    // control flag set true if any water systems
+    bool WaterSystemGetInputCalled = false; // set true once input data gotten.
+    bool AnyIrrigationInModel = false;      // control flag set true if irrigation input for ecoroof DJS PSU Dec 2006
+
+    void clear_state() override
+    {
+        RainFall = {};
+        Irrigation = {};
+        WaterStorage.deallocate();
+        RainCollector.deallocate();
+        GroundwaterWell.deallocate();
+        NumWaterStorageTanks = 0;
+        NumRainCollectors = 0;
+        NumGroundWaterWells = 0;
+        NumSiteRainFall = 0;
+        AnyWaterSystemsInModel = false;
+        WaterSystemGetInputCalled = false;
+        AnyIrrigationInModel = false;
+    }
+};
 
 } // namespace EnergyPlus
 

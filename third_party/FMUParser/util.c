@@ -19,14 +19,14 @@
 /// All rights reserved.
 ///////////////////////////////////////////////////////
 
+#include "util.h"
+#include "fmumini.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include "util.h"
-#include "fmumini.h"
 
-int debug = 0;  // Control for debug information
+int debug = 0; // Control for debug information
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Translate the double variable to string variable.
@@ -34,8 +34,9 @@ int debug = 0;  // Control for debug information
 ///\param buffer String variable.
 ///\param r Double variable.
 ///////////////////////////////////////////////////////////////////////////////
-void doubleToCommaString(char* buffer, double r){
-    char* comma;
+void doubleToCommaString(char *buffer, double r)
+{
+    char *comma;
     sprintf(buffer, "%.16g", r);
     comma = strchr(buffer, '.');
     if (comma) *comma = ',';
@@ -47,40 +48,38 @@ void doubleToCommaString(char* buffer, double r){
 ///\param tmpPat The path of the tmeporary folder
 ///\return 0 if no error occurred
 /////////////////////////////////////////////////////////////////////////
-int delete(char* tmpPat){
-	int version = 0;
-	char* cmd;
-	char* filenames;
-  struct stat st;
+int delete (char *tmpPat)
+{
+    char *cmd;
+    struct stat st;
 
-  // Ceck if the folder present
-  if(stat(tmpPat,&st) != 0){
-    printfError("Folder \"%s\" is not existing.\n", tmpPat);
-    return -1;
-  }
+    // Ceck if the folder present
+    if (stat(tmpPat, &st) != 0) {
+        printfError("Folder \"%s\" is not existing.\n", tmpPat);
+        return -1;
+    }
 
-	cmd = calloc(sizeof(char), strlen(tmpPat) + 20);
-	if (cmd == NULL){
-	    printfError("Fail to allocate memory for cmd.\n", tmpPat);
-	    return -1;
-	  }
+    cmd = calloc(strlen(tmpPat) + 20, sizeof(char));
+    if (cmd == NULL) {
+        printfError("Fail to allocate memory for cmd.\n", tmpPat);
+        return -1;
+    }
 
-  if (WINDOWS)
-  	sprintf(cmd, "rd \"%s\" /S/Q", tmpPat); // Command in windows
-  else
-  	sprintf(cmd, "rm -r \"%s\"", tmpPat); // Command in Linux
+    if (IS_WINDOWS)
+        sprintf(cmd, "rd \"%s\" /S/Q", tmpPat); // Command in windows
+    else
+        sprintf(cmd, "rm -r \"%s\"", tmpPat); // Command in Linux
 
-
-	printfDebug("Generated cmd: \"%s\".\n", cmd);
-	if ( system(cmd) != 0 ){
-	//if(rmdir(tmpPat) != 0)
-	  printError("Fail to delete the temporary files");
-	  free(cmd);
-	  return -1;
-	}
-	printDebug("Deleted temporary files");
-	free(cmd);
-	return 0;
+    printfDebug("Generated cmd: \"%s\".\n", cmd);
+    if (system(cmd) != 0) {
+        // if(rmdir(tmpPat) != 0)
+        printError("Fail to delete the temporary files");
+        free(cmd);
+        return -1;
+    }
+    printDebug("Deleted temporary files");
+    free(cmd);
+    return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -90,33 +89,33 @@ int delete(char* tmpPat){
 ///\param length Number of characters to be copied from \c nam.
 ///\return Point of tmpPat if there is no error occurred.
 /////////////////////////////////////////////////////////////////////////////
-char *getTmpPath(const char *nam, int length)
+char *getTmpPath(const char *nam, size_t length)
 {
-  char *tmpPat;
+    char *tmpPat;
 
-  tmpPat = calloc(sizeof(char), length+2);
+    tmpPat = calloc(length + 2, sizeof(char));
 
-  // Define the temporary folder
-  if(strncpy(tmpPat, nam, length) == NULL){
-    printError("Fail to allocate memory for temp dir.\n");
-    free(tmpPat);
-    return NULL;
-  }
-  if(WINDOWS) strcat(tmpPat, "\\");
-  else strcat(tmpPat, "/");
-  printfDebug("tmpPat=\"%s\"\n",tmpPat);
-  return tmpPat;
+    // Define the temporary folder
+    if (strncpy(tmpPat, nam, length) == NULL) {
+        printError("Fail to allocate memory for temp dir.\n");
+        free(tmpPat);
+        return NULL;
+    }
+    if (IS_WINDOWS)
+        strcat(tmpPat, "\\");
+    else
+        strcat(tmpPat, "/");
+    printfDebug("tmpPat=\"%s\"\n", tmpPat);
+    return tmpPat;
 }
-
-
 
 //////////////////////////////////////////////////////////////////////////////
 /// Set the mode in debug so that the debug information will be printed
 ///
 //////////////////////////////////////////////////////////////////////////////
-void setDebug( )
+void setDebug()
 {
-  debug = 1;
+    debug = 1;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -124,12 +123,12 @@ void setDebug( )
 ///
 ///\param msg Message to be printed for debugging
 //////////////////////////////////////////////////////////////////////////////
-void printDebug(const char* msg){
-  if (debug == 1)
-  {
-	  fprintf(stdout, "Debug: ");
-	  fprintf(stdout, "%s\n", msg);
-  }
+void printDebug(const char *msg)
+{
+    if (debug == 1) {
+        fprintf(stdout, "Debug: ");
+        fprintf(stdout, "%s\n", msg);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -138,12 +137,12 @@ void printDebug(const char* msg){
 ///\param str1 Message to be printed for debugging
 ///\param str2 String variable to be printed for debugging
 //////////////////////////////////////////////////////////////////////////////
-void printfDebug(const char* str1, const char* str2){
-	if (debug == 1)
-	{
-		fprintf(stdout, "Debug: ");
-		fprintf(stdout, str1, str2);
-	}
+void printfDebug(const char *str1, const char *str2)
+{
+    if (debug == 1) {
+        fprintf(stdout, "Debug: ");
+        fprintf(stdout, str1, str2);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -152,12 +151,12 @@ void printfDebug(const char* str1, const char* str2){
 ///\param str1 Message to be printed for debugging
 ///\param integer Integer variable to be printed for debugging
 //////////////////////////////////////////////////////////////////////////////
-void printfIntDebug(const char* str1, const int integer){
-	if (debug == 1)
-	{
-		fprintf(stdout, "Debug: ");
-		fprintf(stdout, str1, integer);
-	}
+void printfIntDebug(const char *str1, const int integer)
+{
+    if (debug == 1) {
+        fprintf(stdout, "Debug: ");
+        fprintf(stdout, str1, integer);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -165,9 +164,10 @@ void printfIntDebug(const char* str1, const int integer){
 ///
 ///\param msg Error message to be printed
 //////////////////////////////////////////////////////////////////////////////
-void printError(const char* msg){
-  fprintf(stderr, "*** Error: ");
-  fprintf(stderr, "%s\n", msg);
+void printError(const char *msg)
+{
+    fprintf(stderr, "*** Error: ");
+    fprintf(stderr, "%s\n", msg);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -176,9 +176,10 @@ void printError(const char* msg){
 ///\param str1 Error message to be printed
 ///\param str2 String variable to be printed
 //////////////////////////////////////////////////////////////////////////////
-void printfError(const char* str1, const char* str2){
-  fprintf(stderr, "*** Error: ");
-  fprintf(stderr, str1, str2);
+void printfError(const char *str1, const char *str2)
+{
+    fprintf(stderr, "*** Error: ");
+    fprintf(stderr, str1, str2);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -188,7 +189,7 @@ void printfError(const char* str1, const char* str2){
 ///\param tmpPat Temporary path of the output file
 ///\return 0 if no error occurred
 /////////////////////////////////////////////////////////////////////////////
-int unpackminizip(const char* fmuFilNam, char* tmpPat){
-  return unpackmz(fmuFilNam, tmpPat);
+int unpackminizip(const char *fmuFilNam, char *tmpPat)
+{
+    return unpackmz(fmuFilNam, tmpPat);
 }
-

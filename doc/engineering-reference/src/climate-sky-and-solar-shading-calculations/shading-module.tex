@@ -173,8 +173,8 @@ EnergyPlus provides four methods for calculating sunlit fractions:
 \begin{enumerate}
     \item Polygon Clipping: The shadow algorithm is based on coordinate transformation methods similar to Groth and Lokmanhekim and the shadow overlap method of Walton.
     \item Pixel Counting: GPU-rendering based calculations based on the method developed by Jones et al 2011.
-    \item Scheduled: Pre-calculated sunlit fractions are input through a schedule in the \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}} object.
-    \item Imported: Pre-calculated sunlit fractions are input through a \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object.
+    \item Scheduled: Pre-calculated sunlit fractions are input through a schedule in the \textbf{SurfaceProperty:LocalEnvironment} object.
+    \item Imported: Pre-calculated sunlit fractions are input through a \textbf{Schedule:File:Shading} object.
 \end{enumerate}
 
 \subsection{Polygon Clipping}
@@ -623,7 +623,7 @@ where
 
 \begin{equation}
 \begin{array}{l}
-QD(ZoneNum) = DBZone(ZoneNum)*BeamSolarRad \\
+QD(ZoneNum) = EnclSolDB(ZoneNum)*BeamSolarRad \\
 \quad \quad \quad + InitialDifSolDistReflectedW(ZoneNum)
 \end{array}
 \end{equation}
@@ -632,14 +632,14 @@ where
 
 \emph{BeamSolarRad} is the outside beam normal solar irradiance {[}W/m\(^{2}\){]}
 
-\emph{DBZone(ZoneNum)} is the diffuse solar radiation originating from beam solar that passes through the exterior windows in the zone and reflects diffusely from inside zone surfaces plus beam solar entering the zone as diffuse radiation from windows with shading devices or diffusing glass (all divided by BeamSolarRad)~~ {[}m\(^{2}\){]}
+\emph{EnclSolDB(ZoneNum)} is the diffuse solar radiation originating from beam solar that passes through the exterior windows in the zone and reflects diffusely from inside zone surfaces plus beam solar entering the zone as diffuse radiation from windows with shading devices or diffusing glass (all divided by BeamSolarRad)~~ {[}m\(^{2}\){]}
 
 \emph{InitialDifSolDistReflectedW(ZoneNum)} is the diffuse solar radiation originating from sky and sun related diffuse solar transmitted through the zone's exterior or interior windows into the zone, and reflected diffusely from inside zone surfaces.
 
-\emph{DBZone(ZoneNum)} is calculated as:
+\emph{EnclSolDB(ZoneNum)} is calculated as:
 
 \begin{equation}
-DBZone(ZoneNum) = BTOTZone - BABSZone{\rm{    [}}{{\rm{m}}^{\rm{2}}}]
+EnclSolDB(ZoneNum) = BTOTZone - BABSZone{\rm{    [}}{{\rm{m}}^{\rm{2}}}]
 \end{equation}
 
 where

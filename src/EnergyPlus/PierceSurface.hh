@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -347,7 +347,8 @@ void PierceSurface(DataSurfaces::SurfaceData const &surface, // Surface
 }
 
 ALWAYS_INLINE
-void PierceSurface(int const iSurf,               // Surface index
+void PierceSurface(EnergyPlusData &state,
+                   int const iSurf,               // Surface index
                    Vector3<Real64> const &rayOri, // Ray origin point
                    Vector3<Real64> const &rayDir, // Ray direction vector
                    Vector3<Real64> &hitPt,        // Ray-plane intersection point
@@ -361,7 +362,7 @@ void PierceSurface(int const iSurf,               // Surface index
     // History:
     //  Jan 2016: Initial release
 
-    PierceSurface(DataSurfaces::Surface(iSurf), rayOri, rayDir, hitPt, hit);
+    PierceSurface(state.dataSurface->Surface(iSurf), rayOri, rayDir, hitPt, hit);
 }
 
 ALWAYS_INLINE
@@ -384,8 +385,9 @@ void PierceSurface(DataSurfaces::SurfaceData const &surface, // Surface
     //  Jan 2016: Initial release
 
     // Input checks
-    assert(std::abs(rayDir.mag_squared() - 1.0) < 4 * std::numeric_limits<Real64>::epsilon()); // Check unit vector
-    assert(dMax >= 0.0);                                                                       // Distance must be nonnegative
+    assert(std::abs(rayDir.mag_squared() - 1.0) <
+           6 * std::numeric_limits<Real64>::epsilon()); // Check unit vector (6x is rough estimate. Increase slightly as needed.)
+    assert(dMax >= 0.0);                                // Distance must be nonnegative
 
     // Find ray intersection with surface plane
     hit = false;
@@ -412,7 +414,8 @@ void PierceSurface(DataSurfaces::SurfaceData const &surface, // Surface
 }
 
 ALWAYS_INLINE
-void PierceSurface(int const iSurf,               // Surface index
+void PierceSurface(EnergyPlusData &state,
+                   int const iSurf,               // Surface index
                    Vector3<Real64> const &rayOri, // Ray origin point
                    Vector3<Real64> const &rayDir, // Ray direction unit vector
                    Real64 const dMax,             // Max distance from rayOri to hit point
@@ -427,7 +430,7 @@ void PierceSurface(int const iSurf,               // Surface index
     // History:
     //  Jan 2016: Initial release
 
-    PierceSurface(DataSurfaces::Surface(iSurf), rayOri, rayDir, dMax, hitPt, hit);
+    PierceSurface(state.dataSurface->Surface(iSurf), rayOri, rayDir, dMax, hitPt, hit);
 }
 
 } // namespace EnergyPlus

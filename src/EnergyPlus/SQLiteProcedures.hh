@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,24 +48,30 @@
 #ifndef SQLiteProcedures_hh_INCLUDED
 #define SQLiteProcedures_hh_INCLUDED
 
+// C++ Headers
+#include <fstream>
+#include <iosfwd>
+#include <map>
+#include <memory>
+#include <sqlite3.h>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-
-#include <sqlite3.h>
-
-#include <fstream>
-#include <iosfwd>
-#include <map>
-#include <memory>
+#include <EnergyPlus/Material.hh>
 
 namespace EnergyPlus {
+
+// Forward
+struct EnergyPlusData;
 
 class SQLiteProcedures
 {
@@ -113,8 +119,8 @@ public:
     void addZoneListData(int const number, DataHeatBalance::ZoneListData const &zoneListData);
     void addSurfaceData(int const number, DataSurfaces::SurfaceData const &surfaceData, std::string const &surfaceClass);
     void addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData const &zoneGroupData);
-    void addMaterialData(int const number, DataHeatBalance::MaterialProperties const &materialData);
-    void addConstructionData(int const number, DataHeatBalance::ConstructionData const &constructionData, double const &constructionUValue);
+    void addMaterialData(int const number, Material::MaterialProperties const &materialData);
+    void addConstructionData(int const number, Construction::ConstructionProps const &constructionData, double const &constructionUValue);
     void addNominalLightingData(int const number, DataHeatBalance::LightsData const &nominalLightingData);
     void addNominalPeopleData(int const number, DataHeatBalance::PeopleData const &nominalPeopleData);
     void addNominalElectricEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalElectricEquipmentData);
@@ -146,6 +152,9 @@ public:
 
     // Commit a transaction
     void sqliteCommit();
+
+    // Rollback a transaction (cancel)
+    void sqliteRollback();
 
     // Within a current transaction
     bool sqliteWithinTransaction();
@@ -254,7 +263,7 @@ public:
 
     void createSQLiteEnvironmentPeriodRecord(const int curEnvirNum,
                                              const std::string &environmentName,
-                                             const int kindOfSim,
+                                             const DataGlobalConstants::KindOfSim kindOfSim,
                                              const int simulationIndex = 1);
 
     void sqliteWriteMessage(const std::string &message);
@@ -553,7 +562,7 @@ private:
         Material(std::shared_ptr<std::ostream> const &errorStream,
                  std::shared_ptr<sqlite3> const &db,
                  int const materialNumber,
-                 DataHeatBalance::MaterialProperties const &materialData)
+                 EnergyPlus::Material::MaterialProperties const &materialData)
             : SQLiteData(errorStream, db), number(materialNumber), name(materialData.Name), group(materialData.Group),
               roughness(materialData.Roughness), conductivity(materialData.Conductivity), density(materialData.Density),
               isoMoistCap(materialData.IsoMoistCap), porosity(materialData.Porosity), resistance(materialData.Resistance), rOnly(materialData.ROnly),
@@ -587,7 +596,7 @@ private:
         Construction(std::shared_ptr<std::ostream> const &errorStream,
                      std::shared_ptr<sqlite3> const &db,
                      int const constructionNumber,
-                     DataHeatBalance::ConstructionData const &constructionData,
+                     EnergyPlus::Construction::ConstructionProps const &constructionData,
                      double const &constructionUValue)
             : SQLiteData(errorStream, db), number(constructionNumber), name(constructionData.Name), totLayers(constructionData.TotLayers),
               totSolidLayers(constructionData.TotSolidLayers), totGlassLayers(constructionData.TotGlassLayers),
@@ -965,8 +974,8 @@ private:
     private:
         int const number;
         std::string const &airModelName;
-        int const &airModelType;
-        int const &tempCoupleScheme;
+        DataRoomAirModel::RoomAirModel const &airModelType;
+        DataRoomAirModel::CouplingScheme const &tempCoupleScheme;
         bool const &simAirModel;
     };
 
@@ -990,11 +999,18 @@ private:
     std::vector<std::unique_ptr<SQLite::RoomAirModel>> roomAirModels;
 };
 
-extern std::unique_ptr<SQLite> sqlite;
+std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state);
 
-std::unique_ptr<SQLite> CreateSQLiteDatabase();
+void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state);
 
-void CreateSQLiteZoneExtendedOutput();
+struct SQLiteProceduresData : BaseGlobalStruct
+{
+    std::unique_ptr<SQLite> sqlite;
+    void clear_state() override
+    {
+        sqlite.reset(); // probably not necessary, as it is recreated in ManageSimulation, but it should be fine to delete it here
+    }
+};
 
 } // namespace EnergyPlus
 

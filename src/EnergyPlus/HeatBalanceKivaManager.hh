@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,12 +54,15 @@
 #include <libkiva/Instance.hpp>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
-    
+
+// Forward declarations
+struct EnergyPlusData;
+
 namespace HeatBalanceKivaManager {
 
     const int KIVAZONE_UNCONTROLLED = 0;
@@ -89,15 +92,22 @@ namespace HeatBalanceKivaManager {
         Kiva::InputBlock footing;
         std::string name;
         std::vector<int> surfaces;
-        int wallConstructionIndex;
+        int wallConstructionIndex = 0;
         Real64 assumedIndoorTemperature;
     };
 
     class KivaInstanceMap
     {
     public:
-        KivaInstanceMap(
-            Kiva::Foundation &foundation, int floorSurface, std::vector<int> wallSurfaces, int zoneNum, Real64 zoneAssumedTemperature, Real64 floorWeight, int constructionNum, class KivaManager* kmPtr = nullptr);
+        KivaInstanceMap(EnergyPlusData &state,
+                        Kiva::Foundation &foundation,
+                        int floorSurface,
+                        std::vector<int> wallSurfaces,
+                        int zoneNum,
+                        Real64 zoneAssumedTemperature,
+                        Real64 floorWeight,
+                        int constructionNum,
+                        class KivaManager *kmPtr = nullptr);
         Kiva::Instance instance;
         int floorSurface;
         std::vector<int> wallSurfaces;
@@ -105,13 +115,14 @@ namespace HeatBalanceKivaManager {
         int zoneControlType; // Uncontrolled=0, Temperature=1, Operative=2, Comfort=3, HumidityAndTemperature=4
         int zoneControlNum;
         Real64 zoneAssumedTemperature;
-        void initGround(const KivaWeatherData &kivaWeather);
-        void setInitialBoundaryConditions(const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
-        void setBoundaryConditions();
+        void initGround(EnergyPlusData &state, const KivaWeatherData &kivaWeather);
+        void
+        setInitialBoundaryConditions(EnergyPlusData &state, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
+        void setBoundaryConditions(EnergyPlusData &state);
         void plotDomain();
         Real64 floorWeight;
-        int constructionNum;
-        class KivaManager* kmPtr;
+        int constructionNum = 0;
+        class KivaManager *kmPtr;
 
 #ifdef GROUND_PLOT
         Kiva::SnapshotSettings ss;
@@ -126,24 +137,25 @@ namespace HeatBalanceKivaManager {
     public:
         KivaManager();
         virtual ~KivaManager();
-        void readWeatherData();
-        bool setupKivaInstances(OutputFiles &outputFiles);
-        void initKivaInstances();
-        void calcKivaInstances();
-        void defineDefaultFoundation();
+        void readWeatherData(EnergyPlusData &state);
+        bool setupKivaInstances(EnergyPlusData &state);
+        void initKivaInstances(EnergyPlusData &state);
+        void calcKivaInstances(EnergyPlusData &state);
+        void defineDefaultFoundation(EnergyPlusData &state);
         void addDefaultFoundation();
         int findFoundation(std::string const &name);
-        void calcKivaSurfaceResults();
+        void calcKivaSurfaceResults(EnergyPlusData &state);
 
         KivaWeatherData kivaWeather;
         FoundationKiva defaultFoundation;
         std::vector<FoundationKiva> foundationInputs;
         std::vector<KivaInstanceMap> kivaInstances;
 
-        struct ConvectionAlgorithms {
+        struct ConvectionAlgorithms
+        {
             Kiva::ConvectionAlgorithm in;
             Kiva::ConvectionAlgorithm out;
-            Kiva::ForcedConvectionTerm f;  // Separated out for faster execution
+            Kiva::ForcedConvectionTerm f; // Separated out for faster execution
         };
 
         std::map<int, ConvectionAlgorithms> surfaceConvMap;
@@ -197,6 +209,15 @@ namespace HeatBalanceKivaManager {
     };
 
 } // namespace HeatBalanceKivaManager
+
+struct HeatBalanceKivaMgrData : BaseGlobalStruct
+{
+
+    void clear_state() override
+    {
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif // HeatBalanceKivaManager_hh_INCLUDED

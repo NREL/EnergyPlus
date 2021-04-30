@@ -13,24 +13,24 @@
  * Simulation Research Group, Lawrence Berkeley Laboratory.
  **************************************************************/
 
-// This work was supported by the Assistant Secretary for Energy Efficiency 
-// and Renewable Energy, Office of Building Technologies, 
-// Building Systems and Materials Division of the 
+// This work was supported by the Assistant Secretary for Energy Efficiency
+// and Renewable Energy, Office of Building Technologies,
+// Building Systems and Materials Division of the
 // U.S. Department of Energy under Contract No. DE-AC03-76SF00098.
 
 /*
-NOTICE: The Government is granted for itself and others acting on its behalf 
-a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce, 
-prepare derivative works, and perform publicly and display publicly. 
+NOTICE: The Government is granted for itself and others acting on its behalf
+a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce,
+prepare derivative works, and perform publicly and display publicly.
 Beginning five (5) years after (date permission to assert copyright was obtained),
-subject to two possible five year renewals, the Government is granted for itself 
+subject to two possible five year renewals, the Government is granted for itself
 and others acting on its behalf a paid-up, nonexclusive, irrevocable worldwide
-license in this data to reproduce, prepare derivative works, distribute copies to 
-the public, perform publicly and display publicly, and to permit others to do so. 
+license in this data to reproduce, prepare derivative works, distribute copies to
+the public, perform publicly and display publicly, and to permit others to do so.
 NEITHER THE UNITED STATES NOR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL 
-LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY 
-INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE 
+THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL
+LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY
+INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE
 WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 #pragma warning(disable:4786)
@@ -87,8 +87,8 @@ int process_W4glazing_types(
 	int iz, is, iw;	/* indexes */
 
 	// Set up a list to contain unique glass_type codes as they are encountered in this building
-	int iUniqueGlassIDs[200];					
-	int iUniqueIDCount = 0;					
+	int iUniqueGlassIDs[200];
+	int iUniqueIDCount = 0;
 
 	// Cycle through building description identifying unique Window4 glass_type IDs.
 
@@ -131,7 +131,7 @@ int process_W4glazing_types(
 /****************************** subroutine IsGlassIDUnique *****************************/
 int IsGlassIDUnique(
 	int iGlass_Type,			// current glass_type ID
-	int iUniqueGlassIDs[200],	// array of encountered glass_type IDs					
+	int iUniqueGlassIDs[200],	// array of encountered glass_type IDs
 	int* piUniqueIDCount)		// ptr to current count of unique glass_type ID
 {
 	for (int iGID = 0; iGID < *piUniqueIDCount; iGID++) {
@@ -161,7 +161,6 @@ int ProcessW4GlassType(
 {
 	char cInputLine[MAX_CHAR_LINE+1];	// Input line
 	char *token;						/* Input token pointer */
-	char *next_token;					/* Next token pointer for strtok_s call */
 	int iW4ID;							// Window ID holder
 	int iEntryFound = 0;				// matching ID found flag
 	int iInLine;						// index
@@ -172,7 +171,7 @@ int ProcessW4GlassType(
 	do {
 		// Read the first six lines in a W4 library entry to reach the Window ID.
 		for (iInLine = 0; iInLine < 6; iInLine++)
-			fgets(cInputLine, MAX_CHAR_LINE, W4libfile);
+			if (fgets(cInputLine, MAX_CHAR_LINE, W4libfile) == NULL) return -1;;
 
 		// Scan the sixth line to get the Window ID.
 		sscanf(cInputLine,"%*s %*s %*s %d\n",&iW4ID);
@@ -183,7 +182,7 @@ int ProcessW4GlassType(
 
 			// Skip to the Tvis data line
 			for (iInLine = 6; iInLine < 32; iInLine++)
-				fgets(cInputLine, MAX_CHAR_LINE, W4libfile);
+				if (fgets(cInputLine, MAX_CHAR_LINE, W4libfile) == NULL) return -1;;
 
 			// Scan the angular data and Tvis Hemispherical
 			// Tokenize the line label
@@ -224,10 +223,10 @@ int ProcessW4GlassType(
 
 			// Skip to the Rbvis data line
 			for (iInLine = 32; iInLine < 34; iInLine++)
-				fgets(cInputLine, MAX_CHAR_LINE, W4libfile);
+				if (fgets(cInputLine, MAX_CHAR_LINE, W4libfile) == NULL) return -1;;
 
 			// Scan the thirty-fourth line to get the inside hemispherical visible reflectance.
-			sscanf(cInputLine,"%*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %d\n",&lib_ptr->glass[lib_ptr->nglass]->inside_refl);
+			sscanf(cInputLine,"%*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %d\n",(int*)&lib_ptr->glass[lib_ptr->nglass]->inside_refl);
 
 			// Increment LIB GLASS entry counter
 			(lib_ptr->nglass)++;
@@ -237,7 +236,7 @@ int ProcessW4GlassType(
 		}
 		else {	// skip the remaining lines of this entry
 			for (iInLine = 6; iInLine < 55; iInLine++)
-				fgets(cInputLine, MAX_CHAR_LINE, W4libfile);
+				if (fgets(cInputLine, MAX_CHAR_LINE, W4libfile) == NULL) return -1;;
 		}
     }
     while(!iEntryFound);

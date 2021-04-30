@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,47 +52,59 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-namespace DataUCSDSharedData {
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
+struct UCSDSharedData : BaseGlobalStruct
+{
     // The Eplus surface numbers will be stored in the arrays Apos according to the
     // type of surface. The PosZ_Wall array has dimension 2 times the Number of Zones and
     // for each zone it has 2 positions: the start and end positions in the Apos_Wall array
     // for that specific zone.
-    extern Array1D_int APos_Wall;
-    extern Array1D_int APos_Floor;
-    extern Array1D_int APos_Ceiling;
-    extern Array1D_int PosZ_Wall;
-    extern Array1D_int PosZ_Floor;
-    extern Array1D_int PosZ_Ceiling;
-    extern Array1D_int APos_Window;
-    extern Array1D_int APos_Door;
-    extern Array1D_int APos_Internal;
-    extern Array1D_int PosZ_Window;
-    extern Array1D_int PosZ_Door;
-    extern Array1D_int PosZ_Internal;
+    Array1D_int APos_Wall;
+    Array1D_int APos_Floor;
+    Array1D_int APos_Ceiling;
+    Array1D_int PosZ_Wall;
+    Array1D_int PosZ_Floor;
+    Array1D_int PosZ_Ceiling;
+    Array1D_int APos_Window;
+    Array1D_int APos_Door;
+    Array1D_int APos_Internal;
+    Array1D_int PosZ_Window;
+    Array1D_int PosZ_Door;
+    Array1D_int PosZ_Internal;
     // Convection coeficients for the various surfaces
-    extern Array1D<Real64> HCeiling;
-    extern Array1D<Real64> HWall;
-    extern Array1D<Real64> HFloor;
-    extern Array1D<Real64> HInternal;
-    extern Array1D<Real64> HWindow;
-    extern Array1D<Real64> HDoor;
-
-    void clear_state();
-
-} // namespace DataUCSDSharedData
+    Array1D<Real64> HCeiling;
+    Array1D<Real64> HWall;
+    Array1D<Real64> HFloor;
+    Array1D<Real64> HInternal;
+    Array1D<Real64> HWindow;
+    Array1D<Real64> HDoor;
+    void clear_state() override
+    {
+        this->APos_Wall.clear();
+        this->APos_Floor.clear();
+        this->APos_Ceiling.clear();
+        this->PosZ_Wall.clear();
+        this->PosZ_Floor.clear();
+        this->PosZ_Ceiling.clear();
+        this->APos_Window.clear();
+        this->APos_Door.clear();
+        this->APos_Internal.clear();
+        this->PosZ_Window.clear();
+        this->PosZ_Door.clear();
+        this->PosZ_Internal.clear();
+        // Convection coeficients for the various surfaces
+        this->HCeiling.clear();
+        this->HWall.clear();
+        this->HFloor.clear();
+        this->HInternal.clear();
+        this->HWindow.clear();
+        this->HDoor.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

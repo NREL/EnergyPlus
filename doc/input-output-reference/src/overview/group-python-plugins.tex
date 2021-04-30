@@ -23,6 +23,7 @@ These two operation modes cannot be mixed.
 In plugin mode, EnergyPlus creates a new Python instance internally to allow processing the user-defined scripts.
 When EnergyPlus is run in an API mode, it cannot create a new Python session internally, as it may be in an existing Python session.
 Thus, if a plugin object is found in input during an API call, the program will abort.
+In the future, this limitation may be lifted, but for most use cases, if you are calling EnergyPlus as a library (API), you can simply register API callbacks to execute user-defined code at runtime, and don't need to worry about also writing Python Plugins.
 
 The API section has information about how to access output variable data, meters, internal variable data, simulation parameters, and actuators, so these do not need additional information here.
 However, plugin objects have additional ways to interact with the simulation, and the plugins themselves need description, which is here.
@@ -50,9 +51,8 @@ Consider this minimal plugin:
 from pyenergyplus.plugin import EnergyPlusPlugin
 
 class DummyPlugin(EnergyPlusPlugin):
-
-def on_end_of_zone_timestep_before_zone_reporting(self):
-return 0
+  def on_end_of_zone_timestep_before_zone_reporting(self, state):
+    return 0
 \end{lstlisting}
 
 This skeleton captures the use of a plugin to do nothing, but still shows some important features.
@@ -62,6 +62,11 @@ This skeleton captures the use of a plugin to do nothing, but still shows some i
     \item A method is overridden, which is named appropriately to describe when EnergyPlus will be calling this function, in this case, at the end of each zone time step but before zone-level data is reported.
     \item The custom method returns zero to indicate success.
 \end{enumerate}
+
+\textbf{NOTE!}  The functional form of the plugin methods changed due to an API change between versions 9.3 and 9.4.
+Any plugin files created using 9.3 will need to add a second argument to the methods.
+This same argument will need to be passed into any EnergyPlus API methods called during the plugin.
+Much more information can be found in the API usage section:~\ref{sec:api-usage}.
 
 Several notes can be taken from this list.
 The name of the function matters, as it determines when the function will be called.
@@ -121,7 +126,7 @@ In a lot of cases, it is expected that the plugin will be tied closely to a spec
 In these cases, it may be useful to keep plugin files right next to the input file, regardless of the current working directory.
 Turning this field to Yes will add the directory where the input file is located to the list of search paths.
 
-\paragraph{Field: Search Path 1-5}
+\paragraph{Field: Search Path N}
 
 There are also some cases, where a user may keep a specific library of plugin scripts that work with a variety of input files.
 In this case, they may want to just point EnergyPlus to a custom directory away from any specific input file or working directory.
@@ -185,34 +190,31 @@ There are a few reasons why users may need to use global variables:
 \end{itemize}
 
 To use a global variable, an input object must be defined in the current input file, which specifies the variable name.
-Then, in a plugin, a handle can be looked up for this global variable using the \verb=get_global_handle= function, which accepts the variable name as the only argument.
-With the handle, the current value of the global variable can be looked up using the \verb=get_global_value= function, which takes only the handle for the variable.
-Finally, to update the value of the global variable, the \verb=set_global_value= function is used, which takes a handle and a new value.
+Then, in a plugin, a handle can be looked up for this global variable using the \verb=get_global_handle= function, which accepts the current state and the variable name as arguments.
+With the handle, the current value of the global variable can be looked up using the \verb=get_global_value= function, which takes the current state and the handle for the variable as arguments.
+Finally, to update the value of the global variable, the \verb=set_global_value= function is used, which takes the current state, the variable handle and a new value.
 
 Assuming a global variable is defined on input called ``OutdoorTemperature'', an example of this inside a plugin function follows:
 
 \begin{lstlisting}
-global_var_handle = self.api.exchange.get_global_handle('OutdoorTemperature')
-var_value = self.api.exchange.get_global_value(global_var_handle)
-self.api.exchange.set_global_value(global_var_handle, 3.141)
+global_var_handle = self.api.exchange.get_global_handle(state, 'OutdoorTemperature')
+var_value = self.api.exchange.get_global_value(state, global_var_handle)
+self.api.exchange.set_global_value(state, global_var_handle, 3.141)
 \end{lstlisting}
 
 \subsubsection{Inputs}
 
-The inputs required to declare a global variable consist of the unique PythonPlugin:GlobalVariable object, along with a series of names
-NOTE: Right now, the number of available variables is limited at five, but a future version will make this an unlimited object.
-However, in many cases, using global variables is not necessary to achieve the client needs.
-With the capabilities that come with using Python as a language, many of the reasons to declare and share global variables are eliminated.
+The inputs required to declare a global variable consist of the unique PythonPlugin:GlobalVariable object, along with a series of names to identify each variable.
 
 \paragraph{Field: Name}
 
 This field is the name of this variables object, however since this is required to be a unique object, it does not do much.
 It is purely used for reporting of errors.
 
-\paragraph{Field Variable Name 1-5}
+\paragraph{Field Variable Name N}
 
 This field is used to declare and identify a plugin variable inside EnergyPlus.
-This name is used as the identifier when accessing this value to read/write in user-defind plugins.
+This name is used as the identifier when accessing this value to read/write in user-defined plugins.
 
 \subsection{PythonPlugin:TrendVariable}
 
@@ -220,33 +222,33 @@ Trend variables allow a predeclared global variable to be tracked over time step
 Once these are declared, a number of useful worker functions can be employed to process and read data from the trend.
 Note that trend variables are initially declared with values of zero at each history place, so the first few calls into the simulation could result in unexpected values of the trend.
 
-To use a trend variable, an input object must be defind int he current input file, which specifies the attributes of the trend, including a name and a number of history terms to keep.
+To use a trend variable, an input object must be defined int he current input file, which specifies the attributes of the trend, including a name and a number of history terms to keep.
 Then, in a plugin, a handle can be looked up for this trend variable using the \verb=get_trend_handle= function, which accepts the trend variable name as the only argument.
 With the handle, a number of aspects can be processed/looked up:
 
 \begin{itemize}
-    \item The trend value at a specific point in history can be retrieved using the \verb=get_trend_value= function, which accepts a trend handle and an index specifying how far back in history to evaluate the lookup.
-    \item The average trend value over a specific range can be retrieved using the \verb=get_trend_average= function, which accepts a trend handle and a count of how far back in history to evaluate.
-    \item The minimum trend value over a specific range can be retreived using the \verb=get_trend_min= function, which accepts a trend handle and a count of how far back in history to evaluate.
-    \item The maximum trend value over a specific range can be retreived using the \verb=get_trend_max= function, which accepts a trend handle and a count of how far back in history to evaluate.
-    \item The sum of a trend value over a specific range can be retrieved using the \verb=get_trend_sum= function, which accepts a trend handle and a count of how far back in history to evaluate.
-    \item The trajectory of a trend (slope of a linear regression line) over a specific range can be calculated using the \verb=get_trend_direction= function, which accepts a trend handle and a count of how far back in history to evaluate.
+    \item The trend value at a specific point in history can be retrieved using the \verb=get_trend_value= function, which accepts the current state, a trend handle and an index specifying how far back in history to evaluate the lookup.
+    \item The average trend value over a specific range can be retrieved using the \verb=get_trend_average= function, which accepts the current state, a trend handle and a count of how far back in history to evaluate.
+    \item The minimum trend value over a specific range can be retrieved using the \verb=get_trend_min= function, which accepts the current state, a trend handle and a count of how far back in history to evaluate.
+    \item The maximum trend value over a specific range can be retrieved using the \verb=get_trend_max= function, which accepts the current state, a trend handle and a count of how far back in history to evaluate.
+    \item The sum of a trend value over a specific range can be retrieved using the \verb=get_trend_sum= function, which accepts the current state, a trend handle and a count of how far back in history to evaluate.
+    \item The trajectory of a trend (slope of a linear regression line) over a specific range can be calculated using the \verb=get_trend_direction= function, which accepts the current state, a trend handle and a count of how far back in history to evaluate.
 \end{itemize}
 
-Assuming a global variable is defind on input called ``CustomTemperature'', and a trend variable is declared called ``TrendVar'' with at least 5 history terms saved, an example usage of this inside a plugin function follows:
+Assuming a global variable is defined on input called ``CustomTemperature'', and a trend variable is declared called ``TrendVar'' with at least 5 history terms saved, an example usage of this inside a plugin function follows:
 
 \begin{lstlisting}
 # update the variable throughout the simulation
-global_var_handle = self.api.exchange.get_global_handle('CustomTemperature')
-self.api.exchange.set_global_value(global_var_handle, 3.141)
+global_var_handle = self.api.exchange.get_global_handle(state, 'CustomTemperature')
+self.api.exchange.set_global_value(state, global_var_handle, 3.141)
 
 # get trend values as needed
-trend_var_handle = self.api.exchange.get_trend_handle('TrendVar')
-trend_avg = self.api.exchange.get_trend_average(trend_var_handle, 5)
-trend_min = self.api.exchange.get_trend_min(trend_var_handle, 5)
-trend_max = self.api.exchange.get_trend_max(trend_var_handle, 5)
-trend_sum = self.api.exchange.get_trend_sum(trend_var_handle, 5)
-trend_dir = self.api.exchange.get_trend_direction(trend_var_handle, 5)
+trend_var_handle = self.api.exchange.get_trend_handle(state, 'TrendVar')
+trend_avg = self.api.exchange.get_trend_average(state, trend_var_handle, 5)
+trend_min = self.api.exchange.get_trend_min(state, trend_var_handle, 5)
+trend_max = self.api.exchange.get_trend_max(state, trend_var_handle, 5)
+trend_sum = self.api.exchange.get_trend_sum(state, trend_var_handle, 5)
+trend_dir = self.api.exchange.get_trend_direction(state, trend_var_handle, 5)
 \end{lstlisting}
 
 \subsubsection{Inputs}
@@ -272,7 +274,7 @@ Implementing these plugins required structural additions to the package and to t
 From a user perspective, the only thing that will be noticed likely is the additional size of the installer.
 At the very onset of this project, it was decided that we would package Python into the installer, and not require a user to install an external version.
 This has been successful, however, at the cost of a larger install footprint.
-The EnergyPlus install now includes a Python binary shared library, along with the core Python standard library of code.
+The EnergyPlus install now includes a Python binary shared library, any dependent libraries, along with the core Python standard library of code.
 This allows users to create user-defined plugins that access all of the standard Python library capabilities.
 
 The main question received about this is about installing non-standard Python packages.
@@ -291,9 +293,3 @@ Some possibilities for using external libraries include:
 \end{itemize}
 
 It is hoped that future versions of this will include a package management tool with EnergyPlus itself, so that installing native packages is straightforward.
-
-One additional note is that we are currently not linking to Python for our 32-bit Windows builds.
-Doing this would have taken significant extra effort to develop the build process to handle both 32 and 64 bit options.
-We have very few 32-bit users, and the effort was not justified.
-If you are in the rare case of needing Python Plugins, yet also being on a 32-bit Windows machine, consult the development team and a custom build could possibly be built manually.
-

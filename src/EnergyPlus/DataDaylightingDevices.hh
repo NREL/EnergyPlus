@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -59,32 +60,16 @@ namespace EnergyPlus {
 
 namespace DataDaylightingDevices {
 
-    // Using/Aliasing
+    constexpr int MaxTZones(10);   // Maximum number of transition zones
+    constexpr int NumOfAngles(19); // Number of data points on transmittance vs. angle curve
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const MaxTZones;   // Maximum number of transition zones
-    extern int const NumOfAngles; // Number of data points on transmittance vs. angle curve
-
-    extern int const VisibleBeam; // Constant for radiation type
-    extern int const SolarBeam;   // Constant for radiation type
-    extern int const SolarAniso;  // Constant for radiation type
-    extern int const SolarIso;    // Constant for radiation type
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS: na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumOfTDDPipes; // Number of TDD pipes in the input file
-    extern int NumOfShelf;    // Number of daylighting shelves in the input file
-
-    // Types
+    enum class iRadType
+    {
+        VisibleBeam,
+        SolarBeam,
+        SolarAniso,
+        SolarIso
+    };
 
     struct TDDPipeData
     {
@@ -123,9 +108,9 @@ namespace DataDaylightingDevices {
         // Default Constructor
         TDDPipeData()
             : Dome(0), Diffuser(0), Construction(0), Diameter(0.0), TotLength(0.0), Reff(0.0), NumOfTZones(0), AspectRatio(0.0), ReflectVis(0.0),
-              ReflectSol(0.0), PipeTransVisBeam(NumOfAngles, 0.0), PipeTransSolBeam(NumOfAngles, 0.0), TransSolIso(0.0), TransSolHorizon(0.0),
-              ExtLength(0.0), TransmittedSolar(0.0), PipeAbsorbedSolar(0.0), HeatGain(0.0), HeatLoss(0.0), TransVisBeam(0.0), TransSolBeam(0.0),
-              TransVisDiff(0.0), TransSolDiff(0.0)
+              ReflectSol(0.0), PipeTransVisBeam(DataDaylightingDevices::NumOfAngles, 0.0), PipeTransSolBeam(DataDaylightingDevices::NumOfAngles, 0.0),
+              TransSolIso(0.0), TransSolHorizon(0.0), ExtLength(0.0), TransmittedSolar(0.0), PipeAbsorbedSolar(0.0), HeatGain(0.0), HeatLoss(0.0),
+              TransVisBeam(0.0), TransSolBeam(0.0), TransVisDiff(0.0), TransSolDiff(0.0)
         {
         }
     };
@@ -151,11 +136,24 @@ namespace DataDaylightingDevices {
         }
     };
 
-    // Object Data
-    extern Array1D<TDDPipeData> TDDPipe;
-    extern Array1D<ShelfData> Shelf;
-
 } // namespace DataDaylightingDevices
+
+struct DataDaylightingDevicesData : BaseGlobalStruct
+{
+
+    int NumOfTDDPipes = 0; // Number of TDD pipes in the input file
+    int NumOfShelf = 0;    // Number of daylighting shelves in the input file
+    Array1D<DataDaylightingDevices::TDDPipeData> TDDPipe;
+    Array1D<DataDaylightingDevices::ShelfData> Shelf;
+
+    void clear_state() override
+    {
+        this->NumOfTDDPipes = 0;
+        this->NumOfShelf = 0;
+        this->TDDPipe.deallocate();
+        this->Shelf.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

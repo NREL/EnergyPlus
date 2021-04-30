@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,5 +50,20 @@
 
 typedef float Real32;  // Platform-specific: C++ has no defined precision floating point types
 typedef double Real64; // Platform-specific: C++ has no defined precision floating point types
+
+#ifdef __cplusplus
+namespace EnergyPlus {
+
+enum class Error : int
+{
+    Continue = 0,
+    Info = 1,
+    Warning = 2,
+    Severe = 3,
+    Fatal = 4
+};
+
+} // namespace EnergyPlus
+#endif
 
 #endif

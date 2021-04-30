@@ -78,7 +78,7 @@ EvaporativeCooler:Direct:CelDekPad,
   Supply Outlet Node;           !- Air Outlet Node Name
 \end{lstlisting}
 
-\subsubsection{Outputs}\label{outputs-011}
+\subsubsection{Outputs}
 
 The output variables that are available for this direct evaporative cooler are shown below:
 
@@ -86,9 +86,9 @@ The output variables that are available for this direct evaporative cooler are s
 \item
   HVAC,Average, Evaporative Cooler Wet Bulb Effectiveness
 \item
-  HVAC,Average, Evaporative Cooler Electric Power{[}W{]}
+  HVAC,Average, Evaporative Cooler Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Evaporative Cooler Electric Energy {[}J{]}
+  HVAC,Sum, Evaporative Cooler Electricity Energy {[}J{]}
 \item
   HVAC,Sum, Evaporative Cooler Water Volume{[}m3{]}
 \item
@@ -105,9 +105,9 @@ The output variables that are available for this direct evaporative cooler are s
 
 The effectivenss, or saturation efficiency, is the temperature change of the supply air divided by the difference between the inlet air dry-bulb and wet-bulb temperatures. In other words, it is a measure of the approach to the inlet air wet-bulb temperature.
 
-\paragraph{Evaporative Cooler Electric Power{[}W{]}}\label{evaporative-cooler-electric-powerw}
+\paragraph{Evaporative Cooler Electricity Rate {[}W{]}}\label{evaporative-cooler-electric-powerw}
 
-\paragraph{Evaporative Cooler Electric Energy {[}J{]}}\label{evaporative-cooler-electric-energy-j}
+\paragraph{Evaporative Cooler Electricity Energy {[}J{]}}\label{evaporative-cooler-electric-energy-j}
 
 These output variables report the electric power and electric energy required to operate the water pump.
 
@@ -161,7 +161,7 @@ This alpha field is the name of a curve that modifies the effectiveness design v
 
 This numeric field is the primary air design air flow rate in \si{\volumeFlowRate}. This input field is autosizable. If the evaporative cooler is on the main air loop branch, the design flow rate is the same as branch design flow rate. If the evaporative cooler is in the outdoor air system the design flow rate will be the maximum of the outdoor air design flow rate and one-half of the primary air flow rate on the main air loop branch.
 
-\paragraph{Field: Recirculating Water Pump Design Power}\label{field-recirculating-water-pump-design-power}
+\paragraph{Field: Recirculating Water Pump Design Power}
 
 This numeric field is the recirculating and spray pump electric power at the Primary Design Air Flow Rate in \si{\watt}.
 This is the nominal water recirculating and spray pump power of evaporative cooler at primary air design flow rates and cooler design effectiveness.
@@ -176,7 +176,7 @@ is about \SI{90.0}{\wattperVolumeFlowRate} ( = 90.0 \textasciitilde{} Pump Power
 
 \paragraph{Field: Water Pump Power Modifier Curve Name}\label{field-water-pump-power-modifier-curve-name}
 
-This alpha field is the name of a dimensionless normalized pump power modifying curve. This curve modifies the pump electric power in the previous field by multiplying the design power by the result of this curve. The normalized curve is a function of the primary air flow fraction as the independent variable. The curve shall yield a value of 1.0 at a flow fraction of 1.0. The flow fraction is the ratio of the primary air flow rate divided by primary air Design Air Flow Rate. If this input field is left blank, the pump power is assumed to vary linearly with the load (including air system cycling, if any). If pump power does not vary linearly with load this curve should be used. Any curve or table with one independent variable can be used: \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curvequartic]{Curve:Quartic}, \hyperref[curveexponent]{Curve:Exponent}, \hyperref[curveexponentialskewnormal]{Curve:ExponentialSkewNormal}, \hyperref[curvesigmoid]{Curve:Sigmoid}, Curve:RectuangularHyperbola1, \hyperref[curverectangularhyperbola2]{Curve:RectangularHyperbola2}, \hyperref[curveexponentialdecay]{Curve:ExponentialDecay}, \hyperref[curvedoubleexponentialdecay]{Curve:DoubleExponentialDecay}, and \hyperref[tableoneindependentvariable]{Table:OneIndependentVariable}.
+This alpha field is the name of a dimensionless normalized pump power modifying curve. This curve modifies the pump electric power in the previous field by multiplying the design power by the result of this curve. The normalized curve is a function of the primary air flow fraction as the independent variable. The curve shall yield a value of 1.0 at a flow fraction of 1.0. The flow fraction is the ratio of the primary air flow rate divided by primary air Design Air Flow Rate. If this input field is left blank, the pump power is assumed to vary linearly with the load (including air system cycling, if any). If pump power does not vary linearly with load this curve should be used. Any curve or table with one independent variable can be used: \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curvequartic]{Curve:Quartic}, \hyperref[curveexponent]{Curve:Exponent}, \hyperref[curveexponentialskewnormal]{Curve:ExponentialSkewNormal}, \hyperref[curvesigmoid]{Curve:Sigmoid}, Curve:RectuangularHyperbola1, \hyperref[curverectangularhyperbola2]{Curve:RectangularHyperbola2}, \hyperref[curveexponentialdecay]{Curve:ExponentialDecay}, \hyperref[curvedoubleexponentialdecay]{Curve:DoubleExponentialDecay}, and one-dimensional \hyperref[tablelookup]{Table:Lookup}.
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-1-001}
 
@@ -241,11 +241,11 @@ The output variables that are available for this direct evaporative cooler are s
 
 \begin{itemize}
 \item
-  HVAC,Average, Evaporative Cooler Electric Power{[}W{]}
+  HVAC,Average, Evaporative Cooler Electricity Rate {[}W{]}
 \item
   HVAC,Average, Evaporative Cooler Stage Effectiveness {[]}
 \item
-  HVAC,Sum, Evaporative Cooler Electric Energy {[}J{]}
+  HVAC,Sum, Evaporative Cooler Electricity Energy {[}J{]}
 \item
   HVAC,Sum, Evaporative Cooler Water Volume{[}m3{]}
 \item
@@ -258,9 +258,9 @@ The output variables that are available for this direct evaporative cooler are s
   HVAC,Sum,Evaporative Cooler Starved Mains Water Volume {[}m3{]}
 \end{itemize}
 
-\paragraph{Evaporative Cooler Electric Power{[}W{]}}\label{evaporative-cooler-electric-powerw-1}
+\paragraph{Evaporative Cooler Electricity Rate {[}W{]}}\label{evaporative-cooler-electric-powerw-1}
 
-\paragraph{Evaporative Cooler Electric Energy {[}J{]}}\label{evaporative-cooler-electric-energy-j-1}
+\paragraph{Evaporative Cooler Electricity Energy {[}J{]}}\label{evaporative-cooler-electric-energy-j-1}
 
 These output variables report the electric power and electric energy required to operate the water pump.
 
@@ -397,9 +397,9 @@ The output variables that are available for the indirect dry evaporative cooler 
 \item
   HVAC,Average, Evaporative Cooler Total Stage Effectiveness
 \item
-  HVAC,Average, Evaporative Cooler Electric Power{[}W{]}
+  HVAC,Average, Evaporative Cooler Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Evaporative Cooler Electric Energy {[}J{]}
+  HVAC,Sum, Evaporative Cooler Electricity Energy {[}J{]}
 \item
   HVAC,Sum, Evaporative Cooler Water Volume{[}m3{]}
 \item
@@ -420,9 +420,9 @@ The dry evaporation saturation efficiency is the saturation efficiency of the se
 
 The total stage efficiency includes the sensible heat exchanger effectiveness of the heat exchanger in the supply air stream. It is the saturation efficiency multiplied by the heat exchanger effectiveness.
 
-\paragraph{Evaporative Cooler Electric Power{[}W{]}}\label{evaporative-cooler-electric-powerw-2}
+\paragraph{Evaporative Cooler Electricity Rate {[}W{]}}\label{evaporative-cooler-electric-powerw-2}
 
-\paragraph{Evaporative Cooler Electric Energy {[}J{]}}\label{evaporative-cooler-electric-energy-j-2}
+\paragraph{Evaporative Cooler Electricity Energy {[}J{]}}\label{evaporative-cooler-electric-energy-j-2}
 
 These output variables report the electric power and energy consumed by the secondary air fan and the sump pump.
 
@@ -548,9 +548,9 @@ The output variables that are available for the wet indirect evaporative cooler 
 \item
   HVAC,Average, Evaporative Cooler Total Stage Effectiveness
 \item
-  HVAC,Average, Evaporative Cooler Electric Power{[}W{]}
+  HVAC,Average, Evaporative Cooler Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Evaporative Cooler Electric Energy {[}J{]}
+  HVAC,Sum, Evaporative Cooler Electricity Energy {[}J{]}
 \item
   HVAC,Sum, Evaporative Cooler Water Volume{[}m3{]}
 \item
@@ -567,9 +567,9 @@ The output variables that are available for the wet indirect evaporative cooler 
 
 The Total Stage Efficiency is defined as the temperature change of the supply air divided by the difference between the outdoor dry-bulb and wet-bulb temperatures, including the effect of the reduction in flow because of the secondary air stream. In other words, it is a measure of the approach to the outdoor wet-bulb temperature.
 
-\paragraph{Evaporative Cooler Electric Power {[}W{]}}\label{evaporative-cooler-electric-power-w}
+\paragraph{Evaporative Cooler Electricity Rate {[}W{]}}\label{evaporative-cooler-electric-power-w}
 
-\paragraph{Evaporative Cooler Electric Energy {[}J{]}}\label{evaporative-cooler-electric-energy-j-3}
+\paragraph{Evaporative Cooler Electricity Energy {[}J{]}}\label{evaporative-cooler-electric-energy-j-3}
 
 These output variables report the electric power and energy that are consumed by the secondary air fan and the sump pump.
 
@@ -615,7 +615,7 @@ This numeric field specifies the design effectiveness that is applied to the wet
 
 \paragraph{Field: Wet Bulb Effectiveness Flow Ratio Modifier Curve Name}\label{field-wet-bulb-effectiveness-flow-ratio-modifier-curve-name}
 
-This alpha field is the name of a curve that modifies the wet bulb effectiveness design value specified in the previous field by multiplying that value by the result of this curve. The modifying curve is a function of flow fraction, which is the ratio of the sum of the primary and secondary flow rates divided by the sum of the design flow rates. If this input field is left blank, the effectiveness is assumed to be constant. The wet bulb effectiveness modifier curve is required for proper operation of secondary air flow modulation in wet cooling operating mode, and is used with the three input fields \textit{Evaporative Operation Minimum Limit Secondary Air Drybulb Temperature}, \textit{Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature}, and \textit{Operation Maximum Limit Outdoor Drybulb Temperature}. Any curve or table with one independent variable can be used: \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curvequartic]{Curve:Quartic}, \hyperref[curveexponent]{Curve:Exponent}, \hyperref[curveexponentialskewnormal]{Curve:ExponentialSkewNormal}, \hyperref[curvesigmoid]{Curve:Sigmoid}, Curve:RectuangularHyperbola1, \hyperref[curverectangularhyperbola2]{Curve:RectangularHyperbola2}, \hyperref[curveexponentialdecay]{Curve:ExponentialDecay}, \hyperref[curvedoubleexponentialdecay]{Curve:DoubleExponentialDecay}, and \hyperref[tableoneindependentvariable]{Table:OneIndependentVariable}.
+This alpha field is the name of a curve that modifies the wet bulb effectiveness design value specified in the previous field by multiplying that value by the result of this curve. The modifying curve is a function of flow fraction, which is the ratio of the sum of the primary and secondary flow rates divided by the sum of the design flow rates. If this input field is left blank, the effectiveness is assumed to be constant. The wet bulb effectiveness modifier curve is required for proper operation of secondary air flow modulation in wet cooling operating mode, and is used with the three input fields \textit{Evaporative Operation Minimum Limit Secondary Air Drybulb Temperature}, \textit{Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature}, and \textit{Operation Maximum Limit Outdoor Drybulb Temperature}. Any curve or table with one independent variable can be used: \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curvequartic]{Curve:Quartic}, \hyperref[curveexponent]{Curve:Exponent}, \hyperref[curveexponentialskewnormal]{Curve:ExponentialSkewNormal}, \hyperref[curvesigmoid]{Curve:Sigmoid}, Curve:RectuangularHyperbola1, \hyperref[curverectangularhyperbola2]{Curve:RectangularHyperbola2}, \hyperref[curveexponentialdecay]{Curve:ExponentialDecay}, \hyperref[curvedoubleexponentialdecay]{Curve:DoubleExponentialDecay}, and one-dimensional \hyperref[tablelookup]{Table:Lookup}.
 
 \paragraph{Field: Cooler Drybulb Design Effectiveness}\label{field-cooler-drybulb-design-effectiveness}
 
@@ -623,7 +623,7 @@ This numeric field is the dry bulb design effectiveness of the evaporative coole
 
 \paragraph{Field Drybulb Effectiveness Flow Ratio Modifier Curve Name}\label{field-drybulb-effectiveness-flow-ratio-modifier-curve-name}
 
-This alpha field is the name of a curve that modifies the drybulb effectiveness in the previous field (eff\_db\_design) by multiplying the design effectiveness value by the result of this curve. The curve is evaluated using the flow fraction as the independent variable. The flow fraction is the ratio of sum of the primary and secondary flow rates divided by the sum of the design flow rates. If this input field is left blank, the effectiveness is assumed to be constant. The dry bulb effectiveness modifier curve is required for proper operation of secondary air flow modulation in dry cooling operating mode, and is used with the three input fields \textit{Evaporative Operation Minimum Limit Secondary Air Drybulb Temperature}, \textit{Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature}, and \textit{Operation Maximum Limit Outdoor Drybulb Temperature}. Any curve or table with one independent variable can be used: \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curvequartic]{Curve:Quartic}, \hyperref[curveexponent]{Curve:Exponent}, \hyperref[curveexponentialskewnormal]{Curve:ExponentialSkewNormal}, \hyperref[curvesigmoid]{Curve:Sigmoid}, Curve:RectuangularHyperbola1, \hyperref[curverectangularhyperbola2]{Curve:RectangularHyperbola2}, \hyperref[curveexponentialdecay]{Curve:ExponentialDecay}, \hyperref[curvedoubleexponentialdecay]{Curve:DoubleExponentialDecay}, and \hyperref[tableoneindependentvariable]{Table:OneIndependentVariable}.
+This alpha field is the name of a curve that modifies the drybulb effectiveness in the previous field (eff\_db\_design) by multiplying the design effectiveness value by the result of this curve. The curve is evaluated using the flow fraction as the independent variable. The flow fraction is the ratio of sum of the primary and secondary flow rates divided by the sum of the design flow rates. If this input field is left blank, the effectiveness is assumed to be constant. The dry bulb effectiveness modifier curve is required for proper operation of secondary air flow modulation in dry cooling operating mode, and is used with the three input fields \textit{Evaporative Operation Minimum Limit Secondary Air Drybulb Temperature}, \textit{Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature}, and \textit{Operation Maximum Limit Outdoor Drybulb Temperature}. Any curve or table with one independent variable can be used: \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curvequartic]{Curve:Quartic}, \hyperref[curveexponent]{Curve:Exponent}, \hyperref[curveexponentialskewnormal]{Curve:ExponentialSkewNormal}, \hyperref[curvesigmoid]{Curve:Sigmoid}, Curve:RectuangularHyperbola1, \hyperref[curverectangularhyperbola2]{Curve:RectangularHyperbola2}, \hyperref[curveexponentialdecay]{Curve:ExponentialDecay}, \hyperref[curvedoubleexponentialdecay]{Curve:DoubleExponentialDecay}, and one-dimensional \hyperref[tablelookup]{Table:Lookup}.
 
 \paragraph{Field: Recirculating Water Pump Design Power}\label{field-recirculating-water-pump-design-power}
 
@@ -635,7 +635,7 @@ This numeric field value is recirculating water pump sizing factor in \si{\wattp
 
 \paragraph{Field: Water Pump Power Modifier Curve Name}\label{field-water-pump-power-modifier-curve-name-1}
 
-This alpha field is the name of a dimensionless normalized pump power modifying curve. This curve modifies the pump electric power in the previous field by multiplying the design power by the result of this curve. The normalized curve is a function of the secondary side flow fraction as the independent variable. The curve shall yield a value of 1.0 at a flow fraction of 1.0. The flow fraction is the secondary air flow rate during operation divided by Secondary Design Air Flow Rate. If this input field is left blank, the pump power is assumed to vary linearly with the load. If pump power does not vary linearly with load this curve should be used. Any curve or table with one independent variable can be used: \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curvequartic]{Curve:Quartic}, \hyperref[curveexponent]{Curve:Exponent}, \hyperref[curveexponentialskewnormal]{Curve:ExponentialSkewNormal}, \hyperref[curvesigmoid]{Curve:Sigmoid}, Curve:RectuangularHyperbola1, \hyperref[curverectangularhyperbola2]{Curve:RectangularHyperbola2}, \hyperref[curveexponentialdecay]{Curve:ExponentialDecay}, \hyperref[curvedoubleexponentialdecay]{Curve:DoubleExponentialDecay}, and \hyperref[tableoneindependentvariable]{Table:OneIndependentVariable}.
+This alpha field is the name of a dimensionless normalized pump power modifying curve. This curve modifies the pump electric power in the previous field by multiplying the design power by the result of this curve. The normalized curve is a function of the secondary side flow fraction as the independent variable. The curve shall yield a value of 1.0 at a flow fraction of 1.0. The flow fraction is the secondary air flow rate during operation divided by Secondary Design Air Flow Rate. If this input field is left blank, the pump power is assumed to vary linearly with the load. If pump power does not vary linearly with load this curve should be used. Any curve or table with one independent variable can be used: \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curvequartic]{Curve:Quartic}, \hyperref[curveexponent]{Curve:Exponent}, \hyperref[curveexponentialskewnormal]{Curve:ExponentialSkewNormal}, \hyperref[curvesigmoid]{Curve:Sigmoid}, Curve:RectuangularHyperbola1, \hyperref[curverectangularhyperbola2]{Curve:RectangularHyperbola2}, \hyperref[curveexponentialdecay]{Curve:ExponentialDecay}, \hyperref[curvedoubleexponentialdecay]{Curve:DoubleExponentialDecay}, and one-dimensional \hyperref[tablelookup]{Table:Lookup}.
 
 \paragraph{Field: Secondary Air Design Flow Rate}\label{field-secondary-air-design-flow-rate}
 
@@ -655,7 +655,7 @@ This numeric field is the secondary air fan sizing specific power in W/(m3/s). T
 
 \paragraph{Field: Secondary Air Fan Power Modifier Curve Name}\label{field-secondary-air-fan-power-modifier-curve-name}
 
-This alpha field is the name of a dimensionless normalized curve. The normalized curve modifies the design secondary air fan power in the previous field by multiplying that value by the result of this curve. The normalized curve is a function of the secondary side flow fraction as the independent variable. The curve shall yield a value of 1.0 at a flow fraction of 1.0. The flow fraction is the secondary air flow rate divided by Secondary Design Air Flow Rate. If this input field is left blank, the fan power will vary linearly with load (includes air system cycling, if any). If fan power does not vary linearly with load this curve should be used. Any curve or table with one independent variable can be used: \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curvequartic]{Curve:Quartic}, \hyperref[curveexponent]{Curve:Exponent}, \hyperref[curveexponentialskewnormal]{Curve:ExponentialSkewNormal}, \hyperref[curvesigmoid]{Curve:Sigmoid}, Curve:RectuangularHyperbola1, \hyperref[curverectangularhyperbola2]{Curve:RectangularHyperbola2}, \hyperref[curveexponentialdecay]{Curve:ExponentialDecay}, \hyperref[curvedoubleexponentialdecay]{Curve:DoubleExponentialDecay}, and \hyperref[tableoneindependentvariable]{Table:OneIndependentVariable}.
+This alpha field is the name of a dimensionless normalized curve. The normalized curve modifies the design secondary air fan power in the previous field by multiplying that value by the result of this curve. The normalized curve is a function of the secondary side flow fraction as the independent variable. The curve shall yield a value of 1.0 at a flow fraction of 1.0. The flow fraction is the secondary air flow rate divided by Secondary Design Air Flow Rate. If this input field is left blank, the fan power will vary linearly with load (includes air system cycling, if any). If fan power does not vary linearly with load this curve should be used. Any curve or table with one independent variable can be used: \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curvequartic]{Curve:Quartic}, \hyperref[curveexponent]{Curve:Exponent}, \hyperref[curveexponentialskewnormal]{Curve:ExponentialSkewNormal}, \hyperref[curvesigmoid]{Curve:Sigmoid}, Curve:RectuangularHyperbola1, \hyperref[curverectangularhyperbola2]{Curve:RectangularHyperbola2}, \hyperref[curveexponentialdecay]{Curve:ExponentialDecay}, \hyperref[curvedoubleexponentialdecay]{Curve:DoubleExponentialDecay}, and one-dimensional \hyperref[tablelookup]{Table:Lookup}.
 
 \paragraph{Field: Primary Air Inlet Node Name}\label{field-primary-air-inlet-node-name-2}
 
@@ -758,9 +758,9 @@ The output variables that are available for the EvaporativeCooler:Indirect:Resea
 \item
   HVAC,Average,Evaporative Cooler Operating Mode Satus {[]}
 \item
-  HVAC,Sum,Evaporative Cooler Electric Energy {[}J{]}
+  HVAC,Sum,Evaporative Cooler Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Evaporative Cooler Electric Power {[}W{]}
+  HVAC,Average,Evaporative Cooler Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Evaporative Cooler Storage Tank Water Volume {[}m3{]}
 \item
@@ -785,9 +785,9 @@ This output variable provides the part load fraction of the indirect cooler. The
 
 This output variable is a flag that indicates if the modeling was based on dewpoint effectivenss rather than wetbulb effectiveness The ResearchSpecial model is usually based on wet-bulb approach, but since values in excess of 1.0 are allowed, there is a secondary constraint imposed by dewpoint. If the dewpoint effectiveness was applied, then this flag variable will have the value 1.0, otherwise it is 0.0.
 
-\paragraph{Evaporative Cooler Electric Power {[}W{]}}\label{evaporative-cooler-electric-power-w-1}
+\paragraph{Evaporative Cooler Electricity Rate {[}W{]}}\label{evaporative-cooler-electric-power-w-1}
 
-\paragraph{Evaporative Cooler Electric Energy {[}J{]}}\label{evaporative-cooler-electric-energy-j-4}
+\paragraph{Evaporative Cooler Electricity Energy {[}J{]}}\label{evaporative-cooler-electric-energy-j-4}
 
 These output variables report the electric power and energy that are consumed by the secondary air fan and the sump pump.
 

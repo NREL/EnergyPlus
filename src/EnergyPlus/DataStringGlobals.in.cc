@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,181 +62,15 @@ namespace DataStringGlobals {
     // This data-only module is a repository for string variables used in parsing
     // "pieces" of EnergyPlus.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-    // None!--This module is USEd by other modules; it should not USE anything.
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-    std::string const UpperCase("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ");
-    std::string const LowerCase("abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïðñòóôõöøùúûüý");
-    std::string const AccentedUpperCase("ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ");
-    std::string const AccentedLowerCase("àáâãäåæçèéêëìíîïðñòóôõöøùúûüý");
-    std::string const AllCase("àáâãäåæçèéêëìíîïðñòóôõöøùúûüýÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
-#ifdef _WIN32
-    std::string const NL("\r\n"); // Platform newline
-#else
-    std::string const NL("\n"); // Platform newline
-#endif
-#ifdef _WIN32
-    char const pathChar('\\');
-    char const altpathChar('/');
-#elif __linux__
-    char const pathChar('/');
-    char const altpathChar('\\');
-#elif __unix__
-    char const pathChar('/');
-    char const altpathChar('\\');
-#elif __posix__
-    char const pathChar('/');
-    char const altpathChar('\\');
-#elif __APPLE__
-    char const pathChar('/');
-    char const altpathChar('\\');
-#else
-#error "Invalid platform detection in DataStringGlobals."
-#endif
-    char const CharComma(',');     // comma
-    char const CharSemicolon(';'); // semicolon
-    char const CharTab('\t');      // tab
-    char const CharSpace(' ');     // space
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    std::string outputBndFileName("eplusout.bnd");
-    std::string outputDxfFileName("eplusout.dxf");
-    std::string outputEndFileName("eplusout.end");
-    std::string outputErrFileName("eplusout.err");
-    std::string outputJsonFileName("eplusout.json");
-    std::string outputTSHvacJsonFileName("eplusout_detailed_HVAC.json");
-    std::string outputTSZoneJsonFileName("eplusout_detailed_zone.json");
-    std::string outputTSJsonFileName("eplusout_timestep.json");
-    std::string outputYRJsonFileName("eplusout_yearly.json");
-    std::string outputMNJsonFileName("eplusout_monthly.json");
-    std::string outputDYJsonFileName("eplusout_daily.json");
-    std::string outputHRJsonFileName("eplusout_hourly.json");
-    std::string outputSMJsonFileName("eplusout_runperiod.json");
-    std::string outputCborFileName("eplusout.cbor");
-    std::string outputTSHvacCborFileName("eplusout_detailed_HVAC.cbor");
-    std::string outputTSZoneCborFileName("eplusout_detailed_zone.cbor");
-    std::string outputTSCborFileName("eplusout_timestep.cbor");
-    std::string outputYRCborFileName("eplusout_yearly.cbor");
-    std::string outputMNCborFileName("eplusout_monthly.cbor");
-    std::string outputDYCborFileName("eplusout_daily.cbor");
-    std::string outputHRCborFileName("eplusout_hourly.cbor");
-    std::string outputSMCborFileName("eplusout_runperiod.cbor");
-    std::string outputMsgPackFileName("eplusout.msgpack");
-    std::string outputTSHvacMsgPackFileName("eplusout_detailed_HVAC.msgpack");
-    std::string outputTSZoneMsgPackFileName("eplusout_detailed_zone.msgpack");
-    std::string outputTSMsgPackFileName("eplusout_timestep.msgpack");
-    std::string outputYRMsgPackFileName("eplusout_yearly.msgpack");
-    std::string outputMNMsgPackFileName("eplusout_monthly.msgpack");
-    std::string outputDYMsgPackFileName("eplusout_daily.msgpack");
-    std::string outputHRMsgPackFileName("eplusout_hourly.msgpack");
-    std::string outputSMMsgPackFileName("eplusout_runperiod.msgpack");
-    std::string outputMtdFileName("eplusout.mtd");
-    std::string outputMddFileName("eplusout.mdd");
-    std::string outputRddFileName("eplusout.rdd");
-    std::string outputShdFileName("eplusout.shd");
-    std::string outputTblCsvFileName("eplustbl.csv");
-    std::string outputTblHtmFileName("eplustbl.htm");
-    std::string outputTblTabFileName("eplustbl.tab");
-    std::string outputTblTxtFileName("eplustbl.txt");
-    std::string outputTblXmlFileName("eplustbl.xml");
-    std::string outputAdsFileName("eplusADS.out");
-    std::string outputDfsFileName("eplusout.dfs");
-    std::string outputGLHEFileName("eplusout.glhe");
-    std::string outputDelightInFileName("eplusout.delightin");
-    std::string outputDelightOutFileName("eplusout.delightout");
-    std::string outputDelightEldmpFileName("eplusout.delighteldmp");
-    std::string outputDelightDfdmpFileName("eplusout.delightdfdmp");
-    std::string outputMapTabFileName("eplusmap.tab");
-    std::string outputMapCsvFileName("eplusmap.csv");
-    std::string outputMapTxtFileName("eplusmap.txt");
-    std::string outputEddFileName("eplusout.edd");
-    std::string outputIperrFileName("eplusout.iperr");
-    std::string outputPerfLogFileName("eplusout_perflog.csv");
-    std::string outputSlnFileName("eplusout.sln");
-    std::string outputSciFileName("eplusout.sci");
-    std::string outputWrlFileName("eplusout.wrl");
-    std::string outputScreenCsvFileName("eplusscreen.csv");
-    std::string outputSqlFileName("eplusout.sql");
-    std::string outputSqliteErrFileName("eplussqlite.err");
-    std::string TarcogIterationsFileName("TarcogIterations.dbg");
-    std::string outputCsvFileName("eplusout.csv");
-    std::string outputMtrCsvFileName("eplusmtr.csv");
-    std::string outputRvauditFileName("eplusout.rvaudit");
-    std::string outputExtShdFracFileName("eplusshading.csv");
-
-    std::string EnergyPlusIniFileName;
-    std::string inStatFileName;
-    std::string eplusADSFileName;
-    std::string idfFileNameOnly;
-    std::string idfDirPathName;
-    std::string outDirPathName;
-    std::string inputFileNameOnly;
-    std::string inputDirPathName;
-    std::string outputDirPathName;
-    std::string exeDirectory;
-    std::string inputFileName;
-    std::string inputIddFileName;
-    std::string inputEpJSONSchemaFileName;
-    std::string inputWeatherFileName;
-    std::string FullName;
-    std::string weatherFileNameOnly;
-    std::string ProgramPath;          // Path for Program from INI file
-    std::string CurrentWorkingFolder; // Current working directory for run
-    std::string CurrentDateTime;      // For printing current date and time at start of run
-    std::string IDDVerString;         // Version information from the IDD (line 1)
-
-    std::string
+    std::string const
         VerString("EnergyPlus, Version ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}"); // String that
                                                                                                                                       // represents
                                                                                                                                       // version
                                                                                                                                       // information
-    std::string MatchVersion("${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}"); // String to be matched by Version object
-    std::string PythonAPIVersion("${PYTHON_API_VERSION_MAJOR}.${PYTHON_API_VERSION_MINOR}"); // API version string to be matched when using the Python API
+    std::string const MatchVersion("${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}"); // String to be matched by Version object
+    std::string const
+        PythonAPIVersion("${PYTHON_API_VERSION_MAJOR}.${PYTHON_API_VERSION_MINOR}"); // API version string to be matched when using the Python API
 
-
-    void clear_state()
-    {
-        EnergyPlusIniFileName.clear();
-        inStatFileName.clear();
-        eplusADSFileName.clear();
-        idfFileNameOnly.clear();
-        idfDirPathName.clear();
-        outDirPathName.clear();
-        inputFileNameOnly.clear();
-        inputDirPathName.clear();
-        outputDirPathName.clear();
-        exeDirectory.clear();
-        inputFileName.clear();
-        inputIddFileName.clear();
-        inputEpJSONSchemaFileName.clear();
-        inputWeatherFileName.clear();
-        FullName.clear();
-        weatherFileNameOnly.clear();
-        ProgramPath.clear();
-        CurrentWorkingFolder.clear();
-        CurrentDateTime.clear();
-        IDDVerString.clear();
-    }
 } // namespace DataStringGlobals
 
 } // namespace EnergyPlus

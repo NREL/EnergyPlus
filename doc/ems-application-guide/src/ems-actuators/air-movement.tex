@@ -16,8 +16,12 @@ An actuator called ``ZoneMixing'' is available with a control type called ``Air 
 
 An actuator called ``ZoneCrossMixing'' is available with a control type called ``Air Exchange Flow Rate'' (m\(^{3}\)/s). This provides override control over the interzonal mixing rate. This is the simple air movement model provided by the input object ZoneCrossMixing. The unique identifier is the name of the ZoneCrossMixing object.
 
+\subsection{Zone Thermal Chimney}\label{zone-thermal-chimney}
+
+An actuator called ``Zone Thermal Chimney'' is available with a control type called ``Air Exchange Flow Rate'' (m\(^{3}\)/s). This provides override control over the thermal chimney flow rate. This is the simple air movement model provided by the input object ZoneThermalChimney. The unique identifier is the name of the ZoneThermalChimney object.
+
 \subsection{Airflow Network Openings}\label{airflow-network-openings}
 
-An actuator called ``AirFlow Network Window/Door Opening'' is available with a control type called ``Venting Opening Factor.''~ It is available in models that have operable openings in the Airflow Network model and that are entered by using either AirflowNetwork:MultiZone:Component:DetailedOpening or AirflowNetwork:MultiZone:Component:SimpleOpening input objects. This control allows you to use EMS to vary the size of the opening during the airflow model calculations, such as for natural and hybrid ventilation.
+An actuator called ``AirFlow Network Window/Door Opening'' is available with a control type called ``Venting Opening Factor.''~ It is available in models that have operable openings in the Airflow Network model and that are entered by using either AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:SimpleOpening, or AirflowNetwork:MultiZone:Component:HorizontalOpening input objects. This control allows you to use EMS to vary the size of the opening during the airflow model calculations, such as for natural and hybrid ventilation.
 
-The unique identifier is the name of the window or door, not the name of the associated airflow network input objects. The actuator control involves setting the value of the opening factor between 0.0 and 1.0.
+The unique identifier is the name of the surface (window, door or air boundary), not the name of the associated airflow network input objects. The actuator control involves setting the value of the opening factor between 0.0 and 1.0. Use of this actuator with an air boundary surface is allowed, but will generate a warning since air boundaries are typically always open.

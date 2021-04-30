@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,14 +54,13 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWater.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -80,43 +79,9 @@ namespace WaterManager {
     //       MODIFIED       DJS to add ecoroof irrigation Jan 2007
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS MODULE:
-
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-    // <use statements for data only modules>
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using DataGlobals::BigNumber;
     using namespace DataWater;
 
-    // <use statements for access to subroutines in other modules>
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE WaterManager:
-    // pointers for water storage tanks and their supply arrays
-    // pointers for water storage tanks and their demand arrays
-
-    // Functions
-
-    void ManageWater()
+    void ManageWater(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -134,90 +99,59 @@ namespace WaterManager {
         // State variables are continually recalculated each system iteration
         // except when appropriate to update them.  IF this module is moved up
         // to a different timestep (with less iteration), then numerical solution
-        // may need to be added.  Iteration is being used to solve interdependecies
+        // may need to be added.  Iteration is being used to solve interdependencies
         // of storage, supply, and demand modeling of water system.
-        // Most data are declared in data-only module DataWater.cc
+        // Most data are declared in data-only module DataWater.hh
         // Calling order,
         //   storage tanks
         //   supply
         //   demands
         //  IF first/last timestep, then do an update.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool GetInputFlag(true); // First time, input is "gotten"
-        static int RainColNum(0);
-        static int TankNum(0);
-        static int WellNum(0);
+        int RainColNum(0);
+        int TankNum(0);
+        int WellNum(0);
 
-        if (GetInputFlag) {
-            GetWaterManagerInput();
-            GetInputFlag = false;
+        if (state.dataWaterManager->GetInputFlag) {
+            GetWaterManagerInput(state);
+            state.dataWaterManager->GetInputFlag = false;
         }
 
-        if (!(AnyWaterSystemsInModel)) return;
+        if (!(state.dataWaterData->AnyWaterSystemsInModel)) return;
 
         // this is the main water manager
         // first call all the water storage tanks
         //    (these called first to make control decisions)
-        for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
-            CalcWaterStorageTank(TankNum);
+        for (TankNum = 1; TankNum <= state.dataWaterData->NumWaterStorageTanks; ++TankNum) {
+            CalcWaterStorageTank(state, TankNum);
         } // tank loop
 
-        for (RainColNum = 1; RainColNum <= NumRainCollectors; ++RainColNum) {
-            CalcRainCollector(RainColNum);
+        for (RainColNum = 1; RainColNum <= state.dataWaterData->NumRainCollectors; ++RainColNum) {
+            CalcRainCollector(state, RainColNum);
         }
 
-        for (WellNum = 1; WellNum <= NumGroundWaterWells; ++WellNum) {
-            CalcGroundwaterWell(WellNum);
+        for (WellNum = 1; WellNum <= state.dataWaterData->NumGroundWaterWells; ++WellNum) {
+            CalcGroundwaterWell(state, WellNum);
         }
 
         // call the tanks again to get updated rain and well activity
-        for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
-            CalcWaterStorageTank(TankNum);
+        for (TankNum = 1; TankNum <= state.dataWaterData->NumWaterStorageTanks; ++TankNum) {
+            CalcWaterStorageTank(state, TankNum);
         } // tank loop
-
-        ReportWaterManager();
     }
 
-    void ManageWaterInits()
+    void ManageWaterInits(EnergyPlusData &state)
     {
+        if (!(state.dataWaterData->AnyWaterSystemsInModel)) return;
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
+        UpdateWaterManager(state);
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        if (!(AnyWaterSystemsInModel)) return;
-
-        UpdateWaterManager();
-
-        UpdatePrecipitation();
-        UpdateIrrigation();
+        UpdatePrecipitation(state);
+        UpdateIrrigation(state);
     }
 
-    void GetWaterManagerInput()
+    void GetWaterManagerInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -226,13 +160,6 @@ namespace WaterManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // Using/Aliasing
-        using DataHeatBalance::Zone;
-        using DataSurfaces::Surface;
-        using General::RoundSigDigits;
         using ScheduleManager::CheckScheduleValue;
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
@@ -240,18 +167,16 @@ namespace WaterManager {
         using ScheduleManager::GetScheduleMinValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Item;                       // Item to be "gotten"
-        static int NumAlphas(0);        // Number of Alphas for each GetObjectItem call
-        static int NumNumbers(0);       // Number of Numbers for each GetObjectItem call
-        static int IOStatus(0);         // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        static bool MyOneTimeFlag(true);
-        static int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
-        static int MaxNumNumbers(0); // argument for call to GetObjectDefMaxArgs
-        static int TotalArgs(0);     // argument for call to GetObjectDefMaxArgs
-        static int alphaOffset(0);
-        static int SurfNum(0);
-        static std::string objNameMsg;
+        int Item;                // Item to be "gotten"
+        int NumAlphas(0);        // Number of Alphas for each GetObjectItem call
+        int NumNumbers(0);       // Number of Numbers for each GetObjectItem call
+        int IOStatus(0);         // Used in GetObjectItem
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        int MaxNumAlphas(0);     // argument for call to GetObjectDefMaxArgs
+        int MaxNumNumbers(0);    // argument for call to GetObjectDefMaxArgs
+        int TotalArgs(0);        // argument for call to GetObjectDefMaxArgs
+        int alphaOffset(0);
+        std::string objNameMsg;
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
         Array1D_bool lNumericFieldBlanks;
@@ -259,35 +184,29 @@ namespace WaterManager {
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
-        static Real64 tmpMax(0.0);
-        static Real64 tmpMin(0.0);
-        static Real64 tmpNumerator(0.0);
-        static Real64 tmpArea(0.0);
-        static Real64 tmpDenominator(0.0);
-        static int ThisSurf(0);
         int NumIrrigation;
         int Dummy;
 
-        if ((MyOneTimeFlag) && (!(WaterSystemGetInputCalled))) { // big block for entire subroutine
+        if ((state.dataWaterManager->MyOneTimeFlag) && (!(state.dataWaterData->WaterSystemGetInputCalled))) { // big block for entire subroutine
 
             cCurrentModuleObject = "WaterUse:Storage";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
             MaxNumNumbers = NumNumbers;
             MaxNumAlphas = NumAlphas;
             cCurrentModuleObject = "WaterUse:RainCollector";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
             MaxNumNumbers = max(MaxNumNumbers, NumNumbers);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "WaterUse:Well";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
             MaxNumNumbers = max(MaxNumNumbers, NumNumbers);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "Site:Precipitation";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
             MaxNumNumbers = max(MaxNumNumbers, NumNumbers);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "RoofIrrigation";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
             MaxNumNumbers = max(MaxNumNumbers, NumNumbers);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
@@ -298,342 +217,344 @@ namespace WaterManager {
             rNumericArgs.dimension(MaxNumNumbers, 0.0);
             lNumericFieldBlanks.dimension(MaxNumNumbers, false);
 
-            MyOneTimeFlag = false;
+            state.dataWaterManager->MyOneTimeFlag = false;
             cCurrentModuleObject = "WaterUse:Storage";
-            NumWaterStorageTanks = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-            if (NumWaterStorageTanks > 0) {
-                AnyWaterSystemsInModel = true;
-                if (!(allocated(WaterStorage))) WaterStorage.allocate(NumWaterStorageTanks);
+            state.dataWaterData->NumWaterStorageTanks = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            if (state.dataWaterData->NumWaterStorageTanks > 0) {
+                state.dataWaterData->AnyWaterSystemsInModel = true;
+                if (!(allocated(state.dataWaterData->WaterStorage)))
+                    state.dataWaterData->WaterStorage.allocate(state.dataWaterData->NumWaterStorageTanks);
 
-                for (Item = 1; Item <= NumWaterStorageTanks; ++Item) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
-                                                  Item,
-                                                  cAlphaArgs,
-                                                  NumAlphas,
-                                                  rNumericArgs,
-                                                  NumNumbers,
-                                                  IOStatus,
-                                                  _,
-                                                  _,
-                                                  cAlphaFieldNames,
-                                                  cNumericFieldNames);
-                    AnyWaterSystemsInModel = true;
-                    WaterStorage(Item).Name = cAlphaArgs(1);
-                    UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                for (Item = 1; Item <= state.dataWaterData->NumWaterStorageTanks; ++Item) {
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                             cCurrentModuleObject,
+                                                                             Item,
+                                                                             cAlphaArgs,
+                                                                             NumAlphas,
+                                                                             rNumericArgs,
+                                                                             NumNumbers,
+                                                                             IOStatus,
+                                                                             _,
+                                                                             _,
+                                                                             cAlphaFieldNames,
+                                                                             cNumericFieldNames);
+                    state.dataWaterData->AnyWaterSystemsInModel = true;
+                    state.dataWaterData->WaterStorage(Item).Name = cAlphaArgs(1);
+                    UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                     objNameMsg = cCurrentModuleObject + " = " + cAlphaArgs(1);
 
-                    WaterStorage(Item).QualitySubCategoryName = cAlphaArgs(2);
-                    //    If (UtilityRoutines::SameString(cAlphaArgs(2), 'Mains')) Then
-                    //      WaterStorage(Item)%QualitySubCategory = MainsWater
-                    //    ELSEIF (UtilityRoutines::SameString(cAlphaArgs(2), 'RAINWATER')) Then
-                    //      WaterStorage(Item)%QualitySubCategory = RainWater
-                    //    ELSEIF (UtilityRoutines::SameString(cAlphaArgs(2), 'GREYWATER')) Then
-                    //      WaterStorage(Item)%QualitySubCategory = GreyWater
-                    //    ELSEIF (UtilityRoutines::SameString(cAlphaArgs(2), 'WELLWATER')) Then
-                    //      WaterStorage(Item)%QualitySubCategory =  WellWater
-                    //    ELSEIF (UtilityRoutines::SameString(cAlphaArgs(2), 'BLACKWATER')) Then
-                    //      WaterStorage(Item)%QualitySubCategory = BlackWater
+                    state.dataWaterData->WaterStorage(Item).QualitySubCategoryName = cAlphaArgs(2);
 
-                    //    ELSE
-                    //          CALL ShowSevereError('Invalid '//TRIM(cAlphaFieldNames(2))//'='//TRIM(cAlphaArgs(2)))
-                    //          CALL ShowContinueError('Entered in '//TRIM(cCurrentModuleObject)//'='//TRIM(cAlphaArgs(1)))
-                    //      ErrorsFound = .TRUE.
-                    //    ENDIF
-
-                    WaterStorage(Item).MaxCapacity = rNumericArgs(1);
-                    if (WaterStorage(Item).MaxCapacity == 0.0) { // default
-                        WaterStorage(Item).MaxCapacity = BigNumber;
+                    state.dataWaterData->WaterStorage(Item).MaxCapacity = rNumericArgs(1);
+                    if (state.dataWaterData->WaterStorage(Item).MaxCapacity == 0.0) { // default
+                        state.dataWaterData->WaterStorage(Item).MaxCapacity = DataGlobalConstants::BigNumber;
                     }
 
-                    WaterStorage(Item).InitialVolume = rNumericArgs(2);
-                    WaterStorage(Item).MaxInFlowRate = rNumericArgs(3);
-                    if (WaterStorage(Item).MaxInFlowRate == 0.0) { // default
-                        WaterStorage(Item).MaxInFlowRate = BigNumber;
+                    state.dataWaterData->WaterStorage(Item).InitialVolume = rNumericArgs(2);
+                    state.dataWaterData->WaterStorage(Item).MaxInFlowRate = rNumericArgs(3);
+                    if (state.dataWaterData->WaterStorage(Item).MaxInFlowRate == 0.0) { // default
+                        state.dataWaterData->WaterStorage(Item).MaxInFlowRate = DataGlobalConstants::BigNumber;
                     }
 
-                    WaterStorage(Item).MaxOutFlowRate = rNumericArgs(4);
-                    if (WaterStorage(Item).MaxOutFlowRate == 0.0) { // default
-                        WaterStorage(Item).MaxOutFlowRate = BigNumber;
+                    state.dataWaterData->WaterStorage(Item).MaxOutFlowRate = rNumericArgs(4);
+                    if (state.dataWaterData->WaterStorage(Item).MaxOutFlowRate == 0.0) { // default
+                        state.dataWaterData->WaterStorage(Item).MaxOutFlowRate = DataGlobalConstants::BigNumber;
                     }
 
-                    WaterStorage(Item).OverflowTankName = cAlphaArgs(3); // setup later
+                    state.dataWaterData->WaterStorage(Item).OverflowTankName = cAlphaArgs(3); // setup later
 
                     if (UtilityRoutines::SameString(cAlphaArgs(4), "None")) {
-                        WaterStorage(Item).ControlSupplyType = NoControlLevel;
+                        state.dataWaterData->WaterStorage(Item).ControlSupply = DataWater::ControlSupplyType::NoControlLevel;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(4), "Mains")) {
-                        WaterStorage(Item).ControlSupplyType = MainsFloatValve;
+                        state.dataWaterData->WaterStorage(Item).ControlSupply = DataWater::ControlSupplyType::MainsFloatValve;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(4), "GroundwaterWell")) {
-                        WaterStorage(Item).ControlSupplyType = WellFloatValve;
+                        state.dataWaterData->WaterStorage(Item).ControlSupply = DataWater::ControlSupplyType::WellFloatValve;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(4), "OtherTank")) {
-                        WaterStorage(Item).ControlSupplyType = OtherTankFloatValve;
+                        state.dataWaterData->WaterStorage(Item).ControlSupply = DataWater::ControlSupplyType::OtherTankFloatValve;
                     } else {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
                     }
-                    WaterStorage(Item).ValveOnCapacity = rNumericArgs(5);
-                    WaterStorage(Item).ValveOffCapacity = rNumericArgs(6);
-                    if (WaterStorage(Item).ControlSupplyType != NoControlLevel) {
-                        if (WaterStorage(Item).ValveOffCapacity < WaterStorage(Item).ValveOnCapacity) {
-                            ShowSevereError("Invalid " + cNumericFieldNames(5) + " and/or " + cNumericFieldNames(6));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                            ShowContinueError(cNumericFieldNames(6) + " must be greater than " + cNumericFieldNames(5));
-                            ShowContinueError("Check value for " + cNumericFieldNames(5) + " = " +
-                                              RoundSigDigits(WaterStorage(Item).ValveOnCapacity, 5));
-                            ShowContinueError("which must be lower than " + cNumericFieldNames(6) + " = " +
-                                              RoundSigDigits(WaterStorage(Item).ValveOffCapacity, 5));
+                    state.dataWaterData->WaterStorage(Item).ValveOnCapacity = rNumericArgs(5);
+                    state.dataWaterData->WaterStorage(Item).ValveOffCapacity = rNumericArgs(6);
+                    if (state.dataWaterData->WaterStorage(Item).ControlSupply != DataWater::ControlSupplyType::NoControlLevel) {
+                        if (state.dataWaterData->WaterStorage(Item).ValveOffCapacity < state.dataWaterData->WaterStorage(Item).ValveOnCapacity) {
+                            ShowSevereError(state, "Invalid " + cNumericFieldNames(5) + " and/or " + cNumericFieldNames(6));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError(state, cNumericFieldNames(6) + " must be greater than " + cNumericFieldNames(5));
+                            ShowContinueError(state,
+                                              format("Check value for {} = {:.5R}",
+                                                     cNumericFieldNames(5),
+                                                     state.dataWaterData->WaterStorage(Item).ValveOnCapacity));
+                            ShowContinueError(state,
+                                              format("which must be lower than {} = {:.5R}",
+                                                     cNumericFieldNames(6),
+                                                     state.dataWaterData->WaterStorage(Item).ValveOffCapacity));
                             ErrorsFound = true;
                         }
                     }
 
-                    WaterStorage(Item).BackupMainsCapacity = rNumericArgs(7);
-                    if (WaterStorage(Item).BackupMainsCapacity > 0.0) { // add backup to well and other thank supply
-                        if (WaterStorage(Item).ControlSupplyType == WellFloatValve) {
-                            WaterStorage(Item).ControlSupplyType = WellFloatMainsBackup;
+                    state.dataWaterData->WaterStorage(Item).BackupMainsCapacity = rNumericArgs(7);
+                    if (state.dataWaterData->WaterStorage(Item).BackupMainsCapacity > 0.0) { // add backup to well and other thank supply
+                        if (state.dataWaterData->WaterStorage(Item).ControlSupply == DataWater::ControlSupplyType::WellFloatValve) {
+                            state.dataWaterData->WaterStorage(Item).ControlSupply = DataWater::ControlSupplyType::WellFloatMainsBackup;
                         }
-                        if (WaterStorage(Item).ControlSupplyType == OtherTankFloatValve) {
-                            WaterStorage(Item).ControlSupplyType = TankMainsBackup;
+                        if (state.dataWaterData->WaterStorage(Item).ControlSupply == DataWater::ControlSupplyType::OtherTankFloatValve) {
+                            state.dataWaterData->WaterStorage(Item).ControlSupply = DataWater::ControlSupplyType::TankMainsBackup;
                         }
                     }
 
-                    WaterStorage(Item).SupplyTankName = cAlphaArgs(5); // set up later
+                    state.dataWaterData->WaterStorage(Item).SupplyTankName = cAlphaArgs(5); // set up later
 
                     if (UtilityRoutines::SameString(cAlphaArgs(6), "ScheduledTemperature")) {
-                        WaterStorage(Item).ThermalMode = ScheduledTankTemp;
+                        state.dataWaterData->WaterStorage(Item).ThermalMode = DataWater::TankThermalMode::ScheduledTankTemp;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(6), "ThermalModel")) {
-                        WaterStorage(Item).ThermalMode = TankZoneThermalCoupled;
+                        state.dataWaterData->WaterStorage(Item).ThermalMode = DataWater::TankThermalMode::TankZoneThermalCoupled;
                     } else {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                     }
 
-                    if (WaterStorage(Item).ThermalMode == ScheduledTankTemp) {
-                        WaterStorage(Item).TempSchedID = GetScheduleIndex(cAlphaArgs(7));
-                        if (WaterStorage(Item).TempSchedID == 0) {
-                            ShowSevereError("Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                    if (state.dataWaterData->WaterStorage(Item).ThermalMode == DataWater::TankThermalMode::ScheduledTankTemp) {
+                        state.dataWaterData->WaterStorage(Item).TempSchedID = GetScheduleIndex(state, cAlphaArgs(7));
+                        if (state.dataWaterData->WaterStorage(Item).TempSchedID == 0) {
+                            ShowSevereError(state, "Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ErrorsFound = true;
                         }
-                        tmpMin = GetScheduleMinValue(WaterStorage(Item).TempSchedID);
+                        Real64 tmpMin = GetScheduleMinValue(state, state.dataWaterData->WaterStorage(Item).TempSchedID);
                         if (tmpMin < 0.0) {
-                            ShowSevereError("Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                            ShowContinueError("Found storage tank temperature schedule value less than 0.0 in " + objNameMsg);
+                            ShowSevereError(state, "Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError(state, "Found storage tank temperature schedule value less than 0.0 in " + objNameMsg);
                             ErrorsFound = true;
                         }
-                        tmpMax = GetScheduleMaxValue(WaterStorage(Item).TempSchedID);
+                        Real64 tmpMax = GetScheduleMaxValue(state, state.dataWaterData->WaterStorage(Item).TempSchedID);
                         if (tmpMax > 100.0) {
-                            ShowSevereError("Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                            ShowContinueError("found storage tank temperature schedule value greater than 100.0 in " + objNameMsg);
+                            ShowSevereError(state, "Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError(state, "found storage tank temperature schedule value greater than 100.0 in " + objNameMsg);
                             ErrorsFound = true;
                         }
                     }
 
-                    if (WaterStorage(Item).ThermalMode == TankZoneThermalCoupled) {
+                    if (state.dataWaterData->WaterStorage(Item).ThermalMode == DataWater::TankThermalMode::TankZoneThermalCoupled) {
                         if (UtilityRoutines::SameString(cAlphaArgs(8), "Schedule")) {
-                            WaterStorage(Item).AmbientTempIndicator = AmbientTempSchedule;
+                            state.dataWaterData->WaterStorage(Item).AmbientTempIndicator = DataWater::AmbientTempType::Schedule;
                         } else if (UtilityRoutines::SameString(cAlphaArgs(8), "Zone")) {
-                            WaterStorage(Item).AmbientTempIndicator = AmbientTempZone;
+                            state.dataWaterData->WaterStorage(Item).AmbientTempIndicator = DataWater::AmbientTempType::Zone;
                         } else if (UtilityRoutines::SameString(cAlphaArgs(8), "Outdoors")) {
-                            WaterStorage(Item).AmbientTempIndicator = AmbientTempExterior;
+                            state.dataWaterData->WaterStorage(Item).AmbientTempIndicator = DataWater::AmbientTempType::Exterior;
                         } else {
-                            ShowSevereError("Invalid " + cAlphaFieldNames(8) + '=' + cAlphaArgs(8));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowSevereError(state, "Invalid " + cAlphaFieldNames(8) + '=' + cAlphaArgs(8));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ErrorsFound = true;
                         }
-                        WaterStorage(Item).AmbientTempSchedule = GetScheduleIndex(cAlphaArgs(9));
-                        if ((WaterStorage(Item).AmbientTempSchedule == 0) && (WaterStorage(Item).AmbientTempIndicator == AmbientTempSchedule)) {
-                            ShowSevereError("Invalid " + cAlphaFieldNames(9) + '=' + cAlphaArgs(9));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        state.dataWaterData->WaterStorage(Item).AmbientTempSchedule = GetScheduleIndex(state, cAlphaArgs(9));
+                        if ((state.dataWaterData->WaterStorage(Item).AmbientTempSchedule == 0) &&
+                            (state.dataWaterData->WaterStorage(Item).AmbientTempIndicator == DataWater::AmbientTempType::Schedule)) {
+                            ShowSevereError(state, "Invalid " + cAlphaFieldNames(9) + '=' + cAlphaArgs(9));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ErrorsFound = true;
                         }
-                        WaterStorage(Item).ZoneID = UtilityRoutines::FindItemInList(cAlphaArgs(10), Zone);
-                        if ((WaterStorage(Item).ZoneID == 0) && (WaterStorage(Item).AmbientTempIndicator == AmbientTempZone)) {
-                            ShowSevereError("Invalid " + cAlphaFieldNames(10) + '=' + cAlphaArgs(10));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        state.dataWaterData->WaterStorage(Item).ZoneID = UtilityRoutines::FindItemInList(cAlphaArgs(10), state.dataHeatBal->Zone);
+                        if ((state.dataWaterData->WaterStorage(Item).ZoneID == 0) &&
+                            (state.dataWaterData->WaterStorage(Item).AmbientTempIndicator == DataWater::AmbientTempType::Zone)) {
+                            ShowSevereError(state, "Invalid " + cAlphaFieldNames(10) + '=' + cAlphaArgs(10));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ErrorsFound = true;
                         }
-                        WaterStorage(Item).SurfArea = rNumericArgs(8);
-                        WaterStorage(Item).UValue = rNumericArgs(9);
-                        WaterStorage(Item).SurfMaterialName = cAlphaArgs(11);
+                        state.dataWaterData->WaterStorage(Item).SurfArea = rNumericArgs(8);
+                        state.dataWaterData->WaterStorage(Item).UValue = rNumericArgs(9);
+                        state.dataWaterData->WaterStorage(Item).SurfMaterialName = cAlphaArgs(11);
                         // todo verify material collect and store useful data from it.
                     }
                 }
             } // num water storage tanks > 0
 
             cCurrentModuleObject = "WaterUse:RainCollector";
-            NumRainCollectors = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-            if (NumRainCollectors > 0) {
-                if (!(allocated(RainCollector))) RainCollector.allocate(NumRainCollectors);
-                // allow exensible reference to surfaces.
-                AnyWaterSystemsInModel = true;
+            state.dataWaterData->NumRainCollectors = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            if (state.dataWaterData->NumRainCollectors > 0) {
+                if (!(allocated(state.dataWaterData->RainCollector)))
+                    state.dataWaterData->RainCollector.allocate(state.dataWaterData->NumRainCollectors);
+                // allow extensible reference to surfaces.
+                state.dataWaterData->AnyWaterSystemsInModel = true;
 
-                for (Item = 1; Item <= NumRainCollectors; ++Item) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
-                                                  Item,
-                                                  cAlphaArgs,
-                                                  NumAlphas,
-                                                  rNumericArgs,
-                                                  NumNumbers,
-                                                  IOStatus,
-                                                  _,
-                                                  _,
-                                                  cAlphaFieldNames,
-                                                  cNumericFieldNames);
-                    RainCollector(Item).Name = cAlphaArgs(1);
-                    UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                for (Item = 1; Item <= state.dataWaterData->NumRainCollectors; ++Item) {
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                             cCurrentModuleObject,
+                                                                             Item,
+                                                                             cAlphaArgs,
+                                                                             NumAlphas,
+                                                                             rNumericArgs,
+                                                                             NumNumbers,
+                                                                             IOStatus,
+                                                                             _,
+                                                                             _,
+                                                                             cAlphaFieldNames,
+                                                                             cNumericFieldNames);
+                    state.dataWaterData->RainCollector(Item).Name = cAlphaArgs(1);
+                    UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                     objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs(1);
 
-                    RainCollector(Item).StorageTankName = cAlphaArgs(2);
-                    RainCollector(Item).StorageTankID = UtilityRoutines::FindItemInList(cAlphaArgs(2), WaterStorage);
-                    if (RainCollector(Item).StorageTankID == 0) {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                    state.dataWaterData->RainCollector(Item).StorageTankName = cAlphaArgs(2);
+                    state.dataWaterData->RainCollector(Item).StorageTankID =
+                        UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataWaterData->WaterStorage);
+                    if (state.dataWaterData->RainCollector(Item).StorageTankID == 0) {
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
                     }
 
                     if (UtilityRoutines::SameString(cAlphaArgs(3), "Constant")) {
-                        RainCollector(Item).LossFactorMode = ConstantRainLossFactor;
+                        state.dataWaterData->RainCollector(Item).LossFactorMode = DataWater::RainLossFactor::Constant;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(3), "Scheduled")) {
-                        RainCollector(Item).LossFactorMode = ScheduledRainLossFactor;
+                        state.dataWaterData->RainCollector(Item).LossFactorMode = DataWater::RainLossFactor::Scheduled;
                     } else {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
                     }
-                    RainCollector(Item).LossFactor = rNumericArgs(1);
-                    if (RainCollector(Item).LossFactor > 1.0) {
-                        ShowWarningError("Invalid " + cNumericFieldNames(1) + '=' + RoundSigDigits(rNumericArgs(1), 2));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError("found rain water collection loss factor greater than 1.0, simulation continues");
+                    state.dataWaterData->RainCollector(Item).LossFactor = rNumericArgs(1);
+                    if (state.dataWaterData->RainCollector(Item).LossFactor > 1.0) {
+                        ShowWarningError(state, format("Invalid {}={:.2R}", cNumericFieldNames(1), rNumericArgs(1)));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowContinueError(state, "found rain water collection loss factor greater than 1.0, simulation continues");
                     }
-                    if (RainCollector(Item).LossFactor < 0.0) {
-                        ShowSevereError("Invalid " + cNumericFieldNames(1) + '=' + RoundSigDigits(rNumericArgs(1), 2));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError("found rain water collection loss factor less than 0.0");
+                    if (state.dataWaterData->RainCollector(Item).LossFactor < 0.0) {
+                        ShowSevereError(state, format("Invalid {}={:.2R}", cNumericFieldNames(1), rNumericArgs(1)));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowContinueError(state, "found rain water collection loss factor less than 0.0");
                         ErrorsFound = true;
                     }
 
-                    if (RainCollector(Item).LossFactorMode == ScheduledRainLossFactor) {
-                        RainCollector(Item).LossFactorSchedID = GetScheduleIndex(cAlphaArgs(4));
-                        if (RainCollector(Item).LossFactorSchedID == 0) {
-                            ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                    if (state.dataWaterData->RainCollector(Item).LossFactorMode == DataWater::RainLossFactor::Scheduled) {
+                        state.dataWaterData->RainCollector(Item).LossFactorSchedID = GetScheduleIndex(state, cAlphaArgs(4));
+                        if (state.dataWaterData->RainCollector(Item).LossFactorSchedID == 0) {
+                            ShowSevereError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ErrorsFound = true;
                         }
-                        if (GetScheduleMinValue(RainCollector(Item).LossFactorSchedID) < 0.0) {
-                            ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                            ShowContinueError("found rain water collection loss factor schedule value less than 0.0 in " + objNameMsg);
+                        if (GetScheduleMinValue(state, state.dataWaterData->RainCollector(Item).LossFactorSchedID) < 0.0) {
+                            ShowSevereError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError(state, "found rain water collection loss factor schedule value less than 0.0 in " + objNameMsg);
                             ErrorsFound = true;
                         }
-                        if (GetScheduleMaxValue(RainCollector(Item).LossFactorSchedID) > 1.0) {
-                            ShowWarningError("Potentially invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                            ShowContinueError("found rain water collection loss factor schedule value greater than 1.0, simulation continues");
+                        if (GetScheduleMaxValue(state, state.dataWaterData->RainCollector(Item).LossFactorSchedID) > 1.0) {
+                            ShowWarningError(state, "Potentially invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError(state, "found rain water collection loss factor schedule value greater than 1.0, simulation continues");
                             // allowing it to continue
                         }
                     }
-                    RainCollector(Item).MaxCollectRate = rNumericArgs(1);
-                    if (RainCollector(Item).MaxCollectRate == 0.0) RainCollector(Item).MaxCollectRate = 100000000000.0;
+                    state.dataWaterData->RainCollector(Item).MaxCollectRate = rNumericArgs(1);
+                    if (state.dataWaterData->RainCollector(Item).MaxCollectRate == 0.0)
+                        state.dataWaterData->RainCollector(Item).MaxCollectRate = 100000000000.0;
 
                     // number of surfaces is extensible and = NumAlphas - alphaOffset
                     alphaOffset = 4; // update this if more alphas inserted ahead of extensible surface listing
-                    RainCollector(Item).NumCollectSurfs = NumAlphas - alphaOffset;
-                    RainCollector(Item).SurfName.allocate(RainCollector(Item).NumCollectSurfs);
-                    RainCollector(Item).SurfID.allocate(RainCollector(Item).NumCollectSurfs);
-                    for (SurfNum = 1; SurfNum <= RainCollector(Item).NumCollectSurfs; ++SurfNum) {
-                        RainCollector(Item).SurfName(SurfNum) = cAlphaArgs(SurfNum + alphaOffset);
-                        RainCollector(Item).SurfID(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + alphaOffset), Surface);
-                        if (RainCollector(Item).SurfID(SurfNum) == 0) {
-                            ShowSevereError("Invalid " + cAlphaFieldNames(SurfNum + alphaOffset) + '=' + cAlphaArgs(SurfNum + alphaOffset));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                    state.dataWaterData->RainCollector(Item).NumCollectSurfs = NumAlphas - alphaOffset;
+                    state.dataWaterData->RainCollector(Item).SurfName.allocate(state.dataWaterData->RainCollector(Item).NumCollectSurfs);
+                    state.dataWaterData->RainCollector(Item).SurfID.allocate(state.dataWaterData->RainCollector(Item).NumCollectSurfs);
+                    for (int SurfNum = 1; SurfNum <= state.dataWaterData->RainCollector(Item).NumCollectSurfs; ++SurfNum) {
+                        state.dataWaterData->RainCollector(Item).SurfName(SurfNum) = cAlphaArgs(SurfNum + alphaOffset);
+                        state.dataWaterData->RainCollector(Item).SurfID(SurfNum) =
+                            UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + alphaOffset), state.dataSurface->Surface);
+                        if (state.dataWaterData->RainCollector(Item).SurfID(SurfNum) == 0) {
+                            ShowSevereError(state, "Invalid " + cAlphaFieldNames(SurfNum + alphaOffset) + '=' + cAlphaArgs(SurfNum + alphaOffset));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ErrorsFound = true;
                         }
                     }
 
                     // now setup horizontal surface area
-                    tmpArea = 0.0;
-                    tmpNumerator = 0.0;
-                    tmpDenominator = 0.0;
-                    for (SurfNum = 1; SurfNum <= RainCollector(Item).NumCollectSurfs; ++SurfNum) {
-                        ThisSurf = RainCollector(Item).SurfID(SurfNum);
-                        tmpArea += Surface(ThisSurf).GrossArea * Surface(ThisSurf).CosTilt;
-                        tmpNumerator += Surface(ThisSurf).Centroid.z * Surface(ThisSurf).GrossArea;
-                        tmpDenominator += Surface(ThisSurf).GrossArea;
+                    Real64 tmpArea = 0.0;
+                    Real64 tmpNumerator = 0.0;
+                    Real64 tmpDenominator = 0.0;
+                    for (int SurfNum = 1; SurfNum <= state.dataWaterData->RainCollector(Item).NumCollectSurfs; ++SurfNum) {
+                        int ThisSurf = state.dataWaterData->RainCollector(Item).SurfID(SurfNum);
+                        tmpArea += state.dataSurface->Surface(ThisSurf).GrossArea * state.dataSurface->Surface(ThisSurf).CosTilt;
+                        tmpNumerator += state.dataSurface->Surface(ThisSurf).Centroid.z * state.dataSurface->Surface(ThisSurf).GrossArea;
+                        tmpDenominator += state.dataSurface->Surface(ThisSurf).GrossArea;
                     }
-                    RainCollector(Item).HorizArea = tmpArea;
+                    state.dataWaterData->RainCollector(Item).HorizArea = tmpArea;
                     // now setup vertical hieght above ground for height dependent outdoor temps
-                    RainCollector(Item).MeanHeight = tmpNumerator / tmpDenominator;
+                    state.dataWaterData->RainCollector(Item).MeanHeight = tmpNumerator / tmpDenominator;
 
                     // now set up tank supply connection
-                    InternalSetupTankSupplyComponent(RainCollector(Item).Name,
+                    InternalSetupTankSupplyComponent(state,
+                                                     state.dataWaterData->RainCollector(Item).Name,
                                                      cCurrentModuleObject,
-                                                     RainCollector(Item).StorageTankName,
+                                                     state.dataWaterData->RainCollector(Item).StorageTankName,
                                                      ErrorsFound,
-                                                     RainCollector(Item).StorageTankID,
-                                                     RainCollector(Item).StorageTankSupplyARRID);
+                                                     state.dataWaterData->RainCollector(Item).StorageTankID,
+                                                     state.dataWaterData->RainCollector(Item).StorageTankSupplyARRID);
                 }
             } // (NumRainCollectors > 0)
 
             cCurrentModuleObject = "WaterUse:Well";
-            NumGroundWaterWells = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-            if (NumGroundWaterWells > 0) {
-                AnyWaterSystemsInModel = true;
-                GroundwaterWell.allocate(NumGroundWaterWells);
-                for (Item = 1; Item <= NumGroundWaterWells; ++Item) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
-                                                  Item,
-                                                  cAlphaArgs,
-                                                  NumAlphas,
-                                                  rNumericArgs,
-                                                  NumNumbers,
-                                                  IOStatus,
-                                                  _,
-                                                  lAlphaFieldBlanks,
-                                                  cAlphaFieldNames,
-                                                  cNumericFieldNames);
-                    GroundwaterWell(Item).Name = cAlphaArgs(1);
-                    UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            state.dataWaterData->NumGroundWaterWells = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            if (state.dataWaterData->NumGroundWaterWells > 0) {
+                state.dataWaterData->AnyWaterSystemsInModel = true;
+                state.dataWaterData->GroundwaterWell.allocate(state.dataWaterData->NumGroundWaterWells);
+                for (Item = 1; Item <= state.dataWaterData->NumGroundWaterWells; ++Item) {
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                             cCurrentModuleObject,
+                                                                             Item,
+                                                                             cAlphaArgs,
+                                                                             NumAlphas,
+                                                                             rNumericArgs,
+                                                                             NumNumbers,
+                                                                             IOStatus,
+                                                                             _,
+                                                                             lAlphaFieldBlanks,
+                                                                             cAlphaFieldNames,
+                                                                             cNumericFieldNames);
+                    state.dataWaterData->GroundwaterWell(Item).Name = cAlphaArgs(1);
+                    UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                     objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs(1);
-                    GroundwaterWell(Item).StorageTankName = cAlphaArgs(2);
+                    state.dataWaterData->GroundwaterWell(Item).StorageTankName = cAlphaArgs(2);
 
-                    InternalSetupTankSupplyComponent(GroundwaterWell(Item).Name,
+                    InternalSetupTankSupplyComponent(state,
+                                                     state.dataWaterData->GroundwaterWell(Item).Name,
                                                      cCurrentModuleObject,
-                                                     GroundwaterWell(Item).StorageTankName,
+                                                     state.dataWaterData->GroundwaterWell(Item).StorageTankName,
                                                      ErrorsFound,
-                                                     GroundwaterWell(Item).StorageTankID,
-                                                     GroundwaterWell(Item).StorageTankSupplyARRID);
+                                                     state.dataWaterData->GroundwaterWell(Item).StorageTankID,
+                                                     state.dataWaterData->GroundwaterWell(Item).StorageTankSupplyARRID);
 
-                    if (allocated(WaterStorage)) WaterStorage(GroundwaterWell(Item).StorageTankID).GroundWellID = Item;
+                    if (allocated(state.dataWaterData->WaterStorage))
+                        state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(Item).StorageTankID).GroundWellID = Item;
 
-                    GroundwaterWell(Item).PumpDepth = rNumericArgs(1);
-                    GroundwaterWell(Item).PumpNomVolFlowRate = rNumericArgs(2);
-                    GroundwaterWell(Item).PumpNomHead = rNumericArgs(3);
-                    GroundwaterWell(Item).PumpNomPowerUse = rNumericArgs(4);
-                    GroundwaterWell(Item).PumpEfficiency = rNumericArgs(5);
-                    GroundwaterWell(Item).WellRecoveryRate = rNumericArgs(6);
-                    GroundwaterWell(Item).NomWellStorageVol = rNumericArgs(7);
+                    state.dataWaterData->GroundwaterWell(Item).PumpDepth = rNumericArgs(1);
+                    state.dataWaterData->GroundwaterWell(Item).PumpNomVolFlowRate = rNumericArgs(2);
+                    state.dataWaterData->GroundwaterWell(Item).PumpNomHead = rNumericArgs(3);
+                    state.dataWaterData->GroundwaterWell(Item).PumpNomPowerUse = rNumericArgs(4);
+                    state.dataWaterData->GroundwaterWell(Item).PumpEfficiency = rNumericArgs(5);
+                    state.dataWaterData->GroundwaterWell(Item).WellRecoveryRate = rNumericArgs(6);
+                    state.dataWaterData->GroundwaterWell(Item).NomWellStorageVol = rNumericArgs(7);
                     if (UtilityRoutines::SameString(cAlphaArgs(3), "Constant")) {
-                        GroundwaterWell(Item).GroundwaterTableMode = ConstantWaterTable;
+                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = DataWater::GroundWaterTable::ConstantWaterTable;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(3), "Scheduled")) {
-                        GroundwaterWell(Item).GroundwaterTableMode = ScheduledWaterTable;
+                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = DataWater::GroundWaterTable::ScheduledWaterTable;
                     } else if (lAlphaFieldBlanks(3)) {
-                        GroundwaterWell(Item).GroundwaterTableMode = 0;
+                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = DataWater::GroundWaterTable::Unassigned;
                     } else {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
                     }
 
                     //  N8, \field water table depth
-                    GroundwaterWell(Item).WaterTableDepth = rNumericArgs(8);
+                    state.dataWaterData->GroundwaterWell(Item).WaterTableDepth = rNumericArgs(8);
                     // A4; \field water table depth schedule
-                    GroundwaterWell(Item).WaterTableDepthSchedID = GetScheduleIndex(cAlphaArgs(4));
-                    if ((GroundwaterWell(Item).GroundwaterTableMode == ScheduledWaterTable) && (GroundwaterWell(Item).WaterTableDepthSchedID == 0)) {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                    state.dataWaterData->GroundwaterWell(Item).WaterTableDepthSchedID = GetScheduleIndex(state, cAlphaArgs(4));
+                    if ((state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode == DataWater::GroundWaterTable::ScheduledWaterTable) &&
+                        (state.dataWaterData->GroundwaterWell(Item).WaterTableDepthSchedID == 0)) {
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
@@ -641,139 +562,160 @@ namespace WaterManager {
 
             // do some water tank setup
             cCurrentModuleObject = "WaterUse:Storage";
-            if (NumWaterStorageTanks > 0) {
-                for (Item = 1; Item <= NumWaterStorageTanks; ++Item) {
+            if (state.dataWaterData->NumWaterStorageTanks > 0) {
+                for (Item = 1; Item <= state.dataWaterData->NumWaterStorageTanks; ++Item) {
                     // check that all storage tanks with ground well controls actually had wells pointing to them
-                    if ((WaterStorage(Item).ControlSupplyType == WellFloatValve) || (WaterStorage(Item).ControlSupplyType == WellFloatMainsBackup)) {
-                        if (WaterStorage(Item).GroundWellID == 0) {
-                            ShowSevereError(cCurrentModuleObject + "= \"" + WaterStorage(Item).Name +
-                                            "\" does not have a WaterUse:Well (groundwater well) that names it.");
+                    if ((state.dataWaterData->WaterStorage(Item).ControlSupply == DataWater::ControlSupplyType::WellFloatValve) ||
+                        (state.dataWaterData->WaterStorage(Item).ControlSupply == DataWater::ControlSupplyType::WellFloatMainsBackup)) {
+                        if (state.dataWaterData->WaterStorage(Item).GroundWellID == 0) {
+                            ShowSevereError(state,
+                                            cCurrentModuleObject + "= \"" + state.dataWaterData->WaterStorage(Item).Name +
+                                                "\" does not have a WaterUse:Well (groundwater well) that names it.");
                             ErrorsFound = true;
                         }
                     }
 
                     // setup tanks whose level is controlled by supply from another tank
-                    if ((WaterStorage(Item).ControlSupplyType == OtherTankFloatValve) || (WaterStorage(Item).ControlSupplyType == TankMainsBackup)) {
-                        WaterStorage(Item).SupplyTankID = UtilityRoutines::FindItemInList(WaterStorage(Item).SupplyTankName, WaterStorage);
-                        if (WaterStorage(Item).SupplyTankID == 0) {
-                            ShowSevereError("Other tank called " + WaterStorage(Item).SupplyTankName + " not found for " + cCurrentModuleObject +
-                                            " Named " + WaterStorage(Item).Name); // TODO rename point
+                    if ((state.dataWaterData->WaterStorage(Item).ControlSupply == DataWater::ControlSupplyType::OtherTankFloatValve) ||
+                        (state.dataWaterData->WaterStorage(Item).ControlSupply == DataWater::ControlSupplyType::TankMainsBackup)) {
+                        state.dataWaterData->WaterStorage(Item).SupplyTankID = UtilityRoutines::FindItemInList(
+                            state.dataWaterData->WaterStorage(Item).SupplyTankName, state.dataWaterData->WaterStorage);
+                        if (state.dataWaterData->WaterStorage(Item).SupplyTankID == 0) {
+                            ShowSevereError(state,
+                                            "Other tank called " + state.dataWaterData->WaterStorage(Item).SupplyTankName + " not found for " +
+                                                cCurrentModuleObject + " Named " + state.dataWaterData->WaterStorage(Item).Name); // TODO rename point
                             ErrorsFound = true;
                         }
-                        InternalSetupTankDemandComponent(WaterStorage(Item).Name,
+                        InternalSetupTankDemandComponent(state,
+                                                         state.dataWaterData->WaterStorage(Item).Name,
                                                          cCurrentModuleObject,
-                                                         WaterStorage(Item).SupplyTankName,
+                                                         state.dataWaterData->WaterStorage(Item).SupplyTankName,
                                                          ErrorsFound,
-                                                         WaterStorage(Item).SupplyTankID,
-                                                         WaterStorage(Item).SupplyTankDemandARRID);
+                                                         state.dataWaterData->WaterStorage(Item).SupplyTankID,
+                                                         state.dataWaterData->WaterStorage(Item).SupplyTankDemandARRID);
                         // call to setup tank supply as well
-                        InternalSetupTankSupplyComponent(
-                            WaterStorage(Item).SupplyTankName, cCurrentModuleObject, WaterStorage(Item).Name, ErrorsFound, Dummy, Dummy);
+                        InternalSetupTankSupplyComponent(state,
+                                                         state.dataWaterData->WaterStorage(Item).SupplyTankName,
+                                                         cCurrentModuleObject,
+                                                         state.dataWaterData->WaterStorage(Item).Name,
+                                                         ErrorsFound,
+                                                         Dummy,
+                                                         Dummy);
                     }
                     // setup overflow inputs
-                    WaterStorage(Item).OverflowTankID = UtilityRoutines::FindItemInList(WaterStorage(Item).OverflowTankName, WaterStorage);
-                    if (WaterStorage(Item).OverflowTankID == 0) {
+                    state.dataWaterData->WaterStorage(Item).OverflowTankID =
+                        UtilityRoutines::FindItemInList(state.dataWaterData->WaterStorage(Item).OverflowTankName, state.dataWaterData->WaterStorage);
+                    if (state.dataWaterData->WaterStorage(Item).OverflowTankID == 0) {
                         // if blank, then okay it is discarded.  but if not blank then error
-                        if (is_blank(WaterStorage(Item).OverflowTankName)) {
-                            WaterStorage(Item).OverflowMode = OverflowDiscarded;
+                        if (is_blank(state.dataWaterData->WaterStorage(Item).OverflowTankName)) {
+                            state.dataWaterData->WaterStorage(Item).OverflowMode = DataWater::Overflow::Discarded;
                         } else {
-                            ShowSevereError("Overflow tank name of " + WaterStorage(Item).OverflowTankName + " not found for " +
-                                            cCurrentModuleObject + " Named " + WaterStorage(Item).Name);
+                            ShowSevereError(state,
+                                            "Overflow tank name of " + state.dataWaterData->WaterStorage(Item).OverflowTankName + " not found for " +
+                                                cCurrentModuleObject + " Named " + state.dataWaterData->WaterStorage(Item).Name);
                             ErrorsFound = true;
                         }
                     } else {
-                        WaterStorage(Item).OverflowMode = OverflowToTank;
+                        state.dataWaterData->WaterStorage(Item).OverflowMode = DataWater::Overflow::ToTank;
                     }
-                    if (WaterStorage(Item).OverflowMode == OverflowToTank) {
-                        InternalSetupTankSupplyComponent(WaterStorage(Item).Name,
+                    if (state.dataWaterData->WaterStorage(Item).OverflowMode == DataWater::Overflow::ToTank) {
+                        InternalSetupTankSupplyComponent(state,
+                                                         state.dataWaterData->WaterStorage(Item).Name,
                                                          cCurrentModuleObject,
-                                                         WaterStorage(Item).OverflowTankName,
+                                                         state.dataWaterData->WaterStorage(Item).OverflowTankName,
                                                          ErrorsFound,
-                                                         WaterStorage(Item).OverflowTankID,
-                                                         WaterStorage(Item).OverflowTankSupplyARRID);
+                                                         state.dataWaterData->WaterStorage(Item).OverflowTankID,
+                                                         state.dataWaterData->WaterStorage(Item).OverflowTankSupplyARRID);
                     }
                 }
             }
 
             cCurrentModuleObject = "Site:Precipitation";
-            NumSiteRainFall = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-            if (NumSiteRainFall > 1) { // throw error
-                ShowSevereError("Only one " + cCurrentModuleObject + " object is allowed");
+            state.dataWaterData->NumSiteRainFall = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            if (state.dataWaterData->NumSiteRainFall > 1) { // throw error
+                ShowSevereError(state, "Only one " + cCurrentModuleObject + " object is allowed");
                 ErrorsFound = true;
             }
 
-            if (NumSiteRainFall == 1) {
-                AnyWaterSystemsInModel = true;
-                inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+            if (state.dataWaterData->NumSiteRainFall == 1) {
+                state.dataWaterData->AnyWaterSystemsInModel = true;
+                state.dataInputProcessing->inputProcessor->getObjectItem(
+                    state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
 
                 if (UtilityRoutines::SameString(cAlphaArgs(1), "ScheduleAndDesignLevel")) {
-                    RainFall.ModeID = RainSchedDesign;
+                    state.dataWaterData->RainFall.ModeID = DataWater::RainfallMode::RainSchedDesign;
                 } else {
-                    ShowSevereError("Precipitation Model Type of " + cCurrentModuleObject + " is incorrect.");
-                    ShowContinueError("Only available option is ScheduleAndDesignLevel.");
+                    ShowSevereError(state, "Precipitation Model Type of " + cCurrentModuleObject + " is incorrect.");
+                    ShowContinueError(state, "Only available option is ScheduleAndDesignLevel.");
                     ErrorsFound = true;
                 }
-                RainFall.RainSchedID = GetScheduleIndex(cAlphaArgs(2));
-                if ((RainFall.RainSchedID == 0) && (RainFall.ModeID == RainSchedDesign)) {
-                    ShowSevereError("Schedule not found for " + cCurrentModuleObject + " object");
+                state.dataWaterData->RainFall.RainSchedID = GetScheduleIndex(state, cAlphaArgs(2));
+                if ((state.dataWaterData->RainFall.RainSchedID == 0) &&
+                    (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign)) {
+                    ShowSevereError(state, "Schedule not found for " + cCurrentModuleObject + " object");
                     ErrorsFound = true;
-                } else if ((RainFall.RainSchedID != 0) && (RainFall.ModeID == RainSchedDesign)) {
-                    if (!CheckScheduleValueMinMax(RainFall.RainSchedID, ">=", 0.0)) {
-                        ShowSevereError("Schedule=" + cAlphaArgs(2) + " for " + cCurrentModuleObject + " object has values < 0.");
+                } else if ((state.dataWaterData->RainFall.RainSchedID != 0) &&
+                           (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign)) {
+                    if (!CheckScheduleValueMinMax(state, state.dataWaterData->RainFall.RainSchedID, ">=", 0.0)) {
+                        ShowSevereError(state, "Schedule=" + cAlphaArgs(2) + " for " + cCurrentModuleObject + " object has values < 0.");
                         ErrorsFound = true;
                     }
                 }
 
-                RainFall.DesignAnnualRain = rNumericArgs(1);
-                RainFall.NomAnnualRain = rNumericArgs(2);
+                state.dataWaterData->RainFall.DesignAnnualRain = rNumericArgs(1);
+                state.dataWaterData->RainFall.NomAnnualRain = rNumericArgs(2);
             }
 
             cCurrentModuleObject = "RoofIrrigation";
-            NumIrrigation = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumIrrigation = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             if (NumIrrigation > 1) {
-                ShowSevereError("Only one " + cCurrentModuleObject + " object is allowed");
+                ShowSevereError(state, "Only one " + cCurrentModuleObject + " object is allowed");
                 ErrorsFound = true;
             }
 
             if (NumIrrigation == 1) {
-                AnyIrrigationInModel = true;
-                inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+                state.dataWaterData->AnyIrrigationInModel = true;
+                state.dataInputProcessing->inputProcessor->getObjectItem(
+                    state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
                 if (UtilityRoutines::SameString(cAlphaArgs(1), "Schedule")) {
-                    Irrigation.ModeID = IrrSchedDesign;
+                    state.dataWaterData->Irrigation.ModeID = DataWater::RainfallMode::IrrSchedDesign;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(1), "SmartSchedule")) {
-                    Irrigation.ModeID = IrrSmartSched;
+                    state.dataWaterData->Irrigation.ModeID = DataWater::RainfallMode::IrrSmartSched;
                 } else {
-                    ShowSevereError("Type of " + cCurrentModuleObject + " is incorrect. Options are Schedule or SmartSchedule");
+                    ShowSevereError(state, "Type of " + cCurrentModuleObject + " is incorrect. Options are Schedule or SmartSchedule");
                     ErrorsFound = true;
                 }
-                Irrigation.IrrSchedID = GetScheduleIndex(cAlphaArgs(2));
-                if ((Irrigation.IrrSchedID == 0) && ((Irrigation.ModeID == IrrSchedDesign) || Irrigation.ModeID == IrrSmartSched)) {
-                    ShowSevereError("Schedule not found for " + cCurrentModuleObject + " object");
+                state.dataWaterData->Irrigation.IrrSchedID = GetScheduleIndex(state, cAlphaArgs(2));
+                if ((state.dataWaterData->Irrigation.IrrSchedID == 0) &&
+                    ((state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSchedDesign) ||
+                     state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSmartSched)) {
+                    ShowSevereError(state, "Schedule not found for " + cCurrentModuleObject + " object");
                     ErrorsFound = true;
-                } else if ((Irrigation.IrrSchedID == 0) && (Irrigation.ModeID == IrrSchedDesign)) {
-                    if (!CheckScheduleValueMinMax(Irrigation.IrrSchedID, ">=", 0.0)) {
-                        ShowSevereError("Schedule=" + cAlphaArgs(2) + " for " + cCurrentModuleObject + " object has values < 0.");
+                } else if ((state.dataWaterData->Irrigation.IrrSchedID == 0) &&
+                           (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSchedDesign)) {
+                    if (!CheckScheduleValueMinMax(state, state.dataWaterData->Irrigation.IrrSchedID, ">=", 0.0)) {
+                        ShowSevereError(state, "Schedule=" + cAlphaArgs(2) + " for " + cCurrentModuleObject + " object has values < 0.");
                         ErrorsFound = true;
                     }
                 }
 
                 // If we later add a designannualirrigation and a nominalannualirrigation variable (for scaling) those
                 // would be assigned here... as with the Rainfall...
-                Irrigation.IrrigationThreshold = 0.4;
-                if (Irrigation.ModeID == IrrSmartSched && NumNumbers > 0) {
+                state.dataWaterData->Irrigation.IrrigationThreshold = 0.4;
+                if (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSmartSched && NumNumbers > 0) {
                     if (rNumericArgs(1) > 100.0 || rNumericArgs(1) < 0.0) {
-                        ShowSevereError("Irrigation threshold for " + cCurrentModuleObject + " object has values > 100 or < 0.");
+                        ShowSevereError(state, "Irrigation threshold for " + cCurrentModuleObject + " object has values > 100 or < 0.");
                         ErrorsFound = true;
                     } else {
-                        Irrigation.IrrigationThreshold = rNumericArgs(1) / 100.0;
+                        state.dataWaterData->Irrigation.IrrigationThreshold = rNumericArgs(1) / 100.0;
                     }
                 }
 
             } // NumIrrigation ==1
 
-            AnyWaterSystemsInModel = true;
-            WaterSystemGetInputCalled = true;
-            MyOneTimeFlag = false;
+            state.dataWaterData->AnyWaterSystemsInModel = true;
+            state.dataWaterData->WaterSystemGetInputCalled = true;
+            state.dataWaterManager->MyOneTimeFlag = false;
 
             cAlphaFieldNames.deallocate();
             cAlphaArgs.deallocate();
@@ -783,126 +725,147 @@ namespace WaterManager {
             lNumericFieldBlanks.deallocate();
 
             if (ErrorsFound) {
-                ShowFatalError("Errors found in processing input for water manager objects");
+                ShowFatalError(state, "Errors found in processing input for water manager objects");
             }
             // <SetupOutputVariables here...>, CurrentModuleObject='WaterUse:Storage'
-            for (Item = 1; Item <= NumWaterStorageTanks; ++Item) {
+            for (Item = 1; Item <= state.dataWaterData->NumWaterStorageTanks; ++Item) {
                 // this next one is a measure of the state of water in the tank, not a flux of m3 that needs to be summed
-                SetupOutputVariable("Water System Storage Tank Volume",
+                SetupOutputVariable(state,
+                                    "Water System Storage Tank Volume",
                                     OutputProcessor::Unit::m3,
-                                    WaterStorage(Item).ThisTimeStepVolume,
+                                    state.dataWaterData->WaterStorage(Item).ThisTimeStepVolume,
                                     "System",
                                     "Average",
-                                    WaterStorage(Item).Name);
-                SetupOutputVariable("Water System Storage Tank Net Volume Flow Rate",
+                                    state.dataWaterData->WaterStorage(Item).Name);
+                SetupOutputVariable(state,
+                                    "Water System Storage Tank Net Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    WaterStorage(Item).NetVdot,
+                                    state.dataWaterData->WaterStorage(Item).NetVdot,
                                     "System",
                                     "Average",
-                                    WaterStorage(Item).Name);
-                SetupOutputVariable("Water System Storage Tank Inlet Volume Flow Rate",
+                                    state.dataWaterData->WaterStorage(Item).Name);
+                SetupOutputVariable(state,
+                                    "Water System Storage Tank Inlet Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    WaterStorage(Item).VdotToTank,
+                                    state.dataWaterData->WaterStorage(Item).VdotToTank,
                                     "System",
                                     "Average",
-                                    WaterStorage(Item).Name);
-                SetupOutputVariable("Water System Storage Tank Outlet Volume Flow Rate",
+                                    state.dataWaterData->WaterStorage(Item).Name);
+                SetupOutputVariable(state,
+                                    "Water System Storage Tank Outlet Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    WaterStorage(Item).VdotFromTank,
+                                    state.dataWaterData->WaterStorage(Item).VdotFromTank,
                                     "System",
                                     "Average",
-                                    WaterStorage(Item).Name);
-                SetupOutputVariable("Water System Storage Tank Mains Water Volume",
+                                    state.dataWaterData->WaterStorage(Item).Name);
+                SetupOutputVariable(state,
+                                    "Water System Storage Tank Mains Water Volume",
                                     OutputProcessor::Unit::m3,
-                                    WaterStorage(Item).MainsDrawVol,
+                                    state.dataWaterData->WaterStorage(Item).MainsDrawVol,
                                     "System",
                                     "Sum",
-                                    WaterStorage(Item).Name,
+                                    state.dataWaterData->WaterStorage(Item).Name,
                                     _,
                                     "MainsWater",
                                     "WaterSystem",
-                                    WaterStorage(Item).QualitySubCategoryName,
+                                    state.dataWaterData->WaterStorage(Item).QualitySubCategoryName,
                                     "System");
-                SetupOutputVariable("Water System Storage Tank Mains Water Volume Flow Rate",
+                SetupOutputVariable(state,
+                                    "Water System Storage Tank Mains Water Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    WaterStorage(Item).MainsDrawVdot,
+                                    state.dataWaterData->WaterStorage(Item).MainsDrawVdot,
                                     "System",
                                     "Average",
-                                    WaterStorage(Item).Name);
-                SetupOutputVariable("Water System Storage Tank Water Temperature",
+                                    state.dataWaterData->WaterStorage(Item).Name);
+                SetupOutputVariable(state,
+                                    "Water System Storage Tank Water Temperature",
                                     OutputProcessor::Unit::C,
-                                    WaterStorage(Item).Twater,
+                                    state.dataWaterData->WaterStorage(Item).Twater,
                                     "System",
                                     "Average",
-                                    WaterStorage(Item).Name);
-                SetupOutputVariable("Water System Storage Tank Overflow Volume Flow Rate",
+                                    state.dataWaterData->WaterStorage(Item).Name);
+                SetupOutputVariable(state,
+                                    "Water System Storage Tank Overflow Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    WaterStorage(Item).VdotOverflow,
+                                    state.dataWaterData->WaterStorage(Item).VdotOverflow,
                                     "System",
                                     "Average",
-                                    WaterStorage(Item).Name);
-                if (WaterStorage(Item).OverflowMode == OverflowDiscarded) {
-                    SetupOutputVariable("Water System Storage Tank Overflow Water Volume",
+                                    state.dataWaterData->WaterStorage(Item).Name);
+                if (state.dataWaterData->WaterStorage(Item).OverflowMode == DataWater::Overflow::Discarded) {
+                    SetupOutputVariable(state,
+                                        "Water System Storage Tank Overflow Water Volume",
                                         OutputProcessor::Unit::m3,
-                                        WaterStorage(Item).VolOverflow,
+                                        state.dataWaterData->WaterStorage(Item).VolOverflow,
                                         "System",
                                         "Sum",
-                                        WaterStorage(Item).Name);
-                    //     ResourceTypeKey='Water',  &
-                    //     EndUseKey='WaterSystems', &
-                    //     EndUseSubkey=WaterStorage(item)%QualitySubCategoryName ,&
-                    //     GroupKey='System')
+                                        state.dataWaterData->WaterStorage(Item).Name);
                 } else {
-                    SetupOutputVariable("Water System Storage Tank Overflow Water Volume",
+                    SetupOutputVariable(state,
+                                        "Water System Storage Tank Overflow Water Volume",
                                         OutputProcessor::Unit::m3,
-                                        WaterStorage(Item).VolOverflow,
+                                        state.dataWaterData->WaterStorage(Item).VolOverflow,
                                         "System",
                                         "Sum",
-                                        WaterStorage(Item).Name);
+                                        state.dataWaterData->WaterStorage(Item).Name);
                 }
-                SetupOutputVariable("Water System Storage Tank Overflow Temperature",
+                SetupOutputVariable(state,
+                                    "Water System Storage Tank Overflow Temperature",
                                     OutputProcessor::Unit::C,
-                                    WaterStorage(Item).TwaterOverflow,
+                                    state.dataWaterData->WaterStorage(Item).TwaterOverflow,
                                     "System",
                                     "Average",
-                                    WaterStorage(Item).Name);
+                                    state.dataWaterData->WaterStorage(Item).Name);
             }
 
-            if (NumSiteRainFall == 1) { // CurrentModuleObject='Site:Precipitation'
-                SetupOutputVariable(
-                    "Site Precipitation Rate", OutputProcessor::Unit::m_s, RainFall.CurrentRate, "System", "Average", "Site:Precipitation");
-                SetupOutputVariable(
-                    "Site Precipitation Depth", OutputProcessor::Unit::m, RainFall.CurrentAmount, "System", "Sum", "Site:Precipitation");
+            if (state.dataWaterData->NumSiteRainFall == 1) { // CurrentModuleObject='Site:Precipitation'
+                SetupOutputVariable(state,
+                                    "Site Precipitation Rate",
+                                    OutputProcessor::Unit::m_s,
+                                    state.dataWaterData->RainFall.CurrentRate,
+                                    "System",
+                                    "Average",
+                                    "Site:Precipitation");
+                SetupOutputVariable(state,
+                                    "Site Precipitation Depth",
+                                    OutputProcessor::Unit::m,
+                                    state.dataWaterData->RainFall.CurrentAmount,
+                                    "System",
+                                    "Sum",
+                                    "Site:Precipitation");
             }
 
             if (NumIrrigation == 1) { // CurrentModuleObject='RoofIrrigation'
-                SetupOutputVariable("Water System Roof Irrigation Scheduled Depth",
+                SetupOutputVariable(state,
+                                    "Water System Roof Irrigation Scheduled Depth",
                                     OutputProcessor::Unit::m,
-                                    Irrigation.ScheduledAmount,
+                                    state.dataWaterData->Irrigation.ScheduledAmount,
                                     "System",
                                     "Sum",
                                     "RoofIrrigation");
-                SetupOutputVariable("Water System Roof Irrigation Actual Depth",
+                SetupOutputVariable(state,
+                                    "Water System Roof Irrigation Actual Depth",
                                     OutputProcessor::Unit::m,
-                                    Irrigation.ActualAmount,
+                                    state.dataWaterData->Irrigation.ActualAmount,
                                     "System",
                                     "Sum",
                                     "RoofIrrigation");
             }
 
-            for (Item = 1; Item <= NumRainCollectors; ++Item) { // CurrentModuleObject='WaterUse:RainCollector'
-                SetupOutputVariable("Water System Rainwater Collector Volume Flow Rate",
+            for (Item = 1; Item <= state.dataWaterData->NumRainCollectors; ++Item) { // CurrentModuleObject='WaterUse:RainCollector'
+                SetupOutputVariable(state,
+                                    "Water System Rainwater Collector Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    RainCollector(Item).VdotAvail,
+                                    state.dataWaterData->RainCollector(Item).VdotAvail,
                                     "System",
                                     "Average",
-                                    RainCollector(Item).Name);
-                SetupOutputVariable("Water System Rainwater Collector Volume",
+                                    state.dataWaterData->RainCollector(Item).Name);
+                SetupOutputVariable(state,
+                                    "Water System Rainwater Collector Volume",
                                     OutputProcessor::Unit::m3,
-                                    RainCollector(Item).VolCollected,
+                                    state.dataWaterData->RainCollector(Item).VolCollected,
                                     "System",
                                     "Sum",
-                                    RainCollector(Item).Name,
+                                    state.dataWaterData->RainCollector(Item).Name,
                                     _,
                                     "OnSiteWater",
                                     "Rainwater",
@@ -910,42 +873,47 @@ namespace WaterManager {
                                     "System");
             }
 
-            for (Item = 1; Item <= NumGroundWaterWells; ++Item) { // CurrentModuleObject='WaterUse:Well'
-                SetupOutputVariable("Water System Groundwater Well Requested Volume Flow Rate",
+            for (Item = 1; Item <= state.dataWaterData->NumGroundWaterWells; ++Item) { // CurrentModuleObject='WaterUse:Well'
+                SetupOutputVariable(state,
+                                    "Water System Groundwater Well Requested Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    GroundwaterWell(Item).VdotRequest,
+                                    state.dataWaterData->GroundwaterWell(Item).VdotRequest,
                                     "System",
                                     "Average",
-                                    GroundwaterWell(Item).Name);
-                SetupOutputVariable("Water System Groundwater Well Volume Flow Rate",
+                                    state.dataWaterData->GroundwaterWell(Item).Name);
+                SetupOutputVariable(state,
+                                    "Water System Groundwater Well Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    GroundwaterWell(Item).VdotDelivered,
+                                    state.dataWaterData->GroundwaterWell(Item).VdotDelivered,
                                     "System",
                                     "Average",
-                                    GroundwaterWell(Item).Name);
-                SetupOutputVariable("Water System Groundwater Well Volume",
+                                    state.dataWaterData->GroundwaterWell(Item).Name);
+                SetupOutputVariable(state,
+                                    "Water System Groundwater Well Volume",
                                     OutputProcessor::Unit::m3,
-                                    GroundwaterWell(Item).VolDelivered,
+                                    state.dataWaterData->GroundwaterWell(Item).VolDelivered,
                                     "System",
                                     "Sum",
-                                    GroundwaterWell(Item).Name,
+                                    state.dataWaterData->GroundwaterWell(Item).Name,
                                     _,
                                     "OnSiteWater",
                                     "Wellwater",
                                     _,
                                     "System");
-                SetupOutputVariable("Water System Groundwater Well Pump Electric Power",
+                SetupOutputVariable(state,
+                                    "Water System Groundwater Well Pump Electricity Rate",
                                     OutputProcessor::Unit::W,
-                                    GroundwaterWell(Item).PumpPower,
+                                    state.dataWaterData->GroundwaterWell(Item).PumpPower,
                                     "System",
                                     "Average",
-                                    GroundwaterWell(Item).Name);
-                SetupOutputVariable("Water System Groundwater Well Pump Electric Energy",
+                                    state.dataWaterData->GroundwaterWell(Item).Name);
+                SetupOutputVariable(state,
+                                    "Water System Groundwater Well Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
-                                    GroundwaterWell(Item).PumpEnergy,
+                                    state.dataWaterData->GroundwaterWell(Item).PumpEnergy,
                                     "System",
                                     "Sum",
-                                    GroundwaterWell(Item).Name,
+                                    state.dataWaterData->GroundwaterWell(Item).Name,
                                     _,
                                     "Electricity",
                                     "WaterSystems",
@@ -956,7 +924,7 @@ namespace WaterManager {
         } // my one time flag block
     }
 
-    void UpdatePrecipitation()
+    void UpdatePrecipitation(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -968,45 +936,25 @@ namespace WaterManager {
         // PURPOSE OF THIS SUBROUTINE:
         // update the current rate of precipitation
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
-        using DataGlobals::SecInHour;
-        using DataHVACGlobals::TimeStepSys;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 schedRate;
         Real64 ScaleFactor;
 
-        if (RainFall.ModeID == RainSchedDesign) {
-            schedRate = GetCurrentScheduleValue(RainFall.RainSchedID); // m/hr
-            ScaleFactor = RainFall.DesignAnnualRain / RainFall.NomAnnualRain;
-            RainFall.CurrentRate = schedRate * ScaleFactor / SecInHour; // convert to m/s
-            RainFall.CurrentAmount = RainFall.CurrentRate * (TimeStepSys * SecInHour);
+        if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign) {
+            schedRate = GetCurrentScheduleValue(state, state.dataWaterData->RainFall.RainSchedID); // m/hr
+            if (state.dataWaterData->RainFall.NomAnnualRain > 0.0) {
+                ScaleFactor = state.dataWaterData->RainFall.DesignAnnualRain / state.dataWaterData->RainFall.NomAnnualRain;
+            } else {
+                ScaleFactor = 0.0;
+            }
+            state.dataWaterData->RainFall.CurrentRate = schedRate * ScaleFactor / DataGlobalConstants::SecInHour; // convert to m/s
+            state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour);
         }
     }
 
-    void UpdateIrrigation()
+    void UpdateIrrigation(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1018,86 +966,26 @@ namespace WaterManager {
         // PURPOSE OF THIS SUBROUTINE:
         // update the current rate of irrigation
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
-        using DataGlobals::SecInHour;
-        using DataHVACGlobals::TimeStepSys;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 schedRate;
-        // REAL(r64)  :: ScaleFactor
 
-        Irrigation.ScheduledAmount = 0.0;
+        state.dataWaterData->Irrigation.ScheduledAmount = 0.0;
 
-        if (Irrigation.ModeID == IrrSchedDesign) {
-            schedRate = GetCurrentScheduleValue(Irrigation.IrrSchedID);                     // m/hr
-            Irrigation.ScheduledAmount = schedRate * (TimeStepSys * SecInHour) / SecInHour; // convert to m/timestep
+        if (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSchedDesign) {
+            schedRate = GetCurrentScheduleValue(state, state.dataWaterData->Irrigation.IrrSchedID); // m/hr
+            state.dataWaterData->Irrigation.ScheduledAmount =
+                schedRate * (TimeStepSys * DataGlobalConstants::SecInHour) / DataGlobalConstants::SecInHour; // convert to m/timestep
 
-        } else if (Irrigation.ModeID == IrrSmartSched) {
-            schedRate = GetCurrentScheduleValue(Irrigation.IrrSchedID);                     // m/hr
-            Irrigation.ScheduledAmount = schedRate * (TimeStepSys * SecInHour) / SecInHour; // convert to m/timestep
+        } else if (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSmartSched) {
+            schedRate = GetCurrentScheduleValue(state, state.dataWaterData->Irrigation.IrrSchedID); // m/hr
+            state.dataWaterData->Irrigation.ScheduledAmount =
+                schedRate * (TimeStepSys * DataGlobalConstants::SecInHour) / DataGlobalConstants::SecInHour; // convert to m/timestep
         }
     }
 
-    void SizeWaterManager()
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   August 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-    }
-
-    void CalcWaterStorageTank(int const TankNum) // Index of storage tank
+    void CalcWaterStorageTank(EnergyPlusData &state, int const TankNum) // Index of storage tank
     {
 
         // SUBROUTINE INFORMATION:
@@ -1110,190 +998,188 @@ namespace WaterManager {
         // Collect the calculations used to update the modeled values
         // for the storage tanks at each system timestep
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataGlobals::BeginTimeStepFlag;
-        using DataGlobals::SecInHour;
-        using DataHVACGlobals::TimeStepSys;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // see DataWater.cc
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 OrigVdotDemandRequest(0.0);
-        static Real64 TotVdotDemandAvail(0.0);
-        static Real64 OrigVolDemandRequest(0.0);
-        static Real64 TotVolDemandAvail(0.0);
-        static Real64 OrigVdotSupplyAvail(0.0);
-        static Real64 TotVdotSupplyAvail(0.0);
-        static Real64 TotVolSupplyAvail(0.0);
-        //  REAL(r64)    :: TotVolSupplyAllow = 0.0d0
-        static Real64 overflowVdot(0.0);
-        static Real64 overflowVol(0.0);
-        static Real64 overflowTwater(0.0);
-        static Real64 NetVdotAdd(0.0);
-        static Real64 NetVolAdd(0.0);
-        static Real64 FillVolRequest(0.0);
-        static Real64 TotVolAllowed(0.0);
-        static Real64 AvailVolume(0.0);
-        static Real64 underflowVdot(0.0);
-        static Real64 VolumePredict(0.0);
-        static Real64 OverFillVolume(0.0);
+        Real64 OrigVdotDemandRequest(0.0);
+        Real64 TotVdotDemandAvail(0.0);
+        Real64 OrigVolDemandRequest(0.0);
+        Real64 TotVolDemandAvail(0.0);
+        Real64 OrigVdotSupplyAvail(0.0);
+        Real64 TotVdotSupplyAvail(0.0);
+        Real64 TotVolSupplyAvail(0.0);
+        Real64 overflowVdot(0.0);
+        Real64 overflowVol(0.0);
+        Real64 NetVdotAdd(0.0);
+        Real64 NetVolAdd(0.0);
+        Real64 FillVolRequest(0.0);
+        Real64 TotVolAllowed(0.0);
+        Real64 underflowVdot(0.0);
+        Real64 VolumePredict(0.0);
 
-        if (BeginTimeStepFlag) {
+        if (state.dataGlobal->BeginTimeStepFlag) {
             // initializations are done in UpdateWaterManager
         }
 
         overflowVdot = 0.0;
-        if (WaterStorage(TankNum).NumWaterSupplies > 0) {
-            OrigVdotSupplyAvail = sum(WaterStorage(TankNum).VdotAvailSupply);
+        if (state.dataWaterData->WaterStorage(TankNum).NumWaterSupplies > 0) {
+            OrigVdotSupplyAvail = sum(state.dataWaterData->WaterStorage(TankNum).VdotAvailSupply);
         } else {
             OrigVdotSupplyAvail = 0.0;
         }
         TotVdotSupplyAvail = OrigVdotSupplyAvail; // Init
-        if (TotVdotSupplyAvail > WaterStorage(TankNum).MaxInFlowRate) {
+        if (TotVdotSupplyAvail > state.dataWaterData->WaterStorage(TankNum).MaxInFlowRate) {
             // pipe/filter rate constraints on inlet
-            overflowVdot = TotVdotSupplyAvail - WaterStorage(TankNum).MaxInFlowRate;
-            overflowTwater =
-                sum(WaterStorage(TankNum).VdotAvailSupply * WaterStorage(TankNum).TwaterSupply) / sum(WaterStorage(TankNum).VdotAvailSupply);
-            TotVdotSupplyAvail = WaterStorage(TankNum).MaxInFlowRate;
+            overflowVdot = TotVdotSupplyAvail - state.dataWaterData->WaterStorage(TankNum).MaxInFlowRate;
+            state.dataWaterManager->overflowTwater =
+                sum(state.dataWaterData->WaterStorage(TankNum).VdotAvailSupply * state.dataWaterData->WaterStorage(TankNum).TwaterSupply) /
+                sum(state.dataWaterData->WaterStorage(TankNum).VdotAvailSupply);
+            TotVdotSupplyAvail = state.dataWaterData->WaterStorage(TankNum).MaxInFlowRate;
         }
-        TotVolSupplyAvail = TotVdotSupplyAvail * TimeStepSys * SecInHour;
-        overflowVol = overflowVdot * TimeStepSys * SecInHour;
+        TotVolSupplyAvail = TotVdotSupplyAvail * TimeStepSys * DataGlobalConstants::SecInHour;
+        overflowVol = overflowVdot * TimeStepSys * DataGlobalConstants::SecInHour;
 
         underflowVdot = 0.0;
-        if (WaterStorage(TankNum).NumWaterDemands > 0) {
-            OrigVdotDemandRequest = sum(WaterStorage(TankNum).VdotRequestDemand);
+        if (state.dataWaterData->WaterStorage(TankNum).NumWaterDemands > 0) {
+            OrigVdotDemandRequest = sum(state.dataWaterData->WaterStorage(TankNum).VdotRequestDemand);
         } else {
             OrigVdotDemandRequest = 0.0;
         }
-        OrigVolDemandRequest = OrigVdotDemandRequest * TimeStepSys * SecInHour;
+        OrigVolDemandRequest = OrigVdotDemandRequest * TimeStepSys * DataGlobalConstants::SecInHour;
         TotVdotDemandAvail = OrigVdotDemandRequest; // initialize to satisfied then modify if needed
-        if (TotVdotDemandAvail > WaterStorage(TankNum).MaxOutFlowRate) {
+        if (TotVdotDemandAvail > state.dataWaterData->WaterStorage(TankNum).MaxOutFlowRate) {
             // pipe/filter rate constraints on outlet
-            underflowVdot = OrigVdotDemandRequest - WaterStorage(TankNum).MaxOutFlowRate;
-            TotVdotDemandAvail = WaterStorage(TankNum).MaxOutFlowRate;
+            underflowVdot = OrigVdotDemandRequest - state.dataWaterData->WaterStorage(TankNum).MaxOutFlowRate;
+            TotVdotDemandAvail = state.dataWaterData->WaterStorage(TankNum).MaxOutFlowRate;
         }
-        TotVolDemandAvail = TotVdotDemandAvail * (TimeStepSys * SecInHour);
+        TotVolDemandAvail = TotVdotDemandAvail * (TimeStepSys * DataGlobalConstants::SecInHour);
 
         NetVdotAdd = TotVdotSupplyAvail - TotVdotDemandAvail;
-        NetVolAdd = NetVdotAdd * (TimeStepSys * SecInHour);
+        NetVolAdd = NetVdotAdd * (TimeStepSys * DataGlobalConstants::SecInHour);
 
-        VolumePredict = WaterStorage(TankNum).LastTimeStepVolume + NetVolAdd;
+        VolumePredict = state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume + NetVolAdd;
 
         // would tank capacity be exceeded?
-        TotVolAllowed = WaterStorage(TankNum).MaxCapacity - WaterStorage(TankNum).LastTimeStepVolume;
-        if (VolumePredict > WaterStorage(TankNum).MaxCapacity) { // too much
+        TotVolAllowed = state.dataWaterData->WaterStorage(TankNum).MaxCapacity - state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume;
+        if (VolumePredict > state.dataWaterData->WaterStorage(TankNum).MaxCapacity) { // too much
             // added overflow to inlet rate limit, new temperature model
-            OverFillVolume = (VolumePredict - WaterStorage(TankNum).MaxCapacity);
-            overflowTwater = (overflowTwater * overflowVol + OverFillVolume * WaterStorage(TankNum).Twater) / (overflowVol + OverFillVolume);
+            Real64 OverFillVolume = (VolumePredict - state.dataWaterData->WaterStorage(TankNum).MaxCapacity);
+            state.dataWaterManager->overflowTwater =
+                (state.dataWaterManager->overflowTwater * overflowVol + OverFillVolume * state.dataWaterData->WaterStorage(TankNum).Twater) /
+                (overflowVol + OverFillVolume);
             overflowVol += OverFillVolume;
             NetVolAdd -= OverFillVolume;
-            NetVdotAdd = NetVolAdd / (TimeStepSys * SecInHour);
-            VolumePredict = WaterStorage(TankNum).MaxCapacity;
+            NetVdotAdd = NetVolAdd / (TimeStepSys * DataGlobalConstants::SecInHour);
+            VolumePredict = state.dataWaterData->WaterStorage(TankNum).MaxCapacity;
         }
 
         // Is tank too low to meet the request?
         if (VolumePredict < 0.0) {
-            AvailVolume = WaterStorage(TankNum).LastTimeStepVolume + TotVolSupplyAvail;
+            Real64 AvailVolume = state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume + TotVolSupplyAvail;
             AvailVolume = max(0.0, AvailVolume);
             TotVolDemandAvail = AvailVolume;
-            TotVdotDemandAvail = AvailVolume / (TimeStepSys * SecInHour);
+            TotVdotDemandAvail = AvailVolume / (TimeStepSys * DataGlobalConstants::SecInHour);
             underflowVdot = OrigVdotDemandRequest - TotVdotDemandAvail;
             NetVdotAdd = TotVdotSupplyAvail - TotVdotDemandAvail;
-            NetVolAdd = NetVdotAdd * (TimeStepSys * SecInHour);
+            NetVolAdd = NetVdotAdd * (TimeStepSys * DataGlobalConstants::SecInHour);
             VolumePredict = 0.0;
         }
 
         if (TotVdotDemandAvail < OrigVdotDemandRequest) { // starvation
             // even distribution
             if (OrigVdotDemandRequest > 0.0) {
-                WaterStorage(TankNum).VdotAvailDemand = (TotVdotDemandAvail / OrigVdotDemandRequest) * WaterStorage(TankNum).VdotRequestDemand;
+                state.dataWaterData->WaterStorage(TankNum).VdotAvailDemand =
+                    (TotVdotDemandAvail / OrigVdotDemandRequest) * state.dataWaterData->WaterStorage(TankNum).VdotRequestDemand;
             } else {
-                WaterStorage(TankNum).VdotAvailDemand = 0.0;
+                state.dataWaterData->WaterStorage(TankNum).VdotAvailDemand = 0.0;
             }
         } else { // requested demand can be served
-            if (WaterStorage(TankNum).NumWaterDemands > 0) {
-                WaterStorage(TankNum).VdotAvailDemand = WaterStorage(TankNum).VdotRequestDemand;
+            if (state.dataWaterData->WaterStorage(TankNum).NumWaterDemands > 0) {
+                state.dataWaterData->WaterStorage(TankNum).VdotAvailDemand = state.dataWaterData->WaterStorage(TankNum).VdotRequestDemand;
             }
         }
 
         // is tank lower than float valve on capacity and requesting fill from controlled supplier?
         FillVolRequest = 0.0;
-        if ((VolumePredict) < WaterStorage(TankNum).ValveOnCapacity) { // turn on supply to fill tank
-            FillVolRequest = WaterStorage(TankNum).ValveOffCapacity - VolumePredict;
+
+        if (((VolumePredict) < state.dataWaterData->WaterStorage(TankNum).ValveOnCapacity) ||
+            state.dataWaterData->WaterStorage(TankNum).LastTimeStepFilling) { // turn on supply to fill tank
+            FillVolRequest = state.dataWaterData->WaterStorage(TankNum).ValveOffCapacity - VolumePredict;
+
+            state.dataWaterData->WaterStorage(TankNum).LastTimeStepFilling = true;
 
             // set mains draws for float on (all the way to Float off)
-            if (WaterStorage(TankNum).ControlSupplyType == MainsFloatValve) {
+            if (state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::MainsFloatValve) {
 
-                WaterStorage(TankNum).MainsDrawVdot = FillVolRequest / (TimeStepSys * SecInHour);
+                state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot = FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour);
                 NetVolAdd = FillVolRequest;
             }
             // set demand request in supplying tank if needed
-            if ((WaterStorage(TankNum).ControlSupplyType == OtherTankFloatValve) || (WaterStorage(TankNum).ControlSupplyType == TankMainsBackup)) {
-                WaterStorage(WaterStorage(TankNum).SupplyTankID).VdotRequestDemand(WaterStorage(TankNum).SupplyTankDemandARRID) =
-                    FillVolRequest / (TimeStepSys * SecInHour);
+            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::OtherTankFloatValve) ||
+                (state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::TankMainsBackup)) {
+                state.dataWaterData->WaterStorage(state.dataWaterData->WaterStorage(TankNum).SupplyTankID)
+                    .VdotRequestDemand(state.dataWaterData->WaterStorage(TankNum).SupplyTankDemandARRID) =
+                    FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour);
             }
 
             // set demand request in groundwater well if needed
-            if ((WaterStorage(TankNum).ControlSupplyType == WellFloatValve) || (WaterStorage(TankNum).ControlSupplyType == WellFloatMainsBackup)) {
-                GroundwaterWell(WaterStorage(TankNum).GroundWellID).VdotRequest = FillVolRequest / (TimeStepSys * SecInHour);
+            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::WellFloatValve) ||
+                (state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::WellFloatMainsBackup)) {
+                state.dataWaterData->GroundwaterWell(state.dataWaterData->WaterStorage(TankNum).GroundWellID).VdotRequest =
+                    FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour);
             }
         }
 
         // set mains flow if mains backup active
-        if ((VolumePredict) < WaterStorage(TankNum).BackupMainsCapacity) { // turn on supply
-            if ((WaterStorage(TankNum).ControlSupplyType == WellFloatMainsBackup) || (WaterStorage(TankNum).ControlSupplyType == TankMainsBackup)) {
-                FillVolRequest = WaterStorage(TankNum).ValveOffCapacity - VolumePredict;
-                WaterStorage(TankNum).MainsDrawVdot = FillVolRequest / (TimeStepSys * SecInHour);
+        if ((VolumePredict) < state.dataWaterData->WaterStorage(TankNum).BackupMainsCapacity) { // turn on supply
+            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::WellFloatMainsBackup) ||
+                (state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::TankMainsBackup)) {
+                FillVolRequest = state.dataWaterData->WaterStorage(TankNum).ValveOffCapacity - VolumePredict;
+                state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot = FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour);
                 NetVolAdd = FillVolRequest;
             }
         }
 
-        WaterStorage(TankNum).ThisTimeStepVolume = WaterStorage(TankNum).LastTimeStepVolume + NetVolAdd;
-        WaterStorage(TankNum).VdotOverflow = overflowVol / (TimeStepSys * SecInHour);
-        WaterStorage(TankNum).VolOverflow = overflowVol;
-        WaterStorage(TankNum).TwaterOverflow = overflowTwater;
-        WaterStorage(TankNum).NetVdot = NetVolAdd / (TimeStepSys * SecInHour);
-        WaterStorage(TankNum).MainsDrawVol = WaterStorage(TankNum).MainsDrawVdot * (TimeStepSys * SecInHour);
-        WaterStorage(TankNum).VdotToTank = TotVdotSupplyAvail;
-        WaterStorage(TankNum).VdotFromTank = TotVdotDemandAvail;
+        state.dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume + NetVolAdd;
+        if (state.dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume >= state.dataWaterData->WaterStorage(TankNum).ValveOffCapacity) {
+            state.dataWaterData->WaterStorage(TankNum).LastTimeStepFilling = false;
+        }
+
+        state.dataWaterData->WaterStorage(TankNum).VdotOverflow = overflowVol / (TimeStepSys * DataGlobalConstants::SecInHour);
+        state.dataWaterData->WaterStorage(TankNum).VolOverflow = overflowVol;
+        state.dataWaterData->WaterStorage(TankNum).TwaterOverflow = state.dataWaterManager->overflowTwater;
+        state.dataWaterData->WaterStorage(TankNum).NetVdot = NetVolAdd / (TimeStepSys * DataGlobalConstants::SecInHour);
+        state.dataWaterData->WaterStorage(TankNum).MainsDrawVol =
+            state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot * (TimeStepSys * DataGlobalConstants::SecInHour);
+        state.dataWaterData->WaterStorage(TankNum).VdotToTank = TotVdotSupplyAvail;
+        state.dataWaterData->WaterStorage(TankNum).VdotFromTank = TotVdotDemandAvail;
 
         {
-            auto const SELECT_CASE_var(WaterStorage(TankNum).ThermalMode);
-            if (SELECT_CASE_var == ScheduledTankTemp) {
-                WaterStorage(TankNum).Twater = GetCurrentScheduleValue(WaterStorage(TankNum).TempSchedID);
-                WaterStorage(TankNum).TouterSkin = WaterStorage(TankNum).Twater;
-            } else if (SELECT_CASE_var == TankZoneThermalCoupled) {
-                ShowFatalError("WaterUse:Storage (Water Storage Tank) zone thermal model incomplete");
+            auto const SELECT_CASE_var(state.dataWaterData->WaterStorage(TankNum).ThermalMode);
+            if (SELECT_CASE_var == DataWater::TankThermalMode::ScheduledTankTemp) {
+                state.dataWaterData->WaterStorage(TankNum).Twater =
+                    GetCurrentScheduleValue(state, state.dataWaterData->WaterStorage(TankNum).TempSchedID);
+                state.dataWaterData->WaterStorage(TankNum).TouterSkin = state.dataWaterData->WaterStorage(TankNum).Twater;
+            } else if (SELECT_CASE_var == DataWater::TankThermalMode::TankZoneThermalCoupled) {
+                ShowFatalError(state, "WaterUse:Storage (Water Storage Tank) zone thermal model incomplete");
             }
         }
 
         // set supply avail data from overflows in Receiving tank
-        if (WaterStorage(TankNum).OverflowMode == OverflowToTank) {
-            WaterStorage(WaterStorage(TankNum).OverflowTankID).VdotAvailSupply(WaterStorage(TankNum).OverflowTankSupplyARRID) =
-                WaterStorage(TankNum).VdotOverflow;
-            WaterStorage(WaterStorage(TankNum).OverflowTankID).TwaterSupply(WaterStorage(TankNum).OverflowTankSupplyARRID) =
-                WaterStorage(TankNum).TwaterOverflow;
+        if (state.dataWaterData->WaterStorage(TankNum).OverflowMode == DataWater::Overflow::ToTank) {
+            state.dataWaterData->WaterStorage(state.dataWaterData->WaterStorage(TankNum).OverflowTankID)
+                .VdotAvailSupply(state.dataWaterData->WaterStorage(TankNum).OverflowTankSupplyARRID) =
+                state.dataWaterData->WaterStorage(TankNum).VdotOverflow;
+            state.dataWaterData->WaterStorage(state.dataWaterData->WaterStorage(TankNum).OverflowTankID)
+                .TwaterSupply(state.dataWaterData->WaterStorage(TankNum).OverflowTankSupplyARRID) =
+                state.dataWaterData->WaterStorage(TankNum).TwaterOverflow;
         }
     }
 
-    void SetupTankSupplyComponent(std::string const &CompName,
+    void SetupTankSupplyComponent(EnergyPlusData &state,
+                                  std::string const &CompName,
                                   std::string const &CompType,
                                   std::string const &TankName,
                                   bool &ErrorsFound,
@@ -1316,35 +1202,15 @@ namespace WaterManager {
         // METHODOLOGY EMPLOYED:
         // push the VdotAvailToTank array and return
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        if (!(WaterSystemGetInputCalled)) {
-            GetWaterManagerInput();
+        if (!(state.dataWaterData->WaterSystemGetInputCalled)) {
+            GetWaterManagerInput(state);
         }
 
-        InternalSetupTankSupplyComponent(CompName, CompType, TankName, ErrorsFound, TankIndex, WaterSupplyIndex);
+        InternalSetupTankSupplyComponent(state, CompName, CompType, TankName, ErrorsFound, TankIndex, WaterSupplyIndex);
     }
 
-    void InternalSetupTankSupplyComponent(std::string const &CompName,
+    void InternalSetupTankSupplyComponent(EnergyPlusData &state,
+                                          std::string const &CompName,
                                           std::string const &CompType,
                                           std::string const &TankName,
                                           bool &ErrorsFound,
@@ -1371,58 +1237,58 @@ namespace WaterManager {
         int oldNumSupply;
         Array1D_string oldSupplyCompNames;
         Array1D_string oldSupplyCompTypes;
-        //  LOGICAL , SAVE    :: MyOneTimeFlag = .TRUE.
 
-        TankIndex = UtilityRoutines::FindItemInList(TankName, WaterStorage);
+        TankIndex = UtilityRoutines::FindItemInList(TankName, state.dataWaterData->WaterStorage);
         if (TankIndex == 0) {
-            ShowSevereError("WaterUse:Storage (Water Storage Tank) =\"" + TankName + "\" not found in " + CompType + " called " + CompName);
+            ShowSevereError(state, "WaterUse:Storage (Water Storage Tank) =\"" + TankName + "\" not found in " + CompType + " called " + CompName);
             ErrorsFound = true;
             return; // So we don't pass TankIndex=0
         }
-        oldNumSupply = WaterStorage(TankIndex).NumWaterSupplies;
+        oldNumSupply = state.dataWaterData->WaterStorage(TankIndex).NumWaterSupplies;
         if (oldNumSupply > 0) { // do array push
             if (allocated(oldSupplyCompNames)) oldSupplyCompNames.deallocate();
             oldSupplyCompNames.allocate(oldNumSupply);
             if (allocated(oldSupplyCompTypes)) oldSupplyCompTypes.deallocate();
             oldSupplyCompTypes.allocate(oldNumSupply);
-            if (allocated(WaterStorage(TankIndex).SupplyCompNames)) {
-                oldSupplyCompNames = WaterStorage(TankIndex).SupplyCompNames;
-                WaterStorage(TankIndex).SupplyCompNames.deallocate();
-                WaterStorage(TankIndex).SupplyCompNames.allocate(oldNumSupply + 1);
-                WaterStorage(TankIndex).SupplyCompNames({1, oldNumSupply}) = oldSupplyCompNames; // array assignment
-                WaterStorage(TankIndex).SupplyCompNames(oldNumSupply + 1) = CompName;
+            if (allocated(state.dataWaterData->WaterStorage(TankIndex).SupplyCompNames)) {
+                oldSupplyCompNames = state.dataWaterData->WaterStorage(TankIndex).SupplyCompNames;
+                state.dataWaterData->WaterStorage(TankIndex).SupplyCompNames.deallocate();
+                state.dataWaterData->WaterStorage(TankIndex).SupplyCompNames.allocate(oldNumSupply + 1);
+                state.dataWaterData->WaterStorage(TankIndex).SupplyCompNames({1, oldNumSupply}) = oldSupplyCompNames; // array assignment
+                state.dataWaterData->WaterStorage(TankIndex).SupplyCompNames(oldNumSupply + 1) = CompName;
             }
-            if (allocated(WaterStorage(TankIndex).SupplyCompTypes)) {
-                oldSupplyCompTypes = WaterStorage(TankIndex).SupplyCompTypes;
-                WaterStorage(TankIndex).SupplyCompTypes.deallocate();
-                WaterStorage(TankIndex).SupplyCompTypes.allocate(oldNumSupply + 1);
-                WaterStorage(TankIndex).SupplyCompTypes({1, oldNumSupply}) = oldSupplyCompTypes; // array assignment
-                WaterStorage(TankIndex).SupplyCompTypes(oldNumSupply + 1) = CompType;
+            if (allocated(state.dataWaterData->WaterStorage(TankIndex).SupplyCompTypes)) {
+                oldSupplyCompTypes = state.dataWaterData->WaterStorage(TankIndex).SupplyCompTypes;
+                state.dataWaterData->WaterStorage(TankIndex).SupplyCompTypes.deallocate();
+                state.dataWaterData->WaterStorage(TankIndex).SupplyCompTypes.allocate(oldNumSupply + 1);
+                state.dataWaterData->WaterStorage(TankIndex).SupplyCompTypes({1, oldNumSupply}) = oldSupplyCompTypes; // array assignment
+                state.dataWaterData->WaterStorage(TankIndex).SupplyCompTypes(oldNumSupply + 1) = CompType;
             }
-            WaterStorage(TankIndex).VdotAvailSupply.deallocate();
-            WaterStorage(TankIndex).VdotAvailSupply.allocate(oldNumSupply + 1);
-            WaterStorage(TankIndex).VdotAvailSupply = 0.0; // initialize
-            WaterStorage(TankIndex).TwaterSupply.deallocate();
-            WaterStorage(TankIndex).TwaterSupply.allocate(oldNumSupply + 1);
-            WaterStorage(TankIndex).TwaterSupply = 0.0; // initialize
+            state.dataWaterData->WaterStorage(TankIndex).VdotAvailSupply.deallocate();
+            state.dataWaterData->WaterStorage(TankIndex).VdotAvailSupply.allocate(oldNumSupply + 1);
+            state.dataWaterData->WaterStorage(TankIndex).VdotAvailSupply = 0.0; // initialize
+            state.dataWaterData->WaterStorage(TankIndex).TwaterSupply.deallocate();
+            state.dataWaterData->WaterStorage(TankIndex).TwaterSupply.allocate(oldNumSupply + 1);
+            state.dataWaterData->WaterStorage(TankIndex).TwaterSupply = 0.0; // initialize
             WaterSupplyIndex = oldNumSupply + 1;
-            ++WaterStorage(TankIndex).NumWaterSupplies;
+            ++state.dataWaterData->WaterStorage(TankIndex).NumWaterSupplies;
         } else { // first time (no push)
 
-            WaterStorage(TankIndex).VdotAvailSupply.allocate(1);
-            WaterStorage(TankIndex).VdotAvailSupply = 0.0; // initialize
-            WaterStorage(TankIndex).TwaterSupply.allocate(1);
-            WaterStorage(TankIndex).TwaterSupply = 0.0; // initialize
-            WaterStorage(TankIndex).SupplyCompNames.allocate(1);
-            WaterStorage(TankIndex).SupplyCompNames(1) = CompName;
-            WaterStorage(TankIndex).SupplyCompTypes.allocate(1);
-            WaterStorage(TankIndex).SupplyCompTypes(1) = CompType;
+            state.dataWaterData->WaterStorage(TankIndex).VdotAvailSupply.allocate(1);
+            state.dataWaterData->WaterStorage(TankIndex).VdotAvailSupply = 0.0; // initialize
+            state.dataWaterData->WaterStorage(TankIndex).TwaterSupply.allocate(1);
+            state.dataWaterData->WaterStorage(TankIndex).TwaterSupply = 0.0; // initialize
+            state.dataWaterData->WaterStorage(TankIndex).SupplyCompNames.allocate(1);
+            state.dataWaterData->WaterStorage(TankIndex).SupplyCompNames(1) = CompName;
+            state.dataWaterData->WaterStorage(TankIndex).SupplyCompTypes.allocate(1);
+            state.dataWaterData->WaterStorage(TankIndex).SupplyCompTypes(1) = CompType;
             WaterSupplyIndex = 1;
-            WaterStorage(TankIndex).NumWaterSupplies = 1;
+            state.dataWaterData->WaterStorage(TankIndex).NumWaterSupplies = 1;
         }
     }
 
-    void SetupTankDemandComponent(std::string const &CompName,
+    void SetupTankDemandComponent(EnergyPlusData &state,
+                                  std::string const &CompName,
                                   std::string const &CompType,
                                   std::string const &TankName,
                                   bool &ErrorsFound,
@@ -1445,35 +1311,15 @@ namespace WaterManager {
         // METHODOLOGY EMPLOYED:
         // push the VdotAvailToTank array and return
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        if (!(WaterSystemGetInputCalled)) {
-            GetWaterManagerInput();
+        if (!(state.dataWaterData->WaterSystemGetInputCalled)) {
+            GetWaterManagerInput(state);
         }
 
-        InternalSetupTankDemandComponent(CompName, CompType, TankName, ErrorsFound, TankIndex, WaterDemandIndex);
+        InternalSetupTankDemandComponent(state, CompName, CompType, TankName, ErrorsFound, TankIndex, WaterDemandIndex);
     }
 
-    void InternalSetupTankDemandComponent(std::string const &CompName,
+    void InternalSetupTankDemandComponent(EnergyPlusData &state,
+                                          std::string const &CompName,
                                           std::string const &CompType,
                                           std::string const &TankName,
                                           bool &ErrorsFound,
@@ -1500,61 +1346,60 @@ namespace WaterManager {
         int oldNumDemand;
         Array1D_string oldDemandCompNames;
         Array1D_string oldDemandCompTypes;
-        //  LOGICAL , SAVE    :: MyOneTimeFlag = .TRUE.
 
-        TankIndex = UtilityRoutines::FindItemInList(TankName, WaterStorage);
+        TankIndex = UtilityRoutines::FindItemInList(TankName, state.dataWaterData->WaterStorage);
         if (TankIndex == 0) {
-            ShowSevereError("WaterUse:Storage (Water Storage Tank) =\"" + TankName + "\" not found in " + CompType + " called " + CompName);
+            ShowSevereError(state, "WaterUse:Storage (Water Storage Tank) =\"" + TankName + "\" not found in " + CompType + " called " + CompName);
             ErrorsFound = true;
             return;
         }
-        oldNumDemand = WaterStorage(TankIndex).NumWaterDemands;
+        oldNumDemand = state.dataWaterData->WaterStorage(TankIndex).NumWaterDemands;
         if (oldNumDemand > 0) { // do array push
             if (allocated(oldDemandCompNames)) oldDemandCompNames.deallocate();
             oldDemandCompNames.allocate(oldNumDemand);
             if (allocated(oldDemandCompTypes)) oldDemandCompTypes.deallocate();
             oldDemandCompTypes.allocate(oldNumDemand);
-            if (allocated(WaterStorage(TankIndex).DemandCompNames)) {
-                oldDemandCompNames = WaterStorage(TankIndex).DemandCompNames;
-                WaterStorage(TankIndex).DemandCompNames.deallocate();
-                WaterStorage(TankIndex).DemandCompNames.allocate(oldNumDemand + 1);
-                WaterStorage(TankIndex).DemandCompNames({1, oldNumDemand}) = oldDemandCompNames; // array assignment
-                WaterStorage(TankIndex).DemandCompNames(oldNumDemand + 1) = CompName;
+            if (allocated(state.dataWaterData->WaterStorage(TankIndex).DemandCompNames)) {
+                oldDemandCompNames = state.dataWaterData->WaterStorage(TankIndex).DemandCompNames;
+                state.dataWaterData->WaterStorage(TankIndex).DemandCompNames.deallocate();
+                state.dataWaterData->WaterStorage(TankIndex).DemandCompNames.allocate(oldNumDemand + 1);
+                state.dataWaterData->WaterStorage(TankIndex).DemandCompNames({1, oldNumDemand}) = oldDemandCompNames; // array assignment
+                state.dataWaterData->WaterStorage(TankIndex).DemandCompNames(oldNumDemand + 1) = CompName;
             }
-            if (allocated(WaterStorage(TankIndex).DemandCompTypes)) {
-                oldDemandCompTypes = WaterStorage(TankIndex).DemandCompTypes;
-                WaterStorage(TankIndex).DemandCompTypes.deallocate();
-                WaterStorage(TankIndex).DemandCompTypes.allocate(oldNumDemand + 1);
-                WaterStorage(TankIndex).DemandCompTypes({1, oldNumDemand}) = oldDemandCompTypes; // array assignment
-                WaterStorage(TankIndex).DemandCompTypes(oldNumDemand + 1) = CompType;
+            if (allocated(state.dataWaterData->WaterStorage(TankIndex).DemandCompTypes)) {
+                oldDemandCompTypes = state.dataWaterData->WaterStorage(TankIndex).DemandCompTypes;
+                state.dataWaterData->WaterStorage(TankIndex).DemandCompTypes.deallocate();
+                state.dataWaterData->WaterStorage(TankIndex).DemandCompTypes.allocate(oldNumDemand + 1);
+                state.dataWaterData->WaterStorage(TankIndex).DemandCompTypes({1, oldNumDemand}) = oldDemandCompTypes; // array assignment
+                state.dataWaterData->WaterStorage(TankIndex).DemandCompTypes(oldNumDemand + 1) = CompType;
             }
 
-            WaterStorage(TankIndex).VdotRequestDemand.deallocate();
-            WaterStorage(TankIndex).VdotRequestDemand.allocate(oldNumDemand + 1);
-            WaterStorage(TankIndex).VdotRequestDemand = 0.0; // initialize
+            state.dataWaterData->WaterStorage(TankIndex).VdotRequestDemand.deallocate();
+            state.dataWaterData->WaterStorage(TankIndex).VdotRequestDemand.allocate(oldNumDemand + 1);
+            state.dataWaterData->WaterStorage(TankIndex).VdotRequestDemand = 0.0; // initialize
 
-            WaterStorage(TankIndex).VdotAvailDemand.deallocate();
-            WaterStorage(TankIndex).VdotAvailDemand.allocate(oldNumDemand + 1);
-            WaterStorage(TankIndex).VdotAvailDemand = 0.0; // initialize
+            state.dataWaterData->WaterStorage(TankIndex).VdotAvailDemand.deallocate();
+            state.dataWaterData->WaterStorage(TankIndex).VdotAvailDemand.allocate(oldNumDemand + 1);
+            state.dataWaterData->WaterStorage(TankIndex).VdotAvailDemand = 0.0; // initialize
 
             WaterDemandIndex = oldNumDemand + 1;
-            ++WaterStorage(TankIndex).NumWaterDemands;
+            ++state.dataWaterData->WaterStorage(TankIndex).NumWaterDemands;
         } else { // first time (no push)
 
-            WaterStorage(TankIndex).VdotRequestDemand.allocate(1);
-            WaterStorage(TankIndex).VdotRequestDemand = 0.0; // initialize
-            WaterStorage(TankIndex).VdotAvailDemand.allocate(1);
-            WaterStorage(TankIndex).VdotAvailDemand = 0.0; // initialize
-            WaterStorage(TankIndex).DemandCompNames.allocate(1);
-            WaterStorage(TankIndex).DemandCompNames(1) = CompName;
-            WaterStorage(TankIndex).DemandCompTypes.allocate(1);
-            WaterStorage(TankIndex).DemandCompTypes(1) = CompType;
-            WaterStorage(TankIndex).NumWaterDemands = 1;
+            state.dataWaterData->WaterStorage(TankIndex).VdotRequestDemand.allocate(1);
+            state.dataWaterData->WaterStorage(TankIndex).VdotRequestDemand = 0.0; // initialize
+            state.dataWaterData->WaterStorage(TankIndex).VdotAvailDemand.allocate(1);
+            state.dataWaterData->WaterStorage(TankIndex).VdotAvailDemand = 0.0; // initialize
+            state.dataWaterData->WaterStorage(TankIndex).DemandCompNames.allocate(1);
+            state.dataWaterData->WaterStorage(TankIndex).DemandCompNames(1) = CompName;
+            state.dataWaterData->WaterStorage(TankIndex).DemandCompTypes.allocate(1);
+            state.dataWaterData->WaterStorage(TankIndex).DemandCompTypes(1) = CompType;
+            state.dataWaterData->WaterStorage(TankIndex).NumWaterDemands = 1;
             WaterDemandIndex = 1;
         }
     }
 
-    void CalcRainCollector(int const RainColNum) // Index of rain collector
+    void CalcRainCollector(EnergyPlusData &state, int const RainColNum) // Index of rain collector
     {
 
         // SUBROUTINE INFORMATION:
@@ -1567,78 +1412,60 @@ namespace WaterManager {
         // Collect the calculations used to update the modeled values
         // for the rain collector at each system timestep
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
         using DataEnvironment::OutWetBulbTempAt;
-        using DataGlobals::SecInHour;
-        using DataHVACGlobals::TimeStepSys;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // see DataWater.cc
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 LossFactor(0.0);
         Real64 VdotAvail;
 
         // If (.NOT.(IsRain)) Then ! is it raining now? No don't use this flag since precip schedule might differ from weather file
-        if (RainFall.CurrentRate <= 0.0) {
+        if (state.dataWaterData->RainFall.CurrentRate <= 0.0) {
             // set available supply rate in WaterStorage
-            WaterStorage(RainCollector(RainColNum).StorageTankID).VdotAvailSupply(RainCollector(RainColNum).StorageTankSupplyARRID) = 0.0;
+            state.dataWaterData->WaterStorage(state.dataWaterData->RainCollector(RainColNum).StorageTankID)
+                .VdotAvailSupply(state.dataWaterData->RainCollector(RainColNum).StorageTankSupplyARRID) = 0.0;
             // temperature of water supply is modeled as the same as outdoor drybulb.
-            WaterStorage(RainCollector(RainColNum).StorageTankID).TwaterSupply(RainCollector(RainColNum).StorageTankSupplyARRID) = 0.0;
+            state.dataWaterData->WaterStorage(state.dataWaterData->RainCollector(RainColNum).StorageTankID)
+                .TwaterSupply(state.dataWaterData->RainCollector(RainColNum).StorageTankSupplyARRID) = 0.0;
 
-            RainCollector(RainColNum).VdotAvail = 0.0;
-            RainCollector(RainColNum).VolCollected = 0.0;
+            state.dataWaterData->RainCollector(RainColNum).VdotAvail = 0.0;
+            state.dataWaterData->RainCollector(RainColNum).VolCollected = 0.0;
         } else {
 
             {
-                auto const SELECT_CASE_var(RainCollector(RainColNum).LossFactorMode);
+                auto const SELECT_CASE_var(state.dataWaterData->RainCollector(RainColNum).LossFactorMode);
 
-                if (SELECT_CASE_var == ConstantRainLossFactor) {
-                    LossFactor = RainCollector(RainColNum).LossFactor;
-                } else if (SELECT_CASE_var == ScheduledRainLossFactor) {
-                    LossFactor = GetCurrentScheduleValue(RainCollector(RainColNum).LossFactorSchedID);
+                if (SELECT_CASE_var == DataWater::RainLossFactor::Constant) {
+                    LossFactor = state.dataWaterData->RainCollector(RainColNum).LossFactor;
+                } else if (SELECT_CASE_var == DataWater::RainLossFactor::Scheduled) {
+                    LossFactor = GetCurrentScheduleValue(state, state.dataWaterData->RainCollector(RainColNum).LossFactorSchedID);
                 } else {
                     assert(false);
                 }
             }
 
-            VdotAvail = RainFall.CurrentRate * RainCollector(RainColNum).HorizArea * (1.0 - LossFactor);
+            VdotAvail = state.dataWaterData->RainFall.CurrentRate * state.dataWaterData->RainCollector(RainColNum).HorizArea * (1.0 - LossFactor);
 
-            if (VdotAvail > RainCollector(RainColNum).MaxCollectRate) {
-                VdotAvail = RainCollector(RainColNum).MaxCollectRate;
+            if (VdotAvail > state.dataWaterData->RainCollector(RainColNum).MaxCollectRate) {
+                VdotAvail = state.dataWaterData->RainCollector(RainColNum).MaxCollectRate;
             }
 
             // set available supply rate in WaterStorage
-            WaterStorage(RainCollector(RainColNum).StorageTankID).VdotAvailSupply(RainCollector(RainColNum).StorageTankSupplyARRID) = VdotAvail;
+            state.dataWaterData->WaterStorage(state.dataWaterData->RainCollector(RainColNum).StorageTankID)
+                .VdotAvailSupply(state.dataWaterData->RainCollector(RainColNum).StorageTankSupplyARRID) = VdotAvail;
 
             // temperature of water supply is modeled as the same as outdoor drybulb.
-            WaterStorage(RainCollector(RainColNum).StorageTankID).TwaterSupply(RainCollector(RainColNum).StorageTankSupplyARRID) =
-                OutWetBulbTempAt(RainCollector(RainColNum).MeanHeight);
+            state.dataWaterData->WaterStorage(state.dataWaterData->RainCollector(RainColNum).StorageTankID)
+                .TwaterSupply(state.dataWaterData->RainCollector(RainColNum).StorageTankSupplyARRID) =
+                OutWetBulbTempAt(state, state.dataWaterData->RainCollector(RainColNum).MeanHeight);
 
-            RainCollector(RainColNum).VdotAvail = VdotAvail;
-            RainCollector(RainColNum).VolCollected = VdotAvail * TimeStepSys * SecInHour;
+            state.dataWaterData->RainCollector(RainColNum).VdotAvail = VdotAvail;
+            state.dataWaterData->RainCollector(RainColNum).VolCollected = VdotAvail * TimeStepSys * DataGlobalConstants::SecInHour;
         }
     }
 
-    void CalcGroundwaterWell(int const WellNum) // Index of well
+    void CalcGroundwaterWell(EnergyPlusData &state, int const WellNum) // Index of well
     {
 
         // SUBROUTINE INFORMATION:
@@ -1655,68 +1482,49 @@ namespace WaterManager {
         // starting simple and ignoring well storage and complex rate restrictions.
         // just uses nominal pump rate and power (assuming well designed well).
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataEnvironment::GroundTemp_Deep;
-        using DataGlobals::BeginTimeStepFlag;
-        using DataGlobals::SecInHour;
-        using DataHVACGlobals::TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // see DataWater.cc
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 VdotDelivered;
-        //  REAL(r64) :: VdotRequest
         Real64 PumpPower;
-
-        if (BeginTimeStepFlag) {
-            // do any updating needed
-            // GroundwaterWell(WellNum)%VdotRequest = 0.0
-        }
 
         VdotDelivered = 0.0;
         PumpPower = 0.0;
-        if (GroundwaterWell(WellNum).VdotRequest > 0.0) {
+        if (state.dataWaterData->GroundwaterWell(WellNum).VdotRequest > 0.0) {
 
-            if (GroundwaterWell(WellNum).VdotRequest >= GroundwaterWell(WellNum).PumpNomVolFlowRate) { // run flat out
-                WaterStorage(GroundwaterWell(WellNum).StorageTankID).VdotAvailSupply(GroundwaterWell(WellNum).StorageTankSupplyARRID) =
-                    GroundwaterWell(WellNum).PumpNomVolFlowRate;
-                WaterStorage(GroundwaterWell(WellNum).StorageTankID).TwaterSupply(GroundwaterWell(WellNum).StorageTankSupplyARRID) = GroundTemp_Deep;
-                VdotDelivered = GroundwaterWell(WellNum).PumpNomVolFlowRate;
-                PumpPower = GroundwaterWell(WellNum).PumpNomPowerUse;
+            if (state.dataWaterData->GroundwaterWell(WellNum).VdotRequest >=
+                state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate) { // run flat out
+                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID)
+                    .VdotAvailSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) =
+                    state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate;
+                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID)
+                    .TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = state.dataEnvrn->GroundTemp_Deep;
+                VdotDelivered = state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate;
+                PumpPower = state.dataWaterData->GroundwaterWell(WellNum).PumpNomPowerUse;
             }
 
             // the run at part load to just meet request
-            if (GroundwaterWell(WellNum).VdotRequest < GroundwaterWell(WellNum).PumpNomVolFlowRate) {
-                WaterStorage(GroundwaterWell(WellNum).StorageTankID).VdotAvailSupply(GroundwaterWell(WellNum).StorageTankSupplyARRID) =
-                    GroundwaterWell(WellNum).VdotRequest;
-                WaterStorage(GroundwaterWell(WellNum).StorageTankID).TwaterSupply(GroundwaterWell(WellNum).StorageTankSupplyARRID) = GroundTemp_Deep;
+            if (state.dataWaterData->GroundwaterWell(WellNum).VdotRequest < state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate) {
+                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID)
+                    .VdotAvailSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) =
+                    state.dataWaterData->GroundwaterWell(WellNum).VdotRequest;
+                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID)
+                    .TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = state.dataEnvrn->GroundTemp_Deep;
 
-                VdotDelivered = GroundwaterWell(WellNum).VdotRequest;
-                PumpPower =
-                    GroundwaterWell(WellNum).PumpNomPowerUse * GroundwaterWell(WellNum).VdotRequest / GroundwaterWell(WellNum).PumpNomVolFlowRate;
+                VdotDelivered = state.dataWaterData->GroundwaterWell(WellNum).VdotRequest;
+                PumpPower = state.dataWaterData->GroundwaterWell(WellNum).PumpNomPowerUse *
+                            state.dataWaterData->GroundwaterWell(WellNum).VdotRequest /
+                            state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate;
             }
         }
 
-        GroundwaterWell(WellNum).VdotDelivered = VdotDelivered;
-        GroundwaterWell(WellNum).VolDelivered = VdotDelivered * TimeStepSys * SecInHour;
-        GroundwaterWell(WellNum).PumpPower = PumpPower;
-        GroundwaterWell(WellNum).PumpEnergy = PumpPower * TimeStepSys * SecInHour;
+        state.dataWaterData->GroundwaterWell(WellNum).VdotDelivered = VdotDelivered;
+        state.dataWaterData->GroundwaterWell(WellNum).VolDelivered = VdotDelivered * TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataWaterData->GroundwaterWell(WellNum).PumpPower = PumpPower;
+        state.dataWaterData->GroundwaterWell(WellNum).PumpEnergy = PumpPower * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
-    void UpdateWaterManager()
+    void UpdateWaterManager(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1732,152 +1540,87 @@ namespace WaterManager {
         //  this routine updates variables
         // that hold the value of the Last Timestep
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TankNum;
         int RainColNum;
         int WellNum;
-        static bool MyEnvrnFlag(true);   // flag for init once at start of environment
-        static bool MyWarmupFlag(false); // flag for init after warmup complete
-        static bool MyTankDemandCheckFlag(true);
 
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
-            for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataWaterManager->MyEnvrnFlag) {
+            for (TankNum = 1; TankNum <= state.dataWaterData->NumWaterStorageTanks; ++TankNum) {
 
-                WaterStorage(TankNum).LastTimeStepVolume = WaterStorage(TankNum).InitialVolume;
-                WaterStorage(TankNum).ThisTimeStepVolume = WaterStorage(TankNum).InitialVolume;
+                state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).InitialVolume;
+                state.dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).InitialVolume;
             }
-            if ((!DoingSizing) && (!KickOffSimulation) && MyTankDemandCheckFlag) {
-                if (NumWaterStorageTanks > 0) {
-                    for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
-                        if (WaterStorage(TankNum).NumWaterDemands == 0) {
-                            ShowWarningError("Found WaterUse:Storage that has nothing connected to draw water from it.");
-                            ShowContinueError("Occurs for WaterUse:Storage = " + WaterStorage(TankNum).Name);
-                            ShowContinueError("Check that input for water consuming components specifies a water supply tank.");
+            if ((!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) && state.dataWaterManager->MyTankDemandCheckFlag) {
+                if (state.dataWaterData->NumWaterStorageTanks > 0) {
+                    for (TankNum = 1; TankNum <= state.dataWaterData->NumWaterStorageTanks; ++TankNum) {
+                        if (state.dataWaterData->WaterStorage(TankNum).NumWaterDemands == 0) {
+                            ShowWarningError(state, "Found WaterUse:Storage that has nothing connected to draw water from it.");
+                            ShowContinueError(state, "Occurs for WaterUse:Storage = " + state.dataWaterData->WaterStorage(TankNum).Name);
+                            ShowContinueError(state, "Check that input for water consuming components specifies a water supply tank.");
                         }
                     }
                 }
-                MyTankDemandCheckFlag = false;
+                state.dataWaterManager->MyTankDemandCheckFlag = false;
             }
 
-            MyEnvrnFlag = false;
-            MyWarmupFlag = true;
+            state.dataWaterManager->MyEnvrnFlag = false;
+            state.dataWaterManager->MyWarmupFlag = true;
         } // end environmental inits
-        if (!BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) {
+            state.dataWaterManager->MyEnvrnFlag = true;
         }
 
-        if (MyWarmupFlag && (!WarmupFlag)) { // do environment inits.  just went out of warmup mode
-            for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
-                WaterStorage(TankNum).LastTimeStepVolume = WaterStorage(TankNum).InitialVolume;
-                WaterStorage(TankNum).ThisTimeStepVolume = WaterStorage(TankNum).InitialVolume;
-                WaterStorage(TankNum).LastTimeStepTemp = WaterStorage(TankNum).InitialTankTemp;
+        if (state.dataWaterManager->MyWarmupFlag && (!state.dataGlobal->WarmupFlag)) { // do environment inits.  just went out of warmup mode
+            for (TankNum = 1; TankNum <= state.dataWaterData->NumWaterStorageTanks; ++TankNum) {
+                state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).InitialVolume;
+                state.dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).InitialVolume;
+                state.dataWaterData->WaterStorage(TankNum).LastTimeStepTemp = state.dataWaterData->WaterStorage(TankNum).InitialTankTemp;
             }
-            MyWarmupFlag = false;
+            state.dataWaterManager->MyWarmupFlag = false;
         }
 
-        for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
+        for (TankNum = 1; TankNum <= state.dataWaterData->NumWaterStorageTanks; ++TankNum) {
             // main location for inits for new timestep.
-            WaterStorage(TankNum).LastTimeStepVolume = max(WaterStorage(TankNum).ThisTimeStepVolume, 0.0);
-            WaterStorage(TankNum).MainsDrawVdot = 0.0;
-            WaterStorage(TankNum).MainsDrawVol = 0.0;
-            WaterStorage(TankNum).NetVdot = 0.0;
-            WaterStorage(TankNum).VdotFromTank = 0.0;
-            WaterStorage(TankNum).VdotToTank = 0.0;
-            if (WaterStorage(TankNum).NumWaterDemands > 0) {
+            state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume = max(state.dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume, 0.0);
+            state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot = 0.0;
+            state.dataWaterData->WaterStorage(TankNum).MainsDrawVol = 0.0;
+            state.dataWaterData->WaterStorage(TankNum).NetVdot = 0.0;
+            state.dataWaterData->WaterStorage(TankNum).VdotFromTank = 0.0;
+            state.dataWaterData->WaterStorage(TankNum).VdotToTank = 0.0;
+            if (state.dataWaterData->WaterStorage(TankNum).NumWaterDemands > 0) {
                 // don't reset the requested demand, it is up to the other components to update it themselves
                 // WaterStorage( TankNum ).VdotRequestDemand = 0.0;
                 // the available demand is calculated here in the calc routine, so its fine to initialize it
-                WaterStorage(TankNum).VdotAvailDemand = 0.0;
+                state.dataWaterData->WaterStorage(TankNum).VdotAvailDemand = 0.0;
             }
-            WaterStorage(TankNum).VdotOverflow = 0.0;
-            if (WaterStorage(TankNum).NumWaterSupplies > 0) {
+            state.dataWaterData->WaterStorage(TankNum).VdotOverflow = 0.0;
+            if (state.dataWaterData->WaterStorage(TankNum).NumWaterSupplies > 0) {
                 // TODO: Figure out what to do with this...the available supply should be updated by the components
                 //       This was an issue because the coil supply was being stomped by this assignment to zero, so no tank action was happening
-                WaterStorage(TankNum).VdotAvailSupply = 0.0;
+                state.dataWaterData->WaterStorage(TankNum).VdotAvailSupply = 0.0;
             }
-            if ((WaterStorage(TankNum).ControlSupplyType == WellFloatValve) || (WaterStorage(TankNum).ControlSupplyType == WellFloatMainsBackup)) {
-                if (allocated(GroundwaterWell)) GroundwaterWell(WaterStorage(TankNum).GroundWellID).VdotRequest = 0.0;
+            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::WellFloatValve) ||
+                (state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::WellFloatMainsBackup)) {
+                if (allocated(state.dataWaterData->GroundwaterWell))
+                    state.dataWaterData->GroundwaterWell(state.dataWaterData->WaterStorage(TankNum).GroundWellID).VdotRequest = 0.0;
             }
         } // tank loop
 
-        for (RainColNum = 1; RainColNum <= NumRainCollectors; ++RainColNum) {
+        for (RainColNum = 1; RainColNum <= state.dataWaterData->NumRainCollectors; ++RainColNum) {
 
-            RainCollector(RainColNum).VdotAvail = 0.0;
-            RainCollector(RainColNum).VolCollected = 0.0;
+            state.dataWaterData->RainCollector(RainColNum).VdotAvail = 0.0;
+            state.dataWaterData->RainCollector(RainColNum).VolCollected = 0.0;
         }
 
-        for (WellNum = 1; WellNum <= NumGroundWaterWells; ++WellNum) {
-            // re init calculated vars
-            GroundwaterWell(WellNum).VdotRequest = 0.0;
-            GroundwaterWell(WellNum).VdotDelivered = 0.0;
-            GroundwaterWell(WellNum).VolDelivered = 0.0;
-            GroundwaterWell(WellNum).PumpPower = 0.0;
-            GroundwaterWell(WellNum).PumpEnergy = 0.0;
+        for (WellNum = 1; WellNum <= state.dataWaterData->NumGroundWaterWells; ++WellNum) {
+            state.dataWaterData->GroundwaterWell(WellNum).VdotRequest = 0.0;
+            state.dataWaterData->GroundwaterWell(WellNum).VdotDelivered = 0.0;
+            state.dataWaterData->GroundwaterWell(WellNum).VolDelivered = 0.0;
+            state.dataWaterData->GroundwaterWell(WellNum).PumpPower = 0.0;
+            state.dataWaterData->GroundwaterWell(WellNum).PumpEnergy = 0.0;
         }
-    }
-
-    void ReportWaterManager()
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   August 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // <this routine is typically needed only for those cases where you must transform the internal data to a reportable form>
     }
 
 } // namespace WaterManager

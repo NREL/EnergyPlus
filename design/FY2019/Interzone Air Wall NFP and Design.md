@@ -151,7 +151,7 @@ exchange balance. The same approximate view factor rules that are used within a 
  will exaggerate that problem.
  - Within the grouped zones it is likely that many surfaces will not have a direct view to all of the surfaces
  in the combined zone. Presently there is no algorithm to exclude certain views. View factors could be determined
- external to EnergyPlus and imported using `ZoneProperty:UserViewFactors:bySurfaceName` which may require some
+ external to EnergyPlus and imported using `ZoneProperty:UserViewFactors:BySurfaceName` which may require some
  changes to allow view factors to be specified for surface pairs that are in different zones.
  - Input processing will need to allow view factors (for radiant HVAC equipment) to cross zone boundaries.
  - Re-simulation for radiant HVAC equipment will involve all surfaces in the group, causing extra computation time.
@@ -242,7 +242,7 @@ choices:
   and air boundary with more than one zone, then all of the connected zones will be grouped together. For example, if there is an air
   boundary between zones A and B, and another air boundary between zones B and C, all three zones A, B, and C will be grouped into a
   single zone for radiant exchange. Normal default simplified view factors will apply unless detailed view factors are specified using
-  ZoneProperty:UserViewFactors:bySurfaceName.
+  ZoneProperty:UserViewFactors:BySurfaceName.
 
   **IRTSurface** - The air boundary will be modeled as blackbody surface between the adjacent zones (similar, but not exactly the same 
   as `Material:InfraredTransparent`. The surface participates in
@@ -267,7 +267,7 @@ as the basis. The default is 0.5. If an AirflowNetwork simulation is active this
 If the Air Exchange Method is *SimpleMixing* then this field specifies the schedule name for the air mixing across this boundary. If this field
 is blank, then the schedule defaults to always 1.0. If an AirflowNetwork simulation is active this field is ignored.
 
-### *Modified object* - ZoneProperty:UserViewFactors:bySurfaceName ###
+### *Modified object* - ZoneProperty:UserViewFactors:BySurfaceName ###
 
 The method of entering user view factors is to enter each surface name and its view factor value to other
 surfaces in a zone or group of zones connected by air boundaries (see Construction:AirBoundary).

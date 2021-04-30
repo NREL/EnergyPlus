@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -47,6 +47,7 @@
 
 #include <ObjexxFCL/Array1D.hh>
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -58,17 +59,13 @@ namespace EnergyPlus {
 
 namespace HysteresisPhaseChange {
 
-    bool getHysteresisModels(true);
-    int numHysteresisModels = 0;
-    std::vector<HysteresisPhaseChange> hysteresisPhaseChangeModels;
-
-    HysteresisPhaseChange *HysteresisPhaseChange::factory(const std::string &objectName)
+    HysteresisPhaseChange *HysteresisPhaseChange::factory(EnergyPlusData &state, const std::string &objectName)
     {
-        if (getHysteresisModels) {
-            readAllHysteresisModels();
-            getHysteresisModels = false;
+        if (state.dataHysteresisPhaseChange->getHysteresisModels) {
+            readAllHysteresisModels(state);
+            state.dataHysteresisPhaseChange->getHysteresisModels = false;
         }
-        for (auto &hm : hysteresisPhaseChangeModels) {
+        for (auto &hm : state.dataHysteresisPhaseChange->hysteresisPhaseChangeModels) {
             if (hm.name == objectName) {
                 return &hm;
             }
@@ -270,11 +267,11 @@ namespace HysteresisPhaseChange {
                                            Real64 EnthalpyNew)
     {
 
-        //	Tc                  ! Critical (Melting/Freezing) Temperature of PCM
-        //	Tau1                ! Width of Melting Zone low
-        //	Tau2                ! Width of Melting Zone high
-        //	EnthalpyOld         ! Previous Timestep Nodal Enthalpy
-        //	EnthalpyNew         ! Current Timestep Nodal Enthalpy
+        //    Tc                  ! Critical (Melting/Freezing) Temperature of PCM
+        //    Tau1                ! Width of Melting Zone low
+        //    Tau2                ! Width of Melting Zone high
+        //    EnthalpyOld         ! Previous Timestep Nodal Enthalpy
+        //    EnthalpyNew         ! Current Timestep Nodal Enthalpy
 
         Real64 T = temperatureCurrent;
 
@@ -317,15 +314,16 @@ namespace HysteresisPhaseChange {
         }
     }
 
-    void readAllHysteresisModels()
+    void readAllHysteresisModels(EnergyPlusData &state)
     {
 
         // convenience variables
-        DataIPShortCuts::cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
-        numHysteresisModels = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataIPShortCut->cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
+        state.dataHysteresisPhaseChange->numHysteresisModels =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         // loop over all hysteresis input instances, if zero, this will simply not do anything
-        for (int hmNum = 1; hmNum <= numHysteresisModels; ++hmNum) {
+        for (int hmNum = 1; hmNum <= state.dataHysteresisPhaseChange->numHysteresisModels; ++hmNum) {
 
             // just a few vars to pass in and out to GetObjectItem
             int ioStatus;
@@ -333,60 +331,55 @@ namespace HysteresisPhaseChange {
             int numNumbers;
 
             // get the input data and store it in the Shortcuts structures
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
-                                          hmNum,
-                                          DataIPShortCuts::cAlphaArgs,
-                                          numAlphas,
-                                          DataIPShortCuts::rNumericArgs,
-                                          numNumbers,
-                                          ioStatus,
-                                          DataIPShortCuts::lNumericFieldBlanks,
-                                          DataIPShortCuts::lAlphaFieldBlanks,
-                                          DataIPShortCuts::cAlphaFieldNames,
-                                          DataIPShortCuts::cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     state.dataIPShortCut->cCurrentModuleObject,
+                                                                     hmNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     numAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     numNumbers,
+                                                                     ioStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             // the input processor validates the numeric inputs based on the IDD definition
             // still validate the name to make sure there aren't any duplicates or blanks
             // blanks are easy: fatal if blank
-            if (DataIPShortCuts::lAlphaFieldBlanks[0]) {
-                ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
+            if (state.dataIPShortCut->lAlphaFieldBlanks[0]) {
+                ShowFatalError(state, "Invalid input for " + state.dataIPShortCut->cCurrentModuleObject + " object: Name cannot be blank");
             }
 
             // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
-            for (auto &existingHysteresisModel : hysteresisPhaseChangeModels) {
-                if (DataIPShortCuts::cAlphaArgs(1) == existingHysteresisModel.name) {
-                    ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
-                                   " object: Duplicate name found: " + existingHysteresisModel.name);
+            for (auto &existingHysteresisModel : state.dataHysteresisPhaseChange->hysteresisPhaseChangeModels) {
+                if (state.dataIPShortCut->cAlphaArgs(1) == existingHysteresisModel.name) {
+                    ShowFatalError(state,
+                                   "Invalid input for " + state.dataIPShortCut->cCurrentModuleObject +
+                                       " object: Duplicate name found: " + existingHysteresisModel.name);
                 }
             }
 
             // now build out a new hysteresis instance and add it to the vector
             HysteresisPhaseChange thisHM;
-            thisHM.name = DataIPShortCuts::cAlphaArgs(1);
-            thisHM.totalLatentHeat = DataIPShortCuts::rNumericArgs(1);
-            thisHM.fullyLiquidThermalConductivity = DataIPShortCuts::rNumericArgs(2);
-            thisHM.fullyLiquidDensity = DataIPShortCuts::rNumericArgs(3);
-            thisHM.specificHeatLiquid = DataIPShortCuts::rNumericArgs(4);
-            thisHM.deltaTempMeltingHigh = DataIPShortCuts::rNumericArgs(5);
-            thisHM.peakTempMelting = DataIPShortCuts::rNumericArgs(6);
-            thisHM.deltaTempMeltingLow = DataIPShortCuts::rNumericArgs(7);
-            thisHM.fullySolidThermalConductivity = DataIPShortCuts::rNumericArgs(8);
-            thisHM.fullySolidDensity = DataIPShortCuts::rNumericArgs(9);
-            thisHM.specificHeatSolid = DataIPShortCuts::rNumericArgs(10);
-            thisHM.deltaTempFreezingHigh = DataIPShortCuts::rNumericArgs(11);
-            thisHM.peakTempFreezing = DataIPShortCuts::rNumericArgs(12);
-            thisHM.deltaTempFreezingLow = DataIPShortCuts::rNumericArgs(13);
+            thisHM.name = state.dataIPShortCut->cAlphaArgs(1);
+            thisHM.totalLatentHeat = state.dataIPShortCut->rNumericArgs(1);
+            thisHM.fullyLiquidThermalConductivity = state.dataIPShortCut->rNumericArgs(2);
+            thisHM.fullyLiquidDensity = state.dataIPShortCut->rNumericArgs(3);
+            thisHM.specificHeatLiquid = state.dataIPShortCut->rNumericArgs(4);
+            thisHM.deltaTempMeltingHigh = state.dataIPShortCut->rNumericArgs(5);
+            thisHM.peakTempMelting = state.dataIPShortCut->rNumericArgs(6);
+            thisHM.deltaTempMeltingLow = state.dataIPShortCut->rNumericArgs(7);
+            thisHM.fullySolidThermalConductivity = state.dataIPShortCut->rNumericArgs(8);
+            thisHM.fullySolidDensity = state.dataIPShortCut->rNumericArgs(9);
+            thisHM.specificHeatSolid = state.dataIPShortCut->rNumericArgs(10);
+            thisHM.deltaTempFreezingHigh = state.dataIPShortCut->rNumericArgs(11);
+            thisHM.peakTempFreezing = state.dataIPShortCut->rNumericArgs(12);
+            thisHM.deltaTempFreezingLow = state.dataIPShortCut->rNumericArgs(13);
             thisHM.specHeatTransition = (thisHM.specificHeatSolid + thisHM.specificHeatLiquid) / 2.0;
             thisHM.CpOld = thisHM.specificHeatSolid;
-            hysteresisPhaseChangeModels.push_back(thisHM);
+            state.dataHysteresisPhaseChange->hysteresisPhaseChangeModels.push_back(thisHM);
         }
-    }
-
-    void clear_state()
-    {
-        numHysteresisModels = 0;
-        getHysteresisModels = true;
-        hysteresisPhaseChangeModels.clear();
     }
 
 } // namespace HysteresisPhaseChange

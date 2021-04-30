@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,79 +52,94 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace WaterManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
+    void ManageWater(EnergyPlusData &state);
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
+    void ManageWaterInits(EnergyPlusData &state);
 
-    // MODULE VARIABLE DECLARATIONS:
-    // na
+    void GetWaterManagerInput(EnergyPlusData &state);
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE WaterManager:
-    // pointers for water storage tanks and their supply arrays
-    // pointers for water storage tanks and their demand arrays
+    void UpdatePrecipitation(EnergyPlusData &state);
 
-    // Functions
+    void UpdateIrrigation(EnergyPlusData &state);
 
-    void ManageWater();
+    void CalcWaterStorageTank(EnergyPlusData &state, int const TankNum); // Index of storage tank
 
-    void ManageWaterInits();
-
-    void GetWaterManagerInput();
-
-    void UpdatePrecipitation();
-
-    void UpdateIrrigation();
-
-    void SizeWaterManager();
-
-    void CalcWaterStorageTank(int const TankNum); // Index of storage tank
-
-    void SetupTankSupplyComponent(std::string const &CompName,
+    void SetupTankSupplyComponent(EnergyPlusData &state,
+                                  std::string const &CompName,
                                   std::string const &CompType,
                                   std::string const &TankName,
                                   bool &ErrorsFound,
                                   int &TankIndex,
                                   int &WaterSupplyIndex);
 
-    void InternalSetupTankSupplyComponent(std::string const &CompName,
+    void InternalSetupTankSupplyComponent(EnergyPlusData &state,
+                                          std::string const &CompName,
                                           std::string const &CompType,
                                           std::string const &TankName,
                                           bool &ErrorsFound,
                                           int &TankIndex,
                                           int &WaterSupplyIndex);
 
-    void SetupTankDemandComponent(std::string const &CompName,
+    void SetupTankDemandComponent(EnergyPlusData &state,
+                                  std::string const &CompName,
                                   std::string const &CompType,
                                   std::string const &TankName,
                                   bool &ErrorsFound,
                                   int &TankIndex,
                                   int &WaterDemandIndex);
 
-    void InternalSetupTankDemandComponent(std::string const &CompName,
+    void InternalSetupTankDemandComponent(EnergyPlusData &state,
+                                          std::string const &CompName,
                                           std::string const &CompType,
                                           std::string const &TankName,
                                           bool &ErrorsFound,
                                           int &TankIndex,
                                           int &WaterDemandIndex);
 
-    void CalcRainCollector(int const RainColNum); // Index of rain collector
+    void CalcRainCollector(EnergyPlusData &state, int const RainColNum); // Index of rain collector
 
-    void CalcGroundwaterWell(int const WellNum); // Index of well
+    void CalcGroundwaterWell(EnergyPlusData &state, int const WellNum); // Index of well
 
-    void UpdateWaterManager();
-
-    void ReportWaterManager();
+    void UpdateWaterManager(EnergyPlusData &state);
 
 } // namespace WaterManager
+
+struct WaterManagerData : BaseGlobalStruct
+{
+
+    bool MyOneTimeFlag;
+    bool GetInputFlag; // First time, input is "gotten"
+    bool MyEnvrnFlag;  // flag for init once at start of environment
+    bool MyWarmupFlag; // flag for init after warmup complete
+    bool MyTankDemandCheckFlag;
+    Real64 overflowTwater = 0.0;
+
+    void clear_state() override
+    {
+        this->MyOneTimeFlag = true;
+        this->GetInputFlag = true;
+        this->MyEnvrnFlag = true;
+        this->MyWarmupFlag = false;
+        this->MyTankDemandCheckFlag = true;
+        this->overflowTwater = 0.0;
+    }
+
+    // Default Constructor
+    WaterManagerData()
+        : MyOneTimeFlag(true), GetInputFlag(true), MyEnvrnFlag(true), MyWarmupFlag(false), MyTankDemandCheckFlag(true), overflowTwater(0.0)
+    {
+    }
+};
 
 } // namespace EnergyPlus
 

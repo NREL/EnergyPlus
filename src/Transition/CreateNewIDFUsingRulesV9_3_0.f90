@@ -684,17 +684,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! Wait - there's more for the transition for AirTerminal:SingleDuct:Uncontrolled
               CASE('ROOMAIR:NODE:AIRFLOWNETWORK:HVACEQUIPMENT')
               IF(TotATSDUObjs > 0) THEN
+                 NoDiff = .true.
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 OutArgs(1) = InArgs(1)
-                 ! Loop through fields looking for  AirTerminal:SingleDuct:Uncontrolled node name
-                 DO nodeCount=2, CurArgs
-                   IF (SameString(TRIM(InArgs(nodeCount)), TRIM(ATSDUNodeNames(atCount)))) THEN
-                     OutArgs(nodeCount) = TRIM(InArgs(nodeCount)) // ' ATInlet'
-                   ELSE
-                     OutArgs(nodeCount) = InArgs(nodeCount)
+                 OutArgs(1:CurArgs) = InArgs(1:CurArgs)
+                 ! Loop through "ZoneHVAC or Air Terminal Equipment Object Type" fields looking for
+                 ! "AirTerminal:SingleDuct:Uncontrolled" and replace with "AirTerminal:SingleDuct:ConstantVolume:NoReheat"
+                 ! Four extensible fields
+                 DO CurField=2, CurArgs-1, 4
+                   IF (SameString(TRIM(InArgs(CurField)),'AirTerminal:SingleDuct:Uncontrolled')) THEN
+                     OutArgs(CurField) = 'AirTerminal:SingleDuct:ConstantVolume:NoReheat'
+                     NoDiff = .false.
                    END IF
-                 ENDDO
-                NoDiff = .false.
+                 END DO
               ELSE
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
@@ -1136,6 +1137,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      nodiff=.false.
                    END IF
                  END DO
+			
+			 CASE('ENERGYMANAGEMENTSYSTEM:ACTUATOR')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.true.
+                  OutArgs(1:4)=InArgs(1:4)
+                  IF (MakeUPPERCase(InArgs(3)).eq.'AIRTERMINAL:SINGLEDUCT:UNCONTROLLED') THEN
+                    OutArgs(3)='AirTerminal:SingleDuct:ConstantVolume:NoReheat'
+                  END IF
+
 
               ! If your original object starts with P, insert the rules here
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,14 +53,11 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
+#include <EnergyPlus/EconomicTariff.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -257,37 +254,37 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetInputForLifeCycleCost();
+    GetInputForLifeCycleCost(*state);
 
-    EXPECT_EQ(disConvEndOfYear, discountConvension);
-    EXPECT_EQ(inflAppConstantDollar, inflationApproach);
-    EXPECT_EQ(0.03, realDiscountRate);
-    EXPECT_EQ(1, baseDateMonth);
-    EXPECT_EQ(2012, baseDateYear);
-    EXPECT_EQ(22 * 12, lengthStudyTotalMonths);
+    EXPECT_EQ(iDiscConv::EndOfYear, state->dataEconLifeCycleCost->discountConvention);
+    EXPECT_EQ(iInflAppr::ConstantDollar, state->dataEconLifeCycleCost->inflationApproach);
+    EXPECT_EQ(0.03, state->dataEconLifeCycleCost->realDiscountRate);
+    EXPECT_EQ(1, state->dataEconLifeCycleCost->baseDateMonth);
+    EXPECT_EQ(2012, state->dataEconLifeCycleCost->baseDateYear);
+    EXPECT_EQ(22 * 12, state->dataEconLifeCycleCost->lengthStudyTotalMonths);
 
-    EXPECT_EQ(5, numNonrecurringCost);
-    EXPECT_EQ("RESIDUALVALUE", NonrecurringCost(5).name);
-    EXPECT_EQ(costCatSalvage, NonrecurringCost(5).category);
-    EXPECT_EQ(startBasePeriod, NonrecurringCost(5).startOfCosts);
-    EXPECT_EQ(-20000., NonrecurringCost(5).cost);
+    EXPECT_EQ(5, state->dataEconLifeCycleCost->numNonrecurringCost);
+    EXPECT_EQ("RESIDUALVALUE", state->dataEconLifeCycleCost->NonrecurringCost(5).name);
+    EXPECT_EQ(costCatSalvage, state->dataEconLifeCycleCost->NonrecurringCost(5).category);
+    EXPECT_EQ(iStartCosts::BasePeriod, state->dataEconLifeCycleCost->NonrecurringCost(5).startOfCosts);
+    EXPECT_EQ(-20000., state->dataEconLifeCycleCost->NonrecurringCost(5).cost);
 
-    EXPECT_EQ(1, numRecurringCosts);
-    EXPECT_EQ("ANNUALMAINT", RecurringCosts(1).name);
-    EXPECT_EQ(costCatMaintenance, RecurringCosts(1).category);
-    EXPECT_EQ(7000., RecurringCosts(1).cost);
-    EXPECT_EQ(startServicePeriod, RecurringCosts(1).startOfCosts);
-    EXPECT_EQ(1, RecurringCosts(1).repeatPeriodYears);
+    EXPECT_EQ(1, state->dataEconLifeCycleCost->numRecurringCosts);
+    EXPECT_EQ("ANNUALMAINT", state->dataEconLifeCycleCost->RecurringCosts(1).name);
+    EXPECT_EQ(costCatMaintenance, state->dataEconLifeCycleCost->RecurringCosts(1).category);
+    EXPECT_EQ(7000., state->dataEconLifeCycleCost->RecurringCosts(1).cost);
+    EXPECT_EQ(iStartCosts::ServicePeriod, state->dataEconLifeCycleCost->RecurringCosts(1).startOfCosts);
+    EXPECT_EQ(1, state->dataEconLifeCycleCost->RecurringCosts(1).repeatPeriodYears);
 
-    EXPECT_EQ(3, numUsePriceEscalation);
-    EXPECT_EQ("MIDWEST  COMMERCIAL-NATURAL GAS", UsePriceEscalation(3).name);
-    EXPECT_EQ(2012, UsePriceEscalation(3).escalationStartYear);
-    EXPECT_EQ(1.1321, UsePriceEscalation(3).Escalation(11));
-    EXPECT_EQ(1.2818, UsePriceEscalation(3).Escalation(21));
+    EXPECT_EQ(3, state->dataEconLifeCycleCost->numUsePriceEscalation);
+    EXPECT_EQ("MIDWEST  COMMERCIAL-NATURAL GAS", state->dataEconLifeCycleCost->UsePriceEscalation(3).name);
+    EXPECT_EQ(2012, state->dataEconLifeCycleCost->UsePriceEscalation(3).escalationStartYear);
+    EXPECT_EQ(1.1321, state->dataEconLifeCycleCost->UsePriceEscalation(3).Escalation(11));
+    EXPECT_EQ(1.2818, state->dataEconLifeCycleCost->UsePriceEscalation(3).Escalation(21));
 
-    EXPECT_EQ(1, numUseAdjustment);
-    EXPECT_EQ("NOELECTRICUSEADJUSTMENT", UseAdjustment(1).name);
-    EXPECT_EQ(1.0, UseAdjustment(1).Adjustment(1));
+    EXPECT_EQ(1, state->dataEconLifeCycleCost->numUseAdjustment);
+    EXPECT_EQ("NOELECTRICUSEADJUSTMENT", state->dataEconLifeCycleCost->UseAdjustment(1).name);
+    EXPECT_EQ(1.0, state->dataEconLifeCycleCost->UseAdjustment(1).Adjustment(1));
 }
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ProcessMaxInput)
@@ -394,199 +391,201 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ProcessMaxInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetInputForLifeCycleCost();
+    GetInputForLifeCycleCost(*state);
 
-    EXPECT_EQ(disConvEndOfYear, discountConvension);
-    EXPECT_EQ(inflAppConstantDollar, inflationApproach);
-    EXPECT_EQ(0.03, realDiscountRate);
-    EXPECT_EQ(1, baseDateMonth);
-    EXPECT_EQ(2012, baseDateYear);
-    EXPECT_EQ(100 * 12, lengthStudyTotalMonths);
+    EXPECT_EQ(iDiscConv::EndOfYear, state->dataEconLifeCycleCost->discountConvention);
+    EXPECT_EQ(iInflAppr::ConstantDollar, state->dataEconLifeCycleCost->inflationApproach);
+    EXPECT_EQ(0.03, state->dataEconLifeCycleCost->realDiscountRate);
+    EXPECT_EQ(1, state->dataEconLifeCycleCost->baseDateMonth);
+    EXPECT_EQ(2012, state->dataEconLifeCycleCost->baseDateYear);
+    EXPECT_EQ(100 * 12, state->dataEconLifeCycleCost->lengthStudyTotalMonths);
 
-    EXPECT_EQ(3, numUsePriceEscalation);
-    EXPECT_EQ("MIDWEST  COMMERCIAL-NATURAL GAS", UsePriceEscalation(3).name);
-    EXPECT_EQ(2012, UsePriceEscalation(3).escalationStartYear);
-    EXPECT_EQ(1.007, UsePriceEscalation(3).Escalation(1));
-    EXPECT_EQ(1.008, UsePriceEscalation(3).Escalation(11));
-    EXPECT_EQ(1.009, UsePriceEscalation(3).Escalation(21));
-    EXPECT_EQ(1.099, UsePriceEscalation(3).Escalation(99));
-    EXPECT_EQ(1.100, UsePriceEscalation(3).Escalation(100));
+    EXPECT_EQ(3, state->dataEconLifeCycleCost->numUsePriceEscalation);
+    EXPECT_EQ("MIDWEST  COMMERCIAL-NATURAL GAS", state->dataEconLifeCycleCost->UsePriceEscalation(3).name);
+    EXPECT_EQ(2012, state->dataEconLifeCycleCost->UsePriceEscalation(3).escalationStartYear);
+    EXPECT_EQ(1.007, state->dataEconLifeCycleCost->UsePriceEscalation(3).Escalation(1));
+    EXPECT_EQ(1.008, state->dataEconLifeCycleCost->UsePriceEscalation(3).Escalation(11));
+    EXPECT_EQ(1.009, state->dataEconLifeCycleCost->UsePriceEscalation(3).Escalation(21));
+    EXPECT_EQ(1.099, state->dataEconLifeCycleCost->UsePriceEscalation(3).Escalation(99));
+    EXPECT_EQ(1.100, state->dataEconLifeCycleCost->UsePriceEscalation(3).Escalation(100));
 
-    EXPECT_EQ(1, numUseAdjustment);
-    EXPECT_EQ("NOELECTRICUSEADJUSTMENT", UseAdjustment(1).name);
-    EXPECT_EQ(1.007, UseAdjustment(1).Adjustment(1));
-    EXPECT_EQ(1.008, UseAdjustment(1).Adjustment(11));
-    EXPECT_EQ(1.009, UseAdjustment(1).Adjustment(21));
-    EXPECT_EQ(1.099, UseAdjustment(1).Adjustment(99));
-    EXPECT_EQ(1.100, UseAdjustment(1).Adjustment(100));
+    EXPECT_EQ(1, state->dataEconLifeCycleCost->numUseAdjustment);
+    EXPECT_EQ("NOELECTRICUSEADJUSTMENT", state->dataEconLifeCycleCost->UseAdjustment(1).name);
+    EXPECT_EQ(1.007, state->dataEconLifeCycleCost->UseAdjustment(1).Adjustment(1));
+    EXPECT_EQ(1.008, state->dataEconLifeCycleCost->UseAdjustment(1).Adjustment(11));
+    EXPECT_EQ(1.009, state->dataEconLifeCycleCost->UseAdjustment(1).Adjustment(21));
+    EXPECT_EQ(1.099, state->dataEconLifeCycleCost->UseAdjustment(1).Adjustment(99));
+    EXPECT_EQ(1.100, state->dataEconLifeCycleCost->UseAdjustment(1).Adjustment(100));
 }
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
 {
-    lengthStudyYears = 5;
+    state->dataEconLifeCycleCost->lengthStudyYears = 5;
 
-    numCashFlow = 1;
-    CashFlow.allocate(numCashFlow);
-    CashFlow(1).pvKind = pvkEnergy;
-    CashFlow(1).Resource = 1001;
-    CashFlow(1).yrAmount.allocate(lengthStudyYears);
-    CashFlow(1).yrAmount(1) = 100;
-    CashFlow(1).yrAmount(2) = 110;
-    CashFlow(1).yrAmount(3) = 120;
-    CashFlow(1).yrAmount(4) = 130;
-    CashFlow(1).yrAmount(5) = 140;
+    state->dataEconLifeCycleCost->numCashFlow = 1;
+    state->dataEconLifeCycleCost->CashFlow.allocate(state->dataEconLifeCycleCost->numCashFlow);
+    state->dataEconLifeCycleCost->CashFlow(1).pvKind = iPrValKind::Energy;
+    state->dataEconLifeCycleCost->CashFlow(1).Resource = DataGlobalConstants::ResourceType::Electricity;
+    state->dataEconLifeCycleCost->CashFlow(1).yrAmount.allocate(state->dataEconLifeCycleCost->lengthStudyYears);
+    state->dataEconLifeCycleCost->CashFlow(1).yrAmount(1) = 100;
+    state->dataEconLifeCycleCost->CashFlow(1).yrAmount(2) = 110;
+    state->dataEconLifeCycleCost->CashFlow(1).yrAmount(3) = 120;
+    state->dataEconLifeCycleCost->CashFlow(1).yrAmount(4) = 130;
+    state->dataEconLifeCycleCost->CashFlow(1).yrAmount(5) = 140;
 
-    numResourcesUsed = 1;
+    state->dataEconLifeCycleCost->numResourcesUsed = 1;
 
-    EscalatedEnergy.allocate(lengthStudyYears, NumOfResourceTypes);
-    EscalatedEnergy = 0.0;
-    EscalatedTotEnergy.allocate(lengthStudyYears);
-    EscalatedTotEnergy = 0.0;
+    for (int year = 1; year <= state->dataEconLifeCycleCost->lengthStudyYears; ++year) {
+        std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
+        for (auto iResource : state->dataGlobalConst->AllResourceTypes) {
+            yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
+        }
+        state->dataEconLifeCycleCost->EscalatedEnergy.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
+    }
 
-    ComputeEscalatedEnergyCosts();
-    EXPECT_NEAR(EscalatedEnergy(1, 1), 100., 0.001);
-    EXPECT_NEAR(EscalatedEnergy(2, 1), 110., 0.001);
-    EXPECT_NEAR(EscalatedEnergy(3, 1), 120., 0.001);
-    EXPECT_NEAR(EscalatedEnergy(4, 1), 130., 0.001);
-    EXPECT_NEAR(EscalatedEnergy(5, 1), 140., 0.001);
+    state->dataEconLifeCycleCost->EscalatedTotEnergy.allocate(state->dataEconLifeCycleCost->lengthStudyYears);
+    state->dataEconLifeCycleCost->EscalatedTotEnergy = 0.0;
 
-    EXPECT_NEAR(EscalatedTotEnergy(1), 100., 0.001);
-    EXPECT_NEAR(EscalatedTotEnergy(2), 110., 0.001);
-    EXPECT_NEAR(EscalatedTotEnergy(3), 120., 0.001);
-    EXPECT_NEAR(EscalatedTotEnergy(4), 130., 0.001);
-    EXPECT_NEAR(EscalatedTotEnergy(5), 140., 0.001);
+    ComputeEscalatedEnergyCosts(*state);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(1).at(DataGlobalConstants::ResourceType::Electricity), 100., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(2).at(DataGlobalConstants::ResourceType::Electricity), 110., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(3).at(DataGlobalConstants::ResourceType::Electricity), 120., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(4).at(DataGlobalConstants::ResourceType::Electricity), 130., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(5).at(DataGlobalConstants::ResourceType::Electricity), 140., 0.001);
 
-    numUsePriceEscalation = 1;
-    UsePriceEscalation.allocate(numUsePriceEscalation);
-    UsePriceEscalation(1).resource = 1001;
-    UsePriceEscalation(1).Escalation.allocate(lengthStudyYears);
-    UsePriceEscalation(1).Escalation(1) = 1.03;
-    UsePriceEscalation(1).Escalation(2) = 1.05;
-    UsePriceEscalation(1).Escalation(3) = 1.07;
-    UsePriceEscalation(1).Escalation(4) = 1.11;
-    UsePriceEscalation(1).Escalation(5) = 1.15;
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(1), 100., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(2), 110., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(3), 120., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(4), 130., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(5), 140., 0.001);
 
-    //reset this variable to zero
-    EscalatedTotEnergy = 0.0;
+    state->dataEconLifeCycleCost->numUsePriceEscalation = 1;
+    state->dataEconLifeCycleCost->UsePriceEscalation.allocate(state->dataEconLifeCycleCost->numUsePriceEscalation);
+    state->dataEconLifeCycleCost->UsePriceEscalation(1).resource = DataGlobalConstants::ResourceType::Electricity;
+    state->dataEconLifeCycleCost->UsePriceEscalation(1).Escalation.allocate(state->dataEconLifeCycleCost->lengthStudyYears);
+    state->dataEconLifeCycleCost->UsePriceEscalation(1).Escalation(1) = 1.03;
+    state->dataEconLifeCycleCost->UsePriceEscalation(1).Escalation(2) = 1.05;
+    state->dataEconLifeCycleCost->UsePriceEscalation(1).Escalation(3) = 1.07;
+    state->dataEconLifeCycleCost->UsePriceEscalation(1).Escalation(4) = 1.11;
+    state->dataEconLifeCycleCost->UsePriceEscalation(1).Escalation(5) = 1.15;
 
-    ComputeEscalatedEnergyCosts();
-    EXPECT_NEAR(EscalatedEnergy(1, 1), 103.0, 0.001);
-    EXPECT_NEAR(EscalatedEnergy(2, 1), 115.5, 0.001);
-    EXPECT_NEAR(EscalatedEnergy(3, 1), 128.4, 0.001);
-    EXPECT_NEAR(EscalatedEnergy(4, 1), 144.3, 0.001);
-    EXPECT_NEAR(EscalatedEnergy(5, 1), 161.0, 0.001);
+    // reset this variable to zero
+    state->dataEconLifeCycleCost->EscalatedTotEnergy = 0.0;
 
-    EXPECT_NEAR(EscalatedTotEnergy(1), 103., 0.001);
-    EXPECT_NEAR(EscalatedTotEnergy(2), 115.5, 0.001);
-    EXPECT_NEAR(EscalatedTotEnergy(3), 128.4, 0.001);
-    EXPECT_NEAR(EscalatedTotEnergy(4), 144.3, 0.001);
-    EXPECT_NEAR(EscalatedTotEnergy(5), 161.0, 0.001);
+    ComputeEscalatedEnergyCosts(*state);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(1).at(DataGlobalConstants::ResourceType::Electricity), 103.0, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(2).at(DataGlobalConstants::ResourceType::Electricity), 115.5, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(3).at(DataGlobalConstants::ResourceType::Electricity), 128.4, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(4).at(DataGlobalConstants::ResourceType::Electricity), 144.3, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(5).at(DataGlobalConstants::ResourceType::Electricity), 161.0, 0.001);
 
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(1), 103., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(2), 115.5, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(3), 128.4, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(4), 144.3, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(5), 161.0, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_MonthToMonthNumber)
 {
-    EXPECT_EQ(1, MonthToMonthNumber("January",1));
-    EXPECT_EQ(2, MonthToMonthNumber("February",1));
-    EXPECT_EQ(3, MonthToMonthNumber("March",1));
-    EXPECT_EQ(4, MonthToMonthNumber("April",1));
-    EXPECT_EQ(5, MonthToMonthNumber("May",1));
-    EXPECT_EQ(6, MonthToMonthNumber("June",1));
-    EXPECT_EQ(7, MonthToMonthNumber("July",1));
-    EXPECT_EQ(8, MonthToMonthNumber("August",1));
-    EXPECT_EQ(9, MonthToMonthNumber("September",1));
-    EXPECT_EQ(10, MonthToMonthNumber("October",1));
-    EXPECT_EQ(11, MonthToMonthNumber("November",1));
-    EXPECT_EQ(12, MonthToMonthNumber("December",1));
-    EXPECT_EQ(99, MonthToMonthNumber("Hexember",99));
+    EXPECT_EQ(1, MonthToMonthNumber("January", 1));
+    EXPECT_EQ(2, MonthToMonthNumber("February", 1));
+    EXPECT_EQ(3, MonthToMonthNumber("March", 1));
+    EXPECT_EQ(4, MonthToMonthNumber("April", 1));
+    EXPECT_EQ(5, MonthToMonthNumber("May", 1));
+    EXPECT_EQ(6, MonthToMonthNumber("June", 1));
+    EXPECT_EQ(7, MonthToMonthNumber("July", 1));
+    EXPECT_EQ(8, MonthToMonthNumber("August", 1));
+    EXPECT_EQ(9, MonthToMonthNumber("September", 1));
+    EXPECT_EQ(10, MonthToMonthNumber("October", 1));
+    EXPECT_EQ(11, MonthToMonthNumber("November", 1));
+    EXPECT_EQ(12, MonthToMonthNumber("December", 1));
+    EXPECT_EQ(99, MonthToMonthNumber("Hexember", 99));
 }
-
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
 {
-    baseDateYear = 2020;
-    baseDateMonth = 1;
+    state->dataEconLifeCycleCost->baseDateYear = 2020;
+    state->dataEconLifeCycleCost->baseDateMonth = 1;
 
-    serviceDateYear = 2023;
-    serviceDateMonth = 1;
+    state->dataEconLifeCycleCost->serviceDateYear = 2023;
+    state->dataEconLifeCycleCost->serviceDateMonth = 1;
 
-    lengthStudyYears = 5;
-    lengthStudyTotalMonths = lengthStudyYears * 12;
+    state->dataEconLifeCycleCost->lengthStudyYears = 5;
+    state->dataEconLifeCycleCost->lengthStudyTotalMonths = state->dataEconLifeCycleCost->lengthStudyYears * 12;
 
+    state->dataEconTariff->numTariff = 1;
+    state->dataEconTariff->tariff.allocate(1);
+    state->dataEconTariff->tariff(1).isSelected = true;
+    state->dataEconTariff->tariff(1).resourceNum = DataGlobalConstants::ResourceType::Electricity;
+    state->dataEconTariff->tariff(1).ptTotal = 1;
+    state->dataEconTariff->econVar.allocate(1);
+    state->dataEconTariff->econVar(1).values.allocate(12);
+    state->dataEconTariff->econVar(1).values(1) = 101.;
+    state->dataEconTariff->econVar(1).values(2) = 102.;
+    state->dataEconTariff->econVar(1).values(3) = 103.;
+    state->dataEconTariff->econVar(1).values(4) = 104.;
+    state->dataEconTariff->econVar(1).values(5) = 105.;
+    state->dataEconTariff->econVar(1).values(6) = 106.;
+    state->dataEconTariff->econVar(1).values(7) = 107.;
+    state->dataEconTariff->econVar(1).values(8) = 108.;
+    state->dataEconTariff->econVar(1).values(9) = 109.;
+    state->dataEconTariff->econVar(1).values(10) = 110.;
+    state->dataEconTariff->econVar(1).values(11) = 111.;
+    state->dataEconTariff->econVar(1).values(12) = 112.;
 
-    numTariff = 1;
-    tariff.allocate(1);
-    tariff(1).isSelected = true;
-    tariff(1).resourceNum = 1001;
-    tariff(1).ptTotal = 1;
-    econVar.allocate(1);
-    econVar(1).values.allocate(12);
-    econVar(1).values(1) = 101.;
-    econVar(1).values(2) = 102.;
-    econVar(1).values(3) = 103.;
-    econVar(1).values(4) = 104.;
-    econVar(1).values(5) = 105.;
-    econVar(1).values(6) = 106.;
-    econVar(1).values(7) = 107.;
-    econVar(1).values(8) = 108.;
-    econVar(1).values(9) = 109.;
-    econVar(1).values(10) = 110.;
-    econVar(1).values(11) = 111.;
-    econVar(1).values(12) = 112.;
+    state->dataEconLifeCycleCost->numNonrecurringCost = 1;
+    state->dataEconLifeCycleCost->NonrecurringCost.allocate(1);
+    state->dataEconLifeCycleCost->NonrecurringCost(1).name = "MiscConstruction";
+    state->dataEconLifeCycleCost->NonrecurringCost(1).name = "MiscConstruction";
+    state->dataEconLifeCycleCost->NonrecurringCost(1).category = costCatConstruction;
+    state->dataEconLifeCycleCost->NonrecurringCost(1).cost = 123456.;
+    state->dataEconLifeCycleCost->NonrecurringCost(1).startOfCosts = iStartCosts::ServicePeriod;
+    state->dataEconLifeCycleCost->NonrecurringCost(1).totalMonthsFromStart = 10;
 
-    numNonrecurringCost = 1;
-    NonrecurringCost.allocate(1);
-    NonrecurringCost(1).name = "MiscConstruction";
-    NonrecurringCost(1).name = "MiscConstruction";
-    NonrecurringCost(1).category = costCatConstruction;
-    NonrecurringCost(1).cost = 123456.;
-    NonrecurringCost(1).startOfCosts = startServicePeriod;
-    NonrecurringCost(1).totalMonthsFromStart = 10;
+    ExpressAsCashFlows(*state);
 
-    ExpressAsCashFlows();
-
-    EXPECT_NEAR(CashFlow(17).mnAmount(47), 123456., 0.001);  // 36 months plus 10 months plus one month 
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(17).mnAmount(47), 123456., 0.001); // 36 months plus 10 months plus one month
 
     // first year
-    EXPECT_NEAR(CashFlow(18).mnAmount(37), 101., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(38), 102., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(39), 103., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(40), 104., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(41), 105., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(42), 106., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(43), 107., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(44), 108., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(45), 109., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(46), 110., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(47), 111., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(48), 112., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(37), 101., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(38), 102., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(39), 103., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(40), 104., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(41), 105., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(42), 106., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(43), 107., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(44), 108., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(45), 109., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(46), 110., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(47), 111., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(48), 112., 0.001);
     // second  year
-    EXPECT_NEAR(CashFlow(18).mnAmount(49), 101., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(50), 102., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(51), 103., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(52), 104., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(53), 105., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(54), 106., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(55), 107., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(56), 108., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(57), 109., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(58), 110., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(59), 111., 0.001);
-    EXPECT_NEAR(CashFlow(18).mnAmount(60), 112., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(49), 101., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(50), 102., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(51), 103., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(52), 104., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(53), 105., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(54), 106., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(55), 107., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(56), 108., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(57), 109., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(58), 110., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(59), 111., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).mnAmount(60), 112., 0.001);
 
-    EXPECT_NEAR(CashFlow(18).yrAmount(4), 1278., 0.001);
-    EXPECT_NEAR(CashFlow(18).yrAmount(5), 1278., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).yrAmount(4), 1278., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).yrAmount(5), 1278., 0.001);
 
-    EXPECT_NEAR(CashFlow(costCatEnergy).yrAmount(4), 1278., 0.001);
-    EXPECT_NEAR(CashFlow(costCatEnergy).yrAmount(5), 1278., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(costCatEnergy).yrAmount(4), 1278., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(costCatEnergy).yrAmount(5), 1278., 0.001);
 
-    EXPECT_NEAR(CashFlow(costCatTotEnergy).yrAmount(4), 1278., 0.001);
-    EXPECT_NEAR(CashFlow(costCatTotEnergy).yrAmount(5), 1278., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(costCatTotEnergy).yrAmount(4), 1278., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(costCatTotEnergy).yrAmount(5), 1278., 0.001);
 
-    EXPECT_NEAR(CashFlow(costCatConstruction).yrAmount(4), 123456, 0.001);
-    EXPECT_NEAR(CashFlow(costCatTotCaptl).yrAmount(4), 123456, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(costCatConstruction).yrAmount(4), 123456, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(costCatTotCaptl).yrAmount(4), 123456, 0.001);
 
-    EXPECT_NEAR(CashFlow(costCatTotGrand).yrAmount(4), 1278. + 123456., 0.001);
-    EXPECT_NEAR(CashFlow(costCatTotGrand).yrAmount(5), 1278., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(costCatTotGrand).yrAmount(4), 1278. + 123456., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(costCatTotGrand).yrAmount(5), 1278., 0.001);
 }
-

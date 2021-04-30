@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,34 +52,20 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace TranspiredCollector {
 
     // Using/Aliasing
     using DataVectorTypes::Vector;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const Layout_Square;
-    extern int const Layout_Triangle;
-    extern int const Correlation_Kutscher1994;
-    extern int const Correlation_VanDeckerHollandsBrunger2001;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumUTSC; // number of transpired collectors in model
-    extern Array1D_bool CheckEquipName;
-    extern bool GetInputFlag; // First time, input is gotten
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE TranspiredCollector:
-
-    // Types
 
     struct UTSCDataStruct
     {
@@ -166,44 +152,67 @@ namespace TranspiredCollector {
         }
     };
 
-    // Object Data
-    extern Array1D<UTSCDataStruct> UTSC;
-
-    // Functions
-    void clear_state();
-
-    void SimTranspiredCollector(std::string const &CompName, // component name
+    void SimTranspiredCollector(EnergyPlusData &state,
+                                std::string const &CompName, // component name
                                 int &CompIndex               // component index (to reduce string compares during simulation)
     );
 
-    void GetTranspiredCollectorInput();
+    void GetTranspiredCollectorInput(EnergyPlusData &state);
 
-    void InitTranspiredCollector(int const UTSCNum); // compindex already checked in calling routine
+    void InitTranspiredCollector(EnergyPlusData &state, int const UTSCNum); // compindex already checked in calling routine
 
-    void CalcActiveTranspiredCollector(int const UTSCNum);
+    void CalcActiveTranspiredCollector(EnergyPlusData &state, int const UTSCNum);
 
-    void CalcPassiveTranspiredCollector(int const UTSCNum);
+    void CalcPassiveTranspiredCollector(EnergyPlusData &state, int const UTSCNum);
 
-    void UpdateTranspiredCollector(int const UTSCNum);
+    void UpdateTranspiredCollector(EnergyPlusData &state, int const UTSCNum);
 
-    void SetUTSCQdotSource(int const UTSCNum,
+    void SetUTSCQdotSource(EnergyPlusData &state,
+                           int const UTSCNum,
                            Real64 const QSource // source term in Watts
     );
 
-    void GetTranspiredCollectorIndex(int const SurfacePtr, int &UTSCIndex);
+    void GetTranspiredCollectorIndex(EnergyPlusData &state, int const SurfacePtr, int &UTSCIndex);
 
-    void GetUTSCTsColl(int const UTSCNum, Real64 &TsColl);
+    void GetUTSCTsColl(EnergyPlusData &state, int const UTSCNum, Real64 &TsColl);
 
-    int GetAirInletNodeNum(std::string const &UTSCName,
-        bool &ErrorsFound
-    );
+    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound);
 
-    int GetAirOutletNodeNum(std::string const &UTSCName,
-        bool &ErrorsFound
-    );
+    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound);
 
 } // namespace TranspiredCollector
 
+struct TranspiredCollectorData : BaseGlobalStruct
+{
+
+    int const Layout_Square = 1;
+    int const Layout_Triangle = 2;
+    int const Correlation_Kutscher1994 = 1;
+    int const Correlation_VanDeckerHollandsBrunger2001 = 2;
+
+    int NumUTSC = 0; // number of transpired collectors in model
+    Array1D_bool CheckEquipName;
+    bool GetInputFlag = true; // First time, input is gotten
+
+    EPVector<TranspiredCollector::UTSCDataStruct> UTSC;
+    bool MyOneTimeFlag = true;
+    bool MySetPointCheckFlag = true;
+
+    Array1D_bool MyEnvrnFlag;
+
+    void clear_state() override
+    {
+        this->NumUTSC = 0;
+        this->GetInputFlag = true;
+        this->UTSC.deallocate();
+        this->MyOneTimeFlag = true;
+        this->MySetPointCheckFlag = true;
+        this->MyEnvrnFlag.deallocate();
+    }
+
+    // Default Constructor
+    TranspiredCollectorData() = default;
+};
 } // namespace EnergyPlus
 
 #endif

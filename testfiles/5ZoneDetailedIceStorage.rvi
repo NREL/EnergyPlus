@@ -24,14 +24,14 @@ Ice Thermal Storage Cooling Discharge Rate
 Ice Thermal Storage Cooling Discharge Energy
 Ice Thermal Storage Cooling Charge Rate
 Ice Thermal Storage Cooling Charge Energy
-Ice Thermal Storage Ancillary Electric Power
-Ice Thermal Storage Ancillary Electric Energy
+Ice Thermal Storage Ancillary Electricity Rate
+Ice Thermal Storage Ancillary Electricity Energy
 Chiller Evaporator Cooling Rate
 Chiller Evaporator Inlet Temperature
 Chiller Evaporator Outlet Temperature
 Chiller COP
-Chiller Electric Power
-Chiller Electric Energy
+Chiller Electricity Rate
+Chiller Electricity Energy
 Electricity:Plant
 Electricity:Facility
 0

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,35 +49,150 @@
 #define CostEstimateManager_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace CostEstimateManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
+    struct CostLineItemStruct
+    {
+        // Members
+        std::string LineName;      // object name (needed ?)
+        std::string ParentObjType; // parent reference to IDD object type
+        std::string ParentObjName; // parent instance in IDF
+        int ParentObjIDinList;
+        Real64 PerSquareMeter;     // cost per square meter
+        Real64 PerEach;            // cost per each
+        Real64 PerKiloWattCap;     // cost per kW of nominal capacity
+        Real64 PerKWCapPerCOP;     // cost per kW of nominal capacity per COP
+        Real64 PerCubicMeter;      // cost per cubic meter
+        Real64 PerCubMeterPerSec;  // cost per cubic meter per second
+        Real64 PerUAinWattperDelK; // cost per (UA) in Watt/deltaK
+        int LineNumber;            // number of line item in detail list
+        Real64 Qty;                // quantity in calculations (can be input)
+        std::string Units;         // Reported units
+        Real64 ValuePer;           // Cost used in final calculation
+        Real64 LineSubTotal;       // line item total  Qty * ValuePer
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
+        // Default Constructor
+        CostLineItemStruct()
+            : ParentObjIDinList(1), PerSquareMeter(0.0), PerEach(0.0), PerKiloWattCap(0.0), PerKWCapPerCOP(0.0), PerCubicMeter(0.0),
+              PerCubMeterPerSec(0.0), PerUAinWattperDelK(0.0), LineNumber(-1), Qty(0.0), ValuePer(0.0), LineSubTotal(0.0)
+        {
+        }
+    };
 
-    // MODULE VARIABLE DECLARATIONS:
-    // na
+    struct CostAdjustmentStruct
+    {
+        // Members
+        Real64 LineItemTot;        // = 0.0 ! holds total from line item cost calculations
+        Real64 MiscCostperSqMeter; // = 0.0 ! holds user-defined constant cost model
+        Real64 DesignFeeFrac;      // = 0.0 ! holds user-defined fraction for design fees
+        Real64 ContractorFeeFrac;  // = 0.0 ! holds user-defined fraction for contractor fees
+        Real64 ContingencyFrac;    // = 0.0 ! holds user-defined fraction for contingencies
+        Real64 BondCostFrac;       // = 0.0 ! holds user-defined fraction for bonding costs
+        Real64 CommissioningFrac;  // = 0.0 ! holds user-defined fraction for commissioning costs
+        Real64 RegionalModifier;   // = 1.0 ! holds user-defined multiplier to account for regional diffs
+        Real64 GrandTotal;         // = 0.0 ! the Grand Total of all line items plus all other costs
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
+        // Default Constructor
+        CostAdjustmentStruct()
+            : LineItemTot(0.0), MiscCostperSqMeter(0.0), DesignFeeFrac(0.0), ContractorFeeFrac(0.0), ContingencyFrac(0.0), BondCostFrac(0.0),
+              CommissioningFrac(0.0), RegionalModifier(0.0), GrandTotal(0.0)
+        {
+        }
 
-    // Functions
+        // Member Constructor
+        CostAdjustmentStruct(Real64 const LineItemTot,        // = 0.0 ! holds total from line item cost calculations
+                             Real64 const MiscCostperSqMeter, // = 0.0 ! holds user-defined constant cost model
+                             Real64 const DesignFeeFrac,      // = 0.0 ! holds user-defined fraction for design fees
+                             Real64 const ContractorFeeFrac,  // = 0.0 ! holds user-defined fraction for contractor fees
+                             Real64 const ContingencyFrac,    // = 0.0 ! holds user-defined fraction for contingencies
+                             Real64 const BondCostFrac,       // = 0.0 ! holds user-defined fraction for bonding costs
+                             Real64 const CommissioningFrac,  // = 0.0 ! holds user-defined fraction for commissioning costs
+                             Real64 const RegionalModifier,   // = 1.0 ! holds user-defined multiplier to account for regional diffs
+                             Real64 const GrandTotal          // = 0.0 ! the Grand Total of all line items plus all other costs
+                             )
+            : LineItemTot(LineItemTot), MiscCostperSqMeter(MiscCostperSqMeter), DesignFeeFrac(DesignFeeFrac), ContractorFeeFrac(ContractorFeeFrac),
+              ContingencyFrac(ContingencyFrac), BondCostFrac(BondCostFrac), CommissioningFrac(CommissioningFrac), RegionalModifier(RegionalModifier),
+              GrandTotal(GrandTotal)
+        {
+        }
+    };
 
-    void SimCostEstimate();
+    struct monetaryUnitType
+    {
+        // Members
+        std::string code; // ISO code for currency such as USD or EUR
+        std::string txt;  // text representation of the currency
+        std::string html; // representation for HTML file - contains unicode references
 
-    void GetCostEstimateInput();
+        // Default Constructor
+        monetaryUnitType() : code(std::string()), txt(std::string()), html(std::string())
+        {
+        }
+    };
 
-    void CheckCostEstimateInput(bool &ErrorsFound); // Set to true if errors in input, fatal at end of routine
+    void SimCostEstimate(EnergyPlusData &state);
 
-    void CalcCostEstimate();
+    void GetCostEstimateInput(EnergyPlusData &state);
+
+    void CheckCostEstimateInput(EnergyPlusData &state, bool &ErrorsFound); // Set to true if errors in input, fatal at end of routine
+
+    void CalcCostEstimate(EnergyPlusData &state);
 
 } // namespace CostEstimateManager
+
+struct CostEstimateManagerData : BaseGlobalStruct
+{
+
+    bool GetCostInput = true;
+    int NumLineItems = 0;        // number of cost estimate line items
+    bool DoCostEstimate = false; // set to true if any cost estimating needed
+    int numMonetaryUnit = 0;
+    int selectedMonetaryUnit = 0;
+
+    Array1D<CostEstimateManager::CostLineItemStruct> CostLineItem;
+
+    CostEstimateManager::CostAdjustmentStruct CurntBldg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
+    // holds total from line item cost calculations | holds user-defined
+    // constant cost model | holds user-defined fraction for design fees
+    // | holds user-defined fraction for contractor fees | holds
+    // user-defined fraction for contingencies | holds user-defined
+    // fraction for bonding costs | holds user-defined fraction for
+    // commissioning costs | holds user-defined multiplier to account for
+    // regional diffs | the Grand Total of all line items plus all other
+    // costs
+
+    CostEstimateManager::CostAdjustmentStruct RefrncBldg{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
+    // holds total from line item cost calculations | holds user-defined
+    // constant cost model | holds user-defined fraction for design fees
+    // | holds user-defined fraction for contractor fees | holds
+    // user-defined fraction for contingencies | holds user-defined
+    // fraction for bonding costs | holds user-defined fraction for
+    // commissioning costs | holds user-defined multiplier to account
+    // for regional diffs | the Grand Total of all line items plus all
+    // other costs
+
+    Array1D<CostEstimateManager::monetaryUnitType> monetaryUnit;
+
+    void clear_state() override
+    {
+        this->GetCostInput = true;
+        this->NumLineItems = 0;
+        this->DoCostEstimate = false;
+        this->numMonetaryUnit = 0;
+        this->selectedMonetaryUnit = 0;
+        this->CurntBldg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
+        this->RefrncBldg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
+        this->monetaryUnit.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

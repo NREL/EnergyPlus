@@ -961,7 +961,7 @@ Current ventilation output variables:
 \item
   HVAC,Average,Zone Ventilation Air Change Rate {[}ach{]}
 \item
-  HVAC,Sum,Zone Ventilation Fan Electric Energy {[}J{]}
+  HVAC,Sum,Zone Ventilation Fan Electricity Energy {[}J{]}
 \item
   HVAC,Average,Zone Ventilation Air Inlet Temperature {[}C{]}
 \end{itemize}
@@ -1016,7 +1016,7 @@ This output is the total mass flow rate into a particular zone from outdoors.
 
 The volume flow rate of the ventilation air in air changes per hour.
 
-\paragraph{Zone Ventilation Fan Electric Energy {[}J{]}}\label{zone-ventilation-fan-electric-energy-j}
+\paragraph{Zone Ventilation Fan Electricity Energy {[}J{]}}\label{zone-ventilation-fan-electric-energy-j}
 
 The fan electrical consumption for Intake or Exhaust ventilation types (for ZoneVentilation:DesignFlowRate objects only).
 
@@ -1118,7 +1118,7 @@ ZoneAirBalance:OutdoorAir output variables will be provided when the Air Balance
 \item
   HVAC,Average, Zone Combined Outdoor Air Changes per Hour {[}ach{]}
 \item
-  HVAC,Sum, Zone Combined Outdoor Air Fan Electric Energy {[}J{]}
+  HVAC,Sum, Zone Combined Outdoor Air Fan Electricity Energy {[}J{]}
 \end{itemize}
 
 \paragraph{Zone Combined Outdoor Air Sensible Heat Loss Energy {[}J{]}}\label{zone-combined-outdoor-air-sensible-heat-loss-energy-j}
@@ -1169,7 +1169,7 @@ This output is the total mass flow rate into a particular zone from outdoors.
 
 The volume flow rate of the ventilation air in air changes per hour.
 
-\paragraph{Zone Combined Outdoor Air Fan Electric Energy {[}J{]}}\label{zone-combined-outdoor-air-fan-electric-energy-j}
+\paragraph{Zone Combined Outdoor Air Fan Electricity Energy {[}J{]}}\label{zone-combined-outdoor-air-fan-electric-energy-j}
 
 The fan electrical consumption for Intake, Exhaust, or Balanced ventilation types (for
 
@@ -1878,9 +1878,9 @@ Current Earth Tube output variables:
 \item
   HVAC,Average,Earth Tube Water Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Sum,Earth Tube Fan Electric Energy {[}J{]}
+  HVAC,Sum,Earth Tube Fan Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Earth Tube Fan Electric Power {[}W{]}
+  HVAC,Average,Earth Tube Fan Electricity Rate {[}W{]}
 \item
   HVAC,Average,Earth Tube Zone Inlet Air Temperature {[}C{]}
 \item
@@ -1929,9 +1929,9 @@ The mass flow rate of air through the earth tube.
 
 The mass flow rate of water vapor at the exit of the earth tube.
 
-\subsubsection{Earth Tube Fan Electric Energy {[}J{]}}\label{earth-tube-fan-electric-energy-j}
+\subsubsection{Earth Tube Fan Electricity Energy {[}J{]}}\label{earth-tube-fan-electric-energy-j}
 
-\subsubsection{Earth Tube Fan Electric Power {[}W{]}}\label{earth-tube-fan-electric-power-w}
+\subsubsection{Earth Tube Fan Electricity Rate {[}W{]}}\label{earth-tube-fan-electric-power-w}
 
 These are the fan electricity consumption and power for intake or exhaust earth tube types.
 
@@ -2072,9 +2072,9 @@ ZoneCoolTower:Shower
 \item
   HVAC,Average,Zone Cooltower Air Outlet Humidity Ratio {[}kgWater/kgDryAir{]}
 \item
-  HVAC,Average,Zone Cooltower Pump Electric Power {[}W{]}
+  HVAC,Average,Zone Cooltower Pump Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Zone Cooltower Pump Electric Energy {[}J{]}
+  HVAC,Sum,Zone Cooltower Pump Electricity Energy {[}J{]}
 \item
   HVAC,Sum,Zone Cooltower Water Volume {[}m3{]}
 \item
@@ -2149,11 +2149,11 @@ This is the water consumed by the cooltower that actually be met by the water st
 
 This is the source (mains) of water consumed by the cooltower that could not actually be met by the storage tank. ~This output variable appears only when the water comes from storage tank waters.
 
-\paragraph{Zone Cooltower Pump Electric Power {[}W{]}}\label{zone-cooltower-pump-electric-power-w}
+\paragraph{Zone Cooltower Pump Electricity Rate {[}W{]}}\label{zone-cooltower-pump-electric-power-w}
 
 The power consumed by the recirculating pump in Watts.
 
-\paragraph{Zone Cooltower Pump Electric Energy {[}J{]}}\label{zone-cooltower-pump-electric-energy-j}
+\paragraph{Zone Cooltower Pump Electricity Energy {[}J{]}}\label{zone-cooltower-pump-electric-energy-j}
 
 The energy consumed by the recirculating pump in Joules.
 
@@ -2283,21 +2283,27 @@ The total air mass flow rate caused by the thermal chimney.
 
 The temperature of the air which is discharged from the thermal chimney through the outlet.
 
+In addition, the mass flow rate and associated sensible and latent loads are included in Zone Infiltration * output variables. In other words, the output variables of Zone Infiltration * include impact of ZoneThermalChimney.
+
 \subsection{ZoneAirMassFlowConservation}\label{zoneairmassflowconservation}
 
-This global object allows users to trigger the zone air mass flow conservation calculation when desired. This object has three input fields; the first choice input field allows the user whether to adjust mixing flows to enforce the zone air mass flow conservation; and the other fields allows the user to specify how infiltration object mass flow rate is calculated for zone air mass flow balance calculation.~ If adjustments for either mixing or infiltration is specified then the zone air mass balance attempts to enforce conservation. If both mixing and infiltration adjustments are off, then the zone air mass flow calculation uses the default method which does not include zone mixing objects and assumes self-balanced simple infiltration. The default method may not necessarily enforce zone air mass flow conservation unless the user has specified a balanced flow to begin with. The zone air mass flow conservation primarily accounts for the zonemixing objects air flow in the zone air flow mass balance calculation. In addition to the zonemixing object flow, the procedure accounts for zone supply, exhaust, and return flows and adjusts infiltration air flows (up or down) when required in order to balance the zone air mass flow.~ Mixing and infiltration adjustments will only be made in zones which have zonemixing or infiltration objects defined in the input. For example, if a zone does not have any infiltration objects, then no infiltration adjustment will be made for that zone.
+This global object allows users to trigger the zone air mass flow conservation calculation when desired. This object has three input fields; the first choice input field allows the user whether to adjust mixing flows, the return air flow, or a combination of mixing and return air flows to enforce the zone air mass flow conservation; and the other fields allows the user to specify how infiltration object mass flow rate is calculated for zone air mass flow balance calculation.~Currently supported options are: \textbf{AdjustMixingOnly}, \textbf{AdjustReturnOnly}, \textbf{AdjustMixingThenReturn}, \textbf{AdjustReturnThenMixing}, or \textbf{None}. If adjustments for either of mixing, return, or a combination of mixing and return or infiltration is specified then the zone air mass balance attempts to enforce conservation. If adjutement choice is None and infiltration adjustments are off, then the zone air mass flow calculation uses the default method which does not include zone mixing objects and assumes self-balanced simple infiltration. The default method may not necessarily enforce zone air mass flow conservation unless the user has specified a balanced flow to begin with. The zone air mass flow conservation primarily accounts for the zonemixing objects and return air flows in the zone air flow mass balance calculation. In addition to the zonemixing object and zone return air flows, the procedure accounts for zone supply, exhaust, and adjusts infiltration air flows (up or down) when required in order to balance the zone air mass flow.~ Mixing and infiltration adjustments will only be made in zones which have zonemixing or infiltration objects defined in the input. For example, if a zone does not have any infiltration objects, then no infiltration adjustment will be made for that zone. 
 
-First, the \hyperref[zonemixing]{ZoneMixing} object mass flow rate is adjusted or modified in order to balance zone air mass flow while assuming any zone infiltration objects are self-balanced. This step will always results in balanced zone air mass for receiving zones of \hyperref[zonemixing]{ZoneMixing} object but it may not necessarily result in a balanced air mass flow for source zones.~
+The zone mixing object and return flows adjusting options to enforce zone air mass flow conseravtion are defined as follows. \textbf{AdjustMixingOnly} adjusts the zone mixing object flow only to enforce zone air mass flow balance. \textbf{AdjustReturnOnly} adjusts the zone return air flow only to enforce zone air mass flow balance while the zone mixing object flow are kept at user specified values. \textbf{AdjustMixingThenReturn} adjusts the zone mixing object flow first, and followed with adjusting the return air flows to enforce zone air mass flow balance. \textbf{AdjustReturnThenMixing} adjusts the zone return air flow first, and followed with adjusting the zone mixing object flow to enforce zone air mass flow balance. \textbf{None} does not adjust either the zone mixing or the zone return air flow, and the zone air mass flow balance uses the default method. 
+ 
+First, depending user choice either the \hyperref[zonemixing]{ZoneMixing} object mass flow rate, the zone total return air flow rate, or a combination zone mixing and zone total return flow rates are adjusted or modified in order to balance zone air mass flow while assuming any zone infiltration objects are self-balanced. 
 
-Second, infiltration flow rates are adjusted accoring to the options set. Infiltration flow will be increased or decreased to balance the net flow from supply, exhaust, mixing, and return air flows. If a negative infiltration rate (exfiltration) is required to balance a zone's airflow, then the infiltration rate will be set to zero. This can happen, for example, if the total supply flow exceeds the total exahust plus return flow.
+This step will always results in balanced zone air mass for receiving zones of \hyperref[zonemixing]{ZoneMixing} object but it may not necessarily result in a balanced air mass flow for source zones.~
+
+Second, infiltration flow rates are adjusted according to the options set. Infiltration flow will be increased or decreased to balance the net flow from supply, exhaust, mixing, and return air flows. If a negative infiltration rate (exfiltration) is required to balance a zone's airflow, then the infiltration rate will be set to zero. This can happen, for example, if the total supply flow exceeds the total exahust plus return flow.
 
 This object is optional. If it is not present in the input file, the default zone air mass flow calculastion are used which do not account for zonemixing and infiltration flows.
 
 \subsubsection{Inputs}\label{inputs-9-002}
 
-\paragraph{Field: Adjust Zone Mixing For Zone Air Mass Flow Balance}\label{field-adjust-zone-mixing-for-zone-air-mass-flow-balance}
+\paragraph{Field: Adjust Zone Mixing and Return For Air Mass Flow Balance}\label{field-adjust-zone-mixing-and-return-for-air-mass-flow-balance}
 
-This field has two choices: \emph{Yes} or \emph{No}.~ When set to \emph{Yes}, the zone air mass flow balance attempts to enforce conservation by adjusting zone mixing flow rates. When set to \emph{No}, mixing flow rates are not adjusted; the mixing flows specified in \hyperref[zonemixing]{ZoneMixing} obects will be used.~ The default is \emph{No}.
+This field has five choices: \emph{AdjustMixingOnly}, \emph{AdjustReturnOnly}, \emph{AdjustMixingThenReturn}, \emph{AdjustReturnThenMixing} or \emph{None}.~When set to \emph{AdjustMixingOnly}, the zone air mass flow balance attempts to enforce zone mass flow conservation by adjusting zone mixing flow rates and zone infiltration air flow may be increased or decreased if required in order to balance the zone air mass flow. When set to \emph{AdjustReturnOnly}, the zone air mass flow balance attempts to enforce zone mass flow conservation by adjusting zone total return air flow rates and zone infiltration air flow may be increased or decreased if required in order to balance the zone air mass flow. When set to \emph{AdjustMixingThenReturn}, first the zone air mass flow balance attempts to enforce zone mass flow conservation by adjusting zone mixing object flow rates, then the zone total return flow rates are adjusted and zone infiltration air flow may be increased or decreased if required in order to balance the zone air mass flow. When set to \emph{AdjustReturnThenMixing}, first the zone air mass flow balance attempts to enforce zone mass flow conservation by adjusting zone total return air flow rates, then the zone mixing flow rates are adjusted and zone infiltration air flow may be increased or decreased if required in order to balance the zone air mass flow. When set to \emph{None}, mixing flow rates are not adjusted; the mixing flows specified in \hyperref[zonemixing]{ZoneMixing} obects will be used.~ The default is \emph{None}.
 
 \paragraph{Field: Infiltration Balancing Method}\label{field-infiltration-balancing-method}
 

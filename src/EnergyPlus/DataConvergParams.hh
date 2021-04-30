@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -59,81 +60,54 @@ namespace EnergyPlus {
 
 namespace DataConvergParams {
 
-    // Using/Aliasing
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-
     // Note: Unless otherwise noted, the tolerance parameters listed below were chosen
     // to represent educated guesses at what the tolerances for individual physical
     // parameters should be.
-    extern Real64 const HVACEnthalpyToler;               // Tolerance for enthalpy comparisons (in kJ/kgK)
-    extern Real64 const HVACFlowRateToler;               // Tolerance for mass flow rate convergence (in kg/s) [~20 CFM]
-    extern Real64 const HVACFlowRateSlopeToler;          // Slope tolerance for mass flow, kg/s/iteration
-    extern Real64 const HVACFlowRateOscillationToler;    // tolerance for detecting duplicate flow rate in stack
-    extern Real64 const HVACHumRatToler;                 // Tolerance for humidity ratio comparisons (kg water/kg dryair)
-    extern Real64 const HVACHumRatSlopeToler;            // Slope tolerance for humidity ratio, kg water/kg-dryair/iteration
-    extern Real64 const HVACHumRatOscillationToler;      // tolerance for detecting duplicate humidity ratio in stack
-    extern Real64 const HVACQualityToler;                // Tolerance for fluid quality comparisons (dimensionless)
-    extern Real64 const HVACPressToler;                  // Tolerance for pressure comparisons (in Pascals)
-    extern Real64 const HVACTemperatureToler;            // Tolerance for temperature comparisons (in degrees C or K)
-    extern Real64 const HVACTemperatureSlopeToler;       // Slope tolerance for Temperature, Deg C/iteration
-    extern Real64 const HVACTemperatureOscillationToler; // tolerance for detecting duplicate temps in stack
-    extern Real64 const HVACEnergyToler;                 // Tolerance for Energy comparisons (in Watts W)
+    constexpr Real64 HVACEnthalpyToler(260.0);                  // Tolerance for enthalpy comparisons (in kJ/kgK)
+    constexpr Real64 HVACFlowRateToler(0.01);                   // Tolerance for mass flow rate convergence (in kg/s) [~20 CFM]
+    constexpr Real64 HVACFlowRateSlopeToler(0.001);             // Slope tolerance for mass flow, kg/s/iteration
+    constexpr Real64 HVACFlowRateOscillationToler(0.0000001);   // tolerance for detecting duplicate flow rate in stack
+    constexpr Real64 HVACHumRatToler(0.0001);                   // Tolerance for humidity ratio comparisons (kg water/kg dryair)
+    constexpr Real64 HVACHumRatSlopeToler(0.00001);             // Slope tolerance for humidity ratio, kg water/kg-dryair/iteration
+    constexpr Real64 HVACHumRatOscillationToler(0.00000001);    // tolerance for detecting duplicate humidity ratio in stack
+    constexpr Real64 HVACQualityToler(0.01);                    // Tolerance for fluid quality comparisons (dimensionless)
+    constexpr Real64 HVACPressToler(10.0);                      // Tolerance for pressure comparisons (in Pascals)
+    constexpr Real64 HVACTemperatureToler(0.01);                // Tolerance for temperature comparisons (in degrees C or K)
+    constexpr Real64 HVACTemperatureSlopeToler(0.001);          // Slope tolerance for Temperature, Deg C/iteration
+    constexpr Real64 HVACTemperatureOscillationToler(0.000001); // tolerance for detecting duplicate temps in stack
+    constexpr Real64 HVACEnergyToler(10.0);                     // Tolerance for Energy comparisons (in Watts W)
     // to be consistent, should be 20.d0 (BG Aug 2012)
 
-    extern Real64 const HVACCpApprox; // Air Cp (20C,0.0Kg/Kg) Only for energy Tolerance Calculation
+    constexpr Real64 HVACCpApprox(1004.844); // Air Cp (20C,0.0Kg/Kg) Only for energy Tolerance Calculation
     // Only used to scale the answer for a more intuitive answer for comparison
 
-    extern Real64 const PlantEnthalpyToler;    // Tolerance for enthalpy comparisons (in kJ/kgK)
-    extern Real64 const PlantFlowRateToler;    // Tolerance for mass flow rate convergence (in kg/s) [~2 CFM]
-    extern Real64 const PlantLowFlowRateToler; // // Tolerance for low flow rate used for determining when
-    // plant pumps can be shut down
-    extern Real64 const PlantFlowRateOscillationToler;
-    extern Real64 const PlantFlowRateSlopeToler; // Slope tolerance for mass flow, kg/s/iteration
+    constexpr Real64 PlantEnthalpyToler(0.10);  // Tolerance for enthalpy comparisons (in kJ/kgK)
+    constexpr Real64 PlantFlowRateToler(0.001); // Tolerance for mass flow rate convergence (in kg/s) [~2 CFM]
+    constexpr Real64 PlantFlowRateOscillationToler(0.0000001);
+    constexpr Real64 PlantFlowRateSlopeToler(0.0001); // Slope tolerance for mass flow, kg/s/iteration
 
-    extern Real64 const PlantPressToler;                  // Tolerance for pressure comparisons (in Pascals)
-    extern Real64 const PlantTemperatureToler;            // Tolerance for temperature comparisons (in degrees C or K)
-    extern Real64 const PlantTemperatureSlopeToler;       // Slope tolerance for Temperature, Deg C/iteration
-    extern Real64 const PlantTemperatureOscillationToler; // tolerance for detecting duplicate temps in stack
+    constexpr Real64 PlantPressToler(10.0);                      // Tolerance for pressure comparisons (in Pascals)
+    constexpr Real64 PlantTemperatureToler(0.01);                // Tolerance for temperature comparisons (in degrees C or K)
+    constexpr Real64 PlantTemperatureSlopeToler(0.001);          // Slope tolerance for Temperature, Deg C/iteration
+    constexpr Real64 PlantTemperatureOscillationToler(0.000001); // tolerance for detecting duplicate temps in stack
 
-    extern Real64 const PlantEnergyToler; // Tolerance for Energy comparisons (in Watts W)
+    constexpr Real64 PlantEnergyToler(10.0); // Tolerance for Energy comparisons (in Watts W)
 
-    extern Real64 const PlantCpApprox; // Approximate Cp used in Interface manager for
+    constexpr Real64 PlantCpApprox(4180.0); // Approximate Cp used in Interface manager for
     // Energy Tolerance Calculation, used to scale the answer
     // for a more intuitive answer for comparison
-    extern Real64 const PlantFlowFlowRateToler; // Tolerance for mass flow rate convergence (in kg/s)
+    constexpr Real64 PlantFlowFlowRateToler(0.01);    // Tolerance for mass flow rate convergence (in kg/s)
+    constexpr Real64 PlantLowFlowRateToler(0.000001); // Tolerance for low flow rate used for determining when
+    // plant pumps can be shut down
 
-    extern int const ConvergLogStackDepth;
-    extern Array1D<Real64> const ConvergLogStackARR;
-    extern Real64 const sum_ConvergLogStackARR;
-    extern Real64 const square_sum_ConvergLogStackARR;
-    extern Real64 const sum_square_ConvergLogStackARR;
+    constexpr int ConvergLogStackDepth(10);
 
-    extern int const CalledFromAirSystemDemandSide;
-    extern int const CalledFromAirSystemSupplySideDeck1;
-    extern int const CalledFromAirSystemSupplySideDeck2;
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int AirLoopConvergFail;
-
-    extern Real64 MinTimeStepSys;  // =1 minute
-    extern Real64 MinTimeStepTol;  // = min allowable for ABS(1.-TimeStepSys/(MinTimeStepSys))
-    extern Real64 MaxZoneTempDiff; // 0.3 C = (1% OF 300 C) = max allowable difference between
-    //   zone air temp at Time=T and Time=T-1
-    extern Real64 MinSysTimeRemaining; // = 1 second
-    extern int MaxIter;                // maximum number of iterations allowed
-
-    extern int MaxPlantSubIterations; // Iteration Max for Plant Simulation sub iterations
-    extern int MinPlantSubIterations; // Iteration Min for Plant Simulation sub iterations
-
-    // Types
+    enum class iCalledFrom
+    {
+        AirSystemDemandSide,
+        AirSystemSupplySideDeck1,
+        AirSystemSupplySideDeck2
+    };
 
     struct HVACNodeConvergLogStruct
     {
@@ -234,14 +208,39 @@ namespace DataConvergParams {
         }
     };
 
-    // Object Data
-    extern Array1D<HVACZoneInletConvergenceStruct> ZoneInletConvergence;
-    extern Array1D<HVACAirLoopIterationConvergenceStruct> AirLoopConvergence;
-    extern Array1D<PlantIterationConvergenceStruct> PlantConvergence;
-
-    void clear_state();
-
 } // namespace DataConvergParams
+
+struct ConvergParamsData : BaseGlobalStruct
+{
+
+    int AirLoopConvergFail = 0;
+
+    Real64 MinTimeStepSys = (1.0 / 60.0); // =1 minute
+    Real64 MinTimeStepTol = 1.0e-4;       // = min allowable for ABS(1.-TimeStepSys/(MinTimeStepSys))
+    Real64 MaxZoneTempDiff = 0.3;         // 0.3 C = (1% OF 300 C) = max allowable difference between
+    int MaxIter = 20;                     // maximum number of iterations allowed
+    int MaxPlantSubIterations = 8;        // Iteration Max for Plant Simulation sub iterations
+    int MinPlantSubIterations = 2;        // Iteration Min for Plant Simulation sub iterations
+
+    // Object Data
+    Array1D<DataConvergParams::HVACZoneInletConvergenceStruct> ZoneInletConvergence;
+    Array1D<DataConvergParams::HVACAirLoopIterationConvergenceStruct> AirLoopConvergence;
+    Array1D<DataConvergParams::PlantIterationConvergenceStruct> PlantConvergence;
+
+    void clear_state() override
+    {
+        this->AirLoopConvergFail = 0;
+        this->MinTimeStepSys = (1.0 / 60.0); // =1 minute
+        this->MinTimeStepTol = 1.0e-4;       // = min allowable for ABS(1.-TimeStepSys/(MinTimeStepSys))
+        this->MaxZoneTempDiff = 0.3;         // 0.3 C = (1% OF 300 C) = max allowable difference between
+        this->MaxIter = 20;                  // maximum number of iterations allowed
+        this->MaxPlantSubIterations = 8;     // Iteration Max for Plant Simulation sub iterations
+        this->MinPlantSubIterations = 2;     // Iteration Min for Plant Simulation sub iterations
+        this->ZoneInletConvergence.deallocate();
+        this->AirLoopConvergence.deallocate();
+        this->PlantConvergence.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

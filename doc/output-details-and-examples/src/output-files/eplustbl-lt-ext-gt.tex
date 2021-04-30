@@ -93,6 +93,8 @@ Lists the All Summary tables, the Monthly tables as well as the Zone Component L
 \item
   Outdoor Air Summary
 \item
+  Outdoor Air Details
+\item
   Object Count Summary
 \item
   Component Cost Economics Summary
@@ -283,8 +285,8 @@ Steam & 0.300 \tabularnewline
 Gasoline & 1.050 \tabularnewline
 Diesel & 1.050 \tabularnewline
 Coal & 1.050 \tabularnewline
-Fuel Oil \#1 & 1.050 \tabularnewline
-Fuel Oil \#2 & 1.050 \tabularnewline
+Fuel Oil No 1 & 1.050 \tabularnewline
+Fuel Oil No 2 & 1050 \tabularnewline
 Propane & 1.050 \tabularnewline
 \bottomrule
 \end{longtable}
@@ -1182,7 +1184,7 @@ The HVAC Sizing Summary also includes a coil summary report table. This is a lar
 
 Throughout this table the special value of -999.0 is deliberately used to signal that no data are available to report for that coil for that field or column.  This could be for a variety of reasons such as, no sizing calculations in the model, did not run design day full simulations, particular fields only applies to certain types of coils, certain calculations are only performed for particular coils, etc.  If you find a -999.0 in a situation where you think the value should be available, please report it.  Another special value of -99999.0 may be encountered which is used within EnergyPlus to signal that numeric input fields were set to Autosize, Autocalculate, or left blank and in some cases this value will carry into the coil report table.
 
-The encyclopedic documentation that follows is important because in many cases, very similiar data are available from up to three seperate fields and one must be careful to understand the subtle differences and be aware that there is some repetition of the similar types of data in the fields.  This is mainly because coil performance changes with the conditions under which it operates and so an important part of this table is describing each coil under different sets of operating conditions.
+The encyclopedic documentation that follows is important because in many cases, very similiar data are available from up to three separate fields and one must be careful to understand the subtle differences and be aware that there is some repetition of the similar types of data in the fields.  This is mainly because coil performance changes with the conditions under which it operates and so an important part of this table is describing each coil under different sets of operating conditions.
 
 There are three broad groupings of data fields in the table:
 
@@ -1279,7 +1281,7 @@ The following is a comprehensive listing of each column/field in the coil summar
 
 \emph{Date/Time at Total Ideal Loads Peak}  This field provides the result for the date and time of day when the total load peak was found to occur during ideal loads sizing.  The format is (M)M/(D)D HH:MM:00, eg. 1/1 06:00:00 or 12/11 06:00:00.  There is no specific year associated with design days.  If the ideal loads sizing calculations never determine a total load the value here will be ``unknown.''  Text String.
 
-\emph{Design Day Name at Air Flow Ideal Loads Peak}  This field is the name of the design day selected to have the air flow peak for ideal loads sizing calculations.  The text here will be from the user-defined names entered in the name field of the SizingPeriod:DesignDay objects.  If this is a cooling coil, the air flow peak might be calculated seperately and the name here will be from one of the cooling design days.  If this is a heating coil, the air flow peak will be the same as the sensible load peak.  Text String.
+\emph{Design Day Name at Air Flow Ideal Loads Peak}  This field is the name of the design day selected to have the air flow peak for ideal loads sizing calculations.  The text here will be from the user-defined names entered in the name field of the SizingPeriod:DesignDay objects.  If this is a cooling coil, the air flow peak might be calculated separately and the name here will be from one of the cooling design days.  If this is a heating coil, the air flow peak will be the same as the sensible load peak.  Text String.
 
 \emph{Date/Time at Air Flow Ideal Loads Peak}  This field provides the result for the date and time of day when the air flow peak was found to occur.  The format is (M)M/(D)D HH:MM:00, eg. 1/1 06:00:00 or 12/11 06:00:00.  There is no specific year associated with design days. Text String.
 
@@ -1784,7 +1786,7 @@ CW CIRC PUMP & 0.002061 & 526.69 \tabularnewline
 
 The Outdoor Air Summary provides information for each zone on the average and minimum ventilation provided.
 
-The reports described so far in this section are displayed when specified in the Output:Table:Predefined object. They are either on or off and are not customizable. The next few types of tabular reports are customizable. You can specify the report variables being used in each one.
+The reports described so far in this section are displayed when specified in the Output:Table:SummaryReports object. They are either on or off and are not customizable. The next few types of tabular reports are customizable. You can specify the report variables being used in each one.
 
 Directly following is an example of the report. The key used to obtain this report is OutdoorAirSummary.
 
@@ -1835,6 +1837,88 @@ SPACE4-1 & 4.32 & 5.00 & 103.31 & 0.000 & 0.000 & 0.000 \tabularnewline
 SPACE5-1 & 17.27 & 20.00 & 447.68 & 0.000 & 0.000 & 0.000 \tabularnewline
 \bottomrule
 \end{longtable}
+
+\subsection{Outdoor Air Details}\label{outdoor-air-details}
+
+The Outdoor Air Details report provides detailed information on outdoor air flow for each zone and air loop. This report may be specified in the  Output:Table:SummaryReports object with the key OutdoorAirDetails. It is also produced for any AllSummary* key. Each subtable and column are described below.
+
+\subsubsection{Mechanical Ventilation Parameters by Zone}\label{mechanical-ventilation-parameters-by-zone}
+\begin{description}
+  \item[AirLoop Name] The name(s) of air loop(s) serving this zone,if any.
+  \item[Average Number of Occupants] Average number of occupants during occupied times (occupants > 0) for the simulation period.
+  \item[Nominal Number of Occupants] Total number of people for all People objects in this zone (ignoring schedules).
+  \item[Zone Volume] The zone volume in \si{\volume}.
+  \item[Zone Area] The zone floor area in \si{\area}.
+  \item[Design Zone Outdoor Airflow - \(V_{oz}\)] The design outdoor air flow rate specified in the DesignSpecification:OutdoorAir object for this zone in \si{\volumeFlowRate}. This is the outdoor air flow rate used for sizing without any schedule modifier.
+  \item[Minimum Dynamic Target Ventilation - \(V_{oz-dyn-min}\)] The minimum outdoor air flow rate specified in the DesignSpecification:OutdoorAir object for this zone in \si{\volumeFlowRate}. This is the outdoor air flow rate for the minimum number of occupants without any schedule modifier.
+\end{description}
+
+\subsubsection{Total Outdoor Air by Zone}\label{total-outdoor-air-by-zone}
+\begin{description}
+  \item[Mechanical Ventilation] The total outdoor air delivered to this zone by mechanical ventilation (HVAC systems) in \si{\volume} (Output:Variable Zone Mechanical Ventilation Standard Density Volume Flow Rate).
+
+  \item[Natural Ventilation] The total outdoor air delivered to this zone by natural ventilation (ZoneVentilation:* or AirflowNetwork) in \si{\volume}.
+
+  \item[Total Ventilation] The sum of Mechanical and Natural Ventilation in \si{\volume}.
+
+  \item[Infiltration] The total outdoor air delivered to this zone by infiltration (ZoneInfiltration:* or AirflowNetwork) in \si{\volume} (Output:Variable Zone Infiltration Standard Density Volume Flow Rate).
+
+  \item[Total Ventilation and Infiltration] The sum of Mechanical and Natural Ventilation and Infiltration in \si{\volume}.
+
+  \item[Dynamic Target Ventilation - \(V_{oz-dyn}\)] The total dynamic outdoor air flow rate specified in the DesignSpecification:OutdoorAir object for this zone in \si{\volumeFlowRate}. This is the zone target ventilation flow rate \(V_{oz-dyn}\) at standard density at the current timestep including any schedule modifier (Output:Variable Zone Target Voz Ventilation Flow Rate).
+
+  \item[Time Below \(V_{oz-dyn}\)] The time in hours that the Total Ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% below the Dynamic Target Ventilation - \(V_{oz-dyn}\) flow rate (Output:Variable Zone Ventilation Below Target Voz Time).
+
+  \item[Time At \(V_{oz-dyn}\)] The time in hours that the Total Ventilation rate (mechanical ventilation plus natural ventilation) is within 1\% of the Dynamic Target Ventilation - \(V_{oz-dyn}\) flow rate (Output:Variable Zone Ventilation At Target Voz Time).
+
+  \item[Time Above \(V_{oz-dyn}\)] The time in hours that the Total Ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% above the Dynamic Target Ventilation - \(V_{oz-dyn}\) flow rate (Output:Variable Zone Ventilation Above Target Voz Time).
+
+  \item[Time Above Zero When Unoccupied] The time in hours that the Total Ventilation rate (mechanical ventilation plus natural ventilation) is greater than zero when the zone is unoccupied (Output:Variable Zone Ventilation When Unoccupied Time).
+\end{description}
+
+\subsubsection{Average Outdoor Air During Occupancy by Zone - Flow Rates}\label{average-outdoor-air-during-occupancy-by-zone-flow-rates}
+This subtable is the same as Total Outdoor Air by Zone except that it reports average flow rates in \si{\volumeFlowRate} and status times in hours for occupied periods only.
+
+\subsubsection{Total Outdoor Air by AirLoop}\label{total-outdoor-air-by-airloop}
+\begin{description}
+  \item[Mechanical Ventilation] The total outdoor air delivered to the zones on this air loop by only this air loop in \si{\volume} (Output:Variable Air System Mechanical Ventilation Flow Rate).
+
+  \item[Natural Ventilation] The total outdoor air delivered to the zones on this air loop by natural ventilation (ZoneVentilation:* or AirflowNetwork) in \si{\volume} (Output:Variable Air System Natural Ventilation Flow Rate). If any zone terminal unit has a DesignSpecification:AirTerminal:Sizing object then the natural ventilation rate for that zone is scaled by the Fraction of Minimum Outdoor Air Flow value.
+
+  \item[Total Ventilation] The sum of Mechanical and Natural Ventilation in \si{\volume}.
+
+  \item[Sum Zone Dynamic Target Ventilation - \(V_{oz-dyn}\)] The total dynamic outdoor air flow rate specified in the DesignSpecification:OutdoorAir object for the zones on this air loop in \si{\volumeFlowRate}. This is the sum of the zone target ventilation flow rates \(V_{oz-dyn}\) at standard density at the current timestep including any schedule modifier (Output:Variable Air System Target Voz Ventilation Flow Rate). If any zone terminal unit has a DesignSpecification:AirTerminal:Sizing object then the target ventilation rate for that zone is scaled by the Fraction of Minimum Outdoor Air Flow value.
+
+  \item[Time Below \(V_{oz-dyn}\)] The time in hours that the Total Ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% below the Sum Zone Dynamic Target Ventilation - \(V_{oz-dyn}\) flow rate (Output:Variable Air System Ventilation Below Target Voz Time).
+
+  \item[Time At \(V_{oz-dyn}\)] The time in hours that the Total Ventilation rate (mechanical ventilation plus natural ventilation) is within 1\% of the Sum Zone Dynamic Target Ventilation - \(V_{oz-dyn}\) flow rate (Output:Variable Air System Ventilation At Target Voz Time).
+
+  \item[Time Above \(V_{oz-dyn}\)] The time in hours that the Total Ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% above the Sum Zone Dynamic Target Ventilation - \(V_{oz-dyn}\) flow rate (Output:Variable Air System Ventilation Above Target Voz Time).
+
+  \item[Time Above Zero When Unoccupied] The time in hours that the Total Ventilation rate (mechanical ventilation plus natural ventilation) is greater than zero when the all zones on this air loop are unoccupied (Output:Variable Air System Ventilation When Unoccupied Time).
+\end{description}
+
+\subsubsection{Average Outdoor Air During Occupancy by AirLoop}\label{average-outdoor-air-during-occupancy-by-airloop}
+This subtable is the same as Total Outdoor Air by AirLoop except that it reports average flow rates in \si{\volumeFlowRate} and status times in hours when any zone on this air loop is occupied.
+
+\subsubsection{Outdoor Air Controller Limiting Factors by AirLoop}\label{outdoor-air-controller-limiting-factors-by-airloop}
+  Times in hours that the outdoor air flow rate for this airloop is set by one of the following limiting factors (Output:Variable Air System Outdoor Air Limiting Factor).
+\begin{description}
+  \item[No Limiting Factor] None of the other limiting factors is active.
+  \item[Limits and Scheduled Limits] Fixed limits such as Controller:OutdoorAir Minimum Outdoor Air Flow Rate, Maximum Outdoor Air Flow Rate, Minimum Fraction of Outdoor Air Schedule Name, Maximum Fraction of Outdoor Air Schedule Name.
+  \item[Economizer] Economizer is active and sets the flow greater than the minimum outdoor air fraction.
+  \item[Exhaust Flow] Outdoor air flow rate equals the total zone exhaust flow rate.
+  \item[Mixed Air Flow] Outdoor air flow rate is limited by the current mixed air flow rate.
+  \item[High Humidity] Controller:OutdoorAir High Humidity Control.
+  \item[Demand Controlled Ventilation] Controller:MechanicalVentilation requested more than the minimum outdoor air fraction.
+  \item[Night Ventilation] AvailabilityManager:NightVentilation is active.
+  \item[Demand Limiting] DemandManager:Ventilation has reduced the outdoor air flow rate.
+  \item[Energy Management System] An EnergyManagementSystem:Actuator has overridden the outdoor air flow rate.
+\end{description}
+
+\subsubsection{Average Outdoor Air for Limiting Factors During Occupancy}\label{average-outdoor-air-for-limiting-factors-during-occupancy}
+This subtable is the same as Outdoor Air Controller Limiting Factors by AirLoop except that it reports average flow rates in \si{\volumeFlowRate} at each limiting factor for occupied periods only.
+
 
 \subsection{Climatic Data Summary}\label{climatic-data-summary}
 

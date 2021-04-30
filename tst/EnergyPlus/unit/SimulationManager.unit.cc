@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,10 +49,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/OutputFiles.hh>
-#include <EnergyPlus/SimulationManager.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/SimulationManager.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -77,8 +80,6 @@ TEST_F(EnergyPlusFixture, CheckThreading)
 TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
-
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
         "    No,                      !- Do System Sizing Calculation",
@@ -92,18 +93,16 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(outputFiles());
+    SimulationManager::GetProjectData(*state);
 
     // no error message from PerformancePrecisionTradeoffs objects
     EXPECT_TRUE(compare_err_stream("", true));
-  
 }
 
 TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs_DirectSolution_Message)
 {
     // issue 7646
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
         "  PerformancePrecisionTradeoffs,",
         "     Yes; ! - Use Coil Direct Solutions",
 
@@ -111,7 +110,7 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs_DirectSolution_Mess
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
-    SimulationManager::GetProjectData(outputFiles());
+    SimulationManager::GetProjectData(*state);
 
     std::string const error_string = delimited_string({
         "   ** Warning ** PerformancePrecisionTradeoffs: Coil Direct Solution simulation is selected.",
@@ -128,37 +127,376 @@ TEST_F(EnergyPlusFixture, Simulationmanager_bool_to_string)
 
 TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
 {
-    DataStringGlobals::outputPerfLogFileName = "eplusout_perflog.csv";
+    state->dataStrGlobals->outputPerfLogFileName = "eplusout_perflog.csv";
 
-    // start with no file 
-    std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
+    // start with no file
+    std::remove(state->dataStrGlobals->outputPerfLogFileName.c_str());
 
     // make sure the static variables are cleared
-    UtilityRoutines::appendPerfLog("RESET", "RESET");
-
-    DataStringGlobals::VerString = "EnergyPlus, Version 0.0.0-xxxx, August 14 1945";
+    UtilityRoutines::appendPerfLog(*state, "RESET", "RESET");
 
     // call the function to test
-    SimulationManager::writeIntialPerfLogValues("MODE193");
+    SimulationManager::writeIntialPerfLogValues(*state, "MODE193");
 
     // force the file to be written
-    UtilityRoutines::appendPerfLog("lastHeader", "lastValue", true);
+    UtilityRoutines::appendPerfLog(*state, "lastHeader", "lastValue", true);
 
     std::ifstream perfLogFile;
     std::stringstream perfLogStrSteam;
 
-    perfLogFile.open(DataStringGlobals::outputPerfLogFileName);
+    perfLogFile.open(state->dataStrGlobals->outputPerfLogFileName);
     perfLogStrSteam << perfLogFile.rdbuf();
     perfLogFile.close();
     std::string perfLogContents = perfLogStrSteam.str();
 
     std::string expectedContents = "Program, Version, TimeStamp,Use Coil Direct Solution,Zone Radiant Exchange Algorithm,"
-        "Override Mode,Number of Timesteps per Hour,Minimum Number of Warmup Days,SuppressAllBeginEnvironmentResets,MaxZoneTempDiff,lastHeader,\n"
-        "EnergyPlus, Version 0.0.0-xxxx, August 14 1945,False,ScriptF,MODE193,0,1,False,0.30,lastValue,\n";
+                                   "Override Mode,Number of Timesteps per Hour,Minimum Number of Warmup "
+                                   "Days,SuppressAllBeginEnvironmentResets,Minimum System Timestep,MaxZoneTempDiff,MaxAllowedDelTemp,lastHeader,\n" +
+                                   state->dataStrGlobals->VerStringVar + ",False,ScriptF,MODE193,0,1,False,1.0,0.30,2.0000E-003,lastValue,\n";
 
     EXPECT_EQ(perfLogContents, expectedContents);
 
     // clean up the file
-    std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
+    std::remove(state->dataStrGlobals->outputPerfLogFileName.c_str());
+}
 
+TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
+{
+    {
+        std::string const idf_objects = delimited_string({
+            "  Output:DebuggingData,",
+            "    No;                      !- Report Debugging Data",
+        });
+
+        EXPECT_TRUE(process_idf(idf_objects));
+
+        SimulationManager::GetProjectData(*state);
+        EXPECT_FALSE(state->dataReportFlag->DebugOutput);
+        EXPECT_FALSE(state->dataReportFlag->EvenDuringWarmup);
+
+        // no error message from
+        EXPECT_TRUE(compare_err_stream("", true));
+    }
+
+    {
+        std::string const idf_objects = delimited_string({
+            "  Output:DebuggingData,",
+            "    Yes,                     !- Report Debugging Data",
+            "    ;                        !- Report During Warmup",
+        });
+
+        EXPECT_TRUE(process_idf(idf_objects));
+
+        SimulationManager::GetProjectData(*state);
+        EXPECT_TRUE(state->dataReportFlag->DebugOutput);
+        EXPECT_FALSE(state->dataReportFlag->EvenDuringWarmup);
+
+        // no error message from
+        EXPECT_TRUE(compare_err_stream("", true));
+    }
+
+    {
+        std::string const idf_objects = delimited_string({
+            "  Output:DebuggingData,",
+            "    No,                      !- Report Debugging Data",
+            "    Yes;                     !- Report During Warmup",
+        });
+
+        EXPECT_TRUE(process_idf(idf_objects));
+
+        SimulationManager::GetProjectData(*state);
+        EXPECT_FALSE(state->dataReportFlag->DebugOutput);
+        EXPECT_TRUE(state->dataReportFlag->EvenDuringWarmup);
+
+        // no error message from
+        EXPECT_TRUE(compare_err_stream("", true));
+    }
+
+    // Unicity warning
+    {
+        std::string const idf_objects = delimited_string({
+            "  Output:DebuggingData,",
+            "    No,                      !- Report Debugging Data",
+            "    Yes;                     !- Report During Warmup",
+
+            "  Output:DebuggingData,",
+            "    Yes,                     !- Report Debugging Data",
+            "    No;                      !- Report During Warmup",
+        });
+
+        // Input processor with throw a severe, so do not use assertions
+        EXPECT_FALSE(process_idf(idf_objects, false));
+        // Instead do it here, making sure to reset the stream
+        {
+            std::string const expectedError = delimited_string({
+                "   ** Severe  ** <root>[Output:DebuggingData] - Object should have no more than 1 properties.",
+            });
+            EXPECT_TRUE(compare_err_stream(expectedError, true));
+        }
+
+        SimulationManager::GetProjectData(*state);
+        EXPECT_FALSE(state->dataReportFlag->DebugOutput);
+        EXPECT_TRUE(state->dataReportFlag->EvenDuringWarmup);
+
+        {
+            std::string const expectedError = delimited_string({
+                "   ** Warning ** Output:DebuggingData: More than 1 occurrence of this object found, only first will be used.",
+            });
+            EXPECT_TRUE(compare_err_stream(expectedError, true));
+        }
+    }
+}
+
+TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_DefaultState)
+{
+    std::string const idf_objects = delimited_string({
+        "  Output:Diagnostics;",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(*state);
+
+    EXPECT_FALSE(state->dataGlobal->DisplayAllWarnings);
+    EXPECT_FALSE(state->dataGlobal->DisplayExtraWarnings);
+    EXPECT_FALSE(state->dataGlobal->DisplayUnusedObjects);
+    EXPECT_FALSE(state->dataGlobal->DisplayUnusedSchedules);
+    EXPECT_FALSE(state->dataGlobal->DisplayAdvancedReportVariables);
+    EXPECT_FALSE(state->dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
+    EXPECT_TRUE(state->dataReportFlag->MakeMirroredDetachedShading);
+    EXPECT_TRUE(state->dataReportFlag->MakeMirroredAttachedShading);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringWarmup);
+    EXPECT_FALSE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
+    EXPECT_FALSE(state->dataSysVars->ReportDetailedWarmupConvergence);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringHVACSizingSimulation);
+
+    // Undocumented ones, see SimulationManager_OutputDiagnostics_UndocumentedFlags
+    EXPECT_FALSE(state->dataEnvrn->IgnoreSolarRadiation);
+    EXPECT_FALSE(state->dataEnvrn->IgnoreBeamRadiation);
+    EXPECT_FALSE(state->dataEnvrn->IgnoreDiffuseRadiation);
+    EXPECT_FALSE(state->dataSysVars->DeveloperFlag);
+    EXPECT_FALSE(state->dataSysVars->TimingFlag);
+
+    // no error message from
+    EXPECT_TRUE(compare_err_stream("", true));
+}
+
+TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_SimpleCase)
+{
+    std::string const idf_objects = delimited_string({
+        "  Output:Diagnostics,",
+        "    DisplayAllWarnings,      !- Key 1",
+        "    DisplayAdvancedReportVariables;    !- Key 2",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(*state);
+
+    EXPECT_TRUE(state->dataGlobal->DisplayAllWarnings);
+    EXPECT_TRUE(state->dataGlobal->DisplayExtraWarnings);
+    EXPECT_TRUE(state->dataGlobal->DisplayUnusedObjects);
+    EXPECT_TRUE(state->dataGlobal->DisplayUnusedSchedules);
+    EXPECT_TRUE(state->dataGlobal->DisplayAdvancedReportVariables);
+    EXPECT_FALSE(state->dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
+    EXPECT_TRUE(state->dataReportFlag->MakeMirroredDetachedShading);
+    EXPECT_TRUE(state->dataReportFlag->MakeMirroredAttachedShading);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringWarmup);
+    EXPECT_FALSE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
+    EXPECT_FALSE(state->dataSysVars->ReportDetailedWarmupConvergence);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringHVACSizingSimulation);
+
+    // no error message from
+    EXPECT_TRUE(compare_err_stream("", true));
+}
+
+TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_AllKeys)
+{
+    // All keys
+    std::string const idf_objects = delimited_string({
+        "  Output:Diagnostics,",
+        "    DisplayAllWarnings,",
+        "    DisplayExtraWarnings,",
+        "    DisplayUnusedSchedules,",
+        "    DisplayUnusedObjects,",
+        "    DisplayAdvancedReportVariables,",
+        "    DisplayZoneAirHeatBalanceOffBalance,",
+        "    DoNotMirrorDetachedShading,",
+        "    DoNotMirrorAttachedShading,",
+        "    DisplayWeatherMissingDataWarnings,",
+        "    ReportDuringWarmup,",
+        "    ReportDetailedWarmupConvergence,",
+        "    ReportDuringHVACSizingSimulation;",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(*state);
+
+    EXPECT_TRUE(state->dataGlobal->DisplayAllWarnings);
+    EXPECT_TRUE(state->dataGlobal->DisplayExtraWarnings);
+    EXPECT_TRUE(state->dataGlobal->DisplayUnusedObjects);
+    EXPECT_TRUE(state->dataGlobal->DisplayUnusedSchedules);
+    EXPECT_TRUE(state->dataGlobal->DisplayAdvancedReportVariables);
+    EXPECT_TRUE(state->dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
+    EXPECT_FALSE(state->dataReportFlag->MakeMirroredDetachedShading);
+    EXPECT_FALSE(state->dataReportFlag->MakeMirroredAttachedShading);
+    EXPECT_TRUE(state->dataSysVars->ReportDuringWarmup);
+    EXPECT_TRUE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
+    EXPECT_TRUE(state->dataSysVars->ReportDetailedWarmupConvergence);
+    EXPECT_TRUE(state->dataSysVars->ReportDuringHVACSizingSimulation);
+
+    // no error message from
+    EXPECT_TRUE(compare_err_stream("", true));
+}
+
+TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_Unicity)
+{
+    std::string const idf_objects = delimited_string({
+        "  Output:Diagnostics,",
+        "    DisplayAdvancedReportVariables;    !- Key 1",
+
+        "  Output:Diagnostics,",
+        "    DisplayAllWarnings;      !- Key 1",
+    });
+
+    // Input processor will throw a severe, so do not use assertions
+    EXPECT_FALSE(process_idf(idf_objects, false));
+    // Instead do it here, making sure to reset the stream
+    {
+        std::string const expectedError = delimited_string({
+            "   ** Severe  ** <root>[Output:Diagnostics] - Object should have no more than 1 properties.",
+        });
+        EXPECT_TRUE(compare_err_stream(expectedError, true));
+    }
+    SimulationManager::GetProjectData(*state);
+
+    EXPECT_FALSE(state->dataGlobal->DisplayAllWarnings);
+    EXPECT_FALSE(state->dataGlobal->DisplayExtraWarnings);
+    EXPECT_FALSE(state->dataGlobal->DisplayUnusedObjects);
+    EXPECT_FALSE(state->dataGlobal->DisplayUnusedSchedules);
+    EXPECT_TRUE(state->dataGlobal->DisplayAdvancedReportVariables); // Only first object has been processed
+    EXPECT_FALSE(state->dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
+    EXPECT_TRUE(state->dataReportFlag->MakeMirroredDetachedShading);
+    EXPECT_TRUE(state->dataReportFlag->MakeMirroredAttachedShading);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringWarmup);
+    EXPECT_FALSE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
+    EXPECT_FALSE(state->dataSysVars->ReportDetailedWarmupConvergence);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringHVACSizingSimulation);
+
+    {
+        std::string const expectedError = delimited_string({
+            "   ** Warning ** Output:Diagnostics: More than 1 occurrence of this object found, only first will be used.",
+        });
+        EXPECT_TRUE(compare_err_stream(expectedError, true));
+    }
+}
+
+TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)
+{
+    std::string const idf_objects = delimited_string({
+        "  Output:Diagnostics,",
+        "    IgnoreSolarRadiation,",
+        "    IgnoreBeamRadiation,",
+        "    IgnoreDiffuseRadiation,",
+        "    DeveloperFlag,",
+        "    TimingFlag;",
+    });
+
+    // This will throw a warning in InputProcessor since these aren't supported keys, so do not use assertions
+    EXPECT_FALSE(process_idf(idf_objects, false));
+    const std::string expected_warning = delimited_string({
+        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][0][key] - \"IgnoreSolarRadiation\" - Failed to match against "
+        "any enum values.",
+        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][1][key] - \"IgnoreBeamRadiation\" - Failed to match against "
+        "any enum values.",
+        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][2][key] - \"IgnoreDiffuseRadiation\" - Failed to match "
+        "against any enum values.",
+        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][3][key] - \"DeveloperFlag\" - Failed to match against any "
+        "enum values.",
+        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][4][key] - \"TimingFlag\" - Failed to match against any enum "
+        "values.",
+    });
+    EXPECT_TRUE(compare_err_stream(expected_warning, true));
+
+    SimulationManager::GetProjectData(*state);
+
+    EXPECT_FALSE(state->dataGlobal->DisplayAllWarnings);
+    EXPECT_FALSE(state->dataGlobal->DisplayExtraWarnings);
+    EXPECT_FALSE(state->dataGlobal->DisplayUnusedObjects);
+    EXPECT_FALSE(state->dataGlobal->DisplayUnusedSchedules);
+    EXPECT_FALSE(state->dataGlobal->DisplayAdvancedReportVariables);
+    EXPECT_FALSE(state->dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
+    EXPECT_TRUE(state->dataReportFlag->MakeMirroredDetachedShading);
+    EXPECT_TRUE(state->dataReportFlag->MakeMirroredAttachedShading);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringWarmup);
+    EXPECT_FALSE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
+    EXPECT_FALSE(state->dataSysVars->ReportDetailedWarmupConvergence);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringHVACSizingSimulation);
+
+    // Still works
+    EXPECT_TRUE(state->dataEnvrn->IgnoreSolarRadiation);
+    EXPECT_TRUE(state->dataEnvrn->IgnoreBeamRadiation);
+    EXPECT_TRUE(state->dataEnvrn->IgnoreDiffuseRadiation);
+    EXPECT_TRUE(state->dataSysVars->DeveloperFlag);
+    EXPECT_TRUE(state->dataSysVars->TimingFlag);
+
+    // no error message from
+    EXPECT_TRUE(compare_err_stream("", true));
+}
+
+// We want to avoid cryptic failures such as this one: "[json.exception.out_of_range.403] key 'key' not found"
+TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_HasEmpty)
+{
+    std::string const idf_objects = delimited_string({
+        "  Output:Diagnostics,",
+        "    ,                                  !- Key 1",
+        "    DisplayAdvancedReportVariables;    !- Key 2",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    ASSERT_NO_THROW(SimulationManager::GetProjectData(*state));
+
+    EXPECT_FALSE(state->dataGlobal->DisplayAllWarnings);
+    EXPECT_FALSE(state->dataGlobal->DisplayExtraWarnings);
+    EXPECT_FALSE(state->dataGlobal->DisplayUnusedObjects);
+    EXPECT_FALSE(state->dataGlobal->DisplayUnusedSchedules);
+
+    EXPECT_TRUE(state->dataGlobal->DisplayAdvancedReportVariables);
+
+    EXPECT_FALSE(state->dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
+    EXPECT_TRUE(state->dataReportFlag->MakeMirroredDetachedShading);
+    EXPECT_TRUE(state->dataReportFlag->MakeMirroredAttachedShading);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringWarmup);
+    EXPECT_FALSE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
+    EXPECT_FALSE(state->dataSysVars->ReportDetailedWarmupConvergence);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringHVACSizingSimulation);
+
+    // Warning that an empty key was entered
+    std::string const expectedError = delimited_string({
+        "   ** Warning ** Output:Diagnostics: empty key found, consider removing it to avoid this warning.",
+    });
+    EXPECT_TRUE(compare_err_stream(expectedError, true));
+}
+
+TEST_F(EnergyPlusFixture, SimulationManager_HVACSizingSimulationChoiceTest)
+{
+    std::string const idf_objects = delimited_string({
+        "  SimulationControl,",
+        "    No,                      !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    No,                      !- Run Simulation for Sizing Periods",
+        "    Yes,                     !- Run Simulation for Weather File Run Periods",
+        "    Yes;                     !- Do HVAC Sizing Simulation for Sizing Periods",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(*state);
+
+    EXPECT_TRUE(state->dataGlobal->DoHVACSizingSimulation);
+    // get a default value
+    EXPECT_EQ(state->dataGlobal->HVACSizingSimMaxIterations, 1);
 }

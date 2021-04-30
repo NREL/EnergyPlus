@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,16 +49,163 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include "../Coils/CoilCoolingDXFixture.hh"
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
 
 using namespace EnergyPlus;
 
-TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitModeInput )
+TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitModeInput)
 {
     std::string idf_objects = this->getModeObjectString("mode1", 2);
-    EXPECT_TRUE(process_idf( idf_objects, false ));
-    CoilCoolingDXCurveFitOperatingMode thisMode("mode1");
+    EXPECT_TRUE(process_idf(idf_objects, false));
+    CoilCoolingDXCurveFitOperatingMode thisMode(*state, "mode1");
     EXPECT_EQ("MODE1", thisMode.name);
     EXPECT_EQ("MODE1SPEED1", thisMode.speeds[0].name);
+}
+
+TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing)
+{
+
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    std::string idf_objects = delimited_string({
+
+        "Coil:Cooling:DX,",
+        "  Coil Cooling DX 1,                      !- Name",
+        "  Air Loop HVAC Unitary System 5 Fan - Cooling Coil Node, !- Evaporator Inlet Node Name",
+        "  Air Loop HVAC Unitary System 5 Cooling Coil - Heating Coil Node, !- Evaporator Outlet Node Name",
+        "  Always On Discrete,                     !- Availability Schedule Name",
+        "  ,                                       !- Condenser Zone Name",
+        "  Coil Cooling DX 1 Condenser Inlet Node, !- Condenser Inlet Node Name",
+        "  Coil Cooling DX 1 Condenser Outlet Node, !- Condenser Outlet Node Name",
+        "  Coil Cooling DX Curve Fit Performance 1; !- Performance Object Name",
+        "",
+        "Coil:Cooling:DX:CurveFit:Performance,",
+        "  Coil Cooling DX Curve Fit Performance 1, !- Name",
+        "  0,                                      !- Crankcase Heater Capacity {W}",
+        "  -25,                                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "  10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "  773.3,                                  !- Unit Internal Static Air Pressure {Pa}",
+        "  Discrete,                               !- Capacity Control Method",
+        "  0,                                      !- Evaporative Condenser Basin Heater Capacity {W/K}",
+        "  2,                                      !- Evaporative Condenser Basin Heater Setpoint Temperature {C}",
+        "  Always On Discrete,                     !- Evaporative Condenser Basin Heater Operating Schedule Name",
+        "  Electricity,                            !- Compressor Fuel Type",
+        "  Coil Cooling DX Curve Fit Operating Mode 1; !- Base Operating Mode",
+
+        "Coil:Cooling:DX:CurveFit:OperatingMode,",
+        "  Coil Cooling DX Curve Fit Operating Mode 1, !- Name",
+        "  Autosize,                               !- Rated Gross Total Cooling Capacity {W}",
+        "  Autosize,                                    !- Rated Evaporator Air Flow Rate {m3/s}",
+        "  Autosize,                               !- Rated Condenser Air Flow Rate {m3/s}",
+        "  0,                                      !- Maximum Cycling Rate {cycles/hr}",
+        "  0,                                      !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+        "  0,                                      !- Latent Capacity Time Constant {s}",
+        "  0,                                      !- Nominal Time for Condensate Removal to Begin {s}",
+        "  No,                                     !- Apply Latent Degradation to Speeds Greater than 1",
+        "  EvaporativelyCooled,                    !- Condenser Type",
+        "  Autosize,                               !- Nominal Evaporative Condenser Pump Power {W}",
+        "  1,                                      !- Nominal Speed Number",
+        "  Coil Cooling DX Curve Fit Speed 1;      !- Speed Name 1",
+    });
+    idf_objects += this->getSpeedObjectString("Coil Cooling DX Curve Fit Speed 1");
+    EXPECT_TRUE(process_idf(idf_objects, false));
+    CoilCoolingDXCurveFitOperatingMode thisMode(*state, "Coil Cooling DX Curve Fit Operating Mode 1");
+    EXPECT_EQ(CoilCoolingDXCurveFitOperatingMode::CondenserType::EVAPCOOLED, thisMode.condenserType);
+    EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedEvapAirFlowRate);
+    EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedGrossTotalCap);
+    EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedCondAirFlowRate);
+    EXPECT_EQ(DataSizing::AutoSize, thisMode.nominalEvaporativePumpPower);
+
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->SysSizPeakDDNum.allocate(1);
+
+    state->dataSize->CurSysNum = 0;
+    state->dataSize->CurOASysNum = 0;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataEnvrn->StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
+    state->dataEnvrn->StdBaroPress = 101325.0;
+
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+
+    Real64 ratedEvapAirFlowRate = 1.005;
+
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = ratedEvapAirFlowRate;
+
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 30.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.001;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 15.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0006;
+
+    thisMode.size(*state);
+
+    // We need to commit, so that the ComponentSizes is actually written
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
+
+    EXPECT_EQ(ratedEvapAirFlowRate, thisMode.ratedEvapAirFlowRate);
+    Real64 ratedGrossTotalCap = 18827.616766698276;
+    EXPECT_EQ(ratedGrossTotalCap, thisMode.ratedGrossTotalCap);
+    // Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
+    Real64 ratedCondAirFlowRate = 0.000114 * ratedGrossTotalCap;
+    EXPECT_EQ(ratedCondAirFlowRate, thisMode.ratedCondAirFlowRate);
+    // Total Capacity * 0.004266 w/w (15 W/ton)
+    Real64 nominalEvaporativePumpPower = 0.004266 * ratedGrossTotalCap;
+    EXPECT_EQ(nominalEvaporativePumpPower, thisMode.nominalEvaporativePumpPower);
+
+    // Now check output tables to ensure that we also get the right units etc
+    const std::string compType = "Coil:Cooling:DX:CurveFit:OperatingMode";
+    const std::string compName = thisMode.name;
+    EXPECT_EQ(compName, "COIL COOLING DX CURVE FIT OPERATING MODE 1");
+
+    struct TestQuery
+    {
+        TestQuery(std::string t_description, std::string t_units, Real64 t_value)
+            : description(t_description), units(t_units), expectedValue(t_value),
+              displayString("Description='" + description + "'; Units='" + units + "'"){};
+
+        const std::string description;
+        const std::string units;
+        const Real64 expectedValue;
+        const std::string displayString;
+    };
+
+    std::vector<TestQuery> testQueries({
+        TestQuery("Design Size Rated Evaporator Air Flow Rate", "m3/s", ratedEvapAirFlowRate),
+        TestQuery("Design Size Rated Gross Total Cooling Capacity", "W", ratedGrossTotalCap),
+        TestQuery("Design Size Rated Condenser Air Flow Rate", "m3/s", ratedCondAirFlowRate),
+        TestQuery("Design Size Nominal Evaporative Condenser Pump Power", "W", nominalEvaporativePumpPower),
+    });
+
+    for (auto &testQuery : testQueries) {
+
+        std::string query("SELECT Value From ComponentSizes"
+                          "  WHERE CompType = '" +
+                          compType +
+                          "'"
+                          "  AND CompName = '" +
+                          compName +
+                          "'"
+                          "  AND Description = '" +
+                          testQuery.description + "'" + "  AND Units = '" + testQuery.units + "'");
+
+        // execAndReturnFirstDouble returns -10000.0 if not found
+        Real64 return_val = SQLiteFixture::execAndReturnFirstDouble(query);
+
+        if (return_val < 0) {
+            EXPECT_TRUE(false) << "Query returned nothing for " << testQuery.displayString;
+        } else {
+            EXPECT_NEAR(testQuery.expectedValue, return_val, 0.01) << "Failed for " << testQuery.displayString;
+        }
+    }
+
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }

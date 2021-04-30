@@ -1,39 +1,14 @@
 compilers:
   - name: "gcc"
     version: "7.5"
-    build_package_generator:
-     - "STGZ"
-     - "TGZ"
-     - "IFW"
-    release_build_cmake_extra_flags: -DENABLE_REGRESSION_TESTING:BOOL=ON -DBUILD_DOCS:BOOL=ON
-    cmake_extra_flags: -DLINK_WITH_PYTHON=ON -DBUILD_DOCS:BOOL=ON -DTEX_INTERACTION="nonstopmode" -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PERFORMANCE_TESTS:BOOL=ON -DVALGRIND_ANALYZE_PERFORMANCE_TESTS:BOOL=ON
+    cmake_extra_flags: -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PERFORMANCE_TESTS:BOOL=ON -DVALGRIND_ANALYZE_PERFORMANCE_TESTS:BOOL=ON -DENABLE_PCH:BOOL=OFF
     collect_performance_results: true
-    s3_upload: doc/pdf
     s3_upload_bucket: energyplus
-
-  - name: cppcheck
-    compiler_extra_flags: --suppress="*:*third_party*" --suppress="*:*tst/EnergyPlus*" --suppress="uninitvar:*"  # need to rip these last two band-aids soon
-
-  - name: custom_check
-    commands:
-      - ./scripts/dev/license-check.py
-      - ./scripts/dev/verify_formatting.sh
-      - ./scripts/dev/check_stray_fields_in_idd.py
-      - ./scripts/dev/verify_idfs_in_cmake.py
-      - ./scripts/dev/check_non_utf8.py
-      - ./scripts/dev/check_pr_labels.py
-      - ./scripts/dev/verify_file_encodings.py
-      - ./scripts/dev/validate_idd_units.py
-      - ./scripts/dev/find_byref_bool_override.py
-      - ./scripts/dev/check_for_tabs_in_idfs.py
-      - ./scripts/dev/check_for_bom_in_idfs.py
-      - ./scripts/dev/verify_cmake_dirs.py
 
   - name: "gcc"
     version: "7.5"
     build_type: Debug
-    build_package_generator: "STGZ"
-    cmake_extra_flags: -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF
+    cmake_extra_flags: -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DENABLE_PCH:BOOL=OFF
     coverage_enabled: true
     coverage_base_dir: src/EnergyPlus
     coverage_pass_limit: 41.0
@@ -47,12 +22,11 @@ compilers:
   - name: "gcc"
     version: "7.5"
     build_type: Debug
-    build_package_generator: "STGZ"
-    cmake_extra_flags: -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF
+    cmake_extra_flags: -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DENABLE_PCH:BOOL=OFF
     coverage_enabled: true
     coverage_base_dir: src/EnergyPlus
-    coverage_pass_limit: 68.0
-    coverage_warn_limit: 67.9
+    coverage_pass_limit: 66.0
+    coverage_warn_limit: 67.0
     coverage_s3_bucket: energyplus
     build_tag: IntegrationCoverage
     ctest_filter: -R "integration.*"

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,10 +49,11 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
@@ -146,8 +147,6 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
 
     EXPECT_EQ(format("{:.2R}", -0.0), "0.00");
 
-
-
     // kept in the code for the sake of documentation
     // code is expected to not round up with the old version, but clearly it should
     // EXPECT_EQ(format("{:.3R}", 6.41750000000000013576E-005), "6.417E-005");
@@ -155,7 +154,7 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     // EXPECT_EQ(format("{:.5R}", 0.059576949999999996577), "5.95769E-002");
 
     // N formatting simulates the 'G' from Fortran
-    // Always has a leading 0 if printing in fixed notation
+    // Always has a leading 0 if printing in fixed notation < 1
     EXPECT_EQ(format("{:20.8N}", -0.23111252E-04), "     -0.23111252E-04");
     EXPECT_EQ(format("{:20.8N}", -0.0), "      -0.0000000    ");
     EXPECT_EQ(format("{:20.8N}", 0.0), "       0.0000000    ");
@@ -164,6 +163,10 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     EXPECT_EQ(format("{:20.8N}", 213608139.6), "      213608140.    ");
     EXPECT_EQ(format("{:20.8N}", 0.213608134), "      0.21360813    ");
     EXPECT_EQ(format("{:13.6N}", 0.803434E+09), " 0.803434E+09");
+    EXPECT_EQ(format("{:N}", 2.06944444444444), "2.06944444444444    ");
+    //    EXPECT_EQ(format("{:N}", 999.9), "           999.9    ");
+    EXPECT_EQ(format("{:N}", 61677162.0987027), "61677162.0987027    ");
+
     //    EXPECT_EQ(format("{:20.8N}", -0.23111252), "     -0.23111252    ");
     //    EXPECT_EQ(format("{:20.8N}", -0.23111252), "     -0.23111252    ");
 
@@ -178,7 +181,6 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     EXPECT_EQ(format("{:.3T}", 6.41749999999999878051E-005), "6.417E-005");
     EXPECT_EQ(format("{:.3T}", 0.10106298657208269420), "0.101");
 
-
     EXPECT_EQ(format("{:.4T}", 0.14999999999999999445), "0.1500");
     EXPECT_EQ(format("{:.3T}", 4500.0), "4500.000");
     EXPECT_EQ(format("{:.4T}", 7.1846416734478406596), "7.1846");
@@ -190,6 +192,5 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     // code is expected to round down with the old version, but clearly it should not
     // for the case of "Trim"
     // EXPECT_EQ(format("{:.4T}", 0.096970000000000000639), "9.6969E-002");
-
 }
 } // namespace EnergyPlus
