@@ -4325,7 +4325,6 @@ TEST_F(InputProcessorFixture, epJSONgetObjectItem_minfields)
     root[obj_name2][name2] = mat1;
 
     state->dataInputProcessing->inputProcessor->epJSON = root;
-    // getEpJSON();
 
     int numAlphas = 0;
     int numNumbers = 0;
@@ -4404,6 +4403,65 @@ TEST_F(InputProcessorFixture, epJSONgetObjectItem_minfields)
     EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(2), 0.9, 0.0001);
     // Fields beyond min-fields come back as blank or zero, even if they have a default
     EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(4), 0.0, 0.0001);
+}
+
+TEST_F(InputProcessorFixture, epJSONgetFieldValue)
+{
+
+    json root;
+    std::string obj_type1 = "Building";
+    std::string name1 = "Building 1";
+    json bldg1 = {{"loads_convergence_tolerance_value", 0.1}, {"terrain", "Ocean"}};
+    EXPECT_TRUE(bldg1.is_object());
+    root[obj_type1][name1] = bldg1;
+
+    std::string obj_type2 = "Material";
+    std::string name2 = "Standard insulation_01";
+    json mat1 = {{"name", name1}, {"roughness", "MediumRough"}, {"thickness", 0.2}, {"solar_absorptance", 0.5}};
+    EXPECT_TRUE(mat1.is_object());
+    root[obj_type2][name2] = mat1;
+
+    state->dataInputProcessing->inputProcessor->epJSON = root;
+
+    state->dataGlobal->isEpJSON = true;
+    state->dataInputProcessing->inputProcessor->initializeMaps();
+    std::string alphaFieldValue;
+    Real64 numericFieldValue = 0.0;
+    // User inputs from above
+    // Note even though choice keys are case-sensitive during epJSON processing, getFieldValue pushes Alphas to UPPERcase
+    state->dataInputProcessing->inputProcessor->getFieldValue(*state, obj_type1, bldg1, "terrain", alphaFieldValue);
+    EXPECT_EQ(alphaFieldValue, "OCEAN");
+    state->dataInputProcessing->inputProcessor->getFieldValue(*state, obj_type1, bldg1, "loads_convergence_tolerance_value", numericFieldValue);
+    EXPECT_NEAR(numericFieldValue, 0.1, 0.0001);
+    // Defaults from schema
+    state->dataInputProcessing->inputProcessor->getFieldValue(*state, obj_type1, bldg1, "solar_distribution", alphaFieldValue);
+    EXPECT_EQ(alphaFieldValue, "FULLEXTERIOR");
+    state->dataInputProcessing->inputProcessor->getFieldValue(*state, obj_type1, bldg1, "north_axis", numericFieldValue);
+    EXPECT_NEAR(numericFieldValue, 0.0, 0.0001);
+    state->dataInputProcessing->inputProcessor->getFieldValue(*state, obj_type1, bldg1, "temperature_convergence_tolerance_value", numericFieldValue);
+    EXPECT_NEAR(numericFieldValue, 0.4, 0.0001);
+    state->dataInputProcessing->inputProcessor->getFieldValue(*state, obj_type1, bldg1, "maximum_number_of_warmup_days", numericFieldValue);
+    EXPECT_NEAR(numericFieldValue, 25.0, 0.0001);
+    state->dataInputProcessing->inputProcessor->getFieldValue(*state, obj_type1, bldg1, "minimum_number_of_warmup_days", numericFieldValue);
+    EXPECT_NEAR(numericFieldValue, 1.0, 0.0001);
+
+    // User inputs from above
+    // Note even though choice keys are case-sensitive during epJSON processing, getObjectItem pushes Alphas to UPPERcase
+    state->dataInputProcessing->inputProcessor->getFieldValue(*state, obj_type2, mat1, "roughness", alphaFieldValue);
+    EXPECT_EQ(alphaFieldValue, "MEDIUMROUGH");
+    state->dataInputProcessing->inputProcessor->getFieldValue(*state, obj_type2, mat1, "thickness", numericFieldValue);
+    EXPECT_NEAR(numericFieldValue, 0.2, 0.0001);
+    state->dataInputProcessing->inputProcessor->getFieldValue(*state, obj_type2, mat1, "solar_absorptance", numericFieldValue);
+    EXPECT_NEAR(numericFieldValue, 0.5, 0.0001);
+    // Defaults from schema
+    state->dataInputProcessing->inputProcessor->getFieldValue(*state, obj_type2, mat1, "thermal_absorptance", numericFieldValue);
+    EXPECT_NEAR(numericFieldValue, 0.9, 0.0001);
+    // Fields beyond min-fields also return their default if they have one (unlike getObjectItem)
+    state->dataInputProcessing->inputProcessor->getFieldValue(*state, obj_type2, mat1, "visible_absorptance", numericFieldValue);
+    EXPECT_NEAR(numericFieldValue, 0.7, 0.0001);
+    // or zero if they don't have a default (in this case it's a required field, so it would have failed before now)
+    state->dataInputProcessing->inputProcessor->getFieldValue(*state, obj_type2, mat1, "specific_heat", numericFieldValue);
+    EXPECT_NEAR(numericFieldValue, 0.0, 0.0001);
 }
 
 /*
