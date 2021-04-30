@@ -4241,6 +4241,8 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
 
     // Test node connection function
     auto &thisTU = state->dataHVACVarRefFlow->VRFTU(VRFTUNum);
+    // current configuration is draw through fan
+    EXPECT_EQ(thisTU.FanPlace, DataHVACGlobals::DrawThru);
     EXPECT_FALSE(ErrorsFound);
     CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);      // nodes are connected correctly
@@ -4265,6 +4267,23 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     ErrorsFound = false;
     thisTU.heatCoilAirInNode += 1;  // revert previous change
     thisTU.heatCoilAirOutNode -= 1; // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    thisTU.heatCoilAirOutNode += 1; // revert previous change
+
+    // switch fan placement
+    thisTU.FanPlace = DataHVACGlobals::BlowThru;
+    EXPECT_TRUE(thisTU.OAMixerUsed);
+    // correct node connections
+    thisTU.fanInletNode = thisTU.VRFTUOAMixerMixedNodeNum;
+    thisTU.fanOutletNode = thisTU.coolCoilAirInNode;
+    thisTU.heatCoilAirOutNode = thisTU.VRFTUOutletNodeNum;
+    ErrorsFound = false;
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound); // nodes are connected correctly
+
+    // change OA mixer return node
+    thisTU.VRFTUOAMixerRetNodeNum += 1;
     CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
     EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
 }

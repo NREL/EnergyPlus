@@ -5577,7 +5577,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &ErrorsFound)
 {
 
-    std::string const cTerminalUnitType("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow");
+    constexpr static std::string_view cTerminalUnitType("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow");
     auto &nodeID = state.dataLoopNodes->NodeID;
     auto &vrfTU = state.dataHVACVarRefFlow->VRFTU(VRFTUNum);
     std::string const cTUName(vrfTU.Name);
@@ -5604,7 +5604,7 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
     // the following is checked regardless of fan placement
     if (CoolingCoilPresent && HeatingCoilPresent) {
         if (coolCoilAirOutNode != heatCoilAirInNode) {
-            ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+            ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
             ShowContinueError(state, "The cooling coil air outlet node name must match the heating coil air inlet node name.");
             if (coolCoilAirOutNode > 0 && heatCoilAirInNode > 0) {
                 ShowContinueError(state, "... Cooling coil air outlet node = " + nodeID(coolCoilAirOutNode));
@@ -5618,7 +5618,7 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
     if (FanPlace == DataHVACGlobals::DrawThru || !FanPresent) {
         if (OAMixerUsed) {
             if (VRFTUInletNodeNum != VRFTUOAMixerRetNodeNum) {
-                ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+                ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
                 ShowContinueError(state,
                                   "... For draw thru or no fan when an OA mixer is specified the terminal unit "
                                   "inlet node name must match the OA mixer return air stream node name.");
@@ -5631,7 +5631,7 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
             // check mixer outlet with next component
             if (CoolingCoilPresent) {
                 if (VRFTUOAMixerMixedNodeNum != coolCoilAirInNode) {
-                    ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+                    ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
                     ShowContinueError(state,
                                       "... For draw thru or no fan when an OA mixer is specified and a cooling coil is present "
                                       "the OA mixer mixed air node name must match the cooling coil inlet node name.");
@@ -5643,7 +5643,7 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
                 }
             } else if (HeatingCoilPresent) {
                 if (VRFTUOAMixerMixedNodeNum != heatCoilAirInNode) {
-                    ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+                    ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
                     ShowContinueError(state,
                                       "... For draw thru or no fan when an OA mixer is specified and a cooling coil is not present "
                                       "the OA mixer mixed air node name must match the heating coil inlet node name.");
@@ -5657,7 +5657,7 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
         } else { // OAMixer not used
             if (CoolingCoilPresent) {
                 if (VRFTUInletNodeNum != coolCoilAirInNode) {
-                    ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+                    ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
                     ShowContinueError(
                         state,
                         "... For draw thru or no fan when no OA mixer is specified and a cooling coil is present the terminal unit inlet "
@@ -5670,7 +5670,7 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
                 }
             } else if (HeatingCoilPresent) {
                 if (VRFTUInletNodeNum != heatCoilAirInNode) {
-                    ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+                    ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
                     ShowContinueError(state,
                                       "... For draw thru or no fan when no cooling coil or OA mixer is specified the terminal unit inlet "
                                       "node name must match the heating coil inlet node name.");
@@ -5685,7 +5685,7 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
     }
     if (FanPlace == DataHVACGlobals::BlowThru && !OAMixerUsed) {
         if (VRFTUInletNodeNum != fanInletNode) {
-            ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+            ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
             ShowContinueError(state,
                               "... For blow thru fan when no OA mixer is specified the terminal unit inlet "
                               "node name must match the fan inlet node name.");
@@ -5695,12 +5695,24 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
             }
             ErrorsFound = true;
         }
+    } else if (OAMixerUsed) { // when OA mixer is used TU inlet = OAMixer return node regardless of fan placement
+        if (VRFTUInletNodeNum != VRFTUOAMixerRetNodeNum) {
+            ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
+            ShowContinueError(state,
+                              "... When an OA mixer is specified the terminal unit inlet "
+                              "node name must match the OA mixer return node name.");
+            if (VRFTUInletNodeNum > 0 && VRFTUOAMixerRetNodeNum > 0) {
+                ShowContinueError(state, "... Terminal unit inlet node name = " + nodeID(VRFTUInletNodeNum) + ".");
+                ShowContinueError(state, "... Fan inlet node name = " + nodeID(VRFTUOAMixerRetNodeNum) + ".");
+            }
+            ErrorsFound = true;
+        }
     }
     // check the next component
     if (CoolingCoilPresent) {
         if (FanPlace == DataHVACGlobals::BlowThru) {
             if (fanOutletNode != coolCoilAirInNode) {
-                ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+                ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
                 ShowContinueError(state,
                                   "... For blow thru fan when a cooling coil is present "
                                   "fan outlet node name must match the cooling coil inlet node name.");
@@ -5713,7 +5725,7 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
         }
         if (!HeatingCoilPresent && FanPlace == DataHVACGlobals::DrawThru) {
             if (coolCoilAirOutNode != fanInletNode) {
-                ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+                ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
                 ShowContinueError(state,
                                   "... For draw thru fan when a heating coil is not present "
                                   "the cooling coil outlet node name must match the fan inlet node name.");
@@ -5728,7 +5740,7 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
     if (HeatingCoilPresent) {
         if (FanPlace == DataHVACGlobals::DrawThru) {
             if (heatCoilAirOutNode != fanInletNode) {
-                ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+                ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
                 ShowContinueError(state,
                                   "... For draw thru fan when a heating coil is present "
                                   "the heating coil outlet node name must match the fan inlet node name.");
@@ -5742,7 +5754,7 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
     }
     if (SuppHeatingCoilPresent) {
         if (SuppHeatCoilAirOutletNode != VRFTUOutletNodeNum) {
-            ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+            ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
             ShowContinueError(state, "... The supplemental heating coil outlet node name must match the terminal unit outlet node name.");
             if (SuppHeatCoilAirOutletNode > 0 && VRFTUOutletNodeNum > 0) {
                 ShowContinueError(state, "... Supplemental heating coil outlet node name = " + nodeID(SuppHeatCoilAirOutletNode) + ".");
@@ -5752,7 +5764,7 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
         }
         if (FanPlace == DataHVACGlobals::DrawThru) {
             if (fanOutletNode != SuppHeatCoilAirInletNode) {
-                ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+                ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
                 ShowContinueError(state,
                                   "... For draw thru fan when a supplemental heating coil is present "
                                   "the fan outlet node name must match the supplemental heating coil inlet node name.");
@@ -5764,7 +5776,7 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
             }
         } else {
             if (heatCoilAirOutNode != SuppHeatCoilAirInletNode) {
-                ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+                ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
                 ShowContinueError(state,
                                   "... For blow thru or no fan when a supplemental heating coil is present the heating "
                                   "coil outlet node name must match the supplemental heating coil inlet node name.");
@@ -5777,7 +5789,7 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
         }
     } else if (CoolingCoilPresent && !HeatingCoilPresent && (FanPlace == DataHVACGlobals::BlowThru || !FanPresent)) {
         if (coolCoilAirOutNode != VRFTUOutletNodeNum) {
-            ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+            ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
             ShowContinueError(state,
                               "... For blow through or no fan and no heating or supplemental heating coil the cooling coil outlet node name must "
                               "match the terminal unit outlet node name.");
@@ -5789,7 +5801,7 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
         }
         if (FanPlace == DataHVACGlobals::DrawThru) {
             if (fanOutletNode != VRFTUOutletNodeNum) {
-                ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+                ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
                 ShowContinueError(state,
                                   "... For draw through fan and no supplemental heating coil the fan outlet node name must "
                                   "match the terminal unit outlet node name.");
@@ -5802,7 +5814,7 @@ void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &
         }
     } else if (FanPlace == DataHVACGlobals::DrawThru) {
         if (fanOutletNode != VRFTUOutletNodeNum) {
-            ShowSevereError(state, cTerminalUnitType + " \"" + cTUName + "\"");
+            ShowSevereError(state, fmt::format("{}=\"{}\",", cTerminalUnitType, cTUName));
             ShowContinueError(state,
                               "... For blow through fan and no supplemental heating coil the fan outlet node name must "
                               "match the terminal unit outlet node name.");
