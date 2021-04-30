@@ -680,8 +680,10 @@ namespace CostEstimateManager {
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP > 0.0) {
                         if (WildcardObjNames) {
                             Real64 Qty(0.0);
-                            for (auto const &e : state.dataDXCoils->DXCoil)
-                                Qty += e.RatedCOP(1) * e.RatedTotCap(1);
+                            for (auto const &e : state.dataDXCoils->DXCoil) {
+                                int maxSpeed = e.RatedCOP.size();
+                                Qty += e.RatedCOP(maxSpeed) * e.RatedTotCap(maxSpeed);
+                            }
                             state.dataCostEstimateManager->CostLineItem(Item).Qty = Qty / 1000.0;
                             state.dataCostEstimateManager->CostLineItem(Item).Units = "kW*COP (total, rated) ";
                             state.dataCostEstimateManager->CostLineItem(Item).ValuePer =
@@ -690,8 +692,10 @@ namespace CostEstimateManager {
                                 state.dataCostEstimateManager->CostLineItem(Item).Qty * state.dataCostEstimateManager->CostLineItem(Item).ValuePer;
                         }
                         if (thisCoil > 0) {
-                            state.dataCostEstimateManager->CostLineItem(Item).Qty =
-                                state.dataDXCoils->DXCoil(thisCoil).RatedCOP(1) * state.dataDXCoils->DXCoil(thisCoil).RatedTotCap(1) / 1000.0;
+                            int maxSpeed = state.dataDXCoils->DXCoil(thisCoil).RatedCOP.size();
+                            state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataDXCoils->DXCoil(thisCoil).RatedCOP(maxSpeed) *
+                                                                                    state.dataDXCoils->DXCoil(thisCoil).RatedTotCap(maxSpeed) /
+                                                                                    1000.0;
                             state.dataCostEstimateManager->CostLineItem(Item).Units = "kW*COP (total, rated) ";
                             state.dataCostEstimateManager->CostLineItem(Item).ValuePer =
                                 state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP;
