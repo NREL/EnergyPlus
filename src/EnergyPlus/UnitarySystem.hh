@@ -66,6 +66,7 @@ namespace UnitarySystems {
     struct UnitarySysInputSpec
     {
         std::string name;
+        std::string system_type;
         std::string control_type;
         std::string controlling_zone_or_thermostat_location;
         std::string dehumidification_control_type;

@@ -2909,12 +2909,7 @@ namespace UnitarySystems {
 
         static std::string const unitarySysHeatPumpPerformanceObjectType("UnitarySystemPerformance:Multispeed");
 
-        std::string cCurrentModuleObject("");
-        if (compType_Num == SimAirServingZones::UnitarySystemModel) {
-            cCurrentModuleObject = "AirLoopHVAC:UnitarySystem";
-        } else if (compType_Num == SimAirServingZones::DXSystem) {
-            cCurrentModuleObject = "CoilSystem:Cooling:DX";
-        }
+        std::string cCurrentModuleObject = input_data.system_type;
         std::string thisObjectName = input_data.name;
         this->Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
 
@@ -6836,7 +6831,10 @@ namespace UnitarySystems {
                 UnitarySysInputSpec original_input_specs;
                 auto const &fields = instance.value();
                 original_input_specs.name = thisObjectName;
-                original_input_specs.availability_schedule_name = UtilityRoutines::MakeUPPERCase(fields.at("availability_schedule_name"));
+                original_input_specs.system_type = cCurrentModuleObject;
+                if (fields.find("availability_schedule_name") != fields.end()) { // not required field
+                    original_input_specs.availability_schedule_name = UtilityRoutines::MakeUPPERCase(fields.at("availability_schedule_name"));
+                }
                 original_input_specs.air_inlet_node_name =
                     UtilityRoutines::MakeUPPERCase(fields.at("dx_cooling_coil_system_inlet_node_name")); // required field
                 original_input_specs.air_outlet_node_name =
@@ -7007,6 +7005,7 @@ namespace UnitarySystems {
 
                 UnitarySysInputSpec input_spec;
                 input_spec.name = thisObjectName;
+                input_spec.system_type = cCurrentModuleObject;
                 input_spec.control_type = fields.at("control_type");
                 if (fields.find("controlling_zone_or_thermostat_location") != fields.end()) { // not required field
                     input_spec.controlling_zone_or_thermostat_location =

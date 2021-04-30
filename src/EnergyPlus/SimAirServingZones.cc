@@ -84,7 +84,6 @@
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
@@ -1218,8 +1217,6 @@ void GetAirPathData(EnergyPlusData &state)
                     } else if (componentType == "COIL:HEATING:DESUPERHEATER") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Coil_DeSuperHeat;
 
-                        //} else if (componentType == "COILSYSTEM:COOLING:DX") {
-                        //    PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = DXSystem;
                     } else if (componentType == "COILSYSTEM:HEATING:DX") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = DXHeatPumpSystem;
                     } else if (componentType == "COIL:USERDEFINED") {
@@ -1227,10 +1224,8 @@ void GetAirPathData(EnergyPlusData &state)
                     } else if (componentType == "AIRLOOPHVAC:UNITARYSYSTEM" || componentType == "COILSYSTEM:COOLING:DX") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = UnitarySystemModel;
                         UnitarySystems::UnitarySys thisSys;
-                        int compType = UnitarySys_AnyCoilType;
-                        // if (componentType == "COILSYSTEM:COOLING:DX") compType = DXSystem;
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).compPointer =
-                            thisSys.factory(state, compType, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, false, 0);
+                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).compPointer = thisSys.factory(
+                            state, UnitarySys_AnyCoilType, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, false, 0);
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys_HeatOnly;
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL") {
@@ -1998,8 +1993,15 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                         FoundOASys = true;
                     }
                     if (CompTypeNum == WaterCoil_SimpleCool || CompTypeNum == WaterCoil_Cooling || CompTypeNum == WaterCoil_DetailedCool ||
-                        CompTypeNum == WaterCoil_CoolingHXAsst || CompTypeNum == DXSystem) {
+                        CompTypeNum == WaterCoil_CoolingHXAsst) {
                         FoundCentralCoolCoil = true;
+                    }
+                    if (CompTypeNum == UnitarySystemModel) {
+                        bool CoolingCoilExists = false;
+                        bool HeatingCoilExists = false;
+                        std::string CompName = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name;
+                        UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(state, CompName, CoolingCoilExists, HeatingCoilExists, 0);
+                        if (CoolingCoilExists) FoundCentralCoolCoil = true;
                     }
                     if (CompTypeNum == Fan_Simple_CV || CompTypeNum == Fan_Simple_VAV || CompTypeNum == Fan_ComponentModel) {
                         if (PrimaryAirSystems(AirLoopNum).OASysExists && !PrimaryAirSystems(AirLoopNum).isAllOA) {
@@ -2109,9 +2111,8 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                 for (CompNum = 1; !FoundCentralCoolCoil && CompNum <= PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                     CompTypeNum = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
                     if (CompTypeNum == WaterCoil_SimpleCool || CompTypeNum == WaterCoil_Cooling || CompTypeNum == WaterCoil_DetailedCool ||
-                        CompTypeNum == WaterCoil_CoolingHXAsst || CompTypeNum == DXCoil_CoolingHXAsst || CompTypeNum == DXSystem ||
-                        CompTypeNum == Furnace_UnitarySys_HeatCool || CompTypeNum == UnitarySystem_BypassVAVSys ||
-                        CompTypeNum == UnitarySystem_MSHeatPump || CompTypeNum == CoilUserDefined) {
+                        CompTypeNum == WaterCoil_CoolingHXAsst || CompTypeNum == DXCoil_CoolingHXAsst || CompTypeNum == Furnace_UnitarySys_HeatCool ||
+                        CompTypeNum == UnitarySystem_BypassVAVSys || CompTypeNum == UnitarySystem_MSHeatPump || CompTypeNum == CoilUserDefined) {
                         FoundCentralCoolCoil = true;
                     } else if (CompTypeNum == UnitarySystemModel) {
                         // mine CoolHeat coil exists from UnitarySys
@@ -3488,7 +3489,6 @@ void SimAirLoopComponent(EnergyPlusData &state,
     using Humidifiers::SimHumidifier;
     using HVACDuct::SimDuct;
     using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
-    using HVACDXSystem::SimDXCoolingSystem;
     using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
     using HVACMultiSpeedHeatPump::SimMSHeatPump;
     using HVACUnitaryBypassVAV::SimUnitaryBypassVAV;
@@ -3571,10 +3571,6 @@ void SimAirLoopComponent(EnergyPlusData &state,
             SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, _, CompIndex, QActual);
             if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
 
-        } else if (SELECT_CASE_var == DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
-            SimDXCoolingSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex, _, _, QActual);
-            if (QActual > 0.0) CoolingActive = true; // determine if coil is ON
-
         } else if (SELECT_CASE_var == DXHeatPumpSystem) { // 'CoilSystem:Heating:DX'
             SimDXHeatPumpSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex, _, _, QActual);
             if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
@@ -3582,7 +3578,7 @@ void SimAirLoopComponent(EnergyPlusData &state,
         } else if (SELECT_CASE_var == CoilUserDefined) { // Coil:UserDefined
             SimCoilUserDefined(state, CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
 
-        } else if (SELECT_CASE_var == UnitarySystemModel) { // 'AirLoopHVAC:UnitarySystem'
+        } else if (SELECT_CASE_var == UnitarySystemModel || SELECT_CASE_var == DXSystem) { // 'AirLoopHVAC:UnitarySystem'
             Real64 sensOut = 0.0;
             Real64 latOut = 0.0;
             CompPointer->simulate(state,

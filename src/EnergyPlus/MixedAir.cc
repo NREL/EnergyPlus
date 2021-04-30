@@ -1104,8 +1104,6 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                     state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = UnitarySystemModel;
                     state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum) = CompNum;
                     UnitarySystems::UnitarySys thisSys;
-                    int compType = UnitarySys_AnyCoilType;
-                    // if (SELECT_CASE_var == "COILSYSTEM:COOLING:DX") compType = DXSystem;
                     state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompNum] = thisSys.factory(
                         state, DataHVACGlobals::UnitarySys_AnyCoilType, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
                 } else if (SELECT_CASE_var == "COIL:USERDEFINED") {
