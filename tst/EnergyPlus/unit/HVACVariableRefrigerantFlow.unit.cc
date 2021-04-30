@@ -626,7 +626,7 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
 
     Real64 saveMinOATCooling = state->dataHVACVarRefFlow->VRF(curSysNum).MinOATCooling;
     state->dataHVACVarRefFlow->VRF(curSysNum).MinOATCooling =
-       1.0 + state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp;
+        1.0 + state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp;
     InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
     SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     EXPECT_EQ(SysOutputProvided, 0.0);

@@ -412,8 +412,8 @@ AirConditioner:VariableRefrigerantFlow,
     VRFCondAvailSched,    !- Availability Schedule Name
     autosize,             !- Gross Rated Total Cooling Capacity {W}
     3.16038,              !- Gross Rated Cooling COP {W}
-    -5,                   !- Minimum Temperature in Cooling Mode {C}
-    43,                   !- Maximum Temperature in Cooling Mode {C}
+    -5,                   !- Minimum Condenser Inlet Node Temperature in Cooling Mode {C}
+    43,                   !- Maximum Condenser Inlet Node Temperature in Cooling Mode {C}
     VRFCoolCapFT,         !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name
     VRFCoolCapFTBoundary, !- Cooling Capacity Ratio Boundary Curve Name
     VRFCoolCapFTHi,       !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name
@@ -427,8 +427,8 @@ AirConditioner:VariableRefrigerantFlow,
     autosize,             !- Gross Rated Heating Capacity {W}
     ,                     !- Rated Heating Capacity Sizing Ratio (W/W)
     3.40909,              !- Gross Rated Heating COP
-    -20,                  !- Minimum Temperature in Heating Mode {C}
-    15.5,                 !- Maximum Temperature in Heating Mode {C}
+    -20,                  !- Minimum Condenser Inlet Node Temperature in Heating Mode {C}
+    15.5,                 !- Maximum Condenser Inlet Node Temperature in Heating Mode {C}
     VRFHeatCapFT,         !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name
     VRFHeatCapFTBoundary, !- Heating Capacity Ratio Boundary Curve Name
     VRFHeatCapFTHi,       !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name
@@ -475,8 +475,8 @@ AirConditioner:VariableRefrigerantFlow,
     ,                     !- Basin Heater Set Point Temperature (C)
     ,                     !- Basin Heater Operating Schedule Name
     ,                     !- Fuel Type
-    ,                     !- Minimum Temperature in Heat Recovery Mode (C)
-    ,                     !- Maximum Temperature in Heat Recovery Mode (C)
+    ,                     !- Minimum Condenser Inlet Node Temperature in Heat Recovery Mode (C)
+    ,                     !- Maximum Condenser Inlet Node Temperature in Heat Recovery Mode (C)
     ,                     !- Heat Recovery Cooling Capacity Modifier Function of Temperature Curve Name
     ,                     !- Initial Heat Recovery Cooling Capacity Fraction
     ,                     !- Heat Recovery Cooling Capacity Time Constant (hr)
