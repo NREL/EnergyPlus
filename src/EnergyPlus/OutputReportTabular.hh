@@ -117,9 +117,6 @@ namespace OutputReportTabular {
         NotFound,
     };
 
-    extern int const stepTypeZone;
-    extern int const stepTypeHVAC;
-
     // These correspond to the columns in the load component table
     constexpr int cSensInst(1);
     constexpr int cSensDelay(2);
