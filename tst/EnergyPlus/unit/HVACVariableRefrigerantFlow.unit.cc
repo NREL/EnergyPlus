@@ -4268,7 +4268,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     thisTU.heatCoilAirInNode += 1;  // revert previous change
     thisTU.heatCoilAirOutNode -= 1; // change index of comp node (watch for array bounds)
     CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
-    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    EXPECT_TRUE(ErrorsFound);       // nodes are not connected correctly
     thisTU.heatCoilAirOutNode += 1; // revert previous change
 
     // switch fan placement
