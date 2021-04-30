@@ -74,11 +74,11 @@ This numeric field defines the total cooling capacity (sensible + latent) of the
 
 This numeric field defines the cooling coefficient of performance (COP) at rated conditions. The cooling COP includes compressor power and condenser fan power. This COP value does not account for impacts due to the supply air fan. The nominal heat pump cooling COP must be greater than 0. If this field is left blank, a default COP of 3.3 is assumed.
 
-\paragraph{Field: Minimum Temperature in Cooling Mode}\label{field-minimum-temperature-in-cooling-mode-000}
+\paragraph{Field: Minimum Condenser Inlet Node Temperature in Cooling Mode}\label{field-minimum-condenser-inlet-node-temperature-in-cooling-mode-000}
 
 This numeric field defines the minimum source inlet temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6ºC.
 
-\paragraph{Field: Maximum Temperature in Cooling Mode}\label{field-maximum-temperature-in-cooling-mode-000}
+\paragraph{Field: Maximum Condenser Inlet Node Temperature in Cooling Mode}\label{field-maximum-condenser-inlet-node-temperature-in-cooling-mode-000}
 
 This numeric field defines the maximum source inlet temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, cooling is disabled. If this field is left blank, the default value is 43ºC.
 
@@ -134,11 +134,11 @@ This numeric field defines the ratio of gross heating to gross cooling capacity.
 
 This numeric field defines the heating coefficient of performance (COP) at rated conditions. The heating COP includes compressor power and condenser fan power. This gross COP value does NOT account for impacts due to the supply air fan. The nominal heat pump heating COP must be greater than 0. If this field is left blank, a COP of 3.4 is assumed.
 
-\paragraph{Field: Minimum Temperature in Heating Mode}\label{field-minimum-temperature-in-heating-mode-000}
+\paragraph{Field: Minimum Condenser Inlet Node Temperature in Heating Mode}\label{field-minimum-condenser-inlet-node-temperature-in-heating-mode-000}
 
 This numeric field defines the minimum source inlet temperature allowed for heating operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, heating is disabled. If this field is left blank, the default value is -20ºC.
 
-\paragraph{Field: Maximum Temperature in Heating Mode}\label{field-maximum-temperature-in-heating-mode-000}
+\paragraph{Field: Maximum Condenser Inlet Node Temperature in Heating Mode}\label{field-maximum-condenser-inlet-node-temperature-in-heating-mode-000}
 
 This numeric field defines the maximum source inlet temperature allowed for heating operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, heating is disabled. If this field is left blank, the default value is 16ºC. This default temperature will likely disable water-cooled equipment and a more reasonable value should be entered.  Check manufacturers specifications.
 
@@ -348,13 +348,13 @@ This alpha field contains the name of the basin heater operating schedule. This 
 
 This alpha field determines the type of fuel that this variable refrigerant flow system uses.~ This field has seven choices: Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1, and OtherFuel2. The default is Electricity. The use of alternate fuel types assumes an engine drives the variable speed compression system and also accounts for condenser air flow (i.e., a fan attached to the engine provides air flow through the outdoor condenser.
 
-\paragraph{Field: Minimum Temperature in Heat Recovery Mode}\label{field-minimum-temperature-in-heat-recovery-mode-000}
+\paragraph{Field: Minimum Condenser Inlet Node Temperature in Heat Recovery Mode}\label{field-minimum-condenser-inlet-node-temperature-in-heat-recovery-mode-000}
 
-This numeric field defines the minimum source inlet temperature allowed for heat recovery operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, heat recovery is disabled. This input must be greater than the larger of the minimum temperature in cooling or heating mode. If this field is left blank, the default value is the higher of the Minimum Temperature in Cooling Mode or Minimum Temperature in Heating Mode inputs. This system may still operate in cooling or heating only mode when source inlet temperatures are below the minimum temperature in heat recovery mode. This input is only used when Heat Pump Waste Heat Recovery is selected as Yes.
+This numeric field defines the minimum source inlet temperature allowed for heat recovery operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, heat recovery is disabled. This input must be greater than the larger of the minimum condenser inlet node temperature in cooling or heating mode. If this field is left blank, the default value is the higher of the Minimum Condenser Inlet Node Temperature in Cooling Mode or Minimum Condenser Inlet Node Temperature in Heating Mode inputs. This system may still operate in cooling or heating only mode when source inlet temperatures are below the minimum condenser inlet node temperature in heat recovery mode. This input is only used when Heat Pump Waste Heat Recovery is selected as Yes.
 
-\paragraph{Field: Maximum Temperature in Heat Recovery Mode}\label{field-maximum-temperature-in-heat-recovery-mode-000}
+\paragraph{Field: Maximum Condenser Inlet Node Temperature in Heat Recovery Mode}\label{field-maximum-condenser-inlet-node-temperature-in-heat-recovery-mode-000}
 
-This numeric field defines the maximum source inlet temperature allowed for heat recovery operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, heat recovery is disabled. This input must be less than the smaller of the maximum temperature in cooling or heating mode. If this field is left blank, the default value is the lower of the Maximum Temperature in Cooling Mode or Maximum Temperature in Heating Mode inputs.. This system may still operate in cooling or heating only mode when source inlet temperatures are above the maximum temperature in heat recovery mode. This input is only used when Heat Pump Waste Heat Recovery is selected as Yes.
+This numeric field defines the maximum source inlet temperature allowed for heat recovery operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, heat recovery is disabled. This input must be less than the smaller of the maximum condenser inlet node temperature in cooling or heating mode. If this field is left blank, the default value is the lower of the Maximum Condenser Inlet Node Temperature in Cooling Mode or Maximum Condenser Inlet Node Temperature in Heating Mode inputs.. This system may still operate in cooling or heating only mode when source inlet temperatures are above the maximum condenser inlet node temperature in heat recovery mode. This input is only used when Heat Pump Waste Heat Recovery is selected as Yes.
 
 \paragraph{Field: Heat Recovery Cooling Capacity Modifier Curve Name}\label{field-heat-recovery-cooling-capacity-modifier-curve-name}
 
