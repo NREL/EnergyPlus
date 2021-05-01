@@ -95,8 +95,6 @@ namespace DataWindowEquivalentLayer {
         DIFF,
         BEAM
     };
-    
-    int constexpr isBEAM = 2;
 
     struct CFSLWP
     {

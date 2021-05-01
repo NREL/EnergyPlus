@@ -88,28 +88,6 @@ namespace HeatRecovery {
     int constexpr EconoLockOut_No = 0;
     int constexpr EconoLockOut_Yes = 1;
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE:
-
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Sizing routine for the module
-
-    // Update routines to check convergence and update nodes
-
-    // Common routines
-
-    // External function calls
-
-    // Types
-
     struct HeatExchCond
     {
         // Members
