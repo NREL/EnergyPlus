@@ -1994,7 +1994,7 @@ namespace PhotovoltaicThermalCollectors {
 
         PVTNum = 0;
         Found = false;
-        for (thisPVT = 1; thisPVT <= NumPVT; ++thisPVT) {
+        for (thisPVT = 1; thisPVT <= state.dataPhotovoltaicThermalCollector->NumPVT; ++thisPVT) {
             if (SurfacePtr == state.dataPhotovoltaicThermalCollector->PVT(thisPVT).SurfNum) {
                 Found = true;
                 PVTNum = thisPVT;
