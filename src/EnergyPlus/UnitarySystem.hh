@@ -65,8 +65,13 @@ namespace UnitarySystems {
 
     struct UnitarySysInputSpec
     {
-        std::string name;
+        // system_type is not an object input but the actual type of object (e.g., UnitarySystem, CoilSystem:Cooling:DX, etc.).
+        // Each specific getInput sets this string accordingly so that processInputSpec knows the object type
+        // that will be used in warnings and reporting. This is a work in progress.
         std::string system_type;
+
+        // object input fields
+        std::string name;
         std::string control_type;
         std::string controlling_zone_or_thermostat_location;
         std::string dehumidification_control_type;
