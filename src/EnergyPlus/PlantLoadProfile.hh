@@ -135,7 +135,6 @@ struct PlantLoadProfileData : BaseGlobalStruct
 {
 
     bool GetPlantLoadProfileInputFlag = true;
-    int NumOfPlantProfile = 0;
     int NumOfPlantProfileWater = 0;
     int NumOfPlantProfileSteam = 0;
     Array1D<PlantLoadProfile::PlantProfileData> PlantProfile;
@@ -143,7 +142,6 @@ struct PlantLoadProfileData : BaseGlobalStruct
     void clear_state() override
     {
         this->GetPlantLoadProfileInputFlag = true;
-        this->NumOfPlantProfile = 0;
         this->NumOfPlantProfileWater = 0;
         this->NumOfPlantProfileSteam = 0;
         this->PlantProfile.deallocate();

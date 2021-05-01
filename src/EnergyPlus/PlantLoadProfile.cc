@@ -400,9 +400,6 @@ void GetPlantProfileInput(EnergyPlusData &state)
     state.dataPlantLoadProfile->NumOfPlantProfileSteam =
         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "LoadProfile:Plant:Steam");
 
-    state.dataPlantLoadProfile->NumOfPlantProfile =
-        state.dataPlantLoadProfile->NumOfPlantProfileWater + state.dataPlantLoadProfile->NumOfPlantProfileSteam;
-
     cCurrentModuleObject = "LoadProfile:Plant";
     if (state.dataPlantLoadProfile->NumOfPlantProfileWater > 0) {
         state.dataPlantLoadProfile->PlantProfile.allocate(state.dataPlantLoadProfile->NumOfPlantProfileWater);
