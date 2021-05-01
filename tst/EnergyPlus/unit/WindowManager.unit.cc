@@ -574,8 +574,6 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataSurface->InsideDividerCondensationFlag.allocate(3);
 
     state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(3);
-    state->dataSurface->SurfIntConvCoeff.allocate(3);
-    state->dataSurface->SurfTAirRef.allocate(3);
     state->dataSurface->SurfTAirRef(surfNum1) = DataSurfaces::ZoneMeanAirTemp;
     state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::ZoneSupplyAirTemp;
     state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::AdjacentAirTemp;
@@ -600,7 +598,6 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
     state->dataSurface->SurfWinTransSolar = 0.0;
     state->dataHeatBal->QS = 0.0;
-    state->dataSurface->SurfIntConvCoeff = 0.0;
     state->dataSurface->SurfEMSOverrideIntConvCoef = false;
 
     Real64 inSurfTemp;
@@ -2807,8 +2804,6 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataSurface->InsideFrameCondensationFlag.allocate(3);
     state->dataSurface->InsideDividerCondensationFlag.allocate(3);
     state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(3);
-    state->dataSurface->SurfIntConvCoeff.allocate(3);
-    state->dataSurface->SurfTAirRef.allocate(3);
     state->dataSurface->SurfTAirRef(surfNum1) = DataSurfaces::ZoneMeanAirTemp;
     state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::ZoneSupplyAirTemp;
     state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::AdjacentAirTemp;
@@ -2833,7 +2828,6 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
     state->dataSurface->SurfWinTransSolar = 0.0;
     state->dataHeatBal->QS = 0.0;
-    state->dataSurface->SurfIntConvCoeff = 0.0;
     state->dataSurface->SurfEMSOverrideIntConvCoef = false;
 
     Real64 inSurfTemp;

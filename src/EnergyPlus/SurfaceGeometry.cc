@@ -924,6 +924,54 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfIsPool(SurfNum) = false;
             state.dataSurface->SurfICSPtr(SurfNum) = 0;
         }
+        state.dataSurface->SurfLowTempErrCount.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfHighTempErrCount.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIntConvCoeff.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfExtConvCoeff.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfTAirRef.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIntConvClassification.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIntConvHcModelEq.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIntConvHcUserCurveIndex.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutConvClassification.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutConvHfModelEq.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutConvHfUserCurveIndex.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutConvHnModelEq.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutConvHnUserCurveIndex.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutConvFaceArea.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutConvFacePerimeter.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutConvFaceHeight.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIntConvZoneWallHeight.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIntConvZonePerimLength.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIntConvZoneHorizHydrDiam.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIntConvWindowWallRatio.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIntConvWindowLocation.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIntConvSurfGetsRadiantHeat.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIntConvSurfHasActiveInIt.allocate(state.dataSurface->TotSurfaces);
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            state.dataSurface->SurfLowTempErrCount(SurfNum) = 0;
+            state.dataSurface->SurfHighTempErrCount(SurfNum) = 0;
+            state.dataSurface->SurfIntConvCoeff(SurfNum) = 0.0;
+            state.dataSurface->SurfExtConvCoeff(SurfNum) = 0.0;
+            state.dataSurface->SurfTAirRef(SurfNum) = 0;
+            state.dataSurface->SurfIntConvClassification(SurfNum) = 0;
+            state.dataSurface->SurfIntConvHcModelEq(SurfNum) = 0;
+            state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) = 0;
+            state.dataSurface->SurfOutConvClassification(SurfNum) = 0;
+            state.dataSurface->SurfOutConvHfModelEq(SurfNum) = 0;
+            state.dataSurface->SurfOutConvHfUserCurveIndex(SurfNum) = 0;
+            state.dataSurface->SurfOutConvHnModelEq(SurfNum) = 0;
+            state.dataSurface->SurfOutConvHnUserCurveIndex(SurfNum) = 0;
+            state.dataSurface->SurfOutConvFaceArea(SurfNum) = 0;
+            state.dataSurface->SurfOutConvFacePerimeter(SurfNum) = 0;
+            state.dataSurface->SurfOutConvFaceHeight(SurfNum) = 0;
+            state.dataSurface->SurfIntConvZoneWallHeight(SurfNum) = 0;
+            state.dataSurface->SurfIntConvZonePerimLength(SurfNum) = 0;
+            state.dataSurface->SurfIntConvZoneHorizHydrDiam(SurfNum) = 0;
+            state.dataSurface->SurfIntConvWindowWallRatio(SurfNum) = 0;
+            state.dataSurface->SurfIntConvWindowLocation(SurfNum) = 0;
+            state.dataSurface->SurfIntConvSurfGetsRadiantHeat(SurfNum) = false;
+            state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfNum) = false;
+        }
     }
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
@@ -1483,7 +1531,7 @@ namespace SurfaceGeometry {
         //    After reordering, MovedSurfs should equal TotSurfaces
 
         MovedSurfs = 0;
-        Array1D<bool> SurfaceTmpClassMoved;                                  // Tmp class is moved
+        Array1D<bool> SurfaceTmpClassMoved; // Tmp class is moved
         SurfaceTmpClassMoved.dimension(state.dataSurface->TotSurfaces, false);
 
         // Move all shading Surfaces to Front
@@ -2434,7 +2482,8 @@ namespace SurfaceGeometry {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             // Check for EcoRoof and only 1 allowed to be used.
             if (state.dataSurface->Surface(SurfNum).Construction > 0)
-                state.dataSurface->SurfExtEcoRoof(SurfNum) = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsEcoRoof;
+                state.dataSurface->SurfExtEcoRoof(SurfNum) =
+                    state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsEcoRoof;
             if (!state.dataSurface->SurfExtEcoRoof(SurfNum)) continue;
             if (LayNumOutside == 0) {
                 LayNumOutside = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).LayerPoint(1);
@@ -3818,9 +3867,9 @@ namespace SurfaceGeometry {
                 }
 
                 // Set the logical flag for the EcoRoof presented, this is only based on the flag in the construction type
-//                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction > 0)
-//                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtEcoRoof =
-//                        state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).TypeIsEcoRoof;
+                //                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction > 0)
+                //                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtEcoRoof =
+                //                        state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).TypeIsEcoRoof;
 
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = state.dataIPShortCut->rNumericArgs(1);
                 if (state.dataIPShortCut->lNumericFieldBlanks(1))
@@ -4184,9 +4233,9 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtWind = true;
 
                     // Set the logical flag for the EcoRoof presented, this is only based on the flag in the construction type
-//                    if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction > 0)
-//                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtEcoRoof =
-//                            state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).TypeIsEcoRoof;
+                    //                    if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction > 0)
+                    //                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtEcoRoof =
+                    //                            state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).TypeIsEcoRoof;
 
                 } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == state.dataSurfaceGeometry->UnreconciledZoneSurface) {
                     if (GettingIZSurfaces) {
@@ -7672,8 +7721,7 @@ namespace SurfaceGeometry {
                     }
                     if (state.dataSurface->SurfLocalEnvironment(Loop).SurroundingSurfsPtr != 0) {
                         state.dataSurface->SurfHasSurroundingSurfProperties(SurfLoop) = true;
-                        state.dataSurface->SurfSurroundingSurfacesNum(SurfLoop) =
-                            state.dataSurface->SurfLocalEnvironment(Loop).SurroundingSurfsPtr;
+                        state.dataSurface->SurfSurroundingSurfacesNum(SurfLoop) = state.dataSurface->SurfLocalEnvironment(Loop).SurroundingSurfsPtr;
                     }
                 }
             }

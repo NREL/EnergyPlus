@@ -673,7 +673,7 @@ namespace LowTempRadiantSystem {
                     thisRadSys.SurfaceName(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfName(SurfNum);
                     thisRadSys.SurfaceFrac(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfFlowFrac(SurfNum);
                     if (thisRadSys.SurfacePtr(SurfNum) > 0) {
-                        Surface(thisRadSys.SurfacePtr(SurfNum)).IntConvSurfHasActiveInIt = true;
+                        state.dataSurface->SurfIntConvSurfHasActiveInIt(thisRadSys.SurfacePtr(SurfNum)) = true;
                     }
                 }
             } else { // User entered a single surface name rather than a surface list
@@ -697,8 +697,8 @@ namespace LowTempRadiantSystem {
                     ErrorsFound = true;
                 }
                 if (thisRadSys.SurfacePtr(1) != 0) {
-                    Surface(thisRadSys.SurfacePtr(1)).IntConvSurfHasActiveInIt = true;
-                    Surface(thisRadSys.SurfacePtr(1)).IsRadSurfOrVentSlabOrPool = true;
+                    state.dataSurface->SurfIntConvSurfHasActiveInIt(thisRadSys.SurfacePtr(1)) = true;
+                    state.dataSurface->SurfIntConvSurfHasActiveInIt(thisRadSys.SurfacePtr(1)) = true;
                 }
             }
 
@@ -973,7 +973,7 @@ namespace LowTempRadiantSystem {
                     thisCFloSys.SurfaceFrac(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfFlowFrac(SurfNum);
                     thisCFloSys.NumCircuits(SurfNum) = 0.0;
                     if (thisCFloSys.SurfacePtr(SurfNum) != 0) {
-                        Surface(thisCFloSys.SurfacePtr(SurfNum)).IntConvSurfHasActiveInIt = true;
+                        state.dataSurface->SurfIntConvSurfHasActiveInIt(thisCFloSys.SurfacePtr(SurfNum)) = true;
                     }
                 }
             } else { // User entered a single surface name rather than a surface list
@@ -998,7 +998,7 @@ namespace LowTempRadiantSystem {
                     ErrorsFound = true;
                 }
                 if (thisCFloSys.SurfacePtr(1) != 0) {
-                    Surface(thisCFloSys.SurfacePtr(1)).IntConvSurfHasActiveInIt = true;
+                    state.dataSurface->SurfIntConvSurfHasActiveInIt(thisCFloSys.SurfacePtr(1)) = true;
                     Surface(thisCFloSys.SurfacePtr(1)).IsRadSurfOrVentSlabOrPool = true;
                 }
             }

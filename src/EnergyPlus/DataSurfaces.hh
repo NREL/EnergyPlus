@@ -670,36 +670,9 @@ namespace DataSurfaces {
         Real64 OutWetBulbTemp;                 // Surface outside wet bulb air temperature, for surface heat balance (C)
         Real64 WindSpeed;                      // Surface outside wind speed, for surface heat balance (m/s)
         Real64 WindDir;                    // Surface outside wind direction, for surface heat balance and ventilation(degree)
-
-//        bool ExtEcoRoof;        // True if the top outside construction material is of type Eco Roof
-//        bool ExtCavityPresent;  // true if there is an exterior vented cavity on surface
-//        int ExtCavNum;          // index for this surface in ExtVentedCavity structure (if any)
-//        bool IsPV;              // true if this is a photovoltaic surface (dxf output)
-//        bool IsICS;             // true if this is an ICS collector
-//        bool IsPool;            // true if this is a pool
-//        int ICSPtr;             // Index to ICS collector
         // TH added 3/26/2010
         bool MirroredSurf; // True if it is a mirrored surface
-
         // additional attributes for convection correlations
-        int IntConvClassification;       // current classification for inside face air flow regime and surface orientation
-        int IntConvHcModelEq;            // current convection model for inside face
-        int IntConvHcUserCurveIndex;     // current index to user convection model if used
-        int OutConvClassification;       // current classification for outside face wind regime and convection orientation
-        int OutConvHfModelEq;            // current convection model for forced convection at outside face
-        int OutConvHfUserCurveIndex;     // current index to user forced convection model if used
-        int OutConvHnModelEq;            // current Convection model for natural convection at outside face
-        int OutConvHnUserCurveIndex;     // current index to user natural convection model if used
-        Real64 OutConvFaceArea;          // area of larger building envelope facade that surface is a part of
-        Real64 OutConvFacePerimeter;     // perimeter of larger building envelope facade that surface is a part of
-        Real64 OutConvFaceHeight;        // height of larger building envelope facade that surface is a part of
-        Real64 IntConvZoneWallHeight;    // [m] height of larger inside building wall element that surface is a part of
-        Real64 IntConvZonePerimLength;   // [m] length of perimeter zone's exterior wall
-        Real64 IntConvZoneHorizHydrDiam; // [m] hydraulic diameter, usually 4 times the zone floor area div by perimeter
-        Real64 IntConvWindowWallRatio;   // [-] area of windows over area of exterior wall for zone
-        int IntConvWindowLocation;       // relative location of window in zone for interior Hc models
-        bool IntConvSurfGetsRadiantHeat;
-        bool IntConvSurfHasActiveInIt;
         bool IsRadSurfOrVentSlabOrPool; // surface cannot be part of both a radiant surface & ventilated slab group
         // LG added 1/6/12
         Real64 GenericContam; // [ppm] Surface generic contaminant as a storage term for
@@ -730,11 +703,7 @@ namespace DataSurfaces {
               OutDryBulbTemp(0.0),
               OutWetBulbTemp(0.0),WindSpeed(0.0),
               WindDir(0.0),
-              MirroredSurf(false), IntConvClassification(0), IntConvHcModelEq(0), IntConvHcUserCurveIndex(0),
-              OutConvClassification(0), OutConvHfModelEq(0), OutConvHfUserCurveIndex(0), OutConvHnModelEq(0), OutConvHnUserCurveIndex(0),
-              OutConvFaceArea(0.0), OutConvFacePerimeter(0.0), OutConvFaceHeight(0.0), IntConvZoneWallHeight(0.0), IntConvZonePerimLength(0.0),
-              IntConvZoneHorizHydrDiam(0.0), IntConvWindowWallRatio(0.0), IntConvWindowLocation(InConvWinLoc_NotSet),
-              IntConvSurfGetsRadiantHeat(false), IntConvSurfHasActiveInIt(false), IsRadSurfOrVentSlabOrPool(false), GenericContam(0.0),
+              MirroredSurf(false), IsRadSurfOrVentSlabOrPool(false), GenericContam(0.0),
               SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false)
         {
         }
@@ -1341,10 +1310,7 @@ struct SurfacesData : BaseGlobalStruct
     // Surface Properties
     Array1D<int> SurfLowTempErrCount;
     Array1D<int> SurfHighTempErrCount;
-    Array1D<Real64> SurfIntConvCoeff; // Interior Convection Coefficient pointer (different data structure) when being overridden
-    Array1D<Real64> SurfExtConvCoeff; // Exterior Convection Coefficient pointer (different data structure) when being overridden
     Array1D<int> SurfDaylightingShelfInd;   // Pointer to daylighting shelf
-    Array1D<int> SurfTAirRef; // Flag for reference air temperature
     Array1D<bool> SurfSchedExternalShadingFrac;     // true if the external shading is scheduled or calculated externally to be imported
     Array1D<int> SurfExternalShadingSchInd;         // Schedule for a the external shading
     Array1D<bool> SurfHasSurroundingSurfProperties; // true if surrounding surfaces properties are listed for an external surface
@@ -1359,6 +1325,29 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<bool> SurfIsICS;             // true if this is an ICS collector
     Array1D<bool> SurfIsPool;            // true if this is a pool
     Array1D<int> SurfICSPtr;             // Index to ICS collector
+
+    // Surface ConvCoeff Properties
+    Array1D<int> SurfTAirRef; // Flag for reference air temperature
+    Array1D<Real64> SurfIntConvCoeff; // Interior Convection Coefficient pointer (different data structure) when being overridden
+    Array1D<Real64> SurfExtConvCoeff; // Exterior Convection Coefficient pointer (different data structure) when being overridden
+    Array1D<int> SurfIntConvClassification;       // current classification for inside face air flow regime and surface orientation
+    Array1D<int> SurfIntConvHcModelEq;            // current convection model for inside face
+    Array1D<int> SurfIntConvHcUserCurveIndex;     // current index to user convection model if used
+    Array1D<int> SurfOutConvClassification;       // current classification for outside face wind regime and convection orientation
+    Array1D<int> SurfOutConvHfModelEq;            // current convection model for forced convection at outside face
+    Array1D<int> SurfOutConvHfUserCurveIndex;     // current index to user forced convection model if used
+    Array1D<int> SurfOutConvHnModelEq;            // current Convection model for natural convection at outside face
+    Array1D<int> SurfOutConvHnUserCurveIndex;     // current index to user natural convection model if used
+    Array1D<Real64> SurfOutConvFaceArea;          // area of larger building envelope facade that surface is a part of
+    Array1D<Real64> SurfOutConvFacePerimeter;     // perimeter of larger building envelope facade that surface is a part of
+    Array1D<Real64> SurfOutConvFaceHeight;        // height of larger building envelope facade that surface is a part of
+    Array1D<Real64> SurfIntConvZoneWallHeight;    // [m] height of larger inside building wall element that surface is a part of
+    Array1D<Real64> SurfIntConvZonePerimLength;   // [m] length of perimeter zone's exterior wall
+    Array1D<Real64> SurfIntConvZoneHorizHydrDiam; // [m] hydraulic diameter, usually 4 times the zone floor area div by perimeter
+    Array1D<Real64> SurfIntConvWindowWallRatio;   // [-] area of windows over area of exterior wall for zone
+    Array1D<int> SurfIntConvWindowLocation;       // relative location of window in zone for interior Hc models
+    Array1D<bool> SurfIntConvSurfGetsRadiantHeat;
+    Array1D<bool> SurfIntConvSurfHasActiveInIt;
 
     // Surface Shadow Properties
     Array1D<bool> SurfShadowSurfPossibleObstruction; // True if a surface can be an exterior obstruction
@@ -1682,12 +1671,10 @@ struct SurfacesData : BaseGlobalStruct
 
         this->SurfLowTempErrCount.deallocate();
         this->SurfHighTempErrCount.deallocate();
-        this->SurfIntConvCoeff.deallocate();
-        this->SurfExtConvCoeff.deallocate();
+
         this->SurfShadowSurfPossibleObstruction.deallocate();
         this->SurfShadowSurfRecSurfNum.deallocate();
         this->SurfDaylightingShelfInd.deallocate();
-        this->SurfTAirRef.deallocate();
         this->SurfSchedExternalShadingFrac.deallocate();
         this->SurfExternalShadingSchInd.deallocate();
         this->SurfHasSurroundingSurfProperties.deallocate();
@@ -1702,6 +1689,28 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfIsICS.deallocate();
         this->SurfIsPool.deallocate();
         this->SurfICSPtr.deallocate();
+        this->SurfIntConvCoeff.deallocate();
+        this->SurfExtConvCoeff.deallocate();
+        this->SurfTAirRef.deallocate();
+        this->SurfIntConvClassification.deallocate();
+        this->SurfIntConvHcModelEq.deallocate();
+        this->SurfIntConvHcUserCurveIndex.deallocate();
+        this->SurfOutConvClassification.deallocate();
+        this->SurfOutConvHfModelEq.deallocate();
+        this->SurfOutConvHfUserCurveIndex.deallocate();
+        this->SurfOutConvHnModelEq.deallocate();
+        this->SurfOutConvHnUserCurveIndex.deallocate();
+        this->SurfOutConvFaceArea.deallocate();
+        this->SurfOutConvFacePerimeter.deallocate();
+        this->SurfOutConvFaceHeight.deallocate();
+        this->SurfIntConvZoneWallHeight.deallocate();
+        this->SurfIntConvZonePerimLength.deallocate();
+        this->SurfIntConvZoneHorizHydrDiam.deallocate();
+        this->SurfIntConvWindowWallRatio.deallocate();
+        this->SurfIntConvWindowLocation.deallocate();
+        this->SurfIntConvSurfGetsRadiantHeat.deallocate();
+        this->SurfIntConvSurfHasActiveInIt.deallocate();
+
         this->SurfWinTransSolar.deallocate();
         this->SurfWinBmSolar.deallocate();
         this->SurfWinBmBmSolar.deallocate();
