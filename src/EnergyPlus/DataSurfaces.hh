@@ -58,15 +58,13 @@
 #include <ObjexxFCL/Vector4.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Shape.hh>
-
-#define BITF(B) (1 << (int(B)))
-#define BITF_TEST_ANY(V, B) (((V) & (B)) != 0)
 
 namespace EnergyPlus {
 
