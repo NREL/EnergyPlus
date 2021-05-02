@@ -1951,7 +1951,7 @@ TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)
 
     state->dataSurface->Surface.allocate(3);
     state->dataHeatBal->Zone.allocate(3);
-
+    state->dataSurface->SurfOutWindSpeed.allocate(3);
     // Horizontal Roof, heat flow down
     state->dataSurface->Surface(1).Zone = 1;
     state->dataHeatBal->Zone(1).Volume = 1000;
@@ -1959,7 +1959,7 @@ TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)
     state->dataSurface->Surface(1).Tilt = 0;
     state->dataSurface->Surface(1).Area = 100;
     state->dataSurface->Surface(1).ExtBoundCond = 0;
-    state->dataSurface->Surface(1).WindSpeed = 1;
+    state->dataSurface->SurfOutWindSpeed(1) = 1;
 
     Tsurf = 18.0;
     Tair = 15.0;
@@ -1977,8 +1977,8 @@ TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)
     state->dataSurface->Surface(2).Tilt = 20;
     state->dataSurface->Surface(2).Area = 100;
     state->dataSurface->Surface(2).ExtBoundCond = 0;
-    state->dataSurface->Surface(2).WindSpeed = 1;
     state->dataSurface->Surface(2).Height = 8;
+    state->dataSurface->SurfOutWindSpeed(2) = 1;
 
     Tsurf = 15.0;
     Tair = 18.0;

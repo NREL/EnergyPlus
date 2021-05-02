@@ -551,6 +551,7 @@ namespace DataSurfaces {
         using Plane = Vector4<Real64>;
 
         // Members
+        int Index;
         std::string Name;                 // User supplied name of the surface (must be unique)
         int Construction;                 // Pointer to the construction in the Construct derived type
         int ConstructionStoredInputValue; // holds the original value for Construction per surface input
@@ -605,6 +606,7 @@ namespace DataSurfaces {
         Real64 ViewFactorSkyIR;        // View factor to the sky from the exterior of the surface for IR radiation Special/optional other side coefficients (OSC)
         int OSCPtr;                    // Pointer to OSC data structure
         int OSCMPtr;                   // "Pointer" to OSCM data structure (other side conditions from a model)
+        bool MirroredSurf;            // True if it is a mirrored surface
 
         // Optional parameters specific to shadowing surfaces and subsurfaces (detached shading, overhangs, wings, etc.)
         int SchedShadowSurfIndex;   // Schedule for a shadowing (sub)surface
@@ -664,44 +666,25 @@ namespace DataSurfaces {
         int FrameDivider;                                // Pointer to frame and divider information (windows only)
         Real64 Multiplier;                               // Multiplies glazed area, frame area and divider area (windows only)
 
-        Real64 OutDryBulbTemp;                 // Surface outside dry bulb air temperature, for surface heat balance (C)
-        Real64 OutWetBulbTemp;                 // Surface outside wet bulb air temperature, for surface heat balance (C)
-        Real64 WindSpeed;                      // Surface outside wind speed, for surface heat balance (m/s)
-        Real64 WindDir;                    // Surface outside wind direction, for surface heat balance and ventilation(degree)
-        // TH added 3/26/2010
-        bool MirroredSurf; // True if it is a mirrored surface
-        // additional attributes for convection correlations
-        bool IsRadSurfOrVentSlabOrPool; // surface cannot be part of both a radiant surface & ventilated slab group
-        // LG added 1/6/12
-        Real64 GenericContam; // [ppm] Surface generic contaminant as a storage term for
         // Air boundaries
         int SolarEnclIndex;     // Pointer to solar enclosure this surface belongs to
         int SolarEnclSurfIndex; //  Pointer to solar enclosure surface data, ZoneSolarInfo(n).SurfacePtr(RadEnclSurfIndex) points to this surface
-        bool IsAirBoundarySurf; // True if surface is an air boundary surface (Construction:AirBoundary),
-
-        std::vector<int> DisabledShadowingZoneList; // Array of all disabled shadowing zone number to the current surface
-                                                    // the surface diffusion model
-
+        bool IsAirBoundarySurf; // True if surface is an air boundary surface (Construction:AirBoundary)
         // Default Constructor
         SurfaceData()
-            : Construction(0), ConstructionStoredInputValue(0),
+            : Index(0), Construction(0), ConstructionStoredInputValue(0),
               Class(SurfaceClass::None), Shape(SurfaceShape::None), Sides(0), Area(0.0), GrossArea(0.0), NetAreaShadowCalc(0.0), Perimeter(0.0),
               Azimuth(0.0), Height(0.0), Reveal(0.0), Tilt(0.0), Width(0.0), HeatTransSurf(false), OutsideHeatSourceTermSchedule(0),
               InsideHeatSourceTermSchedule(0), HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0),
               ExtBoundCond(0), ExtSolar(false), ExtWind(false),
-              ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0), OSCMPtr(0),
+              ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0), OSCMPtr(0), MirroredSurf(false),
               SchedShadowSurfIndex(0), ShadowSurfSchedVaries(false), ShadowingSurf(false), IsTransparent(false), SchedMinValue(0.0),
               ShadowSurfDiffuseSolRefl(0.0), ShadowSurfDiffuseVisRefl(0.0), ShadowSurfGlazingFrac(0.0), ShadowSurfGlazingConstruct(0),
-              MaterialMovInsulExt(0),
-              MaterialMovInsulInt(0), SchedMovInsulExt(0), SchedMovInsulInt(0), MovInsulIntPresent(false), MovInsulIntPresentPrevTS(false),
+              MaterialMovInsulExt(0), MaterialMovInsulInt(0), SchedMovInsulExt(0), SchedMovInsulInt(0), MovInsulIntPresent(false), MovInsulIntPresentPrevTS(false),
               Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0), lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0),
               NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0), CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true),
               IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0), shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0),
               activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), FrameDivider(0), Multiplier(1.0),
-              OutDryBulbTemp(0.0),
-              OutWetBulbTemp(0.0),WindSpeed(0.0),
-              WindDir(0.0),
-              MirroredSurf(false), IsRadSurfOrVentSlabOrPool(false), GenericContam(0.0),
               SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false)
         {
         }
@@ -712,7 +695,7 @@ namespace DataSurfaces {
 
         void SetOutBulbTempAt(EnergyPlusData &state);
 
-        void SetWindDirAt(Real64 const fac);
+        void SetWindDirAt(EnergyPlusData &state, Real64 const fac);
 
         void SetWindSpeedAt(EnergyPlusData &state, Real64 const fac);
 
@@ -1287,6 +1270,12 @@ struct SurfacesData : BaseGlobalStruct
     std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
     std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
 
+    // Surface HB arrays
+    Array1D<Real64> SurfOutDryBulbTemp;          // Surface outside dry bulb air temperature, for surface heat balance (C)
+    Array1D<Real64> SurfOutWetBulbTemp;          // Surface outside wet bulb air temperature, for surface heat balance (C)
+    Array1D<Real64> SurfOutWindSpeed;               // Surface outside wind speed, for surface heat balance (m/s)
+    Array1D<Real64> SurfOutWindDir;                 // Surface outside wind direction, for surface heat balance and ventilation(degree)
+
     // Surface EMS
     Array1D<bool> SurfEMSConstructionOverrideON; // if true, EMS is calling to override the construction value
     Array1D<int> SurfEMSConstructionOverrideValue; // pointer value to use for Construction when overridden
@@ -1323,6 +1312,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<bool> SurfIsICS;             // true if this is an ICS collector
     Array1D<bool> SurfIsPool;            // true if this is a pool
     Array1D<int> SurfICSPtr;             // Index to ICS collector
+    Array1D<bool> SurfIsRadSurfOrVentSlabOrPool; // surface cannot be part of both a radiant surface & ventilated slab group
+    Array1D<Real64> SurfGenericContam;   // [ppm] Surface generic contaminant as a storage term for
 
     // Surface ConvCoeff Properties
     Array1D<int> SurfTAirRef; // Flag for reference air temperature
@@ -1350,6 +1341,7 @@ struct SurfacesData : BaseGlobalStruct
     // Surface Shadow Properties
     Array1D<bool> SurfShadowSurfPossibleObstruction; // True if a surface can be an exterior obstruction
     Array1D<int> SurfShadowSurfRecSurfNum;  // Receiving surface number
+    Array1D<std::vector<int>> SurfDisabledShadowingZoneList; // Array of all disabled shadowing zone number to the current surface the surface diffusion model
 
     // Surface Window Heat Balance
     Array1D<Real64> SurfWinTransSolar; // Exterior beam plus diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
@@ -1650,6 +1642,10 @@ struct SurfacesData : BaseGlobalStruct
         this->AllHTNonWindowSurfaceList.clear();
         this->AllHTWindowSurfaceList.clear();
         this->AllSurfaceListReportOrder.clear();
+        this->SurfOutDryBulbTemp.deallocate();
+        this->SurfOutWetBulbTemp.deallocate();
+        this->SurfOutWindSpeed.deallocate();
+        this->SurfOutWindDir.deallocate();
         this->SurfEMSConstructionOverrideON.deallocate();
         this->SurfEMSConstructionOverrideValue.deallocate();
         this->SurfEMSOverrideIntConvCoef.deallocate();
@@ -1672,6 +1668,7 @@ struct SurfacesData : BaseGlobalStruct
 
         this->SurfShadowSurfPossibleObstruction.deallocate();
         this->SurfShadowSurfRecSurfNum.deallocate();
+        this->SurfDisabledShadowingZoneList.deallocate();
         this->SurfDaylightingShelfInd.deallocate();
         this->SurfSchedExternalShadingFrac.deallocate();
         this->SurfExternalShadingSchInd.deallocate();
@@ -1687,6 +1684,8 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfIsICS.deallocate();
         this->SurfIsPool.deallocate();
         this->SurfICSPtr.deallocate();
+        this->SurfIsRadSurfOrVentSlabOrPool.deallocate();
+        this->SurfGenericContam.deallocate();
         this->SurfIntConvCoeff.deallocate();
         this->SurfExtConvCoeff.deallocate();
         this->SurfTAirRef.deallocate();

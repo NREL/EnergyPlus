@@ -319,10 +319,10 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (state.dataSurface->SurfHasLinkedOutAirNode(SurfNum)) {
-                Surface(SurfNum).OutDryBulbTemp = state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum)).OutAirDryBulb;
-                Surface(SurfNum).OutWetBulbTemp = state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum)).OutAirWetBulb;
-                Surface(SurfNum).WindSpeed = state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum)).OutAirWindSpeed;
-                Surface(SurfNum).WindDir = state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum)).OutAirWindDir;
+                state.dataSurface->SurfOutDryBulbTemp(SurfNum) = state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum)).OutAirDryBulb;
+                state.dataSurface->SurfOutWetBulbTemp(SurfNum) = state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum)).OutAirWetBulb;
+                state.dataSurface->SurfOutWindSpeed(SurfNum) = state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum)).OutAirWindSpeed;
+                state.dataSurface->SurfOutWindDir(SurfNum) = state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum)).OutAirWindDir;
             }
 
             if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime && state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
@@ -369,16 +369,16 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (state.dataSurface->SurfOutDryBulbTempEMSOverrideOn(SurfNum)) {
-                Surface(SurfNum).OutDryBulbTemp = state.dataSurface->SurfOutDryBulbTempEMSOverrideValue(SurfNum);
+                state.dataSurface->SurfOutDryBulbTemp(SurfNum) = state.dataSurface->SurfOutDryBulbTempEMSOverrideValue(SurfNum);
             }
             if (state.dataSurface->SurfOutWetBulbTempEMSOverrideOn(SurfNum)) {
-                Surface(SurfNum).OutWetBulbTemp = state.dataSurface->SurfOutWetBulbTempEMSOverrideValue(SurfNum);
+                state.dataSurface->SurfOutWetBulbTemp(SurfNum) = state.dataSurface->SurfOutWetBulbTempEMSOverrideValue(SurfNum);
             }
             if (state.dataSurface->SurfWindSpeedEMSOverrideOn(SurfNum)) {
-                Surface(SurfNum).WindSpeed = state.dataSurface->SurfWindSpeedEMSOverrideValue(SurfNum);
+                state.dataSurface->SurfOutWindSpeed(SurfNum) = state.dataSurface->SurfWindSpeedEMSOverrideValue(SurfNum);
             }
             if (state.dataSurface->SurfWindDirEMSOverrideOn(SurfNum)) {
-                Surface(SurfNum).WindDir = state.dataSurface->SurfWindDirEMSOverrideValue(SurfNum);
+                state.dataSurface->SurfOutWindDir(SurfNum) = state.dataSurface->SurfWindDirEMSOverrideValue(SurfNum);
             }
             if (state.dataSurface->SurfViewFactorGroundEMSOverrideOn(SurfNum)) {
                 Surface(SurfNum).ViewFactorGround = state.dataSurface->SurfViewFactorGroundEMSOverrideValue(SurfNum);
@@ -1654,28 +1654,28 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Surface Outside Face Outdoor Air Drybulb Temperature",
                                 OutputProcessor::Unit::C,
-                                Surface(loop).OutDryBulbTemp,
+                                state.dataSurface->SurfOutDryBulbTemp(loop),
                                 "Zone",
                                 "State",
                                 Surface(loop).Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Outdoor Air Wetbulb Temperature",
                                 OutputProcessor::Unit::C,
-                                Surface(loop).OutWetBulbTemp,
+                                state.dataSurface->SurfOutWetBulbTemp(loop),
                                 "Zone",
                                 "State",
                                 Surface(loop).Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Outdoor Air Wind Speed",
                                 OutputProcessor::Unit::m_s,
-                                Surface(loop).WindSpeed,
+                                state.dataSurface->SurfOutWindSpeed(loop),
                                 "Zone",
                                 "State",
                                 Surface(loop).Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Outdoor Air Wind Direction",
                                 OutputProcessor::Unit::deg,
-                                Surface(loop).WindDir,
+                                state.dataSurface->SurfOutWindDir(loop),
                                 "Zone",
                                 "State",
                                 Surface(loop).Name);
@@ -2239,9 +2239,9 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
         if ((Surface(SurfNum).ExtBoundCond == ExternalEnvironment) || (Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) {
 
             state.dataHeatBalSurf->THM(1, {1, state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms + 1}, SurfNum) =
-                Surface(SurfNum).OutDryBulbTemp;
+                state.dataSurface->SurfOutDryBulbTemp(SurfNum);
             state.dataHeatBalSurf->TH(1, {1, state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms + 1}, SurfNum) =
-                Surface(SurfNum).OutDryBulbTemp;
+                state.dataSurface->SurfOutDryBulbTemp(SurfNum);
 
         } else if (Surface(SurfNum).ExtBoundCond == Ground) {
 
@@ -5963,10 +5963,10 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
 
                     state.dataSurface->OSC(OPtr).OSCTempCalc =
                         (state.dataSurface->OSC(OPtr).ZoneAirTempCoef * state.dataHeatBalFanSys->MAT(zoneNum) +
-                         state.dataSurface->OSC(OPtr).ExtDryBulbCoef * Surface(SurfNum).OutDryBulbTemp +
+                         state.dataSurface->OSC(OPtr).ExtDryBulbCoef * state.dataSurface->SurfOutDryBulbTemp(SurfNum) +
                          ConstantTempCoef * state.dataSurface->OSC(OPtr).ConstTemp +
                          state.dataSurface->OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
-                         state.dataSurface->OSC(OPtr).WindSpeedCoef * Surface(SurfNum).WindSpeed * Surface(SurfNum).OutDryBulbTemp +
+                         state.dataSurface->OSC(OPtr).WindSpeedCoef * state.dataSurface->SurfOutWindSpeed(SurfNum) * state.dataSurface->SurfOutDryBulbTemp(SurfNum) +
                          state.dataSurface->OSC(OPtr).TPreviousCoef * state.dataSurface->OSC(OPtr).TOutsideSurfPast);
 
                     // Enforce max/min limits if applicable
@@ -6026,10 +6026,10 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
 
                     state.dataSurface->OSC(OPtr).OSCTempCalc =
                         (state.dataSurface->OSC(OPtr).ZoneAirTempCoef * state.dataHeatBalFanSys->MAT(zoneNum) +
-                         state.dataSurface->OSC(OPtr).ExtDryBulbCoef * Surface(SurfNum).OutDryBulbTemp +
+                         state.dataSurface->OSC(OPtr).ExtDryBulbCoef * state.dataSurface->SurfOutDryBulbTemp(SurfNum) +
                          state.dataSurface->OSC(OPtr).ConstTempCoef * state.dataSurface->OSC(OPtr).ConstTemp +
                          state.dataSurface->OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
-                         state.dataSurface->OSC(OPtr).WindSpeedCoef * Surface(SurfNum).WindSpeed * Surface(SurfNum).OutDryBulbTemp +
+                         state.dataSurface->OSC(OPtr).WindSpeedCoef * state.dataSurface->SurfOutWindSpeed(SurfNum) * state.dataSurface->SurfOutDryBulbTemp(SurfNum) +
                          state.dataSurface->OSC(OPtr).TPreviousCoef * state.dataSurface->OSC(OPtr).TOutsideSurfPast);
 
                     // Enforce max/min limits if applicable
@@ -6190,7 +6190,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                                 state.dataHeatBalSurf->HcExtSurf(SurfNum) = SetExtConvectionCoeff(state, SurfNum);
                             }
 
-                            TempExt = Surface(SurfNum).OutWetBulbTemp;
+                            TempExt = state.dataSurface->SurfOutWetBulbTemp(SurfNum);
 
                             // start HAMT
                             if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
@@ -6240,7 +6240,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
 
                         } else { // Surface is dry, use the normal correlation
 
-                            TempExt = Surface(SurfNum).OutDryBulbTemp;
+                            TempExt = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
 
                             if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
                                 Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
@@ -6285,7 +6285,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                                                     state.dataHeatBalSurf->HGrdExtSurf(SurfNum),
                                                     state.dataHeatBalSurf->HAirExtSurf(SurfNum));
 
-                        TempExt = Surface(SurfNum).OutDryBulbTemp;
+                        TempExt = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
 
                         if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
                             Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
@@ -6436,9 +6436,9 @@ Real64 GetQdotConvOutRepPerArea(EnergyPlusData &state, int const SurfNum)
         return -state.dataSurface->OSCM(OPtr).HConv * (state.dataHeatBalSurf->TH(1, 1, SurfNum) - state.dataSurface->OSCM(OPtr).TConv);
     } else {
         if (state.dataEnvrn->IsRain) {
-            return -state.dataHeatBalSurf->HcExtSurf(SurfNum) * (state.dataHeatBalSurf->TH(1, 1, SurfNum) - Surface(SurfNum).OutWetBulbTemp);
+            return -state.dataHeatBalSurf->HcExtSurf(SurfNum) * (state.dataHeatBalSurf->TH(1, 1, SurfNum) - state.dataSurface->SurfOutWetBulbTemp(SurfNum));
         } else {
-            return -state.dataHeatBalSurf->HcExtSurf(SurfNum) * (state.dataHeatBalSurf->TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
+            return -state.dataHeatBalSurf->HcExtSurf(SurfNum) * (state.dataHeatBalSurf->TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
         }
     }
 }
@@ -8593,7 +8593,7 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
 
     // Calculate surface heat emission to the air, positive values indicates heat transfer from surface to the outside
     state.dataHeatBalSurf->QAirExtReport(SurfNum) = Surface(SurfNum).Area * state.dataHeatBalSurf->HAirExtSurf(SurfNum) *
-                                                    (state.dataHeatBalSurf->TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
+                                                    (state.dataHeatBalSurf->TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
 
     // Set the radiant system heat balance coefficients if this surface is also a radiant system
     if (construct.SourceSinkPresent) {
@@ -8671,13 +8671,12 @@ void CalcExteriorVentedCavity(EnergyPlusData &state, int const SurfNum) // index
     int thisOSCM;
     Real64 TempExt;
     Real64 OutHumRatExt;
-    auto &Surface(state.dataSurface->Surface);
 
     CavNum = state.dataSurface->SurfExtCavNum(SurfNum);
 
-    TempExt = Surface(SurfNum).OutDryBulbTemp;
+    TempExt = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
 
-    OutHumRatExt = PsyWFnTdbTwbPb(state, Surface(SurfNum).OutDryBulbTemp, Surface(SurfNum).OutWetBulbTemp, state.dataEnvrn->OutBaroPress);
+    OutHumRatExt = PsyWFnTdbTwbPb(state, state.dataSurface->SurfOutDryBulbTemp(SurfNum), state.dataSurface->SurfOutWetBulbTemp(SurfNum), state.dataEnvrn->OutBaroPress);
 
     RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, OutHumRatExt);
 

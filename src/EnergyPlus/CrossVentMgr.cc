@@ -454,10 +454,10 @@ namespace CrossVentMgr {
             } else if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond ==
                        ExternalEnvironment) {
                 state.dataRoomAirMod->Tin(ZoneNum) =
-                    state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp;
+                    state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum);
             } else if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond == Ground) {
                 state.dataRoomAirMod->Tin(ZoneNum) =
-                    state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp;
+                    state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum);
             } else if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond ==
                            OtherSideCoefNoCalcExt ||
                        state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond ==
@@ -466,16 +466,16 @@ namespace CrossVentMgr {
                 state.dataSurface->OSC(OPtr).OSCTempCalc =
                     (state.dataSurface->OSC(OPtr).ZoneAirTempCoef * state.dataHeatBalFanSys->MAT(ZoneNum) +
                      state.dataSurface->OSC(OPtr).ExtDryBulbCoef *
-                         state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp +
+                         state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum) +
                      state.dataSurface->OSC(OPtr).ConstTempCoef * state.dataSurface->OSC(OPtr).ConstTemp +
                      state.dataSurface->OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
                      state.dataSurface->OSC(OPtr).WindSpeedCoef *
-                         state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).WindSpeed *
-                         state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp);
+                         state.dataSurface->SurfOutWindSpeed(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum) *
+                         state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum));
                 state.dataRoomAirMod->Tin(ZoneNum) = state.dataSurface->OSC(OPtr).OSCTempCalc;
             } else {
                 state.dataRoomAirMod->Tin(ZoneNum) =
-                    state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp;
+                    state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum);
             }
             return;
         }
@@ -608,10 +608,10 @@ namespace CrossVentMgr {
             } else if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond ==
                        ExternalEnvironment) {
                 state.dataRoomAirMod->Tin(ZoneNum) =
-                    state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp;
+                    state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum);
             } else if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond == Ground) {
                 state.dataRoomAirMod->Tin(ZoneNum) =
-                    state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp;
+                    state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum);
             } else if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond ==
                            OtherSideCoefNoCalcExt ||
                        state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond ==
@@ -620,16 +620,16 @@ namespace CrossVentMgr {
                 state.dataSurface->OSC(OPtr).OSCTempCalc =
                     (state.dataSurface->OSC(OPtr).ZoneAirTempCoef * state.dataHeatBalFanSys->MAT(ZoneNum) +
                      state.dataSurface->OSC(OPtr).ExtDryBulbCoef *
-                         state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp +
+                         state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum) +
                      state.dataSurface->OSC(OPtr).ConstTempCoef * state.dataSurface->OSC(OPtr).ConstTemp +
                      state.dataSurface->OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
                      state.dataSurface->OSC(OPtr).WindSpeedCoef *
-                         state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).WindSpeed *
-                         state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp);
+                         state.dataSurface->SurfOutWindSpeed(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum) *
+                         state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum));
                 state.dataRoomAirMod->Tin(ZoneNum) = state.dataSurface->OSC(OPtr).OSCTempCalc;
             } else {
                 state.dataRoomAirMod->Tin(ZoneNum) =
-                    state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp;
+                    state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum);
             }
             state.dataRoomAirMod->Urec(ZoneNum) = 0.0;
             state.dataRoomAirMod->Ujet(ZoneNum) = 0.0;
@@ -671,10 +671,10 @@ namespace CrossVentMgr {
             } else if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond ==
                        ExternalEnvironment) {
                 state.dataRoomAirMod->Tin(ZoneNum) =
-                    state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp;
+                    state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum);
             } else if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond == Ground) {
                 state.dataRoomAirMod->Tin(ZoneNum) =
-                    state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp;
+                    state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum);
             } else if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond ==
                            OtherSideCoefNoCalcExt ||
                        state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond ==
@@ -683,17 +683,17 @@ namespace CrossVentMgr {
                 state.dataSurface->OSC(OPtr).OSCTempCalc =
                     (state.dataSurface->OSC(OPtr).ZoneAirTempCoef * state.dataHeatBalFanSys->MAT(ZoneNum) +
                      state.dataSurface->OSC(OPtr).ExtDryBulbCoef *
-                         state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp +
+                         state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum) +
                      state.dataSurface->OSC(OPtr).ConstTempCoef * state.dataSurface->OSC(OPtr).ConstTemp +
                      state.dataSurface->OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
                      state.dataSurface->OSC(OPtr).WindSpeedCoef *
-                         state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).WindSpeed *
-                         state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp);
+                         state.dataSurface->SurfOutWindSpeed(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum) *
+                         state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum));
                 state.dataRoomAirMod->Tin(ZoneNum) = state.dataSurface->OSC(OPtr).OSCTempCalc;
 
             } else {
                 state.dataRoomAirMod->Tin(ZoneNum) =
-                    state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp;
+                    state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum);
             }
             return;
         }
@@ -771,10 +771,10 @@ namespace CrossVentMgr {
         if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond <= 0) {
             if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond == ExternalEnvironment) {
                 state.dataRoomAirMod->Tin(ZoneNum) =
-                    state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp;
+                    state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum);
             } else if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond == Ground) {
                 state.dataRoomAirMod->Tin(ZoneNum) =
-                    state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp;
+                    state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum);
             } else if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond ==
                            OtherSideCoefNoCalcExt ||
                        state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond ==
@@ -783,16 +783,16 @@ namespace CrossVentMgr {
                 state.dataSurface->OSC(OPtr).OSCTempCalc =
                     (state.dataSurface->OSC(OPtr).ZoneAirTempCoef * state.dataHeatBalFanSys->MAT(ZoneNum) +
                      state.dataSurface->OSC(OPtr).ExtDryBulbCoef *
-                         state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp +
+                         state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum) +
                      state.dataSurface->OSC(OPtr).ConstTempCoef * state.dataSurface->OSC(OPtr).ConstTemp +
                      state.dataSurface->OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
                      state.dataSurface->OSC(OPtr).WindSpeedCoef *
-                         state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).WindSpeed *
-                         state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp);
+                         state.dataSurface->SurfOutWindSpeed(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum) *
+                         state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum));
                 state.dataRoomAirMod->Tin(ZoneNum) = state.dataSurface->OSC(OPtr).OSCTempCalc;
             } else {
                 state.dataRoomAirMod->Tin(ZoneNum) =
-                    state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp;
+                    state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum);
             }
         } else {
             // adiabatic surface
@@ -803,7 +803,7 @@ namespace CrossVentMgr {
                 if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).Zone == ZoneNum) {
                     if (state.dataAirflowNetwork->AirflowNetworkNodeData(NodeNum1).EPlusZoneNum <= 0) {
                         state.dataRoomAirMod->Tin(ZoneNum) =
-                            state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp;
+                            state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum);
                     } else if (state.dataRoomAirMod->AirModel(state.dataAirflowNetwork->AirflowNetworkNodeData(NodeNum1).EPlusZoneNum).AirModelType ==
                                DataRoomAirModel::RoomAirModel::UCSDCV) {
                         state.dataRoomAirMod->Tin(ZoneNum) =
@@ -817,7 +817,7 @@ namespace CrossVentMgr {
 
                     if (state.dataAirflowNetwork->AirflowNetworkNodeData(NodeNum2).EPlusZoneNum <= 0) {
                         state.dataRoomAirMod->Tin(ZoneNum) =
-                            state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp;
+                            state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum);
                     } else if (state.dataRoomAirMod->AirModel(state.dataAirflowNetwork->AirflowNetworkNodeData(NodeNum2).EPlusZoneNum).AirModelType ==
                                DataRoomAirModel::RoomAirModel::UCSDCV) {
                         state.dataRoomAirMod->Tin(ZoneNum) =

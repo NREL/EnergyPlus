@@ -943,18 +943,18 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     int CollectorNum;             // current solar collector index
     Real64 ICSWaterTemp;          // ICS solar collector water temp
     Real64 ICSULossbottom;        // ICS solar collector bottom loss Conductance
-
-    Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, SurfPtrARR));
-
+    Real64 sum_area = 0.0;
+    Real64 sum_produc_area_drybulb = 0.0;
+    Real64 sum_produc_area_wetbulb = 0.0;
+    for (int SurfNum: SurfPtrARR) {
+        sum_area += state.dataSurface->Surface(SurfNum).Area;
+        sum_produc_area_drybulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
+        sum_produc_area_wetbulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutWetBulbTemp(SurfNum);
+    }
     //    LocalOutDryBulbTemp = sum( Surface( SurfPtrARR ).Area * Surface( SurfPtrARR ).OutDryBulbTemp ) / sum( Surface( SurfPtrARR ).Area );
-    ////Autodesk:F2C++ Array subscript usage: Replaced by below
-    LocalOutDryBulbTemp = sum_product_sub(state.dataSurface->Surface, &SurfaceData::Area, &SurfaceData::OutDryBulbTemp, SurfPtrARR) /
-                          surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-
+    LocalOutDryBulbTemp = sum_produc_area_drybulb / sum_area; // Autodesk:F2C++ Functions handle array subscript usage
     //    LocalWetBulbTemp = sum( Surface( SurfPtrARR ).Area * Surface( SurfPtrARR ).OutWetBulbTemp ) / sum( Surface( SurfPtrARR ).Area );
-    ////Autodesk:F2C++ Array subscript usage: Replaced by below
-    LocalWetBulbTemp = sum_product_sub(state.dataSurface->Surface, &SurfaceData::Area, &SurfaceData::OutWetBulbTemp, SurfPtrARR) /
-                       surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
+    LocalWetBulbTemp = sum_produc_area_wetbulb / sum_area;
 
     LocalOutHumRat = PsyWFnTdbTwbPb(state, LocalOutDryBulbTemp, LocalWetBulbTemp, state.dataEnvrn->OutBaroPress, RoutineName);
 
@@ -966,7 +966,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         Tamb = LocalWetBulbTemp;
     }
     //    A = sum( Surface( SurfPtrARR ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-    A = surfaceArea;
+    A = sum_area;
     TmpTsBaf = TsBaffle;
 
     // loop through underlying surfaces and collect needed data
@@ -982,7 +982,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         SurfPtr = SurfPtrARR(ThisSurf);
         // Initializations for this surface
         HMovInsul = 0.0;
-        LocalWindArr(ThisSurf) = state.dataSurface->Surface(SurfPtr).WindSpeed;
+        LocalWindArr(ThisSurf) = state.dataSurface->SurfOutWindSpeed(SurfPtr);
         InitExteriorConvectionCoeff(
             state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;

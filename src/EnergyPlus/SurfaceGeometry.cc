@@ -868,7 +868,6 @@ namespace SurfaceGeometry {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
-
         state.dataSurface->ShadeV.allocate(state.dataSurface->TotSurfaces);
         for (auto &e : state.dataSurface->ShadeV)
             e.NVert = 0;
@@ -891,9 +890,60 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinADiffFront.dimension(state.dataSurface->TotSurfaces, CFSMAXNL + 1, 0.0);
         state.dataSurface->SurfWinACFOverlap.dimension(state.dataSurface->TotSurfaces, state.dataHeatBal->MaxSolidWinLayers, 0.0);
 
+        // Surface EMS arrays
+        state.dataSurface->SurfEMSConstructionOverrideON.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfEMSConstructionOverrideValue.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfEMSOverrideIntConvCoef.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfEMSValueForIntConvCoef.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfEMSOverrideExtConvCoef.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfEMSValueForExtConvCoef.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutDryBulbTempEMSOverrideOn.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutDryBulbTempEMSOverrideValue.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutWetBulbTempEMSOverrideOn.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutWetBulbTempEMSOverrideValue.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfWindSpeedEMSOverrideOn.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfWindSpeedEMSOverrideValue.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfViewFactorGroundEMSOverrideOn.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfViewFactorGroundEMSOverrideValue.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfWindDirEMSOverrideOn.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfWindDirEMSOverrideValue.allocate(state.dataSurface->TotSurfaces);
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            state.dataSurface->SurfEMSConstructionOverrideON(SurfNum) = false;
+            state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum) = 0.0;
+            state.dataSurface->SurfEMSOverrideIntConvCoef(SurfNum) = false;
+            state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum) = 0.0;
+            state.dataSurface->SurfEMSOverrideExtConvCoef(SurfNum) = false;
+            state.dataSurface->SurfEMSValueForExtConvCoef(SurfNum) = 0.0;
+            state.dataSurface->SurfOutDryBulbTempEMSOverrideOn(SurfNum) = false;
+            state.dataSurface->SurfOutDryBulbTempEMSOverrideValue(SurfNum) = 0.0;
+            state.dataSurface->SurfOutWetBulbTempEMSOverrideOn(SurfNum) = false;
+            state.dataSurface->SurfOutWetBulbTempEMSOverrideValue(SurfNum) = 0.0;
+            state.dataSurface->SurfWindSpeedEMSOverrideOn(SurfNum) = false;
+            state.dataSurface->SurfWindSpeedEMSOverrideValue(SurfNum) = 0.0;
+            state.dataSurface->SurfViewFactorGroundEMSOverrideOn(SurfNum) = false;
+            state.dataSurface->SurfViewFactorGroundEMSOverrideValue(SurfNum) = 0.0;
+            state.dataSurface->SurfWindDirEMSOverrideOn(SurfNum) = false;
+            state.dataSurface->SurfWindDirEMSOverrideValue(SurfNum) = 0.0;
+        }
+        // Following are surface hb arrays
+        state.dataSurface->SurfOutDryBulbTemp.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutWetBulbTemp.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutWindSpeed.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutWindDir.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfGenericContam.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfPenumbraID.allocate(state.dataSurface->TotSurfaces);
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            state.dataSurface->SurfOutDryBulbTemp(SurfNum) = 0.0;
+            state.dataSurface->SurfOutWetBulbTemp(SurfNum) = 0.0;
+            state.dataSurface->SurfOutWindSpeed(SurfNum) = 0.0;
+            state.dataSurface->SurfOutWindDir(SurfNum) = 0.0;
+            state.dataSurface->SurfGenericContam(SurfNum) = 0.0;
+            state.dataSurface->SurfPenumbraID(SurfNum) = 0;
+        }
         // Following are surface property arrays used in SurfaceGeometry
         state.dataSurface->SurfShadowSurfPossibleObstruction.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfShadowSurfRecSurfNum.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfDisabledShadowingZoneList.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfSchedExternalShadingFrac.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfExternalShadingSchInd.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfHasSurroundingSurfProperties.allocate(state.dataSurface->TotSurfaces);
@@ -907,6 +957,8 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfIsICS.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIsPool.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfICSPtr.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIsRadSurfOrVentSlabOrPool.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfDaylightingShelfInd.allocate(state.dataSurface->TotSurfaces);
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfShadowSurfPossibleObstruction(SurfNum) = false;
             state.dataSurface->SurfShadowSurfRecSurfNum(SurfNum) = 0;
@@ -923,6 +975,8 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfIsICS(SurfNum) = false;
             state.dataSurface->SurfIsPool(SurfNum) = false;
             state.dataSurface->SurfICSPtr(SurfNum) = 0;
+            state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(SurfNum) = false;
+            state.dataSurface->SurfDaylightingShelfInd(SurfNum) = 0;
         }
         state.dataSurface->SurfLowTempErrCount.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfHighTempErrCount.allocate(state.dataSurface->TotSurfaces);
@@ -2673,6 +2727,7 @@ namespace SurfaceGeometry {
         // Initialize run time surface arrays
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
             state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+            state.dataSurface->Surface(SurfNum).Index = SurfNum;
         }
     }
 

@@ -139,7 +139,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     state->dataSurface->Surface(SurfNum).Class = DataSurfaces::SurfaceClass::Wall;
     state->dataSurface->Surface(SurfNum).Area = 10.0;
     state->dataSurface->Surface(SurfNum).MaterialMovInsulExt = 1;
-
+    state->dataSurface->SurfOutDryBulbTemp.allocate(SurfNum);
+    state->dataSurface->SurfOutDryBulbTemp = 0;
     state->dataEnvrn->SkyTemp = 23.0;
     state->dataEnvrn->OutDryBulbTemp = 23.0;
 
@@ -161,7 +162,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
 
     EXPECT_TRUE(ErrorFlag);
     EXPECT_TRUE(compare_err_stream(error_string, true));
-    EXPECT_EQ(10.0 * 1.0 * (state->dataHeatBalSurf->TH(1, 1, SurfNum) - state->dataSurface->Surface(SurfNum).OutDryBulbTemp),
+    EXPECT_EQ(10.0 * 1.0 * (state->dataHeatBalSurf->TH(1, 1, SurfNum) - state->dataSurface->SurfOutDryBulbTemp(SurfNum)),
               state->dataHeatBalSurf->QAirExtReport(SurfNum));
 }
 
@@ -736,11 +737,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     state->dataLoopNodes->Node.allocate(4);
 
-    state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfEMSOverrideExtConvCoef.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfEMSOverrideIntConvCoef = false;
-    state->dataSurface->SurfEMSOverrideExtConvCoef = false;
-
     state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
     state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
     state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
@@ -1279,11 +1275,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
 
     state->dataLoopNodes->Node.allocate(4);
 
-    state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfEMSOverrideExtConvCoef.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfEMSOverrideIntConvCoef = false;
-    state->dataSurface->SurfEMSOverrideExtConvCoef = false;
-
     state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
     state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
     state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
@@ -1354,10 +1345,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     InitSurfaceHeatBalance(*state);
 
     // Test if local value correctly overwritten
-    EXPECT_EQ(25.0, state->dataSurface->Surface(1).OutDryBulbTemp);
-    EXPECT_EQ(20.0, state->dataSurface->Surface(1).OutWetBulbTemp);
-    EXPECT_EQ(1.5, state->dataSurface->Surface(1).WindSpeed);
-    EXPECT_EQ(90.0, state->dataSurface->Surface(1).WindDir);
+    EXPECT_EQ(25.0, state->dataSurface->SurfOutDryBulbTemp(1));
+    EXPECT_EQ(20.0, state->dataSurface->SurfOutWetBulbTemp(1));
+    EXPECT_EQ(1.5, state->dataSurface->SurfOutWindSpeed(1));
+    EXPECT_EQ(90.0, state->dataSurface->SurfOutWindDir(1));
 
     // Test if local value used in surface hc calculation
     // Surface(1) - local; Surface(2) - global;
@@ -1859,11 +1850,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 
     state->dataLoopNodes->Node.allocate(4);
 
-    state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfEMSOverrideExtConvCoef.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfEMSOverrideIntConvCoef = false;
-    state->dataSurface->SurfEMSOverrideExtConvCoef = false;
-
     state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
     state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
     state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
@@ -1921,7 +1907,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     int SurfNum;
     for (SurfNum = 1; SurfNum <= 6; SurfNum++) {
         state->dataHeatBalSurf->TH(1, 1, SurfNum) = 20;           // Surf temp
-        state->dataSurface->Surface(SurfNum).OutDryBulbTemp = 22; // Air temp
+        state->dataSurface->SurfOutDryBulbTemp(SurfNum) = 22; // Air temp
         state->dataSurface->SurfExtConvCoeff(SurfNum) = -6;
         state->dataSurface->AirSkyRadSplit(SurfNum) = 1.0;
     }
@@ -2431,11 +2417,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     state->dataLoopNodes->Node.allocate(4);
 
-    state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfEMSOverrideExtConvCoef.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfEMSOverrideIntConvCoef = false;
-    state->dataSurface->SurfEMSOverrideExtConvCoef = false;
-
     state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
     state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
     state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
@@ -2567,14 +2548,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestReportIntMovInsInsideSur
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_OutsideSurfHeatBalanceWhenRainFlag)
 {
     state->dataSurface->Surface.allocate(1);
+    state->dataSurface->SurfOutWetBulbTemp.allocate(1);
+    state->dataSurface->SurfOutDryBulbTemp.allocate(1);
     state->dataHeatBalSurf->HcExtSurf.allocate(1);
     state->dataHeatBalSurf->TH.allocate(1, 1, 1);
 
     state->dataSurface->Surface(1).Area = 58.197;
     state->dataHeatBalSurf->HcExtSurf(1) = 1000;
     state->dataHeatBalSurf->TH(1, 1, 1) = 6.71793958923051;
-    state->dataSurface->Surface(1).OutWetBulbTemp = 6.66143784594778;
-    state->dataSurface->Surface(1).OutDryBulbTemp = 7.2;
+    state->dataSurface->SurfOutWetBulbTemp(1) = 6.66143784594778;
+    state->dataSurface->SurfOutDryBulbTemp(1) = 7.2;
 
     // If Rain Flag = on, GetQdotConvOutRep uses Outdoor Air Wet Bulb Temp.
     state->dataEnvrn->IsRain = true;
@@ -3123,8 +3106,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     createFacilityElectricPowerServiceObject(*state);
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
-    state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfEMSOverrideIntConvCoef = false;
 
     InitSurfaceHeatBalance(*state);
 

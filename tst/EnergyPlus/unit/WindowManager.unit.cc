@@ -243,7 +243,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     state->dataHeatBal->SunlitFrac.dimension(1, 1, 3, 1.0);
     state->dataHeatBal->SunlitFracWithoutReveal.dimension(1, 1, 3, 1.0);
 
-    state->dataSurface->Surface(winNum).OutDryBulbTemp = T_out;
+    state->dataSurface->SurfOutDryBulbTemp(winNum) = T_out;
     state->dataHeatBal->TempEffBulkAir(winNum) = T_in;
     state->dataSurface->SurfWinIRfromParentZone(winNum) = DataGlobalConstants::StefanBoltzmann * std::pow(T_in + DataGlobalConstants::KelvinConv, 4);
     state->dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(1, 0.01);
@@ -573,7 +573,6 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataSurface->InsideFrameCondensationFlag.allocate(3);
     state->dataSurface->InsideDividerCondensationFlag.allocate(3);
 
-    state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(3);
     state->dataSurface->SurfTAirRef(surfNum1) = DataSurfaces::ZoneMeanAirTemp;
     state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::ZoneSupplyAirTemp;
     state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::AdjacentAirTemp;
@@ -598,7 +597,6 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
     state->dataSurface->SurfWinTransSolar = 0.0;
     state->dataHeatBal->QS = 0.0;
-    state->dataSurface->SurfEMSOverrideIntConvCoef = false;
 
     Real64 inSurfTemp;
     Real64 outSurfTemp;
@@ -2803,7 +2801,6 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataSurface->SurfWinGainFrameDividerToZoneRep.allocate(3);
     state->dataSurface->InsideFrameCondensationFlag.allocate(3);
     state->dataSurface->InsideDividerCondensationFlag.allocate(3);
-    state->dataSurface->SurfEMSOverrideIntConvCoef.allocate(3);
     state->dataSurface->SurfTAirRef(surfNum1) = DataSurfaces::ZoneMeanAirTemp;
     state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::ZoneSupplyAirTemp;
     state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::AdjacentAirTemp;
@@ -2828,7 +2825,6 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
     state->dataSurface->SurfWinTransSolar = 0.0;
     state->dataHeatBal->QS = 0.0;
-    state->dataSurface->SurfEMSOverrideIntConvCoef = false;
 
     Real64 inSurfTemp;
     Real64 outSurfTemp;

@@ -9182,11 +9182,11 @@ namespace AirflowNetworkBalanceManager {
                 // Find a linkage from a zone to outdoors
                 if (ZN1 > 0 && ZN2 == 0) {
                     if (state.dataSurface->SurfHasLinkedOutAirNode(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum)) {
-                        Tamb = state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).OutDryBulbTemp;
+                        Tamb = state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum);
                         CpAir = PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(
                             state,
                             Tamb,
-                            state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).OutWetBulbTemp,
+                            state.dataSurface->SurfOutWetBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum),
                             state.dataEnvrn->OutBaroPress));
                     } else {
                         Tamb = Zone(ZN1).OutDryBulbTemp;
@@ -9267,11 +9267,11 @@ namespace AirflowNetworkBalanceManager {
                 }
                 if (ZN1 == 0 && ZN2 > 0) {
                     if (state.dataSurface->SurfHasLinkedOutAirNode(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum)) {
-                        Tamb = state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).OutDryBulbTemp;
+                        Tamb = state.dataSurface->SurfOutDryBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum);
                         CpAir = PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(
                             state,
                             Tamb,
-                            state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).OutWetBulbTemp,
+                            state.dataSurface->SurfOutWetBulbTemp(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum),
                             state.dataEnvrn->OutBaroPress));
                     } else {
                         Tamb = Zone(ZN2).OutDryBulbTemp;
@@ -10876,7 +10876,7 @@ namespace AirflowNetworkBalanceManager {
         // Venting based on inside-outside air temperature difference
 
         if ((VentCtrlNum == VentControlType::Temp || VentCtrlNum == VentControlType::AdjTemp) && VentingAllowed) {
-            Tamb = state.dataSurface->Surface(SurfNum).OutDryBulbTemp;
+            Tamb = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
             // Check whether this surface is an interior wall or not. If Yes, use adjacent zone conditions
             if (VentCtrlNum == VentControlType::AdjTemp && state.dataAirflowNetwork->MultizoneSurfaceData(i).IndVentControl) {
                 Tamb = state.dataAirflowNetwork->ANZT(

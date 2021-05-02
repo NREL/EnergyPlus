@@ -389,7 +389,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
         state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
     }
 
-    TAir = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+    TAir = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + DataGlobalConstants::KelvinConv;
     TSurf = TempExt + DataGlobalConstants::KelvinConv;
     TSky = state.dataEnvrn->SkyTempKelvin;
     TGround = TAir;
@@ -408,14 +408,14 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
 
     BaseSurf = Surface(SurfNum).BaseSurf; // If this is a base surface, BaseSurf = SurfNum
 
-    SurfWindDir = Surface(SurfNum).WindDir;
+    SurfWindDir = state.dataSurface->SurfOutWindDir(SurfNum);
 
     if (!Surface(SurfNum).ExtWind) {
         SurfWindSpeed = 0.0; // No wind exposure
     } else if (Surface(SurfNum).Class == SurfaceClass::Window && state.dataSurface->SurfWinShadingFlag(SurfNum) == WinShadingType::ExtShade) {
         SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
     } else {
-        SurfWindSpeed = Surface(SurfNum).WindSpeed;
+        SurfWindSpeed = state.dataSurface->SurfOutWindSpeed(SurfNum);
     }
 
     // Check if exterior is to be set by user
@@ -4802,16 +4802,16 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
                 };
             }
         } else if (SELECT_CASE_var == HcExt_NaturalASHRAEVerticalWall) {
-            Hn = CalcASHRAEVerticalWall((TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp));
+            Hn = CalcASHRAEVerticalWall((TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)));
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcASHRAEVerticalWall(Tsurf - Tamb); };
         } else if (SELECT_CASE_var == HcExt_NaturalWaltonUnstableHorizontalOrTilt) {
-            Hn = CalcWaltonUnstableHorizontalOrTilt((TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp),
+            Hn = CalcWaltonUnstableHorizontalOrTilt((TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
                                                     Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
             HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
                 return CalcWaltonUnstableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
             };
         } else if (SELECT_CASE_var == HcExt_NaturalWaltonStableHorizontalOrTilt) {
-            Hn = CalcWaltonStableHorizontalOrTilt((TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp),
+            Hn = CalcWaltonStableHorizontalOrTilt((TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
                                                   Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
             HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
                 return CalcWaltonStableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
@@ -4819,7 +4819,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
         } else if (SELECT_CASE_var == HcExt_AlamdariHammondVerticalWall) {
             Real64 FaceHeight = state.dataSurface->SurfOutConvFaceHeight(SurfNum);
             Hn = CalcAlamdariHammondVerticalWall(
-                state, (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp), FaceHeight, SurfNum);
+                state, (TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), FaceHeight, SurfNum);
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcAlamdariHammondVerticalWall(Tsurf - Tamb, FaceHeight);
             };
@@ -4829,7 +4829,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
                 ShowFatalError(state, "Fohanno Polidori convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
             }
             Hn = CallCalcFohannoPolidoriVerticalWall(state,
-                                                     (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp),
+                                                     (TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
                                                      state.dataSurface->SurfOutConvFaceHeight(SurfNum),
                                                      TH(1, 1, SurfNum),
                                                      -QdotConvOutRepPerArea(SurfNum),
@@ -4840,14 +4840,14 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
             } else {
                 HydraulicDiameter = std::sqrt(state.dataSurface->SurfOutConvFaceArea(SurfNum));
             }
-            Hn = CalcAlamdariHammondStableHorizontal(state, (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp), HydraulicDiameter, SurfNum);
+            Hn = CalcAlamdariHammondStableHorizontal(state, (TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), HydraulicDiameter, SurfNum);
         } else if (SELECT_CASE_var == HcExt_AlamdariHammondUnstableHorizontal) {
             if (state.dataSurface->SurfOutConvFacePerimeter(SurfNum) > 0.0) {
                 HydraulicDiameter = 4.0 * state.dataSurface->SurfOutConvFaceArea(SurfNum) / state.dataSurface->SurfOutConvFacePerimeter(SurfNum);
             } else {
                 HydraulicDiameter = std::sqrt(state.dataSurface->SurfOutConvFaceArea(SurfNum));
             }
-            Hn = CalcAlamdariHammondUnstableHorizontal(state, (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp), HydraulicDiameter, SurfNum);
+            Hn = CalcAlamdariHammondUnstableHorizontal(state, (TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), HydraulicDiameter, SurfNum);
         }
     }
 
@@ -4858,7 +4858,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
         } else if (Surface(SurfNum).Class == SurfaceClass::Window && state.dataSurface->SurfWinShadingFlag(SurfNum) == WinShadingType::ExtShade) {
             SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
         } else {
-            SurfWindSpeed = Surface(SurfNum).WindSpeed;
+            SurfWindSpeed = state.dataSurface->SurfOutWindSpeed(SurfNum);
         }
 
         int Roughness = state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
@@ -4925,7 +4925,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
             }
             HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
         } else if (SELECT_CASE_var == HcExt_MoWiTTWindward) {
-            Hf = CalcMoWITTWindward(TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp, SurfWindSpeed);
+            Hf = CalcMoWITTWindward(TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum), SurfWindSpeed);
             if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
                 HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
             } else {
@@ -4938,7 +4938,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
             }
             HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
         } else if (SELECT_CASE_var == HcExt_MoWiTTLeeward) {
-            Hf = CalcMoWITTLeeward((TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp), SurfWindSpeed);
+            Hf = CalcMoWITTLeeward((TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), SurfWindSpeed);
             if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
                 HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedLeeward(windSpeed); };
             } else {
@@ -4951,7 +4951,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
             }
             HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
         } else if (SELECT_CASE_var == HcExt_DOE2Windward) {
-            Hf = CalcDOE2Windward(TH(1, 1, SurfNum), Surface(SurfNum).OutDryBulbTemp, Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
+            Hf = CalcDOE2Windward(TH(1, 1, SurfNum), state.dataSurface->SurfOutDryBulbTemp(SurfNum), Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
             if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
                 HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
             } else {
@@ -4964,7 +4964,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
             }
             HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
         } else if (SELECT_CASE_var == HcExt_DOE2Leeward) {
-            Hf = CalcDOE2Leeward(TH(1, 1, SurfNum), Surface(SurfNum).OutDryBulbTemp, Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
+            Hf = CalcDOE2Leeward(TH(1, 1, SurfNum), state.dataSurface->SurfOutDryBulbTemp(SurfNum), Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
             if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
                 HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
             } else {
@@ -4993,11 +4993,11 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
             };
             HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
         } else if (SELECT_CASE_var == HcExt_ClearRoof) {
-            SurfWindDir = Surface(SurfNum).WindDir;
+            SurfWindDir = state.dataSurface->SurfOutWindDir(SurfNum);
             Hf = CalcClearRoof(state,
                                SurfNum,
                                TH(1, 1, SurfNum),
-                               Surface(SurfNum).OutDryBulbTemp,
+                               state.dataSurface->SurfOutDryBulbTemp(SurfNum),
                                SurfWindSpeed,
                                SurfWindDir,
                                state.dataSurface->SurfOutConvFaceArea(SurfNum),
@@ -5078,15 +5078,15 @@ void DynamicExtConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
 
     auto &Surface(state.dataSurface->Surface);
 
-    surfWindDir = Surface(SurfNum).WindDir;
+    surfWindDir = state.dataSurface->SurfOutWindDir(SurfNum);
 
     if (Surface(SurfNum).Class == SurfaceClass::Roof ||
         (Surface(SurfNum).Class == SurfaceClass::Floor && Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) // Applies to exterior grade
     ) {
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-            DeltaTemp = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - Surface(SurfNum).OutDryBulbTemp;
+            DeltaTemp = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - state.dataSurface->SurfOutDryBulbTemp(SurfNum);
         } else {
-            DeltaTemp = state.dataHeatBalSurf->TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp;
+            DeltaTemp = state.dataHeatBalSurf->TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum);
         }
 
         if (DeltaTemp < 0.0) {
@@ -6419,7 +6419,7 @@ void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, int const SurfNum, int
         if (SELECT_CASE_var == RefWindWeatherFile) {
             windVel = state.dataEnvrn->WindSpeed;
         } else if (SELECT_CASE_var == RefWindAtZ) {
-            windVel = Surface(SurfNum).WindSpeed;
+            windVel = state.dataSurface->SurfOutWindSpeed(SurfNum);
         } else if (SELECT_CASE_var == RefWindParallComp) {
             // WindSpeed , WindDir, surface Azimuth
             Theta = state.dataEnvrn->WindDir - Surface(SurfNum).Azimuth - 90.0; // TODO double check theta
@@ -6427,9 +6427,9 @@ void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, int const SurfNum, int
             windVel = std::cos(ThetaRad) * state.dataEnvrn->WindSpeed;
         } else if (SELECT_CASE_var == RefWindParallCompAtZ) {
             // Surface WindSpeed , Surface WindDir, surface Azimuth
-            Theta = Surface(SurfNum).WindDir - Surface(SurfNum).Azimuth - 90.0; // TODO double check theta
+            Theta = state.dataSurface->SurfOutWindDir(SurfNum) - Surface(SurfNum).Azimuth - 90.0; // TODO double check theta
             ThetaRad = Theta * DataGlobalConstants::DegToRadians;
-            windVel = std::cos(ThetaRad) * Surface(SurfNum).WindSpeed;
+            windVel = std::cos(ThetaRad) * state.dataSurface->SurfOutWindSpeed(SurfNum);
         }
     }
 
@@ -6446,7 +6446,7 @@ void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, int const SurfNum, int
 
     if (UserCurve.HnFnTempDiffCurveNum > 0) {
         HnFnTempDiff =
-            CurveValue(state, UserCurve.HnFnTempDiffCurveNum, std::abs(state.dataHeatBalSurf->TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp));
+            CurveValue(state, UserCurve.HnFnTempDiffCurveNum, std::abs(state.dataHeatBalSurf->TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)));
         HnFnTempDiffFn = [&](double Tsurf, double Tamb, double, double, double) -> double {
             return CurveValue(state, UserCurve.HnFnTempDiffCurveNum, std::abs(Tsurf - Tamb));
         };
@@ -6457,7 +6457,7 @@ void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, int const SurfNum, int
             HnFnTempDiffDivHeight = CurveValue(
                 state,
                 UserCurve.HnFnTempDiffDivHeightCurveNum,
-                ((std::abs(state.dataHeatBalSurf->TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp)) / state.dataSurface->SurfOutConvFaceHeight(SurfNum)));
+                ((std::abs(state.dataHeatBalSurf->TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum))) / state.dataSurface->SurfOutConvFaceHeight(SurfNum)));
             HnFnTempDiffDivHeightFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                 return CurveValue(state, UserCurve.HnFnTempDiffDivHeightCurveNum, ((std::abs(Tsurf - Tamb)) / state.dataSurface->SurfOutConvFaceHeight(SurfNum)));
             };
@@ -8541,7 +8541,7 @@ Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 c
     }
 
     if (Surface(SurfNum).ExtBoundCond == 0) {
-        v = Surface(SurfNum).WindSpeed;
+        v = state.dataSurface->SurfOutWindSpeed(SurfNum);
     } else {
         v = Vair;
     }

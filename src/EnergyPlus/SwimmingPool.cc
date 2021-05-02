@@ -404,7 +404,7 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
         ShowSevereError(state, RoutineName + "Invalid " + cAlphaField2 + " = " + Alpha2);
         ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alpha1);
         ErrorsFound = true;
-    } else if (state.dataSurface->Surface(this->SurfacePtr).IsRadSurfOrVentSlabOrPool) {
+    } else if (state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(this->SurfacePtr)) {
         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha1 + "\", Invalid Surface");
         ShowContinueError(state, cAlphaField2 + "=\"" + Alpha2 + "\" has been used in another radiant system, ventilated slab, or pool.");
         ShowContinueError(state,
@@ -435,7 +435,7 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
                 " is a pool and uses a construction with a source/sink.  This is not allowed.  Use a standard construction for this surface.");
         ErrorsFound = true;
     } else { // ( Pool( Item ).SurfacePtr > 0 )
-        state.dataSurface->Surface(this->SurfacePtr).IsRadSurfOrVentSlabOrPool = true;
+        state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(this->SurfacePtr) = true;
         state.dataSurface->SurfIsPool(this->SurfacePtr) = true;
         this->ZonePtr = state.dataSurface->Surface(this->SurfacePtr).Zone;
         // Check to make sure pool surface is a floor

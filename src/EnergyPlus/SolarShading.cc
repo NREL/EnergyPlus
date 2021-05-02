@@ -662,12 +662,12 @@ void GetShadowingInput(EnergyPlusData &state)
                             if (SurfZoneGroup == CurZoneGroup && DisableSelfShadingWithinGroup) {
                                 for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones;
                                      ZoneNum++) { // Loop through all zones in the zone list
-                                    state.dataSurface->Surface(SurfNum).DisabledShadowingZoneList.push_back(
+                                    state.dataSurface->SurfDisabledShadowingZoneList(SurfNum).push_back(
                                         state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
                                 }
                             } else if (SurfZoneGroup != CurZoneGroup && DisableSelfShadingBetweenGroup) {
                                 for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones; ZoneNum++) {
-                                    state.dataSurface->Surface(SurfNum).DisabledShadowingZoneList.push_back(
+                                    state.dataSurface->SurfDisabledShadowingZoneList(SurfNum).push_back(
                                         state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
                                 }
                             }
@@ -928,11 +928,6 @@ void AllocateModuleArrays(EnergyPlusData &state)
         state.dataSurface->SurfWinInsRevealDiffIntoZoneReport(SurfNum) = 0.0;
         state.dataSurface->SurfWinInsRevealDiffOntoFrameReport(SurfNum) = 0.0;
         state.dataSurface->SurfWinBmSolAbsdInsRevealReport(SurfNum) = 0.0;
-    }
-
-    state.dataSurface->SurfPenumbraID.allocate(state.dataSurface->TotSurfaces);
-    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        state.dataSurface->SurfPenumbraID(SurfNum) = 0;
     }
 
     DisplayString(state, "Initializing Zone and Enclosure Report Variables");
@@ -5884,7 +5879,7 @@ void SHDGSS(EnergyPlusData &state,
                     continue; // Disable all shadowing surfaces in all zones. Attached shading surfaces are not part of a zone, zone value is 0.
                 }
             } else if (state.dataSysVars->DisableGroupSelfShading) {
-                std::vector<int> DisabledZones = state.dataSurface->Surface(CurSurf).DisabledShadowingZoneList;
+                std::vector<int> DisabledZones = state.dataSurface->SurfDisabledShadowingZoneList(CurSurf);
                 bool isDisabledShadowSurf = false;
                 for (int i : DisabledZones) {
                     if (surface.Zone == i) {
@@ -9703,7 +9698,7 @@ void WindowShadingManager(EnergyPlusData &state)
                 break;
 
             case WindowShadingControlType::HiOutAirTemp: // 'OnIfHighOutdoorAirTemperature'
-                if (state.dataSurface->Surface(ISurf).OutDryBulbTemp > SetPoint && SchedAllowsControl) {
+                if (state.dataSurface->SurfOutDryBulbTemp(ISurf) > SetPoint && SchedAllowsControl) {
                     shadingOn = true;
                 } else if (GlareControlIsActive) {
                     shadingOffButGlareControlOn = true;
@@ -9721,7 +9716,7 @@ void WindowShadingManager(EnergyPlusData &state)
             case WindowShadingControlType::OnHiOutTemp_HiSolarWindow: // 'OnIfHighOutdoorAirTempAndHighSolarOnWindow'  ! Outside air temp and solar on
                                                                       // window
                 if (state.dataEnvrn->SunIsUp) {
-                    if (state.dataSurface->Surface(ISurf).OutDryBulbTemp > SetPoint && SolarOnWindow > SetPoint2 && SchedAllowsControl) {
+                    if (state.dataSurface->SurfOutDryBulbTemp(ISurf) > SetPoint && SolarOnWindow > SetPoint2 && SchedAllowsControl) {
                         shadingOn = true;
                     } else if (GlareControlIsActive) {
                         shadingOffButGlareControlOn = true;
@@ -9732,7 +9727,7 @@ void WindowShadingManager(EnergyPlusData &state)
             case WindowShadingControlType::OnHiOutTemp_HiHorzSolar: // 'OnIfHighOutdoorAirTempAndHighHorizontalSolar'  ! Outside air temp and
                                                                     // horizontal solar
                 if (state.dataEnvrn->SunIsUp) {
-                    if (state.dataSurface->Surface(ISurf).OutDryBulbTemp > SetPoint && HorizSolar > SetPoint2 && SchedAllowsControl) {
+                    if (state.dataSurface->SurfOutDryBulbTemp(ISurf) > SetPoint && HorizSolar > SetPoint2 && SchedAllowsControl) {
                         shadingOn = true;
                     } else if (GlareControlIsActive) {
                         shadingOffButGlareControlOn = true;
@@ -9793,7 +9788,7 @@ void WindowShadingManager(EnergyPlusData &state)
                 break;
 
             case WindowShadingControlType::OnNightLoOutTemp_OffDay: // 'OnNightIfLowOutdoorTempAndOffDay'
-                if (!state.dataEnvrn->SunIsUp && state.dataSurface->Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl) {
+                if (!state.dataEnvrn->SunIsUp && state.dataSurface->SurfOutDryBulbTemp(ISurf) < SetPoint && SchedAllowsControl) {
                     shadingOn = true;
                 } else if (GlareControlIsActive) {
                     shadingOffButGlareControlOn = true;
@@ -9821,7 +9816,7 @@ void WindowShadingManager(EnergyPlusData &state)
             case WindowShadingControlType::OnNightLoOutTemp_OnDayCooling: // 'OnNightIfLowOutdoorTempAndOnDayIfCooling'
                 if (!state.dataGlobal->BeginSimFlag) {
                     if (!state.dataEnvrn->SunIsUp) { // Night
-                        if (state.dataSurface->Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl) shadingOn = true;
+                        if (state.dataSurface->SurfOutDryBulbTemp(ISurf) < SetPoint && SchedAllowsControl) shadingOn = true;
                     } else { // Day
                         if (state.dataHeatBal->SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
                             shadingOn = true;
