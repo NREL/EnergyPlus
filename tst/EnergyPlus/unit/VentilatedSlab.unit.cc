@@ -140,7 +140,6 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
     EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).LateCoolCoilPower > 0.0);
     EXPECT_TRUE(LatOutputProvided < 0.0);
     EXPECT_TRUE(PowerMet < 0.0);
-
 }
 
 TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
@@ -2310,7 +2309,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(*state);  // read schedule data
+    ProcessScheduleInput(*state);               // read schedule data
 
     ErrorsFound = false;
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound); // read project control data

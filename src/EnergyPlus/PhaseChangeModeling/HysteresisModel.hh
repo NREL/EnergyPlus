@@ -134,13 +134,12 @@ namespace HysteresisPhaseChange {
         }
     };
 
-    extern std::vector<HysteresisPhaseChange> hysteresisPhaseChangeModels;
-
     void readAllHysteresisModels(EnergyPlusData &state);
 
 } // namespace HysteresisPhaseChange
 
-struct HysteresisPhaseChangeData : BaseGlobalStruct {
+struct HysteresisPhaseChangeData : BaseGlobalStruct
+{
 
     bool getHysteresisModels = true;
     int numHysteresisModels = 0;

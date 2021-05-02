@@ -144,9 +144,9 @@ protected:
         state->dataGlobal->BeginEnvrnFlag = true;
         state->dataEnvrn->OutDryBulbTemp = 35.0;
         state->dataEnvrn->OutHumRat = 0.012;
-        state->dataEnvrn->OutWetBulbTemp =
-            Psychrometrics::PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, DataEnvironment::StdPressureSeaLevel);
-        state->dataEnvrn->OutBaroPress = 101325;          // sea level
+        state->dataEnvrn->OutWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(
+            *state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, DataEnvironment::StdPressureSeaLevel);
+        state->dataEnvrn->OutBaroPress = 101325;            // sea level
         state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
 
         int numZones = state->dataGlobal->NumOfZones = 5;
@@ -154,6 +154,8 @@ protected:
         state->dataLoopNodes->Node.allocate(50);
         state->dataLoopNodes->NodeID.allocate(50);
 
+        state->dataHeatBalFanSys->TempControlType.allocate(numZones);
+        state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
         state->dataHeatBal->Zone.allocate(numZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(numZones);
         state->dataZoneEquip->ZoneEquipList.allocate(numZones);
@@ -422,7 +424,7 @@ protected:
         int VRFTUOutletNodeNum = 31;
         int VRFTUOAMixerOANodeNum = 32;
         int VRFTUOAMixerRelNodeNum = 33;
-        int VRFTUOAMixerRetNodeNum = 34;
+        int VRFTUOAMixerRetNodeNum = VRFTUInletNodeNum;
         int VRFTUOAMixerMixNodeNum = 35;
         int coolCoilAirInNode = VRFTUOAMixerMixNodeNum;
         int coolCoilAirOutNode = 36;
@@ -445,6 +447,7 @@ protected:
         VRFTU.VRFTUOAMixerOANodeNum = VRFTUOAMixerOANodeNum;
         VRFTU.VRFTUOAMixerRelNodeNum = VRFTUOAMixerRelNodeNum;
         VRFTU.VRFTUOAMixerRetNodeNum = VRFTUOAMixerRetNodeNum;
+        VRFTU.VRFTUOAMixerMixedNodeNum = VRFTUOAMixerMixNodeNum;
         VRFTU.MaxCoolAirVolFlow = DataSizing::AutoSize;
         VRFTU.MaxHeatAirVolFlow = DataSizing::AutoSize;
         VRFTU.MaxNoCoolAirVolFlow = DataSizing::AutoSize;
@@ -542,10 +545,10 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     // node number set up in fixture
     EXPECT_EQ(ZoneInletAirNode, thisTU.VRFTUOutletNodeNum);
 
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(curSysNum).SchedPtr).CurrentValue = 1.0;  // enable the VRF condenser
-    state->dataScheduleMgr->Schedule(thisTU.SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
-    state->dataScheduleMgr->Schedule(thisTU.FanAvailSchedPtr).CurrentValue = 1.0;  // turn on fan
-    state->dataScheduleMgr->Schedule(thisTU.FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(curSysNum).SchedPtr).CurrentValue = 1.0; // enable the VRF condenser
+    state->dataScheduleMgr->Schedule(thisTU.SchedPtr).CurrentValue = 1.0;                                    // enable the terminal unit
+    state->dataScheduleMgr->Schedule(thisTU.FanAvailSchedPtr).CurrentValue = 1.0;                            // turn on fan
+    state->dataScheduleMgr->Schedule(thisTU.FanOpModeSchedPtr).CurrentValue = 1.0;                           // set constant fan operating mode
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputRequired = 0.0; // set load = 0
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToCoolSP = 0.0;
@@ -554,17 +557,22 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     state->dataAirLoop->AirLoopInputsFilled = true;
 
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp = 35.0;
+    // primary air loop has OA system, TU OA flow rate will size to 0
+    state->dataAirSystemsData->PrimaryAirSystems(1).OASysExists = true;
 
     int VRFTUOAMixerOANodeNum = thisTU.VRFTUOAMixerOANodeNum;
     int VRFTUOAMixerRetNodeNum = thisTU.VRFTUOAMixerRetNodeNum;
+    // set mixer OA node conditions
     state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp = 35.0;
     state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat = 0.01;
-    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Enthalpy = PsyHFnTdbW(state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp, state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat);
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Enthalpy =
+        PsyHFnTdbW(state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp, state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat);
     state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Press = state->dataEnvrn->OutBaroPress;
-
+    // set mixer return node conditions (needed for mixer mixing calculation)
     state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Temp = 24.0;
     state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).HumRat = 0.01;
-    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Enthalpy = PsyHFnTdbW(state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Temp, state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).HumRat);
+    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Enthalpy =
+        PsyHFnTdbW(state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Temp, state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).HumRat);
     state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Press = state->dataEnvrn->OutBaroPress;
 
     bool FirstHVACIteration = true;
@@ -594,9 +602,9 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     tuInletNode.MassFlowRate = thisTU.MaxCoolAirMassFlow; // set mass flow rate at TU inlet
 
     InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
-    EXPECT_LT(QZnReq, 0.0);                                                      // cooling load exists
-    EXPECT_TRUE(thisTU.coolSPActive);                                            // cooling set point control active
-    EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).Temp, 24.0, 0.01); // verify outlet node is not at set point = 20
+    EXPECT_LT(QZnReq, 0.0);                                                              // cooling load exists
+    EXPECT_TRUE(thisTU.coolSPActive);                                                    // cooling set point control active
+    EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.coolCoilAirInNode).Temp, 24.0, 0.001); // verify coil inlet node is not at set point = 20
 
     SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     EXPECT_LT(SysOutputProvided, 0.0);
@@ -606,6 +614,10 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     tuInletNode.Temp = 18.0;
     tuInletNode.HumRat = 0.007;
     tuInletNode.Enthalpy = PsyHFnTdbW(tuInletNode.Temp, tuInletNode.HumRat);
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp = 15.0;
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat = 0.01;
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Enthalpy =
+        PsyHFnTdbW(state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp, state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat);
     state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Temp = 18.0;
     state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).HumRat = 0.007;
     state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Enthalpy =
@@ -615,17 +627,18 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp = 10.0;
 
     InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
-    EXPECT_GT(QZnReq, 0.0);                                                      // heating load exists
-    EXPECT_FALSE(thisTU.coolSPActive);                                           // verify cooling set point control is not active
-    EXPECT_TRUE(thisTU.heatSPActive);                                            // verify heating set point control is active
-    EXPECT_NEAR(18.0, tuInletNode.Temp, 0.001);                                  // verify TU inlet node = 18
+    EXPECT_GT(QZnReq, 0.0);                                                              // heating load exists
+    EXPECT_FALSE(thisTU.coolSPActive);                                                   // verify cooling set point control is not active
+    EXPECT_TRUE(thisTU.heatSPActive);                                                    // verify heating set point control is active
+    EXPECT_NEAR(18.0, tuInletNode.Temp, 0.001);                                          // verify TU inlet node = 18
     EXPECT_NEAR(18.0, state->dataLoopNodes->Node(thisTU.coolCoilAirInNode).Temp, 0.001); // verify cooling coil inlet node = 18
     SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
-    EXPECT_GT(SysOutputProvided, 0.0);                                                              // TU provides heating
+    EXPECT_GT(SysOutputProvided, 0.0);                                                                      // TU provides heating
     EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).Temp, thisTU.coilTempSetPoint, 0.01); // TU outlet is at SP target
     EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).Temp, 20.0, 0.01);
 
     // switch to load based control
+    state->dataLoopNodes->Node(curZoneNum).Temp = 20.0; // set zone temp in heating mode
     thisTU.isSetPointControlled = false;
     thisTU.ZoneAirNode = 1;
     thisTU.ZoneNum = 1;
@@ -644,15 +657,56 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     EXPECT_NEAR(SysOutputProvided, QZnReq, 1.0);
 
+    state->dataEnvrn->OutDryBulbTemp = 30.0;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp = 30.0;
+    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Temp = 24.0;
+    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).HumRat = 0.007;
+    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Enthalpy =
+        PsyHFnTdbW(state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Temp, state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).HumRat);
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp = 30.0;
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat = 0.01;
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Enthalpy =
+        PsyHFnTdbW(state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp, state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat);
+    state->dataLoopNodes->Node(curZoneNum).Temp = 24.0;                                             // set zone temp in cooling mode
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputRequired = -1000.0; // set cooling load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToCoolSP = -1000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToHeatSP = -2000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).OutputRequiredToCoolingSP = -1000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).OutputRequiredToHeatingSP = -2000.0;
     InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
     EXPECT_LT(QZnReq, 0.0);
     EXPECT_TRUE(state->dataHVACVarRefFlow->CoolingLoad(curSysNum));
     EXPECT_FALSE(state->dataHVACVarRefFlow->HeatingLoad(curSysNum));
     SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     EXPECT_NEAR(SysOutputProvided, QZnReq, 1.0);
+
+    // Test node connection function
+    EXPECT_FALSE(ErrorsFound);
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);     // nodes are connected correctly
+    thisTU.VRFTUInletNodeNum += 1; // change index of comp node
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.VRFTUOutletNodeNum -= 1; // revert previous change
+    thisTU.coolCoilAirInNode += 1;  // change index of comp node
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.coolCoilAirInNode -= 1;  // revert previous change
+    thisTU.coolCoilAirOutNode -= 1; // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.coolCoilAirOutNode += 1; // revert previous change
+    thisTU.heatCoilAirInNode -= 1;  // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.heatCoilAirInNode += 1;  // revert previous change
+    thisTU.heatCoilAirOutNode -= 1; // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
 }
 
 //*****************VRF-FluidTCtrl Model
@@ -662,8 +716,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     //   Test a group of methods related with the outdoor unit compressor calculations in the VRF_FluidTCtrl model.
 
     // Inputs_general
-    bool ErrorsFound(false);   // function returns true on error
-    int VRFCond(1);            // index to VRF condenser
+    bool ErrorsFound(false); // function returns true on error
+    int VRFCond(1);          // index to VRF condenser
 
     std::string const idf_objects = delimited_string({
         "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,                         ",
@@ -2243,7 +2297,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataSize->CurZoneEqNum = 1;
-    state->dataEnvrn->OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
@@ -2271,7 +2325,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     // #6218 Fan:SystemModel is used and DX coil RatedVolAirFlowRate was not set equal to system fan designAirVolFlowRate
     EXPECT_EQ(state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1), 1.0);
     EXPECT_EQ(state->dataDXCoils->DXCoil(2).RatedAirVolFlowRate(1), 1.0);
-    EXPECT_EQ(HVACFan::fanObjs[state->dataHVACVarRefFlow->VRFTU(1).FanIndex]->designAirVolFlowRate, 1.0);
+    EXPECT_EQ(state->dataHVACFan->fanObjs[state->dataHVACVarRefFlow->VRFTU(1).FanIndex]->designAirVolFlowRate, 1.0);
 
     // Run and Check: GetSupHeatTempRefrig
     {
@@ -2326,24 +2380,24 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 
         // Run
         state->dataHVACVarRefFlow->VRF(VRFCond).VRFHR_OU_HR_Mode(*state,
-                                      h_IU_evap_in,
-                                      h_comp_out,
-                                      Q_c_TU_PL,
-                                      Q_h_TU_PL,
-                                      Tdischarge,
-                                      Tsuction,
-                                      Te_update,
-                                      h_comp_in,
-                                      h_IU_PLc_out,
-                                      Pipe_Q_c,
-                                      Q_c_OU,
-                                      Q_h_OU,
-                                      m_ref_IU_evap,
-                                      m_ref_OU_evap,
-                                      m_ref_OU_cond,
-                                      N_fan_OU,
-                                      CompSpdActual,
-                                      Ncomp);
+                                                                 h_IU_evap_in,
+                                                                 h_comp_out,
+                                                                 Q_c_TU_PL,
+                                                                 Q_h_TU_PL,
+                                                                 Tdischarge,
+                                                                 Tsuction,
+                                                                 Te_update,
+                                                                 h_comp_in,
+                                                                 h_IU_PLc_out,
+                                                                 Pipe_Q_c,
+                                                                 Q_c_OU,
+                                                                 Q_h_OU,
+                                                                 m_ref_IU_evap,
+                                                                 m_ref_OU_evap,
+                                                                 m_ref_OU_cond,
+                                                                 N_fan_OU,
+                                                                 CompSpdActual,
+                                                                 Ncomp);
 
         // Test
         EXPECT_NEAR(756, CompSpdActual, 1);
@@ -2412,7 +2466,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     Real64 CompSpdActual;               // Actual compressor running speed [rps]
 
     // Run
-    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(*state, Q_req, iHXOpMode::CondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(
+        *state, Q_req, iHXOpMode::CondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
 
     // Test
     EXPECT_NEAR(950, CompSpdActual, 5);
@@ -2463,7 +2518,17 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 
     // Run
     state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CalcCompH(*state,
-        TU_load, T_suction, T_discharge, Pipe_h_out_ave, IUMaxCondTemp, MinOutdoorUnitTe, Tfs, Pipe_Q, OUEvapHeatExtract, CompSpdActual, Ncomp);
+                                                            TU_load,
+                                                            T_suction,
+                                                            T_discharge,
+                                                            Pipe_h_out_ave,
+                                                            IUMaxCondTemp,
+                                                            MinOutdoorUnitTe,
+                                                            Tfs,
+                                                            Pipe_Q,
+                                                            OUEvapHeatExtract,
+                                                            CompSpdActual,
+                                                            Ncomp);
 
     // Test
     EXPECT_NEAR(5110, OUEvapHeatExtract, 1);
@@ -2510,7 +2575,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Coil)
 
     // Pre-process
     state->dataEnvrn->OutBaroPress = OutBaroPress;
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Run and Check: VRFOU_Cap
     { //   Test the method VRFOU_Cap, which determines the VRF OU heat transfer rate, given refrigerant side temperature,
@@ -2600,7 +2665,8 @@ OutHumRat = 0.0146;
 SC = 1;
 
 // Run
-state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(*state, iHXOpMode::CondMode, Q_h_OU, SC, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tdischarge);
+state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(
+    *state, iHXOpMode::CondMode, Q_h_OU, SC, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tdischarge);
 
 // Test
 EXPECT_NEAR(36, Tdischarge, 0.05);
@@ -2618,7 +2684,8 @@ EXPECT_NEAR(36, Tdischarge, 0.05);
     Tsuction = -3;
 
     // Run
-    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(*state, iHXOpMode::EvapMode, Q_c_OU, SH, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tsuction);
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(
+        *state, iHXOpMode::EvapMode, Q_c_OU, SH, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tsuction);
 
     // Test
     EXPECT_NEAR(-3, Tsuction, 0.05);
@@ -2641,7 +2708,8 @@ EXPECT_NEAR(36, Tdischarge, 0.05);
         Tdischarge = 36;
 
         // Run
-        SC = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_SCSH(*state, iHXOpMode::CondMode, Q_h_OU, Tdischarge, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
+        SC = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_SCSH(
+            *state, iHXOpMode::CondMode, Q_h_OU, Tdischarge, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
 
         // Test
         EXPECT_NEAR(1, SC, 0.01);
@@ -2658,7 +2726,8 @@ EXPECT_NEAR(36, Tdischarge, 0.05);
         Tsuction = -3;
 
         // Run
-        SH = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_SCSH(*state, iHXOpMode::EvapMode, Q_c_OU, Tsuction, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
+        SH = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_SCSH(
+            *state, iHXOpMode::EvapMode, Q_c_OU, Tsuction, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
 
         // Test
         EXPECT_NEAR(1, SH, 0.01);
@@ -2877,7 +2946,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUAirFlow)
     FanSpdRatio = 0;
     Wout = 1;
     state->dataEnvrn->OutBaroPress = 101570;
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     state->dataDXCoils->DXCoil(CoolCoilIndex).C1Te = 0;
     state->dataDXCoils->DXCoil(CoolCoilIndex).C2Te = 0.804;
@@ -3698,7 +3767,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataSize->CurZoneEqNum = 1;
-    state->dataEnvrn->OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataSize->ZoneEqSizing.allocate(1);
@@ -3713,18 +3782,19 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
-    ProcessScheduleInput(*state);   // read schedules
-    GetCurveInput(*state);          // read curves
+    ProcessScheduleInput(*state);     // read schedules
+    GetCurveInput(*state);            // read curves
     GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData(*state);                                  // read equipment list and connections
     ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum); // trigger GetVRFInput by calling a mining function
 
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;             // enable the VRF condenser
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;  // turn on fan
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;            // enable the VRF condenser
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // enable the terminal unit
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // turn on fan
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
+        0.0; // set cycling fan operating mode
 
     // Test coil sizing
 
@@ -3735,14 +3805,15 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
 
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 35.0;                          // AHRI condition at 95 F db
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 35.0;                  // AHRI condition at 95 F db
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).HumRat = 0.01;                // don't care
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 35.0;           // AHRI condition at 95 F db
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 35.0;   // AHRI condition at 95 F db
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).HumRat = 0.01; // don't care
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     state->dataSize->DesDayWeath.allocate(1);
     state->dataSize->DesDayWeath(1).Temp.allocate(1);
-    state->dataSize->DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
+    state->dataSize->DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum)
+        .Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
 
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
@@ -3769,7 +3840,8 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
 
     ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFCond);
     ASSERT_EQ(ZoneInletAirNode,
-              state->dataZoneEquip->ZoneEquipConfig(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).InletNode(1)); // only 1 inlet node specified above in ZoneHVAC:EquipmentConnections
+              state->dataZoneEquip->ZoneEquipConfig(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum)
+                  .InletNode(1)); // only 1 inlet node specified above in ZoneHVAC:EquipmentConnections
     ASSERT_EQ(1.0, state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCombinationRatio);
     EXPECT_NEAR(11170.869, state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity, 0.001);
     EXPECT_NEAR(11170.869, state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity, 0.001);
@@ -3778,12 +3850,15 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     // test defrost operation Issue #4950 - Reverse cycle with timed defrost = 0
 
     // set OA node temperatures for heating where defrost should be active
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = state->dataHVACVarRefFlow->VRF(VRFCond).MaxOATDefrost - 1.0;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp =
+        state->dataHVACVarRefFlow->VRF(VRFCond).MaxOATDefrost - 1.0;
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).HumRat = 0.005;
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp =
+        state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp;
 
     // set zone load to heating
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity; // set load equal to the VRF heating capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired =
+        state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity; // set load equal to the VRF heating capacity
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP =
         state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity + 1000.0; // simulates a dual Tstat with load to cooling SP > load to heating SP
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity;
@@ -3802,7 +3877,8 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 LatOutputProvided);
 
     ASSERT_TRUE(state->dataHVACVarRefFlow->VRF(VRFCond).DefrostPower > 0.0); // defrost power should be greater than 0
-    DefrostWatts = state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF * (state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity / 1.01667) * state->dataHVACVarRefFlow->VRF(VRFCond).DefrostFraction;
+    DefrostWatts = state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF * (state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity / 1.01667) *
+                   state->dataHVACVarRefFlow->VRF(VRFCond).DefrostFraction;
     ASSERT_EQ(DefrostWatts, state->dataHVACVarRefFlow->VRF(VRFCond).DefrostPower); // defrost power calculation check
 
     // test that correct performance curve is used (i.e., lo or hi performance curves based on OAT)
@@ -3813,8 +3889,9 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     Real64 outT = 0.82 * state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp - 8.589;
     Real64 OutdoorCoildw = max(1.0e-6, (outHR - PsyWFnTdpPb(*state, outT, state->dataEnvrn->OutBaroPress)));
     Real64 FractionalDefrostTime = state->dataHVACVarRefFlow->VRF(VRFCond).DefrostFraction;
-    Real64 LoadDueToDefrost =
-        (0.01 * FractionalDefrostTime) * (7.222 - state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp) * (state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity / 1.01667);
+    Real64 LoadDueToDefrost = (0.01 * FractionalDefrostTime) *
+                              (7.222 - state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp) *
+                              (state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity / 1.01667);
     Real64 HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
     Real64 InputPowerMultiplier = 0.90 - 36.45 * OutdoorCoildw;
     // setup curve results
@@ -3825,21 +3902,27 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     Real64 TotHeatEIRTempModFacLo = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, outWB);
     Real64 TotHeatCapTempModFacHi = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, outWB);
     Real64 TotHeatEIRTempModFacHi = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, outWB);
-    Real64 EIRFPLRModFac = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFPLR1, max(state->dataHVACVarRefFlow->VRF(VRFCond).MinPLR, state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR));
-    Real64 TotalCondHeatingCapacityLo =
-        state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity * state->dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacLo * HeatingCapacityMultiplier;
-    Real64 ElecHeatingPowerLo =
-        state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacLo * TotHeatEIRTempModFacLo * EIRFPLRModFac * InputPowerMultiplier;
-    Real64 TotalCondHeatingCapacityHi =
-        state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity * state->dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacHi * HeatingCapacityMultiplier;
-    Real64 ElecHeatingPowerHi =
-        state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacHi * TotHeatEIRTempModFacHi * EIRFPLRModFac * InputPowerMultiplier;
-    Real64 HeatingPLRLo = (state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating) / TotalCondHeatingCapacityLo;
-    HeatingPLRLo += (LoadDueToDefrost * HeatingPLRLo) / TotalCondHeatingCapacityLo;       // account for defrost
-    Real64 OperatingCondHeatCapLo = TotalCondHeatingCapacityLo * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalHeatingCapacity
-    Real64 HeatingPLRHi = (state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating) / TotalCondHeatingCapacityHi;
-    HeatingPLRHi += (LoadDueToDefrost * HeatingPLRHi) / TotalCondHeatingCapacityHi;       // account for defrost
-    Real64 OperatingCondHeatCapHi = TotalCondHeatingCapacityHi * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalHeatingCapacity
+    Real64 EIRFPLRModFac = CurveValue(*state,
+                                      state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFPLR1,
+                                      max(state->dataHVACVarRefFlow->VRF(VRFCond).MinPLR, state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR));
+    Real64 TotalCondHeatingCapacityLo = state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity *
+                                        state->dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacLo * HeatingCapacityMultiplier;
+    Real64 ElecHeatingPowerLo = state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacLo * TotHeatEIRTempModFacLo *
+                                EIRFPLRModFac * InputPowerMultiplier;
+    Real64 TotalCondHeatingCapacityHi = state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity *
+                                        state->dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacHi * HeatingCapacityMultiplier;
+    Real64 ElecHeatingPowerHi = state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacHi * TotHeatEIRTempModFacHi *
+                                EIRFPLRModFac * InputPowerMultiplier;
+    Real64 HeatingPLRLo = (state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating) /
+                          TotalCondHeatingCapacityLo;
+    HeatingPLRLo += (LoadDueToDefrost * HeatingPLRLo) / TotalCondHeatingCapacityLo; // account for defrost
+    Real64 OperatingCondHeatCapLo =
+        TotalCondHeatingCapacityLo * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalHeatingCapacity
+    Real64 HeatingPLRHi = (state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating) /
+                          TotalCondHeatingCapacityHi;
+    HeatingPLRHi += (LoadDueToDefrost * HeatingPLRHi) / TotalCondHeatingCapacityHi; // account for defrost
+    Real64 OperatingCondHeatCapHi =
+        TotalCondHeatingCapacityHi * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalHeatingCapacity
 
     // check that the performance curves yield different results (i.e., different curves are used)
     EXPECT_NE(TotHeatCapTempModFacLo, TotHeatCapTempModFacHi);
@@ -3871,9 +3954,12 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     InputPowerMultiplier = 1.0;      // no defrost operation
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 15;
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).OutAirWetBulb = 7.0;
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp;
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFCond).VRFTUInletNodeNum).Temp = 20;          // 20 C at 13 C WB (44.5 % RH) for indoor heating condition
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFCond).VRFTUInletNodeNum).HumRat = 0.0064516; // need to set these so OA mixer will get proper mixed air condition
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp =
+        state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFCond).VRFTUInletNodeNum).Temp =
+        20; // 20 C at 13 C WB (44.5 % RH) for indoor heating condition
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFCond).VRFTUInletNodeNum).HumRat =
+        0.0064516; // need to set these so OA mixer will get proper mixed air condition
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFCond).VRFTUInletNodeNum).Enthalpy = 36485.3142;
     SimulateVRF(*state,
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
@@ -3888,7 +3974,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 SysOutputProvided,
                 LatOutputProvided);
 
-    outWB = state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).OutAirWetBulb;                // no defrost adjustment to OA WB
+    outWB = state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).OutAirWetBulb; // no defrost adjustment to OA WB
     InletAirDryBulbC = state->dataDXCoils->DXCoilHeatInletAirDBTemp(DXHeatingCoilIndex); // load weighted average but only 1 coil here
     OATatHeatCapBoundary = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatBoundaryCurvePtr, InletAirDryBulbC);
     OATatHeatEIRBoundary = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).EIRHeatBoundaryCurvePtr, InletAirDryBulbC);
@@ -3896,14 +3982,23 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     TotHeatEIRTempModFacLo = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, outWB);
     TotHeatCapTempModFacHi = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, outWB);
     TotHeatEIRTempModFacHi = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, outWB);
-    EIRFPLRModFac = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFPLR1, max(state->dataHVACVarRefFlow->VRF(VRFCond).MinPLR, state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR)); // EIRFPLR1 is used when PLR <= 1
-    TotalCondHeatingCapacityLo = state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity * state->dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacLo * HeatingCapacityMultiplier;
-    ElecHeatingPowerLo = state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacLo * TotHeatEIRTempModFacLo * EIRFPLRModFac * InputPowerMultiplier;
-    TotalCondHeatingCapacityHi = state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity * state->dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacHi * HeatingCapacityMultiplier;
-    ElecHeatingPowerHi = state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacHi * TotHeatEIRTempModFacHi * EIRFPLRModFac * InputPowerMultiplier;
-    HeatingPLRLo = (state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating) / TotalCondHeatingCapacityLo;
+    EIRFPLRModFac = CurveValue(
+        *state,
+        state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFPLR1,
+        max(state->dataHVACVarRefFlow->VRF(VRFCond).MinPLR, state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR)); // EIRFPLR1 is used when PLR <= 1
+    TotalCondHeatingCapacityLo = state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity * state->dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) *
+                                 TotHeatCapTempModFacLo * HeatingCapacityMultiplier;
+    ElecHeatingPowerLo = state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacLo * TotHeatEIRTempModFacLo * EIRFPLRModFac *
+                         InputPowerMultiplier;
+    TotalCondHeatingCapacityHi = state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity * state->dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) *
+                                 TotHeatCapTempModFacHi * HeatingCapacityMultiplier;
+    ElecHeatingPowerHi = state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacHi * TotHeatEIRTempModFacHi * EIRFPLRModFac *
+                         InputPowerMultiplier;
+    HeatingPLRLo = (state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating) /
+                   TotalCondHeatingCapacityLo;
     OperatingCondHeatCapLo = TotalCondHeatingCapacityLo * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalHeatingCapacity
-    HeatingPLRHi = (state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating) / TotalCondHeatingCapacityHi;
+    HeatingPLRHi = (state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating) /
+                   TotalCondHeatingCapacityHi;
     OperatingCondHeatCapHi = TotalCondHeatingCapacityHi * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalHeatingCapacity
 
     // check that the performance curves yield different results (i.e., different curves are used)
@@ -3945,14 +4040,17 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired =
         -state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity * 0.75; // set load equal to the VRF cooling capacity adjusted for SHR
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = -state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity * 0.75;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = -state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity * 0.75 - 1000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP =
+        -state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity * 0.75;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP =
+        -state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity * 0.75 - 1000.0;
 
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 35.0;     // AHRI condition at 95 F db
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp = 27.0; // some zone return condition
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).HumRat = 0.011;
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Enthalpy = 55194.0; // VRF DX coil model uses node enthalpy
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 35.0;    // AHRI condition at 95 F db
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Enthalpy =
+        55194.0;                                                                                              // VRF DX coil model uses node enthalpy
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 35.0; // AHRI condition at 95 F db
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).HumRat = 0.008; // don't care
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Enthalpy = 55698.0;
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).OutAirWetBulb = 19.652;
@@ -3982,18 +4080,36 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     Real64 InletAirWetBulbC = state->dataDXCoils->DXCoilCoolInletAirWBTemp(DXCoolingCoilIndex); // load weighted average but only 1 coil here
     Real64 OATatCoolCapBoundary = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).CoolBoundaryCurvePtr, InletAirWetBulbC);
     Real64 OATatCoolEIRBoundary = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).EIRCoolBoundaryCurvePtr, InletAirWetBulbC);
-    Real64 TotCoolCapTempModFacLo = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).CoolCapFT, InletAirWetBulbC, state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp);
-    Real64 TotCoolEIRTempModFacLo = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFT, InletAirWetBulbC, state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp);
-    Real64 TotCoolCapTempModFacHi = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).CoolCapFTHi, InletAirWetBulbC, state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp);
-    Real64 TotCoolEIRTempModFacHi = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFTHi, InletAirWetBulbC, state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp);
-    Real64 TotalCondCoolingCapacityLo = state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity * state->dataHVACVarRefFlow->CoolCombinationRatio(VRFCond) * TotCoolCapTempModFacLo;
+    Real64 TotCoolCapTempModFacLo = CurveValue(*state,
+                                               state->dataHVACVarRefFlow->VRF(VRFCond).CoolCapFT,
+                                               InletAirWetBulbC,
+                                               state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotCoolEIRTempModFacLo = CurveValue(*state,
+                                               state->dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFT,
+                                               InletAirWetBulbC,
+                                               state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotCoolCapTempModFacHi = CurveValue(*state,
+                                               state->dataHVACVarRefFlow->VRF(VRFCond).CoolCapFTHi,
+                                               InletAirWetBulbC,
+                                               state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotCoolEIRTempModFacHi = CurveValue(*state,
+                                               state->dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFTHi,
+                                               InletAirWetBulbC,
+                                               state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotalCondCoolingCapacityLo =
+        state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity * state->dataHVACVarRefFlow->CoolCombinationRatio(VRFCond) * TotCoolCapTempModFacLo;
     Real64 ElecCoolingPowerLo = state->dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower * TotCoolCapTempModFacLo * TotCoolEIRTempModFacLo;
-    Real64 TotalCondCoolingCapacityHi = state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity * state->dataHVACVarRefFlow->CoolCombinationRatio(VRFCond) * TotCoolCapTempModFacHi;
+    Real64 TotalCondCoolingCapacityHi =
+        state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity * state->dataHVACVarRefFlow->CoolCombinationRatio(VRFCond) * TotCoolCapTempModFacHi;
     Real64 ElecCoolingPowerHi = state->dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower * TotCoolCapTempModFacHi * TotCoolEIRTempModFacHi;
-    Real64 CoolingPLRLo = (state->dataHVACVarRefFlow->VRF(VRFCond).TUCoolingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionCooling) / TotalCondCoolingCapacityLo;
-    Real64 OperatingCondCoolCapLo = TotalCondCoolingCapacityLo * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalCoolingCapacity
-    Real64 CoolingPLRHi = (state->dataHVACVarRefFlow->VRF(VRFCond).TUCoolingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionCooling) / TotalCondCoolingCapacityHi;
-    Real64 OperatingCondCoolCapHi = TotalCondCoolingCapacityHi * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalCoolingCapacity
+    Real64 CoolingPLRLo = (state->dataHVACVarRefFlow->VRF(VRFCond).TUCoolingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionCooling) /
+                          TotalCondCoolingCapacityLo;
+    Real64 OperatingCondCoolCapLo =
+        TotalCondCoolingCapacityLo * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalCoolingCapacity
+    Real64 CoolingPLRHi = (state->dataHVACVarRefFlow->VRF(VRFCond).TUCoolingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionCooling) /
+                          TotalCondCoolingCapacityHi;
+    Real64 OperatingCondCoolCapHi =
+        TotalCondCoolingCapacityHi * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalCoolingCapacity
 
     // check that the performance curves yield different results (i.e., different curves are used)
     EXPECT_NE(TotCoolCapTempModFacLo, TotCoolCapTempModFacHi);
@@ -4024,15 +4140,20 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     // ensure that TU turns off when fan heat exceeds the heating load
     state->dataHeatBalFanSys->ZT = 20.0; // set zone temp below heating SP (SP=21) to ensure heating mode
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp = 20.0;
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp = 20;          // 20 C at 13 C WB (44.5 % RH) for indoor heating condition
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).HumRat = 0.0064516; // need to set these so OA mixer will get proper mixed air condition
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp =
+        20; // 20 C at 13 C WB (44.5 % RH) for indoor heating condition
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).HumRat =
+        0.0064516; // need to set these so OA mixer will get proper mixed air condition
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Enthalpy = 36485.3142;
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 20.0; // within the heating temperature range of VRF outdoor unit
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp =
+        20.0; // within the heating temperature range of VRF outdoor unit
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 19.0;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 400.0; // set load equal to small value less than expected fan heat
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired =
+        400.0; // set load equal to small value less than expected fan heat
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 500.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 400.0;
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0; // set constant fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
+        1.0; // set constant fan operating mode
     SimulateVRF(*state,
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
@@ -4050,13 +4171,16 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.0); // system should be off
 
     // ensure that TU operates when fan heat does not exceed the heating load
-    state->dataHeatBalFanSys->ZT = 20.0;                                       // set zone temp below heating SP (SP=21) to ensure heating mode
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 19.0; // within the heating temperature range of VRF outdoor unit
+    state->dataHeatBalFanSys->ZT = 20.0; // set zone temp below heating SP (SP=21) to ensure heating mode
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp =
+        19.0; // within the heating temperature range of VRF outdoor unit
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 19.0;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 800.0; // set load equal to small value less than expected fan heat
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired =
+        800.0; // set load equal to small value less than expected fan heat
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 900.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 800.0;
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0; // set constant fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
+        1.0; // set constant fan operating mode
     SimulateVRF(*state,
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
@@ -4069,10 +4193,13 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 ZoneEquipment,
                 SysOutputProvided,
                 LatOutputProvided);
-    EXPECT_NEAR(SysOutputProvided, state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired, 5.0); // system should meet the heating load
-    EXPECT_GT(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.0);                                                      // system should be on
+    EXPECT_NEAR(SysOutputProvided,
+                state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired,
+                5.0);                                                   // system should meet the heating load
+    EXPECT_GT(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.0); // system should be on
 
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 21.0; // outside the heating temperature range (-20 to 20) of VRF outdoor unit
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp =
+        21.0; // outside the heating temperature range (-20 to 20) of VRF outdoor unit
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 21.0;
     SimulateVRF(*state,
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
@@ -4092,7 +4219,8 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate,
               0.0); // flow should be = 0 at no load flow rate for constant fan mode in this example
 
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
+        0.0; // set cycling fan operating mode
     SimulateVRF(*state,
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
@@ -4105,9 +4233,59 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 ZoneEquipment,
                 SysOutputProvided,
                 LatOutputProvided);
-    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.0);                               // system should also be off
-    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate, 0.0);  // flow should be = 0 for cycling fan mode
-    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate, 0.0); // flow should be = 0 for cycling fan mode
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.0); // system should also be off
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate,
+              0.0); // flow should be = 0 for cycling fan mode
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate,
+              0.0); // flow should be = 0 for cycling fan mode
+
+    // Test node connection function
+    auto &thisTU = state->dataHVACVarRefFlow->VRFTU(VRFTUNum);
+    // current configuration is draw through fan
+    EXPECT_EQ(thisTU.FanPlace, DataHVACGlobals::DrawThru);
+    EXPECT_FALSE(ErrorsFound);
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);      // nodes are connected correctly
+    thisTU.VRFTUOutletNodeNum += 1; // change index of comp node
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.VRFTUOutletNodeNum -= 1; // revert previous change
+    thisTU.coolCoilAirInNode += 1;  // change index of comp node
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.coolCoilAirInNode -= 1;  // revert previous change
+    thisTU.coolCoilAirOutNode -= 1; // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.coolCoilAirOutNode += 1; // revert previous change
+    thisTU.heatCoilAirInNode -= 1;  // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.heatCoilAirInNode += 1;  // revert previous change
+    thisTU.heatCoilAirOutNode -= 1; // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound);       // nodes are not connected correctly
+    thisTU.heatCoilAirOutNode += 1; // revert previous change
+
+    // switch fan placement
+    thisTU.FanPlace = DataHVACGlobals::BlowThru;
+    EXPECT_TRUE(thisTU.OAMixerUsed);
+    // correct node connections
+    thisTU.fanInletNode = thisTU.VRFTUOAMixerMixedNodeNum;
+    thisTU.fanOutletNode = thisTU.coolCoilAirInNode;
+    thisTU.heatCoilAirOutNode = thisTU.VRFTUOutletNodeNum;
+    ErrorsFound = false;
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound); // nodes are connected correctly
+
+    // change OA mixer return node
+    thisTU.VRFTUOAMixerRetNodeNum += 1;
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
@@ -4687,7 +4865,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataSize->CurZoneEqNum = 1;
-    state->dataEnvrn->OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataSize->ZoneEqSizing.allocate(1);
@@ -4702,8 +4880,8 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
-    ProcessScheduleInput(*state);   // read schedules
-    GetCurveInput(*state);          // read curves
+    ProcessScheduleInput(*state);     // read schedules
+    GetCurveInput(*state);            // read curves
     GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
@@ -5537,7 +5715,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataSize->CurZoneEqNum = 1;
-    state->dataEnvrn->OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataSize->ZoneEqSizing.allocate(1);
@@ -5559,7 +5737,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DummyArray = 0.0;
     ScheduleManager::GetScheduleValuesForDay(*state, 1, DummyArray, 58, 3);
 
-    CurveManager::GetCurveInput(*state);                // read curves
+    CurveManager::GetCurveInput(*state);                  // read curves
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
@@ -5574,10 +5752,11 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum); // trigger GetVRFInput by calling a mining function
     state->dataAirLoop->AirLoopInputsFilled = true;
 
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;             // enable the VRF condenser
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;  // turn on fan
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;            // enable the VRF condenser
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // enable the terminal unit
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // turn on fan
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
+        0.0; // set cycling fan operating mode
 
     // Test coil sizing
 
@@ -5587,14 +5766,15 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
 
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 35.0;                        // AHRI condition at 95 F db
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 35.0;                // AHRI condition at 95 F db
-    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).HumRat = 0.01;              // don't care
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 35.0;           // AHRI condition at 95 F db
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 35.0;   // AHRI condition at 95 F db
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).HumRat = 0.01; // don't care
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     state->dataSize->DesDayWeath.allocate(1);
     state->dataSize->DesDayWeath(1).Temp.allocate(1);
-    state->dataSize->DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
+    state->dataSize->DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum)
+        .Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
 
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
@@ -5660,16 +5840,27 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     EXPECT_NEAR(SysOutputProvided, state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP, 1.0);
 
     rho = GetDensityGlycol(*state,
-        state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName, state->dataSize->PlantSizData(1).ExitTemp, state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
+                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
+                           state->dataSize->PlantSizData(1).ExitTemp,
+                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
+                           RoutineName);
     Cp = GetSpecificHeatGlycol(*state,
-        state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName, state->dataSize->PlantSizData(1).ExitTemp, state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
-    CondVolFlowRate = max(state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity, state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity) / (state->dataSize->PlantSizData(1).DeltaT * Cp * rho);
+                               state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
+                               state->dataSize->PlantSizData(1).ExitTemp,
+                               state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
+                               RoutineName);
+    CondVolFlowRate = max(state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity, state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity) /
+                      (state->dataSize->PlantSizData(1).DeltaT * Cp * rho);
 
     EXPECT_DOUBLE_EQ(CondVolFlowRate, state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate);
 
     rho = GetDensityGlycol(*state,
-        state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName, DataGlobalConstants::InitConvTemp, state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
-    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow, (state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate * rho));
+                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
+                           DataGlobalConstants::InitConvTemp,
+                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
+                           RoutineName);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow,
+                     (state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate * rho));
 
     // set zone load to heating
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired =
@@ -5706,8 +5897,11 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     EXPECT_NEAR(SysOutputProvided, state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP, 1.0);
 
     ASSERT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow,
-              state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).MassFlowRate); // Condenser flow rate should be set for active cooling
-    ASSERT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow, state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserOutletNodeNum).MassFlowRate); // outlet node should also be set
+              state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum)
+                  .MassFlowRate); // Condenser flow rate should be set for active cooling
+    ASSERT_EQ(
+        state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow,
+        state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserOutletNodeNum).MassFlowRate); // outlet node should also be set
 
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp =
         21.0; // outside the heating temperature range (-20 to 20) of VRF outdoor unit
@@ -5724,14 +5918,17 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
                 ZoneEquipment,
                 SysOutputProvided,
                 LatOutputProvided);
-    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.0);                               // system should be off
-    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate, 0.0);  // flow should be = 0 for cycling fan mode
-    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate, 0.0); // flow should be = 0 for cycling fan mode
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.0); // system should be off
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate,
+              0.0); // flow should be = 0 for cycling fan mode
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate,
+              0.0); // flow should be = 0 for cycling fan mode
 
     state->dataHeatBalFanSys->TempControlType.allocate(1);
     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0; // set constant fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
+        1.0; // set constant fan operating mode
     SimulateVRF(*state,
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
@@ -6431,7 +6628,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataSize->CurZoneEqNum = 1;
-    state->dataEnvrn->OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataGlobal->SysSizingCalc = true;
@@ -6439,26 +6636,27 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataSize->ZoneEqSizing.allocate(1);
 
-    CurveManager::GetCurveInput(*state);                // read curves
+    CurveManager::GetCurveInput(*state);                  // read curves
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData(*state); // read equipment list and connections
     state->dataAirLoop->AirLoopInputsFilled = true;
     state->dataHVACVarRefFlow->MyEnvrnFlag = true;
-    ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum); // trigger GetVRFInput by calling a mining function
-    OutsideAirNode = state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum;       // outside air air inlet node num
+    ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum);                     // trigger GetVRFInput by calling a mining function
+    OutsideAirNode = state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum; // outside air air inlet node num
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0;    // No load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0; // No load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0; // No load
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired; // No load
     // Initialize terminal unit
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;                            // turn on TU
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;                    // turn on fan
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0;                   // set continuous fan operating mode
-    InitVRF(*state, VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
-    ASSERT_EQ(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode, DataHVACGlobals::ContFanCycCoil);               // continuous fan cycling coil operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // turn on TU
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // turn on fan
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
+        1.0;                                                                                       // set continuous fan operating mode
+    InitVRF(*state, VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);             // Initialize all VRFTU related parameters
+    ASSERT_EQ(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode, DataHVACGlobals::ContFanCycCoil); // continuous fan cycling coil operating mode
     // Set average OA flow rate when there in no load for cont. fan cyc. coil operating mode
     SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
     AverageOAMassFlow = state->dataEnvrn->StdRhoAir * state->dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow;
@@ -6537,8 +6735,10 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity = 20000.0;
     state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCOP = 3.0;
     state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCOP = 3.0;
-    state->dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower = state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity / state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCOP;
-    state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower = state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity / state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCOP;
+    state->dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower =
+        state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity / state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCOP;
+    state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower =
+        state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity / state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCOP;
     state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionCooling = 1.0;
     state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating = 1.0;
     state->dataHVACVarRefFlow->VRF(VRFCond).CoolCapFT = 1;
@@ -6658,7 +6858,8 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 1.0);
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).ModeChange);
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRModeChange);
-    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower, state->dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR);
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, 0.0);
 
     // TU's are in heating mode only
@@ -6690,7 +6891,8 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).ModeChange);
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRModeChange);
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower, 0.0);
-    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR);
 
     // increment time step
     state->dataGlobal->CurrentTime += state->dataGlobal->TimeStepZone; // 0.5
@@ -6739,7 +6941,8 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     Real64 HRInitialEIRFrac = state->dataHVACVarRefFlow->VRF(VRFCond).HRInitialHeatEIRFrac;
     Real64 HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier;
 
-    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
 
     // last operating mode was cooling should give same answer since TU heating request > TU cooling request * ( 1 + 1/COP)
     state->dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
@@ -6747,8 +6950,8 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     state->dataHVACVarRefFlow->LastModeCooling(VRFCond) = true;
     state->dataHVACVarRefFlow->LastModeHeating(VRFCond) = false;
 
-    state->dataGlobal->CurrentTime += state->dataGlobal->TimeStepZone; // 0.75 - CalcVRFCondenser saves last time stamp for use in exponential curve, increment by
-                                                           // 1 time step to get same answer
+    state->dataGlobal->CurrentTime += state->dataGlobal->TimeStepZone; // 0.75 - CalcVRFCondenser saves last time stamp for use in exponential curve,
+                                                                       // increment by 1 time step to get same answer
     CalcVRFCondenser(*state, VRFCond);
     EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive);
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive);
@@ -6762,7 +6965,8 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(VRFCond).ModeChange);
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRModeChange);
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower, 0.0);
-    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
     EXPECT_NEAR(HREIRAdjustment, 1.06321, 0.00001);
 
     // simulate again and see that power has exponential changed from previous time step
@@ -6777,7 +6981,8 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier;
 
     EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 0.86466, 0.00001); // will exponentially rise towards 1.0
-    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
     EXPECT_NEAR(HREIRAdjustment, 1.08646, 0.00001); // will exponentially rise towards VRF( VRFCond ).HREIRFTHeatConst = 1.1
 
     // simulate again and see that power has exponential changed from previous time step
@@ -6785,7 +6990,8 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     CalcVRFCondenser(*state, VRFCond);
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 0.95021, 0.00001); // will exponentially rise towards 1.0
-    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
     EXPECT_NEAR(HREIRAdjustment, 1.09502, 0.00001); // will exponentially rise towards VRF( VRFCond ).HREIRFTHeatConst = 1.1
 
     // simulate again and see that power has exponential changed from previous time step
@@ -6793,7 +6999,8 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     CalcVRFCondenser(*state, VRFCond);
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 0.98168, 0.00001); // will exponentially rise towards 1.0
-    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
     EXPECT_NEAR(HREIRAdjustment, 1.09817, 0.00001); // will exponentially rise towards VRF( VRFCond ).HREIRFTHeatConst = 1.1
 
     // simulate again and see that power has exponential changed from previous time step
@@ -6801,7 +7008,8 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     CalcVRFCondenser(*state, VRFCond);
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 1.0, 0.00001); // will exponentially rise towards 1.0
-    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
     EXPECT_NEAR(HREIRAdjustment, 1.1, 0.00001); // will exponentially rise towards VRF( VRFCond ).HREIRFTHeatConst = 1.1
 
     // at end of exponential decay (when SUMultiplier = 1), HREIRAdjustment = VRF( VRFCond ).HREIRFTHeatConst
@@ -10596,11 +10804,11 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     EXPECT_EQ(QZnReq, -5000.0);
     SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     // check fan operation for cooling mode
-    Real64 Result_AirMassFlowRateDesign = HVACFan::fanObjs[0]->maxAirMassFlowRate();
+    Real64 Result_AirMassFlowRateDesign = state->dataHVACFan->fanObjs[0]->maxAirMassFlowRate();
     EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.347052, 0.000001);
-    Real64 Result_AirMassFlowRate = state->dataLoopNodes->Node(HVACFan::fanObjs[0]->outletNodeNum).MassFlowRate;
+    Real64 Result_AirMassFlowRate = state->dataLoopNodes->Node(state->dataHVACFan->fanObjs[0]->outletNodeNum).MassFlowRate;
     EXPECT_NEAR(Result_AirMassFlowRate, state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1), 0.000001);
-    Real64 Result_FanPower = HVACFan::fanObjs[0]->fanPower();
+    Real64 Result_FanPower = state->dataHVACFan->fanObjs[0]->fanPower();
     EXPECT_NEAR(Result_FanPower, 39.593, 0.001);
 
     // test no load mode fan operation
@@ -10614,11 +10822,11 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     EXPECT_EQ(QZnReq, 0.0);
     SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     // check no load fan operation
-    Result_AirMassFlowRateDesign = HVACFan::fanObjs[0]->maxAirMassFlowRate();
+    Result_AirMassFlowRateDesign = state->dataHVACFan->fanObjs[0]->maxAirMassFlowRate();
     EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.34706, 0.00001);
-    Result_AirMassFlowRate = state->dataLoopNodes->Node(HVACFan::fanObjs[0]->outletNodeNum).MassFlowRate;
+    Result_AirMassFlowRate = state->dataLoopNodes->Node(state->dataHVACFan->fanObjs[0]->outletNodeNum).MassFlowRate;
     EXPECT_EQ(Result_AirMassFlowRate, 0.0);
-    Result_FanPower = HVACFan::fanObjs[0]->fanPower();
+    Result_FanPower = state->dataHVACFan->fanObjs[0]->fanPower();
     EXPECT_EQ(Result_FanPower, 0.0);
 }
 
@@ -11170,7 +11378,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataSize->CurZoneEqNum = 1;
-    state->dataEnvrn->OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataSize->ZoneEqSizing.allocate(1);
@@ -11204,17 +11412,18 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     // set zone air node properties
     state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Temp = 24.0;
     state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).HumRat = 0.0075;
-    state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Temp, state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).HumRat);
+    state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Temp, state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).HumRat);
 
     auto &thisVRFTU(state->dataHVACVarRefFlow->VRFTU(1));
     state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp = 24.0;
     state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat = 0.0075;
-    state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp, state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
+    state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp, state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
     state->dataLoopNodes->Node(thisVRFTU.ZoneAirNode).Temp = 24.0;
     state->dataLoopNodes->Node(thisVRFTU.ZoneAirNode).HumRat = 0.0075;
-    state->dataLoopNodes->Node(thisVRFTU.ZoneAirNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp, state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
+    state->dataLoopNodes->Node(thisVRFTU.ZoneAirNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp, state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
 
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.0100;
@@ -11222,13 +11431,16 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 0.0;
 
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak =
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak =
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     state->dataSize->DesDayWeath.allocate(1);
     state->dataSize->DesDayWeath(1).Temp.allocate(1);
-    state->dataSize->DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
+    state->dataSize->DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum)
+        .Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
     // set pointer to components
@@ -12901,7 +13113,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataSize->CurZoneEqNum = 1;
-    state->dataEnvrn->OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataSize->ZoneEqSizing.allocate(1);
@@ -12936,17 +13148,18 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     // set zone air node properties
     state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Temp = 24.0;
     state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).HumRat = 0.0075;
-    state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Temp, state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).HumRat);
+    state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Temp, state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).HumRat);
 
     auto &thisVRFTU(state->dataHVACVarRefFlow->VRFTU(1));
     state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp = 24.0;
     state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat = 0.0075;
-    state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp, state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
+    state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp, state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
     state->dataLoopNodes->Node(thisVRFTU.ZoneAirNode).Temp = 24.0;
     state->dataLoopNodes->Node(thisVRFTU.ZoneAirNode).HumRat = 0.0075;
-    state->dataLoopNodes->Node(thisVRFTU.ZoneAirNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp, state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
+    state->dataLoopNodes->Node(thisVRFTU.ZoneAirNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp, state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
 
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.0100;
@@ -12954,13 +13167,16 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 0.0;
 
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak =
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak =
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     state->dataSize->DesDayWeath.allocate(1);
     state->dataSize->DesDayWeath(1).Temp.allocate(1);
-    state->dataSize->DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
+    state->dataSize->DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum)
+        .Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
 
@@ -13082,8 +13298,10 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity = 20000.0;
     state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCOP = 3.0;
     state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCOP = 3.0;
-    state->dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower = state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity / state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCOP;
-    state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower = state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity / state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCOP;
+    state->dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower =
+        state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity / state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCOP;
+    state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower =
+        state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity / state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCOP;
     state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionCooling = 1.0;
     state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating = 1.0;
     // Curve Indices, including HR curves (3 & 4)
@@ -13233,7 +13451,8 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     // VRFRTF = 1.0 because not cycling below min PLR
     // EIRFPLRModFac is 1 because EIRFPLR curve output is constant as 1.0 above
     // InputPowerMultiplier is 1 because no defrost
-    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
 }
 
 TEST_F(EnergyPlusFixture, VRF_BlowthroughFanPlacement_InputTest)
@@ -14277,9 +14496,9 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_EQ(1.00, maxEIRfLowPLRXInput);               // getinput checks this
     EXPECT_GT(thisHeatEIRFPLR.Var1Min, thisVRF.MinPLR); // expect warning message
     EXPECT_EQ(thisVRF.FuelType, "Electricity"); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
-    EXPECT_EQ(thisVRF.FuelTypeNum, DataGlobalConstants::ResourceType::Electricity); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
+    EXPECT_EQ(thisVRF.FuelTypeNum, DataGlobalConstants::ResourceType::Electricity); // Check fuel type input that uses
+                                                                                    // UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
 }
-
 
 TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
 {
@@ -14954,7 +15173,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataSize->CurZoneEqNum = 1;
-    state->dataEnvrn->OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataGlobal->SysSizingCalc = true;
@@ -14962,14 +15181,14 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataSize->ZoneEqSizing.allocate(1);
 
-    CurveManager::GetCurveInput(*state);                // read curves
+    CurveManager::GetCurveInput(*state);                  // read curves
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData(*state); // read equipment list and connections
     state->dataAirLoop->AirLoopInputsFilled = true;
     state->dataHVACVarRefFlow->MyEnvrnFlag = true;
-    ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum);  // trigger GetVRFInput by calling a mining function
+    ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum);                     // trigger GetVRFInput by calling a mining function
     OutsideAirNode = state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum; // outside air air inlet node num
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0;    // No load
@@ -14977,23 +15196,22 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0; // No load
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired; // No load
     // Initialize terminal unit
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0;            // set continuous fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
+        1.0; // set continuous fan operating mode
 
     // Reset the err stream, which has warnings about curves values not equal to 1.0 (+ or - 10%) at rated conditions
     EXPECT_TRUE(has_err_output(true));
 
-
     InitVRF(*state, VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
 
-    std::string const error_string = delimited_string({
-        "   ** Severe  ** InitVRF: VRF Terminal Unit = [ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,LEVEL1:OFFICE1 VRF INDOOR UNIT] is not on any ZoneHVAC:EquipmentList, AirloopHVAC or AirLoopHVAC:OutdoorAirSystem:EquipmentList.  It will not be simulated.",
-        "   **   ~~~   ** ...The VRF AC System associated with this terminal unit may also not be simulated."
-    });
+    std::string const error_string = delimited_string(
+        {"   ** Severe  ** InitVRF: VRF Terminal Unit = [ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,LEVEL1:OFFICE1 VRF INDOOR UNIT] is not on any "
+         "ZoneHVAC:EquipmentList, AirloopHVAC or AirLoopHVAC:OutdoorAirSystem:EquipmentList.  It will not be simulated.",
+         "   **   ~~~   ** ...The VRF AC System associated with this terminal unit may also not be simulated."});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    ASSERT_EQ(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode, DataHVACGlobals::ContFanCycCoil);        // continuous fan cycling coil operating mode
-
+    ASSERT_EQ(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode, DataHVACGlobals::ContFanCycCoil); // continuous fan cycling coil operating mode
 }
 
 TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
@@ -15178,7 +15396,6 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
         "  ,                        !- Maximum Curve Output",
         "  Dimensionless,           !- Input Unit Type for X",
         "  Dimensionless;           !- Output Unit Type",
-
 
         "OutdoorAir:Mixer,",
         "  TU1 OA Mixer,             !- Name",
@@ -15578,7 +15795,7 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataSize->CurZoneEqNum = 1;
-    state->dataEnvrn->OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataSize->ZoneEqSizing.allocate(1);
@@ -15639,7 +15856,8 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     state->dataSize->DesDayWeath.allocate(1);
     state->dataSize->DesDayWeath(1).Temp.allocate(1);
-    state->dataSize->DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
+    state->dataSize->DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum)
+        .Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
     // set pointer to components
@@ -15683,6 +15901,5 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     EXPECT_NEAR(368.0386, thisFan.FanPower, 0.0001);
     EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
 }
-
 
 } // end of namespace EnergyPlus

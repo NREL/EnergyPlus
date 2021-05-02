@@ -113,7 +113,7 @@ namespace CommandLineInterface {
         // Define options
         ezOptionParser opt;
 
-        opt.overview = VerString + "\nPythonLinkage: " + PluginManagement::pythonStringForUsage(state);
+        opt.overview = state.dataStrGlobals->VerStringVar + "\nPythonLinkage: " + PluginManagement::pythonStringForUsage(state);
 
         opt.syntax = "energyplus [options] [input-file]";
 
@@ -174,7 +174,8 @@ namespace CommandLineInterface {
 
         opt.get("-i")->getString(state.dataStrGlobals->inputIddFileName);
 
-        if (!opt.isSet("-i") && !legacyMode) state.dataStrGlobals->inputIddFileName = state.dataStrGlobals->exeDirectory + state.dataStrGlobals->inputIddFileName;
+        if (!opt.isSet("-i") && !legacyMode)
+            state.dataStrGlobals->inputIddFileName = state.dataStrGlobals->exeDirectory + state.dataStrGlobals->inputIddFileName;
 
         opt.get("-d")->getString(state.dataStrGlobals->outDirPathName);
 
@@ -202,7 +203,7 @@ namespace CommandLineInterface {
         }
 
         if (opt.isSet("-v")) {
-            DisplayString(state, VerString);
+            DisplayString(state, state.dataStrGlobals->VerStringVar);
             if (eplusRunningViaAPI) {
                 // we need another return code to let runEnergyPlusAsLibrary know it should not try to run anything
                 return static_cast<int>(ReturnCodes::SuccessButHelper);
@@ -581,7 +582,8 @@ namespace CommandLineInterface {
 
         if (opt.isSet("-w") && !state.dataGlobal->DDOnlySimulation) {
             if (!FileSystem::fileExists(state.files.inputWeatherFileName.fileName)) {
-                DisplayString(state, "ERROR: Could not find weather file: " + FileSystem::getAbsolutePath(state.files.inputWeatherFileName.fileName) + ".");
+                DisplayString(state,
+                              "ERROR: Could not find weather file: " + FileSystem::getAbsolutePath(state.files.inputWeatherFileName.fileName) + ".");
                 DisplayString(state, errorFollowUp);
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
@@ -631,7 +633,9 @@ namespace CommandLineInterface {
 
             // check if IDD actually exists since ExpandObjects still requires it
             if (!FileSystem::fileExists(state.dataStrGlobals->inputIddFileName)) {
-                DisplayString(state, "ERROR: Could not find input data dictionary: " + FileSystem::getAbsolutePath(state.dataStrGlobals->inputIddFileName) + ".");
+                DisplayString(state,
+                              "ERROR: Could not find input data dictionary: " + FileSystem::getAbsolutePath(state.dataStrGlobals->inputIddFileName) +
+                                  ".");
                 DisplayString(state, errorFollowUp);
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
@@ -640,7 +644,8 @@ namespace CommandLineInterface {
                 }
             }
 
-            bool iddFileNamedEnergy = (FileSystem::getAbsolutePath(state.dataStrGlobals->inputIddFileName) == FileSystem::getAbsolutePath("Energy+.idd"));
+            bool iddFileNamedEnergy =
+                (FileSystem::getAbsolutePath(state.dataStrGlobals->inputIddFileName) == FileSystem::getAbsolutePath("Energy+.idd"));
 
             if (!inputFileNamedIn) FileSystem::linkFile(state.dataStrGlobals->inputFileName.c_str(), "in.idf");
             if (!iddFileNamedEnergy) FileSystem::linkFile(state.dataStrGlobals->inputIddFileName, "Energy+.idd");
@@ -728,9 +733,13 @@ namespace CommandLineInterface {
         while (inputFile.good() && !Found) {
             const auto readResult = inputFile.readLine();
 
-            if (readResult.eof) { break; }
+            if (readResult.eof) {
+                break;
+            }
 
-            if (readResult.data.empty()) { continue; } // Ignore Blank Lines
+            if (readResult.data.empty()) {
+                continue;
+            } // Ignore Blank Lines
 
             std::string LINEOut;
             ConvertCaseToLower(readResult.data, LINEOut); // Turn line into lower case
@@ -747,7 +756,9 @@ namespace CommandLineInterface {
             //                                  Heading line found, now looking for Kind
             while (inputFile.good() && !NewHeading) {
                 const auto innerReadResult = inputFile.readLine();
-                if (innerReadResult.eof) { break; }
+                if (innerReadResult.eof) {
+                    break;
+                }
 
                 auto line = innerReadResult.data;
                 strip(line);

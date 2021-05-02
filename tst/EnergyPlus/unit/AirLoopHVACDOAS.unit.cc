@@ -4181,7 +4181,6 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
         "    ,                        !- Motor Loss Radiative Fraction",
         "    General;                 !- End-Use Subcategory",
 
-
         "  OutdoorAir:NodeList,",
         "    OutsideAirInletNodes;    !- Node or NodeList Name 1",
 

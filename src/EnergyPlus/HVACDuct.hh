@@ -95,9 +95,9 @@ namespace HVACDuct {
     // Object Data
 
     void SimDuct(EnergyPlusData &state,
-                 std::string const &CompName,   // name of the duct component
-                 bool FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
-                 int &CompIndex                 // index of duct component
+                 std::string const &CompName, // name of the duct component
+                 bool FirstHVACIteration,     // TRUE if 1st HVAC simulation of system timestep !unused1208
+                 int &CompIndex               // index of duct component
     );
 
     void GetDuctInput(EnergyPlusData &state);
@@ -112,7 +112,8 @@ namespace HVACDuct {
 
 } // namespace HVACDuct
 
-struct HVACDuctData : BaseGlobalStruct {
+struct HVACDuctData : BaseGlobalStruct
+{
 
     int NumDucts = 0;
     Array1D_bool CheckEquipName;

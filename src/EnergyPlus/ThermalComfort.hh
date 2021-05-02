@@ -95,11 +95,11 @@ namespace ThermalComfort {
         // Default Constructor
         ThermalComfortDataType()
             : FangerPMV(0.0), FangerPPD(0.0), CloSurfTemp(0.0), PiercePMVET(0.0), PiercePMVSET(0.0), PierceDISC(0.0), PierceTSENS(0.0),
-              PierceSET(0.0), KsuTSV(0.0), ThermalComfortMRT(0.0), ThermalComfortOpTemp(0.0), ClothingValue(0.0),
-              ThermalComfortAdaptiveASH5590(0), ThermalComfortAdaptiveASH5580(0), ThermalComfortAdaptiveCEN15251CatI(0),
-              ThermalComfortAdaptiveCEN15251CatII(0), ThermalComfortAdaptiveCEN15251CatIII(0), TComfASH55(0.0), TComfCEN15251(0.0),
-              ASHRAE55RunningMeanOutdoorTemp(0.0), CEN15251RunningMeanOutdoorTemp(0.0), CoolingEffectASH55(0.0), CoolingEffectAdjustedPMVASH55(0.0),
-              CoolingEffectAdjustedPPDASH55(0.0), AnkleDraftPPDASH55(0.0)
+              PierceSET(0.0), KsuTSV(0.0), ThermalComfortMRT(0.0), ThermalComfortOpTemp(0.0), ClothingValue(0.0), ThermalComfortAdaptiveASH5590(0),
+              ThermalComfortAdaptiveASH5580(0), ThermalComfortAdaptiveCEN15251CatI(0), ThermalComfortAdaptiveCEN15251CatII(0),
+              ThermalComfortAdaptiveCEN15251CatIII(0), TComfASH55(0.0), TComfCEN15251(0.0), ASHRAE55RunningMeanOutdoorTemp(0.0),
+              CEN15251RunningMeanOutdoorTemp(0.0), CoolingEffectASH55(0.0), CoolingEffectAdjustedPMVASH55(0.0), CoolingEffectAdjustedPPDASH55(0.0),
+              AnkleDraftPPDASH55(0.0)
         {
         }
     };
@@ -178,14 +178,8 @@ namespace ThermalComfort {
                                   Optional<Real64 const> Tset = _, // Temperature setpoint for thermal comfort control
                                   Optional<Real64> PMVResult = _   // PMV value for thermal comfort control
     );
-    Real64 CalcFangerPMV(EnergyPlusData &state,
-                         Real64 AirTemp,
-                         Real64 RadTemp,
-                         Real64 RelHum,
-                         Real64 AirVel,
-                         Real64 ActLevel,
-                         Real64 CloUnit,
-                         Real64 WorkEff);
+    Real64 CalcFangerPMV(
+        EnergyPlusData &state, Real64 AirTemp, Real64 RadTemp, Real64 RelHum, Real64 AirVel, Real64 ActLevel, Real64 CloUnit, Real64 WorkEff);
 
     Real64 CalcFangerPPD(Real64 PMV);
 
@@ -193,19 +187,10 @@ namespace ThermalComfort {
 
     void GetThermalComfortInputsASHRAE(EnergyPlusData &state);
 
-    Real64 CalcStandardEffectiveTemp(EnergyPlusData &state,
-                                     Real64 AirTemp,
-                                     Real64 RadTemp,
-                                     Real64 RelHum,
-                                     Real64 AirVel,
-                                     Real64 ActMet,
-                                     Real64 CloUnit,
-                                     Real64 WorkEff
-    );
+    Real64 CalcStandardEffectiveTemp(
+        EnergyPlusData &state, Real64 AirTemp, Real64 RadTemp, Real64 RelHum, Real64 AirVel, Real64 ActMet, Real64 CloUnit, Real64 WorkEff);
 
-    void CalcCoolingEffectAdjustedPMV(EnergyPlusData &state,
-                                      Real64 &CoolingEffect,
-                                      Real64 &CoolingEffectAdjustedPMV);
+    void CalcCoolingEffectAdjustedPMV(EnergyPlusData &state, Real64 &CoolingEffect, Real64 &CoolingEffectAdjustedPMV);
 
     void CalcThermalComfortPierceASHRAE(EnergyPlusData &state);
 
@@ -215,7 +200,8 @@ namespace ThermalComfort {
 
     void CalcThermalComfortKSU(EnergyPlusData &state);
 
-    void DERIV(EnergyPlusData &state, int &TempIndiceNum,         // Number of temperature indices  unused1208
+    void DERIV(EnergyPlusData &state,
+               int &TempIndiceNum,         // Number of temperature indices  unused1208
                Array1D<Real64> &Temp,      // Temperature unused1208
                Array1D<Real64> &TempChange // Change of temperature
     );
@@ -260,22 +246,23 @@ namespace ThermalComfort {
 
 } // namespace ThermalComfort
 
-struct ThermalComfortsData : BaseGlobalStruct {
+struct ThermalComfortsData : BaseGlobalStruct
+{
 
     bool FirstTimeFlag = true;                // Flag set to make sure you get input once
     bool FirstTimeSurfaceWeightedFlag = true; // Flag set to make sure certain calcs related to surface weighted option are only done once
-    int CoolingEffectWarningInd = 0; // Counter for ankle draft invalid air velocity warnings.
-    int AnkleDraftAirVelWarningInd = 0; // Counter for ankle draft invalid air velocity warnings.
-    int AnkleDraftCloUnitWarningInd = 0; // Counter for ankle draft invalid clothing unit warnings.
-    int AnkleDraftActMetWarningInd = 0; // Counter for ankle draft invalid activity level warnings.
+    int CoolingEffectWarningInd = 0;          // Counter for ankle draft invalid air velocity warnings.
+    int AnkleDraftAirVelWarningInd = 0;       // Counter for ankle draft invalid air velocity warnings.
+    int AnkleDraftCloUnitWarningInd = 0;      // Counter for ankle draft invalid clothing unit warnings.
+    int AnkleDraftActMetWarningInd = 0;       // Counter for ankle draft invalid activity level warnings.
 
     // MODULE PARAMETER DEFINITIONS
     Real64 const TAbsConv = DataGlobalConstants::KelvinConv; // Converter for absolute temperature
-    Real64 const ActLevelConv = 58.2;   // Converter for activity level (1Met = 58.2 W/m2)
-    Real64 const BodySurfArea = 1.8;    // Dubois body surface area of the human body (m2)
-    Real64 const BodySurfAreaPierce = 1.8258;    // Pierce two node body surface area of the human body (m2)
-    Real64 const RadSurfEff = 0.72;     // Fraction of surface effective for radiation
-    Real64 const StefanBoltz = 5.6697e-8; // Stefan-Boltzmann constant (W/m2K4)
+    Real64 const ActLevelConv = 58.2;                        // Converter for activity level (1Met = 58.2 W/m2)
+    Real64 const BodySurfArea = 1.8;                         // Dubois body surface area of the human body (m2)
+    Real64 const BodySurfAreaPierce = 1.8258;                // Pierce two node body surface area of the human body (m2)
+    Real64 const RadSurfEff = 0.72;                          // Fraction of surface effective for radiation
+    Real64 const StefanBoltz = 5.6697e-8;                    // Stefan-Boltzmann constant (W/m2K4)
 
     // MODULE VARIABLE DECLARATIONS:
     Real64 AbsAirTemp = 0.0;                // Absolute air temperature; K
@@ -351,7 +338,7 @@ struct ThermalComfortsData : BaseGlobalStruct {
     int ZoneNum = 0;                        // Zone number
     Real64 TemporarySixAMTemperature = 0.0; // Temperature at 6am
 
-                                           // time that any zone is not comfortable based on simple ASHRAE 55 using summer clothes
+    // time that any zone is not comfortable based on simple ASHRAE 55 using summer clothes
     Real64 AnyZoneTimeNotSimpleASH55Summer = 0.0;
     // time that any zone is not comfortable based on simple ASHRAE 55 using winter clothes
     Real64 AnyZoneTimeNotSimpleASH55Winter = 0.0;
@@ -378,19 +365,19 @@ struct ThermalComfortsData : BaseGlobalStruct {
     bool useEpwData = false;
     Array1D<Real64> DailyAveOutTemp;
 
-    Array1D<ThermalComfort::ThermalComfortInASH55Type> ThermalComfortInASH55;
-    Array1D<ThermalComfort::ThermalComfortSetPointType> ThermalComfortSetPoint;
-    Array1D<ThermalComfort::ThermalComfortDataType> ThermalComfortData;
-    Array1D<ThermalComfort::AngleFactorData> AngleFactorList; // Angle Factor List data for each Angle Factor List
+    EPVector<ThermalComfort::ThermalComfortInASH55Type> ThermalComfortInASH55;
+    EPVector<ThermalComfort::ThermalComfortSetPointType> ThermalComfortSetPoint;
+    EPVector<ThermalComfort::ThermalComfortDataType> ThermalComfortData;
+    EPVector<ThermalComfort::AngleFactorData> AngleFactorList; // Angle Factor List data for each Angle Factor List
 
     Real64 runningAverageASH = 0.0;
 
     Array1D<Real64> Coeff = Array1D<Real64>(2);      // Coefficients used in Range-Kutta's Method
     Array1D<Real64> Temp = Array1D<Real64>(2);       // Temperature
     Array1D<Real64> TempChange = Array1D<Real64>(2); // Change of temperature
-    Array1D<Real64> SurfaceAE; // Product of area and emissivity for each surface
-    Array1D<Real64> ZoneAESum; // Sum of area times emissivity for all zone surfaces
-    bool FirstTimeError;       // Only report the error message one time
+    Array1D<Real64> SurfaceAE;                       // Product of area and emissivity for each surface
+    Array1D<Real64> ZoneAESum;                       // Sum of area times emissivity for all zone surfaces
+    bool FirstTimeError;                             // Only report the error message one time
     Real64 avgDryBulbASH = 0.0;
     Array1D<Real64> monthlyTemp = Array1D<Real64>(12, 0.0);
     bool useStatData = false;
@@ -514,7 +501,8 @@ struct ThermalComfortsData : BaseGlobalStruct {
 
     // Default Constructor
     ThermalComfortsData() : DailyAveOutTemp(30, 0.0)
-    {}
+    {
+    }
 };
 } // namespace EnergyPlus
 

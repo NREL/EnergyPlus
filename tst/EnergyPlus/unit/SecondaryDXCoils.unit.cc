@@ -165,7 +165,7 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataDXCoils->DXCoil(DXCoilNum).AirInNode = 2;
     state->dataLoopNodes->Node(state->dataDXCoils->DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     CalcSecondaryDXCoils(*state, DXCoilNum);
     EXPECT_DOUBLE_EQ(-5000.0, state->dataDXCoils->DXCoil(DXCoilNum).SecCoilTotalHeatRemovalRate);
@@ -189,9 +189,20 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4)
     Real64 SHRTest;
 
     // make the call
-    SHRTest =
-        CalcSecondaryDXCoilsSHR(*state, DXCoilNum, EvapAirMassFlow, TotalHeatRemovalRate, PartLoadRatio, SecCoilRatedSHR, EvapInletDryBulb, EvapInletHumRat,
-                                EvapInletWetBulb, EvapInletEnthalpy, CondInletDryBulb, SecCoilFlowFraction, SecCoilSHRFT, SecCoilSHRFF);
+    SHRTest = CalcSecondaryDXCoilsSHR(*state,
+                                      DXCoilNum,
+                                      EvapAirMassFlow,
+                                      TotalHeatRemovalRate,
+                                      PartLoadRatio,
+                                      SecCoilRatedSHR,
+                                      EvapInletDryBulb,
+                                      EvapInletHumRat,
+                                      EvapInletWetBulb,
+                                      EvapInletEnthalpy,
+                                      CondInletDryBulb,
+                                      SecCoilFlowFraction,
+                                      SecCoilSHRFT,
+                                      SecCoilSHRFF);
 
     EXPECT_DOUBLE_EQ(1.0, SHRTest);
 
@@ -246,7 +257,7 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataDXCoils->DXCoil(DXCoilNum).AirInNode = 2;
     state->dataLoopNodes->Node(state->dataDXCoils->DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     CalcSecondaryDXCoils(*state, DXCoilNum);
     EXPECT_DOUBLE_EQ(-5000.0, state->dataDXCoils->DXCoil(DXCoilNum).SecCoilTotalHeatRemovalRate);

@@ -45,42 +45,15 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus Headers
-#include <EnergyPlus/DataIPShortCuts.hh>
+#ifndef ENERGYPLUS_BITF_HH
+#define ENERGYPLUS_BITF_HH
 
-namespace EnergyPlus {
+// This is a bitfield alternative to using the comparison(== and !=) operators for multiple comparisons in one statement. It is advantageous to use
+// BITF if the argument can be interpreted as an int/enum-class and if there are two or more comparisons. The BITF_ANY and BITF_NONE will return
+// boolean values. An example of using BITF can be found in the TARCOGCommon.hh file.
 
-namespace DataIPShortCuts {
+#define BITF(B) (1 << (int(B)))
+#define BITF_TEST_ANY(V, B) (((V) & (B)) != 0)
+#define BITF_TEST_NONE(V, B) (((V) & (B)) == 0)
 
-    // MODULE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   July 2008
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS MODULE:
-    // This data-only module is a data holder for field names to be passed into
-    // input processing GetObject routines so that individual Get routines do not have
-    // to create them. These will be passed in rather than filled by the GetObject
-    // routines automatically.  The field names are used for error messages. They are
-    // dimensioned to the max alpha/numeric found in the IDD.
-
-    // MODULE VARIABLE DECLARATIONS:
-    Array1D_string cAlphaFieldNames;
-    Array1D_string cNumericFieldNames;
-    Array1D_bool lNumericFieldBlanks;
-    Array1D_bool lAlphaFieldBlanks;
-    Array1D_string cAlphaArgs;
-    Array1D<Real64> rNumericArgs;
-    std::string cCurrentModuleObject;
-
-    // Clears the global data in DataIPShortCuts.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-
-    }
-
-} // namespace DataIPShortCuts
-
-} // namespace EnergyPlus
+#endif // ENERGYPLUS_BITF_HH

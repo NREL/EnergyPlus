@@ -430,6 +430,191 @@ void SolveRoot(EnergyPlusData &state,
     XRes = XTemp;
 }
 
+void SolveRoot(EnergyPlusData &state,
+               Real64 const Eps, // required absolute accuracy
+               int const MaxIte, // maximum number of allowed iterations
+               int &Flag,        // integer storing exit status
+               Real64 &XRes,     // value of x that solves f(x,Par) = 0
+               std::function<Real64(EnergyPlusData &state, Real64 const, std::vector<Real64> const &)> f,
+               Real64 const X_0,              // 1st bound of interval that contains the solution
+               Real64 const X_1,              // 2nd bound of interval that contains the solution
+               std::vector<Real64> const &Par // array with additional parameters used for function evaluation
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Michael Wetter
+    //       DATE WRITTEN   March 1999
+    //       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
+    //                      L. Gu, May 2017 - allow both Bisection and RegulaFalsi
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Find the value of x between x0 and x1 such that f(x,Par)
+    // is equal to zero.
+
+    // METHODOLOGY EMPLOYED:
+    // Uses the Regula Falsi (false position) method (similar to secant method)
+
+    // REFERENCES:
+    // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
+    // 2nd edition, 1992. Page 347 ff.
+
+    // SUBROUTINE ARGUMENT DEFINITIONS:
+    // = -2: f(x0) and f(x1) have the same sign
+    // = -1: no convergence
+    // >  0: number of iterations performed
+    Real64 const SMALL(1.e-10);
+
+    Real64 X0;       // present 1st bound
+    Real64 X1;       // present 2nd bound
+    Real64 XTemp;    // new estimate
+    Real64 Y0;       // f at X0
+    Real64 Y1;       // f at X1
+    Real64 YTemp;    // f at XTemp
+    Real64 DY;       // DY = Y0 - Y1
+    bool Conv;       // flag, true if convergence is achieved
+    bool StopMaxIte; // stop due to exceeding of maximum # of iterations
+    bool Cont;       // flag, if true, continue searching
+    int NIte;        // number of interations
+    int AltIte;      // an accounter used for Alternation choice
+
+    X0 = X_0;
+    X1 = X_1;
+    XTemp = X0;
+    Conv = false;
+    StopMaxIte = false;
+    Cont = true;
+    NIte = 0;
+    AltIte = 0;
+
+    Y0 = f(state, X0, Par);
+    Y1 = f(state, X1, Par);
+    // check initial values
+    if (Y0 * Y1 > 0) {
+        Flag = -2;
+        XRes = X0;
+        return;
+    }
+    XRes = XTemp;
+}
+
+void SolveRoot(Real64 const Eps, // required absolute accuracy
+               int const MaxIte, // maximum number of allowed iterations
+               int &Flag,        // integer storing exit status
+               Real64 &XRes,     // value of x that solves f(x,Par) = 0
+               std::function<Real64(Real64 const, Array1D<Real64> const &)> f,
+               Real64 const X_0,           // 1st bound of interval that contains the solution
+               Real64 const X_1,           // 2nd bound of interval that contains the solution
+               Array1D<Real64> const &Par, // array with additional parameters used for function evaluation
+               int const AlgorithmTypeNum, // ALgorithm selection
+               Real64 &XX_0,               // Low bound obtained with maximum number of allowed iterations
+               Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Michael Wetter
+    //       DATE WRITTEN   March 1999
+    //       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
+    //                      L. Gu, May 2017 - selcte an algorithm and output both bounds
+    //       RE-ENGINEERED  na
+
+    while (Cont) {
+
+        DY = Y0 - Y1;
+        if (std::abs(DY) < SMALL) DY = SMALL;
+        if (std::abs(X1 - X0) < SMALL) {
+            break;
+        }
+        // new estimation
+        switch (state.dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver) {
+        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
+            XTemp = (Y0 * X1 - Y1 * X0) / DY;
+            break;
+        }
+        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection: {
+            XTemp = (X1 + X0) / 2.0;
+            break;
+        }
+        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
+            if (NIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
+                XTemp = (X1 + X0) / 2.0;
+            } else {
+                XTemp = (Y0 * X1 - Y1 * X0) / DY;
+            }
+            break;
+        }
+        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
+            if (NIte <= state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
+                XTemp = (X1 + X0) / 2.0;
+            } else {
+                XTemp = (Y0 * X1 - Y1 * X0) / DY;
+            }
+            break;
+        }
+        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
+            if (AltIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
+                XTemp = (X1 + X0) / 2.0;
+                if (AltIte >= 2 * state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) AltIte = 0;
+            } else {
+                XTemp = (Y0 * X1 - Y1 * X0) / DY;
+            }
+            break;
+        }
+        default: {
+            XTemp = (Y0 * X1 - Y1 * X0) / DY;
+        }
+        }
+
+        YTemp = f(state, XTemp, Par);
+
+        ++NIte;
+        ++AltIte;
+
+        // check convergence
+        if (std::abs(YTemp) < Eps) Conv = true;
+
+        if (NIte > MaxIte) StopMaxIte = true;
+
+        if ((!Conv) && (!StopMaxIte)) {
+            Cont = true;
+        } else {
+            Cont = false;
+        }
+
+        if (Cont) {
+
+            // reassign values (only if further iteration required)
+            if (Y0 < 0.0) {
+                if (YTemp < 0.0) {
+                    X0 = XTemp;
+                    Y0 = YTemp;
+                } else {
+                    X1 = XTemp;
+                    Y1 = YTemp;
+                }
+            } else {
+                if (YTemp < 0.0) {
+                    X1 = XTemp;
+                    Y1 = YTemp;
+                } else {
+                    X0 = XTemp;
+                    Y0 = YTemp;
+                }
+            } // ( Y0 < 0 )
+
+        } // (Cont)
+
+    } // Cont
+
+    if (Conv) {
+        Flag = NIte;
+    } else {
+        Flag = -1;
+    }
+    XRes = XTemp;
+}
+
 void SolveRoot(Real64 const Eps, // required absolute accuracy
                int const MaxIte, // maximum number of allowed iterations
                int &Flag,        // integer storing exit status
@@ -1013,6 +1198,46 @@ Real64 InterpProfSlatAng(Real64 const ProfAng,           // Profile angle (rad)
         SlatAng1 = SlatAng;
         ProfAng1 = ProfAng;
     }
+    return POLYF;
+}
+
+Real64 POLYF(Real64 const X,         // Cosine of angle of incidence
+             Array1<Real64> const &A // Polynomial coefficients
+)
+{
+    // Return value
+    Real64 POLYF;
+
+    if (X < 0.0 || X > 1.0) {
+        POLYF = 0.0;
+    } else {
+        POLYF = X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
+    }
+    return POLYF;
+}
+
+Real64 POLYF(Real64 const X,          // Cosine of angle of incidence
+             Array1S<Real64> const &A // Polynomial coefficients
+)
+{
+    // Return value
+    Real64 POLYF;
+
+    if (X < 0.0 || X > 1.0) {
+        POLYF = 0.0;
+    } else {
+        POLYF = X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
+    }
+    return POLYF;
+}
+
+std::string &strip_trailing_zeros(std::string &InputString)
+{
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Stuart Mentzer (in-place version of RemoveTrailingZeros by Linda Lawrie)
+    //       DATE WRITTEN   July 2014
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
     IAlpha = int((ProfAng1 + DataGlobalConstants::PiOvr2) / DeltaProfAng) + 1;
     ProfAngRatio = (ProfAng1 + DataGlobalConstants::PiOvr2 - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng;
@@ -1090,65 +1315,6 @@ Real64 BlindBeamBeamTrans(Real64 const ProfAng,        // Solar profile angle (r
     }
 
     return BlindBeamBeamTrans;
-}
-
-Real64 POLYF(Real64 const X,         // Cosine of angle of incidence
-             Array1A<Real64> const A // Polynomial coefficients
-)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Fred Winkelmann
-    //       DATE WRITTEN   February 1999
-    //       DATE MODIFIED  October 1999, FW: change to 6th order polynomial over
-    //                        entire incidence angle range
-
-    // PURPOSE OF THIS FUNCTION:
-    // Evaluates glazing beam transmittance or absorptance of the form
-    // A(1)*X + A(2)*X^2 + A(3)*X^3 + A(4)*X^4 + A(5)*X^5 + A(6)*X^6
-    // where X is the cosine of the angle of incidence (0.0 to 1.0)
-
-    // Return value
-    Real64 POLYF;
-
-    // Argument array dimensioning
-    A.dim(6);
-
-    if (X < 0.0 || X > 1.0) {
-        POLYF = 0.0;
-    } else {
-        POLYF = X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
-    }
-    return POLYF;
-}
-
-Real64 POLYF(Real64 const X,         // Cosine of angle of incidence
-             Array1<Real64> const &A // Polynomial coefficients
-)
-{
-    // Return value
-    Real64 POLYF;
-
-    if (X < 0.0 || X > 1.0) {
-        POLYF = 0.0;
-    } else {
-        POLYF = X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
-    }
-    return POLYF;
-}
-
-Real64 POLYF(Real64 const X,          // Cosine of angle of incidence
-             Array1S<Real64> const &A // Polynomial coefficients
-)
-{
-    // Return value
-    Real64 POLYF;
-
-    if (X < 0.0 || X > 1.0) {
-        POLYF = 0.0;
-    } else {
-        POLYF = X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
-    }
-    return POLYF;
 }
 
 std::string &strip_trailing_zeros(std::string &InputString)
@@ -2223,20 +2389,20 @@ void ScanForReports(EnergyPlusData &state,
 
         cCurrentModuleObject = "Output:Surfaces:List";
 
-        NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
-                                          RepNum,
-                                          state.dataIPShortCut->cAlphaArgs,
-                                          NumNames,
-                                          state.dataIPShortCut->rNumericArgs,
-                                          NumNumbers,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     RepNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumNames,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(1));
@@ -2283,20 +2449,20 @@ void ScanForReports(EnergyPlusData &state,
 
         cCurrentModuleObject = "Output:Surfaces:Drawing";
 
-        NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
-                                          RepNum,
-                                          state.dataIPShortCut->cAlphaArgs,
-                                          NumNames,
-                                          state.dataIPShortCut->rNumericArgs,
-                                          NumNumbers,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     RepNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumNames,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(1));
@@ -2329,7 +2495,7 @@ void ScanForReports(EnergyPlusData &state,
             }
         }
 
-        RepNum = inputProcessor->getNumSectionsFound("Report Variable Dictionary");
+        RepNum = state.dataInputProcessing->inputProcessor->getNumSectionsFound("Report Variable Dictionary");
         if (RepNum > 0) {
             state.dataGeneral->VarDict = true;
             VarDictOption1 = "REGULAR";
@@ -2338,40 +2504,40 @@ void ScanForReports(EnergyPlusData &state,
 
         cCurrentModuleObject = "Output:VariableDictionary";
 
-        NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
-                                          RepNum,
-                                          state.dataIPShortCut->cAlphaArgs,
-                                          NumNames,
-                                          state.dataIPShortCut->rNumericArgs,
-                                          NumNumbers,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     RepNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumNames,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             state.dataGeneral->VarDict = true;
             VarDictOption1 = state.dataIPShortCut->cAlphaArgs(1);
             VarDictOption2 = state.dataIPShortCut->cAlphaArgs(2);
         }
 
         cCurrentModuleObject = "Output:Constructions";
-        NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
-                                          RepNum,
-                                          state.dataIPShortCut->cAlphaArgs,
-                                          NumNames,
-                                          state.dataIPShortCut->rNumericArgs,
-                                          NumNumbers,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     RepNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumNames,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "CONSTRUCTIONS")) {
                 state.dataGeneral->Constructions = true;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "MATERIALS")) {
@@ -2387,20 +2553,20 @@ void ScanForReports(EnergyPlusData &state,
         }
 
         cCurrentModuleObject = "Output:EnergyManagementSystem";
-        NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
-                                          RepNum,
-                                          state.dataIPShortCut->cAlphaArgs,
-                                          NumNames,
-                                          state.dataIPShortCut->rNumericArgs,
-                                          NumNumbers,
-                                          IOStat,
-                                          state.dataIPShortCut->lNumericFieldBlanks,
-                                          state.dataIPShortCut->lAlphaFieldBlanks,
-                                          state.dataIPShortCut->cAlphaFieldNames,
-                                          state.dataIPShortCut->cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     RepNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumNames,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             state.dataGeneral->EMSoutput = true;
 

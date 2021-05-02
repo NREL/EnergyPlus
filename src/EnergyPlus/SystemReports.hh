@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -146,9 +147,8 @@ namespace SystemReports {
         std::vector<Real64> SysTimeAtOALimitOcc = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // time [hrs] at limit [n] during occupied
         std::vector<Real64> SysMechVentTotAtLimitOcc = {
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // air loop mech vent total vol OA at limit [n] {m3} during occupied
-
     };
-        
+
     // Functions
 
     void InitEnergyReports(EnergyPlusData &state);
@@ -274,7 +274,8 @@ namespace SystemReports {
 
 } // namespace SystemReports
 
-struct SystemReportsData : BaseGlobalStruct {
+struct SystemReportsData : BaseGlobalStruct
+{
 
     Array1D<Real64> MaxCoolingLoadMetByVent;
     Array1D<Real64> MaxCoolingLoadAddedByVent;
@@ -361,7 +362,7 @@ struct SystemReportsData : BaseGlobalStruct {
     bool VentLoadsReportEnabled = true;
     bool VentEnergyReportEnabled = false;
     bool VentReportStructureCreated = false;
-    int TotalLoopConnects = 0;              // Total number of loop connections
+    int TotalLoopConnects = 0; // Total number of loop connections
     int MaxLoopArraySize = 100;
     int MaxCompArraySize = 500;
 
@@ -374,8 +375,8 @@ struct SystemReportsData : BaseGlobalStruct {
     Array1D_bool NoLoadFlag;
     Array1D_bool UnmetLoadFlag;
 
-    Array1D<SystemReports::SummarizeLoads> Vent;
-    Array1D<SystemReports::SysPreDefRepType> SysPreDefRep;
+    EPVector<SystemReports::SummarizeLoads> Vent;
+    EPVector<SystemReports::SysPreDefRepType> SysPreDefRep;
 
     bool OneTimeFlag_FindFirstLastPtr = true;
     bool OneTimeFlag_InitEnergyReports = true;

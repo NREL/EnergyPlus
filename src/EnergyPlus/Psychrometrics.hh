@@ -59,8 +59,10 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PsychCacheData.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -104,7 +106,6 @@ namespace Psychrometrics {
     constexpr int iPsyRhFnTdbRhovLBnd0C = 13;
     constexpr int iPsyTwbFnTdbWPb_cache = 18;
     constexpr int iPsyPsatFnTemp_cache = 19;
-    constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychrometric routines that
 
 #ifdef EP_psych_stats
     extern Array1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 -
@@ -140,92 +141,9 @@ namespace Psychrometrics {
     constexpr int tsat_hbp_precision_bits = 28;
 #endif
 
-    // MODULE VARIABLE DECLARATIONS:
-    // na
+    void InitializePsychRoutines(EnergyPlusData &state);
 
-    // MODULE VARIABLE DEFINITIONS:
-
-    // DERIVED TYPE DEFINITIONS
-
-    // Types
-
-#ifdef EP_cache_PsyTwbFnTdbWPb
-    struct cached_twb_t
-    {
-        // Members
-        Int64 iTdb;
-        Int64 iW;
-        Int64 iPb;
-        Real64 Twb;
-
-        // Default Constructor
-        cached_twb_t() : iTdb(0), iW(0), iPb(0), Twb(0.0)
-        {
-        }
-    };
-#endif
-#ifdef EP_cache_PsyTsatFnHPb
-    struct cached_tsat_h_pb
-    {
-        // Members
-        Int64 iH;
-        Int64 iPb;
-        Real64 Tsat;
-
-        // Default Constructor
-        cached_tsat_h_pb() : iH(0), iPb(0), Tsat(0.0)
-        {
-        }
-    };
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-    struct cached_psat_t
-    {
-        // Members
-        Int64 iTdb;
-        Real64 Psat;
-
-        // Default Constructor
-        cached_psat_t() : iTdb(-1000), Psat(0.0)
-        {
-        }
-    };
-#endif
-#ifdef EP_cache_PsyTsatFnPb
-    struct cached_tsat_pb
-    {
-        // Members
-        Int64 iPb;
-        Real64 Tsat;
-
-        // Default Constructor
-        cached_tsat_pb() : iPb(-1000), Tsat(0.0)
-        {
-        }
-    };
-#endif
-    // Object Data
-#ifdef EP_cache_PsyTwbFnTdbWPb
-    inline Array1D<cached_twb_t> cached_Twb; // DIMENSION(0:twbcache_size)
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-    inline Array1D<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
-#endif
-#ifdef EP_cache_PsyTsatFnPb
-    inline Array1D<cached_tsat_pb> cached_Tsat; // DIMENSION(0:tsatcache_size)
-#endif
-#ifdef EP_cache_PsyTsatFnHPb
-    inline Array1D<cached_tsat_h_pb> cached_Tsat_HPb; // DIMENSION(0:tsat_hbp_cache_size)
-#endif
-    // Subroutine Specifications for the Module
-
-    // Functions
-
-    void clear_state();
-
-    void InitializePsychRoutines();
-
-    void ShowPsychrometricSummary(InputOutputFile &auditFile);
+    void ShowPsychrometricSummary(EnergyPlusData &state, InputOutputFile &auditFile);
 
 #ifdef EP_psych_errors
     void PsyRhoAirFnPbTdbW_error(EnergyPlusData &state,
@@ -550,7 +468,7 @@ namespace Psychrometrics {
         // ASHRAE handbook 1993 Fundamentals,
 
 #ifdef EP_psych_stats
-        ++NumTimesCalled(iPsyRhFnTdbRhovLBnd0C);
+        ++state.dataPsychCache->NumTimesCalled(iPsyRhFnTdbRhovLBnd0C);
 #endif
 
         Real64 const RHValue(Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + DataGlobalConstants::KelvinConv) *
@@ -627,7 +545,7 @@ namespace Psychrometrics {
         // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQN 28
 
 #ifdef EP_psych_stats
-        ++NumTimesCalled(iPsyVFnTdbWPb);
+        ++state.dataPsychCache->NumTimesCalled(iPsyVFnTdbWPb);
 #endif
 
         Real64 const w(max(dW, 1.0e-5));                                           // humidity ratio
@@ -674,7 +592,7 @@ namespace Psychrometrics {
         // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P100, EQN 32
 
 #ifdef EP_psych_stats
-        ++NumTimesCalled(iPsyWFnTdbH);
+        ++state.dataPsychCache->NumTimesCalled(iPsyWFnTdbH);
 #endif
 
         Real64 const W((H - 1.00484e3 * TDB) / (2.50094e6 + 1.85895e3 * TDB)); // humidity ratio
@@ -730,15 +648,13 @@ namespace Psychrometrics {
         assert(Grid_Shift == 64 - 12 - psatprecision_bits); // Force Grid_Shift updates when precision bits changes
 
 #ifdef EP_psych_stats
-        ++NumTimesCalled(iPsyPsatFnTemp_cache);
+        ++state.dataPsychCache->NumTimesCalled(iPsyPsatFnTemp_cache);
 #endif
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         Int64 const Tdb_tag(bit_shift(bit_transfer(T, Grid_Shift), -Grid_Shift)); // Note that 2nd arg to TRANSFER is not used: Only type matters
         //        Int64 const hash( bit::bit_and( Tdb_tag, psatcache_mask ) ); //Tuned Replaced by below
         Int64 const hash(Tdb_tag & psatcache_mask);
-        auto &cPsat(cached_Psat(hash));
+        auto &cPsat(state.dataPsychCache->cached_Psat(hash));
 
         if (cPsat.iTdb != Tdb_tag) {
             cPsat.iTdb = Tdb_tag;
@@ -788,7 +704,7 @@ namespace Psychrometrics {
         Int64 hash;
 
 #ifdef EP_psych_stats
-        ++NumTimesCalled(iPsyTwbFnTdbWPb_cache);
+        ++state.dataPsychCache->NumTimesCalled(iPsyTwbFnTdbWPb_cache);
 #endif
 
         H_tag = bit_transfer(H, H_tag);
@@ -796,6 +712,7 @@ namespace Psychrometrics {
         Pb_tag = bit_transfer(Pb, Pb_tag);
         Pb_tag = bit_shift(Pb_tag, -Grid_Shift);
         hash = bit_and(bit_xor(H_tag, Pb_tag), Int64(tsat_hbp_cache_size - 1));
+        auto &cached_Tsat_HPb = state.dataPsychCache->cached_Tsat_HPb;
         if (cached_Tsat_HPb(hash).iH != H_tag || cached_Tsat_HPb(hash).iPb != Pb_tag) {
             cached_Tsat_HPb(hash).iH = H_tag;
             cached_Tsat_HPb(hash).iPb = Pb_tag;
@@ -885,7 +802,7 @@ namespace Psychrometrics {
         static std::string const RoutineName("PsyRhFnTdbRhov");
 
 #ifdef EP_psych_stats
-        ++NumTimesCalled(iPsyRhFnTdbRhov);
+        ++state.dataPsychCache->NumTimesCalled(iPsyRhFnTdbRhov);
 #endif
 
         Real64 const RHValue(Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + DataGlobalConstants::KelvinConv) / PsyPsatFnTemp(state, Tdb, RoutineName)
@@ -936,7 +853,7 @@ namespace Psychrometrics {
         static std::string const RoutineName("PsyRhFnTdbWPb");
 
 #ifdef EP_psych_stats
-        ++NumTimesCalled(iPsyRhFnTdbWPb);
+        ++state.dataPsychCache->NumTimesCalled(iPsyRhFnTdbWPb);
 #endif
 
         Real64 const PWS(PsyPsatFnTemp(state, TDB, (CalledFrom.empty() ? RoutineName : CalledFrom))); // Pressure -- saturated for pure water
@@ -994,7 +911,7 @@ namespace Psychrometrics {
         static std::string const RoutineName("PsyWFnTdpPb");
 
 #ifdef EP_psych_stats
-        ++NumTimesCalled(iPsyWFnTdpPb);
+        ++state.dataPsychCache->NumTimesCalled(iPsyWFnTdpPb);
 #endif
 
         Real64 const PDEW(
@@ -1057,7 +974,7 @@ namespace Psychrometrics {
         static std::string const RoutineName("PsyWFnTdbRhPb");
 
 #ifdef EP_psych_stats
-        ++NumTimesCalled(iPsyWFnTdbRhPb);
+        ++state.dataPsychCache->NumTimesCalled(iPsyWFnTdbRhPb);
 #endif
 
         Real64 const PDEW(RH *
@@ -1123,7 +1040,7 @@ namespace Psychrometrics {
         static std::string const RoutineName("PsyWFnTdbTwbPb");
 
 #ifdef EP_psych_stats
-        ++NumTimesCalled(iPsyWFnTdbTwbPb);
+        ++state.dataPsychCache->NumTimesCalled(iPsyWFnTdbTwbPb);
 #endif
 
         Real64 TWB(TWBin); // test wet-bulb temperature
@@ -1196,7 +1113,7 @@ namespace Psychrometrics {
         Int64 const Pb_tag(bit_shift(bit_transfer(Press, Grid_Shift), -Grid_Shift));
 
         Int64 const hash(Pb_tag & tsatcache_mask);
-        auto &cTsat(cached_Tsat(hash));
+        auto &cTsat(state.dataPsychCache->cached_Tsat(hash));
         if (cTsat.iPb != Pb_tag) {
             cTsat.iPb = Pb_tag;
             cTsat.Tsat = PsyTsatFnPb_raw(state, Press, CalledFrom);
@@ -1270,7 +1187,7 @@ namespace Psychrometrics {
         // This function calculates the dew-point temperature {C} from dry-bulb, wet-bulb and pressure.
 
 #ifdef EP_psych_stats
-        ++NumTimesCalled(iPsyTdpFnTdbTwbPb);
+        ++state.dataPsychCache->NumTimesCalled(iPsyTdpFnTdbTwbPb);
 #endif
 
         Real64 const W(max(PsyWFnTdbTwbPb(state, TDB, TWB, PB, CalledFrom), 1.0e-5));
@@ -1394,19 +1311,13 @@ struct PsychrometricsData : BaseGlobalStruct
     Real64 last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
     Real64 Press_Save = -99999.0;
     Real64 tSat_Save = -99999.0;
-
-#ifdef EP_psych_stats
-    Array1D<Int64> NumTimesCalled = Array1D<Int64>(NumPsychMonitors, 0);
-    Array1D_int NumIterations = Array1D_int(NumPsychMonitors, 0);
-#endif
-
-    Array1D_int iPsyErrIndex = Array1D_int(Psychrometrics::NumPsychMonitors, 0); // Number of times error occurred
+    Array1D_int iPsyErrIndex = Array1D_int(EnergyPlus::NumPsychMonitors, 0); // Number of times error occurred
     std::string String;
     bool ReportErrors = true;
 
     void clear_state() override
     {
-        iPsyErrIndex = Array1D_int(Psychrometrics::NumPsychMonitors, 0);
+        iPsyErrIndex = Array1D_int(EnergyPlus::NumPsychMonitors, 0);
         iconvTol = 0.0001;
         last_Patm = -99999.0;  // barometric pressure {Pascals}  (last)
         last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
@@ -1414,11 +1325,6 @@ struct PsychrometricsData : BaseGlobalStruct
         tSat_Save = -99999.0;
         String = "";
         ReportErrors = true;
-
-#ifdef EP_psych_stats
-        NumTimesCalled = Array1D<Int64>(NumPsychMonitors, 0);
-        NumIterations = Array1D_int(NumPsychMonitors, 0);
-#endif
     }
 };
 

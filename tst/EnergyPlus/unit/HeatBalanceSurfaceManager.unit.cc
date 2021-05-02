@@ -286,7 +286,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataMaterial->Material(1).AbsorpThermal = 0.2;
     state->dataMaterial->Material(1).AbsorpSolar = 0.5;
 
-    state->dataSurface->Surface(1).SchedMovInsulInt = -1; // According to schedule manager protocol, an index of -1 returns a 1.0 value for the schedule
+    state->dataSurface->Surface(1).SchedMovInsulInt =
+        -1; // According to schedule manager protocol, an index of -1 returns a 1.0 value for the schedule
     state->dataMaterial->Material(1).Resistance = 1.25;
 
     ComputeIntThermalAbsorpFactors(*state);
@@ -1897,7 +1898,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 
     int SurfNum;
     for (SurfNum = 1; SurfNum <= 6; SurfNum++) {
-        state->dataHeatBalSurf->TH(1, 1, SurfNum) = 20;         // Surf temp
+        state->dataHeatBalSurf->TH(1, 1, SurfNum) = 20;           // Surf temp
         state->dataSurface->Surface(SurfNum).OutDryBulbTemp = 22; // Air temp
         state->dataSurface->Surface(SurfNum).ExtConvCoeff = -6;
         state->dataSurface->AirSkyRadSplit(SurfNum) = 1.0;
@@ -1913,17 +1914,24 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     EXPECT_DOUBLE_EQ(0.25, state->dataSurface->Surface(3).ViewFactorSkyIR);
     EXPECT_DOUBLE_EQ(0.25, state->dataSurface->Surface(3).ViewFactorGroundIR);
     // Test if sky and grd view factor and temperature correctly overwritten
-    EXPECT_DOUBLE_EQ((DataGlobalConstants::StefanBoltzmann * 0.9 * 0.3 * (pow_4(20.0 + DataGlobalConstants::KelvinConv) - pow_4(15.0 + DataGlobalConstants::KelvinConv)) / (20.0 - 15.0)),
+    EXPECT_DOUBLE_EQ((DataGlobalConstants::StefanBoltzmann * 0.9 * 0.3 *
+                      (pow_4(20.0 + DataGlobalConstants::KelvinConv) - pow_4(15.0 + DataGlobalConstants::KelvinConv)) / (20.0 - 15.0)),
                      state->dataHeatBalSurf->HSkyExtSurf(1));
-    EXPECT_DOUBLE_EQ((DataGlobalConstants::StefanBoltzmann * 0.9 * 0.1 * (pow_4(20.0 + DataGlobalConstants::KelvinConv) - pow_4(22.0 + DataGlobalConstants::KelvinConv)) / (20.0 - 22.0)),
+    EXPECT_DOUBLE_EQ((DataGlobalConstants::StefanBoltzmann * 0.9 * 0.1 *
+                      (pow_4(20.0 + DataGlobalConstants::KelvinConv) - pow_4(22.0 + DataGlobalConstants::KelvinConv)) / (20.0 - 22.0)),
                      state->dataHeatBalSurf->HGrdExtSurf(1));
 
     // Test if LWR from surrounding surfaces correctly calculated
-    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.9 * 0.6 * (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(20.0 + DataGlobalConstants::KelvinConv)), state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(1));
+    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.9 * 0.6 *
+                         (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(20.0 + DataGlobalConstants::KelvinConv)),
+                     state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(1));
     EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.9 *
-                         (0.3 * (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(20.0 + DataGlobalConstants::KelvinConv)) + 0.3 * (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(20.0 + DataGlobalConstants::KelvinConv))),
+                         (0.3 * (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(20.0 + DataGlobalConstants::KelvinConv)) +
+                          0.3 * (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(20.0 + DataGlobalConstants::KelvinConv))),
                      state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(2));
-    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.9 * 0.5 * (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(20.0 + DataGlobalConstants::KelvinConv)), state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(3));
+    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.9 * 0.5 *
+                         (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(20.0 + DataGlobalConstants::KelvinConv)),
+                     state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(3));
     EXPECT_DOUBLE_EQ(0.0, state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(4));
 }
 
@@ -2455,10 +2463,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
     InitSurfaceHeatBalance(*state);
-    for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
+    for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
         state->dataSurface->Surface(SurfNum).ExtConvCoeff = -1;
     }
-
     // Test Additional Heat Source Calculation
     CalcHeatBalanceOutsideSurf(*state);
     EXPECT_EQ(-0.1, state->dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(1));
@@ -2695,8 +2702,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_EQ(0, state->dataHeatBalFanSys->ZoneHeatIndexHourBins(1)[3]);
     EXPECT_EQ(0, state->dataHeatBalFanSys->ZoneHeatIndexOccuHourBins(1)[0]); // # of People = 0
 
-    EXPECT_EQ(2, state->dataHeatBalFanSys->ZoneHumidexHourBins(1)[0]); // Humidex <= 29
-    EXPECT_EQ(2, state->dataHeatBalFanSys->ZoneHumidexHourBins(1)[1]); // Humidex (29, 40]
+    EXPECT_EQ(2, state->dataHeatBalFanSys->ZoneHumidexHourBins(1)[0]);     // Humidex <= 29
+    EXPECT_EQ(2, state->dataHeatBalFanSys->ZoneHumidexHourBins(1)[1]);     // Humidex (29, 40]
     EXPECT_EQ(0, state->dataHeatBalFanSys->ZoneHumidexOccuHourBins(1)[0]); // # of People = 0
 
     // Test SET-hours calculation - No occupant
@@ -2707,7 +2714,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     for (int hour = 5; hour <= 7; hour++) {
         state->dataGlobal->HourOfDay = hour;
-//        CalcThermalResilience(*state);
+        //        CalcThermalResilience(*state);
         ReportThermalResilience(*state);
     }
     // Test SET-hours calculation - Heating unmet
@@ -2720,7 +2727,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
         ReportThermalResilience(*state);
     }
     // Test SET-hours calculation - Cooling unmet
-    EXPECT_EQ(6, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0]); // SET Hours = (32 - 30) * 3 Hours
+    EXPECT_EQ(6, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0]);  // SET Hours = (32 - 30) * 3 Hours
     EXPECT_EQ(12, state->dataHeatBalFanSys->ZoneHighSETHours(1)[1]); // SET OccupantHours = (32 - 30) * 3 Hours * 2 OCC
 
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 25;
@@ -2742,9 +2749,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     // Test SET longest duration calculation
     // Cooling Unmet Duration: Hour 1 - 4 (no occupants), Hour 8 - 10;
     // Heating Unmet Duration: Hour 5 - 7, Hour 13 - 18, Hour 18 - 20 (no occupants);
-    EXPECT_EQ(9, state->dataHeatBalFanSys->ZoneLowSETHours(1)[0]); // SET Hours = (12.2 - 11.2) * (3 + 6) Hours
+    EXPECT_EQ(9, state->dataHeatBalFanSys->ZoneLowSETHours(1)[0]);  // SET Hours = (12.2 - 11.2) * (3 + 6) Hours
     EXPECT_EQ(6, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0]); // SET Hours = SET Hours = (32 - 30) * 3 Hours
-    EXPECT_EQ(6, state->dataHeatBalFanSys->ZoneLowSETHours(1)[2]); // Longest Heating SET Unmet Duration
+    EXPECT_EQ(6, state->dataHeatBalFanSys->ZoneLowSETHours(1)[2]);  // Longest Heating SET Unmet Duration
     EXPECT_EQ(3, state->dataHeatBalFanSys->ZoneHighSETHours(1)[2]); //  Longest Cooling SET Unmet Duration
 
     state->dataHeatBalFanSys->ZoneCO2LevelHourBins.allocate(state->dataGlobal->NumOfZones);
@@ -2772,7 +2779,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     ReportVisualResilience(*state);
     EXPECT_EQ(1, state->dataHeatBalFanSys->ZoneLightingLevelHourBins(1)[2]);
     EXPECT_EQ(2, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBins(1)[2]);
-
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)

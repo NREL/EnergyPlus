@@ -194,7 +194,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
@@ -286,8 +286,10 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
         state->dataSurface->Surface(1).Tilt = 180 - tiltSave;
         state->dataSurface->Surface(1).CosTilt = cos(state->dataSurface->Surface(winNum).Tilt * DataGlobalConstants::Pi / 180);
         state->dataSurface->Surface(1).SinTilt = sin(state->dataSurface->Surface(winNum).Tilt * DataGlobalConstants::Pi / 180);
-        ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(*state,
-            winNum, outSurfTemp,
+        ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(
+            *state,
+            winNum,
+            outSurfTemp,
             T_out); // This subroutine sets the global HConvIn( 1 ) variable. We will use it to set the exterior natural convection.
         h_exterior = h_exterior_f + state->dataHeatBal->HConvIn(winNum); // add natural convection
 
@@ -295,8 +297,10 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
         state->dataSurface->Surface(1).Tilt = tiltSave;
         state->dataSurface->Surface(1).CosTilt = cos(tiltSave * DataGlobalConstants::Pi / 180);
         state->dataSurface->Surface(1).SinTilt = sin(tiltSave * DataGlobalConstants::Pi / 180);
-        ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(*state,
-            winNum, inSurfTemp,
+        ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(
+            *state,
+            winNum,
+            inSurfTemp,
             T_in); // This time it's actually being used as intended. HConvIn( 1 ) is referenced from the actual heat balance calculation.
 
         WindowManager::CalcWindowHeatBalance(*state, winNum, h_exterior, inSurfTemp, outSurfTemp);
@@ -346,8 +350,8 @@ TEST_F(EnergyPlusFixture, WindowManager_TransAndReflAtPhi)
     rbp = 0.; // Back reflectance at cs
 
     SimpleGlazingSystem = true; // .TRUE. if simple block model being used
-    SimpleGlazingSHGC = 0.335;    // SHGC value to use in alternate model for simple glazing system
-    SimpleGlazingU = 1.704;       // U-factor value to use in alternate model for simple glazing system
+    SimpleGlazingSHGC = 0.335;  // SHGC value to use in alternate model for simple glazing system
+    SimpleGlazingU = 1.704;     // U-factor value to use in alternate model for simple glazing system
 
     for (Real64 theta = 0.0; theta <= DataGlobalConstants::PiOvr2; theta += DataGlobalConstants::PiOvr2 / 10.0) {
         cs = std::cos(theta); // Cosine of incidence angle
@@ -356,8 +360,6 @@ TEST_F(EnergyPlusFixture, WindowManager_TransAndReflAtPhi)
 
         EXPECT_GE(afp, 0.00);
     }
-
-
 }
 
 TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
@@ -472,7 +474,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
@@ -551,7 +553,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBalFanSys->QHWBaseboardSurf.allocate(3);
     state->dataHeatBalFanSys->QSteamBaseboardSurf.allocate(3);
     state->dataHeatBalFanSys->QElecBaseboardSurf.allocate(3);
-    state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(1, 3);
+    state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(3, 1);
     state->dataHeatBal->SurfQRadThermInAbs.allocate(3);
     state->dataHeatBal->SurfQRadSWOutIncident.allocate(3);
     state->dataSurface->SurfWinTransSolar.allocate(3);
@@ -2489,7 +2491,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     bool FoundError = false;
 
     HeatBalanceManager::GetProjectControlData(*state, FoundError); // read project control data
-    EXPECT_FALSE(FoundError);                              // expect no errors
+    EXPECT_FALSE(FoundError);                                      // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     CurveManager::GetCurveInput(*state);
@@ -2531,7 +2533,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
     SurfaceGeometry::GetSurfaceData(*state, FoundError); // setup zone geometry and get zone data
-    EXPECT_FALSE(FoundError);                    // expect no errors
+    EXPECT_FALSE(FoundError);                            // expect no errors
 
     WindowManager::InitGlassOpticalCalculations(*state);
 
@@ -2555,7 +2557,8 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         EXPECT_NEAR(correctR(i), state->dataWindowManager->rfsolPhi(i), 0.0001);
         EXPECT_NEAR(correctabs1(i), state->dataWindowManager->solabsPhi(1, i), 0.0001);
         EXPECT_NEAR(correctabs2(i), state->dataWindowManager->solabsPhi(2, i), 0.0001);
-        sum = state->dataWindowManager->tsolPhi(i) + state->dataWindowManager->rfsolPhi(i) + state->dataWindowManager->solabsPhi(1, i) + state->dataWindowManager->solabsPhi(2, i);
+        sum = state->dataWindowManager->tsolPhi(i) + state->dataWindowManager->rfsolPhi(i) + state->dataWindowManager->solabsPhi(1, i) +
+              state->dataWindowManager->solabsPhi(2, i);
         EXPECT_NEAR(sum, 1.0, 0.0001);
     }
 
@@ -2698,7 +2701,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
@@ -2778,7 +2781,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBalFanSys->QHWBaseboardSurf.allocate(3);
     state->dataHeatBalFanSys->QSteamBaseboardSurf.allocate(3);
     state->dataHeatBalFanSys->QElecBaseboardSurf.allocate(3);
-    state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(1, 3);
+    state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(3, 1);
     state->dataHeatBal->SurfQRadThermInAbs.allocate(3);
     state->dataHeatBal->SurfQRadSWOutIncident.allocate(3);
     state->dataSurface->SurfWinTransSolar.allocate(3);
@@ -2829,45 +2832,45 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBal->HConvIn(surfNum2), inSurfTemp, outSurfTemp);
     // Test if LWR from surrounding surfaces correctly calculated
-    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.84 * 0.6 * (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(state->dataWindowManager->thetas(1))), state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(surfNum2));
-    EXPECT_NEAR(-24.9342, state->dataHeatBalSurf->QHeatEmiReport(surfNum2),3);
+    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.84 * 0.6 *
+                         (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(state->dataWindowManager->thetas(1))),
+                     state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(surfNum2));
+    EXPECT_NEAR(-24.9342, state->dataHeatBalSurf->QHeatEmiReport(surfNum2), 3);
 }
 TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
 {
 
-   std::string const idf_objects =
-        delimited_string({
-   "WindowMaterial:ComplexShade,",
-    "Shade_14_Layer,          !- Name",
-    "VenetianHorizontal,      !- Layer Type",
-    "1.016000e-003,           !- Thickness {m}",
-    "1.592276e+002,           !- Conductivity {W / m - K}",
-    "0.000000e+000,           !- IR Transmittance",
-    "0.9,                     !- Front Emissivity",
-    "0.9,                       !- Back Emissivity",
-    "0.000000e+000,           !- Top Opening Multiplier",
-    "0.000000e+000,           !- Bottom Opening Multiplier",
-    "0.000000e+000,           !- Left Side Opening Multiplier",
-    "0.000000e+000,           !- Right Side Opening Multiplier",
-    "5.000000e-002,           !- Front Opening Multiplier",
-    "0.0254,                  !- Slat Width {m}",
-    "0.0201,                  !- Slat Spacing {m}",
-    "0.0010,                  !- Slat Thickness {m}",
-    "45.0000,                 !- Slat Angle {deg}",
-    "159.2276,                !- Slat Conductivity {W / m - K}",
-    "0.0000;                  !- Slat Curve {m}" });
+    std::string const idf_objects = delimited_string({"WindowMaterial:ComplexShade,",
+                                                      "Shade_14_Layer,          !- Name",
+                                                      "VenetianHorizontal,      !- Layer Type",
+                                                      "1.016000e-003,           !- Thickness {m}",
+                                                      "1.592276e+002,           !- Conductivity {W / m - K}",
+                                                      "0.000000e+000,           !- IR Transmittance",
+                                                      "0.9,                     !- Front Emissivity",
+                                                      "0.9,                       !- Back Emissivity",
+                                                      "0.000000e+000,           !- Top Opening Multiplier",
+                                                      "0.000000e+000,           !- Bottom Opening Multiplier",
+                                                      "0.000000e+000,           !- Left Side Opening Multiplier",
+                                                      "0.000000e+000,           !- Right Side Opening Multiplier",
+                                                      "5.000000e-002,           !- Front Opening Multiplier",
+                                                      "0.0254,                  !- Slat Width {m}",
+                                                      "0.0201,                  !- Slat Spacing {m}",
+                                                      "0.0010,                  !- Slat Thickness {m}",
+                                                      "45.0000,                 !- Slat Angle {deg}",
+                                                      "159.2276,                !- Slat Conductivity {W / m - K}",
+                                                      "0.0000;                  !- Slat Curve {m}"});
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool errors_found = false;
     HeatBalanceManager::GetMaterialData(*state, errors_found);
     EXPECT_FALSE(errors_found);
     EXPECT_EQ(state->dataHeatBal->ComplexShade(1).Name, "SHADE_14_LAYER");
-    EXPECT_EQ(state->dataHeatBal->ComplexShade(1).LayerType, 1);
+    EXPECT_EQ(state->dataHeatBal->ComplexShade(1).LayerType, TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ);
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).Thickness, 1.016000e-003, 1e-5);
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).Conductivity, 1.592276e+002, 1e-5);
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).IRTransmittance, 0, 1e-5);
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).FrontEmissivity, 0.9,1e-5);
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).BackEmissivity, 0.9,1e-5);
+    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).FrontEmissivity, 0.9, 1e-5);
+    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).BackEmissivity, 0.9, 1e-5);
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).TopOpeningMultiplier, 0, 1e-5);
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).BottomOpeningMultiplier, 0, 1e-5);
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).LeftOpeningMultiplier, 0, 1e-5);
@@ -2879,4 +2882,4 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).SlatAngle, 45.0, 1e-5);
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).SlatConductivity, 159.2276, 1e-5);
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).SlatCurve, 0, 1e-5);
-    }
+}

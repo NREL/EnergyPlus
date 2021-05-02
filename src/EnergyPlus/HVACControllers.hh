@@ -304,7 +304,8 @@ namespace HVACControllers {
 
     void DumpAirLoopStatistics(EnergyPlusData &state);
 
-    void WriteAirLoopStatistics(EnergyPlusData &state, InputOutputFile &statisticsFile,
+    void WriteAirLoopStatistics(EnergyPlusData &state,
+                                InputOutputFile &statisticsFile,
                                 DefinePrimaryAirSystem const &ThisPrimaryAirSystem,
                                 AirLoopStatsType const &ThisAirLoopStats);
 
@@ -373,7 +374,6 @@ struct HVACControllersData : BaseGlobalStruct
     Array1D_bool MyEnvrnFlag;
     Array1D_bool MySizeFlag;
     Array1D_bool MyPlantIndexsFlag;
-
 
     void clear_state() override
     {

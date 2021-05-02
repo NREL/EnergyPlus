@@ -281,12 +281,22 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataHeatBal->HConvIn(2) = 1.0;
     state->dataHeatBalSurf->TempSurfInTmp(1) = 25.0;
     state->dataHeatBalSurf->TempSurfInTmp(2) = 30.0;
-    state->dataMstBal->RhoVaporAirIn(1) = PsyRhovFnTdbWPb(state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
-    state->dataMstBal->RhoVaporAirIn(2) = PsyRhovFnTdbWPb(state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
-    state->dataMstBal->HMassConvInFD(1) = state->dataHeatBal->HConvIn(1) / ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) + state->dataMstBal->RhoVaporAirIn(1)) *
-                                     PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
-    state->dataMstBal->HMassConvInFD(2) = state->dataHeatBal->HConvIn(2) / ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) + state->dataMstBal->RhoVaporAirIn(2)) *
-                                     PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
+    state->dataMstBal->RhoVaporAirIn(1) =
+        PsyRhovFnTdbWPb(state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
+    state->dataMstBal->RhoVaporAirIn(2) =
+        PsyRhovFnTdbWPb(state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
+    state->dataMstBal->HMassConvInFD(1) =
+        state->dataHeatBal->HConvIn(1) /
+        ((PsyRhoAirFnPbTdbW(
+              *state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) +
+          state->dataMstBal->RhoVaporAirIn(1)) *
+         PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
+    state->dataMstBal->HMassConvInFD(2) =
+        state->dataHeatBal->HConvIn(2) /
+        ((PsyRhoAirFnPbTdbW(
+              *state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) +
+          state->dataMstBal->RhoVaporAirIn(2)) *
+         PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
 
     RoomAirNode = 1;
     auto &thisRAFN(state->dataRoomAirflowNetModel->RAFN(ZoneNum));

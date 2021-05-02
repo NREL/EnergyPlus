@@ -65,7 +65,7 @@ struct AirLoopHVACDOASData;
 struct AirSystemsData;
 struct AirflowNetworkBalanceManagerData;
 struct AirflowNetworkData;
-struct AutoSizingBaseData;
+struct AirflowNetworkSolverData;
 struct BSDFWindowData;
 struct BaseSizerWithFanHeatInputsData;
 struct BaseSizerWithScalableInputsData;
@@ -95,11 +95,13 @@ struct CrossVentMgrData;
 struct CurveManagerData;
 struct DXCoilsData;
 struct DXFEarClippingData;
+struct DataAFNProps;
 struct DataAirLoopData;
 struct DataBranchAirLoopPlantData;
 struct DataDaylightingDevicesData;
 struct DataGlobal;
 struct DataGlobalConstantsData;
+struct DataInputProcessing;
 struct DataPlantData;
 struct DataStringGlobalsData;
 struct DataTimingsData;
@@ -191,6 +193,7 @@ struct InternalHeatGainsData;
 struct LoopNodeData;
 struct LowTempRadiantSystemData;
 struct MaterialData;
+struct MatrixDataManagerData;
 struct MicroCHPElectricGeneratorData;
 struct MicroturbineElectricGeneratorData;
 struct MixedAirData;
@@ -198,6 +201,7 @@ struct MixerComponentData;
 struct MoistureBalanceData;
 struct MoistureBalanceEMPDData;
 struct MoistureBalanceEMPDManagerData;
+struct MundtSimMgrData;
 struct NodeInputManagerData;
 struct OutAirNodeManagerData;
 struct OutdoorAirUnitData;
@@ -232,6 +236,7 @@ struct PollutionModuleData;
 struct PondGroundHeatExchangerData;
 struct PoweredInductionUnitsData;
 struct PsychrometricsData;
+struct PsychrometricCacheData;
 struct PumpsData;
 struct PurchasedAirManagerData;
 struct RefrigeratedCaseData;
@@ -310,7 +315,8 @@ struct ZoneEquipmentManagerData;
 struct ZonePlenumData;
 struct ZoneTempPredictorCorrectorData;
 
-struct EnergyPlusData : BaseGlobalStruct {
+struct EnergyPlusData : BaseGlobalStruct
+{
 
     IOFiles files;
 
@@ -319,7 +325,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<AirSystemsData> dataAirSystemsData;
     std::unique_ptr<AirflowNetworkBalanceManagerData> dataAirflowNetworkBalanceManager;
     std::unique_ptr<AirflowNetworkData> dataAirflowNetwork;
-    std::unique_ptr<AutoSizingBaseData> dataAutoSizingBase;
+    std::unique_ptr<AirflowNetworkSolverData> dataAFNSolver;
     std::unique_ptr<BSDFWindowData> dataBSDFWindow;
     std::unique_ptr<BaseSizerWithFanHeatInputsData> dataBaseSizerFanHeatInputs;
     std::unique_ptr<BaseSizerWithScalableInputsData> dataBaseSizerScalableInputs;
@@ -349,11 +355,13 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<CurveManagerData> dataCurveManager;
     std::unique_ptr<DXCoilsData> dataDXCoils;
     std::unique_ptr<DXFEarClippingData> dataDXFEarClipping;
+    std::unique_ptr<DataAFNProps> dataAFNProps;
     std::unique_ptr<DataAirLoopData> dataAirLoop;
     std::unique_ptr<DataBranchAirLoopPlantData> dataBranchAirLoopPlant;
     std::unique_ptr<DataDaylightingDevicesData> dataDaylightingDevicesData;
     std::unique_ptr<DataGlobal> dataGlobal;
     std::unique_ptr<DataGlobalConstantsData> dataGlobalConst;
+    std::unique_ptr<DataInputProcessing> dataInputProcessing;
     std::unique_ptr<DataPlantData> dataPlnt;
     std::unique_ptr<DataStringGlobalsData> dataStrGlobals;
     std::unique_ptr<DataTimingsData> dataTimingsData;
@@ -445,6 +453,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<LoopNodeData> dataLoopNodes;
     std::unique_ptr<LowTempRadiantSystemData> dataLowTempRadSys;
     std::unique_ptr<MaterialData> dataMaterial;
+    std::unique_ptr<MatrixDataManagerData> dataMatrixDataManager;
     std::unique_ptr<MicroCHPElectricGeneratorData> dataCHPElectGen;
     std::unique_ptr<MicroturbineElectricGeneratorData> dataMircoturbElectGen;
     std::unique_ptr<MixedAirData> dataMixedAir;
@@ -452,6 +461,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<MoistureBalanceData> dataMstBal;
     std::unique_ptr<MoistureBalanceEMPDData> dataMstBalEMPD;
     std::unique_ptr<MoistureBalanceEMPDManagerData> dataMoistureBalEMPD;
+    std::unique_ptr<MundtSimMgrData> dataMundtSimMgr;
     std::unique_ptr<NodeInputManagerData> dataNodeInputMgr;
     std::unique_ptr<OutAirNodeManagerData> dataOutAirNodeMgr;
     std::unique_ptr<OutdoorAirUnitData> dataOutdoorAirUnit;
@@ -486,6 +496,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<PondGroundHeatExchangerData> dataPondGHE;
     std::unique_ptr<PoweredInductionUnitsData> dataPowerInductionUnits;
     std::unique_ptr<PsychrometricsData> dataPsychrometrics;
+    std::unique_ptr<PsychrometricCacheData> dataPsychCache;
     std::unique_ptr<PumpsData> dataPumps;
     std::unique_ptr<PurchasedAirManagerData> dataPurchasedAirMgr;
     std::unique_ptr<RefrigeratedCaseData> dataRefrigCase;
@@ -572,8 +583,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     EnergyPlusData(EnergyPlusData &&) = delete;
 
     void clear_state() override;
-
 };
 
-}
+} // namespace EnergyPlus
 #endif

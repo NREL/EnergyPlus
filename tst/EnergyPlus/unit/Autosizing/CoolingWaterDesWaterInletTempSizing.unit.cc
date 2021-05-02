@@ -49,8 +49,8 @@
 #include <gtest/gtest.h>
 
 #include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
 
 namespace EnergyPlus {
@@ -250,7 +250,8 @@ TEST_F(AutoSizingFixture, CoolingWaterDesWaterInletTempSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
-    eiooutput = std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Inlet Water Temperature [C], 15.00000\n");
+    eiooutput =
+        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Inlet Water Temperature [C], 15.00000\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -370,13 +371,14 @@ TEST_F(AutoSizingFixture, CoolingWaterDesWaterInletTempSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType); // cumulative of previous calls
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(12.0, sizedValue, 0.01); // hard-sized value
-    sizer.autoSizedValue = 0.0;         // reset for next test
+    sizer.autoSizedValue = 0.0;          // reset for next test
 
     EXPECT_FALSE(errorsFound);
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
-    eiooutput = std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Inlet Water Temperature [C], 15.00000\n"
-                            " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Design Inlet Water Temperature [C], 12.00000\n");
+    eiooutput =
+        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Inlet Water Temperature [C], 15.00000\n"
+                    " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Design Inlet Water Temperature [C], 12.00000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }
 

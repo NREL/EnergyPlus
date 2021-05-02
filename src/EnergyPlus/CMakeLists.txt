@@ -214,7 +214,6 @@ set(SRC
     DataTimings.hh
     DataUCSDSharedData.hh
     DataVectorTypes.hh
-    DataViewFactorInformation.cc
     DataViewFactorInformation.hh
     DataWater.hh
     DataWindowEquivalentLayer.hh
@@ -513,6 +512,7 @@ set(SRC
     PoweredInductionUnits.hh
     Psychrometrics.cc
     Psychrometrics.hh
+    PsychCacheData.hh
     Pumps.cc
     Pumps.hh
     PurchasedAirManager.cc
@@ -566,8 +566,6 @@ set(SRC
     SplitterComponent.hh
     StandardRatings.cc
     StandardRatings.hh
-    StateManagement.cc
-    StateManagement.hh
     SteamBaseboardRadiator.cc
     SteamBaseboardRadiator.hh
     SteamCoils.cc
@@ -772,7 +770,7 @@ target_link_libraries(
          airflownetworklib
          ssc)
 
-target_link_libraries(energypluslib PRIVATE project_options project_fp_options project_warnings)
+target_link_libraries(energypluslib PRIVATE project_options project_fp_options project_warnings cpp_pch_files)
 
 if(OPENGL_FOUND)
   target_link_libraries(energypluslib PUBLIC penumbra)

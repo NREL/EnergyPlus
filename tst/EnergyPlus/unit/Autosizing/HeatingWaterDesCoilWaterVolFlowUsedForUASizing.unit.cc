@@ -49,8 +49,8 @@
 #include <gtest/gtest.h>
 
 #include <EnergyPlus/Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 
 namespace EnergyPlus {
 

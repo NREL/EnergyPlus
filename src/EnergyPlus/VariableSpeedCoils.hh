@@ -276,67 +276,76 @@ namespace VariableSpeedCoils {
         bool reportCoilFinalSizes; // one time report of sizes to coil selection report
         Real64 capModFacTotal;     // coil  TotCapTempModFac * TotCapAirFFModFac * TotCapWaterFFModFac, for result for simulation peak reporting
 
-        //default constructor
+        // default constructor
         VariableSpeedCoilData()
-            : NumOfSpeeds(2), NormSpedLevel(DataGlobalConstants::MaxSpeedLevels), RatedWaterVolFlowRate(DataSizing::AutoSize), RatedWaterMassFlowRate(DataSizing::AutoSize),
-            RatedAirVolFlowRate(DataSizing::AutoSize), RatedCapHeat(DataSizing::AutoSize), RatedCapCoolTotal(DataSizing::AutoSize), MaxONOFFCyclesperHour(0.0), Twet_Rated(0.0),
-            Gamma_Rated(0.0), HOTGASREHEATFLG(0), HPTimeConstant(0.0), PLFFPLR(0), VSCoilTypeOfNum(0), SimFlag(false), DesignWaterMassFlowRate(0.0),
-            DesignWaterVolFlowRate(0.0), DesignAirMassFlowRate(0.0), DesignAirVolFlowRate(0.0), AirVolFlowRate(0.0), AirMassFlowRate(0.0),
-            InletAirPressure(0.0), InletAirDBTemp(0.0), InletAirHumRat(0.0), InletAirEnthalpy(0.0), OutletAirDBTemp(0.0), OutletAirHumRat(0.0),
-            OutletAirEnthalpy(0.0), WaterVolFlowRate(0.0), WaterMassFlowRate(0.0), InletWaterTemp(0.0), InletWaterEnthalpy(0.0), OutletWaterTemp(0.0),
-            OutletWaterEnthalpy(0.0), Power(0.0), QLoadTotal(0.0), QSensible(0.0), QLatent(0.0), QSource(0.0), QWasteHeat(0.0), Energy(0.0),
-            EnergyLoadTotal(0.0), EnergySensible(0.0), EnergyLatent(0.0), EnergySource(0.0), COP(0.0), RunFrac(0.0), PartLoadRatio(0.0),
-            RatedPowerHeat(0.0), RatedCOPHeat(0.0), RatedCapCoolSens(0.0), RatedPowerCool(0.0), RatedCOPCool(0.0), AirInletNodeNum(0),
-            AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0),
-            FindCompanionUpStreamCoil(true), IsDXCoilInZone(false), CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0), FanDelayTime(0.0),
-            // This one calls into a std::vector, so it's 0-indexed, so we initialize it to -1
-            MSHPDesignSpecIndex(-1), MSErrIndex(DataGlobalConstants::MaxSpeedLevels, 0), MSRatedPercentTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0),
-            MSRatedSHR(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedCOP(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedAirVolFlowPerRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0),
-            MSRatedAirVolFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedAirMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
-            MSRatedWaterVolFlowPerRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedWaterVolFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
-            MSRatedWaterMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedCBF(DataGlobalConstants::MaxSpeedLevels, 0.0), MSEffectiveAo(DataGlobalConstants::MaxSpeedLevels, 0.0),
-            MSCCapFTemp(DataGlobalConstants::MaxSpeedLevels, 0), MSCCapAirFFlow(DataGlobalConstants::MaxSpeedLevels, 0), MSCCapWaterFFlow(DataGlobalConstants::MaxSpeedLevels, 0), MSEIRFTemp(DataGlobalConstants::MaxSpeedLevels, 0),
-            MSEIRAirFFlow(DataGlobalConstants::MaxSpeedLevels, 0), MSEIRWaterFFlow(DataGlobalConstants::MaxSpeedLevels, 0), MSWasteHeat(DataGlobalConstants::MaxSpeedLevels, 0), MSWasteHeatFrac(DataGlobalConstants::MaxSpeedLevels, 0.0),
-            MSWHPumpPower(DataGlobalConstants::MaxSpeedLevels, 0.0), MSWHPumpPowerPerRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0), SpeedNumReport(0.0), SpeedRatioReport(0.0),
-            DefrostStrategy(0), DefrostControl(0), EIRFPLR(0), DefrostEIRFT(0), MinOATCompressor(0.0), OATempCompressorOn(0.0), MaxOATDefrost(0.0),
-            DefrostTime(0.0), DefrostCapacity(0.0), HPCompressorRuntime(0.0), HPCompressorRuntimeLast(0.0), TimeLeftToDefrost(0.0), DefrostPower(0.0),
-            DefrostConsumption(0.0), ReportCoolingCoilCrankcasePower(true), CrankcaseHeaterCapacity(0.0), CrankcaseHeaterPower(0.0),
-            MaxOATCrankcaseHeater(0.0), CrankcaseHeaterConsumption(0.0), CondenserInletNodeNum(0), CondenserType(DataHVACGlobals::AirCooled), ReportEvapCondVars(false),
-            EvapCondPumpElecNomPower(0.0), EvapCondPumpElecPower(0.0), EvapWaterConsumpRate(0.0), EvapCondPumpElecConsumption(0.0),
-            EvapWaterConsump(0.0), BasinHeaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0), BasinHeaterPower(0.0),
-            BasinHeaterSchedulePtr(0), EvapCondAirFlow(DataGlobalConstants::MaxSpeedLevels, 0.0), EvapCondEffect(DataGlobalConstants::MaxSpeedLevels, 0.0),
-            MSRatedEvapCondVolFlowPerRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0), EvapWaterSupplyMode(101), EvapWaterSupTankID(0),
-            EvapWaterTankDemandARRID(0), CondensateCollectMode(1001), CondensateTankID(0), CondensateTankSupplyARRID(0),
-            CondensateVdot(0.0), CondensateVol(0.0), CondInletTemp(0.0), SupplyFanIndex(0), SupplyFan_TypeNum(0), SourceAirMassFlowRate(0.0),
-            InletSourceAirTemp(0.0), InletSourceAirEnthalpy(0.0),
-            // begin varibles for HPWH
-            RatedCapWH(0.0),                  // Rated water heating Capacity [W]
-            InletAirTemperatureType(0),       // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
-            WHRatedInletDBTemp(0.0),          // Rated inlet air dry-bulb temperature [C]
-            WHRatedInletWBTemp(0.0),          // Rated inlet air wet-bulb temperature [C]
-            WHRatedInletWaterTemp(0.0),       // Rated condenser water inlet temperature [C]
-            HPWHCondPumpElecNomPower(0.0),    // Nominal power input to the condenser water circulation pump [W]
-            HPWHCondPumpFracToWater(1.0),     // Nominal power fraction to water for the condenser water circulation pump
-            RatedHPWHCondWaterFlow(0.0),      // Rated water flow rate through the condenser of the HPWH DX coil [m3/s]
-            ElecWaterHeatingPower(0.0),       // Total electric power consumed by compressor and condenser pump [W]
-            ElecWaterHeatingConsumption(0.0), // Total electric consumption by compressor and condenser pump [J]
-            FanPowerIncludedInCOP(false),     // Indicates that fan heat is included in heating capacity and COP
-            CondPumpHeatInCapacity(false),    // Indicates that condenser pump heat is included in heating capacity
-            CondPumpPowerInCOP(false),        // Indicates that condenser pump power is included in heating COP
-            AirVolFlowAutoSized(false),       // Used to report autosizing info for the HPWH DX coil
-            WaterVolFlowAutoSized(false),     // Used to report autosizing info for the HPWH DX coil
-            TotalHeatingEnergy(0.0),          // total water heating energy
-            TotalHeatingEnergyRate(0.0),      // total WH energy rate
-            bIsDesuperheater(false),          // whether the coil is used for a desuperheater, i.e. zero all the cooling capacity and power
-                                              // end variables for HPWH
-            reportCoilFinalSizes(true), // coil report
-            capModFacTotal(0.0)         // coil report
+            : NumOfSpeeds(2), NormSpedLevel(DataGlobalConstants::MaxSpeedLevels), RatedWaterVolFlowRate(DataSizing::AutoSize),
+              RatedWaterMassFlowRate(DataSizing::AutoSize), RatedAirVolFlowRate(DataSizing::AutoSize), RatedCapHeat(DataSizing::AutoSize),
+              RatedCapCoolTotal(DataSizing::AutoSize), MaxONOFFCyclesperHour(0.0), Twet_Rated(0.0), Gamma_Rated(0.0), HOTGASREHEATFLG(0),
+              HPTimeConstant(0.0), PLFFPLR(0), VSCoilTypeOfNum(0), SimFlag(false), DesignWaterMassFlowRate(0.0), DesignWaterVolFlowRate(0.0),
+              DesignAirMassFlowRate(0.0), DesignAirVolFlowRate(0.0), AirVolFlowRate(0.0), AirMassFlowRate(0.0), InletAirPressure(0.0),
+              InletAirDBTemp(0.0), InletAirHumRat(0.0), InletAirEnthalpy(0.0), OutletAirDBTemp(0.0), OutletAirHumRat(0.0), OutletAirEnthalpy(0.0),
+              WaterVolFlowRate(0.0), WaterMassFlowRate(0.0), InletWaterTemp(0.0), InletWaterEnthalpy(0.0), OutletWaterTemp(0.0),
+              OutletWaterEnthalpy(0.0), Power(0.0), QLoadTotal(0.0), QSensible(0.0), QLatent(0.0), QSource(0.0), QWasteHeat(0.0), Energy(0.0),
+              EnergyLoadTotal(0.0), EnergySensible(0.0), EnergyLatent(0.0), EnergySource(0.0), COP(0.0), RunFrac(0.0), PartLoadRatio(0.0),
+              RatedPowerHeat(0.0), RatedCOPHeat(0.0), RatedCapCoolSens(0.0), RatedPowerCool(0.0), RatedCOPCool(0.0), AirInletNodeNum(0),
+              AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0),
+              FindCompanionUpStreamCoil(true), IsDXCoilInZone(false), CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0), FanDelayTime(0.0),
+              // This one calls into a std::vector, so it's 0-indexed, so we initialize it to -1
+              MSHPDesignSpecIndex(-1), MSErrIndex(DataGlobalConstants::MaxSpeedLevels, 0),
+              MSRatedPercentTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              MSRatedSHR(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedCOP(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              MSRatedAirVolFlowPerRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              MSRatedAirVolFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedAirMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              MSRatedWaterVolFlowPerRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              MSRatedWaterVolFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedWaterMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              MSRatedCBF(DataGlobalConstants::MaxSpeedLevels, 0.0), MSEffectiveAo(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              MSCCapFTemp(DataGlobalConstants::MaxSpeedLevels, 0), MSCCapAirFFlow(DataGlobalConstants::MaxSpeedLevels, 0),
+              MSCCapWaterFFlow(DataGlobalConstants::MaxSpeedLevels, 0), MSEIRFTemp(DataGlobalConstants::MaxSpeedLevels, 0),
+              MSEIRAirFFlow(DataGlobalConstants::MaxSpeedLevels, 0), MSEIRWaterFFlow(DataGlobalConstants::MaxSpeedLevels, 0),
+              MSWasteHeat(DataGlobalConstants::MaxSpeedLevels, 0), MSWasteHeatFrac(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              MSWHPumpPower(DataGlobalConstants::MaxSpeedLevels, 0.0), MSWHPumpPowerPerRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              SpeedNumReport(0.0), SpeedRatioReport(0.0), DefrostStrategy(0), DefrostControl(0), EIRFPLR(0), DefrostEIRFT(0), MinOATCompressor(0.0),
+              OATempCompressorOn(0.0), MaxOATDefrost(0.0), DefrostTime(0.0), DefrostCapacity(0.0), HPCompressorRuntime(0.0),
+              HPCompressorRuntimeLast(0.0), TimeLeftToDefrost(0.0), DefrostPower(0.0), DefrostConsumption(0.0), ReportCoolingCoilCrankcasePower(true),
+              CrankcaseHeaterCapacity(0.0), CrankcaseHeaterPower(0.0), MaxOATCrankcaseHeater(0.0), CrankcaseHeaterConsumption(0.0),
+              CondenserInletNodeNum(0), CondenserType(DataHVACGlobals::AirCooled), ReportEvapCondVars(false), EvapCondPumpElecNomPower(0.0),
+              EvapCondPumpElecPower(0.0), EvapWaterConsumpRate(0.0), EvapCondPumpElecConsumption(0.0), EvapWaterConsump(0.0),
+              BasinHeaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0), BasinHeaterPower(0.0),
+              BasinHeaterSchedulePtr(0), EvapCondAirFlow(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              EvapCondEffect(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              MSRatedEvapCondVolFlowPerRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0), EvapWaterSupplyMode(101), EvapWaterSupTankID(0),
+              EvapWaterTankDemandARRID(0), CondensateCollectMode(1001), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0),
+              CondensateVol(0.0), CondInletTemp(0.0), SupplyFanIndex(0), SupplyFan_TypeNum(0), SourceAirMassFlowRate(0.0), InletSourceAirTemp(0.0),
+              InletSourceAirEnthalpy(0.0),
+              // begin varibles for HPWH
+              RatedCapWH(0.0),                  // Rated water heating Capacity [W]
+              InletAirTemperatureType(0),       // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
+              WHRatedInletDBTemp(0.0),          // Rated inlet air dry-bulb temperature [C]
+              WHRatedInletWBTemp(0.0),          // Rated inlet air wet-bulb temperature [C]
+              WHRatedInletWaterTemp(0.0),       // Rated condenser water inlet temperature [C]
+              HPWHCondPumpElecNomPower(0.0),    // Nominal power input to the condenser water circulation pump [W]
+              HPWHCondPumpFracToWater(1.0),     // Nominal power fraction to water for the condenser water circulation pump
+              RatedHPWHCondWaterFlow(0.0),      // Rated water flow rate through the condenser of the HPWH DX coil [m3/s]
+              ElecWaterHeatingPower(0.0),       // Total electric power consumed by compressor and condenser pump [W]
+              ElecWaterHeatingConsumption(0.0), // Total electric consumption by compressor and condenser pump [J]
+              FanPowerIncludedInCOP(false),     // Indicates that fan heat is included in heating capacity and COP
+              CondPumpHeatInCapacity(false),    // Indicates that condenser pump heat is included in heating capacity
+              CondPumpPowerInCOP(false),        // Indicates that condenser pump power is included in heating COP
+              AirVolFlowAutoSized(false),       // Used to report autosizing info for the HPWH DX coil
+              WaterVolFlowAutoSized(false),     // Used to report autosizing info for the HPWH DX coil
+              TotalHeatingEnergy(0.0),          // total water heating energy
+              TotalHeatingEnergyRate(0.0),      // total WH energy rate
+              bIsDesuperheater(false),          // whether the coil is used for a desuperheater, i.e. zero all the cooling capacity and power
+                                                // end variables for HPWH
+              reportCoilFinalSizes(true),       // coil report
+              capModFacTotal(0.0)               // coil report
 
         {
         }
     };
 
-    void SimVariableSpeedCoils(EnergyPlusData &state, std::string const &CompName,   // Coil Name
+    void SimVariableSpeedCoils(EnergyPlusData &state,
+                               std::string const &CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name
                                int const CyclingScheme,       // Continuous fan OR cycling compressor
                                Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -356,7 +365,8 @@ namespace VariableSpeedCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum,                // Current DXCoilNum under simulation
+    void InitVarSpeedCoil(EnergyPlusData &state,
+                          int const DXCoilNum,                // Current DXCoilNum under simulation
                           Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
                           Real64 const HPTimeConstant,        // Heat pump time constant [s]
                           Real64 const FanDelayTime,          // Fan delay time, time delay for the HP's fan to
@@ -524,7 +534,8 @@ namespace VariableSpeedCoils {
 
 } // namespace VariableSpeedCoils
 
-struct VariableSpeedCoilsData : BaseGlobalStruct {
+struct VariableSpeedCoilsData : BaseGlobalStruct
+{
 
     Real64 const RatedInletAirTemp = 26.6667;       // 26.6667C or 80F
     Real64 const RatedInletWetBulbTemp = 19.4444;   // 19.44 or 67F, cooling mode
@@ -535,9 +546,9 @@ struct VariableSpeedCoilsData : BaseGlobalStruct {
     Real64 const RatedInletWaterTempHeat = 21.1111; // 21.11C or 70F, heating mode
     Real64 const RatedAmbAirTempHeat = 8.3333;      // 8.33 or 47F, heating mode
     Real64 const RatedAmbAirWBHeat = 6.1111;        // 8.33 or 43F, heating mode, rated wet bulb temperature
-                                                       // Water Systems
-    int const CondensateDiscarded = 1001; // default mode where water is "lost"
-    int const CondensateToTank = 1002;    // collect coil condensate from air and store in water storage tank
+                                                    // Water Systems
+    int const CondensateDiscarded = 1001;           // default mode where water is "lost"
+    int const CondensateToTank = 1002;              // collect coil condensate from air and store in water storage tank
 
     int const WaterSupplyFromMains = 101;
     int const WaterSupplyFromTank = 102;
@@ -552,15 +563,15 @@ struct VariableSpeedCoilsData : BaseGlobalStruct {
     // Defrost strategy (heat pump only)
     int const ReverseCycle = 1; // uses reverse cycle defrost strategy
     int const Resistive = 2;    // uses electric resistance heater for defrost
-                               // Defrost control  (heat pump only)
-    int const Timed = 1;    // defrost cycle is timed
-    int const OnDemand = 2; // defrost cycle occurs only when required
+                                // Defrost control  (heat pump only)
+    int const Timed = 1;        // defrost cycle is timed
+    int const OnDemand = 2;     // defrost cycle occurs only when required
 
     int NumVarSpeedCoils = 0; // The Number of Water to Air Heat Pumps found in the Input
 
     bool MyOneTimeFlag = true;     // one time allocation flag
     bool GetCoilsInputFlag = true; // Flag set to make sure you get input once
-                                  // LOGICAL, ALLOCATABLE, DIMENSION(:) :: MySizeFlag
+                                   // LOGICAL, ALLOCATABLE, DIMENSION(:) :: MySizeFlag
 
     Real64 SourceSideMassFlowRate = 0.0; // Source Side Mass flow rate [Kg/s]
     Real64 SourceSideInletTemp = 0.0;    // Source Side Inlet Temperature [C]
@@ -584,7 +595,7 @@ struct VariableSpeedCoilsData : BaseGlobalStruct {
     Real64 VSHPWHHeatingCapacity = 0.0; // Used by Heat Pump:Water Heater object as total water heating capacity [W]
     Real64 VSHPWHHeatingCOP = 0.0;      // Used by Heat Pump:Water Heater object as water heating COP [W/W]
 
-    Array1D<VariableSpeedCoils::VariableSpeedCoilData> VarSpeedCoil;
+    EPVector<VariableSpeedCoils::VariableSpeedCoilData> VarSpeedCoil;
     bool firstTime = true;
 
     Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
@@ -597,19 +608,19 @@ struct VariableSpeedCoilsData : BaseGlobalStruct {
     Real64 LoadSideInletEnth_Init = 0.0;
     Real64 CpAir_Init = 0.0;
 
-    Real64 OutdoorCoilT = 0.0;              // Outdoor coil temperature (C)
-    Real64 OutdoorCoildw = 0.0;             // Outdoor coil delta w assuming coil temp of OutdoorCoilT (kg/kg)
-    Real64 OutdoorDryBulb = 0.0;            // Outdoor dry-bulb temperature at condenser (C)
-    Real64 OutdoorWetBulb = 0.0;            // Outdoor wet-bulb temperature at condenser (C)
-    Real64 OutdoorHumRat = 0.0;             // Outdoor humidity ratio at condenser (kg/kg)
-    Real64 OutdoorPressure = 0.0;           // Outdoor barometric pressure at condenser (Pa)
-    Real64 FractionalDefrostTime = 0.0;     // Fraction of time step system is in defrost
-    Real64 HeatingCapacityMultiplier = 0.0; // Multiplier for heating capacity when system is in defrost
-    Real64 InputPowerMultiplier = 0.0;      // Multiplier for power when system is in defrost
-    Real64 LoadDueToDefrost = 0.0;          // Additional load due to defrost
-    Real64 CrankcaseHeatingPower = 0.0;     // power due to crankcase heater
-    Real64 DefrostEIRTempModFac = 0.0;      // EIR modifier for defrost (function of entering wetbulb, outside drybulb)
-    Real64 TotRatedCapacity = 0.0;          // total rated capacity at the given speed and speed ratio for defrosting
+    Real64 OutdoorCoilT = 0.0;                                  // Outdoor coil temperature (C)
+    Real64 OutdoorCoildw = 0.0;                                 // Outdoor coil delta w assuming coil temp of OutdoorCoilT (kg/kg)
+    Real64 OutdoorDryBulb = 0.0;                                // Outdoor dry-bulb temperature at condenser (C)
+    Real64 OutdoorWetBulb = 0.0;                                // Outdoor wet-bulb temperature at condenser (C)
+    Real64 OutdoorHumRat = 0.0;                                 // Outdoor humidity ratio at condenser (kg/kg)
+    Real64 OutdoorPressure = 0.0;                               // Outdoor barometric pressure at condenser (Pa)
+    Real64 FractionalDefrostTime = 0.0;                         // Fraction of time step system is in defrost
+    Real64 HeatingCapacityMultiplier = 0.0;                     // Multiplier for heating capacity when system is in defrost
+    Real64 InputPowerMultiplier = 0.0;                          // Multiplier for power when system is in defrost
+    Real64 LoadDueToDefrost = 0.0;                              // Additional load due to defrost
+    Real64 CrankcaseHeatingPower = 0.0;                         // power due to crankcase heater
+    Real64 DefrostEIRTempModFac = 0.0;                          // EIR modifier for defrost (function of entering wetbulb, outside drybulb)
+    Real64 TotRatedCapacity = 0.0;                              // total rated capacity at the given speed and speed ratio for defrosting
     Real64 OutdoorDryBulb_CalcVarSpeedCoilCooling = 0.0;        // Outdoor dry-bulb temperature at condenser (C)
     Real64 OutdoorWetBulb_CalcVarSpeedCoilCooling = 0.0;        // Outdoor wet-bulb temperature at condenser (C)
     Real64 OutdoorHumRat_CalcVarSpeedCoilCooling = 0.0;         // Outdoor humidity ratio at condenser (kg/kg)

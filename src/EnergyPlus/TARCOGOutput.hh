@@ -55,30 +55,33 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 
 namespace EnergyPlus {
 
 namespace TARCOGOutput {
 
-    struct Files {
-      std::string DBGD;
-      bool WriteDebugOutput{false};
+    struct Files
+    {
+        std::string DBGD;
+        bool WriteDebugOutput{false};
 
-      std::string WINCogFileName{"test.w7"};
-      InputOutputFile WINCogFile{WINCogFileName};
+        std::string WINCogFileName{"test.w7"};
+        InputOutputFile WINCogFile{WINCogFileName};
 
-     // Intermediate debug files
-      std::string TarcogIterationsFileName{"TarcogIterations.dbg"};
-      InputOutputFile TarcogIterationsFile{TarcogIterationsFileName};
+        // Intermediate debug files
+        std::string TarcogIterationsFileName{"TarcogIterations.dbg"};
+        InputOutputFile TarcogIterationsFile{TarcogIterationsFileName};
 
-      std::string IterationCSVName{"IterationResults.csv"};
-      InputOutputFile IterationCSVFile{IterationCSVName};
+        std::string IterationCSVName{"IterationResults.csv"};
+        InputOutputFile IterationCSVFile{IterationCSVName};
 
-      std::string DebugOutputFileName{"Tarcog.dbg"};
-      InputOutputFile DebugOutputFile{DebugOutputFileName};
+        std::string DebugOutputFileName{"Tarcog.dbg"};
+        InputOutputFile DebugOutputFile{DebugOutputFileName};
     };
 
-    void WriteInputArguments(EnergyPlusData &state, InputOutputFile &InArgumentsFile,
+    void WriteInputArguments(EnergyPlusData &state,
+                             InputOutputFile &InArgumentsFile,
                              const std::string &DBGD,
                              Real64 tout,
                              Real64 tind,
@@ -98,7 +101,7 @@ namespace TARCOGOutput {
                              Real64 hout,
                              Real64 hin,
                              int standard,
-                             int ThermalMod,
+                             TARCOGParams::TARCOGThermalModel ThermalMod,
                              Real64 SDScalar,
                              Real64 height,
                              Real64 heightt,
@@ -106,7 +109,7 @@ namespace TARCOGOutput {
                              Real64 tilt,
                              Real64 totsol,
                              int nlayer,
-                             const Array1D_int &LayerType,
+                             const Array1D<TARCOGParams::TARCOGLayerType> &LayerType,
                              const Array1D<Real64> &thick,
                              const Array1D<Real64> &scon,
                              const Array1D<Real64> &asol,
@@ -149,7 +152,7 @@ namespace TARCOGOutput {
                                 Real64 Gout,
                                 Real64 Gin,
                                 int nlayer,
-                                const Array1D_int &LayerType,
+                                const Array1D<TARCOGParams::TARCOGLayerType> &LayerType,
                                 const Array1D_int &nmix,
                                 Array2A<Real64> frct,
                                 const Array1D<Real64> &thick,
@@ -185,7 +188,7 @@ namespace TARCOGOutput {
                               Real64 hrout,
                               const Array1D<Real64> &Ra,
                               const Array1D<Real64> &Nu,
-                              const Array1D_int &LayerType,
+                              const Array1D<TARCOGParams::TARCOGLayerType> &LayerType,
                               const Array1D<Real64> &Ebf,
                               const Array1D<Real64> &Ebb,
                               const Array1D<Real64> &Rf,
@@ -218,7 +221,8 @@ namespace TARCOGOutput {
                           const Array1D<Real64> &hs,
                           int &nperr);
 
-    void WriteTARCOGInputFile(EnergyPlusData &state, Files &files,
+    void WriteTARCOGInputFile(EnergyPlusData &state,
+                              Files &files,
                               std::string const &VerNum,
                               Real64 tout,
                               Real64 tind,
@@ -234,7 +238,7 @@ namespace TARCOGOutput {
                               Real64 fclr,
                               Real64 VacuumPressure,
                               Real64 VacuumMaxGapThickness,
-                              int CalcDeflection,
+                              TARCOGParams::DeflectionCalculation CalcDeflection,
                               Real64 Pa,
                               Real64 Pini,
                               Real64 Tini,
@@ -242,7 +246,7 @@ namespace TARCOGOutput {
                               Real64 hout,
                               Real64 hin,
                               int standard,
-                              int ThermalMod,
+                              TARCOGParams::TARCOGThermalModel ThermalMod,
                               Real64 SDScalar,
                               Real64 height,
                               Real64 heightt,
@@ -250,7 +254,7 @@ namespace TARCOGOutput {
                               Real64 tilt,
                               Real64 totsol,
                               int nlayer,
-                              const Array1D_int &LayerType,
+                              const Array1D<TARCOGParams::TARCOGLayerType> &LayerType,
                               const Array1D<Real64> &thick,
                               const Array1D<Real64> &scon,
                               const Array1D<Real64> &YoungsMod,
@@ -294,7 +298,8 @@ namespace TARCOGOutput {
 
 } // namespace TARCOGOutput
 
-struct TARCOGOutputData : BaseGlobalStruct {
+struct TARCOGOutputData : BaseGlobalStruct
+{
     int winID = 0;
     int iguID = 0;
 

@@ -158,33 +158,7 @@ namespace Psychrometrics {
                                             // PsyTwbFnTdbWPb_raw (raw calc) | PsyPsatFnTemp_cache  19 - PsyPsatFnTemp_raw (raw calc)
 #endif
 
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // MODULE VARIABLE DEFINITIONS:
-
-    // Subroutine Specifications for the Module
-
-    // Functions
-
-    void clear_state()
-    {
-
-#ifdef EP_cache_PsyTwbFnTdbWPb
-        cached_Twb.deallocate();
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-        cached_Psat.deallocate();
-#endif
-#ifdef EP_cache_PsyTsatFnPb
-        cached_Tsat.deallocate();
-#endif
-#ifdef EP_cache_PsyTsatFnHPb
-        cached_Tsat_HPb.deallocate();
-#endif
-    }
-
-    void InitializePsychRoutines()
+    void InitializePsychRoutines([[maybe_unused]] EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -196,49 +170,21 @@ namespace Psychrometrics {
         // PURPOSE OF THIS SUBROUTINE:
         // Initializes some variables for PsychRoutines
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
 #ifdef EP_cache_PsyTwbFnTdbWPb
-        cached_Twb.allocate({0, twbcache_size});
+        state.dataPsychCache->cached_Twb.allocate({0, twbcache_size});
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
-        cached_Psat.allocate({0, psatcache_size});
+        state.dataPsychCache->cached_Psat.allocate({0, psatcache_size});
 #endif
 #ifdef EP_cache_PsyTsatFnPb
-        cached_Tsat.allocate({0, tsatcache_size});
+        state.dataPsychCache->cached_Tsat.allocate({0, tsatcache_size});
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
-        cached_Tsat_HPb.allocate({0, tsat_hbp_cache_size});
+        state.dataPsychCache->cached_Tsat_HPb.allocate({0, tsat_hbp_cache_size});
 #endif
     }
 
-#ifdef EP_psych_stats
-    void ShowPsychrometricSummary(InputOutputFile &auditFile)
-#else
-    void ShowPsychrometricSummary([[maybe_unused]] InputOutputFile &auditFile)
-#endif
+    void ShowPsychrometricSummary([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] InputOutputFile &auditFile)
     {
 
         // SUBROUTINE INFORMATION:
@@ -277,14 +223,13 @@ namespace Psychrometrics {
         Real64 AverageIterations;
 
         if (!auditFile.good()) return;
-        if (any_gt(state.dataPsychrometrics->NumTimesCalled, 0)) {
+        if (any_gt(state.dataPsychCache->NumTimesCalled, 0)) {
             print(auditFile, "RoutineName,#times Called,Avg Iterations\n");
             for (Loop = 1; Loop <= NumPsychMonitors; ++Loop) {
                 if (!PsyReportIt(Loop)) continue;
-                const auto istring = fmt::to_string(state.dataPsychrometrics->NumTimesCalled(Loop));
-                if (state.dataPsychrometrics->NumIterations(Loop) > 0) {
-                    AverageIterations =
-                        double(state.dataPsychrometrics->NumIterations(Loop)) / double(state.dataPsychrometrics->NumTimesCalled(Loop));
+                const auto istring = fmt::to_string(state.dataPsychCache->NumTimesCalled(Loop));
+                if (state.dataPsychCache->NumIterations(Loop) > 0) {
+                    AverageIterations = double(state.dataPsychCache->NumIterations(Loop)) / double(state.dataPsychCache->NumTimesCalled(Loop));
                     print(auditFile, "{},{},{:.2R}\n", PsyRoutineNames(Loop), istring, AverageIterations);
                 } else {
                     print(auditFile, "{},{}\n", PsyRoutineNames(Loop), istring);
@@ -442,6 +387,8 @@ namespace Psychrometrics {
         Pb_tag = bit_shift(Pb_tag, -Grid_Shift);
         hash = bit_and(bit_xor(Tdb_tag, bit_xor(W_tag, Pb_tag)), Int64(twbcache_size - 1));
 
+        auto &cached_Twb = state.dataPsychCache->cached_Twb;
+
         if (cached_Twb(hash).iTdb != Tdb_tag || cached_Twb(hash).iW != W_tag || cached_Twb(hash).iPb != Pb_tag) {
             cached_Twb(hash).iTdb = Tdb_tag;
             cached_Twb(hash).iW = W_tag;
@@ -519,7 +466,7 @@ namespace Psychrometrics {
         bool FlagError;  // set when errors should be flagged
 
 #ifdef EP_psych_stats
-        ++state.dataPsychrometrics->NumTimesCalled(iPsyTwbFnTdbWPb);
+        ++state.dataPsychCache->NumTimesCalled(iPsyTwbFnTdbWPb);
 #endif
 
         // CHECK TDB IN RANGE.
@@ -631,7 +578,7 @@ namespace Psychrometrics {
         } // End of Iteration Loop
 
 #ifdef EP_psych_stats
-        state.dataPsychrometrics->NumIterations(iPsyTwbFnTdbWPb) += iter;
+        state.dataPsychCache->NumIterations(iPsyTwbFnTdbWPb) += iter;
 #endif
 
         // Wet bulb temperature has not converged after maximum specified
@@ -800,7 +747,7 @@ namespace Psychrometrics {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
 #ifdef EP_psych_stats
-        ++state.dataPsychrometrics->NumTimesCalled(iPsyPsatFnTemp);
+        ++state.dataPsychCache->NumTimesCalled(iPsyPsatFnTemp);
 #endif
 
         // CHECK T IN RANGE.
@@ -1048,7 +995,7 @@ namespace Psychrometrics {
         }
 
 #ifdef EP_psych_stats
-        ++state.dataPsychrometrics->NumTimesCalled(iPsyTsatFnHPb);
+        ++state.dataPsychCache->NumTimesCalled(iPsyTsatFnHPb);
 #endif
 
         FlagError = false;
@@ -1122,7 +1069,7 @@ namespace Psychrometrics {
         if (std::abs(PB - 1.0133e5) / 1.0133e5 > 0.01) {
             IterCount = 0;
             T1 = T;
-            H1 = PsyHFnTdbW(T1, PsyWFnTdbTwbPb(state, T1, T1, PB));
+            H1 = PsyHFnTdbW(T1, PsyWFnTdbTwbPb(state, T1, T1, PB, CalledFrom));
             Y1 = H1 - Hloc;
             if (std::abs(Y1 / Hloc) <= 0.1e-4) {
                 T = T1;
@@ -1130,7 +1077,7 @@ namespace Psychrometrics {
                 T2 = T1 * 0.9;
                 while (IterCount <= 30) {
                     ++IterCount;
-                    H2 = PsyHFnTdbW(T2, PsyWFnTdbTwbPb(state, T2, T2, PB));
+                    H2 = PsyHFnTdbW(T2, PsyWFnTdbTwbPb(state, T2, T2, PB, CalledFrom));
                     Y2 = H2 - Hloc;
                     if (std::abs(Y2 / Hloc) <= 0.1e-4 || Y2 == Y1) {
                         T = T2;
@@ -1400,7 +1347,7 @@ namespace Psychrometrics {
         int iter;       // Iteration counter
 
 #ifdef EP_psych_stats
-        ++state.dataPsychrometrics->NumTimesCalled(iPsyTsatFnPb);
+        ++state.dataPsychCache->NumTimesCalled(iPsyTsatFnPb);
 #endif
 
         // Check press in range.
@@ -1481,7 +1428,7 @@ namespace Psychrometrics {
         } // End If for the Pressure Range Checking
 
 #ifdef EP_psych_stats
-        state.dataPsychrometrics->NumIterations(iPsyTsatFnPb) += iter;
+        state.dataPsychCache->NumIterations(iPsyTsatFnPb) += iter;
 #endif
 
 #ifdef EP_psych_errors

@@ -67,7 +67,8 @@ namespace EnergyPlus {
 
 namespace GroundTemperatureManager {
 
-    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &objectType_str, std::string const &objectName)
+    std::shared_ptr<BaseGroundTempsModel>
+    GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &objectType_str, std::string const &objectName)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Matt Mitchell
@@ -82,7 +83,7 @@ namespace GroundTemperatureManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int objectType(0);
 
-        auto & CurrentModuleObjects = state.dataGrndTempModelMgr->CurrentModuleObjects;
+        auto &CurrentModuleObjects = state.dataGrndTempModelMgr->CurrentModuleObjects;
 
         std::string objectType_str_UPPERCase = UtilityRoutines::MakeUPPERCase(objectType_str);
 
@@ -116,7 +117,6 @@ namespace GroundTemperatureManager {
                 return state.dataGrndTempModelMgr->groundTempModels[i];
             }
         }
-
 
         // If not found, create new instance of the model
         if (objectType == objectType_KusudaGroundTemp) {
