@@ -2910,8 +2910,8 @@ namespace WindowComplexManager {
                 tsky = state.dataEnvrn->SkyTempKelvin;
                 Ebout = state.dataWindowComplexManager->sigma * pow_4(tout);
                 outir = state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *
-                            (state.dataSurface->AirSkyRadSplit(SurfNum) * state.dataWindowComplexManager->sigma * pow_4(tsky) +
-                             (1.0 - state.dataSurface->AirSkyRadSplit(SurfNum)) * Ebout) +
+                            (state.dataSurface->SurfAirSkyRadSplit(SurfNum) * state.dataWindowComplexManager->sigma * pow_4(tsky) +
+                             (1.0 - state.dataSurface->SurfAirSkyRadSplit(SurfNum)) * Ebout) +
                         state.dataSurface->Surface(SurfNum).ViewFactorGroundIR * Ebout + OutSrdIR;
             }
 

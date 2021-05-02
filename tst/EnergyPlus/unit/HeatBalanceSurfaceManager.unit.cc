@@ -1899,7 +1899,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 
     InitSurfaceHeatBalance(*state);
 
-    state->dataSurface->AirSkyRadSplit.allocate(6);
+    state->dataSurface->SurfAirSkyRadSplit.allocate(6);
     state->dataScheduleMgr->Schedule(1).CurrentValue = 25.0; // Srd Srfs Temp
     state->dataScheduleMgr->Schedule(2).CurrentValue = 15.0; // Sky temp
     state->dataScheduleMgr->Schedule(3).CurrentValue = 22.0; // Grd temp
@@ -1909,7 +1909,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
         state->dataHeatBalSurf->TH(1, 1, SurfNum) = 20;           // Surf temp
         state->dataSurface->SurfOutDryBulbTemp(SurfNum) = 22; // Air temp
         state->dataSurface->SurfExtConvCoeff(SurfNum) = -6;
-        state->dataSurface->AirSkyRadSplit(SurfNum) = 1.0;
+        state->dataSurface->SurfAirSkyRadSplit(SurfNum) = 1.0;
     }
     CalcHeatBalanceOutsideSurf(*state);
 

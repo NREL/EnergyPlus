@@ -225,12 +225,12 @@ namespace SolarReflectionManager {
 
         state.dataSolarReflectionManager->SolReflRecSurf.allocate(state.dataSolarReflectionManager->TotSolReflRecSurf);
 
-        state.dataSurface->ReflFacBmToDiffSolObs.dimension(24, state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->ReflFacBmToDiffSolGnd.dimension(24, state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->ReflFacBmToBmSolObs.dimension(24, state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->ReflFacSkySolObs.dimension(state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->ReflFacSkySolGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->CosIncAveBmToBmSolObs.dimension(24, state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfReflFacBmToDiffSolObs.dimension(24, state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfReflFacBmToDiffSolGnd.dimension(24, state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfReflFacBmToBmSolObs.dimension(24, state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfReflFacSkySolObs.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfReflFacSkySolGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfCosIncAveBmToBmSolObs.dimension(24, state.dataSurface->TotSurfaces, 0.0);
 
         // Only surfaces with sun exposure can receive solar reflection from ground or onstructions
         //  Shading surfaces are always not exposed to solar (ExtSolar = False)
@@ -581,14 +581,14 @@ namespace SolarReflectionManager {
             } else {
                 DisplayString(state, "Updating Beam-to-Diffuse Exterior Solar Reflection Factors");
             }
-            state.dataSurface->ReflFacBmToDiffSolObs = 0.0;
-            state.dataSurface->ReflFacBmToDiffSolGnd = 0.0;
+            state.dataSurface->SurfReflFacBmToDiffSolObs = 0.0;
+            state.dataSurface->SurfReflFacBmToDiffSolGnd = 0.0;
             for (state.dataSolarReflectionManager->IHr = 1; state.dataSolarReflectionManager->IHr <= 24; ++state.dataSolarReflectionManager->IHr) {
                 FigureBeamSolDiffuseReflFactors(state, state.dataSolarReflectionManager->IHr);
             }    // End of IHr loop
         } else { // timestep integrated solar, use current hour of day
-            state.dataSurface->ReflFacBmToDiffSolObs(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
-            state.dataSurface->ReflFacBmToDiffSolGnd(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
+            state.dataSurface->SurfReflFacBmToDiffSolObs(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
+            state.dataSurface->SurfReflFacBmToDiffSolGnd(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
             FigureBeamSolDiffuseReflFactors(state, state.dataGlobal->HourOfDay);
         }
     }
@@ -617,7 +617,7 @@ namespace SolarReflectionManager {
         ReflBmToDiffSolGnd = 0.0;
 
         // Unit vector to sun
-        state.dataSolarReflectionManager->SunVec = state.dataSurface->SUNCOSHR(iHour, {1, 3});
+        state.dataSolarReflectionManager->SunVec = state.dataSurface->SurfSunCosHourly(iHour, {1, 3});
 
         // loop through each surface that can receive beam solar reflected as diffuse solar from other surfaces
         for (state.dataSolarReflectionManager->RecSurfNum = 1;
@@ -788,7 +788,7 @@ namespace SolarReflectionManager {
                         } else {
                             // Ray hits ground (in this case we do not multiply by BmReflSolRadiance since
                             // ground reflectance and cos of incidence angle of sun on
-                            // ground is taken into account later when ReflFacBmToDiffSolGnd is used)
+                            // ground is taken into account later when SurfReflFacBmToDiffSolGnd is used)
                             state.dataSolarReflectionManager->dReflBeamToDiffSol =
                                 state.dataSolarReflectionManager->SolReflRecSurf(state.dataSolarReflectionManager->RecSurfNum)
                                     .dOmegaRay(state.dataSolarReflectionManager->RayNum) *
@@ -802,25 +802,25 @@ namespace SolarReflectionManager {
             }     // End of loop over receiving points
 
             // Average over receiving points
-            state.dataSurface->ReflFacBmToDiffSolObs(iHour, state.dataSolarReflectionManager->SurfNum) = 0.0;
-            state.dataSurface->ReflFacBmToDiffSolGnd(iHour, state.dataSolarReflectionManager->SurfNum) = 0.0;
+            state.dataSurface->SurfReflFacBmToDiffSolObs(iHour, state.dataSolarReflectionManager->SurfNum) = 0.0;
+            state.dataSurface->SurfReflFacBmToDiffSolGnd(iHour, state.dataSolarReflectionManager->SurfNum) = 0.0;
             state.dataSolarReflectionManager->NumRecPts =
                 state.dataSolarReflectionManager->SolReflRecSurf(state.dataSolarReflectionManager->RecSurfNum).NumRecPts;
             for (state.dataSolarReflectionManager->RecPtNum = 1;
                  state.dataSolarReflectionManager->RecPtNum <= state.dataSolarReflectionManager->NumRecPts;
                  ++state.dataSolarReflectionManager->RecPtNum) {
-                state.dataSurface->ReflFacBmToDiffSolObs(iHour, state.dataSolarReflectionManager->SurfNum) +=
+                state.dataSurface->SurfReflFacBmToDiffSolObs(iHour, state.dataSolarReflectionManager->SurfNum) +=
                     ReflBmToDiffSolObs(state.dataSolarReflectionManager->RecPtNum);
-                state.dataSurface->ReflFacBmToDiffSolGnd(iHour, state.dataSolarReflectionManager->SurfNum) +=
+                state.dataSurface->SurfReflFacBmToDiffSolGnd(iHour, state.dataSolarReflectionManager->SurfNum) +=
                     ReflBmToDiffSolGnd(state.dataSolarReflectionManager->RecPtNum);
             }
-            state.dataSurface->ReflFacBmToDiffSolObs(iHour, state.dataSolarReflectionManager->SurfNum) /= state.dataSolarReflectionManager->NumRecPts;
-            state.dataSurface->ReflFacBmToDiffSolGnd(iHour, state.dataSolarReflectionManager->SurfNum) /= state.dataSolarReflectionManager->NumRecPts;
+            state.dataSurface->SurfReflFacBmToDiffSolObs(iHour, state.dataSolarReflectionManager->SurfNum) /= state.dataSolarReflectionManager->NumRecPts;
+            state.dataSurface->SurfReflFacBmToDiffSolGnd(iHour, state.dataSolarReflectionManager->SurfNum) /= state.dataSolarReflectionManager->NumRecPts;
 
-            // Do not allow ReflFacBmToDiffSolGnd to exceed the surface's unobstructed ground view factor
-            state.dataSurface->ReflFacBmToDiffSolGnd(iHour, state.dataSolarReflectionManager->SurfNum) =
+            // Do not allow SurfReflFacBmToDiffSolGnd to exceed the surface's unobstructed ground view factor
+            state.dataSurface->SurfReflFacBmToDiffSolGnd(iHour, state.dataSolarReflectionManager->SurfNum) =
                 min(0.5 * (1.0 - state.dataSurface->Surface(state.dataSolarReflectionManager->SurfNum).CosTilt),
-                    state.dataSurface->ReflFacBmToDiffSolGnd(iHour, state.dataSolarReflectionManager->SurfNum));
+                    state.dataSurface->SurfReflFacBmToDiffSolGnd(iHour, state.dataSolarReflectionManager->SurfNum));
             // Note: the above factors are dimensionless; they are equal to
             // (W/m2 reflected solar incident on SurfNum)/(W/m2 beam normal solar)
         } // End of loop over receiving surfaces
@@ -851,15 +851,15 @@ namespace SolarReflectionManager {
             } else {
                 DisplayString(state, "Updating Beam-to-Beam Exterior Solar Reflection Factors");
             }
-            state.dataSurface->ReflFacBmToBmSolObs = 0.0;
-            state.dataSurface->CosIncAveBmToBmSolObs = 0.0;
+            state.dataSurface->SurfReflFacBmToBmSolObs = 0.0;
+            state.dataSurface->SurfCosIncAveBmToBmSolObs = 0.0;
             for (state.dataSolarReflectionManager->NumHr = 1; state.dataSolarReflectionManager->NumHr <= 24;
                  ++state.dataSolarReflectionManager->NumHr) {
                 FigureBeamSolSpecularReflFactors(state, state.dataSolarReflectionManager->NumHr);
             }    // End of NumHr loop
         } else { // timestep integrated solar, use current hour of day
-            state.dataSurface->ReflFacBmToBmSolObs(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
-            state.dataSurface->CosIncAveBmToBmSolObs(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
+            state.dataSurface->SurfReflFacBmToBmSolObs(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
+            state.dataSurface->SurfCosIncAveBmToBmSolObs(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
             FigureBeamSolSpecularReflFactors(state, state.dataGlobal->HourOfDay);
         }
     }
@@ -910,10 +910,10 @@ namespace SolarReflectionManager {
         ReflBmToDiffSolObs = 0.0;
         ReflFacTimesCosIncSum = 0.0;
 
-        if (state.dataSurface->SUNCOSHR(iHour, 3) < DataEnvironment::SunIsUpValue) return; // Skip if sun is below horizon
+        if (state.dataSurface->SurfSunCosHourly(iHour, 3) < DataEnvironment::SunIsUpValue) return; // Skip if sun is below horizon
 
         // Unit vector to sun
-        state.dataSolarReflectionManager->SunVect = state.dataSurface->SUNCOSHR(iHour, {1, 3});
+        state.dataSolarReflectionManager->SunVect = state.dataSurface->SurfSunCosHourly(iHour, {1, 3});
 
         for (int RecSurfNum = 1; RecSurfNum <= state.dataSolarReflectionManager->TotSolReflRecSurf; ++RecSurfNum) {
             int const SurfNum =
@@ -1073,11 +1073,11 @@ namespace SolarReflectionManager {
                     } else {
                         state.dataSolarReflectionManager->CosIncWeighted = 0.0;
                     }
-                    state.dataSurface->CosIncAveBmToBmSolObs(iHour, SurfNum) += state.dataSolarReflectionManager->CosIncWeighted;
-                    state.dataSurface->ReflFacBmToBmSolObs(iHour, SurfNum) += ReflBmToBmSolObs(RecPtNum);
+                    state.dataSurface->SurfCosIncAveBmToBmSolObs(iHour, SurfNum) += state.dataSolarReflectionManager->CosIncWeighted;
+                    state.dataSurface->SurfReflFacBmToBmSolObs(iHour, SurfNum) += ReflBmToBmSolObs(RecPtNum);
                 }
-                state.dataSurface->ReflFacBmToBmSolObs(iHour, SurfNum) /= double(NumRecPts);
-                state.dataSurface->CosIncAveBmToBmSolObs(iHour, SurfNum) /= double(NumRecPts);
+                state.dataSurface->SurfReflFacBmToBmSolObs(iHour, SurfNum) /= double(NumRecPts);
+                state.dataSurface->SurfCosIncAveBmToBmSolObs(iHour, SurfNum) /= double(NumRecPts);
             } // End of check if number of possible obstructions > 0
         }     // End of loop over receiving surfaces
     }
@@ -1276,24 +1276,24 @@ namespace SolarReflectionManager {
             }         // End of loop over receiving points
 
             // Average over receiving points
-            state.dataSurface->ReflFacSkySolObs(state.dataSolarReflectionManager->iSurfNum) = 0.0;
-            state.dataSurface->ReflFacSkySolGnd(state.dataSolarReflectionManager->iSurfNum) = 0.0;
+            state.dataSurface->SurfReflFacSkySolObs(state.dataSolarReflectionManager->iSurfNum) = 0.0;
+            state.dataSurface->SurfReflFacSkySolGnd(state.dataSolarReflectionManager->iSurfNum) = 0.0;
             state.dataSolarReflectionManager->iNumRecPts =
                 state.dataSolarReflectionManager->SolReflRecSurf(state.dataSolarReflectionManager->iRecSurfNum).NumRecPts;
             for (state.dataSolarReflectionManager->iRecPtNum = 1;
                  state.dataSolarReflectionManager->iRecPtNum <= state.dataSolarReflectionManager->iNumRecPts;
                  ++state.dataSolarReflectionManager->iRecPtNum) {
-                state.dataSurface->ReflFacSkySolObs(state.dataSolarReflectionManager->iSurfNum) +=
+                state.dataSurface->SurfReflFacSkySolObs(state.dataSolarReflectionManager->iSurfNum) +=
                     ReflSkySolObs(state.dataSolarReflectionManager->iRecPtNum);
-                state.dataSurface->ReflFacSkySolGnd(state.dataSolarReflectionManager->iSurfNum) +=
+                state.dataSurface->SurfReflFacSkySolGnd(state.dataSolarReflectionManager->iSurfNum) +=
                     ReflSkySolGnd(state.dataSolarReflectionManager->iRecPtNum);
             }
-            state.dataSurface->ReflFacSkySolObs(state.dataSolarReflectionManager->iSurfNum) /= state.dataSolarReflectionManager->iNumRecPts;
-            state.dataSurface->ReflFacSkySolGnd(state.dataSolarReflectionManager->iSurfNum) /= state.dataSolarReflectionManager->iNumRecPts;
-            // Do not allow ReflFacBmToDiffSolGnd to exceed the surface's unobstructed ground view factor
-            state.dataSurface->ReflFacSkySolGnd(state.dataSolarReflectionManager->iSurfNum) =
+            state.dataSurface->SurfReflFacSkySolObs(state.dataSolarReflectionManager->iSurfNum) /= state.dataSolarReflectionManager->iNumRecPts;
+            state.dataSurface->SurfReflFacSkySolGnd(state.dataSolarReflectionManager->iSurfNum) /= state.dataSolarReflectionManager->iNumRecPts;
+            // Do not allow SurfReflFacBmToDiffSolGnd to exceed the surface's unobstructed ground view factor
+            state.dataSurface->SurfReflFacSkySolGnd(state.dataSolarReflectionManager->iSurfNum) =
                 min(0.5 * (1.0 - state.dataSurface->Surface(state.dataSolarReflectionManager->iSurfNum).CosTilt),
-                    state.dataSurface->ReflFacSkySolGnd(state.dataSolarReflectionManager->iSurfNum));
+                    state.dataSurface->SurfReflFacSkySolGnd(state.dataSolarReflectionManager->iSurfNum));
             // Note: the above factors are dimensionless; they are equal to
             // (W/m2 reflected solar incident on SurfNum)/(W/m2 unobstructed horizontal sky diffuse irradiance)
         } // End of loop over receiving surfaces

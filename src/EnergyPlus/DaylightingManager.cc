@@ -512,13 +512,13 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
             state.dataDaylightingManager->GILSK = 0.0;
             state.dataDaylightingManager->GILSU = 0.0;
             for (IHR = 1; IHR <= 24; ++IHR) {
-                if (state.dataSurface->SUNCOSHR(IHR, 3) < DataEnvironment::SunIsUpValue)
-                    continue; // Skip if sun is below horizon //Autodesk SUNCOSHR was uninitialized here
-                state.dataDaylightingManager->PHSUN = DataGlobalConstants::PiOvr2 - std::acos(state.dataSurface->SUNCOSHR(IHR, 3));
+                if (state.dataSurface->SurfSunCosHourly(IHR, 3) < DataEnvironment::SunIsUpValue)
+                    continue; // Skip if sun is below horizon //Autodesk SurfSunCosHourly was uninitialized here
+                state.dataDaylightingManager->PHSUN = DataGlobalConstants::PiOvr2 - std::acos(state.dataSurface->SurfSunCosHourly(IHR, 3));
                 state.dataDaylightingManager->PHSUNHR(IHR) = state.dataDaylightingManager->PHSUN;
                 state.dataDaylightingManager->SPHSUNHR(IHR) = std::sin(state.dataDaylightingManager->PHSUN);
                 state.dataDaylightingManager->CPHSUNHR(IHR) = std::cos(state.dataDaylightingManager->PHSUN);
-                state.dataDaylightingManager->THSUNHR(IHR) = std::atan2(state.dataSurface->SUNCOSHR(IHR, 2), state.dataSurface->SUNCOSHR(IHR, 1));
+                state.dataDaylightingManager->THSUNHR(IHR) = std::atan2(state.dataSurface->SurfSunCosHourly(IHR, 2), state.dataSurface->SurfSunCosHourly(IHR, 1));
                 // Get exterior horizontal illuminance from sky and sun
                 state.dataDaylightingManager->THSUN = state.dataDaylightingManager->THSUNHR(IHR);
                 state.dataDaylightingManager->SPHSUN = state.dataDaylightingManager->SPHSUNHR(IHR);
@@ -538,14 +538,14 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
         state.dataDaylightingManager->THSUNHR(state.dataGlobal->HourOfDay) = 0.0;
         state.dataDaylightingManager->GILSK(state.dataGlobal->HourOfDay, {1, 4}) = 0.0;
         state.dataDaylightingManager->GILSU(state.dataGlobal->HourOfDay) = 0.0;
-        if (!(state.dataSurface->SUNCOSHR(state.dataGlobal->HourOfDay, 3) < DataEnvironment::SunIsUpValue)) { // Skip if sun is below horizon
+        if (!(state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay, 3) < DataEnvironment::SunIsUpValue)) { // Skip if sun is below horizon
             state.dataDaylightingManager->PHSUN =
-                DataGlobalConstants::PiOvr2 - std::acos(state.dataSurface->SUNCOSHR(state.dataGlobal->HourOfDay, 3));
+                DataGlobalConstants::PiOvr2 - std::acos(state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay, 3));
             state.dataDaylightingManager->PHSUNHR(state.dataGlobal->HourOfDay) = state.dataDaylightingManager->PHSUN;
             state.dataDaylightingManager->SPHSUNHR(state.dataGlobal->HourOfDay) = std::sin(state.dataDaylightingManager->PHSUN);
             state.dataDaylightingManager->CPHSUNHR(state.dataGlobal->HourOfDay) = std::cos(state.dataDaylightingManager->PHSUN);
             state.dataDaylightingManager->THSUNHR(state.dataGlobal->HourOfDay) =
-                std::atan2(state.dataSurface->SUNCOSHR(state.dataGlobal->HourOfDay, 2), state.dataSurface->SUNCOSHR(state.dataGlobal->HourOfDay, 1));
+                std::atan2(state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay, 2), state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay, 1));
             // Get exterior horizontal illuminance from sky and sun
             state.dataDaylightingManager->THSUN = state.dataDaylightingManager->THSUNHR(state.dataGlobal->HourOfDay);
             state.dataDaylightingManager->SPHSUN = state.dataDaylightingManager->SPHSUNHR(state.dataGlobal->HourOfDay);
@@ -3146,7 +3146,7 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
                 // Lambda function for the octree to test for surface hit
                 auto surfaceHit = [&state, &GroundHitPt, &hitObs, &URay, &ObsHitPt](SurfaceData const &surface) -> bool {
                     // todo - how to find index of object objArr
-                    int ObsSurfNum = UtilityRoutines::FindItemInList(surface.Name, state.dataSurface->Surface);
+                    int ObsSurfNum = surface.Index;
                     if (state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) {
                         PierceSurface(surface, GroundHitPt, URay, ObsHitPt, hitObs); // Check if ray pierces surface
                         return hitObs;                                               // Ray pierces surface
@@ -3231,7 +3231,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
     // switch as need to serve both reference points and map points based on calledFrom
     using General::POLYF;
 
-    if (state.dataSurface->SUNCOSHR(iHour, 3) < DataEnvironment::SunIsUpValue) return;
+    if (state.dataSurface->SurfSunCosHourly(iHour, 3) < DataEnvironment::SunIsUpValue) return;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     static Vector3<Real64> const RREF(0.0); // Location of a reference point in absolute coordinate system //Autodesk Was used uninitialized:
@@ -3478,7 +3478,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
             Real64 const TVISB_ObTrans(TVISB * ObTrans);
             Real64 const AVWLSU_add(TVISB_ObTrans * state.dataDaylightingManager->GILSU(iHour) *
                                     (state.dataEnvrn->GndReflectanceForDayltg / DataGlobalConstants::Pi));
-            Vector3<Real64> const SUNCOS_iHour(state.dataSurface->SUNCOSHR(iHour, {1, 3}));
+            Vector3<Real64> const SUNCOS_iHour(state.dataSurface->SurfSunCosHourly(iHour, {1, 3}));
             assert(equal_dimensions(state.dataDaylightingManager->EDIRSK, state.dataDaylightingManager->AVWLSK));
             auto l(state.dataDaylightingManager->EDIRSK.index(iHour, 1, 1));
             for (ISky = 1; ISky <= 4; ++ISky, ++l) { // [ l ] == ( iHour, 1, ISky )
@@ -3947,7 +3947,7 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     int JSH;    // Shading index: J=1 is unshaded window, J=2 is shaded window
     Real64 VTR; // For switchable glazing, ratio of visible transmittance of fully-switched state to that of the unswitched state
 
-    if (state.dataSurface->SUNCOSHR(iHour, 3) < DataEnvironment::SunIsUpValue) return;
+    if (state.dataSurface->SurfSunCosHourly(iHour, 3) < DataEnvironment::SunIsUpValue) return;
 
     ++ISunPos;
 
@@ -4086,7 +4086,7 @@ void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     Real64 VTR; // For switchable glazing, ratio of visible transmittance of
     //  fully-switched state to that of the unswitched state
 
-    if (state.dataSurface->SUNCOSHR(iHour, 3) < DataEnvironment::SunIsUpValue) return;
+    if (state.dataSurface->SurfSunCosHourly(iHour, 3) < DataEnvironment::SunIsUpValue) return;
 
     // Altitude of sun (degrees)
     state.dataDaylightingManager->PHSUN = state.dataDaylightingManager->PHSUNHR(iHour);
@@ -5906,7 +5906,7 @@ void DayltgHitObstruction(EnergyPlusData &state,
 
         // Lambda function for the octree to test for surface hit and update transmittance if hit
         auto solarTransmittance = [=, &state, &R1, &RN, &hit, &ObTrans](SurfaceData const &surface) -> bool {
-            int ObsSurfNum = UtilityRoutines::FindItemInList(surface.Name, state.dataSurface->Surface);
+            int ObsSurfNum = surface.Index;
             if (!state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) return false; // Do Consider separate octree without filtered surfaces
             auto const sClass(surface.Class);
             if ((sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && (&surface != window_base_p)) {
@@ -7752,7 +7752,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     DPH = (PHMAX - PHMIN) / double(NPHMAX);
 
     // Sky/ground element altitude integration
-    Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SUNCOSHR(IHR, {1, 3}));
+    Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SurfSunCosHourly(IHR, {1, 3}));
     for (IPH = 1; IPH <= NPHMAX; ++IPH) {
         PH = PHMIN + (double(IPH) - 0.5) * DPH;
 
@@ -8286,7 +8286,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
                 // TH 7/7/2010 moved from inside the loop: DO JB = 1,MaxSlatAngs
                 if (BlindOn)
-                    ProfileAngle(state, IWin, state.dataSurface->SUNCOSHR(IHR, {1, 3}), state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
+                    ProfileAngle(state, IWin, state.dataSurface->SurfSunCosHourly(IHR, {1, 3}), state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
 
                 for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                     if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
@@ -8386,7 +8386,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     // specular reflection from exterior surfaces
 
     if (state.dataSurface->CalcSolRefl && state.dataSurface->SurfWinOriginalClass(IWin) != SurfaceClass::TDD_Dome) {
-        ZSU1refl = state.dataSurface->ReflFacBmToBmSolObs(IHR, IWin);
+        ZSU1refl = state.dataSurface->SurfReflFacBmToBmSolObs(IHR, IWin);
 
         if (ZSU1refl > 0.0) {
             // Contribution to window luminance and downgoing flux
@@ -8598,7 +8598,7 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
     } else {
         NGnd = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).NGnd(WinEl);
     }
-    Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SUNCOSHR(IHR, {1, 3}));
+    Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SurfSunCosHourly(IHR, {1, 3}));
     for (iGndElem = 1; iGndElem <= NGnd; ++iGndElem) {
         // case for sky elements. Integration is done over upper ground hemisphere to determine how many obstructions
         // were hit in the process
@@ -9257,7 +9257,7 @@ void DayltgClosestObstruction(EnergyPlusData &state,
 
         // Lambda function for the octree to test for surface hit
         auto surfaceHit = [=, &state, &RecPt, &RayVec, &hit, &NearestHitDistance_sq, &nearestHitSurface, &NearestHitPt](SurfaceData const &surface) {
-            int ObsSurfNum = UtilityRoutines::FindItemInList(surface.Name, state.dataSurface->Surface);
+            int ObsSurfNum = surface.Index;
             if (state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) {
                 // Determine if this ray hits the surface and, if so, get the distance from the receiving point to the hit
                 PierceSurface(surface, RecPt, RayVec, state.dataDaylightingManager->HitPt, hit); // Check if ray pierces surface
@@ -9337,7 +9337,7 @@ void DayltgSurfaceLumFromSun(EnergyPlusData &state,
         }
     }
     // Cosine of angle of incidence of sun at HitPt if sun were to reach HitPt
-    Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SUNCOSHR(IHR, {1, 3}));
+    Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SurfSunCosHourly(IHR, {1, 3}));
     CosIncAngAtHitPt = dot(DayltgSurfaceLumFromSunReflNorm, SUNCOS_IHR);
     // Require that the sun be in front of this surface relative to window element
     if (CosIncAngAtHitPt <= 0.0) return; // Sun is in back of reflecting surface
@@ -10654,7 +10654,7 @@ void DayltgInterReflIllFrIntWins(EnergyPlusData &state, int &ZoneNum) // Zone nu
             // This is an interior window in ZoneNum
             int const ConstrNum = state.dataSurface->Surface(IWin).Construction;
             int const adjEnclNum = state.dataSurface->Surface(state.dataSurface->Surface(IWin).ExtBoundCond).SolarEnclIndex;
-            QDifTrans = state.dataHeatBal->QSDifSol(adjEnclNum) * state.dataConstruction->Construct(ConstrNum).TransDiffVis *
+            QDifTrans = state.dataHeatBal->EnclSolQSDifSol(adjEnclNum) * state.dataConstruction->Construct(ConstrNum).TransDiffVis *
                         state.dataSurface->Surface(IWin).Area * state.dataEnvrn->PDIFLW;
             QDifTransUp = QDifTrans * state.dataSurface->SurfWinFractionUpgoing(IWin);
             QDifTransDn = QDifTrans * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));

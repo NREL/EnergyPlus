@@ -2150,7 +2150,7 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> MultHorizonZenith;      // Contribution to eff sky view factor from horizon or zenith brightening
     Array1D<Real64> QS; // Zone short-wave flux density; used to calculate short-wave  radiation absorbed on inside surfaces of zone or enclosure
     Array1D<Real64> QSLights;                // Like QS, but Lights short-wave only.
-    Array1D<Real64> QSDifSol;                // Like QS, but diffuse solar short-wave only.
+    Array1D<Real64> EnclSolQSDifSol;                // Like QS, but diffuse solar short-wave only.
     Array1D<Real64> ITABSF;                  // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
     Array1D<Real64> TMULT;                   // TMULT  - MULTIPLIER TO COMPUTE 'ITABSF'
     Array1D<Real64> QL;                      // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
@@ -2426,7 +2426,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->MultHorizonZenith.deallocate();
         this->QS.deallocate();
         this->QSLights.deallocate();
-        this->QSDifSol.deallocate();
+        this->EnclSolQSDifSol.deallocate();
         this->ITABSF.deallocate();
         this->TMULT.deallocate();
         this->QL.deallocate();

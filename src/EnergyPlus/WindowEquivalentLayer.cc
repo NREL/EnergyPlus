@@ -861,8 +861,8 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
             Ebout = DataGlobalConstants::StefanBoltzmann * pow_4(Tout);
             // ASHWAT model may be slightly different
             outir = state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *
-                        (state.dataSurface->AirSkyRadSplit(SurfNum) * DataGlobalConstants::StefanBoltzmann * pow_4(tsky) +
-                         (1.0 - state.dataSurface->AirSkyRadSplit(SurfNum)) * Ebout) +
+                        (state.dataSurface->SurfAirSkyRadSplit(SurfNum) * DataGlobalConstants::StefanBoltzmann * pow_4(tsky) +
+                         (1.0 - state.dataSurface->SurfAirSkyRadSplit(SurfNum)) * Ebout) +
                     state.dataSurface->Surface(SurfNum).ViewFactorGroundIR * Ebout + OutSrdIR;
         }
     }

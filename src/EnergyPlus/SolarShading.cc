@@ -745,11 +745,22 @@ void AllocateModuleArrays(EnergyPlusData &state)
     int SurfLoop;
     int I;
     int NumOfLayers;
+
+    state.dataSurface->SurfSunCosHourly.dimension(24, 3, 0.0);
+    state.dataSurface->SurfSunlitArea.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataSurface->SurfSunlitFrac.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataSurface->SurfSkySolarInc.dimension(state.dataSurface->TotSurfaces, 0);
+    state.dataSurface->SurfGndSolarInc.dimension(state.dataSurface->TotSurfaces, 0);
+    state.dataSurface->SurfBmToBmReflFacObs.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataSurface->SurfBmToDiffReflFacObs.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataSurface->SurfBmToDiffReflFacGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataSurface->SurfSkyDiffReflFacGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataSurface->SurfOpaqAI.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataSurface->SurfOpaqAO.dimension(state.dataSurface->TotSurfaces, 0.0);
+
     // TODO - check allocation here
     state.dataSolarShading->CTHETA.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSolarShading->SAREA.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataSurface->SurfSunlitArea.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataSurface->SurfSunlitFrac.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBal->SunlitFracHR.dimension(24, state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBal->SunlitFrac.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBal->SunlitFracWithoutReveal.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataSurface->TotSurfaces, 0.0);
@@ -4855,9 +4866,9 @@ void FigureSunCosines(EnergyPlusData &state,
 
     // Save hourly values for use in DaylightingManager
     if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
-        if (iTimeStep == state.dataGlobal->NumOfTimeStepInHour) state.dataSurface->SUNCOSHR(iHour, {1, 3}) = state.dataSolarShading->SUNCOS;
+        if (iTimeStep == state.dataGlobal->NumOfTimeStepInHour) state.dataSurface->SurfSunCosHourly(iHour, {1, 3}) = state.dataSolarShading->SUNCOS;
     } else {
-        state.dataSurface->SUNCOSHR(iHour, {1, 3}) = state.dataSolarShading->SUNCOS;
+        state.dataSurface->SurfSunCosHourly(iHour, {1, 3}) = state.dataSolarShading->SUNCOS;
     }
     // Save timestep values for use in WindowComplexManager
     state.dataBSDFWindow->SUNCOSTS(iTimeStep, iHour, {1, 3}) = state.dataSolarShading->SUNCOS;
@@ -8593,6 +8604,7 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
         state.dataSurface->EnclSolDBIntWin.allocate(state.dataGlobal->NumOfZones);
     }
 
+    // TODO - allocation
     state.dataSurface->EnclSolDB = 0.0;
     state.dataSurface->EnclSolDBIntWin = 0.0;
     state.dataSurface->SurfOpaqAI = 0.0;

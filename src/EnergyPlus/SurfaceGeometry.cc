@@ -112,6 +112,10 @@ namespace SurfaceGeometry {
 
     void AllocateSurfaceWindows(EnergyPlusData &state, int NumSurfaces)
     {
+        state.dataSurface->SurfWinA.dimension(state.dataSurface->TotSurfaces, CFSMAXNL + 1, 0.0);
+        state.dataSurface->SurfWinADiffFront.dimension(state.dataSurface->TotSurfaces, CFSMAXNL + 1, 0.0);
+        state.dataSurface->SurfWinACFOverlap.dimension(state.dataSurface->TotSurfaces, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+
         state.dataSurface->SurfWinFrameQRadOutAbs.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinFrameQRadInAbs.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinDividerQRadOutAbs.dimension(NumSurfaces, 0);
@@ -359,8 +363,6 @@ namespace SurfaceGeometry {
         state.dataSurfaceGeometry->CosZoneRelNorth.deallocate();
         state.dataSurfaceGeometry->SinZoneRelNorth.deallocate();
 
-        state.dataSurface->AirSkyRadSplit.dimension(state.dataSurface->TotSurfaces, 0.0);
-
         state.dataHeatBal->CalcWindowRevealReflection = false; // Set to True in ProcessSurfaceVertices if beam solar reflection from window reveals
         // is requested for one or more exterior windows.
         state.dataSurface->BuildingShadingCount = 0;
@@ -371,7 +373,7 @@ namespace SurfaceGeometry {
 
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) { // Loop through all surfaces...
 
-            state.dataSurface->AirSkyRadSplit(SurfNum) = std::sqrt(0.5 * (1.0 + state.dataSurface->Surface(SurfNum).CosTilt));
+            state.dataSurface->SurfAirSkyRadSplit(SurfNum) = std::sqrt(0.5 * (1.0 + state.dataSurface->Surface(SurfNum).CosTilt));
 
             // Set flag that determines whether a surface is a shadowing surface
             state.dataSurface->Surface(SurfNum).ShadowingSurf = false;
@@ -876,20 +878,6 @@ namespace SurfaceGeometry {
         state.dataSurface->Y0.dimension(state.dataSurface->TotSurfaces, 0.0);
         state.dataSurface->Z0.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-        // TODO: move the following to (surface) heat balance
-        state.dataSurface->EnclSolDB.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataSurface->EnclSolDBSSG.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBal->QSDifSol.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataSurface->SurfOpaqAI.dimension(state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->SurfOpaqAO.dimension(state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->SurfBmToBmReflFacObs.dimension(state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->SurfBmToDiffReflFacObs.dimension(state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->SurfBmToDiffReflFacGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->SurfSkyDiffReflFacGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->SurfWinA.dimension(state.dataSurface->TotSurfaces, CFSMAXNL + 1, 0.0);
-        state.dataSurface->SurfWinADiffFront.dimension(state.dataSurface->TotSurfaces, CFSMAXNL + 1, 0.0);
-        state.dataSurface->SurfWinACFOverlap.dimension(state.dataSurface->TotSurfaces, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-
         // Surface EMS arrays
         state.dataSurface->SurfEMSConstructionOverrideON.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfEMSConstructionOverrideValue.allocate(state.dataSurface->TotSurfaces);
@@ -932,6 +920,7 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfOutWindDir.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfGenericContam.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfPenumbraID.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfAirSkyRadSplit.allocate(state.dataSurface->TotSurfaces);
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfOutDryBulbTemp(SurfNum) = 0.0;
             state.dataSurface->SurfOutWetBulbTemp(SurfNum) = 0.0;
@@ -939,6 +928,7 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfOutWindDir(SurfNum) = 0.0;
             state.dataSurface->SurfGenericContam(SurfNum) = 0.0;
             state.dataSurface->SurfPenumbraID(SurfNum) = 0;
+            state.dataSurface->SurfAirSkyRadSplit(SurfNum) = 0.0;
         }
         // Following are surface property arrays used in SurfaceGeometry
         state.dataSurface->SurfShadowSurfPossibleObstruction.allocate(state.dataSurface->TotSurfaces);

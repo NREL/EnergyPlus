@@ -398,7 +398,7 @@ Pertinent variables (*inferring units from usage - not documented - grrr*):
   `DataHeatBalance::QL` [W?] - Total thermal radiation added to a zone
   `DataHeatBalance::QS` [W?] - Zone short-wave flux density
   `DataHeatBalance::QSLights` [W?] - Like QS, but Lights short-wave only.
-  `DataHeatBalance::QSDifSol` [W?] - Like QS, but diffuse solar short-wave only.
+  `DataHeatBalance::EnclSolQSDifSol` [W?] - Like QS, but diffuse solar short-wave only.
   
   
 Pertinent functions:

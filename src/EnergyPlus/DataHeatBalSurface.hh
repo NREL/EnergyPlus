@@ -225,7 +225,7 @@ struct HeatBalSurfData : BaseGlobalStruct
     // through exterior windows, beam from exterior windows reflecting
     // from interior surfaces, and beam entering through interior windows
     // (considered diffuse)
-    // Originally QD, now used only for QSDifSol calc for daylighting
+    // Originally QD, now used only for EnclSolQSDifSol calc for daylighting
     Array1D<Real64> EnclSolVMULT;              // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
     Array1D<Real64> SurfNetLWRadToSurf;        // Net interior long wavelength radiation to a surface from other surfaces
     Array1D<Real64> ZoneMRT;                   // Zone Mean Radiant Temperature

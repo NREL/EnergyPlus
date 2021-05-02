@@ -401,8 +401,8 @@ Real64 SurfaceData::getOutsideIR(EnergyPlusData &state, const int t_SurfNum) con
         Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + DataGlobalConstants::KelvinConv;
         value = state.dataWindowManager->sigma * pow_4(tout);
         value =
-            ViewFactorSkyIR * (state.dataSurface->AirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) +
-                               (1.0 - state.dataSurface->AirSkyRadSplit(t_SurfNum)) * value) +
+            ViewFactorSkyIR * (state.dataSurface->SurfAirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) +
+                               (1.0 - state.dataSurface->SurfAirSkyRadSplit(t_SurfNum)) * value) +
             ViewFactorGroundIR * value;
     }
     return value;

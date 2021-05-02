@@ -5739,6 +5739,11 @@ namespace HeatBalanceManager {
         // Use the total number of zones or surfaces to allocate variables to avoid a limit
         // Allocate real Variables
         // Following used for Calculations
+        // Allocate zone / encl hb arrays
+        state.dataSurface->EnclSolDB.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataSurface->EnclSolDBSSG.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->EnclSolQSDifSol.dimension(state.dataGlobal->NumOfZones, 0.0);
+
         //  Allocate variables in DataHeatBalSys
         state.dataHeatBalFanSys->SumConvHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->SumLatentHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
