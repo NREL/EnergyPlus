@@ -6256,7 +6256,7 @@ namespace FluidProperties {
             }
             ShowRecurringSevereErrorAtEnd(state,
                                           RoutineName + "Saturation temperature is out of range for refrigerant [" +
-                                          state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
+                                              state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
                                           state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatTempErrIndex,
                                           Temperature,
                                           Temperature,
@@ -6634,7 +6634,7 @@ namespace FluidProperties {
             }
             ShowRecurringSevereErrorAtEnd(state,
                                           RoutineName + "Saturation temperature is out of range for refrigerant [" +
-                                          state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
+                                              state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
                                           state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatTempDensityErrIndex,
                                           Temperature,
                                           Temperature,
