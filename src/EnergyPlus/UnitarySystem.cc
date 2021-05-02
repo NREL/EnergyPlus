@@ -6903,7 +6903,7 @@ namespace UnitarySystems {
                 // thisSys.m_MaxHeatAirVolFlow = thisSys.m_MaxCoolAirVolFlow;
                 // thisSys.m_MaxNoCoolHeatAirVolFlow = thisSys.m_MaxCoolAirVolFlow;
                 // thisSys.m_FanOpModeSchedPtr = -1;
-                
+
                 sysNum = getUnitarySystemIndex(state, thisObjectName);
 
                 if (sysNum == -1) {
