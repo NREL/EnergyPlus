@@ -532,7 +532,6 @@ namespace FluidProperties {
         Array1D<PressureSequence> PressurePtr;
         Array1D<FluidData> FluidNames;
 
-
         MaxAlphas = 0;
         MaxNumbers = 0;
         if (inputProcessor->getNumObjectsFound(state, "FluidProperties:Name") > 0) {
@@ -728,8 +727,8 @@ namespace FluidProperties {
 
             for (TempLoop = 2; TempLoop <= FluidTemps(Loop).NumOfTemps; ++TempLoop) {
                 if (FluidTemps(Loop).Temps(TempLoop) <= FluidTemps(Loop).Temps(TempLoop - 1)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + " name=" + FluidTemps(Loop).Name +
-                                    ", lists must have data in ascending order");
+                    ShowSevereError(
+                        state, RoutineName + CurrentModuleObject + " name=" + FluidTemps(Loop).Name + ", lists must have data in ascending order");
                     ShowContinueError(state,
                                       format("First out of order occurrence at Temperature #({}) {{{:.R3}}} >= Temp({}) {{{:.R3}}}",
                                              TempLoop - 1,
@@ -787,8 +786,9 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != RefrigData(Loop).NumPsPoints) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
-                                ShowContinueError(state, "Temperature Name=" + TempsName +
-                                                  ", Temperature array and fluid saturation pressure array must have the same number of points");
+                                ShowContinueError(state,
+                                                  "Temperature Name=" + TempsName +
+                                                      ", Temperature array and fluid saturation pressure array must have the same number of points");
                                 ShowContinueError(state,
                                                   format("Temperature # points={} whereas {} # pressure points={}",
                                                          NumNumbers,
@@ -822,8 +822,9 @@ namespace FluidProperties {
                 // then no sat press data found
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
-                    ShowContinueError(state, "No Gas/Fluid Saturation Pressure found. Need properties with " + cAlphaFieldNames(2) + "=\"Pressure\" and " +
-                                      cAlphaFieldNames(3) + "=\"FluidGas\".");
+                    ShowContinueError(state,
+                                      "No Gas/Fluid Saturation Pressure found. Need properties with " + cAlphaFieldNames(2) + "=\"Pressure\" and " +
+                                          cAlphaFieldNames(3) + "=\"FluidGas\".");
                     ErrorsFound = true;
                 }
 
@@ -863,8 +864,9 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != RefrigData(Loop).NumHPoints) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
-                                ShowSevereError(state, "Temperature Name=" + TempsName +
-                                                ", Temperature array and saturated fluid enthalpy array must have the same number of points");
+                                ShowSevereError(state,
+                                                "Temperature Name=" + TempsName +
+                                                    ", Temperature array and saturated fluid enthalpy array must have the same number of points");
                                 ShowContinueError(state,
                                                   format("Temperature # points={} whereas {} # points={}",
                                                          NumNumbers,
@@ -897,8 +899,9 @@ namespace FluidProperties {
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat fluid enthalpy data found
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
-                    ShowContinueError(state, "No Saturated Fluid Enthalpy found. Need properties to be entered with " + cAlphaFieldNames(2) +
-                                      "=\"Enthalpy\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
+                    ShowContinueError(state,
+                                      "No Saturated Fluid Enthalpy found. Need properties to be entered with " + cAlphaFieldNames(2) +
+                                          "=\"Enthalpy\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
                     ErrorsFound = true;
                 }
 
@@ -941,8 +944,10 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != RefrigData(Loop).NumHPoints) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
-                                ShowContinueError(state, "Temperature Name=" + TempsName +
-                                                  ", Temperature array and saturated gas/fluid enthalpy array must have the same number of points");
+                                ShowContinueError(
+                                    state,
+                                    "Temperature Name=" + TempsName +
+                                        ", Temperature array and saturated gas/fluid enthalpy array must have the same number of points");
                                 ShowContinueError(state,
                                                   format("Temperature # points={} whereas {} # points={}",
                                                          NumNumbers,
@@ -974,8 +979,9 @@ namespace FluidProperties {
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat f/g enthalpy data found
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
-                    ShowContinueError(state, "No Saturated Gas/Fluid Enthalpy found. Need properties to be entered with " + cAlphaFieldNames(2) +
-                                      "=\"Enthalpy\" and " + cAlphaFieldNames(3) + "=\"FluidGas\".");
+                    ShowContinueError(state,
+                                      "No Saturated Gas/Fluid Enthalpy found. Need properties to be entered with " + cAlphaFieldNames(2) +
+                                          "=\"Enthalpy\" and " + cAlphaFieldNames(3) + "=\"FluidGas\".");
                     ErrorsFound = true;
                 }
 
@@ -1015,8 +1021,9 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != RefrigData(Loop).NumCpPoints) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
-                                ShowSevereError(state, "Temperature Name=" + TempsName +
-                                                ", Temperature array and saturated fluid Cp array must have the same number of points");
+                                ShowSevereError(state,
+                                                "Temperature Name=" + TempsName +
+                                                    ", Temperature array and saturated fluid Cp array must have the same number of points");
                                 ShowContinueError(state,
                                                   format("Temperature # points={} whereas {} # Cp points={}",
                                                          NumNumbers,
@@ -1049,8 +1056,9 @@ namespace FluidProperties {
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat fluid Cp data found
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
-                    ShowContinueError(state, "No Saturated Fluid Specific Heat found. Need properties to be entered with " + cAlphaFieldNames(2) +
-                                      "=\"SpecificHeat\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
+                    ShowContinueError(state,
+                                      "No Saturated Fluid Specific Heat found. Need properties to be entered with " + cAlphaFieldNames(2) +
+                                          "=\"SpecificHeat\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
                     ErrorsFound = true;
                 }
 
@@ -1093,8 +1101,9 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != RefrigData(Loop).NumCpPoints) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
-                                ShowContinueError(state, "Temperature Name=" + TempsName +
-                                                  ", Temperature array and saturated gas/fluid Cp array must have the same number of points");
+                                ShowContinueError(state,
+                                                  "Temperature Name=" + TempsName +
+                                                      ", Temperature array and saturated gas/fluid Cp array must have the same number of points");
                                 ShowContinueError(state,
                                                   format("Temperature # points={} whereas {} # Cp points={}",
                                                          NumNumbers,
@@ -1126,8 +1135,9 @@ namespace FluidProperties {
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat f/g Cp data found
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
-                    ShowContinueError(state, "No Saturated Gas/Fluid Specific Heat found. Need properties to be entered with " + cAlphaFieldNames(2) +
-                                      "=\"SpecificHeat\" and " + cAlphaFieldNames(3) + "=\"FluidGas\".");
+                    ShowContinueError(state,
+                                      "No Saturated Gas/Fluid Specific Heat found. Need properties to be entered with " + cAlphaFieldNames(2) +
+                                          "=\"SpecificHeat\" and " + cAlphaFieldNames(3) + "=\"FluidGas\".");
                     ErrorsFound = true;
                 }
 
@@ -1167,8 +1177,9 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != RefrigData(Loop).NumRhoPoints) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
-                                ShowContinueError(state, "Temperature Name=" + TempsName +
-                                                  ", Temperature array and saturated fluid density array must have the same number of points");
+                                ShowContinueError(state,
+                                                  "Temperature Name=" + TempsName +
+                                                      ", Temperature array and saturated fluid density array must have the same number of points");
                                 ShowContinueError(state,
                                                   format("Temperature # points={} whereas {} # Density points={}",
                                                          NumNumbers,
@@ -1201,8 +1212,9 @@ namespace FluidProperties {
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat fluid density data found
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
-                    ShowContinueError(state, "No Saturated Fluid Density found. Need properties to be entered with " + cAlphaFieldNames(2) +
-                                      "=\"Density\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
+                    ShowContinueError(state,
+                                      "No Saturated Fluid Density found. Need properties to be entered with " + cAlphaFieldNames(2) +
+                                          "=\"Density\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
                     ErrorsFound = true;
                 }
 
@@ -1245,8 +1257,10 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != RefrigData(Loop).NumRhoPoints) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
-                                ShowContinueError(state, "Temperature Name=" + TempsName +
-                                                  ", Temperature array and saturated gas/fluid density array must have the same number of points");
+                                ShowContinueError(
+                                    state,
+                                    "Temperature Name=" + TempsName +
+                                        ", Temperature array and saturated gas/fluid density array must have the same number of points");
                                 ShowContinueError(state,
                                                   format("Temperature # points={} whereas {} # density points={}",
                                                          NumNumbers,
@@ -1278,8 +1292,9 @@ namespace FluidProperties {
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat f/g density data found
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
-                    ShowSevereError(state, "No Saturated Gas/Fluid Density found. Need properties to be entered with " + cAlphaFieldNames(2) +
-                                    "=\"Density\" and " + cAlphaFieldNames(3) + "=\"FluidGas\".");
+                    ShowSevereError(state,
+                                    "No Saturated Gas/Fluid Density found. Need properties to be entered with " + cAlphaFieldNames(2) +
+                                        "=\"Density\" and " + cAlphaFieldNames(3) + "=\"FluidGas\".");
                     ErrorsFound = true;
                 }
 
@@ -1302,9 +1317,8 @@ namespace FluidProperties {
             //          String2=ADJUSTL(String2)
             //          String4=TrimSigDigits(RefrigData(Loop)%CpTemps(TempLoop),3)
             //          String4=ADJUSTL(String4)
-            //          CALL ShowContinueError(state, 'First Occurrence at CpTemp('//TRIM(String1)//') {'//TRIM(String2)//'} /= {'//TRIM(String4)//'}')
-            //          ErrorsFound=.TRUE.
-            //          EXIT
+            //          CALL ShowContinueError(state, 'First Occurrence at CpTemp('//TRIM(String1)//') {'//TRIM(String2)//'} /=
+            //          {'//TRIM(String4)//'}') ErrorsFound=.TRUE. EXIT
             //        ENDIF
             //      END DO
             //    END IF
@@ -1331,8 +1345,9 @@ namespace FluidProperties {
                         !UtilityRoutines::SameString(Alphas(2), Density)) {
                         if (iTemp == 0) {
                             ShowWarningError(state, RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
-                            ShowContinueError(state, cAlphaFieldNames(3) + "=\"" + Fluid + "\", but " + cAlphaFieldNames(2) + "=\"" + Alphas(2) +
-                                              "\" is not valid.");
+                            ShowContinueError(state,
+                                              cAlphaFieldNames(3) + "=\"" + Fluid + "\", but " + cAlphaFieldNames(2) + "=\"" + Alphas(2) +
+                                                  "\" is not valid.");
                             ShowContinueError(state, "Valid choices are \"" + Enthalpy + "\", \"" + SpecificHeat + "\", \"" + Density + "\".");
                             ShowContinueError(state, "This fluid property will not be processed mor available for the simulation.");
                         }
@@ -1343,10 +1358,12 @@ namespace FluidProperties {
                         !UtilityRoutines::SameString(Alphas(2), SpecificHeat) && !UtilityRoutines::SameString(Alphas(2), Density)) {
                         if (iTemp == 0) {
                             ShowWarningError(state, RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
-                            ShowContinueError(state, cAlphaFieldNames(3) + "=\"" + Fluid + "\", but " + cAlphaFieldNames(2) + "=\"" + Alphas(2) +
-                                              "\" is not valid.");
-                            ShowContinueError(state, "Valid choices are \"" + Pressure + "\", \"" + Enthalpy + "\", \"" + SpecificHeat + "\", \"" + Density +
-                                              "\".");
+                            ShowContinueError(state,
+                                              cAlphaFieldNames(3) + "=\"" + Fluid + "\", but " + cAlphaFieldNames(2) + "=\"" + Alphas(2) +
+                                                  "\" is not valid.");
+                            ShowContinueError(state,
+                                              "Valid choices are \"" + Pressure + "\", \"" + Enthalpy + "\", \"" + SpecificHeat + "\", \"" + Density +
+                                                  "\".");
                             ShowContinueError(state, "This fluid property will not be processed nor available for the simulation.");
                         }
                         ++iTemp;
@@ -1662,7 +1679,7 @@ namespace FluidProperties {
             GlyRawData(Loop).CpDataPresent = false;
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for specific heat are consistant
                 inputProcessor->getObjectItem(state,
-CurrentModuleObject,
+                                              CurrentModuleObject,
                                               InData,
                                               Alphas,
                                               NumAlphas,
@@ -2097,7 +2114,6 @@ CurrentModuleObject,
         GlycolData.allocate(NumOfGlyConcs);
         GlycolUsed.dimension(NumOfGlyConcs, false);
 
-
         GlycolUsed(1) = true; // mark Water as always used
 
         // First "glycol" is always pure water.  Load data from default arrays
@@ -2226,50 +2242,58 @@ CurrentModuleObject,
                 GlycolData(Loop).ViscTemps = DefaultGlycolTemps;
 
                 if (GlycolData(Loop).GlycolIndex == EthyleneGlycolIndex) {
-                    InterpDefValuesForGlycolConc(state, DefaultNumGlyConcs,
+                    InterpDefValuesForGlycolConc(state,
+                                                 DefaultNumGlyConcs,
                                                  DefaultNumGlyTemps,
                                                  DefaultGlycolConcs,
                                                  DefaultEthGlyCpData,
                                                  GlycolData(Loop).Concentration,
                                                  GlycolData(Loop).CpValues);
-                    InterpDefValuesForGlycolConc(state, DefaultNumGlyConcs,
+                    InterpDefValuesForGlycolConc(state,
+                                                 DefaultNumGlyConcs,
                                                  DefaultNumGlyTemps,
                                                  DefaultGlycolConcs,
                                                  DefaultEthGlyRhoData,
                                                  GlycolData(Loop).Concentration,
                                                  GlycolData(Loop).RhoValues);
-                    InterpDefValuesForGlycolConc(state, DefaultNumGlyConcs,
+                    InterpDefValuesForGlycolConc(state,
+                                                 DefaultNumGlyConcs,
                                                  DefaultNumGlyTemps,
                                                  DefaultGlycolConcs,
                                                  DefaultEthGlyCondData,
                                                  GlycolData(Loop).Concentration,
                                                  GlycolData(Loop).CondValues);
-                    InterpDefValuesForGlycolConc(state, DefaultNumGlyConcs,
+                    InterpDefValuesForGlycolConc(state,
+                                                 DefaultNumGlyConcs,
                                                  DefaultNumGlyTemps,
                                                  DefaultGlycolConcs,
                                                  DefaultEthGlyViscData,
                                                  GlycolData(Loop).Concentration,
                                                  GlycolData(Loop).ViscValues);
                 } else { // == PropyleneGlycolIndex
-                    InterpDefValuesForGlycolConc(state, DefaultNumGlyConcs,
+                    InterpDefValuesForGlycolConc(state,
+                                                 DefaultNumGlyConcs,
                                                  DefaultNumGlyTemps,
                                                  DefaultGlycolConcs,
                                                  DefaultPropGlyCpData,
                                                  GlycolData(Loop).Concentration,
                                                  GlycolData(Loop).CpValues);
-                    InterpDefValuesForGlycolConc(state, DefaultNumGlyConcs,
+                    InterpDefValuesForGlycolConc(state,
+                                                 DefaultNumGlyConcs,
                                                  DefaultNumGlyTemps,
                                                  DefaultGlycolConcs,
                                                  DefaultPropGlyRhoData,
                                                  GlycolData(Loop).Concentration,
                                                  GlycolData(Loop).RhoValues);
-                    InterpDefValuesForGlycolConc(state, DefaultNumGlyConcs,
+                    InterpDefValuesForGlycolConc(state,
+                                                 DefaultNumGlyConcs,
                                                  DefaultNumGlyTemps,
                                                  DefaultGlycolConcs,
                                                  DefaultPropGlyCondData,
                                                  GlycolData(Loop).Concentration,
                                                  GlycolData(Loop).CondValues);
-                    InterpDefValuesForGlycolConc(state, DefaultNumGlyConcs,
+                    InterpDefValuesForGlycolConc(state,
+                                                 DefaultNumGlyConcs,
                                                  DefaultNumGlyTemps,
                                                  DefaultGlycolConcs,
                                                  DefaultPropGlyViscData,
@@ -2288,7 +2312,8 @@ CurrentModuleObject,
                     GlycolData(Loop).CpTemps.allocate(GlycolData(Loop).NumCpTempPts);
                     GlycolData(Loop).CpValues.allocate(GlycolData(Loop).NumCpTempPts);
                     GlycolData(Loop).CpTemps = GlyRawData(Index).CpTemps;
-                    InterpValuesForGlycolConc(state, GlyRawData(Index).NumCpConcPts,
+                    InterpValuesForGlycolConc(state,
+                                              GlyRawData(Index).NumCpConcPts,
                                               GlyRawData(Index).NumCpTempPts,
                                               GlyRawData(Index).CpConcs,
                                               GlyRawData(Index).CpValues,
@@ -2309,7 +2334,8 @@ CurrentModuleObject,
                     GlycolData(Loop).RhoTemps.allocate(GlycolData(Loop).NumRhoTempPts);
                     GlycolData(Loop).RhoValues.allocate(GlycolData(Loop).NumRhoTempPts);
                     GlycolData(Loop).RhoTemps = GlyRawData(Index).RhoTemps;
-                    InterpValuesForGlycolConc(state, GlyRawData(Index).NumRhoConcPts,
+                    InterpValuesForGlycolConc(state,
+                                              GlyRawData(Index).NumRhoConcPts,
                                               GlyRawData(Index).NumRhoTempPts,
                                               GlyRawData(Index).RhoConcs,
                                               GlyRawData(Index).RhoValues,
@@ -2330,7 +2356,8 @@ CurrentModuleObject,
                     GlycolData(Loop).CondTemps.allocate(GlycolData(Loop).NumCondTempPts);
                     GlycolData(Loop).CondValues.allocate(GlycolData(Loop).NumCondTempPts);
                     GlycolData(Loop).CondTemps = GlyRawData(Index).CondTemps;
-                    InterpValuesForGlycolConc(state, GlyRawData(Index).NumCondConcPts,
+                    InterpValuesForGlycolConc(state,
+                                              GlyRawData(Index).NumCondConcPts,
                                               GlyRawData(Index).NumCondTempPts,
                                               GlyRawData(Index).CondConcs,
                                               GlyRawData(Index).CondValues,
@@ -2351,7 +2378,8 @@ CurrentModuleObject,
                     GlycolData(Loop).ViscTemps.allocate(GlycolData(Loop).NumViscTempPts);
                     GlycolData(Loop).ViscValues.allocate(GlycolData(Loop).NumViscTempPts);
                     GlycolData(Loop).ViscTemps = GlyRawData(Index).ViscTemps;
-                    InterpValuesForGlycolConc(state, GlyRawData(Index).NumViscConcPts,
+                    InterpValuesForGlycolConc(state,
+                                              GlyRawData(Index).NumViscConcPts,
                                               GlyRawData(Index).NumViscTempPts,
                                               GlyRawData(Index).ViscConcs,
                                               GlyRawData(Index).ViscValues,
@@ -5173,8 +5201,9 @@ CurrentModuleObject,
                 if (GlycolData(GlycolNum).ViscHighTempIndex == 0) Failure = true;
             }
             if (Failure) {
-                ShowSevereError(state, "InitializeGlycolTempLimits: Required values for Glycol=" + GlycolData(GlycolNum).Name +
-                                " are all zeroes for some data types.");
+                ShowSevereError(state,
+                                "InitializeGlycolTempLimits: Required values for Glycol=" + GlycolData(GlycolNum).Name +
+                                    " are all zeroes for some data types.");
                 ErrorsFound = true;
             }
         }
@@ -5339,8 +5368,9 @@ CurrentModuleObject,
                 if (RefrigData(RefrigNum).RhofgHighTempIndex == 0) Failure = true;
             }
             if (Failure) {
-                ShowSevereError(state, "InitializeRefrigerantLimits: Required values for Refrigerant=" + RefrigData(RefrigNum).Name +
-                                " are all zeroes for some data types.");
+                ShowSevereError(state,
+                                "InitializeRefrigerantLimits: Required values for Refrigerant=" + RefrigData(RefrigNum).Name +
+                                    " are all zeroes for some data types.");
                 ErrorsFound = true;
             }
         }
@@ -5550,7 +5580,7 @@ CurrentModuleObject,
             // ========= Conductivity from Temperatures
             if (GlycolData(GlycolNum).CondDataPresent) {
                 print(state.files.debug, "Conductivity Results at Temperatures:");
-                print(state.files.debug, ",{:.2R}",GlycolData(GlycolNum).CondTemps(1) - incr);
+                print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).CondTemps(1) - incr);
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumCondTempPts - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).CondTemps(Loop));
                     Temperature = GlycolData(GlycolNum).CondTemps(Loop) +
@@ -5558,7 +5588,7 @@ CurrentModuleObject,
                     print(state.files.debug, ",{:.2R}", Temperature);
                 }
                 print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts));
-                print(state.files.debug, ",{:.2R}\n" , GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts) + incr);
+                print(state.files.debug, ",{:.2R}\n", GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts) + incr);
                 print(state.files.debug, "Conductivity:");
                 Temperature = GlycolData(GlycolNum).CondTemps(1) - incr;
                 ReturnValue = GetConductivityGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
@@ -5583,7 +5613,7 @@ CurrentModuleObject,
             // ========= Viscosity from Temperatures
             if (GlycolData(GlycolNum).ViscDataPresent) {
                 print(state.files.debug, "Viscosity Results at Temperatures:");
-                print(state.files.debug, ",{:.2R}",GlycolData(GlycolNum).ViscTemps(1) - incr);
+                print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).ViscTemps(1) - incr);
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumViscTempPts - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).ViscTemps(Loop));
                     Temperature = GlycolData(GlycolNum).ViscTemps(Loop) +
@@ -5775,11 +5805,12 @@ CurrentModuleObject,
                     print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).RhofValues(Loop));
                 }
                 print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).RhofValues(RefrigData(RefrigNum).NumRhoPoints));
-                print(state.files.debug, "Density Saturated Fluid/Gas Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
-                                                         RefrigData(RefrigNum).RhofgLowTempValue,
-                                                         RefrigData(RefrigNum).RhofgLowTempIndex,
-                                                         RefrigData(RefrigNum).RhofgHighTempValue,
-                                                         RefrigData(RefrigNum).RhofgHighTempIndex);
+                print(state.files.debug,
+                      "Density Saturated Fluid/Gas Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
+                      RefrigData(RefrigNum).RhofgLowTempValue,
+                      RefrigData(RefrigNum).RhofgLowTempIndex,
+                      RefrigData(RefrigNum).RhofgHighTempValue,
+                      RefrigData(RefrigNum).RhofgHighTempIndex);
                 print(state.files.debug, "Temperatures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
                     print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(Loop));
@@ -5922,7 +5953,7 @@ CurrentModuleObject,
                         RefrigData(RefrigNum).CpTemps(Loop) + (RefrigData(RefrigNum).CpTemps(Loop + 1) - RefrigData(RefrigNum).CpTemps(Loop)) / 2.0;
                     print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(state.files.debug,  ",{:.2R}", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints));
+                print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints));
                 print(state.files.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints) + incr);
                 print(state.files.debug, "Saturated Specific Heat:");
                 Temperature = RefrigData(RefrigNum).CpTemps(1) - incr;
@@ -6032,7 +6063,6 @@ CurrentModuleObject,
         // error counters and dummy string
         bool ErrorFlag; // error flag for current call
 
-
         if (GetInput) {
             GetFluidPropertiesData(state);
             GetInput = false;
@@ -6051,7 +6081,8 @@ CurrentModuleObject,
             // Find which refrigerant (index) is being requested
             RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatPressureRefrig", "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(
+                    state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatPressureRefrig", "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -6080,8 +6111,9 @@ CurrentModuleObject,
             ++RefrigErrorTracking(RefrigNum).SatTempErrCount;
             // send warning
             if (RefrigErrorTracking(RefrigNum).SatTempErrCount <= RefrigerantErrorLimitTest) {
-                ShowSevereMessage(state, RoutineName + "Saturation temperature is out of range for refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
-                                  "] supplied data: **");
+                ShowSevereMessage(state,
+                                  RoutineName + "Saturation temperature is out of range for refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                                      "] supplied data: **");
                 ShowContinueError(state,
                                   format("...Called From:{}, supplied data range=[{:.2R},{:.2R}]",
                                          CalledFrom,
@@ -6091,7 +6123,8 @@ CurrentModuleObject,
                     state, format("...Supplied Refrigerant Temperature={:.2R} Returned saturated pressure value = {:.0R}", Temperature, ReturnValue));
                 ShowContinueErrorTimeStamp(state, "");
             }
-            ShowRecurringSevereErrorAtEnd(state, RoutineName + "Saturation temperature is out of range for refrigerant [" +
+            ShowRecurringSevereErrorAtEnd(state,
+                                          RoutineName + "Saturation temperature is out of range for refrigerant [" +
                                               RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
                                           RefrigErrorTracking(RefrigNum).SatTempErrIndex,
                                           Temperature,
@@ -6156,7 +6189,6 @@ CurrentModuleObject,
         // error counters and dummy string
         bool ErrorFlag; // error flag for current call
 
-
         if (GetInput) {
             GetFluidPropertiesData(state);
             GetInput = false;
@@ -6175,7 +6207,8 @@ CurrentModuleObject,
             // Find which refrigerant (index) is being requested
             RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatTemperatureRefrig", "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(
+                    state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatTemperatureRefrig", "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -6204,8 +6237,9 @@ CurrentModuleObject,
             ++RefrigErrorTracking(RefrigNum).SatPressErrCount;
             // send warning
             if (RefrigErrorTracking(RefrigNum).SatPressErrCount <= RefrigerantErrorLimitTest) {
-                ShowSevereMessage(state, RoutineName + "Saturation pressure is out of range for refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
-                                  "] supplied data: **");
+                ShowSevereMessage(state,
+                                  RoutineName + "Saturation pressure is out of range for refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                                      "] supplied data: **");
                 ShowContinueError(state,
                                   format("...Called From:{}, supplied data range=[{:.0R},{:.0R}]",
                                          CalledFrom,
@@ -6215,7 +6249,8 @@ CurrentModuleObject,
                     state, format("...Supplied Refrigerant Pressure={:.0R} Returned saturated temperature value ={:.2R}", Pressure, ReturnValue));
                 ShowContinueErrorTimeStamp(state, "");
             }
-            ShowRecurringSevereErrorAtEnd(state, RoutineName + "Saturation pressure is out of range for refrigerant [" +
+            ShowRecurringSevereErrorAtEnd(state,
+                                          RoutineName + "Saturation pressure is out of range for refrigerant [" +
                                               RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
                                           RefrigErrorTracking(RefrigNum).SatPressErrIndex,
                                           Pressure,
@@ -6275,7 +6310,6 @@ CurrentModuleObject,
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int RefrigNum; // index for refrigerant under consideration
-
 
         if (GetInput) {
             GetFluidPropertiesData(state);
@@ -6369,7 +6403,6 @@ CurrentModuleObject,
 
         // error counters and dummy string
 
-
         if (GetInput) {
             GetFluidPropertiesData(state);
             GetInput = false;
@@ -6445,8 +6478,9 @@ CurrentModuleObject,
             ++RefrigErrorTracking(RefrigNum).SatTempDensityErrCount;
             // send warning
             if (RefrigErrorTracking(RefrigNum).SatTempDensityErrCount <= RefrigerantErrorLimitTest) {
-                ShowSevereMessage(state, RoutineName + "Saturation temperature is out of range for refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
-                                  "] supplied data: **");
+                ShowSevereMessage(state,
+                                  RoutineName + "Saturation temperature is out of range for refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                                      "] supplied data: **");
                 ShowContinueError(state,
                                   format("...Called From:{}, supplied data range=[{:.2R},{:.2R}]",
                                          CalledFrom,
@@ -6456,7 +6490,8 @@ CurrentModuleObject,
                     state, format("...Supplied Refrigerant Temperature={:.2R} Returned saturated density value ={:.2R}", Temperature, ReturnValue));
                 ShowContinueErrorTimeStamp(state, "");
             }
-            ShowRecurringSevereErrorAtEnd(state, RoutineName + "Saturation temperature is out of range for refrigerant [" +
+            ShowRecurringSevereErrorAtEnd(state,
+                                          RoutineName + "Saturation temperature is out of range for refrigerant [" +
                                               RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
                                           RefrigErrorTracking(RefrigNum).SatTempDensityErrIndex,
                                           Temperature,
@@ -6518,7 +6553,6 @@ CurrentModuleObject,
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int RefrigNum; // index for refrigerant under consideration
 
-
         if (GetInput) {
             GetFluidPropertiesData(state);
             GetInput = false;
@@ -6526,7 +6560,8 @@ CurrentModuleObject,
 
         RefrigNum = 0;
         if (NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatSpecificHeatRefrig", "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(
+                state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatSpecificHeatRefrig", "properties", CalledFrom);
         }
 
         if ((Quality < 0.0) || (Quality > 1.0)) {
@@ -6543,15 +6578,23 @@ CurrentModuleObject,
             // Find which refrigerant (index) is being requested
             RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatSpecificHeatRefrig", "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(
+                    state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatSpecificHeatRefrig", "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
         auto const &refrig(RefrigData(RefrigNum));
 
         // Apply linear interpolation function
-        ReturnValue = GetInterpolatedSatProp(
-            state, Temperature, refrig.CpTemps, refrig.CpfValues, refrig.CpfgValues, Quality, CalledFrom, refrig.CpfLowTempIndex, refrig.CpfHighTempIndex);
+        ReturnValue = GetInterpolatedSatProp(state,
+                                             Temperature,
+                                             refrig.CpTemps,
+                                             refrig.CpfValues,
+                                             refrig.CpfgValues,
+                                             Quality,
+                                             CalledFrom,
+                                             refrig.CpfLowTempIndex,
+                                             refrig.CpfHighTempIndex);
 
         return ReturnValue;
     }
@@ -6744,15 +6787,17 @@ CurrentModuleObject,
                 RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrCount += state.dataFluidProps->SatErrCountGetSupHeatEnthalpyRefrig;
                 // send warning
                 if (RefrigErrorTracking(RefrigNum).SatTempDensityErrCount <= RefrigerantErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
-                                       "] is saturated at the given conditions, saturated enthalpy at given temperature returned. **");
+                    ShowWarningMessage(state,
+                                       RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                                           "] is saturated at the given conditions, saturated enthalpy at given temperature returned. **");
                     ShowContinueError(state, fmt::format("...Called From:{}", CalledFrom));
                     ShowContinueError(state, format("Refrigerant temperature = {:.2R}", Temperature));
                     ShowContinueError(state, format("Refrigerant pressure = {:.0R}", Pressure));
                     ShowContinueError(state, format("Returned Enthalpy value = {:.3R}", ReturnValue));
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                    "] saturated at the given conditions **",
                                                RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrIndex,
                                                Temperature,
@@ -6770,13 +6815,15 @@ CurrentModuleObject,
                 // send temp range error if flagged
                 RefrigErrorTracking(RefrigNum).SatSupEnthalpyTempErrCount += CurTempRangeErrCount;
                 if (CurTempRangeErrCount > 0 && RefrigErrorTracking(RefrigNum).SatSupEnthalpyTempErrCount <= RefrigerantErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
-                                       "] Temperature is out of range for superheated refrigerant enthalpy: values capped **");
+                    ShowWarningMessage(state,
+                                       RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                                           "] Temperature is out of range for superheated refrigerant enthalpy: values capped **");
                     ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurTempRangeErrCount > 0) {
-                    ShowRecurringWarningErrorAtEnd(state, RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                        "] Temperature is out of range for superheated refrigerant enthalpy: values capped **",
                                                    RefrigErrorTracking(RefrigNum).SatSupEnthalpyTempErrIndex,
                                                    Temperature,
@@ -6789,13 +6836,15 @@ CurrentModuleObject,
                 // send pressure range error if flagged
                 RefrigErrorTracking(RefrigNum).SatSupEnthalpyPresErrCount += CurPresRangeErrCount;
                 if (CurPresRangeErrCount > 0 && RefrigErrorTracking(RefrigNum).SatSupEnthalpyPresErrCount <= RefrigerantErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
-                                       "] Pressure is out of range for superheated refrigerant enthalpy: values capped **");
+                    ShowWarningMessage(state,
+                                       RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                                           "] Pressure is out of range for superheated refrigerant enthalpy: values capped **");
                     ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurPresRangeErrCount > 0) {
-                    ShowRecurringWarningErrorAtEnd(state, RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                        "] Pressure is out of range for superheated refrigerant enthalpy: values capped **",
                                                    RefrigErrorTracking(RefrigNum).SatSupEnthalpyPresErrIndex,
                                                    Pressure,
@@ -6900,7 +6949,6 @@ CurrentModuleObject,
         int CurEnthalpyRangeErrCount; // error counter for current call
         int CurSatErrCount;           // error counter for current call
 
-
         if (GetInput) {
             GetFluidPropertiesData(state);
             GetInput = false;
@@ -6908,7 +6956,8 @@ CurrentModuleObject,
 
         RefrigNum = 0;
         if (NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(
+                state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
         }
 
         ErrCount = 0;
@@ -6924,7 +6973,8 @@ CurrentModuleObject,
             // Find which refrigerant (index) is being requested
             RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(
+                    state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -7051,8 +7101,10 @@ CurrentModuleObject,
                 RefrigErrorTracking(RefrigNum).SatSupPressureErrCount += CurSatErrCount;
                 // send warning
                 if (RefrigErrorTracking(RefrigNum).SatSupPressureErrCount <= RefrigerantErrorLimitTest) {
-                    ShowSevereMessage(state, RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
-                                      "] is saturated at the given enthalpy and temperature, saturated enthalpy at given temperature returned. **");
+                    ShowSevereMessage(
+                        state,
+                        RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                            "] is saturated at the given enthalpy and temperature, saturated enthalpy at given temperature returned. **");
                     ShowContinueError(state, fmt::format("...Called From:{}", CalledFrom));
                     ShowContinueError(state, format("Refrigerant temperature = {:.2R}", Temperature));
                     ShowContinueError(state, format("Refrigerant Enthalpy = {:.3R}", Enthalpy));
@@ -7060,7 +7112,8 @@ CurrentModuleObject,
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurSatErrCount > 0) {
-                    ShowRecurringSevereErrorAtEnd(state, RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state,
+                                                  RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                       "] saturated at the given enthalpy and temperature **",
                                                   RefrigErrorTracking(RefrigNum).SatSupPressureErrIndex,
                                                   ReturnValue,
@@ -7073,13 +7126,15 @@ CurrentModuleObject,
                 // send temp range error if flagged
                 RefrigErrorTracking(RefrigNum).SatSupPressureTempErrCount += CurTempRangeErrCount;
                 if (CurTempRangeErrCount > 0 && RefrigErrorTracking(RefrigNum).SatSupPressureTempErrCount <= RefrigerantErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
-                                       "] Temperature is out of range for superheated refrigerant pressure: values capped **");
+                    ShowWarningMessage(state,
+                                       RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                                           "] Temperature is out of range for superheated refrigerant pressure: values capped **");
                     ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurTempRangeErrCount > 0) {
-                    ShowRecurringWarningErrorAtEnd(state, RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                        "] Temperature is out of range for superheated refrigerant pressure: values capped **",
                                                    RefrigErrorTracking(RefrigNum).SatSupPressureTempErrIndex,
                                                    Temperature,
@@ -7092,13 +7147,15 @@ CurrentModuleObject,
                 // send enthalpy range error if flagged
                 RefrigErrorTracking(RefrigNum).SatSupPressureEnthErrCount += CurEnthalpyRangeErrCount;
                 if (CurEnthalpyRangeErrCount > 0 && RefrigErrorTracking(RefrigNum).SatSupPressureEnthErrCount <= RefrigerantErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
-                                       "] Pressure is out of range for superheated refrigerant enthalpy: values capped **");
+                    ShowWarningMessage(state,
+                                       RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                                           "] Pressure is out of range for superheated refrigerant enthalpy: values capped **");
                     ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurEnthalpyRangeErrCount > 0) {
-                    ShowRecurringWarningErrorAtEnd(state, RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                        "] Pressure is out of range for superheated refrigerant pressure: values capped **",
                                                    RefrigErrorTracking(RefrigNum).SatSupPressureEnthErrIndex,
                                                    Enthalpy,
@@ -7163,7 +7220,8 @@ CurrentModuleObject,
 
         RefrigNum = 0;
         if (NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(
+                state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
         }
 
         // Find which refrigerant (index) is being requested and then determine
@@ -7174,7 +7232,8 @@ CurrentModuleObject,
             // Find which refrigerant (index) is being requested
             RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(
+                    state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -7185,22 +7244,25 @@ CurrentModuleObject,
         RefTSat = GetSatTemperatureRefrig(state, Refrigerant, Pressure, RefrigNum, fmt::format("{}{}", RoutineNameNoSpace, CalledFrom));
 
         if (TempLow < RefTSat) {
-            ShowWarningMessage(state, RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
-                               "] temperature lower bound is out of range for superheated refrigerant: values capped **");
+            ShowWarningMessage(state,
+                               RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                                   "] temperature lower bound is out of range for superheated refrigerant: values capped **");
             ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
             ShowContinueErrorTimeStamp(state, "");
             TempLow = RefTSat;
         }
         if (TempUp > RefTHigh) {
-            ShowWarningMessage(state, RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
-                               "] temperature lower bound is out of range for superheated refrigerant: values capped **");
+            ShowWarningMessage(state,
+                               RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                                   "] temperature lower bound is out of range for superheated refrigerant: values capped **");
             ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
             ShowContinueErrorTimeStamp(state, "");
             TempUp = RefTHigh;
         }
         if (TempLow >= TempUp) {
-            ShowWarningMessage(state, RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
-                               "] temperature lower bound is out of range for superheated refrigerant: values capped **");
+            ShowWarningMessage(state,
+                               RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                                   "] temperature lower bound is out of range for superheated refrigerant: values capped **");
             ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
             ShowContinueErrorTimeStamp(state, "");
             TempLow = RefTSat;
@@ -7488,8 +7550,9 @@ CurrentModuleObject,
             RefrigErrorTracking(RefrigNum).SatSupDensityErrCount += state.dataFluidProps->SatErrCountGetSupHeatDensityRefrig;
             // send warning
             if (RefrigErrorTracking(RefrigNum).SatSupDensityErrCount <= RefrigerantErrorLimitTest) {
-                ShowWarningMessage(state, RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
-                                   "] is saturated at the given conditions, saturated density at given temperature returned. **");
+                ShowWarningMessage(state,
+                                   RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                                       "] is saturated at the given conditions, saturated density at given temperature returned. **");
                 ShowContinueError(state, fmt::format("...Called From:{}", CalledFrom));
                 ShowContinueError(state, format("Refrigerant temperature = {:.2R}", Temperature));
                 ShowContinueError(state, format("Refrigerant pressure = {:.0R}", Pressure));
@@ -7497,7 +7560,8 @@ CurrentModuleObject,
                 ShowContinueErrorTimeStamp(state, "");
             }
             if (state.dataFluidProps->SatErrCountGetSupHeatDensityRefrig > 0) {
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                    "] saturated at the given conditions **",
                                                RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrIndex,
                                                Temperature,
@@ -7515,13 +7579,15 @@ CurrentModuleObject,
                 // send temp range error if flagged
                 RefrigErrorTracking(RefrigNum).SatSupDensityTempErrCount += CurTempRangeErrCount;
                 if (CurTempRangeErrCount > 0 && RefrigErrorTracking(RefrigNum).SatSupDensityTempErrCount <= RefrigerantErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
-                                       "] Temperature is out of range for superheated refrigerant density: values capped **");
+                    ShowWarningMessage(state,
+                                       RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                                           "] Temperature is out of range for superheated refrigerant density: values capped **");
                     ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurTempRangeErrCount > 0) {
-                    ShowRecurringWarningErrorAtEnd(state, RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                        "] Temperature is out of range for superheated refrigerant density: values capped **",
                                                    RefrigErrorTracking(RefrigNum).SatSupDensityTempErrIndex,
                                                    Temperature,
@@ -7534,13 +7600,15 @@ CurrentModuleObject,
                 // send pressure range error if flagged
                 RefrigErrorTracking(RefrigNum).SatSupDensityPresErrCount += CurPresRangeErrCount;
                 if (CurPresRangeErrCount > 0 && RefrigErrorTracking(RefrigNum).SatSupDensityPresErrCount <= RefrigerantErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
-                                       "] Pressure is out of range for superheated refrigerant density: values capped **");
+                    ShowWarningMessage(state,
+                                       RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                                           "] Pressure is out of range for superheated refrigerant density: values capped **");
                     ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurPresRangeErrCount > 0) {
-                    ShowRecurringWarningErrorAtEnd(state, RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                        "] Pressure is out of range for superheated refrigerant density: values capped **",
                                                    RefrigErrorTracking(RefrigNum).SatSupDensityPresErrIndex,
                                                    Pressure,
@@ -7612,7 +7680,8 @@ CurrentModuleObject,
 
         // If no glycols, no fluid properties can be evaluated
         int GlycolNum(0);
-        if (NumOfGlycols == 0) ReportFatalGlycolErrors(state, NumOfGlycols, GlycolNum, true, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom);
+        if (NumOfGlycols == 0)
+            ReportFatalGlycolErrors(state, NumOfGlycols, GlycolNum, true, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom);
 
         // If glycol index has not yet been found for this fluid, find its value now
         if (GlycolIndex > 0) {
@@ -7628,7 +7697,8 @@ CurrentModuleObject,
 
         // If user didn't input data (shouldn't get this far, but just in case...), we can't find a value
         if (!glycol_data.CpDataPresent) {
-            ReportFatalGlycolErrors(state, NumOfGlycols, GlycolNum, glycol_data.CpDataPresent, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom);
+            ReportFatalGlycolErrors(
+                state, NumOfGlycols, GlycolNum, glycol_data.CpDataPresent, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom);
         }
 
         // Now determine the value of specific heat using interpolation
@@ -7636,8 +7706,9 @@ CurrentModuleObject,
             if (!state.dataGlobal->WarmupFlag) {
                 state.dataFluidProps->LowTempLimitErrGetSpecificHeatGlycol_raw = ++GlycolErrorTracking(GlycolIndex).SpecHeatLowErrCount;
                 if (state.dataFluidProps->LowTempLimitErrGetSpecificHeatGlycol_raw <= GlycolErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + "Temperature is out of range (too low) for fluid [" + glycol_data.Name +
-                                       "] specific heat supplied values **");
+                    ShowWarningMessage(state,
+                                       RoutineName + "Temperature is out of range (too low) for fluid [" + glycol_data.Name +
+                                           "] specific heat supplied values **");
                     ShowContinueError(state,
                                       format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                              CalledFrom,
@@ -7646,7 +7717,8 @@ CurrentModuleObject,
                                              glycol_data.CpHighTempValue));
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Temperature out of range (too low) for fluid [" + glycol_data.Name +
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Temperature out of range (too low) for fluid [" + glycol_data.Name +
                                                    "] specific heat **",
                                                GlycolErrorTracking(GlycolIndex).SpecHeatLowErrIndex,
                                                Temperature,
@@ -7660,7 +7732,8 @@ CurrentModuleObject,
             if (!state.dataGlobal->WarmupFlag) {
                 state.dataFluidProps->HighTempLimitErrGetSpecificHeatGlycol_raw = ++GlycolErrorTracking(GlycolIndex).SpecHeatHighErrCount;
                 if (state.dataFluidProps->HighTempLimitErrGetSpecificHeatGlycol_raw <= GlycolErrorLimitTest) {
-                    ShowWarningMessage(state, RoutineName + "Temperature is out of range (too high) for fluid [" + glycol_data.Name + "] specific heat **");
+                    ShowWarningMessage(state,
+                                       RoutineName + "Temperature is out of range (too high) for fluid [" + glycol_data.Name + "] specific heat **");
                     ShowContinueError(state,
                                       format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                              CalledFrom,
@@ -7669,7 +7742,8 @@ CurrentModuleObject,
                                              glycol_data.CpHighTempValue));
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Temperature out of range (too high) for fluid [" + glycol_data.Name +
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Temperature out of range (too high) for fluid [" + glycol_data.Name +
                                                    "] specific heat **",
                                                GlycolErrorTracking(GlycolIndex).SpecHeatHighErrIndex,
                                                Temperature,
@@ -7781,8 +7855,8 @@ CurrentModuleObject,
 
         // If user didn't input data (shouldn't get this far, but just in case...), we can't find a value
         if (!GlycolData(GlycolIndex).RhoDataPresent) {
-            ReportFatalGlycolErrors(state,
-                NumOfGlycols, GlycolNum, GlycolData(GlycolIndex).RhoDataPresent, Glycol, "GetDensityGlycol", "density", CalledFrom);
+            ReportFatalGlycolErrors(
+                state, NumOfGlycols, GlycolNum, GlycolData(GlycolIndex).RhoDataPresent, Glycol, "GetDensityGlycol", "density", CalledFrom);
         }
 
         // Now determine the value of specific heat using interpolation
@@ -7820,7 +7894,8 @@ CurrentModuleObject,
             }
 
             if ((LowErrorThisTime) && (state.dataFluidProps->LowTempLimitErrGetDensityGlycol <= GlycolErrorLimitTest)) {
-                ShowWarningMessage(state, RoutineName + "Temperature is out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name + "] density **");
+                ShowWarningMessage(state,
+                                   RoutineName + "Temperature is out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name + "] density **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                          CalledFrom,
@@ -7830,7 +7905,8 @@ CurrentModuleObject,
                 ShowContinueErrorTimeStamp(state, "");
             }
             if (LowErrorThisTime) {
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Temperature out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name +
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Temperature out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name +
                                                    "] density **",
                                                GlycolErrorTracking(GlycolIndex).DensityLowErrIndex,
                                                Temperature,
@@ -7841,8 +7917,8 @@ CurrentModuleObject,
             }
 
             if ((HighErrorThisTime) && (state.dataFluidProps->HighTempLimitErrGetDensityGlycol <= GlycolErrorLimitTest)) {
-                ShowWarningMessage(state, RoutineName + "Temperature is out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
-                                   "] density **");
+                ShowWarningMessage(
+                    state, RoutineName + "Temperature is out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name + "] density **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                          CalledFrom,
@@ -7852,7 +7928,8 @@ CurrentModuleObject,
                 ShowContinueErrorTimeStamp(state, "");
             }
             if (HighErrorThisTime) {
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Temperature out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Temperature out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
                                                    "] density **",
                                                GlycolErrorTracking(GlycolIndex).DensityHighErrIndex,
                                                Temperature,
@@ -7931,7 +8008,8 @@ CurrentModuleObject,
 
         // If no glycols, no fluid properties can be evaluated
         GlycolNum = 0;
-        if (NumOfGlycols == 0) ReportFatalGlycolErrors(state, NumOfGlycols, GlycolNum, true, Glycol, "GetConductivityGlycol", "conductivity", CalledFrom);
+        if (NumOfGlycols == 0)
+            ReportFatalGlycolErrors(state, NumOfGlycols, GlycolNum, true, Glycol, "GetConductivityGlycol", "conductivity", CalledFrom);
 
         // If glycol index has not yet been found for this fluid, find its value now
         if (GlycolIndex > 0) {
@@ -7946,8 +8024,8 @@ CurrentModuleObject,
 
         // If user didn't input data (shouldn't get this far, but just in case...), we can't find a value
         if (!GlycolData(GlycolIndex).CondDataPresent) {
-            ReportFatalGlycolErrors(state,
-                NumOfGlycols, GlycolNum, GlycolData(GlycolIndex).CondDataPresent, Glycol, "GetConductivityGlycol", "conductivity", CalledFrom);
+            ReportFatalGlycolErrors(
+                state, NumOfGlycols, GlycolNum, GlycolData(GlycolIndex).CondDataPresent, Glycol, "GetConductivityGlycol", "conductivity", CalledFrom);
         }
 
         // Now determine the value of specific heat using interpolation
@@ -7985,8 +8063,8 @@ CurrentModuleObject,
             }
 
             if ((LowErrorThisTime) && (state.dataFluidProps->LowTempLimitErrGetConductivityGlycol <= GlycolErrorLimitTest)) {
-                ShowWarningMessage(state, RoutineName + "Temperature is out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name +
-                                   "] conductivity **");
+                ShowWarningMessage(
+                    state, RoutineName + "Temperature is out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name + "] conductivity **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                          CalledFrom,
@@ -7996,7 +8074,8 @@ CurrentModuleObject,
                 ShowContinueErrorTimeStamp(state, "");
             }
             if (LowErrorThisTime) {
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Temperature out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name +
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Temperature out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name +
                                                    "] conductivity **",
                                                GlycolErrorTracking(GlycolIndex).ConductivityLowErrIndex,
                                                Temperature,
@@ -8007,8 +8086,8 @@ CurrentModuleObject,
             }
 
             if ((HighErrorThisTime) && (state.dataFluidProps->HighTempLimitErrGetConductivityGlycol <= GlycolErrorLimitTest)) {
-                ShowWarningMessage(state, RoutineName + "Temperature is out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
-                                   "] conductivity **");
+                ShowWarningMessage(
+                    state, RoutineName + "Temperature is out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name + "] conductivity **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                          CalledFrom,
@@ -8018,7 +8097,8 @@ CurrentModuleObject,
                 ShowContinueErrorTimeStamp(state, "");
             }
             if (HighErrorThisTime) {
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Temperature out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Temperature out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
                                                    "] conductivity **",
                                                GlycolErrorTracking(GlycolIndex).ConductivityHighErrIndex,
                                                Temperature,
@@ -8112,8 +8192,8 @@ CurrentModuleObject,
 
         // If user didn't input data (shouldn't get this far, but just in case...), we can't find a value
         if (!GlycolData(GlycolIndex).ViscDataPresent) {
-            ReportFatalGlycolErrors(state,
-                NumOfGlycols, GlycolNum, GlycolData(GlycolIndex).ViscDataPresent, Glycol, "GetViscosityGlycol", "viscosity", CalledFrom);
+            ReportFatalGlycolErrors(
+                state, NumOfGlycols, GlycolNum, GlycolData(GlycolIndex).ViscDataPresent, Glycol, "GetViscosityGlycol", "viscosity", CalledFrom);
         }
 
         // Now determine the value of specific heat using interpolation
@@ -8151,8 +8231,8 @@ CurrentModuleObject,
             }
 
             if ((LowErrorThisTime) && (state.dataFluidProps->LowTempLimitErrGetViscosityGlycol <= GlycolErrorLimitTest)) {
-                ShowWarningMessage(state, RoutineName + "Temperature is out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name +
-                                   "] viscosity **");
+                ShowWarningMessage(
+                    state, RoutineName + "Temperature is out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name + "] viscosity **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                          CalledFrom,
@@ -8162,7 +8242,8 @@ CurrentModuleObject,
                 ShowContinueErrorTimeStamp(state, "");
             }
             if (LowErrorThisTime) {
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Temperature out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name +
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Temperature out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name +
                                                    "] viscosity **",
                                                GlycolErrorTracking(GlycolIndex).ViscosityLowErrIndex,
                                                Temperature,
@@ -8173,8 +8254,8 @@ CurrentModuleObject,
             }
 
             if ((HighErrorThisTime) && (state.dataFluidProps->HighTempLimitErrGetViscosityGlycol <= GlycolErrorLimitTest)) {
-                ShowWarningMessage(state, RoutineName + "Temperature is out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
-                                   "] viscosity **");
+                ShowWarningMessage(
+                    state, RoutineName + "Temperature is out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name + "] viscosity **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                          CalledFrom,
@@ -8184,7 +8265,8 @@ CurrentModuleObject,
                 ShowContinueErrorTimeStamp(state, "");
             }
             if (HighErrorThisTime) {
-                ShowRecurringWarningErrorAtEnd(state, RoutineName + "Temperature out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
+                ShowRecurringWarningErrorAtEnd(state,
+                                               RoutineName + "Temperature out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
                                                    "] viscosity **",
                                                GlycolErrorTracking(GlycolIndex).ViscosityHighErrIndex,
                                                Temperature,
@@ -8290,7 +8372,8 @@ CurrentModuleObject,
             SatVapEnthalpy = refrig.HfgValues(refrig.HfLowTempIndex);
             // Temperature supplied is out of bounds--produce an error message...
             if (!state.dataGlobal->WarmupFlag)
-                ShowRecurringWarningErrorAtEnd(state, "GetQualityRefrig: ** Temperature for requested quality is below the range of data supplied **",
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "GetQualityRefrig: ** Temperature for requested quality is below the range of data supplied **",
                                                state.dataFluidProps->TempLoRangeErrIndexGetQualityRefrig,
                                                Temperature,
                                                Temperature,
@@ -8303,7 +8386,8 @@ CurrentModuleObject,
             SatVapEnthalpy = refrig.HfgValues(refrig.HfHighTempIndex);
             // Temperature supplied is out of bounds--produce an error message...
             if (!state.dataGlobal->WarmupFlag)
-                ShowRecurringWarningErrorAtEnd(state, "GetQualityRefrig: ** Temperature requested quality is above the range of data supplied **",
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "GetQualityRefrig: ** Temperature requested quality is above the range of data supplied **",
                                                state.dataFluidProps->TempHiRangeErrIndexGetQualityRefrig,
                                                Temperature,
                                                Temperature,
@@ -8361,7 +8445,6 @@ CurrentModuleObject,
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Found; // Indicator for found item
 
-
         // Make sure we have already read in the input
         if (GetInput) {
             GetFluidPropertiesData(state);
@@ -8407,7 +8490,6 @@ CurrentModuleObject,
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Found; // Indicator for found item
-
 
         // Make sure we have already read in the input
         if (GetInput) {
@@ -8475,8 +8557,6 @@ CurrentModuleObject,
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
-
-
 
         // Check to see if this glycol shows up in the glycol data
         //  ArrayLength = SIZE(GlycolData)
@@ -8649,7 +8729,7 @@ CurrentModuleObject,
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         // error counters and dummy string
-        bool ErrorFlag(false);           // error flag for current call
+        bool ErrorFlag(false); // error flag for current call
 
         int const LoTempIndex = FindArrayIndex(Temperature, PropTemps, LowBound, UpperBound); // array index for temp above input temp
 
@@ -8686,7 +8766,8 @@ CurrentModuleObject,
                 ShowContinueError(state, format("Refrigerant temperature = {:.2R}", Temperature));
                 ShowContinueError(state, format("Returned saturated property value = {:.3R}", ReturnValue));
             } else {
-                ShowRecurringWarningErrorAtEnd(state, "GetInterpolatedSatProp: Refrigerant temperature for interpolation out of range error",
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "GetInterpolatedSatProp: Refrigerant temperature for interpolation out of range error",
                                                state.dataFluidProps->TempRangeErrIndexGetInterpolatedSatProp,
                                                Temperature,
                                                Temperature,
@@ -8701,7 +8782,8 @@ CurrentModuleObject,
 
     //*****************************************************************************
 
-    int CheckFluidPropertyName(EnergyPlusData &state, std::string const &NameToCheck) // Name from input(?) to be checked against valid FluidPropertyNames
+    int CheckFluidPropertyName(EnergyPlusData &state,
+                               std::string const &NameToCheck) // Name from input(?) to be checked against valid FluidPropertyNames
     {
 
         // FUNCTION INFORMATION:
@@ -9033,7 +9115,8 @@ CurrentModuleObject,
         }
     }
 
-    GlycolAPI::GlycolAPI(EnergyPlusData &state, std::string const &glycolName) {
+    GlycolAPI::GlycolAPI(EnergyPlusData &state, std::string const &glycolName)
+    {
         this->glycolName = EnergyPlus::UtilityRoutines::MakeUPPERCase(glycolName);
         this->glycolIndex = 0;
         this->cf = "GlycolAPI:Instance";
@@ -9041,20 +9124,25 @@ CurrentModuleObject,
             EnergyPlus::ShowFatalError(state, "Can only do water right now");
         }
     }
-    Real64 GlycolAPI::specificHeat(EnergyPlusData &state, Real64 temperature) {
+    Real64 GlycolAPI::specificHeat(EnergyPlusData &state, Real64 temperature)
+    {
         return FluidProperties::GetSpecificHeatGlycol(state, this->glycolName, temperature, this->glycolIndex, this->cf);
     }
-    Real64 GlycolAPI::density(EnergyPlusData &state, Real64 temperature) {
+    Real64 GlycolAPI::density(EnergyPlusData &state, Real64 temperature)
+    {
         return FluidProperties::GetDensityGlycol(state, this->glycolName, temperature, this->glycolIndex, this->cf);
     }
-    Real64 GlycolAPI::conductivity(EnergyPlusData &state, Real64 temperature) {
+    Real64 GlycolAPI::conductivity(EnergyPlusData &state, Real64 temperature)
+    {
         return FluidProperties::GetConductivityGlycol(state, this->glycolName, temperature, this->glycolIndex, this->cf);
     }
-    Real64 GlycolAPI::viscosity(EnergyPlusData &state, Real64 temperature) {
+    Real64 GlycolAPI::viscosity(EnergyPlusData &state, Real64 temperature)
+    {
         return FluidProperties::GetViscosityGlycol(state, this->glycolName, temperature, this->glycolIndex, this->cf);
     }
 
-    RefrigerantAPI::RefrigerantAPI(EnergyPlusData &state, std::string const &refrigName) {
+    RefrigerantAPI::RefrigerantAPI(EnergyPlusData &state, std::string const &refrigName)
+    {
         this->rName = EnergyPlus::UtilityRoutines::MakeUPPERCase(refrigName);
         this->rIndex = 0;
         this->cf = "RefrigerantAPI:Instance";
@@ -9062,28 +9150,36 @@ CurrentModuleObject,
             EnergyPlus::ShowFatalError(state, "Can only do steam right now");
         }
     }
-    Real64 RefrigerantAPI::saturationPressure(EnergyPlusData &state, Real64 temperature) {
+    Real64 RefrigerantAPI::saturationPressure(EnergyPlusData &state, Real64 temperature)
+    {
         return FluidProperties::GetSatPressureRefrig(state, this->rName, temperature, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::saturationTemperature(EnergyPlusData &state, Real64 pressure) {
+    Real64 RefrigerantAPI::saturationTemperature(EnergyPlusData &state, Real64 pressure)
+    {
         return FluidProperties::GetSatTemperatureRefrig(state, this->rName, pressure, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::saturatedEnthalpy(EnergyPlusData &state, Real64 temperature, Real64 quality) {
+    Real64 RefrigerantAPI::saturatedEnthalpy(EnergyPlusData &state, Real64 temperature, Real64 quality)
+    {
         return FluidProperties::GetSatEnthalpyRefrig(state, this->rName, temperature, quality, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::saturatedDensity(EnergyPlusData &state, Real64 temperature, Real64 quality) {
+    Real64 RefrigerantAPI::saturatedDensity(EnergyPlusData &state, Real64 temperature, Real64 quality)
+    {
         return FluidProperties::GetSatDensityRefrig(state, this->rName, temperature, quality, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::saturatedSpecificHeat(EnergyPlusData &state, Real64 temperature, Real64 quality) {
+    Real64 RefrigerantAPI::saturatedSpecificHeat(EnergyPlusData &state, Real64 temperature, Real64 quality)
+    {
         return FluidProperties::GetSatSpecificHeatRefrig(state, this->rName, temperature, quality, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::superHeatedEnthalpy(EnergyPlusData &state, Real64 temperature, Real64 pressure) {
+    Real64 RefrigerantAPI::superHeatedEnthalpy(EnergyPlusData &state, Real64 temperature, Real64 pressure)
+    {
         return FluidProperties::GetSupHeatEnthalpyRefrig(state, this->rName, temperature, pressure, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::superHeatedPressure(EnergyPlusData &state, Real64 temperature, Real64 enthalpy) {
+    Real64 RefrigerantAPI::superHeatedPressure(EnergyPlusData &state, Real64 temperature, Real64 enthalpy)
+    {
         return FluidProperties::GetSupHeatPressureRefrig(state, this->rName, temperature, enthalpy, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::superHeatedDensity(EnergyPlusData &state, Real64 temperature, Real64 pressure) {
+    Real64 RefrigerantAPI::superHeatedDensity(EnergyPlusData &state, Real64 temperature, Real64 pressure)
+    {
         return FluidProperties::GetSupHeatDensityRefrig(state, this->rName, temperature, pressure, this->rIndex, this->cf);
     }
 

@@ -110,7 +110,6 @@ namespace FluidProperties {
     extern int FluidIndex_EthyleneGlycol;
     extern int FluidIndex_PropoleneGlycol;
 
-
 #ifdef EP_cache_GlycolSpecificHeat
     extern int const t_sh_cache_size;
     extern int const t_sh_precision_bits;
@@ -398,12 +397,12 @@ namespace FluidProperties {
     //*****************************************************************************
 
     void InterpValuesForGlycolConc(EnergyPlusData &state,
-                                   int NumOfConcs,               // number of concentrations (dimension of raw data)
-                                   int NumOfTemps,               // number of temperatures (dimension of raw data)
+                                   int NumOfConcs,                     // number of concentrations (dimension of raw data)
+                                   int NumOfTemps,                     // number of temperatures (dimension of raw data)
                                    const Array1D<Real64> &RawConcData, // concentrations for raw data
-                                   Array2S<Real64> RawPropData,  // raw property data (temperature,concentration)
-                                   Real64 Concentration,         // concentration of actual fluid mix
-                                   Array1D<Real64> &InterpData   // interpolated output data at proper concentration
+                                   Array2S<Real64> RawPropData,        // raw property data (temperature,concentration)
+                                   Real64 Concentration,               // concentration of actual fluid mix
+                                   Array1D<Real64> &InterpData         // interpolated output data at proper concentration
     );
 
     //*****************************************************************************
@@ -631,7 +630,6 @@ namespace FluidProperties {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-
         if (std::abs(Thi - Tlo) > TempToler) {
             return Xhi - (((Thi - Tact) / (Thi - Tlo)) * (Xhi - Xlo));
         } else {
@@ -674,13 +672,13 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    int FindArrayIndex(Real64 Value,           // Value to be placed/found within the array of values
+    int FindArrayIndex(Real64 Value,                 // Value to be placed/found within the array of values
                        Array1D<Real64> const &Array, // Array of values in ascending order
-                       int LowBound,           // Valid values lower bound (set by calling program)
-                       int UpperBound          // Valid values upper bound (set by calling program)
+                       int LowBound,                 // Valid values lower bound (set by calling program)
+                       int UpperBound                // Valid values upper bound (set by calling program)
     );
 
-    int FindArrayIndex(Real64 Value,          // Value to be placed/found within the array of values
+    int FindArrayIndex(Real64 Value,                // Value to be placed/found within the array of values
                        Array1D<Real64> const &Array // Array of values in ascending order
     );
 
@@ -699,7 +697,8 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    int CheckFluidPropertyName(EnergyPlusData &state, std::string const &NameToCheck); // Name from input(?) to be checked against valid FluidPropertyNames
+    int CheckFluidPropertyName(EnergyPlusData &state,
+                               std::string const &NameToCheck); // Name from input(?) to be checked against valid FluidPropertyNames
 
     void ReportOrphanFluids(EnergyPlusData &state);
 
@@ -727,7 +726,8 @@ namespace FluidProperties {
 
     void GetFluidSpecificHeatTemperatureLimits(EnergyPlusData &state, int FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit);
 
-    struct GlycolAPI {
+    struct GlycolAPI
+    {
         std::string glycolName;
         int glycolIndex;
         std::string cf;
@@ -739,7 +739,8 @@ namespace FluidProperties {
         Real64 viscosity(EnergyPlusData &state, Real64 temperature);
     };
 
-    struct RefrigerantAPI {
+    struct RefrigerantAPI
+    {
         std::string rName;
         int rIndex;
         std::string cf;
@@ -757,7 +758,8 @@ namespace FluidProperties {
 
 } // namespace FluidProperties
 
-struct FluidPropertiesData : BaseGlobalStruct {
+struct FluidPropertiesData : BaseGlobalStruct
+{
 
     int SatErrCountGetSupHeatEnthalpyRefrig = 0;
     int SatErrCountGetSupHeatDensityRefrig = 0;
