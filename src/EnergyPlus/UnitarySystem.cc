@@ -1870,7 +1870,7 @@ namespace UnitarySystems {
             state.dataSize->DXCoolCap = EqSizing.DesHeatingLoad;
         }
 
-        if (this->m_OKToPrintSizing) PrintFlag = true;
+        if (this->m_OKToPrintSizing && this->UnitType != "CoilSystem:Cooling:DX") PrintFlag = true;
         // STEP 5: report system parameters (e.g., air flow rates, capacities, etc.)
         if (this->m_FanExists) {
 
@@ -6896,6 +6896,7 @@ namespace UnitarySystems {
                 // now translate to UnitarySystem
                 int sysNum = state.dataUnitarySystems->numUnitarySystems;
                 UnitarySys thisSys;
+                thisSys.UnitType = cCurrentModuleObject;
                 // TODO: figure out another way to set this next variable
                 // Unitary System will not turn on unless this mode is set OR a different method is used to set air flow rate
                 thisSys.m_LastMode = state.dataUnitarySystems->CoolingMode;
