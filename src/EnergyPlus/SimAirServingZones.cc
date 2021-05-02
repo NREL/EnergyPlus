@@ -3578,7 +3578,7 @@ void SimAirLoopComponent(EnergyPlusData &state,
         } else if (SELECT_CASE_var == CoilUserDefined) { // Coil:UserDefined
             SimCoilUserDefined(state, CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
 
-        } else if (SELECT_CASE_var == UnitarySystemModel || SELECT_CASE_var == DXSystem) { // 'AirLoopHVAC:UnitarySystem'
+        } else if (SELECT_CASE_var == UnitarySystemModel) { // 'AirLoopHVAC:UnitarySystem'
             Real64 sensOut = 0.0;
             Real64 latOut = 0.0;
             CompPointer->simulate(state,

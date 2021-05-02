@@ -242,7 +242,10 @@ namespace UnitarySystems {
         // MassFlowRateMaxAvail issues are impeding non-VAV air loop equipment by limiting air flow
         // temporarily open up flow limits while simulating, and then set this same value at the INLET after this parent has simulated
         Real64 tempMassFlowRateMaxAvail = state.dataLoopNodes->Node(this->AirInNode).MassFlowRateMaxAvail;
-        state.dataLoopNodes->Node(this->AirInNode).MassFlowRateMaxAvail = this->m_DesignMassFlowRate;
+        // this is not working for CoilSystem simulated with UnitarySystem. Try to protect when this happens.
+        if (AirLoopNum > 0 && this->m_ControlType != ControlType::Setpoint) {
+            state.dataLoopNodes->Node(this->AirInNode).MassFlowRateMaxAvail = this->m_DesignMassFlowRate;
+        }
 
         if (this->m_OKToPrintSizing) {
             bool HXUnitOn = false;
@@ -309,7 +312,9 @@ namespace UnitarySystems {
         // No, can't do this since there are other checks that need this flag (e.g., HVACManager, SetHeatToReturnAirFlag())
         //  AirLoopControlInfo(AirLoopNum)%UnitarySys = .FALSE.
 
-        state.dataLoopNodes->Node(this->AirInNode).MassFlowRateMaxAvail = tempMassFlowRateMaxAvail;
+        if (AirLoopNum > 0 && this->m_ControlType != ControlType::Setpoint) {
+            state.dataLoopNodes->Node(this->AirInNode).MassFlowRateMaxAvail = tempMassFlowRateMaxAvail;
+        }
     }
 
     DesignSpecMSHP *DesignSpecMSHP::factory(EnergyPlusData &state, int object_type_of_num, std::string const objectName)
@@ -1524,12 +1529,12 @@ namespace UnitarySystems {
         bool HardSizeNoDesRun; // Indicator to a hard-sized field with no design sizing data
 
         // Initiate all reporting variables
-        if (state.dataSize->SysSizingRunDone || state.dataSize->ZoneSizingRunDone) {
+        if (((state.dataSize->CurOASysNum > 0 || state.dataSize->CurSysNum > 0) && state.dataSize->SysSizingRunDone) ||
+            (state.dataSize->CurZoneEqNum > 0 && state.dataSize->ZoneSizingRunDone)) {
             HardSizeNoDesRun = false;
         } else {
             HardSizeNoDesRun = true;
         }
-
         std::string SizingString;
         std::string CompName = this->Name;
         std::string CompType = this->UnitType;
@@ -2903,8 +2908,7 @@ namespace UnitarySystems {
                                       int sysNum,
                                       bool &errorsFound,
                                       bool const ZoneEquipment,
-                                      int const ZoneOAUnitNum,
-                                      int const compType_Num)
+                                      int const ZoneOAUnitNum)
     {
 
         static std::string const unitarySysHeatPumpPerformanceObjectType("UnitarySystemPerformance:Multispeed");
@@ -6892,11 +6896,14 @@ namespace UnitarySystems {
                 // now translate to UnitarySystem
                 int sysNum = state.dataUnitarySystems->numUnitarySystems;
                 UnitarySys thisSys;
-                int compType_Num = SimAirServingZones::DXSystem;
                 // TODO: figure out another way to set this next variable
                 // Unitary System will not turn on unless this mode is set OR a different method is used to set air flow rate
                 thisSys.m_LastMode = state.dataUnitarySystems->CoolingMode;
-                thisSys.processInputSpec(state, original_input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum, compType_Num);
+                thisSys.processInputSpec(state, original_input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
+                // thisSys.m_MaxHeatAirVolFlow = thisSys.m_MaxCoolAirVolFlow;
+                // thisSys.m_MaxNoCoolHeatAirVolFlow = thisSys.m_MaxCoolAirVolFlow;
+                // thisSys.m_FanOpModeSchedPtr = -1;
+                
                 sysNum = getUnitarySystemIndex(state, thisObjectName);
 
                 if (sysNum == -1) {
@@ -7207,8 +7214,7 @@ namespace UnitarySystems {
                         UtilityRoutines::MakeUPPERCase(fields.at("design_specification_multispeed_object_name"));
                 }
 
-                int compType_Num = SimAirServingZones::UnitarySystemModel;
-                thisSys.processInputSpec(state, input_spec, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum, compType_Num);
+                thisSys.processInputSpec(state, input_spec, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
 
                 if (sysNum == -1) {
                     state.dataUnitarySystems->unitarySys.push_back(thisSys);

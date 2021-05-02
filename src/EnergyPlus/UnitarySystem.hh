@@ -524,8 +524,7 @@ namespace UnitarySystems {
                               int sysNum,
                               bool &errorsFound,
                               bool const ZoneEquipment,
-                              int const ZoneOAUnitNum,
-                              int const compType_Num);
+                              int const ZoneOAUnitNum);
 
         void setSystemParams(EnergyPlusData &state, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
 
