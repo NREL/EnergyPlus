@@ -365,8 +365,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
 }
 TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
 {
-    // different names between internal gain objects and room air objects for internal gains result in fatal error from GetInternalGainDeviceIndex
-    // function.
+    // different names between internal gain objects and room air objects for internal gains result in fatal error from GetInternalGainDeviceIndex.
     bool ErrorsFound(false);
     std::string const idf_objects = delimited_string({
 

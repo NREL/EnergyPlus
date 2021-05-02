@@ -1397,7 +1397,7 @@ namespace RoomAirModelManager {
         int TotNumOfRAFNNodeSurfLists;
         int TotNumOfRAFNNodeGainsLists;
         int TotNumOfRAFNNodeHVACLists;
-        bool IntGainError;
+        int IntGainIndex;
         int RAFNNodeNum;
         bool foundList;
         int NumSurfsThisNode;
@@ -1710,15 +1710,13 @@ namespace RoomAirModelManager {
                                 state.dataIPShortCut->cAlphaArgs(gainsLoop * 2 + 1);
 
                             // verify type and name and get pointer to device in internal gains structure array
-                            IntGainError = false;
-                            GetInternalGainDeviceIndex(
+                            IntGainIndex = GetInternalGainDeviceIndex(
                                 state,
                                 ZoneNum,
                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).TypeOfNum,
                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).Name,
-                                state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGainsDeviceIndices(gainsLoop),
-                                IntGainError);
-                            if (IntGainError) {
+                                state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGainsDeviceIndices(gainsLoop));
+                            if (IntGainIndex<0) {
                                 ShowSevereError(state,
                                                 "GetRoomAirflowNetworkData: Invalid " + state.dataIPShortCut->cAlphaFieldNames(gainsLoop * 2 + 1) +
                                                     " = " + state.dataIPShortCut->cAlphaArgs(gainsLoop * 2 + 1));
