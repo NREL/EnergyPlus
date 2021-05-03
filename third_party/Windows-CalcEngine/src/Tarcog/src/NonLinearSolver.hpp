@@ -15,7 +15,7 @@ namespace Tarcog
         class CNonLinearSolver
         {
         public:
-            explicit CNonLinearSolver(CIGU & t_IGU);
+            explicit CNonLinearSolver(CIGU & t_IGU, size_t numberOfIterations = 0u);
 
             // sets tolerance for solution
             void setTolerance(double t_Tolerance);

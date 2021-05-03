@@ -84,9 +84,9 @@ namespace Tarcog
             const auto aFirstLayer = m_IGU.getEnvironment(Environment::Outdoor);
             m_Environment.at(Environment::Outdoor)->connectToIGULayer(aFirstLayer);
 
-            initializeStartValues();
+            //initializeStartValues();
 
-            m_NonLinearSolver = std::make_shared<CNonLinearSolver>(m_IGU);
+            m_NonLinearSolver = std::make_shared<CNonLinearSolver>(m_IGU, t_SingleSystem.getNumberOfIterations());
 
             return *this;
         }

@@ -12,11 +12,11 @@ namespace Tarcog
 {
     namespace ISO15099
     {
-        CNonLinearSolver::CNonLinearSolver(CIGU & t_IGU) :
+        CNonLinearSolver::CNonLinearSolver(CIGU & t_IGU, const size_t numberOfIterations) :
             m_IGU(t_IGU),
             m_QBalance(m_IGU),
             m_Tolerance(IterationConstants::CONVERGENCE_TOLERANCE),
-            m_Iterations(0),
+            m_Iterations(numberOfIterations),
             m_RelaxParam(IterationConstants::RELAXATION_PARAMETER_MAX),
             m_SolutionTolerance(0)
         {}

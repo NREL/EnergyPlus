@@ -9,7 +9,7 @@
 class TestDoubleClearIndoorShadeAir : public testing::Test
 {
 private:
-    std::shared_ptr<Tarcog::ISO15099::CSingleSystem> m_TarcogSystem;
+    std::unique_ptr<Tarcog::ISO15099::CSingleSystem> m_TarcogSystem;
 
 protected:
     void SetUp() override
@@ -89,27 +89,27 @@ protected:
         /////////////////////////////////////////////////////////
         // System
         /////////////////////////////////////////////////////////
-        m_TarcogSystem = std::make_shared<Tarcog::ISO15099::CSingleSystem>(aIGU, Indoor, Outdoor);
+        m_TarcogSystem = std::make_unique<Tarcog::ISO15099::CSingleSystem>(aIGU, Indoor, Outdoor);
         ASSERT_TRUE(m_TarcogSystem != nullptr);
 
         m_TarcogSystem->solve();
     }
 
 public:
-    std::shared_ptr<Tarcog::ISO15099::CSingleSystem> GetSystem() const
+    [[nodiscard]] Tarcog::ISO15099::CSingleSystem & GetSystem() const
     {
-        return m_TarcogSystem;
-    };
+        return *m_TarcogSystem;
+    }
 };
 
 TEST_F(TestDoubleClearIndoorShadeAir, Test1)
 {
     SCOPED_TRACE("Begin Test: Indoor Shade - Air");
 
-    auto aSystem = GetSystem();
+    const auto aSystem = GetSystem();
 
-    auto temperature = aSystem->getTemperatures();
-    auto radiosity = aSystem->getRadiosities();
+    const auto temperature = aSystem.getTemperatures();
+    const auto radiosity = aSystem.getRadiosities();
 
     std::vector<double> correctTemp = {
       258.226548, 258.740345, 276.199456, 276.713252, 288.115819, 288.119712};
@@ -125,9 +125,9 @@ TEST_F(TestDoubleClearIndoorShadeAir, Test1)
         EXPECT_NEAR(correctJ[i], radiosity[i], 1e-6);
     }
 
-    //const auto numOfIter = aSystem->getNumberOfIterations();
-    //EXPECT_EQ(1, int(numOfIter));
+    const auto numOfIter = aSystem.getNumberOfIterations();
+    EXPECT_EQ(3u, numOfIter);
 
-    const auto ventilatedFlow = aSystem->getVentilationFlow(Tarcog::ISO15099::Environment::Indoor);
-    EXPECT_NEAR(40.068453, ventilatedFlow, 1e-5);
+    const auto ventilatedFlow = aSystem.getVentilationFlow(Tarcog::ISO15099::Environment::Indoor);
+    EXPECT_NEAR(40.068458, ventilatedFlow, 1e-6);
 }
