@@ -32,7 +32,6 @@ private: // Types
 public: // Types
 
 	typedef  typename Super::Base  Base;
-	typedef  typename Super::Tail  Tail;
 	typedef  typename Super::IR  IR;
 
 	// STL Style
@@ -80,97 +79,82 @@ public: // Creation
 
 	// Default Constructor
 	Array1A() :
-	 Super( ProxySentinel() )
+	 Super( ProxySentinel{} )
 	{}
 
 	// Copy Constructor
 	Array1A( Array1A const & a ) :
-	 Super( a, ProxySentinel() )
+	 Super( a, ProxySentinel{} )
 	{
 		shift_set( a.shift_ );
 	}
 
 	// Super Constructor
 	Array1A( Super const & a ) :
-	 Super( a, ProxySentinel() )
+	 Super( a, ProxySentinel{} )
 	{
 		shift_set( a.shift_ );
 	}
 
 	// Slice Constructor
 	Array1A( Array1S< T > const & a ) :
-	 Super( a, ProxySentinel() )
+	 Super( a, ProxySentinel{} )
 	{
 		shift_set( a.shift() );
 	}
 
 	// Base Constructor
 	Array1A( Base const & a ) :
-	 Super( a, ProxySentinel() )
-	{
-		shift_set( 1 );
-	}
-
-	// Tail Constructor
-	Array1A( Tail const & s ) :
-	 Super( s, ProxySentinel() )
+	 Super( a, ProxySentinel{} )
 	{
 		shift_set( 1 );
 	}
 
 	// Value Constructor
 	Array1A( T const & t ) :
-	 Super( t, ProxySentinel() )
+	 Super( t, ProxySentinel{} )
 	{
 		shift_set( 1 );
 	}
 
 	// Copy + IndexRange Constructor
 	Array1A( Array1A const & a, IR const & I ) :
-	 Super( a, I, ProxySentinel() )
+	 Super( a, I, ProxySentinel{} )
 	{
 		dimension_argument();
 	}
 
 	// Super + IndexRange Constructor
 	Array1A( Super const & a, IR const & I ) :
-	 Super( a, I, ProxySentinel() )
+	 Super( a, I, ProxySentinel{} )
 	{
 		dimension_argument();
 	}
 
 	// Slice + IndexRange Constructor
 	Array1A( Array1S< T > const & a, IR const & I ) :
-	 Super( a, I, ProxySentinel() )
+	 Super( a, I, ProxySentinel{} )
 	{
 		dimension_argument();
 	}
 
 	// Base + IndexRange Constructor
 	Array1A( Base const & a, IR const & I ) :
-	 Super( a, I, ProxySentinel() )
-	{
-		dimension_argument();
-	}
-
-	// Tail + IndexRange Constructor
-	Array1A( Tail const & s, IR const & I ) :
-	 Super( s, I, ProxySentinel() )
+	 Super( a, I, ProxySentinel{} )
 	{
 		dimension_argument();
 	}
 
 	// Value + IndexRange Constructor
 	Array1A( T const & t, IR const & I ) :
-	 Super( t, I, ProxySentinel() )
+	 Super( t, I, ProxySentinel{} )
 	{
 		dimension_argument();
 	}
 
 	// Destructor
 	virtual
-	~Array1A()
-	{}
+	~Array1A() = default;
 
 public: // Assignment: Array
 
@@ -210,15 +194,6 @@ public: // Assignment: Array
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	Array1A &
 	operator =( Array1S< U > const & a )
-	{
-		Super::operator =( a );
-		return *this;
-	}
-
-	// MArray Assignment Template
-	template< class A, typename M >
-	Array1A &
-	operator =( MArray1< A, M > const & a )
 	{
 		Super::operator =( a );
 		return *this;
@@ -345,42 +320,6 @@ public: // Assignment: Array
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	Array1A &
 	operator /=( Array1S< U > const & a )
-	{
-		Super::operator /=( a );
-		return *this;
-	}
-
-	// += MArray Template
-	template< class A, typename M >
-	Array1A &
-	operator +=( MArray1< A, M > const & a )
-	{
-		Super::operator +=( a );
-		return *this;
-	}
-
-	// -= MArray Template
-	template< class A, typename M >
-	Array1A &
-	operator -=( MArray1< A, M > const & a )
-	{
-		Super::operator -=( a );
-		return *this;
-	}
-
-	// *= MArray Template
-	template< class A, typename M >
-	Array1A &
-	operator *=( MArray1< A, M > const & a )
-	{
-		Super::operator *=( a );
-		return *this;
-	}
-
-	// /= MArray Template
-	template< class A, typename M >
-	Array1A &
-	operator /=( MArray1< A, M > const & a )
 	{
 		Super::operator /=( a );
 		return *this;
@@ -602,170 +541,6 @@ public: // Assignment: Array
 		return *this;
 	}
 
-public: // Assignment: Array: Logical
-
-	// &&= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1A &
-	and_equals( Array1< U > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1A &
-	or_equals( Array1< U > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
-
-	// &&= Slice Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1A &
-	and_equals( Array1S< U > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= Slice Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1A &
-	or_equals( Array1S< U > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
-
-	// &&= MArray Template
-	template< class A, typename M >
-	Array1A &
-	and_equals( MArray1< A, M > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= MArray Template
-	template< class A, typename M >
-	Array1A &
-	or_equals( MArray1< A, M > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
-
-	// &&= Initializer List Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1A &
-	and_equals( std::initializer_list< U > const l )
-	{
-		Super::and_equals( l );
-		return *this;
-	}
-
-	// ||= Initializer List Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1A &
-	or_equals( std::initializer_list< U > const l )
-	{
-		Super::or_equals( l );
-		return *this;
-	}
-
-	// &&= std::array Template
-	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1A &
-	and_equals( std::array< U, s > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= std::array Template
-	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1A &
-	or_equals( std::array< U, s > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
-
-	// &&= std::vector Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1A &
-	and_equals( std::vector< U > const & v )
-	{
-		Super::and_equals( v );
-		return *this;
-	}
-
-	// ||= std::vector Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1A &
-	or_equals( std::vector< U > const & v )
-	{
-		Super::or_equals( v );
-		return *this;
-	}
-
-	// &&= Vector2 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1A &
-	and_equals( Vector2< U > const & v )
-	{
-		Super::and_equals( v );
-		return *this;
-	}
-
-	// ||= Vector2 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1A &
-	or_equals( Vector2< U > const & v )
-	{
-		Super::or_equals( v );
-		return *this;
-	}
-
-	// &&= Vector3 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1A &
-	and_equals( Vector3< U > const & v )
-	{
-		Super::and_equals( v );
-		return *this;
-	}
-
-	// ||= Vector3 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1A &
-	or_equals( Vector3< U > const & v )
-	{
-		Super::or_equals( v );
-		return *this;
-	}
-
-	// &&= Vector4 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1A &
-	and_equals( Vector4< U > const & v )
-	{
-		Super::and_equals( v );
-		return *this;
-	}
-
-	// ||= Vector4 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1A &
-	or_equals( Vector4< U > const & v )
-	{
-		Super::or_equals( v );
-		return *this;
-	}
-
 public: // Assignment: Value
 
 	// = Value
@@ -860,87 +635,6 @@ public: // Modifier
 	{
 		I_.assign( a.I() );
 		dimension_argument();
-		return *this;
-	}
-
-	// Attach to Super Array
-	Array1A &
-	attach( Super const & a )
-	{
-		Base::attach( a );
-		I_.assign( a.I_ );
-		return *this;
-	}
-
-	// Attach to Non-Const Super Array
-	Array1A &
-	attach( Super & a )
-	{
-		Base::attach( a );
-		I_.assign( a.I_ );
-		return *this;
-	}
-
-	// Attach to Base Array
-	Array1A &
-	attach( Base const & a )
-	{
-		Base::attach< 1 >( a );
-		I_ = a.isize();
-		return *this;
-	}
-
-	// Attach to Non-Const Base Array
-	Array1A &
-	attach( Base & a )
-	{
-		Base::attach< 1 >( a );
-		I_ = a.isize();
-		return *this;
-	}
-
-	// Attach to Tail
-	Array1A &
-	attach( Tail const & s )
-	{
-		Base::attach< 1 >( s );
-		I_ = s.isize();
-		return *this;
-	}
-
-	// Attach to Non-Const Tail
-	Array1A &
-	attach( Tail & s )
-	{
-		Base::attach< 1 >( s );
-		I_ = s.isize();
-		return *this;
-	}
-
-	// Attach to Value
-	Array1A &
-	attach( T const & t )
-	{
-		Base::attach< 1 >( t );
-		I_ = _;
-		return *this;
-	}
-
-	// Attach to Non-Const Value
-	Array1A &
-	attach( T & t )
-	{
-		Base::attach< 1 >( t );
-		I_ = _;
-		return *this;
-	}
-
-	// Detach from Source Array
-	Array1A &
-	detach()
-	{
-		Base::detach();
-		I_.clear();
 		return *this;
 	}
 

@@ -1362,7 +1362,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                         //).Instance(
                         // j
                         //).checkfmuInputVariable, NumFMUInputVariables, IsNotOK, IsBlank, "The FMU input variable \"" +
-                        //state.dataExternalInterface->FMU( i ).Instance( j
+                        // state.dataExternalInterface->FMU( i ).Instance( j
                         //).fmuInputVariable( k ).Name + "\" of instance \"" + state.dataExternalInterface->FMU( i ).Instance( j ).Name + "\" of FMU
                         //\"" + state.dataExternalInterface->FMU( i ).Name + "\"
                         // has duplicates. Please check the input file again and delete duplicated entries." );

@@ -2463,10 +2463,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
     InitSurfaceHeatBalance(*state);
-    for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
+    for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
         state->dataSurface->Surface(SurfNum).ExtConvCoeff = -1;
     }
-
     // Test Additional Heat Source Calculation
     CalcHeatBalanceOutsideSurf(*state);
     EXPECT_EQ(-0.1, state->dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(1));

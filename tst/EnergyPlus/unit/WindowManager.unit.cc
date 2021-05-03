@@ -553,7 +553,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBalFanSys->QHWBaseboardSurf.allocate(3);
     state->dataHeatBalFanSys->QSteamBaseboardSurf.allocate(3);
     state->dataHeatBalFanSys->QElecBaseboardSurf.allocate(3);
-    state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(1, 3);
+    state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(3, 1);
     state->dataHeatBal->SurfQRadThermInAbs.allocate(3);
     state->dataHeatBal->SurfQRadSWOutIncident.allocate(3);
     state->dataSurface->SurfWinTransSolar.allocate(3);
@@ -2781,7 +2781,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBalFanSys->QHWBaseboardSurf.allocate(3);
     state->dataHeatBalFanSys->QSteamBaseboardSurf.allocate(3);
     state->dataHeatBalFanSys->QElecBaseboardSurf.allocate(3);
-    state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(1, 3);
+    state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(3, 1);
     state->dataHeatBal->SurfQRadThermInAbs.allocate(3);
     state->dataHeatBal->SurfQRadSWOutIncident.allocate(3);
     state->dataSurface->SurfWinTransSolar.allocate(3);
@@ -2865,7 +2865,7 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
     HeatBalanceManager::GetMaterialData(*state, errors_found);
     EXPECT_FALSE(errors_found);
     EXPECT_EQ(state->dataHeatBal->ComplexShade(1).Name, "SHADE_14_LAYER");
-    EXPECT_EQ(state->dataHeatBal->ComplexShade(1).LayerType, 1);
+    EXPECT_EQ(state->dataHeatBal->ComplexShade(1).LayerType, TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ);
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).Thickness, 1.016000e-003, 1e-5);
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).Conductivity, 1.592276e+002, 1e-5);
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).IRTransmittance, 0, 1e-5);
