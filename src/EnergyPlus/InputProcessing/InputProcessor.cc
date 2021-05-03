@@ -542,18 +542,18 @@ bool InputProcessor::getDefaultValue(EnergyPlusData &state, std::string const &o
     return defaultFound;
 }
 
-void InputProcessor::getFieldValue(EnergyPlusData &state,
+std::string InputProcessor::getAlphaFieldValue(EnergyPlusData &state,
                                    std::string const &objectWord,
                                    json const &ep_object,
                                    json schema_obj_props,
-                                   std::string const &fieldName,
-                                   std::string &value)
+                                   std::string const &fieldName)
 {
     auto const &schema_field_obj = schema_obj_props[fieldName];
     if (schema_field_obj.empty()) {
         ShowFatalError(state, "InputProcessor::fieldValue: Invalid field name = " + fieldName + "for object type = " + objectWord);
     }
     bool isDefaulted = false;
+    std::string value;
     auto it = ep_object.find(fieldName);
     if (it != ep_object.end()) {
         auto const &field_value = it.value();
@@ -571,16 +571,18 @@ void InputProcessor::getFieldValue(EnergyPlusData &state,
             value = "";
         }
     }
+    return value;
 }
 
-void InputProcessor::getFieldValue(
-    EnergyPlusData &state, std::string const &objectWord, json const &ep_object, json schema_obj_props, std::string const &fieldName, Real64 &value)
+Real64 InputProcessor::getRealFieldValue(
+    EnergyPlusData &state, std::string const &objectWord, json const &ep_object, json schema_obj_props, std::string const &fieldName)
 {
     auto const &schema_field_obj = schema_obj_props[fieldName];
     if (schema_field_obj.empty()) {
         ShowFatalError(state, "InputProcessor::fieldValue: Invalid field name = " + fieldName + "for object type = " + objectWord);
     }
     bool isDefaulted = false;
+    Real64 value = 0.0;
     auto it = ep_object.find(fieldName);
     if (it != ep_object.end()) {
         auto const &field_value = it.value();
@@ -604,6 +606,7 @@ void InputProcessor::getFieldValue(
             value = 0.0;
         }
     }
+    return value;
 }
 void InputProcessor::getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord, json &schema_obj_props)
 {
