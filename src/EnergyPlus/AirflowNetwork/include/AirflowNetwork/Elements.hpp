@@ -1670,7 +1670,8 @@ struct AirflowNetworkData : BaseGlobalStruct
     bool VAVSystem = false;              // This flag is used to represent a VAV system
     Real64 ExhaustFanMassFlowRate = 0.0; // Exhaust fan flow rate used in PressureStat
     AirflowNetwork::PressureCtrl PressureSetFlag = AirflowNetwork::PressureCtrl::Unassigned; // PressureSet flag
-    Real64 ReliefMassFlowRate = 0.0;                                                         // OA Mixer relief node flow rate used in PressureStat
+    Real64 ReliefMassFlowRate = 0.0;     // OA Mixer relief node flow rate used in PressureStat
+    bool AFNDefaultControlFlag = false;  // Default simulation control flag
 
     Array1D<AirflowNetwork::AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
     Array1D<AirflowNetwork::AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
