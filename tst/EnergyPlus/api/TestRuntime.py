@@ -80,3 +80,7 @@ api.runtime.callback_begin_new_environment(state, environment_handler)
 api.runtime.callback_progress(state, progress_handler)
 api.functional.callback_error(state, error_handler)
 api.runtime.run_energyplus(state, sys.argv[1:])
+
+state2 = api.state_manager.new_state()
+api.runtime.mute_console_output(state)
+api.runtime.run_energyplus(state, sys.argv[1:])

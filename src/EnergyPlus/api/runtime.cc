@@ -75,6 +75,12 @@ void stopSimulation(EnergyPlusState state)
     thisState->dataGlobal->stopSimulation = true;
 }
 
+void muteConsoleOutput(EnergyPlusState state)
+{
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    thisState->dataGlobal->muteConsoleOutput = true;
+}
+
 void issueWarning(EnergyPlusState state, const char *message)
 {
     auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);

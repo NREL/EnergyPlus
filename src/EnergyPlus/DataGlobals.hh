@@ -163,6 +163,7 @@ struct DataGlobal : BaseGlobalStruct
     bool CountNonZoneEquip = true;
     int FDsimDay = 0;
     int FDnumIterYears = 0;
+    bool muteConsoleOutput = false;
 
     void clear_state() override
     {
@@ -263,6 +264,7 @@ struct DataGlobal : BaseGlobalStruct
         this->CountNonZoneEquip = true;
         this->FDsimDay = 0;
         this->FDnumIterYears = 0;
+        this->muteConsoleOutput = false;
     }
 };
 

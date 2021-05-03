@@ -886,7 +886,7 @@ int EndEnergyPlus(EnergyPlusData &state)
 #ifdef EP_Detailed_Timings
     epSummaryTimes(Time_Finish - Time_Start);
 #endif
-    std::cerr << "EnergyPlus Completed Successfully." << std::endl;
+    if (!state.dataGlobal->muteConsoleOutput) std::cerr << "EnergyPlus Completed Successfully." << std::endl;
     // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
     // indicating that E+ finished its simulation
     if ((state.dataExternalInterface->NumExternalInterfaces > 0) && state.dataExternalInterface->haveExternalInterfaceBCVTB) CloseSocket(state, 1);
@@ -1603,7 +1603,7 @@ void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, Op
         // CacheIPErrorFile is never opened or closed
         // so this output would just go to stdout
         // ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
-        std::cout << ErrorMessage << '\n';
+        if (!state.dataGlobal->muteConsoleOutput) std::cout << ErrorMessage << '\n';
     }
     if (present(OutUnit1)) {
         print(OutUnit1(), "  {}", ErrorMessage);
