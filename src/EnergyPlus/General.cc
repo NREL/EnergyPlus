@@ -1255,36 +1255,6 @@ Real64 BlindBeamBeamTrans(Real64 const ProfAng,        // Solar profile angle (r
     return BlindBeamBeamTrans;
 }
 
-Real64 POLYF(Real64 const X,         // Cosine of angle of incidence
-             Array1<Real64> const &A // Polynomial coefficients
-)
-{
-    // Return value
-    Real64 POLYF;
-
-    if (X < 0.0 || X > 1.0) {
-        POLYF = 0.0;
-    } else {
-        POLYF = X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
-    }
-    return POLYF;
-}
-
-Real64 POLYF(Real64 const X,          // Cosine of angle of incidence
-             Array1S<Real64> const &A // Polynomial coefficients
-)
-{
-    // Return value
-    Real64 POLYF;
-
-    if (X < 0.0 || X > 1.0) {
-        POLYF = 0.0;
-    } else {
-        POLYF = X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
-    }
-    return POLYF;
-}
-
 std::string &strip_trailing_zeros(std::string &InputString)
 {
     // FUNCTION INFORMATION:
