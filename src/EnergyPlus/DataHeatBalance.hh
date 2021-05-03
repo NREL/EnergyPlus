@@ -2049,6 +2049,8 @@ struct HeatBalanceData : BaseGlobalStruct
     bool NoFfactorConstructionsUsed = true;
     bool NoCfactorConstructionsUsed = true;
     bool NoRegularMaterialsUsed = true;
+
+
     Array1D<Real64> SNLoadHeatEnergy;
     Array1D<Real64> SNLoadCoolEnergy;
     Array1D<Real64> SNLoadHeatRate;
@@ -2067,15 +2069,15 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> GroupSNLoadCoolEnergy;
     Array1D<Real64> GroupSNLoadHeatRate;
     Array1D<Real64> GroupSNLoadCoolRate;
-    Array1D<Real64> MRT;            // MEAN RADIANT TEMPERATURE (C)
-    Array1D<Real64> ZoneTransSolar; // Exterior beam plus diffuse solar entering zone sum of WinTransSolar for exterior windows in zone (W)
-    Array1D<Real64>
-        ZoneWinHeatGain; // Heat gain to zone from all exterior windows (includes oneTransSolar); sum of WinHeatGain for exterior windows in zone (W)
+
+    Array1D<Real64> ZoneMRT;            // MEAN RADIANT TEMPERATURE (C)
+    Array1D<Real64> ZoneTransSolar;     // Exterior beam plus diffuse solar entering zone sum of WinTransSolar for exterior windows in zone (W)
+    Array1D<Real64> ZoneWinHeatGain;    // Heat gain to zone from all exterior windows (includes oneTransSolar); sum of WinHeatGain for exterior windows in zone (W)
     Array1D<Real64> ZoneWinHeatGainRep;                 // = ZoneWinHeatGain when ZoneWinHeatGain >= 0
     Array1D<Real64> ZoneWinHeatLossRep;                 // = -ZoneWinHeatGain when ZoneWinHeatGain < 0
     Array1D<Real64> ZoneBmSolFrExtWinsRep;              // Beam solar into zone from exterior windows [W]
     Array1D<Real64> ZoneBmSolFrIntWinsRep;              // Beam solar into zone from interior windows [W]
-    Array1D<Real64> InitialZoneDifSolReflW;             // Initial diffuse solar in zone from ext and int windows reflected from interior surfaces [W]
+    Array1D<Real64> ZoneInitialDifSolReflW;             // Initial diffuse solar in zone from ext and int windows reflected from interior surfaces [W]
     Array1D<Real64> ZoneDifSolFrExtWinsRep;             // Diffuse solar into zone from exterior windows [W]
     Array1D<Real64> ZoneDifSolFrIntWinsRep;             // Diffuse solar into zone from interior windows [W]
     Array1D<Real64> ZoneOpaqSurfInsFaceCond;            // Zone inside face opaque surface conduction (W)
@@ -2095,6 +2097,7 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> ZnOpqSurfInsFaceCondLsRepEnrg;      // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
     Array1D<Real64> ZnOpqSurfExtFaceCondGnRepEnrg;      // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
     Array1D<Real64> ZnOpqSurfExtFaceCondLsRepEnrg;      // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
+
     Array1D<Real64> SurfQRadThermInAbs;                 // Thermal radiation absorbed on inside surfaces
     Array1D<Real64> SurfQRadSWOutIncident;              // Exterior beam plus diffuse solar incident on surface (W/m2)
     Array1D<Real64> SurfQRadSWOutIncidentBeam;          // Exterior beam solar incident on surface (W/m2)
@@ -2123,19 +2126,22 @@ struct HeatBalanceData : BaseGlobalStruct
     Array2D<Real64> SurfWinFenLaySurfTempBack;          // Back surface temperatures of fenestration layers
     Array1D<Real64> SurfWinQRadSWwinAbsTotEnergy;       // Energy of QRadSWwinAbsTot [J]
     Array1D<Real64> SurfWinSWwinAbsTotalReport;         // Report - Total interior/exterior shortwave absorbed in all glass layers of window (W)
-    Array1D<Real64>
-        SurfWinInitialDifSolInTransReport;          // Report - Initial transmitted diffuse solar transmitted out through inside of window surface (W)
+    Array1D<Real64> SurfWinInitialDifSolInTransReport;  // Report - Initial transmitted diffuse solar transmitted out
+                                                        // through inside of window surface (W)
     Array2D<Real64> SurfWinQRadSWwinAbs;            // Short wave radiation absorbed in window glass layers
     Array2D<Real64> SurfWinInitialDifSolwinAbs;     // Initial diffuse solar absorbed in window glass layers from inside(W/m2)
     Array1D<Real64> SurfOpaqSWOutAbsTotalReport;    // Report - Total exterior shortwave/solar absorbed on outside of surface (W)
     Array1D<Real64> SurfOpaqSWOutAbsEnergyReport;   // Report - Total exterior shortwave/solar absorbed on outside of surface (j)
+
+    //Material
     Array1D<Real64> NominalR;                       // Nominal R value of each material -- used in matching interzone surfaces
     Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
     Array1D<Real64> NominalU;                       // Nominal U value for each construction -- used in matching interzone surfaces
-    Array1D<Real64> TempEffBulkAir;                 // air temperature adjacent to the surface used for inside surface heat balances
-    Array1D<Real64> HConvIn;                        // INSIDE CONVECTION COEFFICIENT
-    Array1D<Real64>
-        AnisoSkyMult; // Multiplier on exterior-surface sky view factor to account for anisotropy of sky radiance; = 1.0 for for isotropic sky
+
+    Array1D<Real64> SurfTempEffBulkAir;     // air temperature adjacent to the surface used for inside surface heat balances
+    Array1D<Real64> HConvIn;                // INSIDE CONVECTION COEFFICIENT
+    Array1D<Real64> SurfAnisoSkyMult;       // Multiplier on exterior-surface sky view factor to account for
+                                            // anisotropy of sky radiance; = 1.0 for for isotropic sky // todo - solarshading
     Array1D<Real64> DifShdgRatioIsoSky;     // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
     Array3D<Real64> DifShdgRatioIsoSkyHRTS; // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
     Array1D<Real64> curDifShdgRatioIsoSky;  // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
@@ -2148,9 +2154,10 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> MultIsoSky;             // Contribution to eff sky view factor from isotropic sky
     Array1D<Real64> MultCircumSolar;        // Contribution to eff sky view factor from circumsolar brightening
     Array1D<Real64> MultHorizonZenith;      // Contribution to eff sky view factor from horizon or zenith brightening
-    Array1D<Real64> QS; // Zone short-wave flux density; used to calculate short-wave  radiation absorbed on inside surfaces of zone or enclosure
+
+    Array1D<Real64> QS;                      // Zone short-wave flux density; used to calculate short-wave  radiation absorbed on inside surfaces of zone or enclosure
     Array1D<Real64> QSLights;                // Like QS, but Lights short-wave only.
-    Array1D<Real64> EnclSolQSDifSol;                // Like QS, but diffuse solar short-wave only.
+    Array1D<Real64> EnclSolQSDifSol;         // Like QS, but diffuse solar short-wave only.
     Array1D<Real64> ITABSF;                  // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
     Array1D<Real64> TMULT;                   // TMULT  - MULTIPLIER TO COMPUTE 'ITABSF'
     Array1D<Real64> QL;                      // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
@@ -2346,14 +2353,14 @@ struct HeatBalanceData : BaseGlobalStruct
         this->GroupSNLoadCoolEnergy.deallocate();
         this->GroupSNLoadHeatRate.deallocate();
         this->GroupSNLoadCoolRate.deallocate();
-        this->MRT.deallocate();
+        this->ZoneMRT.deallocate();
         this->ZoneTransSolar.deallocate();
         this->ZoneWinHeatGain.deallocate();
         this->ZoneWinHeatGainRep.deallocate();
         this->ZoneWinHeatLossRep.deallocate();
         this->ZoneBmSolFrExtWinsRep.deallocate();
         this->ZoneBmSolFrIntWinsRep.deallocate();
-        this->InitialZoneDifSolReflW.deallocate();
+        this->ZoneInitialDifSolReflW.deallocate();
         this->ZoneDifSolFrExtWinsRep.deallocate();
         this->ZoneDifSolFrIntWinsRep.deallocate();
         this->ZoneOpaqSurfInsFaceCond.deallocate();
@@ -2409,9 +2416,9 @@ struct HeatBalanceData : BaseGlobalStruct
         this->NominalR.deallocate();
         this->NominalRforNominalUCalculation.deallocate();
         this->NominalU.deallocate();
-        this->TempEffBulkAir.deallocate();
+        this->SurfTempEffBulkAir.deallocate();
         this->HConvIn.deallocate();
-        this->AnisoSkyMult.deallocate();
+        this->SurfAnisoSkyMult.deallocate();
         this->DifShdgRatioIsoSky.deallocate();
         this->DifShdgRatioIsoSkyHRTS.deallocate();
         this->curDifShdgRatioIsoSky.deallocate();

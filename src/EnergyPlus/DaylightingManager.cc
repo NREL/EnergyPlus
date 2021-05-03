@@ -8196,7 +8196,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
         for (ISky = 1; ISky <= 4; ++ISky) {
             // This is only an estimate because the anisotropic sky view of the shelf is not yet taken into account.
-            // AnisoSkyMult would be great to use but it is not available until the heat balance starts up.
+            // SurfAnisoSkyMult would be great to use but it is not available until the heat balance starts up.
             ZSK(ISky) = state.dataDaylightingManager->GILSK(IHR, ISky) * 1.0 * state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectVis *
                         state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
 

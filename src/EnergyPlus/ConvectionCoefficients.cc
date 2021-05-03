@@ -2666,7 +2666,7 @@ void CalcDetailedHcInForDVModel(EnergyPlusData &state,
         {
             auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
             if (SELECT_CASE_var == AdjacentAirTemp) {
-                TAirConv = state.dataHeatBal->TempEffBulkAir(SurfNum);
+                TAirConv = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
             } else {
                 // currently set to mean air temp but should add error warning here
                 TAirConv = state.dataHeatBalFanSys->MAT(Surface(SurfNum).Zone);
@@ -6339,7 +6339,7 @@ void CalcUserDefinedInsideHcModel(EnergyPlusData &state, int const SurfNum, int 
             tmpAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
             state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == RefTempAdjacentAirTemp) {
-            tmpAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
+            tmpAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
             state.dataSurface->SurfTAirRef(SurfNum) = AdjacentAirTemp;
         } else if (SELECT_CASE_var == RefTempSupplyAirTemp) {
             tmpAirTemp = SupplyAirTemp;

@@ -739,7 +739,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
             if (SELECT_CASE_var == ZoneMeanAirTemp) {
                 RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
             } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
+                RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
             } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                 ZoneEquipConfigNum = ZoneNum;
                 // check whether this zone is a controlled zone or not
@@ -783,7 +783,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
                     RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
                 } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                    RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNumAdj);
+                    RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj);
                 } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                     // determine ZoneEquipConfigNum for this zone
                     ZoneEquipConfigNum = ZoneNum;
@@ -815,7 +815,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
             }
 
             Tout = RefAirTemp + DataGlobalConstants::KelvinConv; // outside air temperature
-            tsky = state.dataHeatBal->MRT(ZoneNumAdj) +
+            tsky = state.dataHeatBal->ZoneMRT(ZoneNumAdj) +
                    DataGlobalConstants::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
 
             // The IR radiance of this window's "exterior" surround is the IR radiance

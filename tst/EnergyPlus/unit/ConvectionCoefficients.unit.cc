@@ -713,8 +713,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     state->dataSurface->Surface.allocate(SurfNum);
     state->dataSurface->Surface(SurfNum).Zone = 1;
     state->dataRoomAirMod->AirModel.allocate(1);
-    state->dataHeatBal->TempEffBulkAir.allocate(1);
-    state->dataHeatBal->TempEffBulkAir(1) = 1.0;
+    state->dataHeatBal->SurfTempEffBulkAir.allocate(1);
+    state->dataHeatBal->SurfTempEffBulkAir(1) = 1.0;
     SurfTemp.allocate(1);
     HcIn.allocate(1);
     Vhc.allocate(1);

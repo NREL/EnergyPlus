@@ -290,8 +290,8 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
     //       modifications at some of those places. It is quite logical that reference air temperature
     //       for the surface is calculated as public function of SurfaceData structure (class) and is
     //       later called as needed. Note that SurfaceNum had to be passed to this routine because of
-    //       access to global array TempEffBulkAir. I would propose refactoring where TempEffBulkAir
-    //       is part of SurfaceData structure and instead of calling TempEffBulkAir( SurfNum ) it should
+    //       access to global array SurfTempEffBulkAir. I would propose refactoring where SurfTempEffBulkAir
+    //       is part of SurfaceData structure and instead of calling SurfTempEffBulkAir( SurfNum ) it should
     //       be called Surface( SurfNum ).TempEffBulkAir (Simon Vidanovic)
 
     Real64 RefAirTemp = 0;
@@ -302,7 +302,7 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
         if (SELECT_CASE_var == ZoneMeanAirTemp) {
             RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
         } else if (SELECT_CASE_var == AdjacentAirTemp) {
-            RefAirTemp = state.dataHeatBal->TempEffBulkAir(t_SurfNum);
+            RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(t_SurfNum);
         } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
             // determine ZoneEquipConfigNum for this zone
             //            ControlledZoneAirFlag = .FALSE.

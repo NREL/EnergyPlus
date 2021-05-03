@@ -778,7 +778,7 @@ namespace MundtSimMgr {
                 // Use direct coupling scheme to report air temperatures back to surface/system domains
                 // a) Bulk air temperatures -> TempEffBulkAir(SurfNum)
                 for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
-                    state.dataHeatBal->TempEffBulkAir(SurfFirst + SurfNum - 1) =
+                    state.dataHeatBal->SurfTempEffBulkAir(SurfFirst + SurfNum - 1) =
                         state.dataMundtSimMgr->MundtAirSurf(SurfNum, state.dataMundtSimMgr->MundtZoneNum).TMeanAir;
                     // set flag for reference air temperature
                     state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1) = AdjacentAirTemp;
@@ -800,7 +800,7 @@ namespace MundtSimMgr {
                 for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
                     DeltaTemp = state.dataMundtSimMgr->MundtAirSurf(SurfNum, state.dataMundtSimMgr->MundtZoneNum).TMeanAir -
                                 state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->TstatNodeID, state.dataMundtSimMgr->MundtZoneNum).Temp;
-                    state.dataHeatBal->TempEffBulkAir(SurfFirst + SurfNum - 1) =
+                    state.dataHeatBal->SurfTempEffBulkAir(SurfFirst + SurfNum - 1) =
                         state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp;
                     // set flag for reference air temperature
                     state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1) = AdjacentAirTemp;
@@ -824,7 +824,7 @@ namespace MundtSimMgr {
         } else { // Controlled zone when the system is off --> Use the mixing model instead of the Mundt model
             // Bulk air temperatures -> TempEffBulkAir(SurfNum)
             for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
-                state.dataHeatBal->TempEffBulkAir(SurfFirst + SurfNum - 1) = state.dataHeatBalFanSys->MAT(ZoneNum);
+                state.dataHeatBal->SurfTempEffBulkAir(SurfFirst + SurfNum - 1) = state.dataHeatBalFanSys->MAT(ZoneNum);
                 // set flag for reference air temperature
                 state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1) = ZoneMeanAirTemp;
             }

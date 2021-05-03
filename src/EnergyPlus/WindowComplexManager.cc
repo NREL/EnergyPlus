@@ -2772,7 +2772,7 @@ namespace WindowComplexManager {
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
                     RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                    RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
+                    RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
                 } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                     // determine ZoneEquipConfigNum for this zone
                     //            ControlledZoneAirFlag = .FALSE.
@@ -2825,7 +2825,7 @@ namespace WindowComplexManager {
                     if (SELECT_CASE_var == ZoneMeanAirTemp) {
                         RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
                     } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                        RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNumAdj);
+                        RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj);
                     } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                         // determine ZoneEquipConfigNum for this zone
                         ZoneEquipConfigNum = ZoneNum;
@@ -2861,7 +2861,7 @@ namespace WindowComplexManager {
 
                 tout = RefAirTemp + DataGlobalConstants::KelvinConv; // outside air temperature
 
-                tsky = state.dataHeatBal->MRT(ZoneNumAdj) +
+                tsky = state.dataHeatBal->ZoneMRT(ZoneNumAdj) +
                        DataGlobalConstants::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
 
                 //  ! Add long-wave radiation from adjacent zone absorbed by glass layer closest to the adjacent zone.

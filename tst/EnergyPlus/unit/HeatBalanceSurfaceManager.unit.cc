@@ -744,7 +744,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
     state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
     state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
-    state->dataHeatBal->TempEffBulkAir.allocate(6);
+    state->dataHeatBal->SurfTempEffBulkAir.allocate(6);
 
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;
@@ -787,9 +787,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     // with supply air
     CalcHeatBalanceInsideSurf(*state);
-    EXPECT_EQ(24.0, state->dataHeatBal->TempEffBulkAir(1));
-    EXPECT_EQ(23.0, state->dataHeatBal->TempEffBulkAir(2));
-    EXPECT_EQ(20.0, state->dataHeatBal->TempEffBulkAir(3));
+    EXPECT_EQ(24.0, state->dataHeatBal->SurfTempEffBulkAir(1));
+    EXPECT_EQ(23.0, state->dataHeatBal->SurfTempEffBulkAir(2));
+    EXPECT_EQ(20.0, state->dataHeatBal->SurfTempEffBulkAir(3));
 
     // Supply air flow rate = 0
     state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
@@ -797,9 +797,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataLoopNodes->Node(3).MassFlowRate = 0.0;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.0;
     CalcHeatBalanceInsideSurf(*state);
-    EXPECT_EQ(24.0, state->dataHeatBal->TempEffBulkAir(1));
-    EXPECT_EQ(23.0, state->dataHeatBal->TempEffBulkAir(2));
-    EXPECT_EQ(24.0, state->dataHeatBal->TempEffBulkAir(3));
+    EXPECT_EQ(24.0, state->dataHeatBal->SurfTempEffBulkAir(1));
+    EXPECT_EQ(23.0, state->dataHeatBal->SurfTempEffBulkAir(2));
+    EXPECT_EQ(24.0, state->dataHeatBal->SurfTempEffBulkAir(3));
 
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataSize->ZoneEqSizing.deallocate();
@@ -808,7 +808,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataLoopNodes->Node.deallocate();
     state->dataGlobal->KickOffSimulation = false;
     state->dataHeatBalSurf->TempSurfInTmp.deallocate();
-    state->dataHeatBal->TempEffBulkAir.deallocate();
+    state->dataHeatBal->SurfTempEffBulkAir.deallocate();
     state->dataHeatBalSurf->TH.deallocate();
     state->dataHeatBal->HConvIn.deallocate();
     state->dataMstBal->HConvInFD.deallocate();
@@ -1282,7 +1282,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
     state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
     state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
-    state->dataHeatBal->TempEffBulkAir.allocate(6);
+    state->dataHeatBal->SurfTempEffBulkAir.allocate(6);
 
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;
@@ -1857,7 +1857,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
     state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
     state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
-    state->dataHeatBal->TempEffBulkAir.allocate(6);
+    state->dataHeatBal->SurfTempEffBulkAir.allocate(6);
 
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;
@@ -2424,7 +2424,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
     state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
     state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
-    state->dataHeatBal->TempEffBulkAir.allocate(6);
+    state->dataHeatBal->SurfTempEffBulkAir.allocate(6);
 
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;
@@ -2489,7 +2489,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataLoopNodes->Node.deallocate();
     state->dataGlobal->KickOffSimulation = false;
     state->dataHeatBalSurf->TempSurfInTmp.deallocate();
-    state->dataHeatBal->TempEffBulkAir.deallocate();
+    state->dataHeatBal->SurfTempEffBulkAir.deallocate();
     state->dataHeatBalSurf->TH.deallocate();
     state->dataHeatBal->HConvIn.deallocate();
     state->dataMstBal->HConvInFD.deallocate();
@@ -3087,7 +3087,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
     state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
-    state->dataHeatBal->TempEffBulkAir.allocate(6);
+    state->dataHeatBal->SurfTempEffBulkAir.allocate(6);
 
     state->dataHeatBalSurf->TH.allocate(2, 2, 6);
     state->dataHeatBal->HConvIn.allocate(6);

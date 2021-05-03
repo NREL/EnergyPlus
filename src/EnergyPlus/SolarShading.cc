@@ -217,7 +217,7 @@ void InitSolarCalculations(EnergyPlusData &state)
         state.dataHeatBal->OverlapAreas = 0.0;
         state.dataHeatBal->CosIncAngHR = 0.0;
         state.dataHeatBal->CosIncAng = 0.0;
-        state.dataHeatBal->AnisoSkyMult = 1.0; // For isotropic sky; recalculated in AnisoSkyViewFactors if anisotropic radiance
+        state.dataHeatBal->SurfAnisoSkyMult = 1.0; // For isotropic sky; recalculated in AnisoSkyViewFactors if anisotropic radiance
         //    WithShdgIsoSky=0.0
         //    WoShdgIsoSky=0.0
         //    WithShdgHoriz=0.0
@@ -234,7 +234,7 @@ void InitSolarCalculations(EnergyPlusData &state)
         state.dataHeatBal->ZoneTransSolar = 0.0;
         state.dataHeatBal->ZoneBmSolFrExtWinsRep = 0.0;
         state.dataHeatBal->ZoneBmSolFrIntWinsRep = 0.0;
-        state.dataHeatBal->InitialZoneDifSolReflW = 0.0;
+        state.dataHeatBal->ZoneInitialDifSolReflW = 0.0;
         state.dataHeatBal->ZoneDifSolFrExtWinsRep = 0.0;
         state.dataHeatBal->ZoneDifSolFrIntWinsRep = 0.0;
         state.dataHeatBal->ZoneWinHeatGain = 0.0;
@@ -770,7 +770,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
         state.dataGlobal->NumOfTimeStepInHour, 24, state.dataBSDFWindow->MaxBkSurf, state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBal->CosIncAngHR.dimension(24, state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBal->CosIncAng.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBal->AnisoSkyMult.dimension(state.dataSurface->TotSurfaces,
+    state.dataHeatBal->SurfAnisoSkyMult.dimension(state.dataSurface->TotSurfaces,
                                               1.0); // For isotropic sky: recalculated in AnisoSkyViewFactors if anisotropic radiance
     //  ALLOCATE(WithShdgIsoSky(TotSurfaces))
     //  WithShdgIsoSky=0.0
@@ -816,7 +816,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
     state.dataHeatBal->ZoneTransSolar.dimension(state.dataGlobal->NumOfZones, 0.0);
     state.dataHeatBal->ZoneBmSolFrExtWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
     state.dataHeatBal->ZoneBmSolFrIntWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
-    state.dataHeatBal->InitialZoneDifSolReflW.dimension(state.dataGlobal->NumOfZones, 0.0);
+    state.dataHeatBal->ZoneInitialDifSolReflW.dimension(state.dataGlobal->NumOfZones, 0.0);
     state.dataHeatBal->ZoneDifSolFrExtWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
     state.dataHeatBal->ZoneDifSolFrIntWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
     state.dataHeatBal->ZoneWinHeatGain.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -1177,7 +1177,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Surface Anisotropic Sky Multiplier",
                                 OutputProcessor::Unit::None,
-                                state.dataHeatBal->AnisoSkyMult(SurfLoop),
+                                state.dataHeatBal->SurfAnisoSkyMult(SurfLoop),
                                 "Zone",
                                 "Average",
                                 state.dataSurface->Surface(SurfLoop).Name);
@@ -2413,12 +2413,12 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // Calculates view factor multiplier, AnisoSkyMult, for diffuse
+    // Calculates view factor multiplier, SurfAnisoSkyMult, for diffuse
     // sky irradiance on exterior surfaces taking into account
     // anisotropic radiance of the sky. Called by InitSurfaceHeatBalance
     // In this case the diffuse sky irradiance on a surface is given by
-    //  AnisoSkyMult(SurfNum) * DifSolarRad
-    // AnisoSkyMult accounts not only for the sky radiance distribution but
+    //  SurfAnisoSkyMult(SurfNum) * DifSolarRad
+    // SurfAnisoSkyMult accounts not only for the sky radiance distribution but
     // also for the effects of shading of sky diffuse radiation by
     // shadowing surfaces such as overhangs. It does not account for reflection
     // of sky diffuse radiation from shadowing surfaces.
@@ -2489,7 +2489,7 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
     ZenithAng = std::acos(CosZenithAng);
     ZenithAngDeg = ZenithAng / DataGlobalConstants::DegToRadians;
 
-    state.dataHeatBal->AnisoSkyMult = 0.0;
+    state.dataHeatBal->SurfAnisoSkyMult = 0.0;
 
     //           Relative air mass
     AirMassH = (1.0 - 0.1 * state.dataEnvrn->Elevation / 1000.0);
@@ -2554,13 +2554,13 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
 
         if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
             state.dataHeatBal->SolarDistribution == MinimalShadowing) {
-            state.dataHeatBal->AnisoSkyMult(SurfNum) =
+            state.dataHeatBal->SurfAnisoSkyMult(SurfNum) =
                 state.dataHeatBal->MultIsoSky(SurfNum) * state.dataHeatBal->DifShdgRatioIsoSky(SurfNum) +
                 state.dataHeatBal->MultCircumSolar(SurfNum) *
                     state.dataHeatBal->SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) +
                 state.dataHeatBal->MultHorizonZenith(SurfNum) * state.dataHeatBal->DifShdgRatioHoriz(SurfNum);
         } else {
-            state.dataHeatBal->AnisoSkyMult(SurfNum) =
+            state.dataHeatBal->SurfAnisoSkyMult(SurfNum) =
                 state.dataHeatBal->MultIsoSky(SurfNum) *
                     state.dataHeatBal->DifShdgRatioIsoSkyHRTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) +
                 state.dataHeatBal->MultCircumSolar(SurfNum) *
@@ -2570,7 +2570,7 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
             state.dataHeatBal->curDifShdgRatioIsoSky(SurfNum) =
                 state.dataHeatBal->DifShdgRatioIsoSkyHRTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
         }
-        state.dataHeatBal->AnisoSkyMult(SurfNum) = max(0.0, state.dataHeatBal->AnisoSkyMult(SurfNum)); // make sure not negative.
+        state.dataHeatBal->SurfAnisoSkyMult(SurfNum) = max(0.0, state.dataHeatBal->SurfAnisoSkyMult(SurfNum)); // make sure not negative.
     }
 }
 
@@ -8402,12 +8402,12 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                         int SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
                         Real64 CosInc = state.dataHeatBal->CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
                         // Exterior diffuse solar incident on window (W/m2)
-                        Real64 DifSolarInc = state.dataEnvrn->DifSolarRad * state.dataHeatBal->AnisoSkyMult(SurfNum2) +
+                        Real64 DifSolarInc = state.dataEnvrn->DifSolarRad * state.dataHeatBal->SurfAnisoSkyMult(SurfNum2) +
                                              state.dataEnvrn->GndSolarRad * state.dataSurface->Surface(SurfNum2).ViewFactorGround;
                         // Exterior diffuse sky solar transmitted by TDD (W/m2)
                         Real64 SkySolarTrans = state.dataEnvrn->DifSolarRad *
                                                TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::iRadType::SolarAniso) *
-                                               state.dataHeatBal->AnisoSkyMult(SurfNum2);
+                                               state.dataHeatBal->SurfAnisoSkyMult(SurfNum2);
                         // Exterior diffuse ground solar transmitted by TDD (W/m2)
                         Real64 GndSolarTrans = state.dataEnvrn->GndSolarRad * state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso *
                                                state.dataSurface->Surface(SurfNum2).ViewFactorGround;
@@ -8438,10 +8438,10 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                             (state.dataEnvrn->BeamSolarRad *
                                  state.dataHeatBal->SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, OutShelfSurf) *
                                  state.dataHeatBal->CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, OutShelfSurf) +
-                             state.dataEnvrn->DifSolarRad * state.dataHeatBal->AnisoSkyMult(OutShelfSurf)) *
+                             state.dataEnvrn->DifSolarRad * state.dataHeatBal->SurfAnisoSkyMult(OutShelfSurf)) *
                             state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectSol;
 
-                        Real64 DifSolarInc = state.dataEnvrn->DifSolarRad * state.dataHeatBal->AnisoSkyMult(SurfNum) +
+                        Real64 DifSolarInc = state.dataEnvrn->DifSolarRad * state.dataHeatBal->SurfAnisoSkyMult(SurfNum) +
                                              state.dataEnvrn->GndSolarRad * state.dataSurface->Surface(SurfNum).ViewFactorGround +
                                              ShelfSolarRad * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
 
@@ -9666,7 +9666,7 @@ void WindowShadingManager(EnergyPlusData &state)
             Real64 HorizSolar = 0.0;        // Horizontal direct plus diffuse solar intensity
             if (state.dataEnvrn->SunIsUp) {
                 Real64 SkySolarOnWindow =
-                    state.dataHeatBal->AnisoSkyMult(ISurf) * state.dataEnvrn->DifSolarRad; // Sky diffuse solar intensity on window (W/m2)
+                    state.dataHeatBal->SurfAnisoSkyMult(ISurf) * state.dataEnvrn->DifSolarRad; // Sky diffuse solar intensity on window (W/m2)
                 BeamSolarOnWindow = state.dataEnvrn->BeamSolarRad *
                                     state.dataHeatBal->CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, ISurf) *
                                     state.dataHeatBal->SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, ISurf);
@@ -11663,7 +11663,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
     state.dataHeatBal->SurfWinInitialDifSolwinAbs = 0.0;
 
     // Init accumulator for total reflected diffuse solar within each zone for interreflection calcs
-    state.dataHeatBal->InitialZoneDifSolReflW = 0.0;
+    state.dataHeatBal->ZoneInitialDifSolReflW = 0.0;
 
     // Init accumulator for transmitted diffuse solar for all surfaces for reporting
     state.dataHeatBalSurf->SurfWinInitialDifSolInTrans = 0.0;
@@ -11777,7 +11777,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                     DifSolarReflW = WinDifSolarTrans_Factor * InsideDifReflectance;
 
                     // Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
-                    state.dataHeatBal->InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
+                    state.dataHeatBal->ZoneInitialDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
 
                     // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
                     // For opaque surfaces all incident diffuse is either absorbed or reflected
@@ -11817,7 +11817,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                             DifSolarReflW = WinDifSolarTrans_Factor * state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack;
 
                             // Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
-                            state.dataHeatBal->InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
+                            state.dataHeatBal->ZoneInitialDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
 
                             //------------------------------------------------------------------------------
                             // DISTRIBUTE TRANSMITTED DIFFUSE SOLAR THROUGH INTERIOR WINDOW TO ADJACENT ZONE
@@ -11892,7 +11892,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                                             InterpSw(win_SwitchingFactor, construct.ReflectSolDiffBack, construct_sh.ReflectSolDiffBack);
 
                             // Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
-                            state.dataHeatBal->InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
+                            state.dataHeatBal->ZoneInitialDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
 
                             // Accumulate transmitted Window and Zone total distributed diffuse solar to check for conservation of energy
                             // This is not very effective since it assigns whatever distributed diffuse solar has not been
@@ -11959,7 +11959,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                             DifSolarReflW = WinDifSolarTrans_Factor * InsideDifReflectance;
 
                             // Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
-                            state.dataHeatBal->InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
+                            state.dataHeatBal->ZoneInitialDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
 
                             // Now calc diffuse solar absorbed by shade/blind itself
                             BlNum = state.dataSurface->SurfWinBlindNumber(HeatTransSurfNum);
@@ -12031,7 +12031,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                         DifSolarReflW = WinDifSolarTrans_Factor * state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack;
 
                         // Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
-                        state.dataHeatBal->InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
+                        state.dataHeatBal->ZoneInitialDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
 
                         //------------------------------------------------------------------------------
                         // DISTRIBUTE TRANSMITTED DIFFUSE SOLAR THROUGH INTERIOR WINDOW TO ADJACENT ZONE
@@ -12142,7 +12142,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(
     // of diffuse solar transmitted through the given interior window
     // to individual heat transfer surfaces in the given enclosure.
     // Diffuse solar transmitted through interior windows in this enclosure
-    // to adjacent enclosures, is added to the InitialZoneDifSolReflW
+    // to adjacent enclosures, is added to the ZoneInitialDifSolReflW
     // of the adjacent enclosure for subsequent interreflection calcs
 
     // METHODOLOGY EMPLOYED:
@@ -12368,7 +12368,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(
                     // Get the adjacent zone/enclosure index
                     // Add transmitted diffuse solar to total reflected distributed diffuse solar for each zone
                     // for subsequent interreflection calcs
-                    state.dataHeatBal->InitialZoneDifSolReflW(state.dataSurface->Surface(AdjSurfNum).SolarEnclIndex) += DifSolarTransW; // [W]
+                    state.dataHeatBal->ZoneInitialDifSolReflW(state.dataSurface->Surface(AdjSurfNum).SolarEnclIndex) += DifSolarTransW; // [W]
                 }
 
             } else if (ShadeFlag == WinShadingType::SwitchableGlazing) { // Switchable glazing
@@ -12554,7 +12554,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(
         } // opaque or window heat transfer surface
 
     } // HeatTransSurfNum = Zone(ZoneNum)%SurfaceFirst, Zone(ZoneNum)%SurfaceLast
-    state.dataHeatBal->InitialZoneDifSolReflW(IntWinEnclosureNum) += InitialZoneDifSolReflW_zone;
+    state.dataHeatBal->ZoneInitialDifSolReflW(IntWinEnclosureNum) += InitialZoneDifSolReflW_zone;
 
     // Check debug var for view factors here
     // ViewFactorTotal

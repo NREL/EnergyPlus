@@ -1234,7 +1234,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
-    state->dataHeatBal->TempEffBulkAir.allocate(6);
+    state->dataHeatBal->SurfTempEffBulkAir.allocate(6);
 
     state->dataHeatBal->HConvIn.allocate(6);
     state->dataHeatBal->HConvIn(1) = 0.5;

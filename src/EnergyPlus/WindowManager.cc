@@ -2410,9 +2410,9 @@ namespace WindowManager {
                 auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
                     RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-                    state.dataHeatBal->TempEffBulkAir(SurfNum) = RefAirTemp;
+                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = RefAirTemp;
                 } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                    RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
+                    RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
                 } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                     // determine ZoneEquipConfigNum for this zone
                     //            ControlledZoneAirFlag = .FALSE.
@@ -2446,12 +2446,12 @@ namespace WindowManager {
                     } else {
                         RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                     }
-                    state.dataHeatBal->TempEffBulkAir(SurfNum) = RefAirTemp;
+                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = RefAirTemp;
 
                 } else {
                     // currently set to mean air temp but should add error warning here
                     RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-                    state.dataHeatBal->TempEffBulkAir(SurfNum) = RefAirTemp;
+                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = RefAirTemp;
                 }
             }
 
@@ -2679,9 +2679,9 @@ namespace WindowManager {
                     auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNumAdj));
                     if (SELECT_CASE_var == ZoneMeanAirTemp) {
                         RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
-                        state.dataHeatBal->TempEffBulkAir(SurfNumAdj) = RefAirTemp;
+                        state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj) = RefAirTemp;
                     } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                        RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNumAdj);
+                        RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj);
                     } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                         // determine ZoneEquipConfigNum for this zone
                         ZoneEquipConfigNum = ZoneNumAdj;
@@ -2709,11 +2709,11 @@ namespace WindowManager {
                         } else {
                             RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
                         }
-                        state.dataHeatBal->TempEffBulkAir(SurfNumAdj) = RefAirTemp;
+                        state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj) = RefAirTemp;
                     } else {
                         // currently set to mean air temp but should add error warning here
                         RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
-                        state.dataHeatBal->TempEffBulkAir(SurfNumAdj) = RefAirTemp;
+                        state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj) = RefAirTemp;
                     }
                 }
 

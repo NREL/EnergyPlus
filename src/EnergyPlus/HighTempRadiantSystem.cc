@@ -945,7 +945,7 @@ namespace HighTempRadiantSystem {
             // Determine the current setpoint temperature and the temperature at which the unit should be completely off
             SetPtTemp = GetCurrentScheduleValue(state, state.dataHighTempRadSys->HighTempRadSys(RadSysNum).SetptSchedPtr);
             OffTemp = SetPtTemp + 0.5 * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
-            OpTemp = (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum)) / 2.0; // Approximate the "operative" temperature
+            OpTemp = (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum)) / 2.0; // Approximate the "operative" temperature
 
             // Determine the fraction of maximum power to the unit (limiting the fraction range from zero to unity)
             {
@@ -953,9 +953,9 @@ namespace HighTempRadiantSystem {
                 if (SELECT_CASE_var == RadControlType::MATControl) {
                     HeatFrac = (OffTemp - state.dataHeatBalFanSys->MAT(ZoneNum)) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
                 } else if (SELECT_CASE_var == RadControlType::MRTControl) {
-                    HeatFrac = (OffTemp - state.dataHeatBal->MRT(ZoneNum)) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
+                    HeatFrac = (OffTemp - state.dataHeatBal->ZoneMRT(ZoneNum)) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
                 } else if (SELECT_CASE_var == RadControlType::OperativeControl) {
-                    OpTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
+                    OpTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
                     HeatFrac = (OffTemp - OpTemp) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
                 }
             }
@@ -1057,9 +1057,9 @@ namespace HighTempRadiantSystem {
                 if (SELECT_CASE_var == RadControlType::MATSPControl) {
                     ZoneTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 } else if (SELECT_CASE_var == RadControlType::MRTSPControl) {
-                    ZoneTemp = state.dataHeatBal->MRT(ZoneNum);
+                    ZoneTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
                 } else if (SELECT_CASE_var == RadControlType::OperativeSPControl) {
-                    ZoneTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
+                    ZoneTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
                 } else {
                     assert(false);
                 }
@@ -1099,9 +1099,9 @@ namespace HighTempRadiantSystem {
                         if (SELECT_CASE_var == RadControlType::MATControl) {
                             ZoneTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                         } else if (SELECT_CASE_var == RadControlType::MRTControl) {
-                            ZoneTemp = state.dataHeatBal->MRT(ZoneNum);
+                            ZoneTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
                         } else if (SELECT_CASE_var == RadControlType::OperativeControl) {
-                            ZoneTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
+                            ZoneTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
                         }
                     }
 

@@ -6789,7 +6789,7 @@ void CalcZoneSums(EnergyPlusData &state,
                 RefAirTemp = MAT(ZoneNum);
                 SumHA += HA;
             } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
+                RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
                 SumHATref += HA * RefAirTemp;
             } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                 // check whether this zone is a controlled zone or not
@@ -7039,7 +7039,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
                 // The zone air is the reference temperature
                 RefAirTemp = MAT(ZoneNum);
             } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
+                RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
             } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                 // check whether this zone is a controlled zone or not
                 if (!ControlledZoneAirFlag) {
@@ -7438,7 +7438,7 @@ void AdjustAirSetPointsforOpTempCntrl(EnergyPlusData &state, int const TempContr
     }
 
     // get mean radiant temperature for zone
-    thisMRT = state.dataHeatBal->MRT(ActualZoneNum);
+    thisMRT = state.dataHeatBal->ZoneMRT(ActualZoneNum);
 
     // modify setpoint for operative temperature control
     //  traping for MRT fractions between 0.0 and 0.9 during get input, so shouldn't be able to divide by zero here.
