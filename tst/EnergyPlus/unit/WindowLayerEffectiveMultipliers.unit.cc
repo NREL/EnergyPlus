@@ -68,7 +68,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlin
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1D_int LayerType(nlayer);
+        Array1D<TARCOGLayerType> LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -81,7 +81,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlin
         Array1D<Real64> const Al(nlayer, 0);
         Array1D<Real64> const Ar(nlayer, 0);
         Array1D<Real64> const Ah(nlayer, 0.2);
-        LayerType(1) = VENETBLIND_HORIZ;
+        LayerType(1) = TARCOGLayerType::VENETBLIND_HORIZ;
         Array1D<Real64> const SlatAngle(nlayer, 0);
 
         updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
@@ -100,7 +100,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1D_int LayerType(nlayer);
+        Array1D<TARCOGLayerType> LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -113,7 +113,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_
         Array1D<Real64> const Al(nlayer, 0);
         Array1D<Real64> const Ar(nlayer, 0);
         Array1D<Real64> const Ah(nlayer, 0.2);
-        LayerType(1) = VENETBLIND_VERT;
+        LayerType(1) = TARCOGLayerType::VENETBLIND_VERT;
         Array1D<Real64> const SlatAngle(nlayer, 0);
 
         updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
@@ -132,7 +132,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlin
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1D_int LayerType(nlayer);
+        Array1D<TARCOGLayerType> LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -145,7 +145,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlin
         Array1D<Real64> const Al(nlayer, 0);
         Array1D<Real64> const Ar(nlayer, 0);
         Array1D<Real64> const Ah(nlayer, 0.2);
-        LayerType(1) = VENETBLIND_HORIZ;
+        LayerType(1) = TARCOGLayerType::VENETBLIND_HORIZ;
         Array1D<Real64> const SlatAngle(nlayer, 45);
 
         updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
@@ -164,7 +164,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1D_int LayerType(nlayer);
+        Array1D<TARCOGLayerType> LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -177,7 +177,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_
         Array1D<Real64> const Al(nlayer, 0);
         Array1D<Real64> const Ar(nlayer, 0);
         Array1D<Real64> const Ah(nlayer, 0.2);
-        LayerType(1) = VENETBLIND_VERT;
+        LayerType(1) = TARCOGLayerType::VENETBLIND_VERT;
         Array1D<Real64> const SlatAngle(nlayer, 45);
 
         updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
@@ -196,7 +196,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessOtherShades)
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1D_int LayerType(nlayer);
+        Array1D<TARCOGLayerType> LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -209,7 +209,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessOtherShades)
         Array1D<Real64> const Al(nlayer, 0);
         Array1D<Real64> const Ar(nlayer, 0);
         Array1D<Real64> const Ah(nlayer, 0.2);
-        LayerType(1) = DIFFSHADE;
+        LayerType(1) = TARCOGLayerType::DIFFSHADE;
         Array1D<Real64> const SlatAngle(nlayer, 0);
 
         updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
