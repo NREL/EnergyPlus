@@ -108,8 +108,8 @@ void PlantLoopData::CalcUnmetPlantDemand(EnergyPlusData &state)
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr auto RoutineName("PlantLoopSolver::EvaluateLoopSetPointLoad");
-    constexpr auto RoutineNameAlt("PlantSupplySide:EvaluateLoopSetPointLoad");
+    static constexpr std::string_view RoutineName("PlantLoopSolver::EvaluateLoopSetPointLoad");
+    static constexpr std::string_view RoutineNameAlt("PlantSupplySide:EvaluateLoopSetPointLoad");
 
     //~ General variables
     Real64 MassFlowRate;
