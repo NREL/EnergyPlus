@@ -667,7 +667,8 @@ namespace Humidifiers {
             if (AirOutNode > 0) {
                 if (state.dataLoopNodes->Node(AirOutNode).HumRatMin == SensedNodeFlagValue) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        ShowSevereError(state, "Humidifiers: Missing humidity setpoint for " + HumidifierType(static_cast<int>(HumType)) + " = " + Name);
+                        ShowSevereError(state,
+                                        "Humidifiers: Missing humidity setpoint for " + HumidifierType(static_cast<int>(HumType)) + " = " + Name);
                         ShowContinueError(state,
                                           "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish a setpoint at the "
                                           "humidifier outlet node.");
@@ -677,7 +678,8 @@ namespace Humidifiers {
                         CheckIfNodeSetPointManagedByEMS(
                             state, AirOutNode, EMSManager::SPControlType::iHumidityRatioMinSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
-                            ShowSevereError(state, "Humidifiers: Missing humidity setpoint for " + HumidifierType(static_cast<int>(HumType)) + " = " + Name);
+                            ShowSevereError(state,
+                                            "Humidifiers: Missing humidity setpoint for " + HumidifierType(static_cast<int>(HumType)) + " = " + Name);
                             ShowContinueError(state,
                                               "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish a setpoint at "
                                               "the humidifier outlet node.");
@@ -912,8 +914,8 @@ namespace Humidifiers {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(NomCapVolDes - NomCapVolUser) / NomCapVolUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state,
-                                            "SizeHumidifier: Potential issue with equipment sizing for " + HumidifierType(static_cast<int>(HumType)) + " = \"" +
-                                                Name + "\".");
+                                            "SizeHumidifier: Potential issue with equipment sizing for " + HumidifierType(static_cast<int>(HumType)) +
+                                                " = \"" + Name + "\".");
                                 ShowContinueError(state, format("User-Specified Nominal Capacity Volume of {:.2R} [Wm3/s]", NomCapVolUser));
                                 ShowContinueError(state, format("differs from Design Size Nominal Capacity Volume of {:.2R} [m3/s]", NomCapVolDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -945,8 +947,8 @@ namespace Humidifiers {
                         ThermalEffRated = NominalPower / NomPower;
                     } else {
                         ShowMessage(state,
-                                    CalledFrom + ": capacity and thermal efficiency mismatch for " + HumidifierType(static_cast<int>(HumType)) + " =\"" + Name +
-                                        "\".");
+                                    CalledFrom + ": capacity and thermal efficiency mismatch for " + HumidifierType(static_cast<int>(HumType)) +
+                                        " =\"" + Name + "\".");
                         ShowContinueError(state, format("User-Specified Rated Gas Use Rate of {:.2R} [W]", NomPower));
                         ShowContinueError(state, format("User-Specified or Autosized Rated Capacity of {:.2R} [m3/s]", NomCapVol));
                         ShowContinueError(state,
@@ -987,8 +989,8 @@ namespace Humidifiers {
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(NomPowerDes - NomPowerUser) / NomPowerUser) > state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state,
-                                        "SizeHumidifier: Potential issue with equipment sizing for " + HumidifierType(static_cast<int>(HumType)) + " =\"" + Name +
-                                            "\".");
+                                        "SizeHumidifier: Potential issue with equipment sizing for " + HumidifierType(static_cast<int>(HumType)) +
+                                            " =\"" + Name + "\".");
                             ShowContinueError(state, format("User-Specified Rated Power of {:.2R} [W]", NomPowerUser));
                             ShowContinueError(state, format("differs from Design Size Rated Power of {:.2R} [W]", NomPowerDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");

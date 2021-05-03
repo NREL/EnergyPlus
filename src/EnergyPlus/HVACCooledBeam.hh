@@ -78,8 +78,8 @@ namespace HVACCooledBeam {
         std::string Name;            // name of unit
         std::string UnitType;        // type of unit = AirTerminal:SingleDuct:ConstantVolume:CooledBeam
         int UnitType_Num;            // index to type of unit = 1 (there's only 1 type so far)
-        std::string CBTypeString;          // type of cooled beam: active | passive
-        CooledBeamType CBType;       // index to type of cooled beam: passive=1; active=2
+        std::string CBTypeString;    // type of cooled beam: active | passive
+        CooledBeamType CBType;       // index to type of cooled beam
         std::string Sched;           // availability schedule
         int SchedPtr;                // index to schedule
         Real64 MaxAirVolFlow;        // m3/s (autosizable)
