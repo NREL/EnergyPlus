@@ -4439,18 +4439,19 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue)
         *state, obj_type1, bldg1, objectSchemaProps, "loads_convergence_tolerance_value");
     EXPECT_NEAR(numericFieldValue, 0.1, 0.0001);
     // Defaults from schema
-    alphaFieldValue = state->dataInputProcessing->inputProcessor->getAlphaFieldValue(*state, obj_type1, bldg1, objectSchemaProps, "solar_distribution");
+    alphaFieldValue =
+        state->dataInputProcessing->inputProcessor->getAlphaFieldValue(*state, obj_type1, bldg1, objectSchemaProps, "solar_distribution");
     EXPECT_EQ(alphaFieldValue, "FULLEXTERIOR");
     numericFieldValue = state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type1, bldg1, objectSchemaProps, "north_axis");
     EXPECT_NEAR(numericFieldValue, 0.0, 0.0001);
     numericFieldValue = state->dataInputProcessing->inputProcessor->getRealFieldValue(
         *state, obj_type1, bldg1, objectSchemaProps, "temperature_convergence_tolerance_value");
     EXPECT_NEAR(numericFieldValue, 0.4, 0.0001);
-    numericFieldValue = state->dataInputProcessing->inputProcessor->getRealFieldValue(
-        *state, obj_type1, bldg1, objectSchemaProps, "maximum_number_of_warmup_days");
+    numericFieldValue =
+        state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type1, bldg1, objectSchemaProps, "maximum_number_of_warmup_days");
     EXPECT_NEAR(numericFieldValue, 25.0, 0.0001);
-    numericFieldValue = state->dataInputProcessing->inputProcessor->getRealFieldValue(
-        *state, obj_type1, bldg1, objectSchemaProps, "minimum_number_of_warmup_days");
+    numericFieldValue =
+        state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type1, bldg1, objectSchemaProps, "minimum_number_of_warmup_days");
     EXPECT_NEAR(numericFieldValue, 1.0, 0.0001);
 
     // Material object
@@ -4461,13 +4462,16 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue)
     EXPECT_EQ(alphaFieldValue, "MEDIUMROUGH");
     numericFieldValue = state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type2, mat1, objectSchemaProps, "thickness");
     EXPECT_NEAR(numericFieldValue, 0.2, 0.0001);
-    numericFieldValue = state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type2, mat1, objectSchemaProps, "solar_absorptance");
+    numericFieldValue =
+        state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type2, mat1, objectSchemaProps, "solar_absorptance");
     EXPECT_NEAR(numericFieldValue, 0.5, 0.0001);
     // Defaults from schema
-    numericFieldValue = state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type2, mat1, objectSchemaProps, "thermal_absorptance");
+    numericFieldValue =
+        state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type2, mat1, objectSchemaProps, "thermal_absorptance");
     EXPECT_NEAR(numericFieldValue, 0.9, 0.0001);
     // Fields beyond min-fields also return their default if they have one (unlike getObjectItem)
-    numericFieldValue = state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type2, mat1, objectSchemaProps, "visible_absorptance");
+    numericFieldValue =
+        state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type2, mat1, objectSchemaProps, "visible_absorptance");
     EXPECT_NEAR(numericFieldValue, 0.7, 0.0001);
     // or zero if they don't have a default (in this case it's a required field, so it would have failed before now)
     numericFieldValue = state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type2, mat1, objectSchemaProps, "specific_heat");

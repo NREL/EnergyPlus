@@ -542,11 +542,8 @@ bool InputProcessor::getDefaultValue(EnergyPlusData &state, std::string const &o
     return defaultFound;
 }
 
-std::string InputProcessor::getAlphaFieldValue(EnergyPlusData &state,
-                                   std::string const &objectWord,
-                                   json const &ep_object,
-                                   json schema_obj_props,
-                                   std::string const &fieldName)
+std::string InputProcessor::getAlphaFieldValue(
+    EnergyPlusData &state, std::string const &objectWord, json const &ep_object, json schema_obj_props, std::string const &fieldName)
 {
     auto const &schema_field_obj = schema_obj_props[fieldName];
     if (schema_field_obj.empty()) {
