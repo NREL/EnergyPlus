@@ -589,7 +589,7 @@ namespace Psychrometrics {
                 if (state.dataPsychrometrics->iPsyErrIndex(iPsyTwbFnTdbWPb3) == 0) {
                     ShowWarningMessage(state, format("WetBulb not converged after {} iterations(PsyTwbFnTdbWPb)", iter));
                     if (!CalledFrom.empty()) {
-                        ShowContinueErrorTimeStamp(state, format(" Routine={}", CalledFrom));
+                        ShowContinueErrorTimeStamp(state, format(" Routine={},", CalledFrom));
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
@@ -757,7 +757,7 @@ namespace Psychrometrics {
                 if (state.dataPsychrometrics->iPsyErrIndex(iPsyPsatFnTemp) == 0) {
                     ShowWarningMessage(state, "Temperature out of range [-100. to 200.] (PsyPsatFnTemp)");
                     if (!CalledFrom.empty()) {
-                        ShowContinueErrorTimeStamp(state, format(" Routine={}", CalledFrom));
+                        ShowContinueErrorTimeStamp(state, format(" Routine={},", CalledFrom));
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
@@ -1005,7 +1005,7 @@ namespace Psychrometrics {
                 if (state.dataPsychrometrics->iPsyErrIndex(iPsyTsatFnHPb) == 0) {
                     ShowWarningMessage(state, "Enthalpy out of range (PsyTsatFnHPb)");
                     if (!CalledFrom.empty()) {
-                        ShowContinueErrorTimeStamp(state, format(" Routine={}", CalledFrom));
+                        ShowContinueErrorTimeStamp(state, format(" Routine={},", CalledFrom));
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
@@ -1239,7 +1239,7 @@ namespace Psychrometrics {
                                    "Calculated partial vapor pressure is greater than the barometric pressure, so that calculated humidity ratio is "
                                    "invalid (PsyWFnTdpPb).");
                 if (!CalledFrom.empty()) {
-                    ShowContinueErrorTimeStamp(state, format(" Routine={}", CalledFrom));
+                    ShowContinueErrorTimeStamp(state, format(" Routine={},", CalledFrom));
                 } else {
                     ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                 }

@@ -496,28 +496,6 @@ void SolveRoot(EnergyPlusData &state,
         return;
     }
     XRes = XTemp;
-}
-
-void SolveRoot(Real64 const Eps, // required absolute accuracy
-               int const MaxIte, // maximum number of allowed iterations
-               int &Flag,        // integer storing exit status
-               Real64 &XRes,     // value of x that solves f(x,Par) = 0
-               std::function<Real64(Real64 const, Array1D<Real64> const &)> f,
-               Real64 const X_0,           // 1st bound of interval that contains the solution
-               Real64 const X_1,           // 2nd bound of interval that contains the solution
-               Array1D<Real64> const &Par, // array with additional parameters used for function evaluation
-               int const AlgorithmTypeNum, // ALgorithm selection
-               Real64 &XX_0,               // Low bound obtained with maximum number of allowed iterations
-               Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Michael Wetter
-    //       DATE WRITTEN   March 1999
-    //       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
-    //                      L. Gu, May 2017 - selcte an algorithm and output both bounds
-    //       RE-ENGINEERED  na
 
     while (Cont) {
 
@@ -1198,46 +1176,6 @@ Real64 InterpProfSlatAng(Real64 const ProfAng,           // Profile angle (rad)
         SlatAng1 = SlatAng;
         ProfAng1 = ProfAng;
     }
-    return POLYF;
-}
-
-Real64 POLYF(Real64 const X,         // Cosine of angle of incidence
-             Array1<Real64> const &A // Polynomial coefficients
-)
-{
-    // Return value
-    Real64 POLYF;
-
-    if (X < 0.0 || X > 1.0) {
-        POLYF = 0.0;
-    } else {
-        POLYF = X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
-    }
-    return POLYF;
-}
-
-Real64 POLYF(Real64 const X,          // Cosine of angle of incidence
-             Array1S<Real64> const &A // Polynomial coefficients
-)
-{
-    // Return value
-    Real64 POLYF;
-
-    if (X < 0.0 || X > 1.0) {
-        POLYF = 0.0;
-    } else {
-        POLYF = X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
-    }
-    return POLYF;
-}
-
-std::string &strip_trailing_zeros(std::string &InputString)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Stuart Mentzer (in-place version of RemoveTrailingZeros by Linda Lawrie)
-    //       DATE WRITTEN   July 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     IAlpha = int((ProfAng1 + DataGlobalConstants::PiOvr2) / DeltaProfAng) + 1;
     ProfAngRatio = (ProfAng1 + DataGlobalConstants::PiOvr2 - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng;
@@ -1315,6 +1253,36 @@ Real64 BlindBeamBeamTrans(Real64 const ProfAng,        // Solar profile angle (r
     }
 
     return BlindBeamBeamTrans;
+}
+
+Real64 POLYF(Real64 const X,         // Cosine of angle of incidence
+             Array1<Real64> const &A // Polynomial coefficients
+)
+{
+    // Return value
+    Real64 POLYF;
+
+    if (X < 0.0 || X > 1.0) {
+        POLYF = 0.0;
+    } else {
+        POLYF = X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
+    }
+    return POLYF;
+}
+
+Real64 POLYF(Real64 const X,          // Cosine of angle of incidence
+             Array1S<Real64> const &A // Polynomial coefficients
+)
+{
+    // Return value
+    Real64 POLYF;
+
+    if (X < 0.0 || X > 1.0) {
+        POLYF = 0.0;
+    } else {
+        POLYF = X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
+    }
+    return POLYF;
 }
 
 std::string &strip_trailing_zeros(std::string &InputString)
