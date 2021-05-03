@@ -516,9 +516,8 @@ void CalcEQLWindowSHGCAndTransNormal(EnergyPlusData &state,
     HCIN = 3.0; // Initial guess
     HCOUT = 15.0;
     if (FS.L(1).LTYPE == LayerType::ROLLB || FS.L(1).LTYPE == LayerType::DRAPE || FS.L(1).LTYPE == LayerType::INSCRN ||
-        FS.L(1).LTYPE == LayerType::VBHOR ||
-        FS.L(1).LTYPE == LayerType::VBVER) { // Exterior Roller Blind Present | Exterior Drape Fabric | Exterior Insect Screen Present | Exterior
-                                                // Venetian Blind Present
+        FS.L(1).LTYPE == LayerType::VBHOR || FS.L(1).LTYPE == LayerType::VBVER) { // Exterior Roller Blind Present | Exterior Drape Fabric | Exterior
+                                                                                  // Insect Screen Present | Exterior Venetian Blind Present
         // Reduced convection coefficient due to external attachment
         HCOUT = 12.25;
     }
@@ -568,7 +567,7 @@ void CalcEQLWindowSHGCAndTransNormal(EnergyPlusData &state,
 }
 
 void CalcEQLWindowOpticalProperty(EnergyPlusData &state,
-                                  CFSTY &FS,              // fenestration system
+                                  CFSTY &FS,                      // fenestration system
                                   SolarArrays const DiffBeamFlag, // isDIFF: calc diffuse properties
                                   Array2A<Real64> Abs1,
                                   Real64 const IncA,   // angle of incidence, radians
@@ -8173,7 +8172,7 @@ Real64 TRadC(Real64 const J,    // radiosity, W/m2
 void CalcEQLOpticalProperty(EnergyPlusData &state,
                             int const SurfNum,
                             SolarArrays const BeamDIffFlag, // identifier index of diffuse and beam SW radiation
-                            Array2A<Real64> CFSAbs  // absorbed beam solar radiation by layers fraction
+                            Array2A<Real64> CFSAbs          // absorbed beam solar radiation by layers fraction
 )
 {
 
