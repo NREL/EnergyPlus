@@ -58,6 +58,7 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -247,7 +248,7 @@ namespace HeatBalanceIntRadExchange {
                                 IntShadeOrBlindStatusChanged = true;
                             }
                         } else {
-                            UpdateMovableInsulationFlag(state, IntMovInsulChanged, SurfNum);
+                            if (state.dataSurface->AnyMovableInsulation) UpdateMovableInsulationFlag(state, IntMovInsulChanged, SurfNum);
                         }
                     }
                 }
@@ -261,7 +262,7 @@ namespace HeatBalanceIntRadExchange {
                             ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                             zone_info.Emissivity(ZoneSurfNum) = state.dataHeatBal->ITABSF(SurfNum);
                         }
-                        if (state.dataSurface->SurfMovInsulIntPresent(SurfNum)) {
+                        if (state.dataSurface->AnyMovableInsulation && state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum)) {
                             zone_info.Emissivity(ZoneSurfNum) = state.dataMaterial->Material(state.dataSurface->Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal;
                         }
                         if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
@@ -437,7 +438,7 @@ namespace HeatBalanceIntRadExchange {
 
         MovableInsulationChange = false;
 
-        if (state.dataSurface->SurfMovInsulIntPresent(SurfNum) != state.dataSurface->SurfMovInsulIntPresentPrevTS(SurfNum)) {
+        if (state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum) != state.dataHeatBalSurf->SurfMovInsulIntPresentPrevTS(SurfNum)) {
             auto const &thissurf(state.dataSurface->Surface(SurfNum));
             Real64 AbsorpDiff = std::abs(state.dataConstruction->Construct(thissurf.Construction).InsideAbsorpThermal -
                                          state.dataMaterial->Material(thissurf.MaterialMovInsulInt).AbsorpThermal);

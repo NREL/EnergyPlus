@@ -286,6 +286,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataMaterial->Material(1).AbsorpThermal = 0.2;
     state->dataMaterial->Material(1).AbsorpSolar = 0.5;
     state->dataSurface->SurfMovInsulHInt.allocate(1);
+    state->dataSurface->SurfMovInsulIntPresent.allocate(1);
+    state->dataSurface->AnyMovableInsulation = true;
+    state->dataSurface->SurfMovInsulIntPresent(1) = true;
     state->dataSurface->SurfMovInsulHInt(1) = 1.0;
     ComputeIntThermalAbsorpFactors(*state);
 
@@ -2500,6 +2503,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestReportIntMovInsInsideSur
     state->dataHeatBalSurf->TempSurfInTmp.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBalSurf->TempSurfInMovInsRep.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->SurfMovInsulIntPresent.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->AnyMovableInsulation = true;
 
     // Test 1 Data: Surface does NOT have movable insulation
     state->dataSurface->SurfMovInsulIntPresent(1) = false; // No movable insulation

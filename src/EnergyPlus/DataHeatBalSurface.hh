@@ -261,6 +261,16 @@ struct HeatBalSurfData : BaseGlobalStruct
     bool InterZoneWindow = false;        // True if there is an interzone window
     Real64 SumSurfaceHeatEmission = 0.0; // Heat emission from all surfaces
 
+    // Surface Heat Balance
+    Array1D<bool> SurfMovInsulExtPresent;       // True when interior movable insulation is present
+    Array1D<bool> SurfMovInsulIntPresent;       // True when interior movable insulation is present
+    Array1D<bool> SurfMovInsulIntPresentPrevTS; // True when interior movable insulation was present during the previous time step
+    Array1D<Real64> SurfMovInsulHExt;       // Resistance or "h" value of exterior movable insulation
+    Array1D<Real64> SurfMovInsulHInt;       // Resistance or "h" value of interior movable insulation
+    Array1D<Real64> SurfAbsInt; // Absorptivity of surface inside face or interior movable insulation if present
+    Array1D<Real64> SurfAbsExt; // Absorptivity of surface outside face or exterior movable insulation if present
+    std::vector<int> SurfMovInsulIndexList;
+
     void clear_state() override
     {
         this->Zone_has_mixed_HT_models.clear();
@@ -366,6 +376,14 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->RecDifShortFromZ.deallocate();
         this->InterZoneWindow = false;
         this->SumSurfaceHeatEmission = 0;
+        this->SurfMovInsulExtPresent.deallocate();
+        this->SurfMovInsulIntPresent.deallocate();
+        this->SurfMovInsulIntPresentPrevTS.deallocate();
+        this->SurfMovInsulHExt.deallocate();
+        this->SurfMovInsulHInt.deallocate();
+        this->SurfAbsInt.deallocate();
+        this->SurfAbsExt.deallocate();
+        this->SurfMovInsulIndexList.clear();
     }
 };
 

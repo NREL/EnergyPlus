@@ -2594,6 +2594,12 @@ namespace SurfaceGeometry {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
             state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
         }
+        // Initialize surface with movable insulation index list
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+            if (state.dataSurface->Surface(SurfNum).MaterialMovInsulExt > 0 || state.dataSurface->Surface(SurfNum).MaterialMovInsulInt > 0 ) {
+                state.dataHeatBalSurf->SurfMovInsulIndexList.push_back(SurfNum);
+            }
+        }
     }
 
     void checkSubSurfAzTiltNorm(EnergyPlusData &state,

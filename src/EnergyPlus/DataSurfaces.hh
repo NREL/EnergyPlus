@@ -1361,14 +1361,6 @@ struct SurfacesData : BaseGlobalStruct
     std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
     std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
 
-    // Surface Heat Balance
-    Array1D<bool> SurfMovInsulIntPresent;       // True when interior movable insulation is present
-    Array1D<bool> SurfMovInsulIntPresentPrevTS; // True when interior movable insulation was present during the previous time step
-    Array1D<Real64> SurfMovInsulHExt;       // Resistance or "h" value of exterior movable insulation
-    Array1D<Real64> SurfMovInsulAbsExt;     // Absorptivity of exterior movable insulation if present
-    Array1D<Real64> SurfMovInsulHInt;       // Resistance or "h" value of interior movable insulation
-    Array1D<Real64> SurfMovInsulAbsInt;     // Absorptivity of interior movable insulation if present
-
     // Surface Window Heat Balance
     Array2D<Real64> SurfWinA;          // Time step value of factor for beam absorbed in window glass layers
     Array2D<Real64> SurfWinADiffFront;
@@ -1649,13 +1641,6 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfBmToDiffReflFacObs.deallocate();
         this->SurfBmToDiffReflFacGnd.deallocate();
         this->SurfSkyDiffReflFacGnd.deallocate();
-        this->SurfMovInsulIntPresent.deallocate();
-        this->SurfMovInsulIntPresentPrevTS.deallocate();
-        this->SurfMovInsulHExt.deallocate();
-        this->SurfMovInsulAbsExt.deallocate();
-        this->SurfMovInsulHInt.deallocate();
-        this->SurfMovInsulAbsInt.deallocate();
-
         this->SurfWinA.deallocate();
         this->SurfWinADiffFront.deallocate();
         this->SurfWinACFOverlap.deallocate();

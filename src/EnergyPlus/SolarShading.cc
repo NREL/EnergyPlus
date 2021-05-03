@@ -7378,11 +7378,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                                 // Back surface is opaque interior or exterior wall
                                 // Interior solar absorptance of opaque surface
-                                Real64 AbsIntSurf = state.dataConstruction->Construct(ConstrNumBack).InsideAbsorpSolar;
-                                // TODO - what does cycle prevents SolarShadingGeometry from USEing HeatBalanceSurfaceManager mean
-                                if (state.dataSurface->SurfMovInsulHInt(BackSurfNum) > 0) {
-                                    AbsIntSurf = state.dataSurface->SurfMovInsulAbsInt(BackSurfNum);
-                                }
+                                Real64 AbsIntSurf = state.dataHeatBalSurf->SurfAbsInt(BackSurfNum);
                                 state.dataSurface->SurfOpaqAI(BackSurfNum) +=
                                     BOverlap * AbsIntSurf / state.dataSurface->Surface(BackSurfNum).Area; //[-]
                                 BABSZone += BOverlap * AbsIntSurf;                                        //[m2]
@@ -8119,10 +8115,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                             if (state.dataConstruction->Construct(ConstrNumBack).TransDiff <= 0.0) {
 
                                 // Back surface is opaque interior or exterior wall
-                                Real64 AbsIntSurf = state.dataConstruction->Construct(ConstrNumBack).InsideAbsorpSolar;
-                                if (state.dataSurface->SurfMovInsulHInt(BackSurfNum) > 0) {
-                                    AbsIntSurf = state.dataSurface->SurfMovInsulAbsInt(BackSurfNum);
-                                }
+                                Real64 AbsIntSurf = state.dataHeatBalSurf->SurfAbsInt(BackSurfNum);
                                 state.dataSurface->SurfOpaqAI(BackSurfNum) += BOverlap * AbsIntSurf / state.dataSurface->Surface(BackSurfNum).Area; //[-]
                                 BABSZone += BOverlap * AbsIntSurf;                                        //[m2]
 
@@ -8719,10 +8712,7 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
                     if (state.dataConstruction->Construct(ConstrNumBack).TransDiff <= 0.0) {
                         // Back surface is opaque interior or exterior wall
 
-                        Real64 AbsIntSurf = state.dataConstruction->Construct(ConstrNumBack).InsideAbsorpSolar;
-                        if (state.dataSurface->SurfMovInsulHInt(BackSurfNum) > 0) {
-                            AbsIntSurf = state.dataSurface->SurfMovInsulAbsInt(BackSurfNum);
-                        }
+                        Real64 AbsIntSurf = state.dataHeatBalSurf->SurfAbsInt(BackSurfNum);
                         state.dataSurface->SurfOpaqAI(BackSurfNum) += BOverlap * AbsIntSurf / state.dataSurface->Surface(BackSurfNum).Area; //[-]
                         BABSZone += BOverlap * AbsIntSurf;                                                                                  //[m2]
                     }
@@ -11672,10 +11662,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
 
                     // Determine the inside (back) diffuse solar absorptance
                     // and reflectance of the current heat transfer surface
-                    InsideDifAbsorptance = state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar;
-                    if (state.dataSurface->SurfMovInsulHInt(HeatTransSurfNum) > 0) {
-                        InsideDifAbsorptance = state.dataSurface->SurfMovInsulAbsInt(HeatTransSurfNum);
-                    }
+                    InsideDifAbsorptance = state.dataHeatBalSurf->SurfAbsInt(HeatTransSurfNum);
                     // Inside (back) diffuse solar reflectance is assumed to be 1 - absorptance
                     InsideDifReflectance = 1.0 - InsideDifAbsorptance;
 
@@ -12163,10 +12150,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(
 
             // Determine the inside (back) diffuse solar absorptance
             // and reflectance of the current heat transfer surface
-            InsideDifAbsorptance = state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar;
-            if (state.dataSurface->SurfMovInsulHInt(HeatTransSurfNum) > 0) {
-                InsideDifAbsorptance = state.dataSurface->SurfMovInsulAbsInt(HeatTransSurfNum);
-            }
+            InsideDifAbsorptance = state.dataHeatBalSurf->SurfAbsInt(HeatTransSurfNum);
             // Inside (back) diffuse solar reflectance is assumed to be 1 - absorptance
             InsideDifReflectance = 1.0 - InsideDifAbsorptance;
 

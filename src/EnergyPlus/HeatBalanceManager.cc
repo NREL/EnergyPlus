@@ -5941,8 +5941,10 @@ namespace HeatBalanceManager {
 
         // Update interior movable insulation flag--needed at the end of a zone time step so that the interior radiant
         // exchange algorithm knows whether there has been a change in interior movable insulation or not.
-        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            state.dataSurface->SurfMovInsulIntPresentPrevTS(SurfNum) = state.dataSurface->SurfMovInsulIntPresent(SurfNum);
+        if (state.dataSurface->AnyMovableInsulation) {
+            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+                state.dataHeatBalSurf->SurfMovInsulIntPresentPrevTS(SurfNum) = state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum);
+            }
         }
 
         // For non-complex windows, update a report variable so this shows up in the output as something other than zero

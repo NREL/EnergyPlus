@@ -1078,7 +1078,8 @@ namespace HeatBalFiniteDiffManager {
         auto &GSloopCounter(surfaceFD.GSloopCounter);
         auto &MaxNodeDelTemp(surfaceFD.MaxNodeDelTemp);
 
-        Real64 HMovInsul = state.dataSurface->SurfMovInsulHExt(Surf);
+        Real64 HMovInsul = 0;
+        if (state.dataSurface->AnyMovableInsulation) HMovInsul = state.dataHeatBalSurf->SurfMovInsulHExt(Surf);
         // Start stepping through the slab with time.
         for (int J = 1, J_end = nint(state.dataGlobal->TimeStepZoneSec / Delt); J <= J_end; ++J) { // PT testing higher time steps
 
