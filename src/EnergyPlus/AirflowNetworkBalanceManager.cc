@@ -2665,11 +2665,11 @@ namespace AirflowNetworkBalanceManager {
                 // Get data of polygonal surface
                 if (!lAlphaBlanks(8)) {
                     if (Alphas(8) == "POLYGONHEIGHT") {
-                        state.dataAirflowNetwork->MultizoneSurfaceData(i).EquivRecMethod = EquivRec::Height;
+                        state.dataAirflowNetwork->MultizoneSurfaceData(i).EquivRecMethod = EquivalentRectangle::Height;
                     } else if (Alphas(8) == "BASESURFACEASPECTRATIO") {
-                        state.dataAirflowNetwork->MultizoneSurfaceData(i).EquivRecMethod = EquivRec::BaseAspectRatio;
+                        state.dataAirflowNetwork->MultizoneSurfaceData(i).EquivRecMethod = EquivalentRectangle::BaseAspectRatio;
                     } else if (Alphas(8) == "USERDEFINEDASPECTRATIO") {
-                        state.dataAirflowNetwork->MultizoneSurfaceData(i).EquivRecMethod = EquivRec::UserAspectRatio;
+                        state.dataAirflowNetwork->MultizoneSurfaceData(i).EquivRecMethod = EquivalentRectangle::UserAspectRatio;
                     } else {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + " object, Invalid " + cAlphaFields(8));
                         ShowContinueError(state,
@@ -2680,7 +2680,7 @@ namespace AirflowNetworkBalanceManager {
                         ErrorsFound = true;
                     }
                 } else {
-                    state.dataAirflowNetwork->MultizoneSurfaceData(i).EquivRecMethod = EquivRec::Height;
+                    state.dataAirflowNetwork->MultizoneSurfaceData(i).EquivRecMethod = EquivalentRectangle::Height;
                 }
                 if (!lNumericBlanks(7)) {
                     state.dataAirflowNetwork->MultizoneSurfaceData(i).EquivRecUserAspectRatio = Numbers(7);
@@ -2805,7 +2805,7 @@ namespace AirflowNetworkBalanceManager {
             // Calculate equivalent width and height
             if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).Sides != 4) {
                 state.dataAirflowNetwork->MultizoneSurfaceData(i).NonRectangular = true;
-                if (state.dataAirflowNetwork->MultizoneSurfaceData(i).EquivRecMethod == EquivRec::Height) {
+                if (state.dataAirflowNetwork->MultizoneSurfaceData(i).EquivRecMethod == EquivalentRectangle::Height) {
                     if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).Tilt < 1.0 ||
                         state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).Tilt > 179.0) { // horizontal surface
                         // check base surface shape
@@ -2869,7 +2869,7 @@ namespace AirflowNetworkBalanceManager {
                         }
                     }
                 }
-                if (state.dataAirflowNetwork->MultizoneSurfaceData(i).EquivRecMethod == EquivRec::BaseAspectRatio) {
+                if (state.dataAirflowNetwork->MultizoneSurfaceData(i).EquivRecMethod == EquivalentRectangle::BaseAspectRatio) {
                     if (state.dataSurface->Surface(state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).BaseSurf)
                             .Sides == 4) {
                         baseratio =
@@ -2929,7 +2929,7 @@ namespace AirflowNetworkBalanceManager {
                         }
                     }
                 }
-                if (state.dataAirflowNetwork->MultizoneSurfaceData(i).EquivRecMethod == EquivRec::UserAspectRatio) {
+                if (state.dataAirflowNetwork->MultizoneSurfaceData(i).EquivRecMethod == EquivalentRectangle::UserAspectRatio) {
                     state.dataAirflowNetwork->MultizoneSurfaceData(i).Width =
                         sqrt(state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).Area *
                              state.dataAirflowNetwork->MultizoneSurfaceData(i).EquivRecUserAspectRatio);
