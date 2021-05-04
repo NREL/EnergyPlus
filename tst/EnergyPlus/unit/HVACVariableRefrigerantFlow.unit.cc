@@ -2838,7 +2838,6 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualCool)
 
     using namespace DXCoils;
 
-    int NumPar;
     double FanSpdRto;
     double ZnSenLoad;
     double Th2;
@@ -2872,7 +2871,6 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualHeat)
 
     using namespace DXCoils;
 
-    int NumPar;
     double FanSpdRto;
     double ZnSenLoad;
     double Th2;

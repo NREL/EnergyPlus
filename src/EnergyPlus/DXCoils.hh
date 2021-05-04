@@ -712,7 +712,7 @@ namespace DXCoils {
 
     Real64 CalcTwoSpeedDXCoilIEERResidual(EnergyPlusData &state,
                                           Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                          Array1D<Real64> const &Par          // par(1) = DX coil number
+                                          std::array<Real64, 12> const &Par          // par(1) = DX coil number
     );
 
     // ======================  Utility routines ======================================
