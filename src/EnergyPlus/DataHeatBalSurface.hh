@@ -267,8 +267,11 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<bool> SurfMovInsulIntPresentPrevTS; // True when interior movable insulation was present during the previous time step
     Array1D<Real64> SurfMovInsulHExt;       // Resistance or "h" value of exterior movable insulation
     Array1D<Real64> SurfMovInsulHInt;       // Resistance or "h" value of interior movable insulation
-    Array1D<Real64> SurfAbsInt; // Absorptivity of surface inside face or interior movable insulation if present
-    Array1D<Real64> SurfAbsExt; // Absorptivity of surface outside face or exterior movable insulation if present
+    Array1D<Real64> SurfAbsSolarExt;        // Solar Absorptivity of surface inside face or interior movable insulation if present
+    Array1D<Real64> SurfAbsThermalExt;      // Thermal Absorptivity of surface inside face or interior movable insulation if present
+    Array1D<Real64> SurfAbsSolarInt;        // Solar absorptivity of surface outside face or exterior movable insulation if present
+    Array1D<Real64> SurfRoughnessExt;       // Roughness of surface inside face or interior movable insulation if present
+    Array1D<Real64> SurfAbsThermalInt;      // Thermal absorptivity of surface outside face or exterior movable insulation if present
     std::vector<int> SurfMovInsulIndexList;
 
     void clear_state() override
@@ -381,8 +384,11 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->SurfMovInsulIntPresentPrevTS.deallocate();
         this->SurfMovInsulHExt.deallocate();
         this->SurfMovInsulHInt.deallocate();
-        this->SurfAbsInt.deallocate();
-        this->SurfAbsExt.deallocate();
+        this->SurfAbsSolarExt.deallocate();
+        this->SurfAbsThermalExt.deallocate();
+        this->SurfAbsSolarInt.deallocate();
+        this->SurfAbsThermalInt.deallocate();
+        this->SurfRoughnessExt.deallocate();
         this->SurfMovInsulIndexList.clear();
     }
 };

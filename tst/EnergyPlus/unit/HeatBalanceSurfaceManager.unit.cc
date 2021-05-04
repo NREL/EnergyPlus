@@ -282,14 +282,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataSurface->SurfWinShadingFlag(1) = DataSurfaces::WinShadingType::ShadeOff;
     state->dataConstruction->Construct(1).InsideAbsorpThermal = 0.9;
     state->dataConstruction->Construct(1).TransDiff = 0.0;
-    state->dataSurface->Surface(1).MaterialMovInsulInt = 1;
-    state->dataMaterial->Material(1).AbsorpThermal = 0.2;
-    state->dataMaterial->Material(1).AbsorpSolar = 0.5;
-    state->dataSurface->SurfMovInsulHInt.allocate(1);
-    state->dataSurface->SurfMovInsulIntPresent.allocate(1);
-    state->dataSurface->AnyMovableInsulation = true;
-    state->dataSurface->SurfMovInsulIntPresent(1) = true;
-    state->dataSurface->SurfMovInsulHInt(1) = 1.0;
+    state->dataHeatBalSurf->SurfAbsThermalInt.allocate(1);
+    state->dataHeatBalSurf->SurfAbsThermalInt(1) = 0.2;
     ComputeIntThermalAbsorpFactors(*state);
 
     EXPECT_EQ(0.2, state->dataHeatBal->ITABSF(1));
@@ -2497,23 +2491,24 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestReportIntMovInsInsideSur
     Real64 ExpectedResult1;
     Real64 ExpectedResult2;
 
-    state->dataSurface->TotSurfaces = 3;
+    state->dataSurface->TotSurfaces = 2;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBalSurf->TempSurfIn.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBalSurf->TempSurfInTmp.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBalSurf->TempSurfInMovInsRep.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfMovInsulIntPresent.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBalSurf->SurfMovInsulIntPresent.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->AnyMovableInsulation = true;
-
+    state->dataHeatBalSurf->SurfMovInsulIndexList.push_back(1);
+    state->dataHeatBalSurf->SurfMovInsulIndexList.push_back(2);
     // Test 1 Data: Surface does NOT have movable insulation
-    state->dataSurface->SurfMovInsulIntPresent(1) = false; // No movable insulation
+    state->dataHeatBalSurf->SurfMovInsulIntPresent(1) = false; // No movable insulation
     state->dataHeatBalSurf->TempSurfIn(1) = 23.0;
     state->dataHeatBalSurf->TempSurfInTmp(1) = 12.3;
     state->dataHeatBalSurf->TempSurfInMovInsRep(1) = 1.23;
     ExpectedResult1 = 23.0; // TempSurfInMovInsRep should be set to TempSurfIn
 
     // Test 2 Data: Surface has movable insulation
-    state->dataSurface->SurfMovInsulIntPresent(2) = true;
+    state->dataHeatBalSurf->SurfMovInsulIntPresent(2) = true;
     state->dataHeatBalSurf->TempSurfIn(2) = 123.0;
     state->dataHeatBalSurf->TempSurfInTmp(2) = 12.3;
     state->dataHeatBalSurf->TempSurfInMovInsRep(2) = 1.23;
