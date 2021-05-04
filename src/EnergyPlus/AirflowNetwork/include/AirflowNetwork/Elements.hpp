@@ -87,7 +87,7 @@ namespace AirflowNetwork {
         KeepStatus = 2   // Keep status at the previous time step from probability check
     };
 
-    enum class EquivRec
+    enum class EquivalentRectangle
     {
         Height,          // Effective rectangle polygonal height selection
         BaseAspectRatio, // Effective rectangle base surface aspect ratio selection
@@ -159,7 +159,8 @@ namespace AirflowNetwork {
         SPO = 14  // Splitter Outlet Node
     };
 
-    enum class WindPressureCoefficientType : int{
+    enum class WindPressureCoefficientType : int
+    {
         Input = 1,
         SurfAvg = 2
     };
@@ -358,7 +359,7 @@ namespace AirflowNetwork {
         int OpeningProbStatus;                      // Opening probability status
         bool RAFNflag;                              // True if this surface is used in AirflowNetwork:IntraZone:Linkage
         bool NonRectangular;                        // True if this surface is not rectangular
-        EquivRec EquivRecMethod;        // Equivalent Rectangle Method input: 1 Height; 2 Base surface aspect ratio; 3 User input aspect ratio
+        EquivalentRectangle EquivRecMethod;         // Equivalent Rectangle Method input: 1 Height; 2 Base surface aspect ratio; 3 User input aspect ratio
         Real64 EquivRecUserAspectRatio; // user input value when EquivRecMethod = 3
 
         // Default Constructor
@@ -370,7 +371,7 @@ namespace AirflowNetwork {
               Multiplier(1.0), HybridVentClose(false), HybridCtrlGlobal(false), HybridCtrlMaster(false), WindModifier(1.0),
               OccupantVentilationControlNum(0), OpeningStatus(OpenStatus::FreeOperation), PrevOpeningstatus(OpenStatus::FreeOperation),
               CloseElapsedTime(0.0), OpenElapsedTime(0.0), ClosingProbStatus(ProbabilityCheck::NoAction),
-              OpeningProbStatus(ProbabilityCheck::NoAction), RAFNflag(false), NonRectangular(false), EquivRecMethod(EquivRec::Height),
+              OpeningProbStatus(ProbabilityCheck::NoAction), RAFNflag(false), NonRectangular(false), EquivRecMethod(EquivalentRectangle::Height),
               EquivRecUserAspectRatio(1.0)
         {
         }
@@ -1638,6 +1639,7 @@ struct AirflowNetworkData : BaseGlobalStruct
     Real64 ExhaustFanMassFlowRate = 0.0; // Exhaust fan flow rate used in PressureStat
     int PressureSetFlag = 0;             // PressureSet flag
     Real64 ReliefMassFlowRate = 0.0;     // OA Mixer relief node flow rate used in PressureStat
+    bool AFNDefaultControlFlag = false;  // Default simulation control flag
 
     Array1D<AirflowNetwork::AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
     Array1D<AirflowNetwork::AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
