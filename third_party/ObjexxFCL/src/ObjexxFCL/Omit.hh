@@ -16,19 +16,11 @@
 namespace ObjexxFCL {
 
 // Omit: Sentinel for Omitted Argument
-class Omit
+struct Omit
 {
-
-public: // Creation
-
-	// Default Constructor
-	Omit()
-	{}
-
 }; // Omit
 
-extern Omit const _;
-extern Omit const omit;
+static constexpr Omit _{};
 
 } // ObjexxFCL
 

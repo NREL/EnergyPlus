@@ -157,19 +157,6 @@ KIND( T const & )
 int
 SELECTED_INT_KIND( int const r );
 
-int
-SELECTED_REAL_KIND( int const p = 0, int const r = 0, int const radix = 2 );
-
-inline
-int
-SELECTED_CHAR_KIND( char const & )
-{
-	return -1;
-}
-
-int
-SELECTED_CHAR_KIND( std::string const & s );
-
 inline
 std::size_t
 SIZEOF( std::string const & x )
@@ -366,28 +353,10 @@ MINEXPONENT( T const & )
 template< typename T >
 inline
 int
-MAXEXPONENT( T const & )
-{
-	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return std::numeric_limits< T >::max_exponent;
-}
-
-template< typename T >
-inline
-int
 EXPONENT( T const x )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
 	return ( x != T( 0 ) ? int( std::log2( std::abs( x ) ) ) + 1 : 0 );
-}
-
-template< typename T >
-inline
-T
-SET_EXPONENT( T const x, int const i )
-{
-	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return ( x != T( 0 ) ? x * std::pow( T( RADIX( x ) ), T( i - EXPONENT( x ) ) ) : T( 0 ) );
 }
 
 template< typename T >
@@ -420,15 +389,6 @@ SPACING( T const x )
 	} catch (...) {
 		return TINY( x );
 	}
-}
-
-template< typename T >
-inline
-T
-RECIPROCAL_RELATIVE_SPACING( T const x )
-{
-	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return std::abs( FRACTION( x ) ) * std::pow( double( RADIX( x ) ), DIGITS( x ) );
 }
 
 template< typename T, typename Y >
