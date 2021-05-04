@@ -216,7 +216,7 @@ namespace FluidCoolers {
 
     Real64 SimpleFluidCoolerUAResidual(EnergyPlusData &state,
                                        Real64 UA,                 // UA of fluid cooler
-                                       Array1D<Real64> const &Par // par(1) = design fluid cooler load [W]
+                                       std::array<Real64, 5> const &Par // par(1) = design fluid cooler load [W]
     );
 
 } // namespace FluidCoolers
