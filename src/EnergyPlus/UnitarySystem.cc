@@ -181,7 +181,7 @@ namespace UnitarySystems {
           CoolCoilLoopNum(0), CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0),
           HeatCoilLoopSide(0), HeatCoilBranchNum(0), HeatCoilCompNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0),
           HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0), ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0),
-          m_CompPointerMSHP(nullptr), LoadSHR(0.0), CoilSHR(0.0), WaterSideEconomizerStatus(0)
+          m_CompPointerMSHP(nullptr), LoadSHR(0.0), CoilSHR(0.0), runWaterSideEconomizer(false), WaterSideEconomizerStatus(0)
     {
     }
 
@@ -1251,6 +1251,23 @@ namespace UnitarySystems {
                 }
                 m_setFaultModelInput = false;
             }
+        }
+
+        // set water-side economizer flags each time step
+        if (this->m_waterSideEconomizerFlag) {
+            // enable water-side economizer cooling
+            this->WaterSideEconomizerStatus = 1;
+            this->runWaterSideEconomizer = true;
+            // disable free cooling water coil if entering fluid temp is > entering air temp minus user specified offset temp
+            if (state.dataLoopNodes->Node(this->CoolCoilFluidInletNode).Temp >
+                (state.dataLoopNodes->Node(this->AirInNode).Temp - this->m_minAirToWaterTempOffset)) {
+                this->runWaterSideEconomizer = false;
+                this->WaterSideEconomizerStatus = 0;
+            }
+        } else {
+            // no water side economizer
+            this->runWaterSideEconomizer = false;
+            this->WaterSideEconomizerStatus = 0;
         }
 
         this->m_CoolingPartLoadFrac = 0.0;
@@ -7058,9 +7075,10 @@ namespace UnitarySystems {
                         UtilityRoutines::MakeUPPERCase(fields.at("design_specification_multispeed_object_name"));
                 }
                 if (fields.find("allow_unitarysystem_as_water_side_eonomizer") != fields.end()) { // not required field, has default
-                    input_spec.allow_unitarysystem_as_water_side_eonomizer = fields.at("allow_unitarysystem_as_water_side_eonomizer");
+                    input_spec.allow_unitarysystem_as_water_side_eonomizer =
+                        UtilityRoutines::MakeUPPERCase(fields.at("allow_unitarysystem_as_water_side_eonomizer"));
                 } else {
-                    input_spec.allow_unitarysystem_as_water_side_eonomizer = "No";
+                    input_spec.allow_unitarysystem_as_water_side_eonomizer = "NO";
                 }
                 if (fields.find("minimum_air_to_water_temperature_offset") != fields.end()) { // not required field, has default
                     input_spec.minimum_air_to_water_temperature_offset = fields.at("minimum_air_to_water_temperature_offset");
@@ -7451,6 +7469,16 @@ namespace UnitarySystems {
                                          "[W]",
                                          state.dataUnitarySystems->unitarySys[sysNum].m_EMSOverrideMoistZoneLoadRequest,
                                          state.dataUnitarySystems->unitarySys[sysNum].m_EMSMoistureZoneLoadValue);
+                    }
+
+                    if (state.dataUnitarySystems->unitarySys[sysNum].m_waterSideEconomizerFlag) {
+                        SetupOutputVariable(state,
+                            "Water Side Economizer Status",
+                            OutputProcessor::Unit::None,
+                            state.dataUnitarySystems->unitarySys[sysNum].WaterSideEconomizerStatus,
+                            "System",
+                            "Average",
+                            state.dataUnitarySystems->unitarySys[sysNum].Name);
                     }
                     // can this be called each time a system is gotten?
                     bool anyEMSRan;
@@ -11628,6 +11656,14 @@ namespace UnitarySystems {
             if (OutdoorDryBulb < this->m_MinOATCompressorCooling) {
                 SensibleLoad = false;
                 LatentLoad = false;
+            }
+
+            // disable waterside economizer if the condition is NOT favorable
+            if (this->m_waterSideEconomizerFlag) {
+                if (!this->runWaterSideEconomizer ) {
+                    SensibleLoad = false;
+                    LatentLoad = false;
+                }
             }
 
             // IF DXCoolingSystem runs with a cooling load then set PartLoadFrac on Cooling System and the Mass Flow
