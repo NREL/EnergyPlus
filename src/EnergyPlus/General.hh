@@ -87,7 +87,7 @@ namespace General {
                    const std::function<Real64(Real64 const, std::vector<Real64> const &)>& f,
                    Real64 X_0,                    // 1st bound of interval that contains the solution
                    Real64 X_1,                    // 2nd bound of interval that contains the solution
-                   std::vector<Real64> const &Par // array with additional parameters used for function evaluation
+                   std::vector<Real64> const &Par = {} // array with additional parameters used for function evaluation
     );
 
     void SolveRoot(EnergyPlusData &state,
@@ -98,7 +98,7 @@ namespace General {
                    const std::function<Real64(EnergyPlusData &state, Real64 const, std::vector<Real64> const &)>& f,
                    Real64 X_0,                    // 1st bound of interval that contains the solution
                    Real64 X_1,                    // 2nd bound of interval that contains the solution
-                   std::vector<Real64> const &Par // array with additional parameters used for function evaluation
+                   std::vector<Real64> const &Par = {} // array with additional parameters used for function evaluation
     );
 
     void SolveRoot(EnergyPlusData &state,
@@ -109,18 +109,18 @@ namespace General {
                    const std::function<Real64(Real64 const, Array1D<Real64> const &)>& f,
                    Real64 X_0,                // 1st bound of interval that contains the solution
                    Real64 X_1,                // 2nd bound of interval that contains the solution
-                   Array1D<Real64> const &Par // array with additional parameters used for function evaluation
+                   Array1D<Real64> const &Par = {} // array with additional parameters used for function evaluation
     );
-
-    void SolveRoot(EnergyPlusData &state,
-                   Real64 Eps,   // required absolute accuracy
-                   int MaxIte,   // maximum number of allowed iterations
-                   int &Flag,    // integer storing exit status
-                   Real64 &XRes, // value of x that solves f(x) = 0
-                   const std::function<Real64(Real64 const)>& f,
-                   Real64 X_0, // 1st bound of interval that contains the solution
-                   Real64 X_1  // 2nd bound of interval that contains the solution
-    );
+//
+//    void SolveRoot(EnergyPlusData &state,
+//                   Real64 Eps,   // required absolute accuracy
+//                   int MaxIte,   // maximum number of allowed iterations
+//                   int &Flag,    // integer storing exit status
+//                   Real64 &XRes, // value of x that solves f(x) = 0
+//                   const std::function<Real64(Real64 const)>& f,
+//                   Real64 X_0, // 1st bound of interval that contains the solution
+//                   Real64 X_1  // 2nd bound of interval that contains the solution
+//    );
 
     constexpr Real64 InterpGeneral(Real64 const Lower, Real64 const Upper, Real64 const InterpFac)
     {
