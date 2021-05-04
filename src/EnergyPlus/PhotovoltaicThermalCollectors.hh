@@ -119,8 +119,7 @@ namespace PhotovoltaicThermalCollectors {
         // Default Constructor
         BIPVTModelStruct()
             : OSCMPtr(0), SchedPtr(0), PVEffGapWidth(0.0), EffCollHeight(0.0), EffCollWidth(0.0), PVTranAbsProduct(0.0), BackMatTranAbsProduct(0.0),
-              PVAreaFract(0.0), PVRTop(0.0), PVRBot(0.0), PVGEmiss(0.0), BackMatEmiss(0.0), LastCollectorTemp(0.0),
-              CollectorTemp(0.0)
+              PVAreaFract(0.0), PVRTop(0.0), PVRBot(0.0), PVGEmiss(0.0), BackMatEmiss(0.0), LastCollectorTemp(0.0), CollectorTemp(0.0)
         {
         }
     };
@@ -213,16 +212,15 @@ namespace PhotovoltaicThermalCollectors {
 
         void calculate(EnergyPlusData &state);
 
-       void SimplePVTcalculate(EnergyPlusData &state);
+        void SimplePVTcalculate(EnergyPlusData &state);
 
-       void BIPVTcalculate(EnergyPlusData &state);
+        void BIPVTcalculate(EnergyPlusData &state);
 
-       void BIPVT_MaxHeatGain_calculate(EnergyPlusData &state);
+        void BIPVT_MaxHeatGain_calculate(EnergyPlusData &state);
 
-       void solve_lin_sys_back_sub(Real64 jj[9], Real64 f[3], Real64 (&y)[3]);
+        void solve_lin_sys_back_sub(Real64 jj[9], Real64 f[3], Real64 (&y)[3]);
 
-       void update(EnergyPlusData &state);
-
+        void update(EnergyPlusData &state);
     };
 
     void GetPVTcollectorsInput(EnergyPlusData &state);
@@ -231,12 +229,13 @@ namespace PhotovoltaicThermalCollectors {
 
     void GetBIPVTCollectorsInput(EnergyPlusData &state, int NumBIPVTPerform, Array1D<BIPVTModelStruct> &tmpBIPVTperf);
 
-    void GetMainPVTInput(EnergyPlusData &state, int NumPVT,
+    void GetMainPVTInput(EnergyPlusData &state,
+                         int NumPVT,
                          Array1D<PVTCollectorStruct> &PVT,
                          Array1D<SimplePVTModelStruct> tmpSimplePVTperf,
                          Array1D<BIPVTModelStruct> tmpBIPVTperf);
 
-    //void simPVTfromOASys(int index, bool FirstHVACIteration);
+    // void simPVTfromOASys(int index, bool FirstHVACIteration);
 
     void simPVTfromOASys(EnergyPlusData &state, int index, bool FirstHVACIteration);
 
