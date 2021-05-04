@@ -84,7 +84,7 @@ namespace General {
                    int MaxIte,   // maximum number of allowed iterations
                    int &Flag,    // integer storing exit status
                    Real64 &XRes, // value of x that solves f(x,Par) = 0
-                   std::function<Real64(Real64 const, std::vector<Real64> const &)> f,
+                   const std::function<Real64(Real64 const, std::vector<Real64> const &)>& f,
                    Real64 X_0,                    // 1st bound of interval that contains the solution
                    Real64 X_1,                    // 2nd bound of interval that contains the solution
                    std::vector<Real64> const &Par // array with additional parameters used for function evaluation
@@ -95,7 +95,7 @@ namespace General {
                    int MaxIte,   // maximum number of allowed iterations
                    int &Flag,    // integer storing exit status
                    Real64 &XRes, // value of x that solves f(x,Par) = 0
-                   std::function<Real64(EnergyPlusData &state, Real64 const, std::vector<Real64> const &)> f,
+                   const std::function<Real64(EnergyPlusData &state, Real64 const, std::vector<Real64> const &)>& f,
                    Real64 X_0,                    // 1st bound of interval that contains the solution
                    Real64 X_1,                    // 2nd bound of interval that contains the solution
                    std::vector<Real64> const &Par // array with additional parameters used for function evaluation
@@ -106,7 +106,7 @@ namespace General {
                    int MaxIte,   // maximum number of allowed iterations
                    int &Flag,    // integer storing exit status
                    Real64 &XRes, // value of x that solves f(x [,Par]) = 0
-                   std::function<Real64(Real64 const, Array1D<Real64> const &)> f,
+                   const std::function<Real64(Real64 const, Array1D<Real64> const &)>& f,
                    Real64 X_0,                // 1st bound of interval that contains the solution
                    Real64 X_1,                // 2nd bound of interval that contains the solution
                    Array1D<Real64> const &Par // array with additional parameters used for function evaluation
@@ -116,7 +116,7 @@ namespace General {
                    int MaxIte,   // maximum number of allowed iterations
                    int &Flag,    // integer storing exit status
                    Real64 &XRes, // value of x that solves f(x [,Par]) = 0
-                   std::function<Real64(Real64 const, Array1D<Real64> const &)> f,
+                   const std::function<Real64(Real64 const, Array1D<Real64> const &)>& f,
                    Real64 X_0,                 // 1st bound of interval that contains the solution
                    Real64 X_1,                 // 2nd bound of interval that contains the solution
                    Array1D<Real64> const &Par, // array with additional parameters used for function evaluation
@@ -130,7 +130,7 @@ namespace General {
                    int MaxIte,   // maximum number of allowed iterations
                    int &Flag,    // integer storing exit status
                    Real64 &XRes, // value of x that solves f(x) = 0
-                   std::function<Real64(Real64 const)> f,
+                   const std::function<Real64(Real64 const)>& f,
                    Real64 X_0, // 1st bound of interval that contains the solution
                    Real64 X_1  // 2nd bound of interval that contains the solution
     );
@@ -139,7 +139,7 @@ namespace General {
                    int MaxIte,   // maximum number of allowed iterations
                    int &Flag,    // integer storing exit status
                    Real64 &XRes, // value of x that solves f(x) = 0
-                   std::function<Real64(Real64 const)> f,
+                   const std::function<Real64(Real64 const)>& f,
                    Real64 X_0,           // 1st bound of interval that contains the solution
                    Real64 X_1,           // 2nd bound of interval that contains the solution
                    int AlgorithmTypeNum, // ALgorithm selection
@@ -365,7 +365,7 @@ namespace General {
     }
 
     void CheckCreatedZoneItemName(EnergyPlusData &state,
-                                  std::string_view const calledFrom,        // routine called from
+                                  std::string_view calledFrom,        // routine called from
                                   std::string const &CurrentObject,         // object being parsed
                                   std::string const &ZoneName,              // Zone Name associated
                                   std::string::size_type MaxZoneNameLength, // maximum length of zonelist zone names

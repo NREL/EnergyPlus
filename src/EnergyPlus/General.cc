@@ -96,7 +96,7 @@ void SolveRoot(EnergyPlusData &state,
                int const MaxIte, // maximum number of allowed iterations
                int &Flag,        // integer storing exit status
                Real64 &XRes,     // value of x that solves f(x,Par) = 0
-               std::function<Real64(Real64 const, Array1D<Real64> const &)> f,
+               const std::function<Real64(Real64 const, Array1D<Real64> const &)>& f,
                Real64 const X_0,          // 1st bound of interval that contains the solution
                Real64 const X_1,          // 2nd bound of interval that contains the solution
                Array1D<Real64> const &Par // array with additional parameters used for function evaluation
@@ -268,7 +268,7 @@ void SolveRoot(EnergyPlusData &state,
                int const MaxIte, // maximum number of allowed iterations
                int &Flag,        // integer storing exit status
                Real64 &XRes,     // value of x that solves f(x,Par) = 0
-               std::function<Real64(Real64 const, std::vector<Real64> const &)> f,
+               const std::function<Real64(Real64 const, std::vector<Real64> const &)>& f,
                Real64 const X_0,              // 1st bound of interval that contains the solution
                Real64 const X_1,              // 2nd bound of interval that contains the solution
                std::vector<Real64> const &Par // array with additional parameters used for function evaluation
@@ -435,7 +435,7 @@ void SolveRoot(EnergyPlusData &state,
                int const MaxIte, // maximum number of allowed iterations
                int &Flag,        // integer storing exit status
                Real64 &XRes,     // value of x that solves f(x,Par) = 0
-               std::function<Real64(EnergyPlusData &state, Real64 const, std::vector<Real64> const &)> f,
+               const std::function<Real64(EnergyPlusData &state, Real64 const, std::vector<Real64> const &)>& f,
                Real64 const X_0,              // 1st bound of interval that contains the solution
                Real64 const X_1,              // 2nd bound of interval that contains the solution
                std::vector<Real64> const &Par // array with additional parameters used for function evaluation
@@ -597,7 +597,7 @@ void SolveRoot(Real64 const Eps, // required absolute accuracy
                int const MaxIte, // maximum number of allowed iterations
                int &Flag,        // integer storing exit status
                Real64 &XRes,     // value of x that solves f(x,Par) = 0
-               std::function<Real64(Real64 const, Array1D<Real64> const &)> f,
+               const std::function<Real64(Real64 const, Array1D<Real64> const &)>& f,
                Real64 const X_0,           // 1st bound of interval that contains the solution
                Real64 const X_1,           // 2nd bound of interval that contains the solution
                Array1D<Real64> const &Par, // array with additional parameters used for function evaluation
@@ -734,7 +734,7 @@ void SolveRoot(EnergyPlusData &state,
                int const MaxIte, // maximum number of allowed iterations
                int &Flag,        // integer storing exit status
                Real64 &XRes,     // value of x that solves f(x) = 0
-               std::function<Real64(Real64 const)> f,
+               const std::function<Real64(Real64 const)>& f,
                Real64 const X_0, // 1st bound of interval that contains the solution
                Real64 const X_1  // 2nd bound of interval that contains the solution
 )
@@ -899,7 +899,7 @@ void SolveRoot(Real64 const Eps, // required absolute accuracy
                int const MaxIte, // maximum number of allowed iterations
                int &Flag,        // integer storing exit status
                Real64 &XRes,     // value of x that solves f(x) = 0
-               std::function<Real64(Real64 const)> f,
+               const std::function<Real64(Real64 const)>& f,
                Real64 const X_0,           // 1st bound of interval that contains the solution
                Real64 const X_1,           // 2nd bound of interval that contains the solution
                int const AlgorithmTypeNum, // ALgorithm selection
@@ -2262,14 +2262,13 @@ void ParseTime(Real64 const Time, // Time value in seconds
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int const MinToSec(60);
     int const HourToSec(MinToSec * 60);
-    Real64 Remainder(0.0);
 
     // Get number of hours
     // This might undershoot the actual number of hours. See DO WHILE loop.
     Hours = int(Time) / HourToSec;
 
     // Compute remainder in seconds
-    Remainder = (Time - Hours * HourToSec);
+    Real64 Remainder = (Time - Hours * HourToSec);
 
     // Compute minutes
     Minutes = int(Remainder) / MinToSec;
@@ -2328,6 +2327,29 @@ void ScanForReports(EnergyPlusData &state,
         cCurrentModuleObject = "Output:Surfaces:List";
 
         NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+
+        enum {
+            EMPTY,
+            LINES,
+            VERTICES,
+            DETAILS,
+            DETAILSWITHVERTICES,
+            COSTINFO,
+            VIEWFACTORINFO,
+            DECAYCURVESFROMCOMPONENTLOADSSUMMARY
+        };
+        std::map<std::string, int> localMap = {{"", EMPTY},
+                                               {"LINES", LINES},
+                                               {"VERTICES", VERTICES},
+                                               {"DETAILS", DETAILS},
+                                               {"DETAILED", DETAILS},
+                                               {"DETAIL", DETAILS},
+                                               {"DETAILSWITHVERTICES", DETAILSWITHVERTICES},
+                                               {"DETAILVERTICES", DETAILSWITHVERTICES},
+                                               {"COSTINFO", COSTINFO},
+                                               {"VIEWFACTORINFO", VIEWFACTORINFO},
+                                               {"DECAYCURVESFROMCOMPONENTLOADSSUMMARY", DECAYCURVESFROMCOMPONENTLOADSSUMMARY}};
+
         for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -2342,46 +2364,45 @@ void ScanForReports(EnergyPlusData &state,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(1));
-
-                if (SELECT_CASE_var == "LINES") {
+            try {
+                int value = localMap[state.dataIPShortCut->cAlphaArgs(1)];
+                switch (value) {
+                case LINES:
                     state.dataGeneral->LineRpt = true;
                     LineRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
-
-                } else if (SELECT_CASE_var == "VERTICES") {
+                    break;
+                case VERTICES:
                     state.dataGeneral->SurfVert = true;
-
-                } else if ((SELECT_CASE_var == "DETAILS") || (SELECT_CASE_var == "DETAILED") || (SELECT_CASE_var == "DETAIL")) {
+                    break;
+                case DETAILS:
                     state.dataGeneral->SurfDet = true;
-
-                } else if ((SELECT_CASE_var == "DETAILSWITHVERTICES") || (SELECT_CASE_var == "DETAILVERTICES")) {
+                    break;
+                case DETAILSWITHVERTICES:
                     state.dataGeneral->SurfDetWVert = true;
-
-                } else if (SELECT_CASE_var == "COSTINFO") {
+                    break;
+                case COSTINFO:
                     //   Custom case for reporting surface info for cost estimates (for first costs in opitimzing)
                     state.dataGeneral->CostInfo = true;
-
-                } else if (SELECT_CASE_var == "VIEWFACTORINFO") { // actual reporting is in HeatBalanceIntRadExchange
+                    break;
+                case VIEWFACTORINFO: // actual reporting is in HeatBalanceIntRadExchange
                     state.dataGeneral->ViewFactorInfo = true;
                     ViewRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
-
-                } else if (SELECT_CASE_var == "DECAYCURVESFROMCOMPONENTLOADSSUMMARY") { // Should the Radiant to Convective Decay Curves from the
-                                                                                        // load component report appear in the EIO file
+                    break;
+                case DECAYCURVESFROMCOMPONENTLOADSSUMMARY: // Should the Radiant to Convective Decay Curves from the
+                                                           // load component report appear in the EIO file
                     state.dataGlobal->ShowDecayCurvesInEIO = true;
-
-                } else if (SELECT_CASE_var == "") {
+                    break;
+                default: // including empty
                     ShowWarningError(state, cCurrentModuleObject + ": No " + state.dataIPShortCut->cAlphaFieldNames(1) + " supplied.");
                     ShowContinueError(state,
                                       R"( Legal values are: "Lines", "Vertices", "Details", "DetailsWithVertices", "CostInfo", "ViewFactorIinfo".)");
-
-                } else {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" +
-                                         state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
-                    ShowContinueError(state,
-                                      R"( Legal values are: "Lines", "Vertices", "Details", "DetailsWithVertices", "CostInfo", "ViewFactorIinfo".)");
                 }
+            } catch (int e) {
+                ShowWarningError(state,
+                                 cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" +
+                                     state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
+                ShowContinueError(state,
+                                  R"( Legal values are: "Lines", "Vertices", "Details", "DetailsWithVertices", "CostInfo", "ViewFactorIinfo".)");
             }
         }
 
