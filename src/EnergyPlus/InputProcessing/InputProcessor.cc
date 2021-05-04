@@ -607,19 +607,13 @@ Real64 InputProcessor::getRealFieldValue(
 }
 void InputProcessor::getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord, json &schema_obj_props)
 {
-    auto find_iterators = objectCacheMap.find(objectWord);
-    if (find_iterators == objectCacheMap.end()) {
-        auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(objectWord));
-        if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
+    auto const &schema_properties = schema.at("properties");
+    const json &object_schema = schema_properties.at(objectWord);
+    if (object_schema.empty()) {
             ShowFatalError(state, "InputProcessor::fieldValue: Invalid object type = " + objectWord);
-        }
-        auto tempobjectWord = tmp_umit->second;
-        find_iterators = objectCacheMap.find(tempobjectWord);
     }
 
-    auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
-    auto const &epJSON_schema_it_val = epJSON_schema_it.value();
-    schema_obj_props = getPatternProperties(state, epJSON_schema_it_val);
+    schema_obj_props = getPatternProperties(state, object_schema);
 }
 
 std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string const &field_value, json const &schema_field_obj)
