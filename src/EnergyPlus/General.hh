@@ -79,48 +79,60 @@ namespace WeatherManager {
 
 namespace General {
 
+    // the only real solve root function, it is a template that takes a fixed array of parameters and matching residual function
+    template <size_t SIZE>
     void SolveRoot(EnergyPlusData &state,
                    Real64 Eps,   // required absolute accuracy
                    int MaxIte,   // maximum number of allowed iterations
                    int &Flag,    // integer storing exit status
                    Real64 &XRes, // value of x that solves f(x,Par) = 0
-                   const std::function<Real64(Real64 const, std::vector<Real64> const &)>& f,
-                   Real64 X_0,                    // 1st bound of interval that contains the solution
-                   Real64 X_1,                    // 2nd bound of interval that contains the solution
-                   std::vector<Real64> const &Par = {} // array with additional parameters used for function evaluation
+                   const std::function<Real64(EnergyPlusData &state, Real64 const, std::array<Real64, SIZE> const &)> &f,
+                   Real64 X_0,                         // 1st bound of interval that contains the solution
+                   Real64 X_1,                         // 2nd bound of interval that contains the solution
+                   std::array<Real64, SIZE> const &Par // array with additional parameters used for function evaluation
     );
 
-    void SolveRoot(EnergyPlusData &state,
-                   Real64 Eps,   // required absolute accuracy
-                   int MaxIte,   // maximum number of allowed iterations
-                   int &Flag,    // integer storing exit status
-                   Real64 &XRes, // value of x that solves f(x,Par) = 0
-                   const std::function<Real64(EnergyPlusData &state, Real64 const, std::vector<Real64> const &)>& f,
-                   Real64 X_0,                    // 1st bound of interval that contains the solution
-                   Real64 X_1,                    // 2nd bound of interval that contains the solution
-                   std::vector<Real64> const &Par = {} // array with additional parameters used for function evaluation
+    // template specializations for parameter array lengths, declared extern as they are instantiated in the cc file
+    extern template void SolveRoot(EnergyPlusData &state,
+                                   Real64 Eps,   // required absolute accuracy
+                                   int MaxIte,   // maximum number of allowed iterations
+                                   int &Flag,    // integer storing exit status
+                                   Real64 &XRes, // value of x that solves f(x,Par) = 0
+                                   const std::function<Real64(EnergyPlusData &state, Real64 const, std::array<Real64, 1> const &)> &f,
+                                   Real64 X_0,                      // 1st bound of interval that contains the solution
+                                   Real64 X_1,                      // 2nd bound of interval that contains the solution
+                                   std::array<Real64, 1> const &Par // array with additional parameters used for function evaluation
     );
-
-    void SolveRoot(EnergyPlusData &state,
-                   Real64 Eps,   // required absolute accuracy
-                   int MaxIte,   // maximum number of allowed iterations
-                   int &Flag,    // integer storing exit status
-                   Real64 &XRes, // value of x that solves f(x [,Par]) = 0
-                   const std::function<Real64(Real64 const, Array1D<Real64> const &)>& f,
-                   Real64 X_0,                // 1st bound of interval that contains the solution
-                   Real64 X_1,                // 2nd bound of interval that contains the solution
-                   Array1D<Real64> const &Par = {} // array with additional parameters used for function evaluation
+    extern template void SolveRoot(EnergyPlusData &state,
+                                   Real64 Eps,   // required absolute accuracy
+                                   int MaxIte,   // maximum number of allowed iterations
+                                   int &Flag,    // integer storing exit status
+                                   Real64 &XRes, // value of x that solves f(x,Par) = 0
+                                   const std::function<Real64(EnergyPlusData &state, Real64 const, std::array<Real64, 2> const &)> &f,
+                                   Real64 X_0,                      // 1st bound of interval that contains the solution
+                                   Real64 X_1,                      // 2nd bound of interval that contains the solution
+                                   std::array<Real64, 2> const &Par // array with additional parameters used for function evaluation
     );
-//
-//    void SolveRoot(EnergyPlusData &state,
-//                   Real64 Eps,   // required absolute accuracy
-//                   int MaxIte,   // maximum number of allowed iterations
-//                   int &Flag,    // integer storing exit status
-//                   Real64 &XRes, // value of x that solves f(x) = 0
-//                   const std::function<Real64(Real64 const)>& f,
-//                   Real64 X_0, // 1st bound of interval that contains the solution
-//                   Real64 X_1  // 2nd bound of interval that contains the solution
-//    );
+    extern template void SolveRoot(EnergyPlusData &state,
+                                   Real64 Eps,   // required absolute accuracy
+                                   int MaxIte,   // maximum number of allowed iterations
+                                   int &Flag,    // integer storing exit status
+                                   Real64 &XRes, // value of x that solves f(x,Par) = 0
+                                   const std::function<Real64(EnergyPlusData &state, Real64 const, std::array<Real64, 5> const &)> &f,
+                                   Real64 X_0,                      // 1st bound of interval that contains the solution
+                                   Real64 X_1,                      // 2nd bound of interval that contains the solution
+                                   std::array<Real64, 5> const &Par // array with additional parameters used for function evaluation
+    );
+    extern template void SolveRoot(EnergyPlusData &state,
+                                   Real64 Eps,   // required absolute accuracy
+                                   int MaxIte,   // maximum number of allowed iterations
+                                   int &Flag,    // integer storing exit status
+                                   Real64 &XRes, // value of x that solves f(x,Par) = 0
+                                   const std::function<Real64(EnergyPlusData &state, Real64 const, std::array<Real64, 8> const &)> &f,
+                                   Real64 X_0,                      // 1st bound of interval that contains the solution
+                                   Real64 X_1,                      // 2nd bound of interval that contains the solution
+                                   std::array<Real64, 8> const &Par // array with additional parameters used for function evaluation
+    );
 
     constexpr Real64 InterpGeneral(Real64 const Lower, Real64 const Upper, Real64 const InterpFac)
     {
@@ -340,7 +352,7 @@ namespace General {
     }
 
     void CheckCreatedZoneItemName(EnergyPlusData &state,
-                                  std::string_view calledFrom,        // routine called from
+                                  std::string_view calledFrom,              // routine called from
                                   std::string const &CurrentObject,         // object being parsed
                                   std::string const &ZoneName,              // Zone Name associated
                                   std::string::size_type MaxZoneNameLength, // maximum length of zonelist zone names

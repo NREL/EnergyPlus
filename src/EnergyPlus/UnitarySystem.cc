@@ -12234,18 +12234,18 @@ namespace UnitarySystems {
                             this->m_CompPartLoadRatio = PartLoadFrac;
 
                         } else if (CoilType_Num == DataHVACGlobals::CoilDX_Cooling) { // CoilCoolingDX
-
-                            Par[1] = double(this->m_CoolingCoilIndex);
-                            Par[2] = DesOutTemp;
-                            // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
-                            Par[3] = double(DehumidMode);
-                            Par[4] = double(FanOpMode);
-                            Par[5] = this->m_CoolingSpeedNum;
-                            Par[6] = this->m_CoolingSpeedRatio;
-                            Par[7] = 0.0;
-                            Par[8] = 0.0;
-                            if (this->m_SingleMode == 1) Par[8] = 1.0;
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par);
+                            std::array<Real64, 8> Par2 = {
+                                double(this->m_CoolingCoilIndex),
+                                DesOutTemp,
+                                double(DehumidMode), // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
+                                double(FanOpMode),
+                                double(this->m_CoolingSpeedNum),
+                                this->m_CoolingSpeedRatio,
+                                0.0,
+                                0.0,
+                            };
+                            if (this->m_SingleMode == 1) Par[7] = 1.0;
+                            General::SolveRoot<8>(state, Acc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
                             if (this->m_CoolingSpeedNum == 1) {
                                 this->m_CompPartLoadRatio = PartLoadFrac;
                                 SpeedRatio = 0.0;
@@ -12452,17 +12452,21 @@ namespace UnitarySystems {
                             if ((state.dataLoopNodes->Node(OutletNode).Temp - DesOutTemp) < Acc) break;
                         }
 
-                        Par[1] = double(this->m_CoolingCoilIndex);
-                        Par[2] = DesOutTemp;
-                        // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
-                        // need to test what happens when Alt mode doesn't exist, or somehow test for it,
-                        // or fatal out in GetInput
-                        Par[3] = 1.0; // DehumidMode
-                        Par[4] = double(FanOpMode);
-                        Par[5] = this->m_CoolingSpeedNum;
-                        Par[6] = 1.0; //  this->m_CoolingSpeedRatio;
-                        Par[7] = 0.0;
-                        General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par);
+                        std::array<Real64, 8> Par2 = {
+                            double(this->m_CoolingCoilIndex),
+                            DesOutTemp,
+                            // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
+                            // need to test what happens when Alt mode doesn't exist, or somehow test for it,
+                            // or fatal out in GetInput
+                            1.0, // DehumidMode
+                            double(FanOpMode),
+                            double(this->m_CoolingSpeedNum),
+                            1.0, //  this->m_CoolingSpeedRatio;
+                            0.0,
+                            0.0 // dummy because genericDXCoilResidual takes 8 Pars
+                        };
+
+                        General::SolveRoot<8>(state, Acc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
                         if (this->m_CoolingSpeedNum == 1) {
                             this->m_CompPartLoadRatio = PartLoadFrac;
                             SpeedRatio = 0.0;
@@ -12827,17 +12831,21 @@ namespace UnitarySystems {
                                 if ((state.dataLoopNodes->Node(OutletNode).HumRat - DesOutHumRat) < Acc) break;
                             }
 
-                            Par[1] = double(this->m_CoolingCoilIndex);
-                            Par[2] = DesOutHumRat;
-                            // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
-                            // need to test what happens when Alt mode doesn't exist, or somehow test for it,
-                            // or fatal out in GetInput
-                            Par[3] = 0.0; // DehumidMode
-                            Par[4] = double(FanOpMode);
-                            Par[5] = this->m_CoolingSpeedNum;
-                            Par[6] = 1.0; //  this->m_CoolingSpeedRatio;
-                            Par[7] = 1.0; // run on latent, check coil outlet node HumRat
-                            General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par);
+                            std::array<Real64, 8> Par2 = {
+                                double(this->m_CoolingCoilIndex),
+                                DesOutHumRat,
+                                // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
+                                // need to test what happens when Alt mode doesn't exist, or somehow test for it,
+                                // or fatal out in GetInput
+                                0.0, // DehumidMode
+                                double(FanOpMode),
+                                double(this->m_CoolingSpeedNum),
+                                1.0, //  this->m_CoolingSpeedRatio;
+                                1.0, // run on latent, check coil outlet node HumRat
+                                0.0 // dummy because genericDXCoilResidual takes 8 parameters
+                            };
+
+                            General::SolveRoot<8>(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
                             if (this->m_CoolingSpeedNum == 1) {
                                 this->m_CompPartLoadRatio = PartLoadFrac;
                                 SpeedRatio = 0.0;
@@ -14986,7 +14994,7 @@ namespace UnitarySystems {
 
     Real64 UnitarySys::genericDXCoilResidual(EnergyPlusData &state,
                                              Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                             std::vector<Real64> const &Par // par(1) = DX coil number
+                                             std::array<Real64, 8> const &Par // par(1) = DX coil number
     )
     {
 
@@ -14996,13 +15004,13 @@ namespace UnitarySystems {
         // Return value
         Real64 Residuum; // residual to be minimized to zero
 
-        int CoilIndex = int(Par[1]);
-        bool useDehumMode = int(Par[3]) > 0;
-        int FanOpMode = int(Par[4]);
-        int CoolingSpeedNum = int(Par[5]);
-        Real64 CoolingSpeedRatio = Par[6];
-        bool RunOnSensible = (Par[7] == 0.0);
-        bool const singleMode = (Par[8] == 1.0);
+        int CoilIndex = int(Par[0]);
+        bool useDehumMode = int(Par[2]) > 0;
+        int FanOpMode = int(Par[3]);
+        int CoolingSpeedNum = int(Par[4]);
+        Real64 CoolingSpeedRatio = Par[5];
+        bool RunOnSensible = (Par[6] == 0.0);
+        bool const singleMode = (Par[7] == 1.0);
         if (CoolingSpeedNum == 1) {
             state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].simulate(
                 state, useDehumMode, PartLoadRatio, CoolingSpeedNum, CoolingSpeedRatio, FanOpMode, singleMode);
@@ -15016,7 +15024,7 @@ namespace UnitarySystems {
         } else {
             outletCondition = state.dataLoopNodes->Node(state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].evapOutletNodeIndex).HumRat;
         }
-        Residuum = Par[2] - outletCondition;
+        Residuum = Par[1] - outletCondition;
 
         return Residuum;
     }

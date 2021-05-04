@@ -2845,11 +2845,6 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualCool)
     double TairInlet;
     double Garate;
     double BF;
-    Array1D<Real64> Par;
-
-    // Allocate
-    NumPar = 6;
-    Par.allocate(6);
 
     // Inputs:
     FanSpdRto = 0.5;
@@ -2858,18 +2853,16 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualCool)
     TairInlet = 25.55534;
     Garate = 0.20664;
     BF = 0.0592;
-    Par(1) = ZnSenLoad;
-    Par(2) = Th2;
-    Par(3) = TairInlet;
-    Par(4) = Garate;
-    Par(5) = BF;
-
+    std::array<Real64, 5> Par = {
+        ZnSenLoad,
+        Th2,
+        TairInlet,
+        Garate,
+        BF
+    };
     // Run and Check
-    double FanSpdResidual = FanSpdResidualCool(FanSpdRto, Par);
+    double FanSpdResidual = FanSpdResidualCool(*state, FanSpdRto, Par);
     EXPECT_NEAR(-0.707, FanSpdResidual, 0.0005);
-
-    // Clean up
-    Par.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualHeat)
@@ -2886,11 +2879,6 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualHeat)
     double TairInlet;
     double Garate;
     double BF;
-    Array1D<Real64> Par;
-
-    // Allocate
-    NumPar = 6;
-    Par.allocate(6);
 
     // Inputs:
     FanSpdRto = 0.5;
@@ -2899,18 +2887,17 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualHeat)
     TairInlet = 20.236;
     Garate = 0.21136;
     BF = 0.1360;
-    Par(1) = ZnSenLoad;
-    Par(2) = Th2;
-    Par(3) = TairInlet;
-    Par(4) = Garate;
-    Par(5) = BF;
+    std::array<Real64, 5> Par = {
+        ZnSenLoad,
+        Th2,
+        TairInlet,
+        Garate,
+        BF
+    };
 
     // Run and Check
-    double FanSpdResidual = FanSpdResidualHeat(FanSpdRto, Par);
+    double FanSpdResidual = FanSpdResidualHeat(*state, FanSpdRto, Par);
     EXPECT_NEAR(-0.5459, FanSpdResidual, 0.0005);
-
-    // Clean up
-    Par.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUAirFlow)

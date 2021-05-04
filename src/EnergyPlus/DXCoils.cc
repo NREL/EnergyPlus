@@ -17507,7 +17507,7 @@ void ControlVRFIUCoil(EnergyPlusData &state,
     using Psychrometrics::PsyHFnTdbW;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Array1D<Real64> Par(11);    // Parameter array for SolveRoot
+    std::array<Real64, 5> Par;    // Parameter array for SolveRoot
     int MaxIter(500);           // Max iteration numbers (-)
     int SolFla;                 // Solving flag for SolveRoot (-)
     int const FlagCoolMode(0);  // Flag for cooling mode
@@ -17585,14 +17585,10 @@ void ControlVRFIUCoil(EnergyPlusData &state,
         if (QCoilSenCoolingLoad > QinSenMin1) {
             // Increase fan speed to meet room sensible load; SH is not updated
 
-            Par(1) = QCoilSenCoolingLoad;
-            Par(2) = Ts_1;
-            Par(3) = Tin;
-            Par(4) = Garate;
-            Par(5) = BF;
+            Par = {QCoilSenCoolingLoad, Ts_1, Tin, Garate, BF};
 
             FanSpdRatioMax = 1.0;
-            SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, FanSpdRatioMin, FanSpdRatioMax, Par);
+            SolveRoot<5>(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, FanSpdRatioMin, FanSpdRatioMax, Par);
             if (SolFla < 0) Ratio1 = FanSpdRatioMax; // over capacity
             FanSpdRatio = Ratio1;
             CoilOnOffRatio = 1.0;
@@ -17686,14 +17682,11 @@ void ControlVRFIUCoil(EnergyPlusData &state,
         if (QCoilSenHeatingLoad > QinSenMin1) {
             // Modulate fan speed to meet room sensible load; SC is not updated
 
-            Par(1) = QCoilSenHeatingLoad;
-            Par(2) = Ts_1;
-            Par(3) = Tin;
-            Par(4) = Garate;
-            Par(5) = BF;
+            Par = {QCoilSenHeatingLoad, Ts_1, Tin, Garate, BF};
 
             FanSpdRatioMax = 1.0;
-            SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, FanSpdRatioMin, FanSpdRatioMax, Par);
+
+            SolveRoot<5>(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, FanSpdRatioMin, FanSpdRatioMax, Par);
             // this will likely cause problems eventually, -1 and -2 mean different things
             if (SolFla < 0) Ratio1 = FanSpdRatioMax; // over capacity
             FanSpdRatio = Ratio1;
@@ -17934,8 +17927,9 @@ void CalcVRFCoilCapModFac(EnergyPlusData &state,
     }
 }
 
-Real64 FanSpdResidualCool(Real64 const FanSpdRto,    // indoor unit fan speed ratio
-                          Array1D<Real64> const &Par // parameters
+Real64 FanSpdResidualCool([[maybe_unused]] EnergyPlusData &state,
+                          Real64 const FanSpdRto,    // indoor unit fan speed ratio
+                          std::array<Real64, 5> const &Par // parameters
 )
 {
     // FUNCTION INFORMATION:
@@ -17959,11 +17953,11 @@ Real64 FanSpdResidualCool(Real64 const FanSpdRto,    // indoor unit fan speed ra
     Real64 Tout;               // Air temperature at the indoor unit outlet (C)
     Real64 ZnSenLoad;          // Zone sensible cooling load (W)
 
-    ZnSenLoad = Par(1);
-    Th2 = Par(2);
-    TcoilIn = Par(3);
-    Garate = Par(4);
-    BF = Par(5);
+    ZnSenLoad = Par[0];
+    Th2 = Par[1];
+    TcoilIn = Par[2];
+    Garate = Par[3];
+    BF = Par[4];
     // +-100 W minimum zone load?
     if (std::abs(ZnSenLoad) < 100.0) ZnSenLoad = sign(100.0, ZnSenLoad);
 
@@ -17974,8 +17968,9 @@ Real64 FanSpdResidualCool(Real64 const FanSpdRto,    // indoor unit fan speed ra
     return FanSpdResidualCool;
 }
 
-Real64 FanSpdResidualHeat(Real64 const FanSpdRto,    // indoor unit fan speed ratio
-                          Array1D<Real64> const &Par // parameters
+Real64 FanSpdResidualHeat([[maybe_unused]] EnergyPlusData &state,
+                          Real64 const FanSpdRto,    // indoor unit fan speed ratio
+                          std::array<Real64, 5> const &Par // parameters
 )
 {
     // FUNCTION INFORMATION:
@@ -17998,11 +17993,11 @@ Real64 FanSpdResidualHeat(Real64 const FanSpdRto,    // indoor unit fan speed ra
     Real64 Tout;               // Air temperature at the indoor unit outlet (C)
     Real64 ZnSenLoad;          // Zone sensible heating load (W)
 
-    ZnSenLoad = Par(1);
-    Th2 = Par(2);
-    TcoilIn = Par(3);
-    Garate = Par(4);
-    BF = Par(5);
+    ZnSenLoad = Par[0];
+    Th2 = Par[1];
+    TcoilIn = Par[2];
+    Garate = Par[3];
+    BF = Par[4];
     // +-100 W minimum zone load?
     if (std::abs(ZnSenLoad) < 100.0) ZnSenLoad = sign(100.0, ZnSenLoad);
 
