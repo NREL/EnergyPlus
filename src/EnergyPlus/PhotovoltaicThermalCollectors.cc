@@ -1485,14 +1485,14 @@ namespace PhotovoltaicThermalCollectors {
         Real64 refrac_index_glass = this->BIPVT.RIndGlass;                            // glass refractive index
         Real64 k_glass = this->BIPVT.ECoffGlass;                                      // extinction coefficient pv glass
         Real64 slope = (pi / 180.0) * state.dataSurface->Surface(this->SurfNum).Tilt; // surface tilt in rad
-        Real64 beta(0);                                                               // surface tilt for calculating internal convective coefficient for stagnation condition
-        Real64 taoaplha_back = this->BIPVT.PVBackTransAbsProduct;                     // tao-alpha product normal back of PV panel
-        Real64 taoalpha_pv = this->BIPVT.PVCellTransAbsProduct;                       // tao-aplha product normal PV cells
-        Real64 taoaplha_cladding = this->BIPVT.CladTranAbsProduct;                    // tao-alpha product normal cladding
-        Real64 g(0.0);                                                                // Solar incident on surface
-        Real64 fcell = this->BIPVT.PVCellAreaFract;                                   // area fraction of cells on pv module
-        Real64 area_pv = w*l*this->BIPVT.PVAreaFract;                                 // total area of pv modules
-        Real64 area_wall_total = w*l;                                                 // total area of wall
+        Real64 beta(0); // surface tilt for calculating internal convective coefficient for stagnation condition
+        Real64 taoaplha_back = this->BIPVT.PVBackTransAbsProduct;  // tao-alpha product normal back of PV panel
+        Real64 taoalpha_pv = this->BIPVT.PVCellTransAbsProduct;    // tao-aplha product normal PV cells
+        Real64 taoaplha_cladding = this->BIPVT.CladTranAbsProduct; // tao-alpha product normal cladding
+        Real64 g(0.0);                                             // Solar incident on surface
+        Real64 fcell = this->BIPVT.PVCellAreaFract;                // area fraction of cells on pv module
+        Real64 area_pv = w * l * this->BIPVT.PVAreaFract;          // total area of pv modules
+        Real64 area_wall_total = w * l;                            // total area of wall
 
         ConvectionCoefficients::InitExteriorConvectionCoeff(state,
                                                             this->SurfNum,
