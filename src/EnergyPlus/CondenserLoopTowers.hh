@@ -463,22 +463,22 @@ namespace CondenserLoopTowers {
 
         Real64 residualUA(EnergyPlusData &state,
                           Real64 UA,                 // UA of cooling tower
-                          Array1D<Real64> const &Par // par(1) = design tower load [W]
+                          std::array<Real64, 6> const &Par // par(1) = design tower load [W]
         );
 
         Real64 residualTa(EnergyPlusData &state,
                           Real64 FlowRatio,          // water or air flow ratio of cooling tower
-                          Array1D<Real64> const &Par // par(1) = tower number
+                          std::array<Real64, 6> const &Par // par(1) = tower number
         );
 
         Real64 residualTr(EnergyPlusData &state,
                           Real64 Trange,             // cooling tower range temperature [C]
-                          Array1D<Real64> const &Par // par(1) = tower number
+                          std::array<Real64, 6> const &Par // par(1) = tower number
         );
 
         Real64 residualMerkelLoad(EnergyPlusData &state,
                                   Real64 airFlowRateRatioLocal, // fan speed ratio (1.0 is continuous, 0.0 is off)
-                                  Array1D<Real64> const &Par    // par(1) = Tower number
+                                  std::array<Real64, 8> const &Par    // par(1) = Tower number
         );
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);

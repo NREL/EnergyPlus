@@ -79,7 +79,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -3340,7 +3340,6 @@ namespace DesiccantDehumidifiers {
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
         using SteamCoils::SimulateSteamCoilComponents;
-        using TempSolveRoot::SolveRoot;
         using WaterCoils::SimulateWaterCoilComponents;
 
         // Locals
@@ -3363,7 +3362,6 @@ namespace DesiccantDehumidifiers {
         // unused  REAL(r64)      :: PartLoadFraction  ! heating or cooling part load fraction
         Real64 MaxHotWaterFlow; // maximum hot water mass flow rate, kg/s
         Real64 HotWaterMdot;    // actual hot water mass flow rate
-        Array1D<Real64> Par(3);
         int SolFlag;
 
         auto &DesicDehum(state.dataDesiccantDehumidifiers->DesicDehum);
@@ -3401,14 +3399,15 @@ namespace DesiccantDehumidifiers {
                         // control water flow to obtain output matching RegenCoilLoad
                         SolFlag = 0;
                         MinWaterFlow = 0.0;
-                        Par(1) = double(DesicDehumNum);
+                        std::array<Real64, 3> Par;
+                        Par[0] = double(DesicDehumNum);
                         if (FirstHVACIteration) {
-                            Par(2) = 1.0;
+                            Par[1] = 1.0;
                         } else {
-                            Par(2) = 0.0;
+                            Par[1] = 0.0;
                         }
-                        Par(3) = RegenCoilLoad;
-                        TempSolveRoot::SolveRoot(
+                        Par[2] = RegenCoilLoad;
+                        General::SolveRoot<3>(
                             state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
                         if (SolFlag == -1) {
                             if (DesicDehum(DesicDehumNum).HotWaterCoilMaxIterIndex == 0) {
@@ -3526,7 +3525,7 @@ namespace DesiccantDehumidifiers {
 
     Real64 HotWaterCoilResidual(EnergyPlusData &state,
                                 Real64 const HWFlow,       // hot water flow rate in kg/s
-                                Array1D<Real64> const &Par // Par(5) is the requested coil load
+                                std::array<Real64, 3> const &Par // Par(5) is the requested coil load
     )
     {
 
@@ -3559,9 +3558,9 @@ namespace DesiccantDehumidifiers {
         Real64 RegenCoilHeatLoad; // requested coild load, W
         Real64 mdot;
 
-        DesicDehumNum = int(Par(1));
-        FirstHVACSoln = (Par(2) > 0.0);
-        RegenCoilHeatLoad = Par(3);
+        DesicDehumNum = int(Par[0]);
+        FirstHVACSoln = (Par[1] > 0.0);
+        RegenCoilHeatLoad = Par[2];
         RegenCoilActual = RegenCoilHeatLoad;
         mdot = HWFlow;
         SetComponentFlowRate(state,
