@@ -10068,9 +10068,9 @@ namespace AirflowNetworkBalanceManager {
                     Tamb = Zone(ZN1).OutDryBulbTemp;
                     CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
                     if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum)
-                                .CompTypeNum == iComponentTypeNum::SCR ||
+                                .CompTypeNum == ComponentType::SCR ||
                         state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum)
-                                .CompTypeNum == iComponentTypeNum::SEL) {
+                                .CompTypeNum == ComponentType::SEL) {
                         state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMCp +=
                             state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 * CpAir;
                         state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMCpT +=
@@ -10098,9 +10098,9 @@ namespace AirflowNetworkBalanceManager {
                     Tamb = Zone(ZN2).OutDryBulbTemp;
                     CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
                     if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum)
-                                .CompTypeNum == iComponentTypeNum::SCR ||
+                                .CompTypeNum == ComponentType::SCR ||
                         state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum)
-                                .CompTypeNum == iComponentTypeNum::SEL) {
+                                .CompTypeNum == ComponentType::SEL) {
                         state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMCp +=
                             state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW * CpAir;
                         state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMCpT +=
