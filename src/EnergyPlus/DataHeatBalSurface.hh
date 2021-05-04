@@ -63,20 +63,19 @@ namespace DataHeatBalSurface {
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-    Real64 constexpr MinSurfaceTempLimit(-100.0);            // Lowest inside surface temperature allowed in Celsius
+    Real64 constexpr MinSurfaceTempLimit(-100.0); // Lowest inside surface temperature allowed in Celsius
     Real64 constexpr MinSurfaceTempLimitBeforeFatal(-250.0); // 2.5 times MinSurfaceTempLimit
-    Real64 constexpr DefaultSurfaceTempLimit(200.0);         // Highest inside surface temperature allowed in Celsius
-    Real64 constexpr IterDampConst(5.0);                     // Damping constant for inside surface temperature iterations
-    int constexpr ItersReevalConvCoeff(30);                  // Number of iterations between inside convection coefficient reevaluations
-    int constexpr MaxIterations(500);                        // Maximum number of iterations allowed for inside surface temps
-    Real64 constexpr PoolIsOperatingLimit(0.0001);           // Limit to determine if swimming pool is operating or not
-    int constexpr MinEMPDIterations(4);                      // Minimum number of iterations required for EMPD solution
-    int constexpr IterationsForCondFDRelaxChange(5);         // number of iterations for inside temps that triggers a change
+    Real64 constexpr DefaultSurfaceTempLimit(200.0); // Highest inside surface temperature allowed in Celsius
+    Real64 constexpr IterDampConst(5.0); // Damping constant for inside surface temperature iterations
+    int constexpr ItersReevalConvCoeff(30); // Number of iterations between inside convection coefficient reevaluations
+    int constexpr MaxIterations(500); // Maximum number of iterations allowed for inside surface temps
+    Real64 constexpr PoolIsOperatingLimit(0.0001); // Limit to determine if swimming pool is operating or not
+    int constexpr MinEMPDIterations(4); // Minimum number of iterations required for EMPD solution
+    int constexpr IterationsForCondFDRelaxChange(5); // number of iterations for inside temps that triggers a change
 
 } // namespace DataHeatBalSurface
 
-struct HeatBalSurfData : BaseGlobalStruct
-{
+struct HeatBalSurfData : BaseGlobalStruct {
 
     std::vector<bool> Zone_has_mixed_HT_models; // True if any surfaces in zone use CondFD, HAMT, or Kiva
 
@@ -84,38 +83,38 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D_int SUMH; // From Old Bldctf.inc
 
     // Surface heat balance limits and convergence parameters
-    Real64 MaxSurfaceTempLimit = 200.0;            // Highest inside surface temperature allowed in Celsius
+    Real64 MaxSurfaceTempLimit = 200.0; // Highest inside surface temperature allowed in Celsius
     Real64 MaxSurfaceTempLimitBeforeFatal = 500.0; // 2.5 times MaxSurfaceTempLimit
-    int MinIterations = 1;                         // Minimum number of iterations for surface heat balance
+    int MinIterations = 1; // Minimum number of iterations for surface heat balance
 
     // Variables Dimensioned to Max Number of Heat Transfer Surfaces (maxhts)
-    Array1D<Real64> CTFConstInPart;  // Constant Inside Portion of the CTF calculation
+    Array1D<Real64> CTFConstInPart; // Constant Inside Portion of the CTF calculation
     Array1D<Real64> CTFConstOutPart; // Constant Outside Portion of the CTF calculation
     // This group of arrays (soon to be vectors) added to facilitate vectorizable loops in CalcHeatBalanceInsideSurf2CTFOnly
-    Array1D<Real64> CTFCross0;     // Construct.CTFCross(0)
-    Array1D<Real64> CTFInside0;    // Construct.CTFInside(0)
-    Array1D<Real64> CTFSourceIn0;  // Construct.CTFSourceIn(0)
-    Array1D<Real64> TH11Surf;      // TH(1,1,SurfNum)
+    Array1D<Real64> CTFCross0; // Construct.CTFCross(0)
+    Array1D<Real64> CTFInside0; // Construct.CTFInside(0)
+    Array1D<Real64> CTFSourceIn0; // Construct.CTFSourceIn(0)
+    Array1D<Real64> TH11Surf; // TH(1,1,SurfNum)
     Array1D<Real64> QsrcHistSurf1; // QsrcHist(SurfNum, 1)
-    Array1D_int IsAdiabatic;       // 0 not adiabatic, 1 is adiabatic
-    Array1D_int IsNotAdiabatic;    // 1 not adiabatic, 0 is adiabatic
-    Array1D_int IsSource;          // 0 no internal source/sink, 1 has internal source/sing
-    Array1D_int IsNotSource;       // 1 no internal source/sink, 0 has internal source/sing
-    Array1D_int IsPoolSurf;        // 0 not pool, 1 is pool
-    Array1D_int IsNotPoolSurf;     // 1 not pool, 0 is pool
-    Array1D<Real64> TempTermSurf;  // TempTerm for heatbalance equation
-    Array1D<Real64> TempDivSurf;   // Divisor for heatbalance equation
+    Array1D_int IsAdiabatic; // 0 not adiabatic, 1 is adiabatic
+    Array1D_int IsNotAdiabatic; // 1 not adiabatic, 0 is adiabatic
+    Array1D_int IsSource; // 0 no internal source/sink, 1 has internal source/sing
+    Array1D_int IsNotSource; // 1 no internal source/sink, 0 has internal source/sing
+    Array1D_int IsPoolSurf; // 0 not pool, 1 is pool
+    Array1D_int IsNotPoolSurf; // 1 not pool, 0 is pool
+    Array1D<Real64> TempTermSurf; // TempTerm for heatbalance equation
+    Array1D<Real64> TempDivSurf; // Divisor for heatbalance equation
     // end group added to support CalcHeatBalanceInsideSurf2CTFOnly
-    Array1D<Real64> TempSurfIn;          // Temperature of the Inside Surface for each heat transfer surface
-    Array1D<Real64> TempInsOld;          // TempSurfIn from previous iteration for convergence check
-    Array1D<Real64> TempSurfInTmp;       // Inside Surface Temperature Of Each Heat Transfer Surface
-    Array1D<Real64> HcExtSurf;           // Outside Convection Coefficient
-    Array1D<Real64> HAirExtSurf;         // Outside Convection Coefficient to Air
-    Array1D<Real64> HSkyExtSurf;         // Outside Convection Coefficient to Sky
-    Array1D<Real64> HGrdExtSurf;         // Outside Convection Coefficient to Ground
-    Array1D<Real64> TempSource;          // Temperature at the source location for each heat transfer surface
-    Array1D<Real64> TempUserLoc;         // Temperature at the user specified location for each heat transfer surface
-    Array1D<Real64> TempSurfInRep;       // Temperature of the Inside Surface for each heat transfer surface
+    Array1D<Real64> TempSurfIn; // Temperature of the Inside Surface for each heat transfer surface
+    Array1D<Real64> TempInsOld; // TempSurfIn from previous iteration for convergence check
+    Array1D<Real64> TempSurfInTmp; // Inside Surface Temperature Of Each Heat Transfer Surface
+    Array1D<Real64> HcExtSurf; // Outside Convection Coefficient
+    Array1D<Real64> HAirExtSurf; // Outside Convection Coefficient to Air
+    Array1D<Real64> HSkyExtSurf; // Outside Convection Coefficient to Sky
+    Array1D<Real64> HGrdExtSurf; // Outside Convection Coefficient to Ground
+    Array1D<Real64> TempSource; // Temperature at the source location for each heat transfer surface
+    Array1D<Real64> TempUserLoc; // Temperature at the user specified location for each heat transfer surface
+    Array1D<Real64> TempSurfInRep; // Temperature of the Inside Surface for each heat transfer surface
     Array1D<Real64> TempSurfInMovInsRep; // Temperature of interior movable insulation on the side facing the zone
     // (report)
     Array1D<Real64> QConvInReport; // Surface convection heat gain at inside face [J]
@@ -125,41 +124,41 @@ struct HeatBalSurfData : BaseGlobalStruct
     //  (report){w/m2]
 
     // these next three all are for net IR thermal radiation exchange with other surfaces in the model.
-    Array1D<Real64> QRadNetSurfInReport;        // Surface thermal radiation heat gain at Inside face [J]
-    Array1D<Real64> QdotRadNetSurfInRep;        // Surface thermal radiation heat transfer inside face surface [W]
+    Array1D<Real64> QRadNetSurfInReport; // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> QdotRadNetSurfInRep; // Surface thermal radiation heat transfer inside face surface [W]
     Array1D<Real64> QdotRadNetSurfInRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at
     //      Inside face surf
     // these next three all are for solar radiation gains on inside face
-    Array1D<Real64> QRadSolarInReport;        // Surface thermal radiation heat gain at Inside face [J]
-    Array1D<Real64> QdotRadSolarInRep;        // Surface thermal radiation heat transfer inside face surface [W]
+    Array1D<Real64> QRadSolarInReport; // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> QdotRadSolarInRep; // Surface thermal radiation heat transfer inside face surface [W]
     Array1D<Real64> QdotRadSolarInRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at
     //      Inside face surf
     // these next three all are for Lights visible radiation gains on inside face
-    Array1D<Real64> QRadLightsInReport;        // Surface thermal radiation heat gain at Inside face [J]
-    Array1D<Real64> QdotRadLightsInRep;        // Surface thermal radiation heat transfer inside face surface [W]
+    Array1D<Real64> QRadLightsInReport; // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> QdotRadLightsInRep; // Surface thermal radiation heat transfer inside face surface [W]
     Array1D<Real64> QdotRadLightsInRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at
     //      Inside face surf
     // these next three all are for Internal Gains sources of radiation gains on inside face
-    Array1D<Real64> QRadIntGainsInReport;        // Surface thermal radiation heat gain at Inside face [J]
-    Array1D<Real64> QdotRadIntGainsInRep;        // Surface thermal radiation heat transfer inside face surface [W]
+    Array1D<Real64> QRadIntGainsInReport; // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> QdotRadIntGainsInRep; // Surface thermal radiation heat transfer inside face surface [W]
     Array1D<Real64> QdotRadIntGainsInRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at
     //      Inside face surf
     // these next three all are for Radiative HVAC sources of radiation gains on inside face
-    Array1D<Real64> QRadHVACInReport;        // Surface thermal radiation heat gain at Inside face [J]
-    Array1D<Real64> QdotRadHVACInRep;        // Surface thermal radiation heat transfer inside face surface [W]
+    Array1D<Real64> QRadHVACInReport; // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> QdotRadHVACInRep; // Surface thermal radiation heat transfer inside face surface [W]
     Array1D<Real64> QdotRadHVACInRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at
     //      Inside face surf
 
-    Array1D<Real64> QConvOutReport;        // Surface convection heat gain at Outside face [J]
-    Array1D<Real64> QdotConvOutRep;        // Surface convection heat transfer rate at Outside face surface [W]
+    Array1D<Real64> QConvOutReport; // Surface convection heat gain at Outside face [J]
+    Array1D<Real64> QdotConvOutRep; // Surface convection heat transfer rate at Outside face surface [W]
     Array1D<Real64> QdotConvOutRepPerArea; // Surface conv heat transfer rate per m2 at Outside face surf
     //  (report){w/m2]
 
-    Array1D<Real64> QRadOutReport;        // Surface thermal radiation heat gain at Outside face [J]
-    Array1D<Real64> QdotRadOutRep;        // Surface thermal radiation heat transfer outside face surface [W]
+    Array1D<Real64> QRadOutReport; // Surface thermal radiation heat gain at Outside face [J]
+    Array1D<Real64> QdotRadOutRep; // Surface thermal radiation heat transfer outside face surface [W]
     Array1D<Real64> QdotRadOutRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at
     //      Outside face surf
-    Array1D<Real64> QAirExtReport;  // Surface Outside Face Thermal Radiation to Air Heat Transfer Rate [W]
+    Array1D<Real64> QAirExtReport; // Surface Outside Face Thermal Radiation to Air Heat Transfer Rate [W]
     Array1D<Real64> QHeatEmiReport; // Surface Outside Face Heat Emission to Air Rate [W]
 
     Array1D<Real64> SurfOpaqInsFaceCondGainRep; // Equals Opaq Surf Ins Face Cond
@@ -226,19 +225,19 @@ struct HeatBalSurfData : BaseGlobalStruct
     // from interior surfaces, and beam entering through interior windows
     // (considered diffuse)
     // Originally QD, now used only for QSDifSol calc for daylighting
-    Array1D<Real64> EnclSolVMULT;              // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
-    Array1D<Real64> SurfNetLWRadToSurf;        // Net interior long wavelength radiation to a surface from other surfaces
-    Array1D<Real64> ZoneMRT;                   // Zone Mean Radiant Temperature
+    Array1D<Real64> EnclSolVMULT; // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
+    Array1D<Real64> SurfNetLWRadToSurf; // Net interior long wavelength radiation to a surface from other surfaces
+    Array1D<Real64> ZoneMRT; // Zone Mean Radiant Temperature
     Array1D<Real64> SurfOpaqQRadSWLightsInAbs; // Short wave from Lights radiation absorbed on inside of opaque surface
     // Variables that are used in both the Surface Heat Balance and the Moisture Balance
-    Array1D<Real64> SurfOpaqQRadSWOutAbs;  // Short wave radiation absorbed on outside of opaque surface
-    Array1D<Real64> SurfOpaqQRadSWInAbs;   // Short wave radiation absorbed on inside of opaque surface
+    Array1D<Real64> SurfOpaqQRadSWOutAbs; // Short wave radiation absorbed on outside of opaque surface
+    Array1D<Real64> SurfOpaqQRadSWInAbs; // Short wave radiation absorbed on inside of opaque surface
     Array1D<Real64> SurfQRadLWOutSrdSurfs; // Long wave radiation absorbed on outside of exterior surface
 
     Array1D<Real64> SurfQAdditionalHeatSourceOutside; // Additional heat source term on boundary conditions at outside surface
-    Array1D<Real64> SurfQAdditionalHeatSourceInside;  // Additional heat source term on boundary conditions at inside surface
+    Array1D<Real64> SurfQAdditionalHeatSourceInside; // Additional heat source term on boundary conditions at inside surface
 
-    Array1D<Real64> SurfOpaqInitialDifSolInAbs;  // Initial diffuse solar absorbed on inside of opaque surface [W/m2]
+    Array1D<Real64> SurfOpaqInitialDifSolInAbs; // Initial diffuse solar absorbed on inside of opaque surface [W/m2]
     Array1D<Real64> SurfWinInitialDifSolInTrans; // Initial diffuse solar transmitted out through window surface [W/m2]
 
     // REAL(r64) variables from BLDCTF.inc and only used in the Heat Balance
@@ -247,31 +246,31 @@ struct HeatBalSurfData : BaseGlobalStruct
     // In/Out (1 = Outside, 2 = Inside)
     Array3D<Real64> QH; // Flux History (TH and QH are interpolated from THM and QHM for
     // the next user requested time step)
-    Array3D<Real64> THM;        // Master Temperature History (on the time step for the construct)
-    Array3D<Real64> QHM;        // Master Flux History (on the time step for the construct)
-    Array2D<Real64> TsrcHist;   // Temperature history at the source location (SurfNum,Term)
-    Array2D<Real64> TuserHist;  // Temperature history at the user specified location (SurfNum,Term)
-    Array2D<Real64> QsrcHist;   // Heat source/sink history for the surface (SurfNum,Term)
-    Array2D<Real64> TsrcHistM;  // Master temperature history at the source location (SurfNum,Term)
+    Array3D<Real64> THM; // Master Temperature History (on the time step for the construct)
+    Array3D<Real64> QHM; // Master Flux History (on the time step for the construct)
+    Array2D<Real64> TsrcHist; // Temperature history at the source location (SurfNum,Term)
+    Array2D<Real64> TuserHist; // Temperature history at the user specified location (SurfNum,Term)
+    Array2D<Real64> QsrcHist; // Heat source/sink history for the surface (SurfNum,Term)
+    Array2D<Real64> TsrcHistM; // Master temperature history at the source location (SurfNum,Term)
     Array2D<Real64> TuserHistM; // Master temperature history at the user specified location (SurfNum,Term)
-    Array2D<Real64> QsrcHistM;  // Master heat source/sink history for the surface (SurfNum,Term)
+    Array2D<Real64> QsrcHistM; // Master heat source/sink history for the surface (SurfNum,Term)
 
-    Array2D<Real64> FractDifShortZtoZ;   // Fraction of diffuse short radiation in Zone 2 transmitted to Zone 1
-    Array1D_bool RecDifShortFromZ;       // True if Zone gets short radiation from another
-    bool InterZoneWindow = false;        // True if there is an interzone window
+    Array2D<Real64> FractDifShortZtoZ; // Fraction of diffuse short radiation in Zone 2 transmitted to Zone 1
+    Array1D_bool RecDifShortFromZ; // True if Zone gets short radiation from another
+    bool InterZoneWindow = false; // True if there is an interzone window
     Real64 SumSurfaceHeatEmission = 0.0; // Heat emission from all surfaces
 
     // Surface Heat Balance
-    Array1D<bool> SurfMovInsulExtPresent;       // True when interior movable insulation is present
-    Array1D<bool> SurfMovInsulIntPresent;       // True when interior movable insulation is present
+    Array1D<bool> SurfMovInsulExtPresent; // True when interior movable insulation is present
+    Array1D<bool> SurfMovInsulIntPresent; // True when interior movable insulation is present
     Array1D<bool> SurfMovInsulIntPresentPrevTS; // True when interior movable insulation was present during the previous time step
-    Array1D<Real64> SurfMovInsulHExt;       // Resistance or "h" value of exterior movable insulation
-    Array1D<Real64> SurfMovInsulHInt;       // Resistance or "h" value of interior movable insulation
-    Array1D<Real64> SurfAbsSolarExt;        // Solar Absorptivity of surface inside face or interior movable insulation if present
-    Array1D<Real64> SurfAbsThermalExt;      // Thermal Absorptivity of surface inside face or interior movable insulation if present
-    Array1D<Real64> SurfAbsSolarInt;        // Solar absorptivity of surface outside face or exterior movable insulation if present
-    Array1D<Real64> SurfRoughnessExt;       // Roughness of surface inside face or interior movable insulation if present
-    Array1D<Real64> SurfAbsThermalInt;      // Thermal absorptivity of surface outside face or exterior movable insulation if present
+    Array1D<Real64> SurfMovInsulHExt; // Resistance or "h" value of exterior movable insulation
+    Array1D<Real64> SurfMovInsulHInt; // Resistance or "h" value of interior movable insulation
+    Array1D<Real64> SurfAbsSolarExt; // Solar Absorptivity of surface inside face or interior movable insulation if present
+    Array1D<Real64> SurfAbsThermalExt; // Thermal Absorptivity of surface inside face or interior movable insulation if present
+    Array1D<Real64> SurfAbsSolarInt; // Solar absorptivity of surface outside face or exterior movable insulation if present
+    Array1D<Real64> SurfRoughnessExt; // Roughness of surface inside face or interior movable insulation if present
+    Array1D<Real64> SurfAbsThermalInt; // Thermal absorptivity of surface outside face or exterior movable insulation if present
     std::vector<int> SurfMovInsulIndexList;
 
     void clear_state() override
