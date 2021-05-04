@@ -112,7 +112,7 @@ namespace PhotovoltaicThermalCollectors {
         Real64 PVCellTransAbsProduct; // PV cell Transmittance-Absorptance prodiuct
         Real64 PVBackTransAbsProduct; // PV back Transmittance-Absorptance product
         Real64 BackMatTranAbsProduct; // Backing Material Normal Transmittance-Absorptance Product
-        Real64 CladTranAbsProduct; // Cladding Normal Transmittance-Absorptance Product
+        Real64 CladTranAbsProduct;    // Cladding Normal Transmittance-Absorptance Product
         Real64 PVAreaFract;           // Fraction of collector gross area covered by PV module
         Real64 PVCellAreaFract;       // Fraction of PV cell area to module area
         Real64 PVRTop;                // PV module top thermal resistance (m2-DegC/W)
@@ -121,7 +121,7 @@ namespace PhotovoltaicThermalCollectors {
         Real64 BackMatEmiss;          // Emissivity of backing material
         Real64 ThGlass;               // Glass thickness (m)
         Real64 RIndGlass;             // Glass refraction index
-        Real64 ECoffGlass;            // Glass extinction coefficient  
+        Real64 ECoffGlass;            // Glass extinction coefficient
         Real64 LastCollectorTemp;     // store previous temperature (DegC)
         Real64 CollectorTemp;         // average solar collector temp (DegC)
         Real64 Tplen;                 // modeled drybulb temperature for air through BIPVT channel (DegC)
@@ -131,10 +131,10 @@ namespace PhotovoltaicThermalCollectors {
 
         // Default Constructor
         BIPVTModelStruct()
-            : OSCMPtr(0), SchedPtr(0), PVEffGapWidth(0.0), EffCollHeight(0.0), EffCollWidth(0.0), PVTranAbsProduct(0.0), PVCellTransAbsProduct(0.0), 
+            : OSCMPtr(0), SchedPtr(0), PVEffGapWidth(0.0), EffCollHeight(0.0), EffCollWidth(0.0), PVTranAbsProduct(0.0), PVCellTransAbsProduct(0.0),
               PVBackTransAbsProduct(0.0), BackMatTranAbsProduct(0.0), CladTranAbsProduct(0.0), PVAreaFract(0.0), PVCellAreaFract(0.0), PVRTop(0.0),
-              PVRBot(0.0), PVGEmiss(0.0), BackMatEmiss(0.0), ThGlass(0.0), RIndGlass(0.0), ECoffGlass(0.0), LastCollectorTemp(0.0), CollectorTemp(0.0),
-              Tplen(20.0), Tcoll(20.0), HrPlen(1.0), HcPlen(10.0)
+              PVRBot(0.0), PVGEmiss(0.0), BackMatEmiss(0.0), ThGlass(0.0), RIndGlass(0.0), ECoffGlass(0.0), LastCollectorTemp(0.0),
+              CollectorTemp(0.0), Tplen(20.0), Tcoll(20.0), HrPlen(1.0), HcPlen(10.0)
         {
         }
     };
@@ -232,7 +232,8 @@ namespace PhotovoltaicThermalCollectors {
 
         void BIPVTcalculate(EnergyPlusData &state);
 
-        void BIPVT_MaxHeatGain_calculate(EnergyPlusData &state, Real64 tsp, std::string Mode, Real64 &bfr, Real64 &q, Real64 &tmixed, Real64 &ThEff, Real64 &tpv);
+        void BIPVT_MaxHeatGain_calculate(
+            EnergyPlusData &state, Real64 tsp, std::string Mode, Real64 &bfr, Real64 &q, Real64 &tmixed, Real64 &ThEff, Real64 &tpv);
 
         void solve_lin_sys_back_sub(Real64 jj[9], Real64 f[3], Real64 (&y)[3]);
 
@@ -249,7 +250,8 @@ namespace PhotovoltaicThermalCollectors {
 
     void GetBIPVTCollectorsInput(EnergyPlusData &state, int NumBIPVTPerform, Array1D<BIPVTModelStruct> &tmpBIPVTperf);
 
-    void GetMainPVTInput(EnergyPlusData &state, int NumPVT,
+    void GetMainPVTInput(EnergyPlusData &state,
+                         int NumPVT,
                          Array1D<PVTCollectorStruct> &PVT,
                          Array1D<SimplePVTModelStruct> tmpSimplePVTperf,
                          Array1D<BIPVTModelStruct> tmpBIPVTperf);

@@ -252,9 +252,9 @@ namespace Photovoltaics {
         // Using/Aliasing
         using namespace DataHeatBalance;
 
+        using PhotovoltaicThermalCollectors::GetPVTmodelIndex;
         using ScheduleManager::GetScheduleIndex;
         using TranspiredCollector::GetTranspiredCollectorIndex;
-        using PhotovoltaicThermalCollectors::GetPVTmodelIndex;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PVnum;     // working variable for do loop through pv arrays
@@ -438,8 +438,11 @@ namespace Photovoltaics {
                             ErrorsFound = true;
                         } else if (state.dataPhotovoltaic->PVarray(dupPtr).CellIntegrationMode == CellIntegration::PVTSolarCollector) {
                             ShowSevereError(state, cCurrentModuleObject + ": problem detected with multiple PV arrays.");
-                            ShowContinueError(state, "When using PhotovoltaicThermalSolarCollector heat transfer mode, only one PV array can be coupled");
-                            ShowContinueError(state, "Both " + state.dataPhotovoltaic->PVarray(PVnum).Name + " and " + state.dataPhotovoltaic->PVarray(dupPtr).Name +
+                            ShowContinueError(state,
+                                              "When using PhotovoltaicThermalSolarCollector heat transfer mode, only one PV array can be coupled");
+                            ShowContinueError(state,
+                                              "Both " + state.dataPhotovoltaic->PVarray(PVnum).Name + " and " +
+                                                  state.dataPhotovoltaic->PVarray(dupPtr).Name +
                                                   " are using PVT surface = " + state.dataPhotovoltaic->PVarray(PVnum).SurfaceName);
                             ErrorsFound = true;
                         }
@@ -866,8 +869,8 @@ namespace Photovoltaics {
         // collect statements that assign to variables tied to output variables
 
         // Using/Aliasing
-        using TranspiredCollector::SetUTSCQdotSource;
         using PhotovoltaicThermalCollectors::SetPVTQdotSource;
+        using TranspiredCollector::SetUTSCQdotSource;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int thisZone; // working index for zones
@@ -937,8 +940,8 @@ namespace Photovoltaics {
         //    integrated photovoltaics. Solar 2002, Sunrise on the Reliable Energy Economy, June 15-19, 2002 Reno, NV
 
         // Using/Aliasing
-        using TranspiredCollector::GetUTSCTsColl;
         using PhotovoltaicThermalCollectors::GetPVTTsColl;
+        using TranspiredCollector::GetUTSCTsColl;
 
         int ThisSurf; // working variable for indexing surfaces
         Real64 Ee;
@@ -1248,8 +1251,8 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the PV performance.
 
-        using TranspiredCollector::GetUTSCTsColl;
         using PhotovoltaicThermalCollectors::GetPVTTsColl;
+        using TranspiredCollector::GetUTSCTsColl;
 
         Real64 const EPS(0.001);
         Real64 const ERR(0.001);
