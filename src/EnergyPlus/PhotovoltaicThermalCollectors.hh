@@ -131,9 +131,10 @@ namespace PhotovoltaicThermalCollectors {
 
         // Default Constructor
         BIPVTModelStruct()
-            : OSCMPtr(0), SchedPtr(0), PVEffGapWidth(0.0), EffCollHeight(0.0), EffCollWidth(0.0), PVTranAbsProduct(0.0), BackMatTranAbsProduct(0.0),
-              PVAreaFract(0.0), PVRTop(0.0), PVRBot(0.0), PVGEmiss(0.0), BackMatEmiss(0.0), LastCollectorTemp(0.0), CollectorTemp(0.0), Tplen(20.0),
-              Tcoll(20.0), HrPlen(1.0), HcPlen(10.0)
+            : OSCMPtr(0), SchedPtr(0), PVEffGapWidth(0.0), EffCollHeight(0.0), EffCollWidth(0.0), PVTranAbsProduct(0.0), PVCellTransAbsProduct(0.0), 
+              PVBackTransAbsProduct(0.0), BackMatTranAbsProduct(0.0), CladTranAbsProduct(0.0), PVAreaFract(0.0), PVCellAreaFract(0.0), PVRTop(0.0),
+              PVRBot(0.0), PVGEmiss(0.0), BackMatEmiss(0.0), ThGlass(0.0), RIndGlass(0.0), ECoffGlass(0.0), LastCollectorTemp(0.0), CollectorTemp(0.0),
+              Tplen(20.0), Tcoll(20.0), HrPlen(1.0), HcPlen(10.0)
         {
         }
     };

@@ -1481,18 +1481,18 @@ namespace PhotovoltaicThermalCollectors {
         Real64 theta_ground(0.0 * pi / 180.0);                                                  // incident angle ground
         Real64 theta_beam = std::acos(state.dataHeatBal->SurfCosIncidenceAngle(this->SurfNum)); // incident angle beam in rad
 
-        Real64 glass_thickness(0.002);                                                // typical pv glass thickness
-        Real64 refrac_index_glass(1.526);                                             // glass refractive index
-        Real64 k_glass(4.0);                                                          // typical extinction coefficient pv glass
+        Real64 glass_thickness = this->BIPVT.ThGlass;                                 // glass thickness
+        Real64 refrac_index_glass = this->BIPVT.RIndGlass;                            // glass refractive index
+        Real64 k_glass = this->BIPVT.ECoffGlass;                                      // extinction coefficient pv glass
         Real64 slope = (pi / 180.0) * state.dataSurface->Surface(this->SurfNum).Tilt; // surface tilt in rad
-        Real64 beta(0);                 // surface tilt for calculating internal convective coefficient for stagnation condition
-        Real64 taoaplha_back(0.9);      // tao-alpha product normal back of PV panel (hard coded for now)
-        Real64 taoalpha_pv(0.957);      // tao-aplha product normal PV cells (hard coded for now)
-        Real64 taoaplha_cladding(0.85); // tao-alpha product normal cladding (hard coded for now)
-        Real64 g(0.0);                  // Solar incident on surface
-        Real64 fcell(0.9);              // area fraction of cells on pv module (hard coded for now)
-        Real64 area_pv(10.0);           // total area of pv modules (hard coded for now)
-        Real64 area_wall_total(10.5);   // total area of wall (hard coded for now)
+        Real64 beta(0);                                                               // surface tilt for calculating internal convective coefficient for stagnation condition
+        Real64 taoaplha_back = this->BIPVT.PVBackTransAbsProduct;                     // tao-alpha product normal back of PV panel
+        Real64 taoalpha_pv = this->BIPVT.PVCellTransAbsProduct;                       // tao-aplha product normal PV cells
+        Real64 taoaplha_cladding = this->BIPVT.CladTranAbsProduct;                    // tao-alpha product normal cladding
+        Real64 g(0.0);                                                                // Solar incident on surface
+        Real64 fcell = this->BIPVT.PVCellAreaFract;                                   // area fraction of cells on pv module
+        Real64 area_pv = w*l*this->BIPVT.PVAreaFract;                                 // total area of pv modules
+        Real64 area_wall_total = w*l;                                                 // total area of wall
 
         ConvectionCoefficients::InitExteriorConvectionCoeff(state,
                                                             this->SurfNum,
