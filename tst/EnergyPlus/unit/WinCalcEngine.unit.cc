@@ -202,7 +202,7 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEVenetian)
     // Transmittance Front
     const auto Tfront = solarLayer->getPropertySimple(
         minLambda, maxLambda, FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectDirect);
-    EXPECT_NEAR(0.047120, Tfront, 1e-6);
+    EXPECT_NEAR(0.823880, Tfront, 1e-6);
 
     // Reflectance Front
     const auto Rfront = solarLayer->getPropertySimple(
@@ -212,12 +212,12 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEVenetian)
     // Transmittance Back
     const auto Tback = solarLayer->getPropertySimple(
         minLambda, maxLambda, FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Back, FenestrationCommon::Scattering::DirectDirect);
-    EXPECT_NEAR(0.047120, Tback, 1e-6);
+    EXPECT_NEAR(0.823900, Tback, 1e-6);
 
     // Reflectance Back
     const auto Rback = solarLayer->getPropertySimple(
         minLambda, maxLambda, FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Back, FenestrationCommon::Scattering::DirectDirect);
-    EXPECT_NEAR(0.000241, Rback, 1e-6);
+    EXPECT_NEAR(0.073680, Rback, 1e-6);
 }
 
 TEST_F(EnergyPlusFixture, DISABLED_WCEShade)
