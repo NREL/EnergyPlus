@@ -8116,7 +8116,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                                 // Back surface is opaque interior or exterior wall
                                 Real64 AbsIntSurf = state.dataHeatBalSurf->SurfAbsSolarInt(BackSurfNum);
-                                state.dataSurface->SurfOpaqAI(BackSurfNum) += BOverlap * AbsIntSurf / state.dataSurface->Surface(BackSurfNum).Area; //[-]
+                                state.dataSurface->SurfOpaqAI(BackSurfNum) +=
+                                    BOverlap * AbsIntSurf / state.dataSurface->Surface(BackSurfNum).Area; //[-]
                                 BABSZone += BOverlap * AbsIntSurf;                                        //[m2]
 
                             } else {

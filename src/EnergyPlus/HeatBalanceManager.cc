@@ -5576,7 +5576,6 @@ namespace HeatBalanceManager {
             }
         }
 
-
         if (state.dataGlobal->BeginSimFlag && state.dataGlobal->DoWeathSim && state.dataSysVars->ReportExtShadingSunlitFrac) {
             OpenShadingFile(state);
         }

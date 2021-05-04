@@ -53,8 +53,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
@@ -64,7 +64,6 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-
 
 namespace EnergyPlus {
 
