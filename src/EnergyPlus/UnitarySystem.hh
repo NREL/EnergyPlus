@@ -125,6 +125,8 @@ namespace UnitarySystems {
         std::string design_specification_multispeed_object_type;
         std::string design_specification_multispeed_object_name;
 
+        std::string dx_cooling_coil_system_sensor_node_name;
+
         UnitarySysInputSpec();
 
         ~UnitarySysInputSpec()

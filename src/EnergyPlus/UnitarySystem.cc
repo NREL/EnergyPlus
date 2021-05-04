@@ -3022,6 +3022,8 @@ namespace UnitarySystems {
         std::string loc_m_DesignSpecMultispeedHPType = input_data.design_specification_multispeed_object_type;
         std::string loc_m_DesignSpecMultispeedHPName = input_data.design_specification_multispeed_object_name;
 
+        std::string loc_m_SystemCoolControlNodeName = input_data.dx_cooling_coil_system_sensor_node_name;
+
         int FanInletNode = 0;
         int FanOutletNode = 0;
         Real64 FanVolFlowRate = 0.0;
@@ -5188,10 +5190,22 @@ namespace UnitarySystems {
                 this->m_ContSpeedCoolingCoil = true;
             } // CoilDX_Cooling is set above
 
-            if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, SetPointManager::iCtrlVarType::Temp))
-                this->m_SystemCoolControlNodeNum = this->AirOutNode;
-            if (SetPointManager::NodeHasSPMCtrlVarType(state, CoolingCoilOutletNode, SetPointManager::iCtrlVarType::Temp))
-                this->m_SystemCoolControlNodeNum = CoolingCoilOutletNode;
+            if (loc_m_SystemCoolControlNodeName.size() > 0) {
+                this->m_SystemCoolControlNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                                       loc_m_SystemCoolControlNodeName,
+                                                                                       errFlag,
+                                                                                       cCurrentModuleObject,
+                                                                                       thisObjectName,
+                                                                                       DataLoopNode::NodeFluidType::Air,
+                                                                                       DataLoopNode::NodeConnectionType::Sensor,
+                                                                                       1,
+                                                                                       DataLoopNode::ObjectIsParent);
+            } else {
+                if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, SetPointManager::iCtrlVarType::Temp))
+                    this->m_SystemCoolControlNodeNum = this->AirOutNode;
+                if (SetPointManager::NodeHasSPMCtrlVarType(state, CoolingCoilOutletNode, SetPointManager::iCtrlVarType::Temp))
+                    this->m_SystemCoolControlNodeNum = CoolingCoilOutletNode;
+            }
 
             this->CoolCoilInletNodeNum = CoolingCoilInletNode;
             this->CoolCoilOutletNodeNum = CoolingCoilOutletNode;
@@ -6844,7 +6858,7 @@ namespace UnitarySystems {
                 original_input_specs.air_outlet_node_name =
                     UtilityRoutines::MakeUPPERCase(fields.at("dx_cooling_coil_system_outlet_node_name")); // required field
 
-                std::string loc_SensorNodeName =
+                original_input_specs.dx_cooling_coil_system_sensor_node_name =
                     UtilityRoutines::MakeUPPERCase(fields.at("dx_cooling_coil_system_sensor_node_name")); // required field
 
                 original_input_specs.cooling_coil_object_type =
@@ -6937,21 +6951,21 @@ namespace UnitarySystems {
                         SetupOutputVariable(state,
                                             "Coil System Cycling Ratio",
                                             OutputProcessor::Unit::None,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_CycRatio,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCycRatio,
                                             "System",
                                             "Average",
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
                         SetupOutputVariable(state,
                                             "Coil System Compressor Speed Ratio",
                                             OutputProcessor::Unit::None,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_SpeedRatio,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_CoolingSpeedRatio,
                                             "System",
                                             "Average",
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
                         SetupOutputVariable(state,
                                             "Coil System Compressor Speed Number",
                                             OutputProcessor::Unit::None,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_SpeedNum,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_CoolingSpeedNum,
                                             "System",
                                             "Average",
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
