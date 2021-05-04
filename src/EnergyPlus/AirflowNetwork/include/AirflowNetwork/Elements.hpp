@@ -1661,6 +1661,7 @@ struct AirflowNetworkData : BaseGlobalStruct
     Real64 ExhaustFanMassFlowRate = 0.0; // Exhaust fan flow rate used in PressureStat
     int PressureSetFlag = 0;             // PressureSet flag
     Real64 ReliefMassFlowRate = 0.0;     // OA Mixer relief node flow rate used in PressureStat
+    bool AFNDefaultControlFlag = false;  // Default simulation control flag
 
     Array1D<AirflowNetwork::AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
     Array1D<AirflowNetwork::AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;

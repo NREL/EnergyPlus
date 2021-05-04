@@ -318,13 +318,6 @@ public: // Predicate
 		return ( l_ - 2 == u_ );
 	}
 
-	// Not Unbounded?
-	bool
-	not_unbounded() const
-	{
-		return ( l_ - 1 <= u_ );
-	}
-
 	// Empty?
 	bool
 	empty() const
