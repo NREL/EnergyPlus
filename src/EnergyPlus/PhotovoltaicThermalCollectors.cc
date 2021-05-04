@@ -1393,9 +1393,9 @@ namespace PhotovoltaicThermalCollectors {
         // BIPVT system parameters
         Real64 rpvg_pv = this->BIPVT.PVRTop;       // thermal resistance of glass (m2-K/W)
         Real64 rpv_1 = this->BIPVT.PVRBot;         // thermal resistance of backing layer (m2-K/W)
-        Real64 w = this->BIPVT.PVEffGapWidth;      // width of BIPVT panel (m)
+        Real64 w = this->BIPVT.EffCollWidth;      // width of BIPVT panel (m)
         Real64 l = this->BIPVT.EffCollHeight;      // length of BIPVT panel (m)
-        Real64 depth_channel(0.05);                // depth of air channel (m)
+        Real64 depth_channel = this->BIPVT.PVEffGapWidth; // depth of air channel (m)
         Real64 emiss_b = this->BIPVT.BackMatEmiss; // emissivity of backing surface
         Real64 emiss_2(0.85);                      // emissivity of bldg surface
         Real64 emiss_pvg = this->BIPVT.PVGEmiss;   // emissivity of glass surface
