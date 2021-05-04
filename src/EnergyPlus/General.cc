@@ -495,6 +495,7 @@ void SolveRoot(EnergyPlusData &state,
         XRes = X0;
         return;
     }
+    XRes = XTemp;
 
     while (Cont) {
 
@@ -1252,65 +1253,6 @@ Real64 BlindBeamBeamTrans(Real64 const ProfAng,        // Solar profile angle (r
     }
 
     return BlindBeamBeamTrans;
-}
-
-Real64 POLYF(Real64 const X,         // Cosine of angle of incidence
-             Array1A<Real64> const A // Polynomial coefficients
-)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Fred Winkelmann
-    //       DATE WRITTEN   February 1999
-    //       DATE MODIFIED  October 1999, FW: change to 6th order polynomial over
-    //                        entire incidence angle range
-
-    // PURPOSE OF THIS FUNCTION:
-    // Evaluates glazing beam transmittance or absorptance of the form
-    // A(1)*X + A(2)*X^2 + A(3)*X^3 + A(4)*X^4 + A(5)*X^5 + A(6)*X^6
-    // where X is the cosine of the angle of incidence (0.0 to 1.0)
-
-    // Return value
-    Real64 POLYF;
-
-    // Argument array dimensioning
-    A.dim(6);
-
-    if (X < 0.0 || X > 1.0) {
-        POLYF = 0.0;
-    } else {
-        POLYF = X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
-    }
-    return POLYF;
-}
-
-Real64 POLYF(Real64 const X,         // Cosine of angle of incidence
-             Array1<Real64> const &A // Polynomial coefficients
-)
-{
-    // Return value
-    Real64 POLYF;
-
-    if (X < 0.0 || X > 1.0) {
-        POLYF = 0.0;
-    } else {
-        POLYF = X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
-    }
-    return POLYF;
-}
-
-Real64 POLYF(Real64 const X,          // Cosine of angle of incidence
-             Array1S<Real64> const &A // Polynomial coefficients
-)
-{
-    // Return value
-    Real64 POLYF;
-
-    if (X < 0.0 || X > 1.0) {
-        POLYF = 0.0;
-    } else {
-        POLYF = X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
-    }
-    return POLYF;
 }
 
 std::string &strip_trailing_zeros(std::string &InputString)
@@ -2709,7 +2651,7 @@ void ScanForReports(EnergyPlusData &state,
 }
 
 void CheckCreatedZoneItemName(EnergyPlusData &state,
-                              std::string const &calledFrom,                  // routine called from
+                              std::string_view const calledFrom,              // routine called from
                               std::string const &CurrentObject,               // object being parsed
                               std::string const &ZoneName,                    // Zone Name associated
                               std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
@@ -2738,7 +2680,7 @@ void CheckCreatedZoneItemName(EnergyPlusData &state,
     ResultName = ZoneName + ' ' + ItemName;
     bool TooLong = false;
     if (ItemLength > DataGlobalConstants::MaxNameLength) {
-        ShowWarningError(state, calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long.");
+        ShowWarningError(state, fmt::format("{}{} Combination of ZoneList and Object Name generate a name too long.", calledFrom, CurrentObject));
         ShowContinueError(state, "Object Name=\"" + ItemName + "\".");
         ShowContinueError(state, "ZoneList/Zone Name=\"" + ZoneName + "\".");
         ShowContinueError(
@@ -2754,7 +2696,7 @@ void CheckCreatedZoneItemName(EnergyPlusData &state,
     int FoundItem = UtilityRoutines::FindItemInList(ResultName, ItemNames, NumItems);
 
     if (FoundItem != 0) {
-        ShowSevereError(state, calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered.");
+        ShowSevereError(state, fmt::format("{}{}=\"{}\", Duplicate Generated name encountered.", calledFrom, CurrentObject, ItemName));
         ShowContinueError(state, format("name=\"{}\" has already been generated or entered as {} item=[{}].", ResultName, CurrentObject, FoundItem));
         if (TooLong) ShowContinueError(state, "Duplicate name likely caused by the previous \"too long\" warning.");
         ResultName = "xxxxxxx";

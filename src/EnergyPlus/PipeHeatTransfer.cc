@@ -1722,11 +1722,22 @@ Real64 PipeHTData::CalcPipeHeatTransCoef(EnergyPlusData &state,
     int const NumOfPropDivisions(13);  // intervals in property correlation
     static Array1D<Real64> const Temps(
         NumOfPropDivisions, {1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85}); // Temperature, in C
-    static Array1D<Real64> const Mu(
-        NumOfPropDivisions,
-        {0.001652, 0.001422, 0.001225, 0.00108, 0.000959, 0.000855, 0.000769, 0.000695, 0.000631, 0.000577, 0.000528, 0.000489, 0.000453}); // Viscosity,
-                                                                                                                                            // in
-                                                                                                                                            // Ns/m2
+    static Array1D<Real64> const Mu(NumOfPropDivisions,
+                                    {0.001652,
+                                     0.001422,
+                                     0.001225,
+                                     0.00108,
+                                     0.000959,
+                                     0.000855,
+                                     0.000769,
+                                     0.000695,
+                                     0.000631,
+                                     0.000577,
+                                     0.000528,
+                                     0.000489,
+                                     0.000453}); // Viscosity,
+                                                 // in
+                                                 // Ns/m2
     static Array1D<Real64> const Conductivity(
         NumOfPropDivisions, {0.574, 0.582, 0.590, 0.598, 0.606, 0.613, 0.620, 0.628, 0.634, 0.640, 0.645, 0.650, 0.656}); // Conductivity, in W/mK
     static Array1D<Real64> const Pr(

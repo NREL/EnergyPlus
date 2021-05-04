@@ -13,9 +13,6 @@
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/noexcept.hh>
-
 // C++ Headers
 #include <algorithm>
 #include <cassert>
@@ -63,7 +60,7 @@ public: // Creation
 	}
 
 	// Move Constructor
-	Cstring( Cstring && s ) NOEXCEPT :
+	Cstring( Cstring && s ) noexcept :
 	 str_( s.str_ )
 	{
 		s.str_ = nullptr;
@@ -186,7 +183,7 @@ public: // Assignment
 
 	// Move Assignment
 	Cstring &
-	operator =( Cstring && s ) NOEXCEPT
+	operator =( Cstring && s ) noexcept
 	{
 		assert( this != &s );
 		delete[] str_;
@@ -281,22 +278,6 @@ public: // Predicate
 		return ( len_trim() != 0 );
 	}
 
-	// Has any Character of a Cstring?
-	bool
-	has_any_of( Cstring const & s ) const;
-
-	// Has any Character of a cstring?
-	bool
-	has_any_of( char const * const s ) const;
-
-	// Has any Character of a std::string?
-	bool
-	has_any_of( std::string const & s ) const;
-
-	// Has a Character?
-	bool
-	has_any_of( char const c ) const;
-
 	// Has a Character?
 	bool
 	has( char const c ) const;
@@ -327,10 +308,6 @@ public: // Inspector
 	// Length Space-Trimmed
 	size_type
 	len_trim() const;
-
-	// Length Whitespace-Trimmed
-	size_type
-	len_trim_whitespace() const;
 
 	// Find First Occurrence of a Character
 	size_type
@@ -363,14 +340,6 @@ public: // Modifier
 	trim()
 	{
 		str_[ len_trim() ] = '\0';
-		return *this;
-	}
-
-	// Trim Trailing Whitespace
-	Cstring &
-	trim_whitespace()
-	{
-		str_[ len_trim_whitespace() ] = '\0';
 		return *this;
 	}
 
@@ -529,13 +498,6 @@ public: // Generator
 		return Cstring( *this ).uppercase();
 	}
 
-	// Left-Justified Copy
-	Cstring
-	ljustified() const
-	{
-		return Cstring( *this ).ljustify();
-	}
-
 	// Right-Justified Copy
 	Cstring
 	rjustified() const
@@ -548,13 +510,6 @@ public: // Generator
 	trimmed() const
 	{
 		return Cstring( *this, len_trim() );
-	}
-
-	// Whitespace-Trimmed Copy
-	Cstring
-	trimmed_whitespace() const
-	{
-		return Cstring( *this, len_trim_whitespace() );
 	}
 
 	// Centered Copy

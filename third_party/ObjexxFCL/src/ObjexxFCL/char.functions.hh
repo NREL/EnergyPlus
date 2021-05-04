@@ -37,23 +37,6 @@ not_blank( char const c )
 	return ( c != ' ' );
 }
 
-// char is Whitespace?
-inline
-bool
-is_whitespace( char const c )
-{
-	static std::string const whitespace( " \t\000" );
-	return ( whitespace.find( c ) != std::string::npos );
-}
-
-// char is Not Whitespace?
-inline
-bool
-not_whitespace( char const c )
-{
-	return ! is_whitespace( c );
-}
-
 // char is Alphabetic?
 inline
 bool
@@ -69,23 +52,6 @@ is_consonant( char const c )
 {
 	static std::string const vowels( "aeiou" );
 	return ( ( std::isalpha( c ) != 0 ) && ( vowels.find( std::tolower( c ) ) == std::string::npos ) );
-}
-
-// char is a Vowel?
-inline
-bool
-is_vowel( char const c )
-{
-	static std::string const vowels( "aeiou" );
-	return ( vowels.find( std::tolower( c ) ) != std::string::npos );
-}
-
-// char is Alphanumeric?
-inline
-bool
-is_alpha_numeric( char const c )
-{
-	return ( std::isalnum( c ) != 0 );
 }
 
 // char is Digits?
@@ -130,14 +96,6 @@ bool
 has_any_of( char const c, std::string const & s )
 {
 	return ( s.find( c ) != std::string::npos );
-}
-
-// char is in a cstring?
-inline
-bool
-has_any_of( char const c, char const * const s )
-{
-	return is_any_of( c, s );
 }
 
 // char is not in a string?
@@ -221,14 +179,6 @@ LGE( char const c, char const d )
 // ASCII Lexical < Comparison
 inline
 bool
-LGT( char const c, char const d )
-{
-	return ( c > d );
-}
-
-// ASCII Lexical < Comparison
-inline
-bool
 llt( char const c, char const d )
 {
 	return ( c < d );
@@ -264,14 +214,6 @@ lgt( char const c, char const d )
 inline
 int
 ICHAR( char const c )
-{
-	return static_cast< int >( c );
-}
-
-// ASCII Integer Value of a char
-inline
-int
-IACHAR( char const c )
 {
 	return static_cast< int >( c );
 }
