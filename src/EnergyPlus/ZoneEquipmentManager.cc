@@ -659,6 +659,8 @@ void SizeZoneEquipment(EnergyPlusData &state)
             if (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum) > 0.0) {
                 state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum).HeatTstatTemp =
                     state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
+                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum).CoolTstatTemp =
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum);
             } else {
                 state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum).HeatTstatTemp =
                     state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum);
