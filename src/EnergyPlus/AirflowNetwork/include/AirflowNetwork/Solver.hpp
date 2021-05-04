@@ -72,14 +72,14 @@ namespace AirflowNetwork {
 
     struct AirProperties
     {
-        Real64 temperature; // 20
+        Real64 temperature = 20;
         // Real64 pressure;      //{0.0}; // gage pressure
-        Real64 humidity_ratio;
-        Real64 density; //{AIRDENSITY(101325.0, 20.0, 0.0)};
-        Real64 sqrt_density; //{sqrt(AIRDENSITY(101325.0, 20.0, 0.0))};
-        Real64 viscosity; //{AIRDYNAMICVISCOSITY(20.0)};
+        Real64 humidity_ratio = 0.0;
+        Real64 density = AIRDENSITY_CONST(101325.0, 20.0, 0.0);
+        Real64 sqrt_density = sqrt(AIRDENSITY_CONST(101325.0, 20.0, 0.0));
+        Real64 viscosity = AIRDYNAMICVISCOSITY(20.0);
 
-        AirProperties(Real64 const airDensity = AIRDENSITY_CONST(101325.0, 20.0, 0.0));
+        //AirProperties(Real64 const airDensity = AIRDENSITY_CONST(101325.0, 20.0, 0.0));
     };
 
     // Forward declaration

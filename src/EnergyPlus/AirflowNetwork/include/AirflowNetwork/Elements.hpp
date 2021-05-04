@@ -570,14 +570,10 @@ namespace AirflowNetwork {
     struct SurfaceCrack : public AirflowElement // Surface crack component
     {
         // Members
-        // std::string ExternalNodeNames; // Name of external node.Not required for internal surface
         Real64 coefficient;         // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
         Real64 exponent;            // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
         Real64 reference_density;   // Reference density for crack data
         Real64 reference_viscosity; // Reference viscosity for crack data
-        //Real64 StandardT;   // Standard temperature for crack data
-        //Real64 StandardP;   // Standard barometric pressure for crack data
-        //Real64 StandardW;   // Standard humidity ratio for crack data
 
         // Default Constructor
         SurfaceCrack() : coefficient(0.0), exponent(0.0), reference_density(AIRDENSITY_CONST(101325.0, 20.0, 0.0)), reference_viscosity(AIRDYNAMICVISCOSITY(20.0))
