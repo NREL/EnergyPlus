@@ -4405,7 +4405,7 @@ TEST_F(InputProcessorFixture, epJSONgetObjectItem_minfields)
     EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(4), 0.0, 0.0001);
 }
 
-TEST_F(InputProcessorFixture, epJSONgetFieldValue)
+TEST_F(InputProcessorFixture, epJSONgetFieldValue_fromJSON)
 {
 
     json root;
@@ -4476,6 +4476,129 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue)
     // or zero if they don't have a default (in this case it's a required field, so it would have failed before now)
     numericFieldValue = state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type2, mat1, objectSchemaProps, "specific_heat");
     EXPECT_NEAR(numericFieldValue, 0.0, 0.0001);
+}
+
+TEST_F(InputProcessorFixture, epJSONgetFieldValue_AutosizefromJSON)
+{
+
+    json root;
+    std::string obj_type1 = "WaterHeater:Mixed";
+    std::string name1 = "Water Heater 1";
+    json wh1 = {{"tank_volume", "autosize"}, {"heater_maximum_capacity", "nonsense"}, {"source_side_effectiveness", "nothing"}};
+    EXPECT_TRUE(wh1.is_object());
+    root[obj_type1][name1] = wh1;
+
+    state->dataInputProcessing->inputProcessor->epJSON = root;
+    state->dataGlobal->isEpJSON = true;
+    state->dataInputProcessing->inputProcessor->initializeMaps();
+    std::string alphaFieldValue;
+    Real64 numericFieldValue = 0.0;
+    json objectSchemaProps;
+
+    // Water heater object
+    state->dataInputProcessing->inputProcessor->getObjectSchemaProps(*state, obj_type1, objectSchemaProps);
+    // User inputs from above
+    // If the field is autosizable and alpha input will return -99999
+    numericFieldValue = state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type1, wh1, objectSchemaProps, "tank_volume");
+    EXPECT_EQ(numericFieldValue, -99999);
+    numericFieldValue =
+        state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type1, wh1, objectSchemaProps, "heater_maximum_capacity");
+    EXPECT_EQ(numericFieldValue, -99999);
+    // Even a field that is not autoszable will return -99999 here (assuming that gets checked upon epJSON input processing)
+    numericFieldValue =
+        state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type1, wh1, objectSchemaProps, "source_side_effectiveness");
+    EXPECT_EQ(numericFieldValue, -99999);
+    // Also check a field that defaults to autosize (not input above)
+    numericFieldValue =
+        state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type1, wh1, objectSchemaProps, "use_side_design_flow_rate");
+    EXPECT_EQ(numericFieldValue, -99999);
+}
+TEST_F(InputProcessorFixture, epJSONgetFieldValue_fromIDF)
+{
+
+    std::string const idf_objects = delimited_string({
+        "  WaterHeater:Mixed,",
+        "    Water Heater 1,          !- Name",
+        "    autosize,                !- Tank Volume {m3}",
+        "    DummySch,                !- Setpoint Temperature Schedule Name",
+        "    ,                        !- Deadband Temperature Difference {deltaC}",
+        "    ,                        !- Maximum Temperature Limit {C}",
+        "    ,                        !- Heater Control Type",
+        "    autosize,                !- Heater Maximum Capacity {W}",
+        "    ,                        !- Heater Minimum Capacity {W}",
+        "    ,                        !- Heater Ignition Minimum Flow Rate {m3/s}",
+        "    ,                        !- Heater Ignition Delay {s}",
+        "    ELECTRICITY,             !- Heater Fuel Type",
+        "    0.95,                    !- Heater Thermal Efficiency",
+        "    ,                        !- Part Load Factor Curve Name",
+        "    10,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}",
+        "    ELECTRICITY,             !- Off Cycle Parasitic Fuel Type",
+        "    0,                       !- Off Cycle Parasitic Heat Fraction to Tank",
+        "    30,                      !- On Cycle Parasitic Fuel Consumption Rate {W}",
+        "    ELECTRICITY,             !- On Cycle Parasitic Fuel Type",
+        "    0,                       !- On Cycle Parasitic Heat Fraction to Tank",
+        "    Schedule,                !- Ambient Temperature Indicator",
+        "    DummySch,                !- Ambient Temperature Schedule Name",
+        "    ,                        !- Ambient Temperature Zone Name",
+        "    ,                        !- Ambient Temperature Outdoor Air Node Name",
+        "    2.0,                     !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "    1.0,                     !- Off Cycle Loss Fraction to Zone",
+        "    2.0,                     !- On Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "    1.0,                     !- On Cycle Loss Fraction to Zone",
+        "    0.00379,                 !- Peak Use Flow Rate {m3/s}",
+        "    DummySch,                !- Use Flow Rate Fraction Schedule Name",
+        "    ,                        !- Cold Water Supply Temperature Schedule Name",
+        "    ,                        !- Use Side Inlet Node Name",
+        "    ,                        !- Use Side Outlet Node Name",
+        "    ,                        !- Use Side Effectiveness",
+        "    Zone4WaterOutletNode,    !- Source Side Inlet Node Name",
+        "    Zone4WaterInletNode,     !- Source Side Outlet Node Name",
+        "    0.9;                     !- Source Side Effectiveness",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    state->dataGlobal->isEpJSON = false;
+    state->dataInputProcessing->inputProcessor->initializeMaps();
+    std::string alphaFieldValue;
+    Real64 numericFieldValue = 0.0;
+    json objectSchemaProps;
+
+    // Water heater object
+    std::string obj_type1 = "WaterHeater:Mixed";
+    state->dataInputProcessing->inputProcessor->getObjectSchemaProps(*state, obj_type1, objectSchemaProps);
+    auto instances = state->dataInputProcessing->inputProcessor->epJSON.find(obj_type1);
+    if (instances != state->dataInputProcessing->inputProcessor->epJSON.end()) {
+        // globalSolverObject.referenceConditions.clear();
+        auto &instancesValue = instances.value();
+        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            auto const &fields = instance.value();
+            // User inputs from above
+            // An autosized field will return -99999
+            numericFieldValue =
+                state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type1, fields, objectSchemaProps, "tank_volume");
+            EXPECT_EQ(numericFieldValue, -99999);
+            numericFieldValue = state->dataInputProcessing->inputProcessor->getRealFieldValue(
+                *state, obj_type1, fields, objectSchemaProps, "heater_maximum_capacity");
+            EXPECT_EQ(numericFieldValue, -99999);
+            // Check a numeric field that's not autosized
+            numericFieldValue = state->dataInputProcessing->inputProcessor->getRealFieldValue(
+                *state, obj_type1, fields, objectSchemaProps, "source_side_effectiveness");
+            EXPECT_EQ(numericFieldValue, 0.9);
+            // Also check a field that defaults to autosize (not input above)
+            numericFieldValue = state->dataInputProcessing->inputProcessor->getRealFieldValue(
+                *state, obj_type1, fields, objectSchemaProps, "use_side_design_flow_rate");
+            EXPECT_EQ(numericFieldValue, -99999);
+            // Check an alpha field
+            alphaFieldValue = state->dataInputProcessing->inputProcessor->getAlphaFieldValue(
+                *state, obj_type1, fields, objectSchemaProps, "on_cycle_parasitic_fuel_type");
+            EXPECT_TRUE(UtilityRoutines::SameString(alphaFieldValue, "Electricity"));
+            // Check a defaulted alpha field
+            alphaFieldValue =
+                state->dataInputProcessing->inputProcessor->getAlphaFieldValue(*state, obj_type1, fields, objectSchemaProps, "heater_control_type");
+            EXPECT_TRUE(UtilityRoutines::SameString(alphaFieldValue, "Cycle"));
+        }
+    }
 }
 
 /*
