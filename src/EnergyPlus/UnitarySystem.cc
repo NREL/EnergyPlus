@@ -118,7 +118,8 @@ namespace UnitarySystems {
           no_load_supply_air_flow_rate_per_unit_of_capacity_during_heating_operation(-999.0), maximum_supply_air_temperature(80.0),
           maximum_outdoor_dry_bulb_temperature_for_supplemental_heater_operation(21.0), maximum_cycling_rate(2.5), heat_pump_time_constant(60.0),
           fraction_of_on_cycle_power_use(0.01), heat_pump_fan_delay_time(60.0), ancillary_on_cycle_electric_power(0.0),
-          ancillary_off_cycle_electric_power(0.0), design_heat_recovery_water_flow_rate(0.0), maximum_temperature_for_heat_recovery(80.0)
+          ancillary_off_cycle_electric_power(0.0), design_heat_recovery_water_flow_rate(0.0), maximum_temperature_for_heat_recovery(80.0), 
+          minimum_air_to_water_temperature_offset(0.0)
     {
     }
 
@@ -172,6 +173,7 @@ namespace UnitarySystems {
           m_FaultyCoilSATFlag(false), m_FaultyCoilSATIndex(0), m_FaultyCoilSATOffset(0.0), m_TESOpMode(0), m_initLoadBasedControlAirLoopPass(false),
           m_airLoopPassCounter(0), m_airLoopReturnCounter(0), m_FanCompNotSetYet(true), m_CoolCompNotSetYet(true), m_HeatCompNotSetYet(true),
           m_SuppCompNotSetYet(true), m_OKToPrintSizing(false), m_SmallLoadTolerance(5.0), m_setupOutputVars(false), UnitarySystemType_Num(0),
+          m_waterSideEconomizerFlag(false), m_minAirToWaterTempOffset(0.0),
           MaxIterIndex(0), RegulaFalsiFailedIndex(0), NodeNumOfControlledZone(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0),
           HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0),
           MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0),
@@ -179,7 +181,7 @@ namespace UnitarySystems {
           CoolCoilLoopNum(0), CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0),
           HeatCoilLoopSide(0), HeatCoilBranchNum(0), HeatCoilCompNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0),
           HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0), ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0),
-          m_CompPointerMSHP(nullptr), LoadSHR(0.0), CoilSHR(0.0)
+          m_CompPointerMSHP(nullptr), LoadSHR(0.0), CoilSHR(0.0), WaterSideEconomizerStatus(0)
     {
     }
 
@@ -3014,6 +3016,8 @@ namespace UnitarySystems {
         std::string loc_heatRecoveryOutletNodeName = input_data.heat_recovery_water_outlet_node_name;
         std::string loc_m_DesignSpecMultispeedHPType = input_data.design_specification_multispeed_object_type;
         std::string loc_m_DesignSpecMultispeedHPName = input_data.design_specification_multispeed_object_name;
+        std::string loc_m_waterSideEconomizerChoice = input_data.allow_unitarysystem_as_water_side_eonomizer;
+        Real64 loc_m_MinAir2WaterTempOffset = input_data.minimum_air_to_water_temperature_offset;
 
         int FanInletNode = 0;
         int FanOutletNode = 0;
@@ -6802,6 +6806,16 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
         }
+
+        // set water-side economizer flag
+        if (loc_m_waterSideEconomizerChoice == "YES") {
+            // set water-side economizer temperature offset
+            this->m_minAirToWaterTempOffset = loc_m_MinAir2WaterTempOffset;
+            this->m_waterSideEconomizerFlag = true;
+        } else {
+            this->m_minAirToWaterTempOffset = 0.0;
+            this->m_waterSideEconomizerFlag = false;
+        }
         this->m_setupOutputVars = true;
     }
 
@@ -7042,6 +7056,14 @@ namespace UnitarySystems {
                 if (fields.find("design_specification_multispeed_object_name") != fields.end()) { // not required field
                     input_spec.design_specification_multispeed_object_name =
                         UtilityRoutines::MakeUPPERCase(fields.at("design_specification_multispeed_object_name"));
+                }
+                if (fields.find("allow_unitarysystem_as_water_side_eonomizer") != fields.end()) { // not required field, has default
+                    input_spec.allow_unitarysystem_as_water_side_eonomizer = fields.at("allow_unitarysystem_as_water_side_eonomizer");
+                } else {
+                    input_spec.allow_unitarysystem_as_water_side_eonomizer = "No";
+                }
+                if (fields.find("minimum_air_to_water_temperature_offset") != fields.end()) { // not required field, has default
+                    input_spec.minimum_air_to_water_temperature_offset = fields.at("minimum_air_to_water_temperature_offset");
                 }
 
                 thisSys.processInputSpec(state, input_spec, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);

@@ -118,6 +118,8 @@ namespace UnitarySystems {
         std::string heat_recovery_water_outlet_node_name;
         std::string design_specification_multispeed_object_type;
         std::string design_specification_multispeed_object_name;
+        std::string allow_unitarysystem_as_water_side_eonomizer;
+        Real64 minimum_air_to_water_temperature_offset;
 
         UnitarySysInputSpec();
 
@@ -402,6 +404,9 @@ namespace UnitarySystems {
         Real64 m_SmallLoadTolerance;
         bool m_setupOutputVars;
 
+        bool m_waterSideEconomizerFlag;  // True if water-side economizer coil is active
+        Real64 m_minAirToWaterTempOffset; // coil entering air to entering water temp offset
+ 
     public:
         // SZVAV variables
         int UnitarySystemType_Num;
@@ -448,6 +453,7 @@ namespace UnitarySystems {
         std::string UnitType;
         Real64 LoadSHR; // Load sensible heat ratio with humidity control
         Real64 CoilSHR; // Load sensible heat ratio with humidity control
+        int WaterSideEconomizerStatus ; // water side economizer status flag, report variable 
 
         //    private:
         // private members not initialized in constructor
