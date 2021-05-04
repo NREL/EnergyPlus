@@ -60,7 +60,6 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -7450,16 +7449,16 @@ namespace FluidProperties {
 
         // Perform iterations to obtain the temperature level
         {
-            Array1D<Real64> Par(6);       // Parameters passed to RegulaFalsi
+            std::array<Real64, 3> Par;       // Parameters passed to RegulaFalsi
             Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
             int const MaxIte(500);        // maximum number of iterations
             int SolFla;                   // Flag of RegulaFalsi solver
 
-            Par(1) = RefrigNum;
-            Par(2) = Enthalpy;
-            Par(3) = Pressure;
+            Par[0] = RefrigNum;
+            Par[1] = Enthalpy;
+            Par[2] = Pressure;
 
-            TempSolveRoot::SolveRoot(state, ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par);
+            General::SolveRoot<3>(state, ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par);
             ReturnValue = Temp;
         }
 
@@ -7468,7 +7467,7 @@ namespace FluidProperties {
 
     Real64 GetSupHeatTempRefrigResidual(EnergyPlusData &state,
                                         Real64 const Temp, // temperature of the refrigerant
-                                        Array1D<Real64> const &Par)
+                                        std::array<Real64, 3> const &Par)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Rongpeng Zhang, LBNL
@@ -7515,9 +7514,9 @@ namespace FluidProperties {
         Real64 Enthalpy_Req;     // enthalpy of the refrigerant to meet
         Real64 Enthalpy_Act;     // enthalpy of the refrigerant calculated
 
-        RefrigNum = int(Par(1));
-        Enthalpy_Req = Par(2);
-        Pressure = Par(3);
+        RefrigNum = int(Par[0]);
+        Enthalpy_Req = Par[1];
+        Pressure = Par[2];
         Refrigerant = state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name;
         if (std::abs(Enthalpy_Req) < 100.0) Enthalpy_Req = sign(100.0, Enthalpy_Req);
 
