@@ -4481,11 +4481,11 @@ void InitEMSControlledSurfaceProperties(EnergyPlusData &state)
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int MaterNum;                         // do loop counter over materials
-    int ConstrNum;                        // do loop counter over constructions
-    int TotLayers;                        // count of material layers in a construction
-    int InsideMaterNum;                   // integer pointer for inside face's material layer
-    int OutsideMaterNum;                  // integer pointer for outside face's material layer
+    int MaterNum;        // do loop counter over materials
+    int ConstrNum;       // do loop counter over constructions
+    int TotLayers;       // count of material layers in a construction
+    int InsideMaterNum;  // integer pointer for inside face's material layer
+    int OutsideMaterNum; // integer pointer for outside face's material layer
 
     // first determine if anything needs to be done, once yes, then always init
     for (auto const &mat : state.dataMaterial->Material) {
