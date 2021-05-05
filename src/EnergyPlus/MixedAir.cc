@@ -567,12 +567,36 @@ void SimOAComponent(EnergyPlusData &state,
                     true;
             }
             OACoolingCoil = true;
-            //} else if (SELECT_CASE_var == DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
-            //    if (Sim) {
-            //        SimDXCoolingSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex);
-            //    }
-            //    OACoolingCoil = true;
-        } else if (SELECT_CASE_var == UnitarySystemModel || SELECT_CASE_var == DXSystem) { // AirLoopHVAC:UnitarySystem
+        } else if (SELECT_CASE_var == DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
+            if (Sim) {
+                // SimDXCoolingSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex);
+                if (state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex] == nullptr) {
+                    UnitarySystems::UnitarySys thisSys;
+                    state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex] =
+                        thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
+                    UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, CompName, 0);
+                }
+                bool HeatingActive = false;
+                bool CoolingActive = false;
+                Real64 OAUCoilOutTemp = 0.0;
+                bool ZoneEquipFlag = false;
+                Real64 sensOut = 0.0;
+                Real64 latOut = 0.0;
+                state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(state,
+                                                                                            CompName,
+                                                                                            FirstHVACIteration,
+                                                                                            AirLoopNum,
+                                                                                            CompIndex,
+                                                                                            HeatingActive,
+                                                                                            CoolingActive,
+                                                                                            CompIndex,
+                                                                                            OAUCoilOutTemp,
+                                                                                            ZoneEquipFlag,
+                                                                                            sensOut,
+                                                                                            latOut);
+            }
+            OACoolingCoil = true;
+        } else if (SELECT_CASE_var == UnitarySystemModel) { // AirLoopHVAC:UnitarySystem
             if (Sim) {
                 bool HeatingActive = false;
                 bool CoolingActive = false;
@@ -1094,13 +1118,13 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                     state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = Coil_GasHeat;
                 } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED") {
                     state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = WaterCoil_CoolingHXAsst;
-                    //} else if (SELECT_CASE_var == "COILSYSTEM:COOLING:DX") {
-                    //    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = DXSystem;
+                } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:DX") {
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = DXSystem;
                     // set the data for 100% DOAS DX cooling coil
-                    //    CheckDXCoolingCoilInOASysExists(state, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum));
+                    // CheckDXCoolingCoilInOASysExists(state, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum));
                 } else if (SELECT_CASE_var == "COILSYSTEM:HEATING:DX") {
                     state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = DXHeatPumpSystem;
-                } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM" || SELECT_CASE_var == "COILSYSTEM:COOLING:DX") {
+                } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
                     state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = UnitarySystemModel;
                     state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum) = CompNum;
                     UnitarySystems::UnitarySys thisSys;

@@ -869,7 +869,7 @@ namespace OutdoorAirUnit {
                             } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:DX") {
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = CompType::DXSystem;
                                 // set the data for 100% DOAS DX cooling coil
-                                CheckDXCoolingCoilInOASysExists(state, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName);
+                                // CheckDXCoolingCoilInOASysExists(state, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName);
 
                             } else if (SELECT_CASE_var == "COILSYSTEM:HEATING:DX") {
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = CompType::DXHeatPumpSystem;
@@ -964,6 +964,11 @@ namespace OutdoorAirUnit {
                                               "UNDEFINED",
                                               "UNDEFINED");
                             }
+                        }
+                        // Must call after SetUpCompSets since this will add another CoilSystem:Cooling:DX object in CompSets
+                        if (OutAirUnit(OAUnitNum).OAEquip(InListNum).ComponentType == "COILSYSTEM:COOLING:DX") {
+                            UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(
+                                state, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, OAUnitNum);
                         }
                     } // End Inlist
 
@@ -2474,13 +2479,38 @@ namespace OutdoorAirUnit {
             } break;
             case (CompType::DXSystem): { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
                 if (Sim) {
+                    if (OutAirUnit(OAUnitNum).OAEquip(SimCompNum).compPointer == nullptr) {
+                        UnitarySystems::UnitarySys thisSys;
+                        OutAirUnit(OAUnitNum).OAEquip(SimCompNum).compPointer =
+                            thisSys.factory(state,
+                                            DataHVACGlobals::UnitarySys_AnyCoilType,
+                                            OutAirUnit(OAUnitNum).OAEquip(SimCompNum).ComponentName,
+                                            false,
+                                            OAUnitNum);
+                    }
                     if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Control::Temperature)) ||
                         (OpMode == Operation::HeatingMode)) {
                         Dxsystemouttemp = 100.0; // There is no cooling demand for the DX system.
                     } else {
                         Dxsystemouttemp = CompAirOutTemp - FanEffect;
                     }
-                    SimDXCoolingSystem(state, EquipName, FirstHVACIteration, -1, DXSystemIndex, UnitNum, Dxsystemouttemp);
+                    // SimDXCoolingSystem(state, EquipName, FirstHVACIteration, -1, DXSystemIndex, UnitNum, Dxsystemouttemp);
+                    Real64 sensOut = 0.0;
+                    Real64 latOut = 0.0;
+                    OutAirUnit(OAUnitNum)
+                        .OAEquip(SimCompNum)
+                        .compPointer->simulate(state,
+                                               EquipName,
+                                               FirstHVACIteration,
+                                               -1,
+                                               DXSystemIndex,
+                                               HeatActive,
+                                               CoolActive,
+                                               UnitNum,
+                                               Dxsystemouttemp,
+                                               false,
+                                               sensOut,
+                                               latOut);
                 }
             } break;
             case (CompType::DXHeatPumpSystem): {
