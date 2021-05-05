@@ -75,7 +75,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
 
@@ -1292,7 +1292,7 @@ namespace EvaporativeFluidCoolers {
         // temperature specified in the plant:sizing object
         // is higher than the design entering air wet-bulb temp
         // when autosize feature is used
-        Array1D<Real64> Par(4); // Parameter array need for RegulaFalsi routine
+        std::array<Real64, 4> Par; // Parameter array need for RegulaFalsi routine
 
         Real64 DesEvapFluidCoolerLoad = 0.0; // Design evaporative fluid cooler load [W]
         Real64 tmpDesignWaterFlowRate = this->DesignWaterFlowRate;
@@ -1547,10 +1547,10 @@ namespace EvaporativeFluidCoolers {
                                                                        state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                                        CalledFrom);
                     DesEvapFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * state.dataSize->PlantSizData(PltSizCondNum).DeltaT;
-                    Par(1) = DesEvapFluidCoolerLoad;
-                    Par(2) = rho * tmpDesignWaterFlowRate; // Design water mass flow rate
-                    Par(3) = tmpHighSpeedAirFlowRate;      // Design air volume flow rate
-                    Par(4) = Cp;
+                    Par[0] = DesEvapFluidCoolerLoad;
+                    Par[1] = rho * tmpDesignWaterFlowRate; // Design water mass flow rate
+                    Par[2] = tmpHighSpeedAirFlowRate;      // Design air volume flow rate
+                    Par[3] = Cp;
 
                     // Lower bound for UA [W/C]
                     Real64 UA0 = 0.0001 * DesEvapFluidCoolerLoad; // Assume deltaT = 10000K (limit)
@@ -1562,14 +1562,14 @@ namespace EvaporativeFluidCoolers {
                     this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                     this->inletConds.AirHumRat =
                         Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
-                    TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
+                    General::SolveRoot<4>(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                     if (SolFla == -1) {
                         ShowWarningError(state, "Iteration limit exceeded in calculating evaporative fluid cooler UA.");
                         ShowContinueError(state, "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + this->Name);
                         ShowContinueError(state, format("The final UA value = {:.2R}W/C, and the simulation continues...", UA));
                     } else if (SolFla == -2) {
-                        this->SimSimpleEvapFluidCooler(state, Par(2), Par(3), UA0, OutWaterTempAtUA0);
-                        this->SimSimpleEvapFluidCooler(state, Par(2), Par(3), UA1, OutWaterTempAtUA1);
+                        this->SimSimpleEvapFluidCooler(state, Par[1], Par[2], UA0, OutWaterTempAtUA0);
+                        this->SimSimpleEvapFluidCooler(state, Par[1], Par[2], UA1, OutWaterTempAtUA1);
                         ShowSevereError(state, CalledFrom + ": The combination of design input values did not allow the calculation of a ");
                         ShowContinueError(state, "reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                         ShowContinueError(state,
@@ -1586,10 +1586,10 @@ namespace EvaporativeFluidCoolers {
                             "based on the autosized values shown below or to adjust design evaporative fluid cooler air inlet wet-bulb temperature.");
                         ShowContinueError(state, "Plant:Sizing object inputs also influence these results (e.g. DeltaT and ExitTemp).");
                         ShowContinueError(state, "Inputs to the evaporative fluid cooler object:");
-                        ShowContinueError(state, format("Design Evaporative Fluid Cooler Load [W]                      = {:.2R}", Par(1)));
+                        ShowContinueError(state, format("Design Evaporative Fluid Cooler Load [W]                      = {:.2R}", Par[0]));
                         ShowContinueError(
                             state, format("Design Evaporative Fluid Cooler Water Volume Flow Rate [m3/s] = {:.6R}", this->DesignWaterFlowRate));
-                        ShowContinueError(state, format("Design Evaporative Fluid Cooler Air Volume Flow Rate [m3/s]   = {:.2R}", Par(3)));
+                        ShowContinueError(state, format("Design Evaporative Fluid Cooler Air Volume Flow Rate [m3/s]   = {:.2R}", Par[2]));
                         ShowContinueError(
                             state, format("Design Evaporative Fluid Cooler Air Inlet Wet-bulb Temp [C]   = {:.2R}", this->inletConds.AirWetBulb));
                         ShowContinueError(
@@ -1667,10 +1667,10 @@ namespace EvaporativeFluidCoolers {
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
                     state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, 35.0, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
                 DesEvapFluidCoolerLoad = this->HighSpeedStandardDesignCapacity * this->HeatRejectCapNomCapSizingRatio;
-                Par(1) = DesEvapFluidCoolerLoad;
-                Par(2) = rho * this->DesignWaterFlowRate; // Design water mass flow rate
-                Par(3) = this->HighSpeedAirFlowRate;      // Design air volume flow rate
-                Par(4) = Cp;
+                Par[0] = DesEvapFluidCoolerLoad;
+                Par[1] = rho * this->DesignWaterFlowRate; // Design water mass flow rate
+                Par[2] = this->HighSpeedAirFlowRate;      // Design air volume flow rate
+                Par[3] = Cp;
                 Real64 UA0 = 0.0001 * DesEvapFluidCoolerLoad; // Assume deltaT = 10000K (limit)
                 Real64 UA1 = DesEvapFluidCoolerLoad;          // Assume deltaT = 1K
                 this->inletConds.WaterTemp = 35.0;            // 95F design inlet water temperature
@@ -1679,7 +1679,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                 this->inletConds.AirHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
-                TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
+                General::SolveRoot<4>(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowWarningError(state, "Iteration limit exceeded in calculating evaporative fluid cooler UA.");
                     ShowContinueError(state, "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + this->Name);
@@ -1741,10 +1741,10 @@ namespace EvaporativeFluidCoolers {
                                                                    state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                                    CalledFrom);
                 DesEvapFluidCoolerLoad = this->HighSpeedUserSpecifiedDesignCapacity;
-                Par(1) = DesEvapFluidCoolerLoad;
-                Par(2) = rho * tmpDesignWaterFlowRate; // Design water mass flow rate
-                Par(3) = tmpHighSpeedAirFlowRate;      // Design air volume flow rate
-                Par(4) = Cp;
+                Par[0] = DesEvapFluidCoolerLoad;
+                Par[1] = rho * tmpDesignWaterFlowRate; // Design water mass flow rate
+                Par[2] = tmpHighSpeedAirFlowRate;      // Design air volume flow rate
+                Par[3] = Cp;
                 Real64 UA0 = 0.0001 * DesEvapFluidCoolerLoad; // Assume deltaT = 10000K (limit)
                 Real64 UA1 = DesEvapFluidCoolerLoad;          // Assume deltaT = 1K
 
@@ -1754,14 +1754,14 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                 this->inletConds.AirHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
-                TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
+                General::SolveRoot<4>(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowWarningError(state, "Iteration limit exceeded in calculating evaporative fluid cooler UA.");
                     ShowContinueError(state, "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + this->Name);
                     ShowContinueError(state, format("The final UA value = {:.2R}W/C, and the simulation continues...", UA));
                 } else if (SolFla == -2) {
-                    this->SimSimpleEvapFluidCooler(state, Par(2), Par(3), UA0, OutWaterTempAtUA0);
-                    this->SimSimpleEvapFluidCooler(state, Par(2), Par(3), UA1, OutWaterTempAtUA1);
+                    this->SimSimpleEvapFluidCooler(state, Par[1], Par[2], UA0, OutWaterTempAtUA0);
+                    this->SimSimpleEvapFluidCooler(state, Par[1], Par[2], UA1, OutWaterTempAtUA1);
                     ShowSevereError(state, CalledFrom + ": The combination of design input values did not allow the calculation of a ");
                     ShowContinueError(state, "reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                     ShowContinueError(
@@ -1778,10 +1778,10 @@ namespace EvaporativeFluidCoolers {
                         "based on the autosized values shown below or to adjust design evaporative fluid cooler air inlet wet-bulb temperature.");
                     ShowContinueError(state, "Plant:Sizing object inputs also influence these results (e.g. DeltaT and ExitTemp).");
                     ShowContinueError(state, "Inputs to the evaporative fluid cooler object:");
-                    ShowContinueError(state, format("Design Evaporative Fluid Cooler Load [W]                      = {:.2R}", Par(1)));
+                    ShowContinueError(state, format("Design Evaporative Fluid Cooler Load [W]                      = {:.2R}", Par[0]));
                     ShowContinueError(state,
                                       format("Design Evaporative Fluid Cooler Water Volume Flow Rate [m3/s] = {:.6R}", this->DesignWaterFlowRate));
-                    ShowContinueError(state, format("Design Evaporative Fluid Cooler Air Volume Flow Rate [m3/s]   = {:.2R}", Par(3)));
+                    ShowContinueError(state, format("Design Evaporative Fluid Cooler Air Volume Flow Rate [m3/s]   = {:.2R}", Par[2]));
                     ShowContinueError(state,
                                       format("Design Evaporative Fluid Cooler Air Inlet Wet-bulb Temp [C]   = {:.2R}", this->inletConds.AirWetBulb));
                     ShowContinueError(state,
@@ -1896,10 +1896,10 @@ namespace EvaporativeFluidCoolers {
                                                                    state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                                    CalledFrom);
                 DesEvapFluidCoolerLoad = this->LowSpeedStandardDesignCapacity * this->HeatRejectCapNomCapSizingRatio;
-                Par(1) = DesEvapFluidCoolerLoad;
-                Par(2) = rho * tmpDesignWaterFlowRate; // Design water mass flow rate
-                Par(3) = this->LowSpeedAirFlowRate;    // Air volume flow rate at low fan speed
-                Par(4) = Cp;
+                Par[0] = DesEvapFluidCoolerLoad;
+                Par[1] = rho * tmpDesignWaterFlowRate; // Design water mass flow rate
+                Par[2] = this->LowSpeedAirFlowRate;    // Air volume flow rate at low fan speed
+                Par[3] = Cp;
                 Real64 UA0 = 0.0001 * DesEvapFluidCoolerLoad; // Assume deltaT = 10000K (limit)
                 Real64 UA1 = DesEvapFluidCoolerLoad;          // Assume deltaT = 1K
                 this->inletConds.WaterTemp = 35.0;            // 95F design inlet water temperature
@@ -1908,7 +1908,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                 this->inletConds.AirHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
-                TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
+                General::SolveRoot<4>(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowWarningError(state, "Iteration limit exceeded in calculating evaporative fluid cooler UA.");
                     ShowContinueError(state, "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + this->Name);
@@ -1953,10 +1953,10 @@ namespace EvaporativeFluidCoolers {
                                                                    state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                                    CalledFrom);
                 DesEvapFluidCoolerLoad = this->LowSpeedUserSpecifiedDesignCapacity;
-                Par(1) = DesEvapFluidCoolerLoad;
-                Par(2) = rho * tmpDesignWaterFlowRate; // Design water mass flow rate
-                Par(3) = this->LowSpeedAirFlowRate;    // Air volume flow rate at low fan speed
-                Par(4) = Cp;
+                Par[0] = DesEvapFluidCoolerLoad;
+                Par[1] = rho * tmpDesignWaterFlowRate; // Design water mass flow rate
+                Par[2] = this->LowSpeedAirFlowRate;    // Air volume flow rate at low fan speed
+                Par[3] = Cp;
                 Real64 UA0 = 0.0001 * DesEvapFluidCoolerLoad; // Assume deltaT = 10000K (limit)
                 Real64 UA1 = DesEvapFluidCoolerLoad;          // Assume deltaT = 1K
                 this->inletConds.WaterTemp = this->DesignEnteringWaterTemp;
@@ -1965,13 +1965,13 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                 this->inletConds.AirHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
-                TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
+                General::SolveRoot<4>(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating EvaporativeFluidCooler UA");
                     ShowFatalError(state, "Autosizing of EvaporativeFluidCooler UA failed for EvaporativeFluidCooler " + this->Name);
                 } else if (SolFla == -2) {
-                    this->SimSimpleEvapFluidCooler(state, Par(2), Par(3), UA0, OutWaterTempAtUA0);
-                    this->SimSimpleEvapFluidCooler(state, Par(2), Par(3), UA1, OutWaterTempAtUA1);
+                    this->SimSimpleEvapFluidCooler(state, Par[1], Par[2], UA0, OutWaterTempAtUA0);
+                    this->SimSimpleEvapFluidCooler(state, Par[1], Par[2], UA1, OutWaterTempAtUA1);
                     ShowSevereError(state, CalledFrom + ": The combination of design input values did not allow the calculation of a ");
                     ShowContinueError(state, "reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                     ShowContinueError(
@@ -1983,9 +1983,9 @@ namespace EvaporativeFluidCoolers {
                     ShowContinueError(state, "temperatures calculated at high and low UA values. If the Design Exit Water Temperature is ");
                     ShowContinueError(state, "out of this range, the solution will not converge and UA will not be calculated. ");
                     ShowContinueError(state, "Inputs to the Evaporative Fluid Cooler model are:");
-                    ShowContinueError(state, format("Design Evaporative Fluid Cooler Load                    = {:.2R}", Par(1)));
-                    ShowContinueError(state, format("Design Evaporative Fluid Cooler Water Volume Flow Rate  = {:.2R}", Par(2)));
-                    ShowContinueError(state, format("Design Evaporative Fluid Cooler Air Volume Flow Rate    = {:.2R}", Par(3)));
+                    ShowContinueError(state, format("Design Evaporative Fluid Cooler Load                    = {:.2R}", Par[0]));
+                    ShowContinueError(state, format("Design Evaporative Fluid Cooler Water Volume Flow Rate  = {:.2R}", Par[1]));
+                    ShowContinueError(state, format("Design Evaporative Fluid Cooler Air Volume Flow Rate    = {:.2R}", Par[2]));
                     ShowContinueError(state, format("Design Evaporative Fluid Cooler Air Inlet Wet-bulb Temp = {:.2R}", this->inletConds.AirWetBulb));
                     ShowContinueError(state, format("Design Evaporative Fluid Cooler Water Inlet Temp        = {:.2R}", this->inletConds.WaterTemp));
                     ShowContinueError(state,
@@ -2432,7 +2432,7 @@ namespace EvaporativeFluidCoolers {
         }
     }
 
-    Real64 EvapFluidCoolerSpecs::SimpleEvapFluidCoolerUAResidual(EnergyPlusData &state, Real64 const UA, Array1D<Real64> const &Par)
+    Real64 EvapFluidCoolerSpecs::SimpleEvapFluidCoolerUAResidual(EnergyPlusData &state, Real64 const UA, std::array<Real64, 4> const &Par)
     {
 
         // FUNCTION INFORMATION:
@@ -2464,9 +2464,9 @@ namespace EvaporativeFluidCoolers {
         Real64 OutWaterTemp;  // outlet water temperature [C]
         Real64 CoolingOutput; // Evaporative fluid cooler cooling output [W]
 
-        this->SimSimpleEvapFluidCooler(state, Par(2), Par(3), UA, OutWaterTemp);
-        CoolingOutput = Par(4) * Par(2) * (this->inletConds.WaterTemp - OutWaterTemp);
-        Residuum = (Par(1) - CoolingOutput) / Par(1);
+        this->SimSimpleEvapFluidCooler(state, Par[1], Par[2], UA, OutWaterTemp);
+        CoolingOutput = Par[3] * Par[1] * (this->inletConds.WaterTemp - OutWaterTemp);
+        Residuum = (Par[0] - CoolingOutput) / Par[0];
         return Residuum;
     }
 
