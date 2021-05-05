@@ -257,7 +257,7 @@ void ManageHVAC(EnergyPlusData &state)
     ManageHybridVentilation(state);
 
     CalcAirFlowSimple(state);
-    if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
+    if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
         state.dataAirflowNetwork->RollBackFlag = false;
         ManageAirflowNetworkBalance(state, false);
     }
@@ -318,8 +318,7 @@ void ManageHVAC(EnergyPlusData &state)
 
             ManageHybridVentilation(state);
             CalcAirFlowSimple(state, SysTimestepLoop);
-            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
-                static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
+            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 state.dataAirflowNetwork->RollBackFlag = false;
                 ManageAirflowNetworkBalance(state, false);
             }
@@ -1875,7 +1874,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
     if (FirstHVACIteration) {
         state.dataHVACMgr->RepIterAir = 0;
         // Call AirflowNetwork simulation to calculate air flows and pressures
-        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
             ManageAirflowNetworkBalance(state, FirstHVACIteration);
         }
         ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
@@ -1901,8 +1900,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
             ++IterAir; // Increment the iteration counter
             // Call AirflowNetwork simulation to calculate air flows and pressures
             ResimulateAirZone = false;
-            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
-                static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
+            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 ManageAirflowNetworkBalance(state, FirstHVACIteration, IterAir, ResimulateAirZone);
             }
             if (SimAirLoops) {
@@ -1928,8 +1926,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
             state.dataHVACMgr->FlowMaxAvailAlreadyReset = false;
 
             //      IterAir = IterAir + 1   ! Increment the iteration counter
-            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
-                static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple)) {
+            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 if (ResimulateAirZone) { // Need to make sure that SimAirLoop and SimZoneEquipment are simulated
                     SimAirLoops = true;  // at min three times using ONOFF fan with the AirflowNetwork model
                     SimZoneEquipment = true;
@@ -2349,17 +2346,16 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     auto &TimeStepSys(state.dataHVACGlobal->TimeStepSys);
 
     // Ensure no airflownetwork and simple calculations
-    if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControl::Unassigned) return;
+    if (state.dataAirflowNetwork->SimulateAirflowNetwork == 0) return;
 
-    if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetwork::AirflowNetworkControl::Simple))
-        ReportAirflowNetwork(state);
+    if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) ReportAirflowNetwork(state);
 
     // Reports zone exhaust loss by exhaust fans
     for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
         CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
         H2OHtOfVap = PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
         ADSCorrectionFactor = 1.0;
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControl::SimpleADS) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
             if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
                 state.dataAirflowNetwork->AirflowNetworkZoneFlag(ZoneLoop)) {
                 ADSCorrectionFactor = 0.0;
