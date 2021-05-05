@@ -5878,7 +5878,6 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;
-        int SurfNum;
 
         // Record Maxs & Mins for individual zone
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -5940,8 +5939,8 @@ namespace HeatBalanceManager {
         // Update interior movable insulation flag--needed at the end of a zone time step so that the interior radiant
         // exchange algorithm knows whether there has been a change in interior movable insulation or not.
         if (state.dataSurface->AnyMovableInsulation) {
-            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                state.dataHeatBalSurf->SurfMovInsulIntPresentPrevTS(SurfNum) = state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum);
+            for (int surfNum : state.dataHeatBalSurf->SurfMovInsulIndexList) {
+                state.dataHeatBalSurf->SurfMovInsulIntPresentPrevTS(surfNum) = state.dataHeatBalSurf->SurfMovInsulIntPresent(surfNum);
             }
         }
 

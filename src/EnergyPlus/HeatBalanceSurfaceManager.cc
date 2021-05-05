@@ -394,23 +394,23 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
         state.dataRoomAirMod->IsZoneCV.dimension(state.dataGlobal->NumOfZones, false);
         state.dataRoomAirMod->IsZoneUI.dimension(state.dataGlobal->NumOfZones, false);
     }
-    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
-        int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
-        for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
-            int ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum); // SurfActiveConstruction set at InitHeatBalance
-            if (ConstrNum > 0) {
-                state.dataHeatBalSurf->SurfAbsSolarInt(SurfNum) = state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar;
-                state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum) = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
-                state.dataHeatBalSurf->SurfRoughnessExt(SurfNum) =
-                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
-                state.dataHeatBalSurf->SurfAbsSolarExt(SurfNum) =
-                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
-                state.dataHeatBalSurf->SurfAbsThermalExt(SurfNum) =
-                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+    if (state.dataGlobal->BeginSimFlag || state.dataGlobal->SurfPropOverridesPresent) {
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
+            int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
+            for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+                int ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum); // SurfActiveConstruction set above
+                if (ConstrNum > 0) {
+                    state.dataHeatBalSurf->SurfAbsSolarInt(SurfNum) = state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar;
+                    state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum) = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
+                    state.dataHeatBalSurf->SurfRoughnessExt(SurfNum) = state.dataConstruction->Construct(ConstrNum).OutsideRoughness;
+                    state.dataHeatBalSurf->SurfAbsSolarExt(SurfNum) = state.dataConstruction->Construct(ConstrNum).OutsideAbsorpSolar;
+                    state.dataHeatBalSurf->SurfAbsThermalExt(SurfNum) = state.dataConstruction->Construct(ConstrNum).OutsideAbsorpThermal;
+                }
             }
         }
     }
+
     // Do the Begin Environment initializations
     if (state.dataGlobal->BeginEnvrnFlag) {
         if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Temperature and Flux Histories");
@@ -1493,7 +1493,6 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
 
     state.dataSurface->SurfSkySolarInc.dimension(state.dataSurface->TotSurfaces, 0);
     state.dataSurface->SurfGndSolarInc.dimension(state.dataSurface->TotSurfaces, 0);
-
     // allocate movable insulation arrays
     if (state.dataSurface->AnyMovableInsulation) {
         state.dataHeatBalSurf->SurfMovInsulExtPresent.dimension(state.dataSurface->TotSurfaces, false);
@@ -1507,7 +1506,6 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     state.dataHeatBalSurf->SurfRoughnessExt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfAbsSolarInt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfAbsThermalInt.dimension(state.dataSurface->TotSurfaces, 0.0);
-
     DisplayString(state, "Setting up Surface Reporting Variables");
     // Setup surface report variables CurrentModuleObject='Opaque Surfaces'
     for (int loop = 1; loop <= state.dataSurface->TotSurfaces; ++loop) {
@@ -3625,6 +3623,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
             int const ConstrNum = Surface(SurfNum).Construction;
 
             Real64 AbsIntSurf = state.dataHeatBalSurf->SurfAbsSolarInt(SurfNum);
+            // TODO - AbsIntSurfVis = InsideAbsorpSolar instead of InsideAbsorpVis?
             Real64 AbsIntSurfVis =
                 state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar; // Inside opaque surface visible absorptance to fix CR 8695 change to
 
@@ -4482,7 +4481,6 @@ void InitEMSControlledSurfaceProperties(EnergyPlusData &state)
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool SurfPropOverridesPresent(false); // detect if EMS ever used for this and inits need to execute
     int MaterNum;                         // do loop counter over materials
     int ConstrNum;                        // do loop counter over constructions
     int TotLayers;                        // count of material layers in a construction
@@ -4492,12 +4490,12 @@ void InitEMSControlledSurfaceProperties(EnergyPlusData &state)
     // first determine if anything needs to be done, once yes, then always init
     for (auto const &mat : state.dataMaterial->Material) {
         if ((mat.AbsorpSolarEMSOverrideOn) || (mat.AbsorpThermalEMSOverrideOn) || (mat.AbsorpVisibleEMSOverrideOn)) {
-            SurfPropOverridesPresent = true;
+            state.dataGlobal->SurfPropOverridesPresent = true;
             break;
         }
     }
 
-    if (!SurfPropOverridesPresent) return; // quick return if nothing has ever needed to be done
+    if (!state.dataGlobal->SurfPropOverridesPresent) return; // quick return if nothing has ever needed to be done
 
     // first, loop over materials
     for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
@@ -4575,10 +4573,10 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
 
             if ((state.dataRuntimeLang->EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) &&
                 (state.dataRuntimeLang->EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum))) {
-
-                Surface(SurfNum).Construction = Surface(SurfNum).EMSConstructionOverrideValue;
+                int ConstrNum = Surface(SurfNum).EMSConstructionOverrideValue;
+                Surface(SurfNum).Construction = ConstrNum;
                 state.dataConstruction->Construct(Surface(SurfNum).Construction).IsUsed = true;
-                state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+                state.dataSurface->SurfActiveConstruction(SurfNum) = ConstrNum;
 
             } else { // have not checked yet or is not okay, so see if we need to warn about incompatible
                 if (!state.dataRuntimeLang->EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) {

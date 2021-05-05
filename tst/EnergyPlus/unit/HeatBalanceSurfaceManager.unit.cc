@@ -764,7 +764,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataMstBal->HConvInFD.allocate(6);
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
-
+    state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
@@ -1301,6 +1301,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
 
+    state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
@@ -1870,6 +1871,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
 
+    state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
@@ -2442,6 +2444,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
 
+    state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
@@ -3068,6 +3071,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
 
+    state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
@@ -3085,6 +3089,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     EXPECT_FALSE(state->dataHeatBalSurf->InterZoneWindow);
     EXPECT_FALSE(allocated(state->dataHeatBalSurf->FractDifShortZtoZ));
 
+    state->dataGlobal->BeginSimFlag = false;
     state->dataHeatBalSurf->InterZoneWindow = true;
     InitSurfaceHeatBalance(*state);
 
