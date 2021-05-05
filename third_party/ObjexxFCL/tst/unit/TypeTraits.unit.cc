@@ -46,11 +46,6 @@ TEST( TypeTraitsTest, TypeTests )
 	EXPECT_FALSE( same_type_as( b, d ) );
 	EXPECT_FALSE( same_type_as( d, b ) );
 
-	EXPECT_TRUE( extends_type_of( b, b ) );
-	EXPECT_TRUE( extends_type_of( d, d ) );
-	EXPECT_TRUE( extends_type_of( d, b ) );
-	EXPECT_FALSE( extends_type_of( b, d ) );
-
 //	B * p( &d ); // polymorphic pointer
 //	EXPECT_DEBUG_DEATH( extends_type_of( d, *p ), "Assertion failed!" );
 

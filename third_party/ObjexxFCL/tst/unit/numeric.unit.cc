@@ -13,7 +13,6 @@
 // C++ Headers
 #include <cmath>
 #include <cstdint>
-#include <cstring>
 #include <limits>
 #include <string>
 
@@ -151,146 +150,6 @@ TEST( NumericTest, SELECTED_INT_KIND )
 
 	for ( int i = 0; i < N; ++i ) {
 		EXPECT_EQ( tests[ i ].output, SELECTED_INT_KIND( tests[ i ].input ) );
-	}
-}
-
-TEST( NumericTest, SELECTED_REAL_KIND )
-{
-	int const min( std::numeric_limits<int>::min() );
-	int const max( std::numeric_limits<int>::max() );
-	const struct {
-		int input1;
-		int input2;
-		int output;
-	} tests[] = {
-    { -1,  min, -3 },
-    { -1,   -1, -3 },
-    { -1,    0, -1 },
-    { -1,   37, -1 },
-    { -1,   38, -1 },
-    { -1,  307, -1 },
-    { -1,  308, -1 },
-    { -1, 4931, -1 },
-    { -1, 4932, -3 },
-    { -1,  max, -3 },
-
-    {  0,  min, -2 },
-    {  0,   -1, -2 },
-    {  0,    0,  4 },
-    {  0,   37,  4 },
-    {  0,   38,  8 },
-    {  0,  307,  8 },
-    {  0,  308, 16 },
-    {  0, 4931, 16 },
-    {  0, 4932, -2 },
-    {  0,  max, -2 },
-
-    {  2,   38,  8 },
-    { 16,    3, 16 },
-
-    {  6,  min, -2 },
-    {  6,   -1, -2 },
-    {  6,    0,  4 },
-    {  6,   37,  4 },
-    {  6,   38,  8 },
-    {  6,  307,  8 },
-    {  6,  308, 16 },
-    {  6, 4931, 16 },
-    {  6, 4932, -2 },
-    {  6,  max, -2 },
-
-    {  7,  min, -2 },
-    {  7,   -1, -2 },
-    {  7,    0,  8 },
-    {  7,   37,  8 },
-    {  7,   38,  8 },
-    {  7,  307,  8 },
-    {  7,  308, 16 },
-    {  7, 4931, 16 },
-    {  7, 4932, -2 },
-    {  7,  max, -2 },
-
-    { 15,  min, -2 },
-    { 15,   -1, -2 },
-    { 15,    0,  8 },
-    { 15,   37,  8 },
-    { 15,   38,  8 },
-    { 15,  307,  8 },
-    { 15,  308, 16 },
-    { 15, 4931, 16 },
-    { 15, 4932, -2 },
-    { 15,  max, -2 },
-
-    { 16,  min, -2 },
-    { 16,   -1, -2 },
-    { 16,    0, 16 },
-    { 16,   37, 16 },
-    { 16,   38, 16 },
-    { 16,  307, 16 },
-    { 16,  308, 16 },
-    { 16, 4931, 16 },
-    { 16, 4932, -2 },
-    { 16,  max, -2 },
-
-    { 33,  min, -2 },
-    { 33,   -1, -2 },
-    { 33,    0, 16 },
-    { 33,   37, 16 },
-    { 33,   38, 16 },
-    { 33,  307, 16 },
-    { 33,  308, 16 },
-    { 33, 4931, 16 },
-    { 33, 4932, -2 },
-    { 33,  max, -2 },
-
-    { 34,  min, -3 },
-    { 34,   -1, -3 },
-    { 34,    0, -1 },
-    { 34,   37, -1 },
-    { 34,   38, -1 },
-    { 34,  307, -1 },
-    { 34,  308, -1 },
-    { 34, 4931, -1 },
-    { 34, 4932, -3 },
-    { 34,  max, -3 }
-	};
-	int const N( ARRAY_LENGTH(tests) );
-
-	for ( int i = 0; i < N; ++i ) {
-		EXPECT_EQ( tests[ i ].output, SELECTED_REAL_KIND( tests[ i ].input1, tests[ i ].input2 ) );
-	}
-}
-
-TEST( NumericTest, SELECTED_CHAR_KIND )
-{
-	{
-		const struct {
-			char const * input;
-			int output;
-		} tests[] = {
-		 { "DEFAULT", 1 }, { "ASCII", 1 },
-		 { "default", -1 }, { "ascii", -1 }, { "", -1 },
-		};
-		int const N( ARRAY_LENGTH(tests) );
-
-		for ( int i = 0; i < N; ++i ) {
-			EXPECT_EQ( tests[ i ].output, SELECTED_CHAR_KIND( std::string( tests[ i ].input ) ) );
-		}
-	}
-
-	{
-		const struct {
-			char input;
-			int output;
-		} tests[] = {
-		 { 'a', -1 }, { 'A', -1 }, { '0', -1 }, { '.', -1 },
-		 { ' ', -1 }, { '\n', -1 }, { '\0', -1 },
-		};
-		int const N( ARRAY_LENGTH(tests) );
-
-		for ( int i = 0; i < N; ++i ) {
-			EXPECT_EQ( tests[ i ].output, SELECTED_CHAR_KIND( tests[ i ].input ) );
-		}
 	}
 }
 
@@ -463,13 +322,6 @@ TEST( NumericTest, MINEXPONENT )
 	EXPECT_EQ( std::numeric_limits< longdouble >::min_exponent, MINEXPONENT( longdouble() ) );
 }
 
-TEST( NumericTest, MAXEXPONENT )
-{
-	EXPECT_EQ( std::numeric_limits< float >::max_exponent, MAXEXPONENT( float() ) );
-	EXPECT_EQ( std::numeric_limits< double >::max_exponent, MAXEXPONENT( double() ) );
-	EXPECT_EQ( std::numeric_limits< longdouble >::max_exponent, MAXEXPONENT( longdouble() ) );
-}
-
 TEST( NumericTest, EXPONENT )
 {
 	EXPECT_EQ( 0, EXPONENT( float() ) );
@@ -491,13 +343,6 @@ TEST( NumericTest, EXPONENT )
 	EXPECT_EQ( 0, EXPONENT( float() ) );
 	EXPECT_EQ( 0, EXPONENT( double() ) );
 	EXPECT_EQ( 0, EXPONENT( longdouble() ) );
-}
-
-TEST( NumericTest, SET_EXPONENT )
-{
-	EXPECT_EQ( 0, SET_EXPONENT( float(), 1 ) );
-	EXPECT_EQ( 0, SET_EXPONENT( double(), 1 ) );
-	EXPECT_EQ( 0, SET_EXPONENT( longdouble(), 1 ) );
 }
 
 TEST( NumericTest, SCALE )
@@ -528,17 +373,6 @@ TEST( NumericTest, SPACING )
 {
 	EXPECT_EQ( SPACING( 0.0 ), TINY( 1.0 ) );
 	EXPECT_EQ( SPACING( 1.0 ), EPSILON( 1.0 ) );
-}
-
-TEST( NumericTest, RECIPROCAL_RELATIVE_SPACING )
-{
-	EXPECT_EQ( RECIPROCAL_RELATIVE_SPACING( +0.0 ), 0.0 );
-	EXPECT_DOUBLE_EQ( RECIPROCAL_RELATIVE_SPACING( +2.0 ), 4.503599627370496E+15 );
-	EXPECT_DOUBLE_EQ( RECIPROCAL_RELATIVE_SPACING( -2.0 ), 4.503599627370496E+15 );
-	EXPECT_DOUBLE_EQ( RECIPROCAL_RELATIVE_SPACING( +3.0 ), 6.755399441055744E+15 );
-	EXPECT_DOUBLE_EQ( RECIPROCAL_RELATIVE_SPACING( -3.0 ), 6.755399441055744E+15 );
-	EXPECT_DOUBLE_EQ( RECIPROCAL_RELATIVE_SPACING( +9.0 ), 5.066549580791808E+15 );
-	EXPECT_DOUBLE_EQ( RECIPROCAL_RELATIVE_SPACING( -9.0 ), 5.066549580791808E+15 );
 }
 
 TEST( NumericTest, NEAREST )

@@ -107,8 +107,7 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~ArrayS()
-	{}
+	~ArrayS() = default;
 
 public: // Predicate
 
