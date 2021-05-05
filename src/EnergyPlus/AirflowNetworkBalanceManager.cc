@@ -184,7 +184,7 @@ namespace AirflowNetworkBalanceManager {
             ResimulateAirZone = false;
         }
 
-        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) < static_cast<int>(AirflowNetworkControl::Multizone)) return;
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork < AirflowNetworkControlMultizone) return;
 
         if (state.dataGlobal->BeginEnvrnFlag) {
             TurnFansOn = false; // The FAN should be off when BeginEnvrnFlag = .True.
@@ -200,8 +200,7 @@ namespace AirflowNetworkBalanceManager {
 
         state.dataAirflowNetwork->AirflowNetworkFanActivated = false;
 
-        if (present(FirstHVACIteration) &&
-            static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >= static_cast<int>(AirflowNetworkControl::SimpleADS)) {
+        if (present(FirstHVACIteration) && state.dataAirflowNetwork->SimulateAirflowNetwork >= AirflowNetworkControlSimpleADS) {
             if (FirstHVACIteration) {
                 if (allocated(state.dataAirLoop->AirLoopAFNInfo)) {
                     for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
@@ -253,8 +252,7 @@ namespace AirflowNetworkBalanceManager {
         if (state.dataAirflowNetworkBalanceManager->VentilationCtrl == 1 && state.dataHVACGlobal->NumHybridVentSysAvailMgrs > 0)
             state.dataAirflowNetwork->AirflowNetworkFanActivated = false;
 
-        if (present(Iter) && present(ResimulateAirZone) &&
-            static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >= static_cast<int>(AirflowNetworkControl::SimpleADS)) {
+        if (present(Iter) && present(ResimulateAirZone) && state.dataAirflowNetwork->SimulateAirflowNetwork >= AirflowNetworkControlSimpleADS) {
             if (state.dataAirflowNetwork->AirflowNetworkFanActivated && Iter < 3 && AFNSupplyFanType == FanType_SimpleOnOff) {
                 ResimulateAirZone = true;
             }
@@ -266,7 +264,7 @@ namespace AirflowNetworkBalanceManager {
             }
         }
         if (state.dataAirflowNetwork->AirflowNetworkFanActivated &&
-            static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetworkControl::Multizone)) {
+            state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
             NetworkNumOfNodes = state.dataAirflowNetwork->AirflowNetworkNumOfNodes;
             NetworkNumOfLinks = state.dataAirflowNetwork->AirflowNetworkNumOfLinks;
         }
@@ -283,7 +281,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         if (state.dataAirflowNetwork->AirflowNetworkFanActivated &&
-            static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetworkControl::Multizone)) {
+            state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
             if (state.dataAirflowNetworkBalanceManager->ValidateDistributionSystemFlag) {
                 ValidateDistributionSystem(state);
                 ValidateFanFlowRate(state);
@@ -293,7 +291,7 @@ namespace AirflowNetworkBalanceManager {
         CalcAirflowNetworkAirBalance(state);
 
         if (state.dataAirflowNetwork->AirflowNetworkFanActivated &&
-            static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetworkControl::Multizone)) {
+            state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
 
             state.dataAirflowNetworkBalanceManager->LoopOnOffFlag = false;
             for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
@@ -1913,13 +1911,13 @@ namespace AirflowNetworkBalanceManager {
                 state.dataAirflowNetwork->AirflowNetworkSimu.Azimuth = 0.0;
                 state.dataAirflowNetwork->AirflowNetworkSimu.AspectRatio = 1.0;
                 state.dataAirflowNetwork->AirflowNetworkSimu.MaxPressure = 500.0; // Maximum pressure difference by default
-                state.dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetworkControl::Multizone;
+                state.dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetworkControlMultizone;
                 SimAirNetworkKey = "MultizoneWithoutDistribution";
                 state.dataAirflowNetwork->AirflowNetworkSimu.InitFlag = 1;
                 ShowWarningError(state, RoutineName + CurrentModuleObject + " object is not found ");
                 ShowContinueError(state, "..The default behaviour values are assigned. Please see details in Input Output Reference.");
             } else {
-                state.dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetworkControl::Simple;
+                state.dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetworkControlSimple;
                 print(state.files.eio, Format_110);
                 print(state.files.eio, Format_120, "NoMultizoneOrDistribution");
                 return;
@@ -1960,16 +1958,16 @@ namespace AirflowNetworkBalanceManager {
             {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(state.dataAirflowNetwork->AirflowNetworkSimu.Control));
                 if (SELECT_CASE_var == "NOMULTIZONEORDISTRIBUTION") {
-                    state.dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetworkControl::Simple;
+                    state.dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetworkControlSimple;
                     SimAirNetworkKey = "NoMultizoneOrDistribution";
                 } else if (SELECT_CASE_var == "MULTIZONEWITHOUTDISTRIBUTION") {
-                    state.dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetworkControl::Multizone;
+                    state.dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetworkControlMultizone;
                     SimAirNetworkKey = "MultizoneWithoutDistribution";
                 } else if (SELECT_CASE_var == "MULTIZONEWITHDISTRIBUTIONONLYDURINGFANOPERATION") {
-                    state.dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetworkControl::SimpleADS;
+                    state.dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetworkControlSimpleADS;
                     SimAirNetworkKey = "MultizoneWithDistributionOnlyDuringFanOperation";
                 } else if (SELECT_CASE_var == "MULTIZONEWITHDISTRIBUTION") {
-                    state.dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetworkControl::MultiADS;
+                    state.dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetworkControlMultiADS;
                     SimAirNetworkKey = "MultizoneWithDistribution";
                 } else { // Error
                     ShowSevereError(state,
@@ -1985,38 +1983,10 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
         }
-        // Find a flag for possible combination of vent and distribution system
-        {
-            auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(state.dataAirflowNetwork->AirflowNetworkSimu.Control));
-            if (SELECT_CASE_var == "NOMULTIZONEORDISTRIBUTION") {
-                state.dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetworkControl::Simple;
-                SimAirNetworkKey = "NoMultizoneOrDistribution";
-            } else if (SELECT_CASE_var == "MULTIZONEWITHOUTDISTRIBUTION") {
-                state.dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetworkControl::Multizone;
-                SimAirNetworkKey = "MultizoneWithoutDistribution";
-            } else if (SELECT_CASE_var == "MULTIZONEWITHDISTRIBUTIONONLYDURINGFANOPERATION") {
-                state.dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetworkControl::SimpleADS;
-                SimAirNetworkKey = "MultizoneWithDistributionOnlyDuringFanOperation";
-            } else if (SELECT_CASE_var == "MULTIZONEWITHDISTRIBUTION") {
-                state.dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetworkControl::MultiADS;
-                SimAirNetworkKey = "MultizoneWithDistribution";
-            } else { // Error
-                ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + " object, The entered choice for " + cAlphaFields(2) + " is not valid = \"" +
-                                    state.dataAirflowNetwork->AirflowNetworkSimu.Control + "\"");
-                ShowContinueError(state,
-                                  "Valid choices are \"NO MULTIZONE OR DISTRIBUTION\",\"MULTIZONE WITH DISTRIBUTION ONLY DURING FAN OPERATION\"");
-                ShowContinueError(state, "\"MULTIZONE WITH DISTRIBUTION\", or \"MULTIZONE WITHOUT DISTRIBUTION\"");
-                ShowContinueError(state,
-                                  "..specified in " + CurrentModuleObject + ' ' + cAlphaFields(1) + " = " +
-                                      state.dataAirflowNetwork->AirflowNetworkSimu.AirflowNetworkSimuName);
-                ErrorsFound = true;
-            }
-        }
 
         // Check the number of primary air loops
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControl::SimpleADS ||
-            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControl::MultiADS) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlSimpleADS ||
+            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlMultiADS) {
             NumAPL = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC");
             if (NumAPL > 0) {
                 state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio.allocate(NumAPL);
@@ -2035,8 +2005,8 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Check whether there are any objects from infiltration, ventilation, mixing and cross mixing
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControl::Simple ||
-            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControl::SimpleADS) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlSimple ||
+            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
             if (state.dataHeatBal->TotInfiltration + state.dataHeatBal->TotVentilation + state.dataHeatBal->TotMixing +
                     state.dataHeatBal->TotCrossMixing + state.dataHeatBal->TotZoneAirBalance +
                     state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneEarthtube") +
@@ -2051,10 +2021,10 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Check whether a user wants to perform SIMPLE calculation only or not
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControl::Simple) return;
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlSimple) return;
 
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControl::Multizone ||
-            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControl::MultiADS) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlMultizone ||
+            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlMultiADS) {
             if (state.dataHeatBal->TotInfiltration > 0) {
                 ShowWarningError(state, RoutineName + CurrentModuleObject + " object, ");
                 ShowContinueError(state,
@@ -4075,7 +4045,7 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
         } else {
-            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetworkControl::Multizone) + 1) {
+            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
                 ShowSevereError(state, RoutineName + "An " + CurrentModuleObject + " object is required but not found.");
                 ErrorsFound = true;
             }
@@ -4083,7 +4053,7 @@ namespace AirflowNetworkBalanceManager {
 
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Duct";
         if (state.dataAirflowNetworkBalanceManager->DisSysNumOfDucts == 0) {
-            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetworkControl::Multizone) + 1) {
+            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
                 ShowSevereError(state, RoutineName + "An " + CurrentModuleObject + " object is required but not found.");
                 ErrorsFound = true;
             }
@@ -4190,7 +4160,7 @@ namespace AirflowNetworkBalanceManager {
 
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Fan";
         if (state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs == 0) {
-            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetworkControl::Multizone) + 1) {
+            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
                 ShowSevereError(state, RoutineName + "An " + CurrentModuleObject + " object is required but not found.");
                 ErrorsFound = true;
             }
@@ -4245,9 +4215,9 @@ namespace AirflowNetworkBalanceManager {
                 {
                     auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(Alphas(3)));
                     if (SELECT_CASE_var == "AIRFLOWNETWORK:MULTIZONE:COMPONENT:ZONEEXHAUSTFAN") {
-                        state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet = PressureCtrl::Exhaust;
+                        state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet = PressureCtrlExhaust;
                     } else if (SELECT_CASE_var == "AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:RELIEFAIRFLOW") {
-                        state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet = PressureCtrl::Relief;
+                        state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet = PressureCtrlRelief;
                     } else { // Error
                         ShowSevereError(state,
                                         RoutineName + CurrentModuleObject + " object, The entered choice for " + cAlphaFields(3) +
@@ -4261,7 +4231,7 @@ namespace AirflowNetworkBalanceManager {
                     }
                 }
 
-                if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrl::Exhaust) {
+                if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrlExhaust) {
                     // This is not great
                     bool is_EXF{false};
                     auto afe = solver.elements.find(Alphas(4));
@@ -4274,7 +4244,7 @@ namespace AirflowNetworkBalanceManager {
                         ErrorsFound = true;
                     }
                 }
-                if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrl::Relief) {
+                if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrlRelief) {
                     // This is not great
                     bool is_REL{false};
                     auto afe = solver.elements.find(Alphas(4));
@@ -4310,7 +4280,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Assign numbers of nodes and linkages
-        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetworkControl::Simple)) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkControlSimple) {
             if (state.dataAirflowNetwork->AirflowNetworkSimu.iWPCCnt == iWPCCntr::Input) {
                 state.dataAirflowNetwork->NumOfNodesMultiZone =
                     state.dataAirflowNetwork->AirflowNetworkNumOfZones + state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode;
@@ -4328,7 +4298,7 @@ namespace AirflowNetworkBalanceManager {
                 state.dataAirflowNetwork->AirflowNetworkNumOfLinks =
                     state.dataAirflowNetwork->AirflowNetworkNumOfLinks + state.dataAirflowNetwork->NumOfLinksIntraZone;
         }
-        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetworkControl::Multizone) + 1) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
             state.dataAirflowNetwork->AirflowNetworkNumOfNodes = state.dataAirflowNetwork->NumOfNodesMultiZone +
                                                                  state.dataAirflowNetworkBalanceManager->DisSysNumOfNodes +
                                                                  state.dataAirflowNetwork->NumOfNodesIntraZone;
@@ -4722,8 +4692,7 @@ namespace AirflowNetworkBalanceManager {
         state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks > 0 &&
-            static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
-                static_cast<int>(AirflowNetworkControl::Multizone)) { // Multizone + Distribution
+            state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkControlMultizone) { // Multizone + Distribution
             state.dataAirflowNetwork->AirflowNetworkNumOfLinks =
                 state.dataAirflowNetwork->NumOfLinksMultiZone + state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks;
             state.dataAirflowNetwork->AirflowNetworkLinkageData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks +
@@ -5033,7 +5002,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         if (state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks > 0 &&
-            static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetworkControl::Multizone)) { // Distribution
+            state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkControlMultizone) { // Distribution
 
             for (auto &e : state.dataAirflowNetwork->AirflowNetworkLinkageData)
                 e.ZoneNum = 0;
@@ -5141,7 +5110,7 @@ namespace AirflowNetworkBalanceManager {
             }
         } else {
 
-            if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetworkControl::Multizone) + 1) {
+            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
                 ShowSevereError(state, RoutineName + "An " + CurrentModuleObject + " object is required but not found.");
                 ErrorsFound = true;
             }
@@ -5369,8 +5338,8 @@ namespace AirflowNetworkBalanceManager {
         */
 
         // Ensure the name of each heat exchanger is shown either once or twice in the field of
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControl::SimpleADS ||
-            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControl::MultiADS) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlSimpleADS ||
+            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlMultiADS) {
             for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfHXs; ++i) {
                 count = 0;
                 for (j = 1; j <= state.dataAirflowNetwork->AirflowNetworkNumOfLinks; ++j) {
@@ -5652,8 +5621,7 @@ void AirflowNetworkBalanceManagerData::initialize(EnergyPlusData &state)
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
         initializeMyEnvrnFlag = true;
-        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) >
-            static_cast<int>(AirflowNetworkBalanceManager::AirflowNetworkControl::Simple)) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkBalanceManager::AirflowNetworkControlSimple) {
             if (state.dataAirflowNetwork->RollBackFlag) {
                 for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
                     state.dataAirflowNetwork->ANZT(i) = state.dataHeatBalFanSys->XMAT(i);
@@ -6732,7 +6700,7 @@ namespace AirflowNetworkBalanceManager {
                     state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum ==
                         iComponentTypeNum::HOP) {
                     if (state.dataAirflowNetwork->AirflowNetworkFanActivated &&
-                        (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetworkControl::Multizone)) &&
+                        (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkControlMultizone) &&
                         state.dataAirflowNetwork->MultizoneSurfaceData(i).OpenFactor > 0.0 &&
                         (state.dataSurface->Surface(j).ExtBoundCond == ExternalEnvironment ||
                          (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).ExtBoundCond ==
@@ -6806,7 +6774,7 @@ namespace AirflowNetworkBalanceManager {
             Par = 0.0;
         }
 
-        state.dataAirflowNetwork->PressureSetFlag = AirflowNetwork::PressureCtrl::Unassigned;
+        state.dataAirflowNetwork->PressureSetFlag = 0;
 
         if (state.dataAirflowNetworkBalanceManager->NumOfPressureControllers == 1) {
             if (state.dataAirflowNetwork->PressureControllerData(1).AvailSchedPtr == DataGlobalConstants::ScheduleAlwaysOn) {
@@ -6816,16 +6784,16 @@ namespace AirflowNetworkBalanceManager {
                     state.dataAirflowNetwork->PressureSetFlag = state.dataAirflowNetwork->PressureControllerData(1).ControlTypeSet;
                 }
             }
-            if (static_cast<int>(state.dataAirflowNetwork->PressureSetFlag) > -1) {
+            if (state.dataAirflowNetwork->PressureSetFlag > 0) {
                 PressureSet = GetCurrentScheduleValue(state, state.dataAirflowNetwork->PressureControllerData(1).PresSetpointSchedPtr);
             }
         }
         auto &solver = state.dataAFNSolver->solver;
         solver.initialize(state);
 
-        if (!(static_cast<int>(state.dataAirflowNetwork->PressureSetFlag) > -1 && state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
+        if (!(state.dataAirflowNetwork->PressureSetFlag > 0 && state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
             solver.airmov(state);
-        } else if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrl::Exhaust) {
+        } else if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrlExhaust) {
             AirLoopNum = state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->PressureControllerData(1).AFNNodeNum).AirLoopNum;
             MinExhaustMassFlowrate = 2.0 * VerySmallMassFlow;
             MaxExhaustMassFlowrate = Node(state.dataAirflowNetwork->PressureControllerData(1).OANodeNum).MassFlowRate;
@@ -7045,11 +7013,11 @@ namespace AirflowNetworkBalanceManager {
 
         PressureSet = Par(1);
 
-        if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrl::Exhaust) {
+        if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrlExhaust) {
             state.dataAirflowNetwork->ExhaustFanMassFlowRate = ControllerMassFlowRate;
         }
 
-        if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrl::Relief) {
+        if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrlRelief) {
             state.dataAirflowNetwork->ReliefMassFlowRate = ControllerMassFlowRate;
         }
         auto &solver = state.dataAFNSolver->solver;
@@ -9135,7 +9103,7 @@ namespace AirflowNetworkBalanceManager {
         int FanNum;
         Real64 RepOnOffFanRunTimeFraction;
 
-        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) < static_cast<int>(AirflowNetworkControl::Multizone)) return;
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork < AirflowNetworkControlMultizone) return;
 
         if (!state.dataAirflowNetworkBalanceManager->onetime) {
             state.dataAirflowNetworkBalanceManager->onceZoneFlag.dimension(state.dataGlobal->NumOfZones, false);
@@ -9202,9 +9170,9 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Calculate sensible and latent loads in each zone from multizone airflows
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControl::Multizone ||
-            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControl::MultiADS ||
-            (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControl::SimpleADS &&
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlMultizone ||
+            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlMultiADS ||
+            (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlSimpleADS &&
              state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
             for (i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces; ++i) { // Multizone airflow energy
                 n = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[0];
@@ -9465,7 +9433,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Assign data for report
-        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetworkControl::Multizone)) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
             for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
                 if (state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakSen > 0.0) {
                     state.dataAirflowNetwork->AirflowNetworkReportData(i).LeakSenGainW =
@@ -9908,8 +9876,8 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
-        if (!(state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControl::Multizone ||
-              state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControl::MultiADS))
+        if (!(state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlMultizone ||
+              state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlMultiADS))
             return;
 
         for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) { // Start of zone loads report variable update loop ...
@@ -10125,9 +10093,9 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Calculate sensible and latent loads in each zone from multizone airflows
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControl::Multizone ||
-            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControl::MultiADS ||
-            (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControl::SimpleADS &&
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlMultizone ||
+            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlMultiADS ||
+            (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlSimpleADS &&
              state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
             for (i = 1; i <= state.dataAirflowNetwork->NumOfLinksMultiZone; ++i) { // Multizone airflow energy
                 n = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[0];
@@ -10294,7 +10262,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         if (!state.dataAirflowNetwork->AirflowNetworkFanActivated &&
-            (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetworkControl::Multizone))) {
+            (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkControlMultizone)) {
             for (i = state.dataAirflowNetwork->NumOfNodesMultiZone + state.dataAirflowNetwork->NumOfNodesIntraZone + 1;
                  i <= state.dataAirflowNetwork->AirflowNetworkNumOfNodes;
                  ++i) {
@@ -10310,10 +10278,10 @@ namespace AirflowNetworkBalanceManager {
         }
 
         if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
-              static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetworkControl::Multizone)))
+              state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkControlMultizone))
             return;
 
-        if (static_cast<int>(state.dataAirflowNetwork->SimulateAirflowNetwork) > static_cast<int>(AirflowNetworkControl::Multizone) + 1) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
             for (i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces; ++i) { // Multizone airflow energy
                 n = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[0];
                 M = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[1];
@@ -12106,7 +12074,7 @@ namespace AirflowNetworkBalanceManager {
                         if (state.dataZoneEquip->ZoneEquipConfig(j).InletNodeAirLoopNum(k) > 0) {
                             state.dataAirflowNetwork->PressureControllerData(i).AirLoopNum =
                                 state.dataZoneEquip->ZoneEquipConfig(j).InletNodeAirLoopNum(k);
-                            if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrl::Relief) {
+                            if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrlRelief) {
                                 state.dataAirflowNetwork->PressureControllerData(i).OANodeNum =
                                     state.dataAirSystemsData->PrimaryAirSystems(state.dataAirflowNetwork->PressureControllerData(i).AirLoopNum)
                                         .OAMixOAInNodeNum;
@@ -12117,7 +12085,7 @@ namespace AirflowNetworkBalanceManager {
                                     }
                                 }
                             }
-                            if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrl::Exhaust) {
+                            if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrlExhaust) {
                                 state.dataAirflowNetwork->PressureControllerData(i).OANodeNum =
                                     state.dataZoneEquip->ZoneEquipConfig(state.dataAirflowNetwork->PressureControllerData(i).ZoneNum).ExhaustNode(1);
                                 for (n = 1; n <= state.dataAirflowNetwork->AirflowNetworkNumOfExhFan; ++n) {
@@ -13226,16 +13194,16 @@ namespace AirflowNetworkBalanceManager {
 
         if (TimeOpenDuration > 0) {
             if (TimeOpenDuration >= MinOpeningTime) {
-                OpeningStatus = static_cast<int>(OpenStatus::FreeOperation); // free operation
+                OpeningStatus = OpenStatus::FreeOperation; // free operation
             } else {
-                OpeningStatus = static_cast<int>(OpenStatus::MinCheckForceOpen); // forced to open
+                OpeningStatus = OpenStatus::MinCheckForceOpen; // forced to open
             }
         }
         if (TimeCloseDuration > 0) {
             if (TimeCloseDuration >= MinClosingTime) {
-                OpeningStatus = static_cast<int>(OpenStatus::FreeOperation); // free operation
+                OpeningStatus = OpenStatus::FreeOperation; // free operation
             } else {
-                OpeningStatus = static_cast<int>(OpenStatus::MinCheckForceClose); // forced to close
+                OpeningStatus = OpenStatus::MinCheckForceClose; // forced to close
             }
         }
 
