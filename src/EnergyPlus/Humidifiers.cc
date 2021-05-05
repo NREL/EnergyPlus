@@ -176,11 +176,11 @@ namespace Humidifiers {
         {
             auto const SELECT_CASE_var(thisHum.HumType);
 
-            if (SELECT_CASE_var == HumidifierType::Electric) { // 'HUMIDIFIER:STEAM:ELECTRIC'
+            if (SELECT_CASE_var == HumType::Electric) { // 'HUMIDIFIER:STEAM:ELECTRIC'
 
                 thisHum.CalcElecSteamHumidifier(state, WaterAddNeeded);
 
-            } else if (SELECT_CASE_var == HumidifierType::Gas) { // 'HUMIDIFIER:STEAM:GAS'
+            } else if (SELECT_CASE_var == HumType::Gas) { // 'HUMIDIFIER:STEAM:GAS'
 
                 thisHum.CalcGasSteamHumidifier(state, WaterAddNeeded);
 
@@ -292,7 +292,7 @@ namespace Humidifiers {
             GlobalNames::VerifyUniqueInterObjectName(state, HumidifierUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             Humidifier(HumNum).Name = Alphas(1);
             //    Humidifier(HumNum)%HumType = TRIM(CurrentModuleObject)
-            Humidifier(HumNum).HumType = HumidifierType::Electric;
+            Humidifier(HumNum).HumType = HumType::Electric;
             Humidifier(HumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
                 Humidifier(HumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -362,7 +362,7 @@ namespace Humidifiers {
             HumNum = NumElecSteamHums + HumidifierIndex;
             GlobalNames::VerifyUniqueInterObjectName(state, HumidifierUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             Humidifier(HumNum).Name = Alphas(1);
-            Humidifier(HumNum).HumType = HumidifierType::Gas;
+            Humidifier(HumNum).HumType = HumType::Gas;
             Humidifier(HumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
                 Humidifier(HumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -547,7 +547,7 @@ namespace Humidifiers {
                                     _,
                                     "System");
             }
-            if (Humidifier(HumNum).HumType == HumidifierType::Electric) {
+            if (Humidifier(HumNum).HumType == HumType::Electric) {
                 SetupOutputVariable(state,
                                     "Humidifier Electricity Rate",
                                     OutputProcessor::Unit::W,
@@ -567,7 +567,7 @@ namespace Humidifiers {
                                     "HUMIDIFIER",
                                     _,
                                     "System");
-            } else if (Humidifier(HumNum).HumType == HumidifierType::Gas) {
+            } else if (Humidifier(HumNum).HumType == HumType::Gas) {
                 SetupOutputVariable(state,
                                     "Humidifier NaturalGas Use Thermal Efficiency",
                                     OutputProcessor::Unit::None,
@@ -654,8 +654,6 @@ namespace Humidifiers {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const CalledFrom("Humidifier:InitHumidifier");
-
-        auto &HumidifierType = state.dataHumidifiers->HumidifierType;
 
         // do sizing calculation once
         if (MySizeFlag) {
@@ -788,17 +786,15 @@ namespace Humidifiers {
         Real64 AirVolFlow;            // Design air volume flow rate
         Real64 AirDensity;            // Density of air
 
-        auto &HumidifierType = state.dataHumidifiers->HumidifierType;
-
-        if (HumType == HumidifierType::Electric || HumType == HumidifierType::Gas) {
+        if (HumType == HumType::Electric || HumType == HumType::Gas) {
             IsAutoSize = false;
             HardSizeNoDesRun = false;
             NomPowerDes = 0.0;
             NomPowerUser = 0.0;
 
-            if (HumType == HumidifierType::Electric) {
+            if (HumType == HumType::Electric) {
                 ModuleObjectType = "electric";
-            } else if (HumType == HumidifierType::Gas) {
+            } else if (HumType == HumType::Gas) {
                 ModuleObjectType = "gas";
             }
             if (NomCapVol == AutoSize) {
@@ -927,19 +923,19 @@ namespace Humidifiers {
             }
 
             NomCap = RhoH2O(DataGlobalConstants::InitConvTemp) * NomCapVol;
-            RefrigerantIndex = FindRefrigerant(state, state.dataHumidifiers->fluidNameSteam);
-            WaterIndex = FindGlycol(state, state.dataHumidifiers->fluidNameWater);
-            SteamSatEnthalpy = GetSatEnthalpyRefrig(state, state.dataHumidifiers->fluidNameSteam, TSteam, 1.0, RefrigerantIndex, CalledFrom);
-            WaterSatEnthalpy = GetSatEnthalpyRefrig(state, state.dataHumidifiers->fluidNameSteam, TSteam, 0.0, RefrigerantIndex, CalledFrom);
-            WaterSpecHeatAvg = 0.5 * (GetSpecificHeatGlycol(state, state.dataHumidifiers->fluidNameWater, TSteam, WaterIndex, CalledFrom) +
-                                      GetSpecificHeatGlycol(state, state.dataHumidifiers->fluidNameWater, Tref, WaterIndex, CalledFrom));
+            RefrigerantIndex = FindRefrigerant(state, format(fluidNameSteam));
+            WaterIndex = FindGlycol(state, format(fluidNameWater));
+            SteamSatEnthalpy = GetSatEnthalpyRefrig(state, format(fluidNameSteam), TSteam, 1.0, RefrigerantIndex, CalledFrom);
+            WaterSatEnthalpy = GetSatEnthalpyRefrig(state, format(fluidNameSteam), TSteam, 0.0, RefrigerantIndex, CalledFrom);
+            WaterSpecHeatAvg = 0.5 * (GetSpecificHeatGlycol(state, format(fluidNameWater), TSteam, WaterIndex, CalledFrom) +
+                                      GetSpecificHeatGlycol(state, format(fluidNameWater), Tref, WaterIndex, CalledFrom));
             NominalPower = NomCap * ((SteamSatEnthalpy - WaterSatEnthalpy) + WaterSpecHeatAvg * (TSteam - Tref));
 
             if (NomPower == AutoSize) {
                 IsAutoSize = true;
             }
 
-            if (HumType == HumidifierType::Gas) {
+            if (HumType == HumType::Gas) {
 
                 if (!IsAutoSize) {
                     // override user specified rated thermal efficiency
@@ -1297,12 +1293,12 @@ namespace Humidifiers {
                     CurMakeupWaterTemp = state.dataEnvrn->WaterMainsTemp;
                 }
                 Tref = CurMakeupWaterTemp;
-                RefrigerantIndex = FindRefrigerant(state, state.dataHumidifiers->fluidNameSteam);
-                WaterIndex = FindGlycol(state, state.dataHumidifiers->fluidNameWater);
-                SteamSatEnthalpy = GetSatEnthalpyRefrig(state, state.dataHumidifiers->fluidNameSteam, TSteam, 1.0, RefrigerantIndex, RoutineName);
-                WaterSatEnthalpy = GetSatEnthalpyRefrig(state, state.dataHumidifiers->fluidNameSteam, TSteam, 0.0, RefrigerantIndex, RoutineName);
-                WaterSpecHeatAvg = 0.5 * (GetSpecificHeatGlycol(state, state.dataHumidifiers->fluidNameWater, TSteam, WaterIndex, RoutineName) +
-                                          GetSpecificHeatGlycol(state, state.dataHumidifiers->fluidNameWater, Tref, WaterIndex, RoutineName));
+                RefrigerantIndex = FindRefrigerant(state, format(fluidNameSteam));
+                WaterIndex = FindGlycol(state, format(fluidNameWater));
+                SteamSatEnthalpy = GetSatEnthalpyRefrig(state, format(fluidNameSteam), TSteam, 1.0, RefrigerantIndex, RoutineName);
+                WaterSatEnthalpy = GetSatEnthalpyRefrig(state, format(fluidNameSteam), TSteam, 0.0, RefrigerantIndex, RoutineName);
+                WaterSpecHeatAvg = 0.5 * (GetSpecificHeatGlycol(state, format(fluidNameWater), TSteam, WaterIndex, RoutineName) +
+                                          GetSpecificHeatGlycol(state, format(fluidNameWater), Tref, WaterIndex, RoutineName));
                 GasUseRateAtRatedEff = WaterAdd * ((SteamSatEnthalpy - WaterSatEnthalpy) + WaterSpecHeatAvg * (TSteam - Tref)) / ThermalEffRated;
             }
             PartLoadRatio = GasUseRateAtRatedEff / NomPower;

@@ -63,8 +63,11 @@ struct EnergyPlusData;
 
 namespace Humidifiers {
 
-    // MODULE PARAMETER DEFINITIONS
-    enum class HumidifierType
+    constexpr std::array<std::string_view, 2> const HumidifierType = {"Humidifier:Steam:Electric", "Humidifier:Steam:Gas"};
+    constexpr std::string_view fluidNameSteam = "STEAM";
+    constexpr std::string_view fluidNameWater = "WATER";
+
+    enum class HumType
     {
         Unassigned = -1,
         Electric,
@@ -94,7 +97,7 @@ namespace Humidifiers {
     public:
         // Members
         std::string Name;                    // unique name of component
-        HumidifierType HumType;              // Pointer to Humidifier in list of humidifiers
+        HumType HumType;              // Pointer to Humidifier in list of humidifiers
         int EquipIndex;                      // Pointer to Humidifier in list of humidifiers
         std::string Sched;                   // name of availability schedule
         int SchedPtr;                        // index of availability schedule
@@ -143,7 +146,7 @@ namespace Humidifiers {
 
         // Default Constructor
         HumidifierData()
-            : HumType(HumidifierType::Unassigned), EquipIndex(0), SchedPtr(0), NomCapVol(0.0), NomCap(0.0), NomPower(0.0), ThermalEffRated(1.0),
+            : HumType(HumType::Unassigned), EquipIndex(0), SchedPtr(0), NomCapVol(0.0), NomCap(0.0), NomPower(0.0), ThermalEffRated(1.0),
               CurMakeupWaterTemp(0.0), EfficiencyCurvePtr(0), InletWaterTempOption(InletWaterTemp::Unassigned), FanPower(0.0), StandbyPower(0.0),
               AirInNode(0), AirOutNode(0), AirInTemp(0.0), AirInHumRat(0.0), AirInEnthalpy(0.0), AirInMassFlowRate(0.0), AirOutTemp(0.0),
               AirOutHumRat(0.0), AirOutEnthalpy(0.0), AirOutMassFlowRate(0.0), HumRatSet(0.0), WaterAdd(0.0), ElecUseEnergy(0.0), ElecUseRate(0.0),
@@ -190,11 +193,6 @@ namespace Humidifiers {
 
 struct HumidifiersData : BaseGlobalStruct
 {
-    std::array<std::string_view, 2> const HumidifierType = {"Humidifier:Steam:Electric", "Humidifier:Steam:Gas"};
-    // Array1D_string const HumidifierType = Array1D_string(2, {"Humidifier:Steam:Electric", "Humidifier:Steam:Gas"});
-    std::string const fluidNameSteam = "STEAM";
-    std::string const fluidNameWater = "WATER";
-
     int NumHumidifiers = 0;   // number of humidifiers of all types
     int NumElecSteamHums = 0; // number of electric steam humidifiers
     int NumGasSteamHums = 0;  // number of electric steam humidifiers
