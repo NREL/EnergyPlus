@@ -2384,8 +2384,8 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     }
 
     // Report results for SIMPLE option only
-    if (!(state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControl::Simple ||
-          state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControl::SimpleADS))
+    if (!(state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimple ||
+          state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS))
         return;
 
     if (state.dataHVACMgr->ReportAirHeatBalanceFirstTimeFlag) {
@@ -2399,7 +2399,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         // Break the infiltration load into heat gain and loss components
         ADSCorrectionFactor = 1.0;
 
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControl::SimpleADS) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS)
             // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(ZoneLoop)) ADSCorrectionFactor=0
             if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
                 state.dataAirflowNetwork->AirflowNetworkZoneFlag(ZoneLoop))
