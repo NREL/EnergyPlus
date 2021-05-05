@@ -14955,7 +14955,8 @@ void GetFanIndexForTwoSpeedCoil(
 
             for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).TotalComponents; ++CompNum) {
 
-                if (state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num == SimAirServingZones::DXSystem) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num ==
+                    SimAirServingZones::DXSystem) {
 
                     if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
                                                     state.dataDXCoils->DXCoil(CoolingCoilIndex).CoilSystemName)) {

@@ -3337,7 +3337,7 @@ namespace UnitarySystems {
             errorsFound = true;
         }
 
-        if (!ZoneEquipmentFound && ZoneOAUnitNum == 0)
+        if (!ZoneEquipmentFound)
             BranchNodeConnections::TestCompSet(
                 state, cCurrentModuleObject, UtilityRoutines::MakeUPPERCase(thisObjectName), loc_AirInNodeName, loc_AirOutNodeName, "Air Nodes");
 

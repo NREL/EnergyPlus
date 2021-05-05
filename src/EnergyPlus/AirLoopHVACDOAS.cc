@@ -618,9 +618,10 @@ namespace AirLoopHVACDOAS {
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) =
                             HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, CompType, CompName, OutletNodeErrFlag);
                     } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:DX") {
-                        //state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = HVACDXSystem::GetCoolingCoilInletNodeNum(
+                        // state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = HVACDXSystem::GetCoolingCoilInletNodeNum(
                         //    state, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), InletNodeErrFlag);
-                        //state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = HVACDXSystem::GetCoolingCoilOutletNodeNum(
+                        // state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) =
+                        // HVACDXSystem::GetCoolingCoilOutletNodeNum(
                         //    state, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
                             state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum)
