@@ -17,7 +17,6 @@
 #include <ObjexxFCL/ArrayS.all.hh>
 #include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2A.hh>
-#include <ObjexxFCL/Array3A.hh>
 #include <ObjexxFCL/Array.functions.hh>
 #include "ObjexxFCL.unit.hh"
 
@@ -210,7 +209,7 @@ TEST( ArraySTest, Array2SWholeArraySlice )
 TEST( ArraySTest, Array3SWholeArraySlice )
 {
 	Array3D_int a( {-1,0}, {1,2}, {0,1}, { 1, 2, 3, 4, 5, 6, 7, 8 } );
-	Array3S_int s( a );
+	Array3S<int> s( a );
 	EXPECT_EQ( 8u, s.size() );
 	EXPECT_EQ( 1, s.l1() );
 	EXPECT_EQ( 1, s.l2() );
@@ -226,44 +225,6 @@ TEST( ArraySTest, Array3SWholeArraySlice )
 	EXPECT_EQ( 6, s( 2, 1, 2 ) );
 	EXPECT_EQ( 7, s( 2, 2, 1 ) );
 	EXPECT_EQ( 8, s( 2, 2, 2 ) );
-}
-
-TEST( ArraySTest, Array3D3SSlice )
-{
-	Array3D_int a( 3, 2, 2, {
-	 111,
-	 112,
-	 121,
-	 122,
-	 211,
-	 212,
-	 221,
-	 222,
-	 311,
-	 312,
-	 321,
-	 322
-	} );
-	Array3S_int s( a( {2,3}, _, _ ) );
-	EXPECT_EQ( 8u, s.size() );
-	EXPECT_EQ( 1, s.l1() );
-	EXPECT_EQ( 1, s.l2() );
-	EXPECT_EQ( 1, s.l3() );
-	EXPECT_EQ( 2, s.u1() );
-	EXPECT_EQ( 2, s.u2() );
-	EXPECT_EQ( 2, s.u3() );
-	EXPECT_EQ( 211, s( 1, 1, 1 ) );
-	EXPECT_EQ( 322, s( 2, 2, 2 ) );
-	Array3A_int p( s ); // OK: Contiguous
-	EXPECT_EQ( 8u, p.size() );
-	EXPECT_EQ( 1, p.l1() );
-	EXPECT_EQ( 1, p.l2() );
-	EXPECT_EQ( 1, p.l3() );
-	EXPECT_EQ( 2, p.u1() );
-	EXPECT_EQ( 2, p.u2() );
-	EXPECT_EQ( 2, p.u3() );
-	EXPECT_EQ( 211, p( 1, 1, 1 ) );
-	EXPECT_EQ( 322, p( 2, 2, 2 ) );
 }
 
 TEST( ArraySTest, Array2SSlice3D )
@@ -336,8 +297,6 @@ TEST( ArraySTest, AllOp2D )
 {
 	Array2D_int const A( 3, 3, { 1, 2, 3, 4, 5, 6, 7, 8, 9 } );
 	Array2S_int S( A );
-	EXPECT_FALSE( all_eq( S, 6 ) );
-	EXPECT_FALSE( all_eq( S, 22 ) );
 	EXPECT_TRUE( all_ne( S, 22 ) );
 	EXPECT_FALSE( all_ne( S, 2 ) );
 	EXPECT_FALSE( all_lt( S, 2 ) );
@@ -369,64 +328,6 @@ TEST( ArraySTest, Functions1D )
 	EXPECT_EQ( 14, magnitude_squared( u ) );
 	EXPECT_EQ( 3, distance_squared( u, v ) );
 	EXPECT_EQ( 20, dot( u, v ) );
-}
-
-TEST( ArraySTest, Function2DMinMaxLoc )
-{
-	{
-		Array2D_int const A( 4, 4, reshape( {
-		  4,  9,  8, -8,
-		  2,  1, -1,  5,
-		  9,  4, -1,  9,
-		 -7,  5,  7, -3
-		}, std::array< int, 2 >{ { 4, 4 } } ) );
-		Array2S_int S( A );
-
-		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 4 } ), minloc( S ) ) );
-		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 2 } ), maxloc( S ) ) ); // First max encountered in row-major order
-
-		EXPECT_TRUE( eq( Array1D_int( { 4, 2, 2, 1 } ), minloc( S, 1 ) ) ); // Min of cols
-		EXPECT_TRUE( eq( Array1D_int( { 4, 3, 3, 1 } ), minloc( S, 2 ) ) ); // Min of rows
-
-		EXPECT_TRUE( eq( Array1D_int( { 3, 1, 1, 3 } ), maxloc( S, 1 ) ) ); // Max of cols
-		EXPECT_TRUE( eq( Array1D_int( { 2, 4, 1, 3 } ), maxloc( S, 2 ) ) ); // Max of rows
-	}
-	{
-		Array2D_int const A( 4, 4, reshape( {
-		 -9,  9,  8, -8,
-		  2,  1, -1,  5,
-		  9,  4, -1,  9,
-		 -7,  5,  7, -3
-		}, std::array< int, 2 >{ { 4, 4 } } ) );
-		Array2S_int S( A( _, _ ) );
-
-		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 1 } ), minloc( S ) ) );
-		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 2 } ), maxloc( S ) ) ); // First max encountered in row-major order
-
-		EXPECT_TRUE( eq( Array1D_int( { 1, 2, 2, 1 } ), minloc( S, 1 ) ) ); // Min of cols
-		EXPECT_TRUE( eq( Array1D_int( { 1, 3, 3, 1 } ), minloc( S, 2 ) ) ); // Min of rows
-
-		EXPECT_TRUE( eq( Array1D_int( { 3, 1, 1, 3 } ), maxloc( S, 1 ) ) ); // Max of cols
-		EXPECT_TRUE( eq( Array1D_int( { 2, 4, 1, 3 } ), maxloc( S, 2 ) ) ); // Max of rows
-	}
-	{
-		Array2D_int const A( 4, 4, reshape( {
-		  9,  9,  8, -8,
-		  2,  1, -1,  5,
-		  9,  4, -1,  9,
-		 -7,  5,  7, -3
-		}, std::array< int, 2 >{ { 4, 4 } } ) );
-		Array2S_int S( A );
-
-		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 4 } ), minloc( S ) ) );
-		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 1 } ), maxloc( S ) ) ); // First max encountered in row-major order
-
-		EXPECT_TRUE( eq( Array1D_int( { 4, 2, 2, 1 } ), minloc( S, 1 ) ) ); // Min of cols
-		EXPECT_TRUE( eq( Array1D_int( { 4, 3, 3, 1 } ), minloc( S, 2 ) ) ); // Min of rows
-
-		EXPECT_TRUE( eq( Array1D_int( { 1, 1, 1, 3 } ), maxloc( S, 1 ) ) ); // Max of cols
-		EXPECT_TRUE( eq( Array1D_int( { 1, 4, 1, 3 } ), maxloc( S, 2 ) ) ); // Max of rows
-	}
 }
 
 TEST( ArraySTest, StreamOut )

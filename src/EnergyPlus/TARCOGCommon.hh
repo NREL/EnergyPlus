@@ -52,8 +52,10 @@
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 
 namespace EnergyPlus {
 
@@ -64,7 +66,15 @@ namespace TARCOGCommon {
 
     int constexpr NMAX(500);
 
-    bool IsShadingLayer(int layertype);
+    constexpr bool IsShadingLayer(TARCOGParams::TARCOGLayerType const layertype)
+    {
+        // Using/Aliasing
+        using namespace TARCOGParams;
+
+        return BITF_TEST_ANY(BITF(layertype),
+                             BITF(TARCOGLayerType::VENETBLIND_HORIZ) | BITF(TARCOGLayerType::VENETBLIND_VERT) | BITF(TARCOGLayerType::WOVSHADE) |
+                                 BITF(TARCOGLayerType::PERFORATED) | BITF(TARCOGLayerType::BSDF) | BITF(TARCOGLayerType::DIFFSHADE));
+    }
 
     Real64 LDSumMax(Real64 Width, Real64 Height);
 

@@ -62,15 +62,7 @@ TEST( CstringTest, Construction )
 		EXPECT_FALSE( s.empty() );
 		EXPECT_FALSE( s.is_blank() );
 		EXPECT_TRUE( s.not_blank() );
-		EXPECT_TRUE( s.has_any_of( "wxyz" ) );
-		EXPECT_FALSE( s.has_any_of( "WXYZ" ) );
-		EXPECT_TRUE( s.has_any_of( Cstring( "wxyz" ) ) );
-		EXPECT_FALSE( s.has_any_of( Cstring( "WXYZ" ) ) );
-		EXPECT_TRUE( s.has_any_of( std::string( "wxyz" ) ) );
-		EXPECT_FALSE( s.has_any_of( std::string( "WXYZ" ) ) );
-		EXPECT_TRUE( s.has_any_of( 't' ) );
 		EXPECT_TRUE( s.has( 't' ) );
-		EXPECT_FALSE( s.has_any_of( 'T' ) );
 		EXPECT_FALSE( s.has( 'T' ) );
 	}
 
@@ -115,20 +107,15 @@ TEST( CstringTest, JustifyTrim )
 {
 	Cstring s( "  Fish " );
 	EXPECT_EQ( 6u, s.len_trim() );
-	EXPECT_EQ( 6u, s.len_trim_whitespace() );
 	s.ljustify();
 	EXPECT_EQ( "Fish   ", s );
 	s.rjustify();
 	EXPECT_EQ( "   Fish", s );
-	EXPECT_EQ( "Fish   ", s.ljustified() );
 	s.ljustify();
 	EXPECT_EQ( "   Fish", s.rjustified() );
 	s = "Bozo \t ";
 	EXPECT_EQ( 6u, s.len_trim() );
-	EXPECT_EQ( 4u, s.len_trim_whitespace() );
 	EXPECT_EQ( "Bozo \t", s.trimmed() );
-	EXPECT_EQ( "Bozo", s.trimmed_whitespace() );
-	s.trim_whitespace();
 	EXPECT_EQ( "Bozo", s );
 }
 

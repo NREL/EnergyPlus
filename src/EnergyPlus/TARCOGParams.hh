@@ -65,39 +65,56 @@ int constexpr maxlay2(maxlay * 2);  // maximum number of glass surfaces (maxlay*
 int constexpr maxlay3(maxlay2 + 1); // maximum number of ? (maxlay2+1)
 
 //  Layer types:
-extern int const SPECULAR;
-extern int const VENETBLIND_VERT;
-extern int const WOVSHADE;
-extern int const PERFORATED;
-extern int const DIFFSHADE;
-extern int const BSDF;
-extern int const VENETBLIND_HORIZ;
-
-extern int const MinLayType;
-extern int const MaxLayType;
+enum class TARCOGLayerType : int
+{
+    UNASSSIGNED = -1,
+    SPECULAR = 0,
+    VENETBLIND_HORIZ = 1,
+    WOVSHADE = 2,
+    PERFORATED = 3,
+    DIFFSHADE = 4,
+    BSDF = 5,
+    VENETBLIND_VERT = 6
+};
 
 //  Thermal models:
-extern int const THERM_MOD_ISO15099;
-extern int const THERM_MOD_SCW;
-extern int const THERM_MOD_CSM;
+enum class TARCOGThermalModel : int
+{
+    UNASSIGNED = -1,
+    ISO15099 = 0,
+    SCW = 1,
+    CSM = 2,
+    CSM_WithSDThickness = 3
+};
 
-extern int const YES_SupportPillar;
+int constexpr YES_SupportPillar = 1;
 
 // Deflection parameters
-extern int const NO_DEFLECTION_CALCULATION;
-extern int const DEFLECTION_CALC_TEMPERATURE;
-extern int const DEFLECTION_CALC_GAP_WIDTHS;
+enum class DeflectionCalculation : int
+{
+    UNASSIGNED = -1,
+    NONE = 0,
+    TEMPERATURE = 1,
+    GAP_WIDTHS = 2
+};
 
 // definition of parameters for deflection sum.  These parameters define maximum number of loop to which sum
 // will perform. By equation, these numbers will go to infinite and some test showed that going to nmax and mmax
 // values would produce enough precision
-extern int const mmax; // top m value for which "deflection sum" will be calculated
-extern int const nmax; // top n value for which "deflection sum" will be calculated
+enum class DeflectionParameters : int
+{
+    mmax = 5, // top m value for which "deflection sum" will be calculated
+    nmax = 5  // top n value for which "deflection sum" will be calculated
+};
 
 //  CalcForcedVentilation flag:
 //  0 = Skip forced ventilation calc
 //  1 = Allow forced ventilation calc
-extern int const CalcForcedVentilation;
+enum class CalcForcedVentilation : int
+{
+    skip = 0,
+    allow = 1
+};
 
 //  Calculation outcome
 enum class CalculationOutcome
