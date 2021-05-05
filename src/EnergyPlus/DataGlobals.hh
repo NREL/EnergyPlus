@@ -141,7 +141,7 @@ struct DataGlobal : BaseGlobalStruct
     bool RedoSizesHVACSimulation = false;           // doing kick off simulation for redoing sizes as part of sizing
     bool FinalSizingHVACSizingSimIteration = false; // when doing HVAC sizing Simulation
     bool AnyEnergyManagementSystemInModel = false;  // true if there is any EMS or Erl in model.  otherwise false
-    bool SurfPropOverridesPresent = false;         // true if there is any EMS or Erl in model.  otherwise false
+    bool SurfPropOverridesPresent = false;          // true if there is any EMS or Erl in model.  otherwise false
     bool AnyLocalEnvironmentsInModel = false;       // true if there is any local environmental data objected defined in model, otherwise false
     bool AnyPlantInModel = false;                   // true if there are any plant or condenser loops in model, otherwise false
     bool AnyIdealCondEntSetPointInModel = false;    // true if there is any ideal condenser entering set point manager in model.
