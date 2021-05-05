@@ -65,7 +65,7 @@ void readJSONfile(EnergyPlusData &state, std::string &filePath, nlohmann::json &
 
         // read json_in data
         try {
-            ifs >> j;
+            j = nlohmann::json::from_cbor(ifs);
             ifs.close();
         } catch (...) {
             if (!j.empty()) {
@@ -80,8 +80,8 @@ void readJSONfile(EnergyPlusData &state, std::string &filePath, nlohmann::json &
 
 void writeJSONfile(nlohmann::json &j, std::string &fPath)
 {
-    std::ofstream ofs(fPath);
-    ofs << std::setw(2) << j;
+    std::ofstream ofs(fPath, std::ofstream::out | std::ofstream::binary);
+    nlohmann::json::to_cbor(j, ofs);
     ofs.close();
 }
 
