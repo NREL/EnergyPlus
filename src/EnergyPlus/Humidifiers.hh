@@ -63,11 +63,11 @@ struct EnergyPlusData;
 
 namespace Humidifiers {
 
-    constexpr std::array<std::string_view, 2> const HumidifierType = {"Humidifier:Steam:Electric", "Humidifier:Steam:Gas"};
+    constexpr std::array<std::string_view, 2> HumidifierType = {"Humidifier:Steam:Electric", "Humidifier:Steam:Gas"};
     constexpr std::string_view fluidNameSteam = "STEAM";
     constexpr std::string_view fluidNameWater = "WATER";
 
-    enum class HumType
+    enum class HumidType
     {
         Unassigned = -1,
         Electric,
@@ -92,12 +92,11 @@ namespace Humidifiers {
 
     class HumidifierData
     {
-
     private:
     public:
         // Members
         std::string Name;                    // unique name of component
-        HumType HumType;              // Pointer to Humidifier in list of humidifiers
+        HumidType HumType;                   // Pointer to Humidifier in list of humidifiers
         int EquipIndex;                      // Pointer to Humidifier in list of humidifiers
         std::string Sched;                   // name of availability schedule
         int SchedPtr;                        // index of availability schedule
@@ -146,7 +145,7 @@ namespace Humidifiers {
 
         // Default Constructor
         HumidifierData()
-            : HumType(HumType::Unassigned), EquipIndex(0), SchedPtr(0), NomCapVol(0.0), NomCap(0.0), NomPower(0.0), ThermalEffRated(1.0),
+            : HumType(HumidType::Unassigned), EquipIndex(0), SchedPtr(0), NomCapVol(0.0), NomCap(0.0), NomPower(0.0), ThermalEffRated(1.0),
               CurMakeupWaterTemp(0.0), EfficiencyCurvePtr(0), InletWaterTempOption(InletWaterTemp::Unassigned), FanPower(0.0), StandbyPower(0.0),
               AirInNode(0), AirOutNode(0), AirInTemp(0.0), AirInHumRat(0.0), AirInEnthalpy(0.0), AirInMassFlowRate(0.0), AirOutTemp(0.0),
               AirOutHumRat(0.0), AirOutEnthalpy(0.0), AirOutMassFlowRate(0.0), HumRatSet(0.0), WaterAdd(0.0), ElecUseEnergy(0.0), ElecUseRate(0.0),

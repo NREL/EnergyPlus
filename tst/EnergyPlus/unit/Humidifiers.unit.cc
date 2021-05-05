@@ -80,7 +80,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_Sizing)
 
     HumidifierData thisHum;
 
-    thisHum.HumType = HumType::Gas;
+    thisHum.HumType = HumidType::Gas;
     thisHum.NomCapVol = 4.00E-5;
     thisHum.NomPower = AutoSize;
     thisHum.ThermalEffRated = 1.0;
@@ -115,7 +115,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_AutoSizing)
 
     HumidifierData thisHum;
 
-    thisHum.HumType = HumType::Gas;
+    thisHum.HumType = HumidType::Gas;
     thisHum.NomCapVol = AutoSize;
     thisHum.NomPower = AutoSize;
     thisHum.ThermalEffRated = 0.80;
@@ -157,7 +157,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
     state->dataHumidifiers->NumGasSteamHums = 1;
     state->dataHumidifiers->NumHumidifiers = 1;
     state->dataHumidifiers->Humidifier.allocate(state->dataHumidifiers->NumGasSteamHums);
-    thisHum.HumType = HumType::Gas;
+    thisHum.HumType = HumidType::Gas;
     thisHum.NomCapVol = 4.00E-5;
     thisHum.NomPower = 103710.0;
     thisHum.ThermalEffRated = 1.0;
@@ -247,7 +247,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
     state->dataHumidifiers->NumGasSteamHums = 1;
     state->dataHumidifiers->NumHumidifiers = 1;
     state->dataHumidifiers->Humidifier.allocate(state->dataHumidifiers->NumGasSteamHums);
-    thisHum.HumType = HumType::Gas;
+    thisHum.HumType = HumidType::Gas;
     thisHum.NomCapVol = 4.00E-5;
     thisHum.NomCap = 4.00E-2;
     thisHum.NomPower = 103720.0;
