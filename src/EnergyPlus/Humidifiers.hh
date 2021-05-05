@@ -190,7 +190,8 @@ namespace Humidifiers {
 
 struct HumidifiersData : BaseGlobalStruct
 {
-    Array1D_string const HumidifierType = Array1D_string(2, {"Humidifier:Steam:Electric", "Humidifier:Steam:Gas"});
+    std::array<std::string_view, 2> const HumidifierType = {"Humidifier:Steam:Electric", "Humidifier:Steam:Gas"};
+    //Array1D_string const HumidifierType = Array1D_string(2, {"Humidifier:Steam:Electric", "Humidifier:Steam:Gas"});
     std::string const fluidNameSteam = "STEAM";
     std::string const fluidNameWater = "WATER";
 
